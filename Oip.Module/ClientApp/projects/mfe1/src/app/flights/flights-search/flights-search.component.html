@@ -1,0 +1,53 @@
+<style>
+  input[type=text] {
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 2px solid silver;
+    font-size: 20px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  button {
+    border: 2px solid silver;
+    background-color: white;
+    font-size: 16px;
+    padding: 10px;
+    padding-left: 40px;
+    padding-right: 40px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+
+  button:active {
+    border-color: black;
+  }
+
+  #container {
+    border: 2px darkred dashed;
+    padding: 20px;
+  }
+</style>
+
+<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="forecasts">
+  <thead>
+  <tr>
+    <th>Date</th>
+    <th>Temp. (C)</th>
+    <th>Temp. (F)</th>
+    <th>Summary</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let forecast of forecasts">
+    <td>{{ forecast.date }}</td>
+    <td>{{ forecast.temperatureC }}</td>
+    <td>{{ forecast.temperatureF }}</td>
+    <td>{{ forecast.summary }}</td>
+  </tr>
+  </tbody>
+</table>

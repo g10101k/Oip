@@ -5,8 +5,8 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
-    <SpaProxyServerUrl>http://localhost:50000</SpaProxyServerUrl>
-    <SpaProxyLaunchCommand>npm run start:oip</SpaProxyLaunchCommand>
+    <SpaProxyServerUrl>http://localhost:50001</SpaProxyServerUrl>
+    <SpaProxyLaunchCommand>npm run start:mfe1</SpaProxyLaunchCommand>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -22,10 +22,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="ClientApp\projects\mfe1\e2e\tsconfig.json" />
-    <_ContentIncludedByDefault Remove="ClientApp\projects\mfe1\tsconfig.app.json" />
-    <_ContentIncludedByDefault Remove="ClientApp\projects\mfe1\tsconfig.spec.json" />
-    <_ContentIncludedByDefault Remove="ClientApp\projects\mfe1\tslint.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\auth-lib\ng-package.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\auth-lib\package.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\auth-lib\tsconfig.lib.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\auth-lib\tsconfig.lib.prod.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\auth-lib\tsconfig.spec.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\auth-lib\tslint.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\oip\e2e\tsconfig.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\oip\src\assets\mf.manifest.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\oip\tsconfig.app.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\oip\tsconfig.spec.json" />
+    <_ContentIncludedByDefault Remove="ClientApp\projects\oip\tslint.json" />
   </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
