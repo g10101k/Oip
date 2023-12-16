@@ -9,6 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Module", "Oip.Module\Oi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.ModuleExample", "Oip.ModuleExample\Oip.ModuleExample.csproj", "{4EC5164F-6A53-4FBB-83DA-CB72593F89F3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFile", "SolutionFile", "{8A10B92E-9699-4796-AE1A-119AE3816ED0}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
