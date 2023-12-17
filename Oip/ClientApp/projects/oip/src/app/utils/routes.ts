@@ -2,21 +2,8 @@ import {loadRemoteModule} from '@angular-architects/module-federation';
 import {Routes} from '@angular/router';
 import {APP_ROUTES, APP_ROUTES_END} from '../app.routes';
 import {CustomManifest} from './config';
-import {HttpClient} from "@angular/common/http";
 
 export function buildRoutes(options: CustomManifest): Routes {
-  let data  = ''
-
-  fetch('./mf.manifest.json.')
-    .then(function(response) {
-      return response.json();
-    })
-    .then(function(myJson) {
-
-      data=myJson
-      console.log(data)
-    });
-
   const lazyRoutes: Routes = Object.keys(options).map(key => {
     const entry = options[key];
     return {
