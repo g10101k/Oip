@@ -1,6 +1,6 @@
 import { loadManifest } from '@angular-architects/module-federation';
 
-loadManifest("/assets/mf.manifest.json")
+loadManifest("/api/module-federation/get-manifest")
   .catch(err => console.error(err))
   .then(_ => import('./bootstrap'))
   .catch(err => console.error(err));
