@@ -28,7 +28,6 @@ internal static class Program
       pattern: "{controller}/{action=Index}/{id?}");
 
     app.MapFallbackToFile("index.html");
-    ;
 
     app.Run();
   }

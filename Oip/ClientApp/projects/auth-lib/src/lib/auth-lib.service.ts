@@ -11,7 +11,7 @@ export class AuthLibService {
     return this.userName;
   }
 
-  public set user(value){
+  public set user(value: string){
     this.userName = value;
   }
 

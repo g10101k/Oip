@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FlightsSearchComponent } from './flights-search/flights-search.component';
-import { RouterModule } from '@angular/router';
-import { FLIGHTS_ROUTES } from './flights.routes';
-import { AuthLibModule } from 'auth-lib';
-import { SharedLibModule } from 'shared-lib';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FlightsSearchComponent} from './flights-search/flights-search.component';
+import {RouterModule} from '@angular/router';
+import {FLIGHTS_ROUTES} from './flights.routes';
+import {AuthLibModule} from 'auth-lib';
+import {SharedLibModule} from 'shared-lib';
 import {Implement} from "@angular/cli/lib/config/workspace-schema";
 
 @NgModule({
@@ -18,15 +18,5 @@ import {Implement} from "@angular/cli/lib/config/workspace-schema";
     FlightsSearchComponent
   ]
 })
-export class FlightsModule implements IPuginModule{
-
-  setBaseUrl(): string {
-        throw new Error('Method not implemented.');
-    }
-
-}
-
-
-export interface IPuginModule{
-  setBaseUrl() : string
+export class FlightsModule {
 }
