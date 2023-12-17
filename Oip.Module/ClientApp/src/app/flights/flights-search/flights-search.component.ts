@@ -1,8 +1,6 @@
 import {Component, Inject} from '@angular/core';
-import {AuthLibService} from 'auth-lib';
 import {HttpClient} from '@angular/common/http';
-import {BaseUrlService} from "../../../services/base-url.service";
-
+import {WeatherForecast} from '../../../dtos/weather.forecast'
 
 @Component({
   selector: 'app-flights-search',
@@ -11,19 +9,9 @@ import {BaseUrlService} from "../../../services/base-url.service";
 export class FlightsSearchComponent {
   public forecasts: WeatherForecast[] = [];
 
-  constructor(http: HttpClient, private service: AuthLibService, baseUrl: BaseUrlService) {
-    console.log('User Name', this.service.user);
-    console.log(baseUrl.getUrl());
-
-    http.get<WeatherForecast[]>(baseUrl.getUrl() + 'weatherforecast').subscribe(result => {
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+    http.get<WeatherForecast[]>(baseUrl + 'weatherforecast').subscribe(result => {
       this.forecasts = result;
     }, error => console.error(error));
   }
-}
-
-interface WeatherForecast {
-  date: string;
-  temperatureC: number;
-  temperatureF: number;
-  summary: string;
 }
