@@ -1,6 +1,6 @@
 import { getManifest } from '@angular-architects/module-federation';
 import { Component, OnInit } from '@angular/core';
-import { CustomManifest } from '../utils/config';
+import { CustomManifest } from 'shared-lib';
 
 @Component({
   selector: 'app-config',

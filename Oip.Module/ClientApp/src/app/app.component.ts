@@ -6,8 +6,7 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: 'app.component.html'
 })
 export class AppComponent {
-  
-  constructor(http: HttpClient) {
-    console.debug('http', http);
+
+  constructor(){
   }
 }
