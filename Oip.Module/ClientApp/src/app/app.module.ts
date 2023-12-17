@@ -14,7 +14,6 @@ import { BaseUrlService} from "../services/base-url.service";
     HttpClientModule,
     FlightsModule,
     RouterModule.forRoot(APP_ROUTES),
-
   ],
   declarations: [
     HomeComponent,

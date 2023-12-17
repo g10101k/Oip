@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +11,14 @@ export class AuthLibService {
     return this.userName;
   }
 
-  constructor() { }
+  public set user(value){
+    this.userName = value;
+  }
+
+  constructor() {
+  }
 
   public login(userName: string, password: string): void {
-    // Authentication for **honest** users TM. (c) Manfred Steyer
     this.userName = userName;
   }
 

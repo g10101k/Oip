@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'lib-shared-lib',
@@ -9,7 +9,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SharedLibComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit(): void {
   }

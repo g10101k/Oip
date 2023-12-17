@@ -5,17 +5,28 @@ import { RouterModule } from '@angular/router';
 import { FLIGHTS_ROUTES } from './flights.routes';
 import { AuthLibModule } from 'auth-lib';
 import { SharedLibModule } from 'shared-lib';
+import {Implement} from "@angular/cli/lib/config/workspace-schema";
 
 @NgModule({
   imports: [
     CommonModule,
     AuthLibModule,
     SharedLibModule,
-    RouterModule.forChild(FLIGHTS_ROUTES),
-    CommonModule
+    RouterModule.forChild(FLIGHTS_ROUTES)
   ],
   declarations: [
     FlightsSearchComponent
   ]
 })
-export class FlightsModule { }
+export class FlightsModule implements IPuginModule{
+
+  setBaseUrl(): string {
+        throw new Error('Method not implemented.');
+    }
+
+}
+
+
+export interface IPuginModule{
+  setBaseUrl() : string
+}
