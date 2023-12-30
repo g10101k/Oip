@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
+using Oip.Controllers.Api;
 
 namespace Oip.Controllers;
 
+/// <summary>
+/// Module federation controller
+/// </summary>
 [ApiController]
 [Route("api/module-federation")]
 public class ModuleFederationController : ControllerBase
 {
-    private static Dictionary<string, ModuleFederation> _modules = new()
+    private static readonly Dictionary<string, ModuleFederation> Modules = new()
     {
         {
             "mfe1", new ModuleFederation()
@@ -23,16 +27,20 @@ public class ModuleFederationController : ControllerBase
 
     private readonly ILogger<ModuleFederationController> _logger;
 
+    /// <summary>.ctor</summary>
     public ModuleFederationController(ILogger<ModuleFederationController> logger)
     {
         _logger = logger;
     }
 
+    /// <summary>
+    /// Get manifest for client app
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("get-manifest")]
     public Dictionary<string, ModuleFederation> GetManifest()
     {
-        
-        return _modules;
+        return Modules;
     }
 
     /// <summary>
@@ -45,10 +53,10 @@ public class ModuleFederationController : ControllerBase
     public IActionResult RegisterModule(string module, ModuleFederation moduleFederation)
     {
         _logger.LogInformation("Register module: {module}", module);
-        if (_modules.ContainsKey(module))
-            _modules.Remove(module);
+        if (Modules.ContainsKey(module))
+            Modules.Remove(module);
 
-        _modules.Add(module, moduleFederation);
+        Modules.Add(module, moduleFederation);
 
         return Ok();
     }

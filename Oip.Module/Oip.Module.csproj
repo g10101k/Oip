@@ -8,6 +8,7 @@
     <SpaProxyServerUrl>http://localhost:50001</SpaProxyServerUrl>
     <SpaProxyLaunchCommand>npm run start:mfe1</SpaProxyLaunchCommand>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,6 +34,10 @@
     <_ContentIncludedByDefault Remove="ClientApp\projects\oip\tsconfig.app.json" />
     <_ContentIncludedByDefault Remove="ClientApp\projects\oip\tsconfig.spec.json" />
     <_ContentIncludedByDefault Remove="ClientApp\projects\oip\tslint.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
   </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
