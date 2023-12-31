@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
 
 namespace Oip.Settings.Providers;
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Oip.Settings.Contexts;
 
 #nullable disable
 
