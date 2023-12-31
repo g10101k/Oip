@@ -9,7 +9,8 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
-        var settings = BaseOipModuleAppSettings.Initialize(new AppSettingsOptions() { ProgrammeArguments = args,UseEfCoreProvider = false});
+        var settings = BaseOipModuleAppSettings.Initialize(args, false, false);
+
         var builder = OipModuleApplication.CreateModuleBuilder(settings);
         var app = builder.BuildModuleApp(settings);
         app.Run();

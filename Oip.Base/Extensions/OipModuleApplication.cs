@@ -47,8 +47,7 @@ public static class OipModuleApplication
         });
     }
 
-    private static void AddOpenApi(this WebApplicationBuilder builder,
-        IBaseOipModuleAppSettings settings)
+    private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         if (settings.OpenApi.Publish)
         {
@@ -141,7 +140,7 @@ public static class OipModuleApplication
         return builder;
     }
 
-    public static WebApplication MapDefaultEndpoints(this WebApplication app, IBaseOipModuleAppSettings settings)
+    private static void MapDefaultEndpoints(this WebApplication app)
     {
         // Uncomment the following line to enable the Prometheus endpoint (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
         // app.MapPrometheusScrapingEndpoint();
@@ -154,8 +153,6 @@ public static class OipModuleApplication
         {
             Predicate = r => r.Tags.Contains("live")
         });
-
-        return app;
     }
 
     /// <summary>
@@ -174,7 +171,7 @@ public static class OipModuleApplication
             app.UseHsts();
         }
 
-        app.MapDefaultEndpoints(settings);
+        app.MapDefaultEndpoints();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
@@ -182,11 +179,18 @@ public static class OipModuleApplication
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller}/{action=Index}/{id?}");
-
+        app.MapOpenApi(settings);
         app.MapFallbackToFile("index.html");
+
+        return app;
+    }
+
+    private static void MapOpenApi(this WebApplication app, IBaseOipModuleAppSettings settings)
+    {
+        if (!settings.OpenApi.Publish)
+            return;
 
         app.UseSwagger();
         app.UseSwaggerUI(x => { x.EnableTryItOutByDefault(); });
-        return app;
     }
 }
