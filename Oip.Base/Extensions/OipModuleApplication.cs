@@ -5,41 +5,64 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Oip.Base.Services;
+using Oip.Base.Settings;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 namespace Oip.Base.Extensions;
 
-public static class OipWebApplication
+/// <summary>
+/// Oip wrapper for <see cref="WebApplicationBuilder"/>
+/// </summary>
+public static class OipModuleApplication
 {
-    public static WebApplicationBuilder CreateBuilder(string[] args)
+    /// <summary>
+    /// Initializes a new instance of the WebApplicationBuilder class with preconfigured defaults
+    /// </summary>
+    /// <param name="settings">App settings</param>
+    /// <returns></returns>
+    public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
 
-        builder.AddServiceDefaults();
+        builder.AddModuleFederation(settings);
+        builder.AddDefaultHealthChecks();
+        builder.ConfigureOpenTelemetry();
+        builder.AddServiceDiscovery();
         builder.AddDefaultAuthentication();
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Version = "v1",
-                Title = "",
-                Description = ""
-            });
-        });
+        builder.AddOpenApi(settings);
 
         builder.Services.AddControllersWithViews();
         return builder;
     }
 
-    private static WebApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
+    private static void AddModuleFederation(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
-        builder.AddBasicServiceDefaults();
+        builder.Services.AddHttpClient<ModuleFederationService>(x =>
+        {
+            x.BaseAddress = new Uri(settings.OipUrls);
+            x.DefaultRequestHeaders.Add("Accept", "application/json");
+        });
+    }
 
-        builder.AddServiceDiscovery();
-
-        return builder;
+    private static void AddOpenApi(this WebApplicationBuilder builder,
+        IBaseOipModuleAppSettings settings)
+    {
+        if (settings.OpenApi.Publish)
+        {
+            builder.Services.AddSwaggerGen(options =>
+            {
+                var openApiSettings = settings.OpenApi;
+                options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
+                {
+                    Version = openApiSettings.Version,
+                    Title = openApiSettings.Title,
+                    Description = openApiSettings.Description
+                });
+            });
+        }
     }
 
     private static void AddServiceDiscovery(this WebApplicationBuilder builder)
@@ -55,23 +78,7 @@ public static class OipWebApplication
 #endif
     }
 
-    /// <summary>
-    /// Adds the services except for making outgoing HTTP calls.
-    /// </summary>
-    /// <remarks>
-    /// This allows for things like Polly to be trimmed out of the app if it isn't used.
-    /// </remarks>
-    private static WebApplicationBuilder AddBasicServiceDefaults(this WebApplicationBuilder builder)
-    {
-        // Default health checks assume the event bus and self health checks
-        builder.AddDefaultHealthChecks();
-
-        builder.ConfigureOpenTelemetry();
-
-        return builder;
-    }
-
-    private static WebApplicationBuilder ConfigureOpenTelemetry(this WebApplicationBuilder builder)
+    private static void ConfigureOpenTelemetry(this WebApplicationBuilder builder)
     {
         builder.Logging.AddOpenTelemetry(o =>
         {
@@ -97,11 +104,9 @@ public static class OipWebApplication
             });
 
         builder.AddOpenTelemetryExporters();
-
-        return builder;
     }
 
-    private static WebApplicationBuilder AddOpenTelemetryExporters(this WebApplicationBuilder builder)
+    private static void AddOpenTelemetryExporters(this WebApplicationBuilder builder)
     {
         var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
@@ -119,8 +124,6 @@ public static class OipWebApplication
                 // Uncomment the following line to enable the Prometheus endpoint
                 //metrics.AddPrometheusExporter();
             });
-
-        return builder;
     }
 
     private static MeterProviderBuilder AddBuiltInMeters(this MeterProviderBuilder meterProviderBuilder) =>
@@ -138,7 +141,7 @@ public static class OipWebApplication
         return builder;
     }
 
-    public static WebApplication MapDefaultEndpoints(this WebApplication app)
+    public static WebApplication MapDefaultEndpoints(this WebApplication app, IBaseOipModuleAppSettings settings)
     {
         // Uncomment the following line to enable the Prometheus endpoint (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
         // app.MapPrometheusScrapingEndpoint();
@@ -155,7 +158,13 @@ public static class OipWebApplication
         return app;
     }
 
-    public static WebApplication BuildOip(this WebApplicationBuilder builder)
+    /// <summary>
+    /// Build Oip Module application
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="settings"></param>
+    /// <returns></returns>
+    public static WebApplication BuildModuleApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var app = builder.Build();
         // Configure the HTTP request pipeline.
@@ -165,6 +174,7 @@ public static class OipWebApplication
             app.UseHsts();
         }
 
+        app.MapDefaultEndpoints(settings);
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();

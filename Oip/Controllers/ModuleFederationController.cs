@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Oip.Controllers.Api;
+using Oip.Base.Api;
 
 namespace Oip.Controllers;
 
@@ -7,13 +7,12 @@ namespace Oip.Controllers;
 /// Module federation controller
 /// </summary>
 [ApiController]
-[Route("api/module-federation")]
 public class ModuleFederationController : ControllerBase
 {
-    private static readonly Dictionary<string, ModuleFederation> Modules = new()
+    private static readonly Dictionary<string, ModuleFederationDto> Modules = new()
     {
         {
-            "mfe1", new ModuleFederation()
+            "mfe1", new ModuleFederationDto()
             {
                 RemoteEntry = "http://localhost:50001/remoteEntry.js",
                 BaseUrl = "http://localhost:50001/",
@@ -37,8 +36,8 @@ public class ModuleFederationController : ControllerBase
     /// Get manifest for client app
     /// </summary>
     /// <returns></returns>
-    [HttpGet("get-manifest")]
-    public Dictionary<string, ModuleFederation> GetManifest()
+    [HttpGet(ModuleFederationRouting.GetManifestRoute)]
+    public Dictionary<string, ModuleFederationDto> GetManifest()
     {
         return Modules;
     }
@@ -46,17 +45,16 @@ public class ModuleFederationController : ControllerBase
     /// <summary>
     /// Registry module
     /// </summary>
-    /// <param name="module"></param>
-    /// <param name="moduleFederation"></param>
+    /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("register-module")]
-    public IActionResult RegisterModule(string module, ModuleFederation moduleFederation)
+    [HttpPost(ModuleFederationRouting.RegisterModuleRoute)]
+    public IActionResult RegisterModule(RegisterModuleDto request)
     {
-        _logger.LogInformation("Register module: {module}", module);
-        if (Modules.ContainsKey(module))
-            Modules.Remove(module);
+        _logger.LogInformation("Register module: {module}", request.Name);
+        if (Modules.ContainsKey(request.Name))
+            Modules.Remove(request.Name);
 
-        Modules.Add(module, moduleFederation);
+        Modules.Add(request.Name, request.ModuleFederationDto);
 
         return Ok();
     }

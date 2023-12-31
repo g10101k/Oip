@@ -1,9 +1,9 @@
-namespace Oip.Controllers.Api;
+namespace Oip.Base.Api;
 
 /// <summary>
 /// Module federation
 /// </summary>
-public class ModuleFederation
+public class ModuleFederationDto
 {
     /// <summary>
     /// Remote entry
@@ -16,12 +16,12 @@ public class ModuleFederation
     public string BaseUrl { get; set; } = default!;
 
     /// <summary>
-    /// Module name
+    /// Module name see exposes in webpack.config.js
     /// </summary>
     public string ExposedModule { get; set; } = default!;
 
     /// <summary>
-    /// Display name
+    /// Display name 
     /// </summary>
     public string DisplayName { get; set; } = default!;
 

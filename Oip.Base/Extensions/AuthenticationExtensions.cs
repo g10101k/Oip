@@ -11,6 +11,11 @@ namespace Oip.Base.Extensions;
 /// </summary>
 public static class AuthenticationExtensions
 {
+    /// <summary>
+    /// Add auth service
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
     public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder)
     {
         var services = builder.Services;

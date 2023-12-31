@@ -1,4 +1,5 @@
 namespace Oip.Module;
+#pragma warning disable CS1591 
 
 public class WeatherForecast
 {
@@ -10,3 +11,4 @@ public class WeatherForecast
 
     public string? Summary { get; set; }
 }
+#pragma warning restore CS1591

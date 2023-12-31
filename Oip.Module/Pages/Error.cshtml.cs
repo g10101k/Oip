@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace Oip.Module.Pages;
 
 [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public class ErrorModel : PageModel
 {
     private readonly ILogger<ErrorModel> _logger;
@@ -23,3 +24,4 @@ public class ErrorModel : PageModel
         RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
     }
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
