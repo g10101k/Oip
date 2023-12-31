@@ -146,11 +146,10 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     private static void NormalizeConnectionString(TAppSettings instance)
     {
-        if (instance.AppSettingsOptions.NormalizeConnectionString)
-        {
-            var connectionModel = ConnectionStringHelper.NormalizeConnectionString(instance.ConnectionString);
-            instance.NormalizedConnectionString = connectionModel.NormalizeConnectionString;
-            instance.Provider = connectionModel.Provider;
-        }
+        if (!instance.AppSettingsOptions.NormalizeConnectionString)
+            return;
+        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(instance.ConnectionString);
+        instance.NormalizedConnectionString = connectionModel.NormalizeConnectionString;
+        instance.Provider = connectionModel.Provider;
     }
 }
