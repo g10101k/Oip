@@ -5,15 +5,15 @@
 namespace Oip.Module.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class WeatherForecastController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
-    {
+    private static readonly string[] Summaries = {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
-
+#pragma warning disable S4487
     private readonly ILogger<WeatherForecastController> _logger;
+#pragma warning restore S4487
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger)
     {

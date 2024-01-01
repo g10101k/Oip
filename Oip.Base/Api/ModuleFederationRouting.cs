@@ -5,7 +5,7 @@ namespace Oip.Base.Api;
 /// </summary>
 public static class ModuleFederationRouting
 {
-    private const string BaseRouting = $"api/module-federation";
+    private const string BaseRouting = "api/module-federation";
 
     /// GetManifest Route
     public const string GetManifestRoute = $"{BaseRouting}/get-manifest";

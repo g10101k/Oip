@@ -10,4 +10,7 @@ public class BaseOipModuleAppSettings : BaseAppSettings<BaseOipModuleAppSettings
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();
+
+    /// <inheritdoc />
+    public SpaDevelopmentServerSettings SpaProxyServer { get; set; } = new();
 }

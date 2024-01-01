@@ -26,15 +26,33 @@ public static class OipModuleApplication
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
-
         builder.AddModuleFederation(settings);
         builder.AddDefaultHealthChecks();
         builder.ConfigureOpenTelemetry();
         builder.AddServiceDiscovery();
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
-
+        builder.Services.AddHostedService<ModulesRegistryProcess>();
         builder.Services.AddControllersWithViews();
+        builder.Services.AddSingleton(settings);
+        return builder;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the WebApplicationBuilder class with preconfigured defaults
+    /// </summary>
+    /// <param name="settings">App settings</param>
+    /// <returns></returns>
+    public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
+    {
+        var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
+        builder.AddDefaultHealthChecks();
+        builder.ConfigureOpenTelemetry();
+        builder.AddServiceDiscovery();
+        builder.AddDefaultAuthentication();
+        builder.AddOpenApi(settings);
+        builder.Services.AddControllersWithViews();
+        builder.Services.AddSingleton(settings);
         return builder;
     }
 
@@ -49,19 +67,18 @@ public static class OipModuleApplication
 
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
-        if (settings.OpenApi.Publish)
+        var openApiSettings = settings.OpenApi;
+        if (!openApiSettings.Publish)
+            return;
+        builder.Services.AddSwaggerGen(options =>
         {
-            builder.Services.AddSwaggerGen(options =>
+            options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
             {
-                var openApiSettings = settings.OpenApi;
-                options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
-                {
-                    Version = openApiSettings.Version,
-                    Title = openApiSettings.Title,
-                    Description = openApiSettings.Description
-                });
+                Version = openApiSettings.Version,
+                Title = openApiSettings.Title,
+                Description = openApiSettings.Description
             });
-        }
+        });
     }
 
     private static void AddServiceDiscovery(this WebApplicationBuilder builder)
@@ -125,19 +142,20 @@ public static class OipModuleApplication
             });
     }
 
-    private static MeterProviderBuilder AddBuiltInMeters(this MeterProviderBuilder meterProviderBuilder) =>
+    private static void AddBuiltInMeters(this MeterProviderBuilder meterProviderBuilder) =>
         meterProviderBuilder.AddMeter(
             "Microsoft.AspNetCore.Hosting",
             "Microsoft.AspNetCore.Server.Kestrel",
             "System.Net.Http");
 
-    private static WebApplicationBuilder AddDefaultHealthChecks(this WebApplicationBuilder builder)
+    /// <summary>
+    /// Add a default liveness check to ensure app is responsive
+    /// </summary>
+    /// <param name="builder"></param>
+    private static void AddDefaultHealthChecks(this WebApplicationBuilder builder)
     {
         builder.Services.AddHealthChecks()
-            // Add a default liveness check to ensure app is responsive
             .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
-
-        return builder;
     }
 
     private static void MapDefaultEndpoints(this WebApplication app)
@@ -161,7 +179,7 @@ public static class OipModuleApplication
     /// <param name="builder"></param>
     /// <param name="settings"></param>
     /// <returns></returns>
-    public static WebApplication BuildModuleApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    public static WebApplication BuildApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var app = builder.Build();
         // Configure the HTTP request pipeline.
@@ -181,7 +199,6 @@ public static class OipModuleApplication
             pattern: "{controller}/{action=Index}/{id?}");
         app.MapOpenApi(settings);
         app.MapFallbackToFile("index.html");
-
         return app;
     }
 
@@ -189,7 +206,6 @@ public static class OipModuleApplication
     {
         if (!settings.OpenApi.Publish)
             return;
-
         app.UseSwagger();
         app.UseSwaggerUI(x => { x.EnableTryItOutByDefault(); });
     }

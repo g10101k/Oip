@@ -9,7 +9,7 @@ internal static class Program
     {
         var settings = BaseOipModuleAppSettings.Initialize(args, false, false);
         var builder = OipModuleApplication.CreateModuleBuilder(settings);
-        var app = builder.BuildModuleApp(settings);
+        var app = builder.BuildApp(settings);
         app.Run();
     }
 }

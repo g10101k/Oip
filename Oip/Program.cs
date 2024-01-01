@@ -8,8 +8,8 @@ internal static class Program
     public static void Main(string[] args)
     {
         var settings = BaseOipModuleAppSettings.Initialize(args, false, false);
-        var builder = OipModuleApplication.CreateModuleBuilder(settings);
-        var app = builder.BuildModuleApp(settings);
+        var builder = OipModuleApplication.CreateShellBuilder(settings);
+        var app = builder.BuildApp(settings);
         app.Run();
     }
 }

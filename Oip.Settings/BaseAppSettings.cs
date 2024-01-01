@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Oip.Settings.Attributes;
 using Oip.Settings.Enums;
@@ -110,6 +111,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         var configuration = new ConfigurationBuilder()
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileName, true, true)
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileNameDevelopment, true, true)
+            .AddSpaConfig()
             .AddEnvironmentVariables()
             .AddCommandLine(Instance.AppSettingsOptions.ProgrammeArguments)
             .Build();
@@ -130,6 +132,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         var configuration = configurationBuilder
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileName, true, true)
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileNameDevelopment, true, true)
+            .AddSpaConfig()
             .AddEnvironmentVariables()
             .AddCommandLine(Instance.AppSettingsOptions.ProgrammeArguments)
             .Build();

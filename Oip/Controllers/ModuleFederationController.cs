@@ -9,20 +9,7 @@ namespace Oip.Controllers;
 [ApiController]
 public class ModuleFederationController : ControllerBase
 {
-    private static readonly Dictionary<string, ModuleFederationDto> Modules = new()
-    {
-        {
-            "mfe1", new ModuleFederationDto()
-            {
-                RemoteEntry = "http://localhost:50001/remoteEntry.js",
-                BaseUrl = "http://localhost:50001/",
-                ExposedModule = "./Module",
-                DisplayName = "Flights",
-                RoutePath = "flights",
-                NgModuleName = "FlightsModule"
-            }
-        }
-    };
+    private static readonly Dictionary<string, ModuleFederationDto> Modules = new();
 
     private readonly ILogger<ModuleFederationController> _logger;
 

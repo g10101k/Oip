@@ -16,4 +16,9 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// OpenAPI section
     /// </summary>
     OpenApiSettings OpenApi { get; set; }
+    
+    /// <summary>
+    /// Spa proxy server config
+    /// </summary>
+    SpaDevelopmentServerSettings SpaProxyServer { get; set; }
 }

@@ -89,7 +89,7 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
         {
             if (list.Exists(x => x.Key == keyValue.Key))
                 continue;
-            dbContext.AppSettings.Add(new AppSettingEntity()
+            dbContext.AppSettings.Add(new AppSettingEntity
             {
                 Key = keyValue.Key,
                 Value = keyValue.Value

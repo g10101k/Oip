@@ -1,4 +1,4 @@
-namespace Oip.Module;
+namespace Oip.Module.Controllers;
 #pragma warning disable CS1591 
 
 public class WeatherForecast
