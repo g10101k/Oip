@@ -2,11 +2,10 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
-namespace Oip.Pages;
+namespace Oip.Module.Example.Pages;
 
 [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public class ErrorModel : PageModel
 {
     private readonly ILogger<ErrorModel> _logger;
