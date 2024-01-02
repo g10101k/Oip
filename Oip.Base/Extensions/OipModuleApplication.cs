@@ -32,8 +32,10 @@ public static class OipModuleApplication
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
         builder.AddModuleFederation(settings);
         builder.AddDefaultHealthChecks();
-        builder.ConfigureOpenTelemetry();
+        builder.ConfigureOpenTelemetry(settings);
+#if NET8_0_OR_GREATER
         builder.AddServiceDiscovery();
+#endif
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
         builder.Services.AddHostedService<ModulesRegistryProcess>();
@@ -51,8 +53,10 @@ public static class OipModuleApplication
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
         builder.AddDefaultHealthChecks();
-        builder.ConfigureOpenTelemetry();
+        builder.ConfigureOpenTelemetry(settings);
+#if NET8_0_OR_GREATER
         builder.AddServiceDiscovery();
+#endif
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
         builder.Services.AddControllersWithViews();
@@ -62,10 +66,8 @@ public static class OipModuleApplication
 
     private static void AddModuleFederation(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
-        builder.Services.AddHttpClient<OipClient>(x =>
-        {
-            x.BaseAddress = new Uri(settings.OipUrls);
-        }).AddPolicyHandler(GetRetryPolicy());
+        builder.Services.AddHttpClient<OipClient>(x => { x.BaseAddress = new Uri(settings.OipUrls); })
+            .AddPolicyHandler(GetRetryPolicy());
     }
 
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
@@ -80,14 +82,12 @@ public static class OipModuleApplication
                 Version = openApiSettings.Version,
                 Title = openApiSettings.Title,
                 Description = openApiSettings.Description,
-                
             });
         });
     }
-
+#if NET8_0_OR_GREATER
     private static void AddServiceDiscovery(this WebApplicationBuilder builder)
     {
-#if NET8_0_OR_GREATER
         builder.Services.AddServiceDiscovery();
 
         builder.Services.ConfigureHttpClientDefaults(http =>
@@ -95,10 +95,10 @@ public static class OipModuleApplication
             http.AddStandardResilienceHandler();
             http.UseServiceDiscovery();
         });
-#endif
     }
+#endif
 
-    private static void ConfigureOpenTelemetry(this WebApplicationBuilder builder)
+    private static void ConfigureOpenTelemetry(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         builder.Logging.AddOpenTelemetry(o =>
         {
@@ -123,10 +123,11 @@ public static class OipModuleApplication
                     .AddHttpClientInstrumentation();
             });
 
-        builder.AddOpenTelemetryExporters();
+        builder.AddOpenTelemetryExporters(settings);
     }
 
-    private static void AddOpenTelemetryExporters(this WebApplicationBuilder builder)
+    private static void AddOpenTelemetryExporters(this WebApplicationBuilder builder,
+        IBaseOipModuleAppSettings settings)
     {
         var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
@@ -141,8 +142,11 @@ public static class OipModuleApplication
         builder.Services.AddOpenTelemetry()
             .WithMetrics(metrics =>
             {
+#if NET8_0_OR_GREATER
                 // Uncomment the following line to enable the Prometheus endpoint
-                //metrics.AddPrometheusExporter();
+                if (settings.Telemetry.UsePrometheusExporter)
+                    metrics.AddPrometheusExporter();
+#endif
             });
     }
 
@@ -162,11 +166,12 @@ public static class OipModuleApplication
             .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
     }
 
-    private static void MapDefaultEndpoints(this WebApplication app)
+    private static void MapDefaultEndpoints(this WebApplication app, IBaseOipModuleAppSettings settings)
     {
-        // Uncomment the following line to enable the Prometheus endpoint (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
-        // app.MapPrometheusScrapingEndpoint();
-
+#if NET8_0_OR_GREATER
+        if (settings.Telemetry.UsePrometheusExporter)
+            app.MapPrometheusScrapingEndpoint();
+#endif
         // All health checks must pass for app to be considered ready to accept traffic after starting
         app.MapHealthChecks("/health");
 
@@ -193,7 +198,7 @@ public static class OipModuleApplication
             app.UseHsts();
         }
 
-        app.MapDefaultEndpoints();
+        app.MapDefaultEndpoints(settings);
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();

@@ -26,4 +26,9 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// Module Federation settings
     /// </summary>
     ModuleFederationSettings ModuleFederation { get; set; } 
+    
+    /// <summary>
+    /// Open telemetry settings
+    /// </summary>
+    OpenTelemetrySettings Telemetry { get; set; }
 }
