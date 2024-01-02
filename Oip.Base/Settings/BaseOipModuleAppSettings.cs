@@ -16,4 +16,7 @@ public class BaseOipModuleAppSettings : BaseAppSettings<BaseOipModuleAppSettings
 
     /// <inheritdoc />
     public ModuleFederationSettings ModuleFederation { get; set; } = new();
+
+    /// <inheritdoc />
+    public OpenTelemetrySettings Telemetry { get; set; } = new();
 }
