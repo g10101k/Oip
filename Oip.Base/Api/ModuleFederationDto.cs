@@ -8,12 +8,12 @@ public class ModuleFederationDto
     /// <summary>
     /// Remote entry
     /// </summary>
-    public string RemoteEntry { get; set; } = default!;
+    public string? RemoteEntry { get; set; }
 
     /// <summary>
     /// Base Url
     /// </summary>
-    public string BaseUrl { get; set; } = default!;
+    public string? BaseUrl { get; set; } 
 
     /// <summary>
     /// Module name see exposes in webpack.config.js
@@ -34,4 +34,9 @@ public class ModuleFederationDto
     /// NgModuleName
     /// </summary>
     public string NgModuleName { get; set; } = default!;
+
+    /// <summary>
+    /// Need for module federation export
+    /// </summary>
+    public string SourcePath { get; set; } = default!;
 }

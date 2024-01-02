@@ -1,10 +1,12 @@
 const {shareAll, withModuleFederationPlugin} = require('@angular-architects/module-federation/webpack');
+const moduleFederation = require('../appsettings.json').ModuleFederation; //(with path)
+const exportModule = moduleFederation.ExportModule;
+const exposes = {};
+exposes[exportModule.ExposedModule] = exportModule.SourcePath;
 
 module.exports = withModuleFederationPlugin({
-  name: 'mfe1',
-  exposes: {
-    './Module': './src/app/flights/flights.module.ts',
-  },
+  name: moduleFederation.Name,
+  exposes: exposes,
   shared: {
     ...shareAll({singleton: true, strictVersion: true, requiredVersion: 'auto'}),
   },

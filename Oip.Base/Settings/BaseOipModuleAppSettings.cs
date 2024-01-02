@@ -13,4 +13,7 @@ public class BaseOipModuleAppSettings : BaseAppSettings<BaseOipModuleAppSettings
 
     /// <inheritdoc />
     public SpaDevelopmentServerSettings SpaProxyServer { get; set; } = new();
+
+    /// <inheritdoc />
+    public ModuleFederationSettings ModuleFederation { get; set; } = new();
 }

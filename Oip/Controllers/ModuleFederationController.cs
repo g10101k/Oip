@@ -37,11 +37,11 @@ public class ModuleFederationController : ControllerBase
     [HttpPost(ModuleFederationRouting.RegisterModuleRoute)]
     public IActionResult RegisterModule(RegisterModuleDto request)
     {
-        _logger.LogInformation("Register module: {module}", request.Name);
+        _logger.LogInformation("Trying register module: {module}", request.Name);
         if (Modules.ContainsKey(request.Name))
             Modules.Remove(request.Name);
 
-        Modules.Add(request.Name, request.ModuleFederationDto);
+        Modules.Add(request.Name, request.ExportModule);
 
         return Ok();
     }

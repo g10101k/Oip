@@ -13,12 +13,17 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     string OipUrls { get; set; }
 
     /// <summary>
-    /// OpenAPI section
+    /// OpenAPI settings
     /// </summary>
     OpenApiSettings OpenApi { get; set; }
     
     /// <summary>
-    /// Spa proxy server config
+    /// Spa proxy server settings
     /// </summary>
     SpaDevelopmentServerSettings SpaProxyServer { get; set; }
+    
+    /// <summary>
+    /// Module Federation settings
+    /// </summary>
+    ModuleFederationSettings ModuleFederation { get; set; } 
 }

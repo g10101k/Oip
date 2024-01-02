@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Net;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -10,6 +11,8 @@ using Oip.Base.Settings;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Polly;
+using Polly.Extensions.Http;
 
 namespace Oip.Base.Extensions;
 
@@ -58,11 +61,11 @@ public static class OipModuleApplication
 
     private static void AddModuleFederation(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
-        builder.Services.AddHttpClient<ModuleFederationService>(x =>
+        builder.Services.AddHttpClient<ModuleFederationClientService>(x =>
         {
             x.BaseAddress = new Uri(settings.OipUrls);
             x.DefaultRequestHeaders.Add("Accept", "application/json");
-        });
+        }).AddPolicyHandler(GetRetryPolicy());
     }
 
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
@@ -208,5 +211,13 @@ public static class OipModuleApplication
             return;
         app.UseSwagger();
         app.UseSwaggerUI(x => { x.EnableTryItOutByDefault(); });
+    }
+
+    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+    {
+        return HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .OrResult(msg => msg.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.InternalServerError)
+            .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
     }
 }

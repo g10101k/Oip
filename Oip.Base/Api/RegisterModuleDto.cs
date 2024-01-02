@@ -13,5 +13,5 @@ public class RegisterModuleDto
     /// <summary>
     /// Module federation
     /// </summary>
-    public ModuleFederationDto ModuleFederationDto { get; set; } = default!;
+    public ModuleFederationDto ExportModule { get; set; } = new();
 }

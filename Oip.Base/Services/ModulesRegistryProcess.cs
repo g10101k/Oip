@@ -1,3 +1,6 @@
+#pragma warning disable CS4014
+#pragma warning disable S2190
+
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Hosting;
@@ -15,17 +18,20 @@ public class ModulesRegistryProcess : BackgroundService
 {
     private readonly ILogger<ModulesRegistryProcess> _logger;
     private readonly IServer _server;
-    private readonly ModuleFederationService _moduleFederationService;
+    private readonly ModuleFederationClientService _moduleFederationClientService;
     private readonly IBaseOipModuleAppSettings _settings;
+    private readonly IHostEnvironment _environment;
 
     /// <inheritdoc />
     public ModulesRegistryProcess(ILogger<ModulesRegistryProcess> logger, IServer server,
-        ModuleFederationService moduleFederationService, IBaseOipModuleAppSettings settings)
+        ModuleFederationClientService moduleFederationClientService, IBaseOipModuleAppSettings settings,
+        IHostEnvironment environment)
     {
         _logger = logger;
         _server = server;
-        _moduleFederationService = moduleFederationService;
+        _moduleFederationClientService = moduleFederationClientService;
         _settings = settings;
+        _environment = environment;
     }
 
     /// <inheritdoc />
@@ -33,47 +39,67 @@ public class ModulesRegistryProcess : BackgroundService
     {
         ThrowIfNull(stoppingToken);
 
-#pragma warning disable CS4014
         Task.Run(RegisterModule, stoppingToken);
         return Task.CompletedTask;
-#pragma warning restore CS4014
     }
 
+    // ReSharper disable once FunctionNeverReturns
     private async Task RegisterModule()
     {
+        // Yes, this is an endless loop; if the shell crashes, the module will register again.
         while (true)
         {
             try
             {
-                _logger.LogInformation($"Start register module {_settings.SpaProxyServer.ServerUrl}");
-                var addressesFeature = _server.Features.Get<IServerAddressesFeature>() ??
-                                       throw new InvalidOperationException(
-                                           $"Cannot get {nameof(IServerAddressesFeature)}");
-                var address = addressesFeature.Addresses.FirstOrDefault(x => x.Contains("https://")) ??
-                              addressesFeature.Addresses.FirstOrDefault();
-                if (address is null) throw new InvalidOperationException("Cannon find server address");
+                _logger.LogInformation($"Start register module");
 
-                await _moduleFederationService.RegisterModuleAsync(new RegisterModuleDto
+                foreach (var baseUrl in GetBaseAddresses())
                 {
-                    Name = "mfe1",
-                    ModuleFederationDto = new ModuleFederationDto
+                    var normalizeBaseUrl = NormalizeBaseUrl(baseUrl);
+                    var module = _settings.ModuleFederation;
+                    module.ExportModule.BaseUrl = normalizeBaseUrl;
+                    module.ExportModule.RemoteEntry = $"{normalizeBaseUrl}remoteEntry.js";
+
+                    await _moduleFederationClientService.RegisterModuleAsync(new RegisterModuleDto
                     {
-                        RemoteEntry = "http://localhost:50001/remoteEntry.js",
-                        BaseUrl = "http://localhost:50001/",
-                        ExposedModule = "./Module",
-                        DisplayName = "Flights",
-                        RoutePath = "flights",
-                        NgModuleName = "FlightsModule"
-                    }
-                });
+                        Name = module.Name,
+                        ExportModule = module.ExportModule
+                    });
+                }
+
                 _logger.LogInformation("Finish register modules ");
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                Console.WriteLine(e);
+                // catch all exceptions, the loop should not stop
+                _logger.LogError("{exception}", exception);
             }
 
-            Thread.Sleep(60000);
+            Thread.Sleep(_settings.ModuleFederation.RegistryTimeOut);
         }
     }
+
+    private IEnumerable<string> GetBaseAddresses()
+    {
+        var addresses = new List<string>();
+        if (_environment.IsDevelopment())
+        {
+            addresses.Add(_settings.SpaProxyServer.ServerUrl);
+            return addresses;
+        }
+
+        var addressesFeature = _server.Features.Get<IServerAddressesFeature>() ??
+                               throw new InvalidOperationException(
+                                   $"Cannot get {nameof(IServerAddressesFeature)}");
+        addresses.AddRange(addressesFeature.Addresses);
+        return addresses;
+    }
+
+    private string NormalizeBaseUrl(string url)
+    {
+        return url[^1] != '/' ? $"{url}/" : url;
+    }
 }
+
+#pragma warning restore CS4014
+#pragma warning restore S2190
