@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip", "Oip\Oip.csproj", "{672A7BED-699B-486C-A0FC-F066AC588A7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Module", "Oip.Module\Oip.Module.csproj", "{2F562F31-B36E-4EC8-8F54-4F19F11D73B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Module.Example", "Oip.Module.Example\Oip.Module.Example.csproj", "{2F562F31-B36E-4EC8-8F54-4F19F11D73B2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFile", "SolutionFile", "{8A10B92E-9699-4796-AE1A-119AE3816ED0}"
 	ProjectSection(SolutionItems) = preProject

@@ -2,7 +2,7 @@
 
 #pragma warning disable CS1591
 
-namespace Oip.Module.Controllers;
+namespace Oip.Module.Example.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

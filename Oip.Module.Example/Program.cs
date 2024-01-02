@@ -1,7 +1,7 @@
 using Oip.Base.Extensions;
 using Oip.Base.Settings;
 
-namespace Oip.Module;
+namespace Oip.Module.Example;
 
 internal static class Program
 {
