@@ -1,0 +1,4 @@
+migration_name=Initialize
+dotnet ef migrations add "${migration_name}_SQLite" --context SqliteMigrationContext --output-dir Migrations/Sqlite -- --ConnectionString="XpoProvider=SQLite;Data Source=appsettings.db" --UseEfCoreProvider=false
+dotnet ef migrations add "${migration_name}_Postgres" --context PostgresMigrationContext --output-dir Migrations/Postgres -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=appsettings;uid=postgres;pwd=" --UseEfCoreProvider=false
+dotnet ef migrations add "${migration_name}_MSSqlServer" --context MsSqlServerMigrationContext --output-dir Migrations/MsSqlServer -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=appsettings;uid=sa;Password=" --UseEfCoreProvider=false
