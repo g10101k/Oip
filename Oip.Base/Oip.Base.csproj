@@ -40,6 +40,6 @@
     </ItemGroup>
     
     <ItemGroup>
-        <OpenApiReference Include=".\Oip.json" CodeGenerator="NSwagCSharp" ClassName="OipClient" Namespace="Oip.Base.Clients" Link="Clients\openapi.json"/>
+        <OpenApiReference Include=".\OipOpenApi.json" CodeGenerator="NSwagCSharp" ClassName="OipClient" Namespace="Oip.Base.Clients" Link="Clients\openapi.json"/>
     </ItemGroup>
 </Project>
