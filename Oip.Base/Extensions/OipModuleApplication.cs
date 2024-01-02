@@ -6,6 +6,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Oip.Base.Clients;
 using Oip.Base.Services;
 using Oip.Base.Settings;
 using OpenTelemetry.Logs;
@@ -61,10 +62,9 @@ public static class OipModuleApplication
 
     private static void AddModuleFederation(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
-        builder.Services.AddHttpClient<ModuleFederationClientService>(x =>
+        builder.Services.AddHttpClient<OipClient>(x =>
         {
             x.BaseAddress = new Uri(settings.OipUrls);
-            x.DefaultRequestHeaders.Add("Accept", "application/json");
         }).AddPolicyHandler(GetRetryPolicy());
     }
 
@@ -79,7 +79,8 @@ public static class OipModuleApplication
             {
                 Version = openApiSettings.Version,
                 Title = openApiSettings.Title,
-                Description = openApiSettings.Description
+                Description = openApiSettings.Description,
+                
             });
         });
     }

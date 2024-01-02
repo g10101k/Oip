@@ -108,13 +108,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     private static void BindTemporaryConfiguration(TAppSettings instance)
     {
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile(Instance.AppSettingsOptions.JsonFileName, true, true)
-            .AddJsonFile(Instance.AppSettingsOptions.JsonFileNameDevelopment, true, true)
-            .AddSpaConfig()
-            .AddEnvironmentVariables()
-            .AddCommandLine(Instance.AppSettingsOptions.ProgrammeArguments)
-            .Build();
+        var configuration = BuildBaseConfiguration(new ConfigurationBuilder());
         BindConfig(configuration, instance);
     }
 
@@ -129,16 +123,23 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         var configurationBuilder = new ConfigurationBuilder();
         if (instance.AppSettingsOptions.UseEfCoreProvider)
             configurationBuilder.Add(efConfigurationSource);
+        var configuration = BuildBaseConfiguration(configurationBuilder);
+
+        BindConfig(configuration, instance);
+        ChangeToken.OnChange(() => configuration.GetReloadToken(), () => { BindConfig(configuration, instance); });
+    }
+
+    private static IConfigurationRoot BuildBaseConfiguration(ConfigurationBuilder configurationBuilder)
+    {
         var configuration = configurationBuilder
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileName, true, true)
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileNameDevelopment, true, true)
             .AddSpaConfig()
+            .AddModuleConfig()
             .AddEnvironmentVariables()
             .AddCommandLine(Instance.AppSettingsOptions.ProgrammeArguments)
             .Build();
-
-        BindConfig(configuration, instance);
-        ChangeToken.OnChange(() => configuration.GetReloadToken(), () => { BindConfig(configuration, instance); });
+        return configuration;
     }
 
     private static void BindConfig(IConfiguration config, TAppSettings instance)

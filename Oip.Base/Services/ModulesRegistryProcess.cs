@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Oip.Base.Api;
+using Oip.Base.Clients;
 using Oip.Base.Settings;
 using static System.ArgumentNullException;
 
@@ -18,18 +18,18 @@ public class ModulesRegistryProcess : BackgroundService
 {
     private readonly ILogger<ModulesRegistryProcess> _logger;
     private readonly IServer _server;
-    private readonly ModuleFederationClientService _moduleFederationClientService;
+    private readonly OipClient _oipClient;
     private readonly IBaseOipModuleAppSettings _settings;
     private readonly IHostEnvironment _environment;
 
     /// <inheritdoc />
     public ModulesRegistryProcess(ILogger<ModulesRegistryProcess> logger, IServer server,
-        ModuleFederationClientService moduleFederationClientService, IBaseOipModuleAppSettings settings,
+        OipClient oipClient, IBaseOipModuleAppSettings settings,
         IHostEnvironment environment)
     {
         _logger = logger;
         _server = server;
-        _moduleFederationClientService = moduleFederationClientService;
+        _oipClient = oipClient;
         _settings = settings;
         _environment = environment;
     }
@@ -57,13 +57,21 @@ public class ModulesRegistryProcess : BackgroundService
                 {
                     var normalizeBaseUrl = NormalizeBaseUrl(baseUrl);
                     var module = _settings.ModuleFederation;
-                    module.ExportModule.BaseUrl = normalizeBaseUrl;
-                    module.ExportModule.RemoteEntry = $"{normalizeBaseUrl}remoteEntry.js";
-
-                    await _moduleFederationClientService.RegisterModuleAsync(new RegisterModuleDto
+                    module.ExportModule.BaseUrl ??= normalizeBaseUrl;
+                    module.ExportModule.RemoteEntry ??= $"{normalizeBaseUrl}remoteEntry.js";
+                    await _oipClient.RegisterModuleAsync(new RegisterModuleDto()
                     {
                         Name = module.Name,
-                        ExportModule = module.ExportModule
+                        ExportModule = new ModuleFederationDto
+                        {
+                            BaseUrl = module.ExportModule.BaseUrl,
+                            RemoteEntry = module.ExportModule.RemoteEntry,
+                            DisplayName = module.ExportModule.DisplayName,
+                            ExposedModule = module.ExportModule.ExposedModule,
+                            RoutePath = module.ExportModule.RoutePath,
+                            SourcePath = module.ExportModule.SourcePath,
+                            NgModuleName = module.ExportModule.NgModuleName
+                        }
                     });
                 }
 
