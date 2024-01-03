@@ -31,7 +31,7 @@ using Skoruba.AuditLogging.EntityFramework.Repositories;
 using Skoruba.AuditLogging.EntityFramework.Services;
 using Xunit;
 
-namespace Oip.Security.UnitTests.Controllers;
+namespace Oip.Security.Tests.Controllers;
 
 public class ConfigurationControllerTests
 {

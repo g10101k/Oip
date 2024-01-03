@@ -12,7 +12,7 @@ public class BaseClassFixture : IClassFixture<TestFixture>
     protected readonly HttpClient Client;
     protected readonly TestServer TestServer;
 
-    public BaseClassFixture(TestFixture fixture)
+    protected BaseClassFixture(TestFixture fixture)
     {
         Client = fixture.Client;
         TestServer = fixture.TestServer;
@@ -20,10 +20,8 @@ public class BaseClassFixture : IClassFixture<TestFixture>
 
     protected virtual void SetupAdminClaimsViaHeaders()
     {
-        using (var scope = TestServer.Services.CreateScope())
-        {
-            var configuration = scope.ServiceProvider.GetRequiredService<AdminConfiguration>();
-            Client.SetAdminClaimsViaHeaders(configuration);
-        }
+        using var scope = TestServer.Services.CreateScope();
+        var configuration = scope.ServiceProvider.GetRequiredService<AdminConfiguration>();
+        Client.SetAdminClaimsViaHeaders(configuration);
     }
 }

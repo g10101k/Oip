@@ -45,14 +45,14 @@ public static class DbMigrationHelpers
         {
             var services = serviceScope.ServiceProvider;
 
-            if ((databaseMigrationsConfiguration != null && databaseMigrationsConfiguration.ApplyDatabaseMigrations)
+            if (databaseMigrationsConfiguration is { ApplyDatabaseMigrations: true }
                 || applyDbMigrationWithDataSeedFromProgramArguments)
                 migrationComplete =
                     await EnsureDatabasesMigratedAsync<TIdentityDbContext, TIdentityServerDbContext,
                         TPersistedGrantDbContext, TLogDbContext, TAuditLogDbContext,
                         TDataProtectionDbContext>(services);
 
-            if ((seedConfiguration != null && seedConfiguration.ApplySeed)
+            if (seedConfiguration is { ApplySeed: true }
                 || applyDbMigrationWithDataSeedFromProgramArguments)
             {
                 var seedComplete = await EnsureSeedDataAsync<TIdentityServerDbContext, TUser, TRole>(services);

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using IdentityServer4.Models;
-using Client = Oip.Security.Dal.Configuration.Configuration.IdentityServer.Client;
+using Client = Oip.Security.Dal.Configuration.IdentityServer.Client;
 
 namespace Oip.Security.Dal.Configuration;
 

@@ -35,7 +35,7 @@ internal static class Program
             var host = CreateHostBuilder(args).Build();
 
             var migrationComplete = await ApplyDbMigrationsWithDataSeedAsync(args, configuration, host);
-            if (args.Any(x => x == MigrateOnlyArgs))
+            if (Array.Exists(args, x => x == MigrateOnlyArgs))
             {
                 await host.StopAsync();
                 if (!migrationComplete) Environment.ExitCode = -1;
@@ -58,7 +58,7 @@ internal static class Program
     private static async Task<bool> ApplyDbMigrationsWithDataSeedAsync(string[] args, IConfiguration configuration,
         IHost host)
     {
-        var applyDbMigrationWithDataSeedFromProgramArguments = args.Any(x => x == SeedArgs);
+        var applyDbMigrationWithDataSeedFromProgramArguments = Array.Exists(args, (x => x == SeedArgs));
         if (applyDbMigrationWithDataSeedFromProgramArguments) args = args.Except(new[] { SeedArgs }).ToArray();
 
         var seedConfiguration = configuration.GetSection(nameof(SeedConfiguration)).Get<SeedConfiguration>();
