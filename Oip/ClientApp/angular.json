@@ -17,7 +17,7 @@
         "build": {
           "builder": "ngx-build-plus:browser",
           "options": {
-            "outputPath": "dist/oip",
+            "outputPath": "dist",
             "index": "projects/oip/src/index.html",
             "main": "projects/oip/src/main.ts",
             "polyfills": "projects/oip/src/polyfills.ts",
