@@ -30,7 +30,7 @@ public static class OipModuleApplication
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
-        builder.AddModuleFederation(settings);
+        builder.AddOipClient(settings);
         builder.AddDefaultHealthChecks();
         builder.ConfigureOpenTelemetry(settings);
 #if NET8_0_OR_GREATER
@@ -64,7 +64,7 @@ public static class OipModuleApplication
         return builder;
     }
 
-    private static void AddModuleFederation(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    private static void AddOipClient(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         builder.Services.AddHttpClient<OipClient>(x => { x.BaseAddress = new Uri(settings.OipUrls); })
             .AddPolicyHandler(GetRetryPolicy());
@@ -77,6 +77,15 @@ public static class OipModuleApplication
             return;
         builder.Services.AddSwaggerGen(options =>
         {
+            var path = Path.GetDirectoryName(typeof(OipModuleApplication).Assembly.Location);
+            if (path == null) return;
+
+            var filesPaths = Directory.GetFiles(path, "*.xml");
+            foreach (var filePath in filesPaths)
+            {
+                options.IncludeXmlComments(filePath);
+            }
+
             options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
             {
                 Version = openApiSettings.Version,
@@ -119,8 +128,7 @@ public static class OipModuleApplication
                     tracing.SetSampler(new AlwaysOnSampler());
                 }
 
-                tracing.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation();
+                tracing.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation();
             });
 
         builder.AddOpenTelemetryExporters(settings);
@@ -194,7 +202,7 @@ public static class OipModuleApplication
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
 

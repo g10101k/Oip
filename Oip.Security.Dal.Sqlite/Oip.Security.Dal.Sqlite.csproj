@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Description>Entity Framework layer for the administration of the IdentityServer4 and Asp.Net Core Identity with SqlServer support</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.12">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.12"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Oip.Security.Dal\Oip.Security.Dal.csproj"/>
+    </ItemGroup>
+
+</Project>
