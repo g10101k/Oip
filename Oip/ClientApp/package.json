@@ -1,11 +1,11 @@
 {
-  "name": "mf-demo",
+  "name": "oip",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "npm run start:oip",
     "start:oip": "ng serve oip --port 50000",
-    "build:shell": "ng build oip --prod",
+    "build:oip": "ng build oip",
     "serve:dist": "concurrently \"serve dist/oip -l 5000 -s\" ",
     "build": "npm run build:oip",
     "test": "ng test",

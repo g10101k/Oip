@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Oip.Security.STS.Identity": {
+      "commandName": "Project",
+      "commandLineArgs": "/",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:44310"
+    }
+  }
+}

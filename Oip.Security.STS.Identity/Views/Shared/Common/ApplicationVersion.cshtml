@@ -1,0 +1,10 @@
+﻿@using System.Reflection
+@using Oip.Security.STS.Identity
+@{
+    var runtimeVersion = typeof(Startup)
+        .GetTypeInfo()
+        .Assembly
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+}
+
+@runtimeVersion
