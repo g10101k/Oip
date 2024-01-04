@@ -1,9 +1,10 @@
-import {getManifest} from '@angular-architects/module-federation';
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {buildRoutes} from './utils/routes';
-import {CustomManifest, CustomRemoteConfig} from "shared-lib";
-import {AuthLibService} from "auth-lib";
+import { getManifest } from '@angular-architects/module-federation';
+import { Component, OnInit } from '@angular/core';
+import { PrimeNGConfig } from 'primeng/api';
+import { Router } from '@angular/router';
+import { buildRoutes } from './utils/routes';
+import { CustomManifest, CustomRemoteConfig } from "shared-lib";
+import { AuthLibService } from "auth-lib";
 
 @Component({
   selector: 'app-root',
@@ -14,14 +15,14 @@ export class AppComponent implements OnInit {
   remotes: CustomRemoteConfig[] = [];
   title: string = "shell";
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private primengConfig: PrimeNGConfig) {
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit() {
     const manifest = getManifest<CustomManifest>();
     const routes = buildRoutes(manifest);
     this.router.resetConfig(routes);
     this.remotes = Object.values(manifest);
+    this.primengConfig.ripple = true;
   }
 }
-

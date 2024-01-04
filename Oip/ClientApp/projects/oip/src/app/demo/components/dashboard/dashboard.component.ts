@@ -3,7 +3,9 @@ import { MenuItem } from 'primeng/api';
 import { Product } from '../../api/product';
 import { ProductService } from '../../service/product.service';
 import { Subscription, debounceTime } from 'rxjs';
-import { LayoutService } from 'src/app/layout/service/app.layout.service';
+import { LayoutService } from "../../../layout/service/app.layout.service";
+import { Chart } from 'chart.js'
+
 
 @Component({
     templateUrl: './dashboard.component.html',
