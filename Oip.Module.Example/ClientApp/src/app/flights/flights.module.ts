@@ -6,6 +6,8 @@ import {FLIGHTS_ROUTES} from './flights.routes';
 import {AuthLibModule} from 'auth-lib';
 import {SharedLibModule} from 'shared-lib';
 import {Implement} from "@angular/cli/lib/config/workspace-schema";
+import { TableModule } from "primeng/table";
+import { TagModule } from "primeng/tag";
 
 
 @NgModule({
@@ -16,6 +18,8 @@ import {Implement} from "@angular/cli/lib/config/workspace-schema";
     RouterModule.forChild(FLIGHTS_ROUTES),
     CurrencyPipe,
     DatePipe,
+    TableModule,
+    TagModule,
 
   ],
   declarations: [
