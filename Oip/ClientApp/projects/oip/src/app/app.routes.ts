@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { NotfoundComponent } from './demo/components/notfound/notfound.component';
-import { ConfigComponent } from "./config/config.component";
+import { ModuleConfigComponent } from "./config/module-config.component";
 import { AppLayoutComponent } from "./layout/app.layout.component";
 
 export const APP_ROUTES: Routes = [
@@ -15,7 +15,7 @@ export const APP_ROUTES: Routes = [
   },
   {
     path: 'config',
-    component: ConfigComponent,
+    component: ModuleConfigComponent,
     pathMatch: 'full',
   }
 ];

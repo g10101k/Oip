@@ -3,11 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { CustomManifest } from 'shared-lib';
 
 @Component({
-  selector: 'app-config',
-  templateUrl: './config.component.html'
+  selector: 'module-config',
+  templateUrl: './module-config.component.html'
 })
-export class ConfigComponent {
+export class ModuleConfigComponent {
 
   manifest = getManifest<CustomManifest>();
-
 }
