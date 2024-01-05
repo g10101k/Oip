@@ -6,8 +6,8 @@
     "oip": {
       "projectType": "application",
       "schematics": {
-        "@schematics/angular:application": {
-          "strict": true
+        "@schematics/angular:component": {
+          "style": "scss"
         }
       },
       "root": "projects/oip",
@@ -20,26 +20,27 @@
             "outputPath": "dist",
             "index": "projects/oip/src/index.html",
             "main": "projects/oip/src/main.ts",
-            "polyfills": "projects/oip/src/polyfills.ts",
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "projects/oip/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
             "assets": [
               "projects/oip/src/favicon.ico",
               "projects/oip/src/assets"
             ],
             "styles": [
-              "projects/oip/src/styles.css"
+              "projects/oip/src/styles.scss"
             ],
-            "scripts": [],
-            "extraWebpackConfig": "projects/oip/webpack.config.js",
-            "commonChunk": false
+            "scripts": []
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "1mb",
+                  "maximumError": "5mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -97,15 +98,19 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "projects/oip/src/test.ts",
-            "polyfills": "projects/oip/src/polyfills.ts",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
             "tsConfig": "projects/oip/tsconfig.spec.json",
             "karmaConfig": "projects/oip/karma.conf.js",
+            "inlineStyleLanguage": "scss",
             "assets": [
               "projects/oip/src/favicon.ico",
               "projects/oip/src/assets"
             ],
             "styles": [
-              "projects/oip/src/styles.css"
+              "projects/oip/src/styles.scss"
             ],
             "scripts": []
           }
