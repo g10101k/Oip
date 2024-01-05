@@ -275,3 +275,5 @@ Thumbs.db
 
 # db
 Oip.Security.db
+Oip.Security.db-shm
+Oip.Security.db-wal
