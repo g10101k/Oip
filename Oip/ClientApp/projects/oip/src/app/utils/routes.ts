@@ -4,10 +4,9 @@ import {APP_ROUTES, APP_ROUTES_END} from '../app.routes';
 import {CustomManifest} from 'shared-lib';
 import {AuthLibService} from "auth-lib";
 
-export function buildRoutes(options: CustomManifest): Routes {
-  const lazyRoutes: Routes = Object.keys(options).map(key => {
-
-    const entry = options[key];
+export function buildRoutes(manifest: CustomManifest): Routes {
+  const lazyRoutes: Routes = Object.keys(manifest).map(key => {
+    const entry = manifest[key];
     return {
       path: entry.routePath,
       providers: [{ provide: 'BASE_URL', useValue: entry.baseUrl, deps: [] }],
