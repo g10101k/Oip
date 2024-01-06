@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductService } from 'src/app/demo/service/product.service';
-import { PhotoService } from 'src/app/demo/service/photo.service';
-import { Product } from 'src/app/demo/api/product';
+import { ProductService } from 'projects/oip/src/app/demo/service/product.service';
+import { PhotoService } from 'projects/oip/src/app/demo/service/photo.service';
+import { Product } from 'projects/oip/src/app/demo/api/product';
 
 @Component({
     templateUrl: './mediademo.component.html'
@@ -60,5 +60,5 @@ export class MediaDemoComponent implements OnInit {
             this.images = images;
         });
     }
-    
+
 }
