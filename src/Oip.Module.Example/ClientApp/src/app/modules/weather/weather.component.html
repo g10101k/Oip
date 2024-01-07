@@ -1,6 +1,6 @@
-<div class="card">
+<div class="card" *ngIf="topBarService.checkId('content')">
   <div>
-    <h2>Weather</h2>
+    <h5>Weather</h5>
     <p-table [value]="forecasts" [tableStyle]="{'min-width': '50rem'}">
       <ng-template pTemplate="header" let-columns>
         <tr>
@@ -23,3 +23,5 @@
     </p-table>
   </div>
 </div>
+<weather-settings *ngIf="topBarService.checkId('settings')"></weather-settings>
+<weather-security *ngIf="topBarService.checkId('security')"></weather-security>
