@@ -1,11 +1,11 @@
 .layout-topbar {
   position: fixed;
-  height: 5rem;
+  height: 4rem;
   z-index: 997;
   left: 0;
   top: 0;
   width: 100%;
-  padding: 0 2rem;
+  padding: 0 $doubleGutter;
   background-color: var(--surface-card);
   transition: left $transitionDuration;
   display: flex;
@@ -37,7 +37,6 @@
     align-items: center;
     position: relative;
     color: var(--text-color-secondary);
-    border-radius: 50%;
     width: 3rem;
     height: 3rem;
     cursor: pointer;
@@ -63,7 +62,6 @@
   }
 
   .layout-menu-button {
-    margin-left: 2rem;
   }
 
   .layout-topbar-menu-button {
@@ -84,6 +82,22 @@
       margin-left: 1rem;
     }
   }
+
+  .p-tabview-panels {
+    display: none;
+  }
+
+  .p-tabview-nav-link {
+    color: var(--text-color)
+  }
+
+  .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    height: 4rem;
+    color: var(--text-color-secondary)
+  }
+  .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: var(--primary-color)
+  }
 }
 
 @media (max-width: 991px) {
@@ -97,7 +111,6 @@
 
     .layout-menu-button {
       margin-left: 0;
-      order: 1;
     }
 
     .layout-topbar-menu-button {
@@ -140,10 +153,14 @@
         }
 
         span {
-          font-weight: medium;
+          font-weight: 100;
           display: block;
         }
       }
+    }
+
+    .top-bar-module-item-text {
+      display: none;
     }
   }
 }
