@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { OtherComponent } from './other.component';
+import { OtherComponent } from 'shared-lib';
 
 describe('OtherComponent', () => {
   let component: OtherComponent;
@@ -8,9 +7,9 @@ describe('OtherComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OtherComponent ]
+      declarations: [OtherComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

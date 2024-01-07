@@ -30,6 +30,7 @@ import { ProductService } from "./demo/service/product.service";
 import { LayoutService } from "./layout/service/app.layout.service";
 import { APP_ROUTES } from "./app.routes";
 import { ModuleConfigComponent } from "./config/module-config.component";
+import { TabViewModule } from "primeng/tabview";
 
 @NgModule({
   declarations: [
@@ -61,8 +62,8 @@ import { ModuleConfigComponent } from "./config/module-config.component";
     RippleModule,
     RouterModule,
     AppConfigModule,
-    CommonModule
-
+    CommonModule,
+    TabViewModule
   ],
   providers: [
     {provide: LocationStrategy, useClass: HashLocationStrategy},

@@ -16,9 +16,8 @@
 
       .layout-sidebar {
         transform: translateX(-100%);
-        left: 0;
-        top: 0;
         height: 100vh;
+        z-index: 999;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
       }

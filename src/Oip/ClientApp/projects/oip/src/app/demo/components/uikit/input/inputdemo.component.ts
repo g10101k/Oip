@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { SelectItem } from 'primeng/api';
-import { CountryService } from 'src/app/demo/service/country.service';
+import { CountryService } from 'projects/oip/src/app/demo/service/country.service';
 
 @Component({
     templateUrl: './inputdemo.component.html'
 })
 export class InputDemoComponent implements OnInit {
-    
+
     countries: any[] = [];
 
     filteredCountries: any[] = [];
