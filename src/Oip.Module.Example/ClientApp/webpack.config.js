@@ -1,8 +1,7 @@
 const {shareAll, withModuleFederationPlugin} = require('@angular-architects/module-federation/webpack');
 const moduleFederation = require('../appsettings.modules.json').ModuleFederation; //(with path)
-const exportModule = moduleFederation.ExportModule;
 const exposes = {};
-exposes[exportModule.ExposedModule] = exportModule.SourcePath;
+moduleFederation.ExportModules.forEach(x =>   exposes[x.ExposedModule] = x.SourcePath);
 
 module.exports = withModuleFederationPlugin({
   name: moduleFederation.Name,

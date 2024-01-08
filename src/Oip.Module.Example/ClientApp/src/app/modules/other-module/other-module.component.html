@@ -1,0 +1,27 @@
+<div class="card" *ngIf="topBarService.checkId('content')">
+  <div>
+    <h5>other-module</h5>
+    <p-table [value]="forecasts" [tableStyle]="{'min-width': '50rem'}">
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Temperature C</th>
+          <th scope="col">Temperature F</th>
+          <th scope="col">Summary</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-forecast let-columns="columns">
+        <tr>
+          <td>{{ forecast.date }}</td>
+          <td>{{ forecast.temperatureC }}</td>
+          <td>{{ forecast.temperatureF }}</td>
+          <td>
+            <p-tag [value]="forecast.summary" severity="success"></p-tag>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+<weather-settings *ngIf="topBarService.checkId('settings')"></weather-settings>
+<weather-security *ngIf="topBarService.checkId('security')"></weather-security>

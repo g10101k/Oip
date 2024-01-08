@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
-import { WeatherComponent } from './weather/weather.component';
+import { WeatherComponent } from './weather.component';
 import { RouterModule } from '@angular/router';
-import { FLIGHTS_ROUTES } from './weather.routes';
 import { AuthLibModule } from 'auth-lib';
 import { SharedLibModule } from 'shared-lib';
 import { TableModule } from "primeng/table";
@@ -22,7 +21,16 @@ import { WeatherSecurityComponent } from "./weather-security/weather-security.co
     TableModule,
     TagModule,
     TabViewModule,
-    RouterModule.forChild(FLIGHTS_ROUTES),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: WeatherComponent
+      },
+      {
+        path: 'weather',
+        component: WeatherComponent
+      }
+    ]),
   ],
   declarations: [
     WeatherComponent,

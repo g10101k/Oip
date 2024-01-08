@@ -6,16 +6,6 @@ namespace Oip.Base.Api;
 public class ModuleFederationDto
 {
     /// <summary>
-    /// Remote entry
-    /// </summary>
-    public string? RemoteEntry { get; set; }
-
-    /// <summary>
-    /// Base Url
-    /// </summary>
-    public string? BaseUrl { get; set; } 
-
-    /// <summary>
     /// Module name see exposes in webpack.config.js
     /// </summary>
     public string ExposedModule { get; set; } = default!;

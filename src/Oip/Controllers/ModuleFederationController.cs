@@ -11,7 +11,7 @@ namespace Oip.Controllers;
 [Route("api/module-federation")]
 public class ModuleFederationController : ControllerBase
 {
-    private static readonly Dictionary<string, ModuleFederationDto> Modules = new();
+    private static readonly Dictionary<string, GetManifestResponse> Modules = new();
 
     private readonly ILogger<ModuleFederationController> _logger;
 
@@ -26,7 +26,7 @@ public class ModuleFederationController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet("get-manifest")]
-    public Dictionary<string, ModuleFederationDto> GetManifest()
+    public Dictionary<string, GetManifestResponse> GetManifest()
     {
         return Modules;
     }
@@ -42,19 +42,34 @@ public class ModuleFederationController : ControllerBase
         _logger.LogInformation("Trying register module: {module}", request.Name);
 
         using HttpClient client = new HttpClient();
-        var remoteEntryResponseTask = client.GetAsync(request.ExportModule.RemoteEntry);
-        var baseUrlResponseTask = client.GetAsync(request.ExportModule.BaseUrl);
+        var remoteEntryResponseTask = client.GetAsync(request.RemoteEntry);
+        var baseUrlResponseTask = client.GetAsync(request.BaseUrl);
 
         Task.WaitAll(remoteEntryResponseTask, baseUrlResponseTask);
         if ((await remoteEntryResponseTask).StatusCode != HttpStatusCode.OK)
-            return BadRequest(new InvalidOperationException($"RemoteEntry: {request.ExportModule.RemoteEntry} - unavailable"));
+            return BadRequest(new InvalidOperationException($"RemoteEntry: {request.RemoteEntry} - unavailable"));
         if ((await baseUrlResponseTask).StatusCode != HttpStatusCode.OK)
-            return BadRequest(new InvalidOperationException($"BaseUrl: {request.ExportModule.BaseUrl} - unavailable"));
+            return BadRequest(new InvalidOperationException($"BaseUrl: {request.BaseUrl} - unavailable"));
 
-        if (Modules.ContainsKey(request.Name))
-            Modules.Remove(request.Name);
+        Modules.Remove(request.Name);
 
-        Modules.Add(request.Name, request.ExportModule);
+        foreach (var module in request.ExportModules)
+        {
+            var moduleFullName = $"{request.Name}::{module.NgModuleName}";
+            if (!Modules.ContainsKey(moduleFullName))
+            {
+                Modules.Add(moduleFullName, new GetManifestResponse
+                {
+                    BaseUrl = request.BaseUrl,
+                    RemoteEntry = request.RemoteEntry,
+                    DisplayName = module.DisplayName,
+                    ExposedModule = module.ExposedModule,
+                    RoutePath = module.RoutePath,
+                    NgModuleName = module.NgModuleName
+                });
+            }
+        }
+
         _logger.LogInformation("Module registered: {module}", request.Name);
 
         return Ok();
