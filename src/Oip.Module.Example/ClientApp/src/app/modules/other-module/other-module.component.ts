@@ -2,12 +2,13 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { WeatherForecast } from '../../../dtos/weather.forecast'
 import { TopBarItem, ModuleTopBarService } from 'shared-lib'
+import { B } from "@fullcalendar/core/internal-common";
 
 @Component({
-  selector: 'weather',
-  templateUrl: './weather.component.html'
+  selector: 'other-module',
+  templateUrl: './other-module.component.html'
 })
-export class WeatherComponent implements OnInit, OnDestroy {
+export class OtherModuleComponent implements OnInit, OnDestroy {
   protected forecasts: WeatherForecast[] = [];
   protected activeIndex: number = 0;
   protected isContent: boolean = true;

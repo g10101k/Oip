@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Oip.Core.HostedServices;
 
-namespace Oip.Core.HostedServices;
+namespace Oip.Base.Services;
 
 /// <summary>
 /// Executed the specified worker within a scoped-lifetime scope.

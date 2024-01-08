@@ -13,9 +13,19 @@ public class ModuleFederationSettings
     public string Name { get; set; } = default!;
 
     /// <summary>
+    /// Remote entry
+    /// </summary>
+    public string? RemoteEntry { get; set; }
+
+    /// <summary>
+    /// Base Url
+    /// </summary>
+    public string? BaseUrl { get; set; }
+
+    /// <summary>
     /// Export modules
     /// </summary>
-    public ModuleFederationDto ExportModule { get; set; } = new();
+    public List<ModuleFederationDto> ExportModules { get; set; } = new();
 
     /// <summary>
     /// Registry time out (default: 60000 milliseconds) 

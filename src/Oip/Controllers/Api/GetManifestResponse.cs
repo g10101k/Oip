@@ -1,10 +1,20 @@
-namespace Oip.Base.Api;
+namespace Oip.Controllers;
 
 /// <summary>
-/// Module federation
+/// Response for module federation
 /// </summary>
-public class ModuleFederationDto
+public class GetManifestResponse
 {
+    /// <summary>
+    /// Remote entry
+    /// </summary>
+    public string? RemoteEntry { get; set; }
+
+    /// <summary>
+    /// Base Url
+    /// </summary>
+    public string? BaseUrl { get; set; }
+
     /// <summary>
     /// Module name see exposes in webpack.config.js
     /// </summary>
@@ -24,9 +34,4 @@ public class ModuleFederationDto
     /// NgModuleName
     /// </summary>
     public string NgModuleName { get; set; } = default!;
-
-    /// <summary>
-    /// Need for module federation export
-    /// </summary>
-    public string SourcePath { get; set; } = default!;
 }

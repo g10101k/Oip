@@ -1,8 +1,7 @@
-import {loadRemoteModule} from '@angular-architects/module-federation';
-import {Routes} from '@angular/router';
-import {APP_ROUTES, APP_ROUTES_END} from '../app.routes';
-import {CustomManifest} from 'shared-lib';
-import {AuthLibService} from "auth-lib";
+import { loadRemoteModule } from '@angular-architects/module-federation';
+import { Routes } from '@angular/router';
+import { APP_ROUTES, APP_ROUTES_END } from '../app.routes';
+import { CustomManifest } from 'shared-lib';
 
 export function buildRoutes(manifest: CustomManifest): Routes {
   const lazyRoutes: Routes = Object.keys(manifest).map(key => {
