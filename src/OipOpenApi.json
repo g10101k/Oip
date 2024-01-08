@@ -18,25 +18,25 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RegisterModuleDto"
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ModuleFederationDto"
                   }
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RegisterModuleDto"
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ModuleFederationDto"
                   }
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RegisterModuleDto"
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/ModuleFederationDto"
                   }
                 }
               }
@@ -121,23 +121,18 @@
             "description": "See 'name' in webpack.config.js",
             "nullable": true
           },
-          "baseUrl": {
-            "type": "string",
-            "description": "Base Url",
-            "nullable": true
-          },
           "remoteEntry": {
             "type": "string",
             "description": "Remote entry",
             "nullable": true
           },
-          "exportModules": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ModuleFederationDto"
-            },
-            "description": "Module federation",
+          "baseUrl": {
+            "type": "string",
+            "description": "Base Url",
             "nullable": true
+          },
+          "exportModule": {
+            "$ref": "#/components/schemas/ModuleFederationDto"
           }
         },
         "additionalProperties": false,

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Clients;
+using Oip.Base.Mappers;
 using Oip.Base.Settings;
 using static System.ArgumentNullException;
 
@@ -57,21 +58,14 @@ public class ModulesRegistryProcess : BackgroundService
                 {
                     var normalizeBaseUrl = NormalizeBaseUrl(baseUrl);
                     var module = _settings.ModuleFederation;
-                    module.ExportModule.BaseUrl ??= normalizeBaseUrl;
-                    module.ExportModule.RemoteEntry ??= $"{normalizeBaseUrl}remoteEntry.js";
+                    module.BaseUrl ??= normalizeBaseUrl;
+                    module.RemoteEntry ??= $"{normalizeBaseUrl}remoteEntry.js";
                     await _oipClient.RegisterModuleAsync(new RegisterModuleDto()
                     {
                         Name = module.Name,
-                        ExportModule = new ModuleFederationDto
-                        {
-                            BaseUrl = module.ExportModule.BaseUrl,
-                            RemoteEntry = module.ExportModule.RemoteEntry,
-                            DisplayName = module.ExportModule.DisplayName,
-                            ExposedModule = module.ExportModule.ExposedModule,
-                            RoutePath = module.ExportModule.RoutePath,
-                            SourcePath = module.ExportModule.SourcePath,
-                            NgModuleName = module.ExportModule.NgModuleName
-                        }
+                        BaseUrl = module.BaseUrl,
+                        RemoteEntry = module.RemoteEntry,
+                        ExportModules = module.ExportModules.Select(x=>x.ToClientDto()).ToList()
                     });
                 }
 

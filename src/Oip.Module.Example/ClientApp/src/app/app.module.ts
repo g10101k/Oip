@@ -3,15 +3,17 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { WeatherModule } from './modules/weather.module';
+import { WeatherModule } from './modules/weather/weather.module';
 import { APP_ROUTES } from './app.routes';
 import { HttpClientModule } from '@angular/common/http';
+import { OtherModule } from "./modules/other-module/other.module";
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
     WeatherModule,
+    OtherModule,
     RouterModule.forRoot(APP_ROUTES),
   ],
   declarations: [
