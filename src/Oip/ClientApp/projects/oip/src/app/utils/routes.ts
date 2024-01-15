@@ -2,6 +2,7 @@ import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Routes } from '@angular/router';
 import { APP_ROUTES, APP_ROUTES_END } from '../app.routes';
 import { CustomManifest } from 'shared-lib';
+import { AuthGuardService } from "../../auth/auth.service";
 
 export function buildRoutes(manifest: CustomManifest): Routes {
   const lazyRoutes: Routes = Object.keys(manifest).map(key => {
@@ -9,6 +10,7 @@ export function buildRoutes(manifest: CustomManifest): Routes {
     return {
       path: entry.routePath,
       providers: [{ provide: 'BASE_URL', useValue: entry.baseUrl, deps: [] }],
+      canActivate: [AuthGuardService],
       loadChildren: () =>
         loadRemoteModule({
           type: 'manifest',

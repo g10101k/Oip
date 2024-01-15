@@ -19,6 +19,7 @@ public class ClientApiDto
     }
 
     public int AbsoluteRefreshTokenLifetime { get; set; } = 2592000;
+
     public int AccessTokenLifetime { get; set; } = 3600;
 
     public int? ConsentLifetime { get; set; }
