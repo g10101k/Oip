@@ -46,6 +46,10 @@ export const APP_ROUTES: Routes = [
     path: 'config',
     component: ModuleConfigComponent,
     pathMatch: 'full',
+  },
+  {
+    path: 'unauthorized',
+    loadChildren: () => import('./demo/components/auth/error/error.module').then(m => m.ErrorModule)
   }
 ];
 
