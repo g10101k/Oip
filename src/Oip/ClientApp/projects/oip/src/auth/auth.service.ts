@@ -45,10 +45,14 @@ export class AuthService extends BaseService {
     return true;
   }
 
-  private _lastAuthenticatedPath: string = defaultPath;
 
   set lastAuthenticatedPath(value: string) {
-    this._lastAuthenticatedPath = value;
+    localStorage.setItem('lastAuthenticatedPath', value);
+  }
+
+  get lastAuthenticatedPath(): string
+  {
+    return localStorage.getItem('lastAuthenticatedPath');
   }
 
   get authorizationHeaderValue(): string {
@@ -69,7 +73,6 @@ export class AuthService extends BaseService {
       if (this.isAuthenticated()) {
         let name: string = defaultUser.name;
         let url: string = defaultUser.avatarUrl;
-        let profile = this.user?.profile;
         if (this.user?.profile?.name != null) {
           name = this.user?.profile?.name;
         }
@@ -159,6 +162,7 @@ export class AuthService extends BaseService {
   async completeAuthentication() {
     this.user = await this.manager.signinRedirectCallback();
     this._authNavStatusSource.next(this.isAuthenticated());
+    await this.router.navigate([this.lastAuthenticatedPath]);
   }
 
   register(userRegistration: any) {
@@ -208,10 +212,9 @@ export class AuthGuardService implements CanActivate {
       }
 
       if (!isLoggedIn && !isAuthForm) {
-        this.authService.lastAuthenticatedPath
+        this.authService.lastAuthenticatedPath = route.routeConfig?.path;
         this.authService.login();
       }
-
 
       if (isLoggedIn) {
         this.authService.lastAuthenticatedPath = route.routeConfig?.path || defaultPath;
@@ -227,13 +230,13 @@ export function getClientSettings(): UserManagerSettings {
   return {
     authority: 'https://localhost:44310/',
     client_id: 'oip-client',
-    redirect_uri: 'http://localhost:50000/auth-callback',
-    post_logout_redirect_uri: 'http://localhost:50000/',
+    redirect_uri: 'https://localhost:50000/auth-callback',
+    post_logout_redirect_uri: 'https://localhost:50000/',
     response_type: "id_token token",
     scope: "openid profile email",
     filterProtocolClaims: true,
     loadUserInfo: true,
     automaticSilentRenew: true,
-    silent_redirect_uri: 'http://localhost:50000/silent-refresh.html',
+    silent_redirect_uri: 'https://localhost:50000/silent-refresh.html',
   };
 }

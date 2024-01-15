@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "npm run start:mfe1",
-    "start:mfe1": "ng serve mfe1 --port 50001",
+    "prestart": "node aspnetcore-https",
+    "start": "run-script-os",
+    "start:windows": "ng serve --port 50001 --ssl --ssl-cert %APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem --ssl-key %APPDATA%\\ASP.NET\\https\\%npm_package_name%.key",
+    "start:default": "ng serve --port 50001 --ssl --ssl-cert $HOME/.aspnet/https/${npm_package_name}.pem --ssl-key $HOME/.aspnet/https/${npm_package_name}.key",
     "build:mfe1": "ng build mfe1 --prod",
     "serve:dist": "concurrently \"serve dist/oip -l 5000 -s\" \"serve dist/mfe1 -l 3000 -s\" ",
     "build": "npm run build:mfe1",
@@ -40,7 +42,8 @@
     "rxjs": "~7.8.0",
     "tslib": "^2.6.2",
     "zone.js": "~0.14.2",
-    "prismjs": "^1.29.0"
+    "prismjs": "^1.29.0",
+    "run-script-os": "^1.1.6"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.0.0",

@@ -128,6 +128,29 @@
         "AllowedCorsOrigins": [
           "https://localhost:44302"
         ]
+      },
+      {
+        "ClientId": "oip-client",
+        "ClientName": "oip-client",
+        "AllowedGrantTypes": [
+          "password",
+          "implicit"
+        ],
+        "RequireClientSecret": false,
+        "RequirePkce": true,
+        "AllowAccessTokensViaBrowser": true,
+        "RedirectUris": [
+          "https://localhost:50000/auth-callback"
+        ],
+        "AllowedScopes": [
+          "roles",
+          "openid",
+          "profile",
+          "email"
+        ],
+        "AllowedCorsOrigins": [
+          "https://localhost:50000"
+        ]
       }
     ]
   }

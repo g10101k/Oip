@@ -9,6 +9,7 @@ public abstract class EntityFrameworkCoreStartupBase
 
     public void ConfigureOipSecurity(OipSecurityOptionsBuilder oipSecurity)
     {
+        // Method intentionally left empty.
     }
 
     protected virtual string GetDefaultConnectionString()

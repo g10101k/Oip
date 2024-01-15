@@ -19,8 +19,6 @@ export class AuthCallbackComponent implements OnInit {
       this.error = true;
       return;
     }
-    alert(this.route);
     await this.authService.completeAuthentication();
-    this.router.navigate(['/home']);
   }
 }
