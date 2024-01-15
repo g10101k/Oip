@@ -4,8 +4,10 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "npm run start:oip",
-    "start:oip": "ng serve oip --port 50000",
+    "prestart": "node aspnetcore-https",
+    "start": "run-script-os",
+    "start:windows": "ng serve --port 50000 --ssl --ssl-cert %APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem --ssl-key %APPDATA%\\ASP.NET\\https\\%npm_package_name%.key",
+    "start:default": "ng serve --port 50000 --ssl --ssl-cert $HOME/.aspnet/https/${npm_package_name}.pem --ssl-key $HOME/.aspnet/https/${npm_package_name}.key",
     "build:oip": "ng build oip",
     "serve:dist": "concurrently \"serve dist/oip -l 5000 -s\" ",
     "build": "npm run build:oip",
@@ -33,6 +35,7 @@
     "@fullcalendar/daygrid": "^6.0.3",
     "@fullcalendar/interaction": "^6.0.3",
     "@fullcalendar/timegrid": "^6.0.3",
+    "oidc-client": "^1.11.5",
     "chart.js": "^4.4.1",
     "primeflex": "^3.3.1",
     "primeicons": "6.0.1",
@@ -41,7 +44,8 @@
     "rxjs": "~7.8.0",
     "tslib": "^2.6.2",
     "zone.js": "~0.14.2",
-    "prismjs": "^1.29.0"
+    "prismjs": "^1.29.0",
+    "run-script-os": "^1.1.6"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.0.0",

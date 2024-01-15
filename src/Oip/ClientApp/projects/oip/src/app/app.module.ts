@@ -31,6 +31,9 @@ import { LayoutService } from "./layout/service/app.layout.service";
 import { APP_ROUTES } from "./app.routes";
 import { ModuleConfigComponent } from "./config/module-config.component";
 import { TabViewModule } from "primeng/tabview";
+import { AuthGuardService, AuthService } from "../auth/auth.service";
+import { AuthCallbackComponent } from "./auth-callback/auth-callback.component";
+import { ConfigService } from "../auth/config.service";
 
 @NgModule({
   declarations: [
@@ -42,7 +45,8 @@ import { TabViewModule } from "primeng/tabview";
     AppLayoutComponent,
     AppComponent,
     NotfoundComponent,
-    ModuleConfigComponent
+    ModuleConfigComponent,
+    AuthCallbackComponent,
   ],
   imports: [
     RouterModule.forRoot(APP_ROUTES, {
@@ -66,9 +70,8 @@ import { TabViewModule } from "primeng/tabview";
     TabViewModule
   ],
   providers: [
-    {provide: LocationStrategy, useClass: HashLocationStrategy},
     CountryService, CustomerService, EventService, IconService, NodeService,
-    PhotoService, ProductService, LayoutService
+    PhotoService, ProductService, LayoutService, AuthGuardService, AuthService, ConfigService
   ],
   bootstrap: [AppComponent]
 })
