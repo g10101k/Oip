@@ -37,7 +37,7 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
     {
         var builder = new DbContextOptionsBuilder<AppSettingsContext>();
 
-        _appSettingsOptions.Builder(builder, _settings.Provider, _settings.ConnectionString);
+        _appSettingsOptions.Builder(builder, _settings.Provider, _settings.NormalizedConnectionString);
 
         switch (_settings.Provider)
         {
