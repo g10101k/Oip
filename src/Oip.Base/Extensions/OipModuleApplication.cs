@@ -4,14 +4,10 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Oip.Base.Clients;
 using Oip.Base.Services;
 using Oip.Base.Settings;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -32,10 +28,6 @@ public static class OipModuleApplication
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
         builder.AddOipClient(settings);
         builder.AddDefaultHealthChecks();
-        builder.ConfigureOpenTelemetry(settings);
-#if NET8_0_OR_GREATER
-        builder.AddServiceDiscovery();
-#endif
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
         builder.Services.AddHostedService<ModulesRegistryProcess>();
@@ -53,10 +45,6 @@ public static class OipModuleApplication
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
         builder.AddDefaultHealthChecks();
-        builder.ConfigureOpenTelemetry(settings);
-#if NET8_0_OR_GREATER
-        builder.AddServiceDiscovery();
-#endif
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
         builder.Services.AddControllersWithViews();
@@ -93,76 +81,7 @@ public static class OipModuleApplication
                 Description = openApiSettings.Description,
             });
         });
-    }
-#if NET8_0_OR_GREATER
-    private static void AddServiceDiscovery(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddServiceDiscovery();
-
-        builder.Services.ConfigureHttpClientDefaults(http =>
-        {
-            http.AddStandardResilienceHandler();
-            http.UseServiceDiscovery();
-        });
-    }
-#endif
-
-    private static void ConfigureOpenTelemetry(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
-        builder.Logging.AddOpenTelemetry(o =>
-        {
-            o.IncludeFormattedMessage = true;
-            o.IncludeScopes = true;
-        });
-
-        builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics =>
-            {
-                metrics.AddRuntimeInstrumentation()
-                    .AddBuiltInMeters();
-            })
-            .WithTracing(tracing =>
-            {
-                if (builder.Environment.IsDevelopment())
-                {
-                    tracing.SetSampler(new AlwaysOnSampler());
-                }
-
-                tracing.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation();
-            });
-
-        builder.AddOpenTelemetryExporters(settings);
-    }
-
-    private static void AddOpenTelemetryExporters(this WebApplicationBuilder builder,
-        IBaseOipModuleAppSettings settings)
-    {
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
-
-        if (useOtlpExporter)
-        {
-            builder.Services.Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter());
-            builder.Services.ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddOtlpExporter());
-            builder.Services.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddOtlpExporter());
-        }
-
-        // Configure alternative exporters
-        builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics =>
-            {
-#if NET8_0_OR_GREATER
-                // Uncomment the following line to enable the Prometheus endpoint
-                if (settings.Telemetry.UsePrometheusExporter)
-                    metrics.AddPrometheusExporter();
-#endif
-            });
-    }
-
-    private static void AddBuiltInMeters(this MeterProviderBuilder meterProviderBuilder) =>
-        meterProviderBuilder.AddMeter(
-            "Microsoft.AspNetCore.Hosting",
-            "Microsoft.AspNetCore.Server.Kestrel",
-            "System.Net.Http");
+    }  
 
     /// <summary>
     /// Add a default liveness check to ensure app is responsive
@@ -176,10 +95,6 @@ public static class OipModuleApplication
 
     private static void MapDefaultEndpoints(this WebApplication app, IBaseOipModuleAppSettings settings)
     {
-#if NET8_0_OR_GREATER
-        if (settings.Telemetry.UsePrometheusExporter)
-            app.MapPrometheusScrapingEndpoint();
-#endif
         // All health checks must pass for app to be considered ready to accept traffic after starting
         app.MapHealthChecks("/health");
 
