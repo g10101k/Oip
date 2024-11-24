@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Oip.Security.Shared.Configuration.Configuration.Email;
 using SendGrid;
 using SendGrid.Helpers.Mail;
