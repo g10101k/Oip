@@ -52,7 +52,7 @@ public class ModulesRegistryProcess : BackgroundService
         {
             try
             {
-                _logger.LogInformation($"Start register module");
+                _logger.LogInformation("Start register module");
 
                 foreach (var baseUrl in GetBaseAddresses())
                 {
@@ -65,7 +65,7 @@ public class ModulesRegistryProcess : BackgroundService
                         Name = module.Name,
                         BaseUrl = module.BaseUrl,
                         RemoteEntry = module.RemoteEntry,
-                        ExportModules = module.ExportModules.Select(x=>x.ToClientDto()).ToList()
+                        ExportModules = module.ExportModules.Select(x => x.ToClientDto()).ToList()
                     });
                 }
 
@@ -74,7 +74,7 @@ public class ModulesRegistryProcess : BackgroundService
             catch (Exception exception)
             {
                 // catch all exceptions, the loop should not stop
-                _logger.LogError("{exception}", exception);
+                _logger.LogError(exception, "Register Module Error");
             }
 
             Thread.Sleep(_settings.ModuleFederation.RegistryTimeOut);

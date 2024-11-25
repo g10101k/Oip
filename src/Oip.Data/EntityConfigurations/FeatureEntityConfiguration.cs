@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Oip.Data.Contexts;
 using Oip.Data.Entities;
+using Oip.Data.Extensions;
 
 namespace Oip.Data.EntityConfigurations;
 
@@ -11,7 +13,6 @@ namespace Oip.Data.EntityConfigurations;
 public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity>
 {
     private const string TableName = "Feature";
-    private const string SchemaName = "oip";
     private readonly DatabaseFacade _database;
     private readonly bool _designTime;
 
@@ -20,34 +21,21 @@ public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity
     /// </summary>
     /// <param name="database"></param>
     /// <param name="designTime"></param>
-    public FeatureEntityConfiguration(DatabaseFacade database, bool designTime)
+    public FeatureEntityConfiguration(DatabaseFacade database, bool designTime = false)
     {
         _database = database;
         _designTime = designTime;
     }
-    
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="entity"></param>
     public void Configure(EntityTypeBuilder<FeatureEntity> entity)
     {
-        if (_designTime)
-        {
-            entity.HasNoKey();
-        }
-        else
-        {
-            entity.HasKey(x => x.FeatureId);
-        }
-
+        entity.SetTable(_database, TableName);
+        entity.SetPrimaryKey(_designTime, e => e.FeatureId);
         entity.Property(e => e.FeatureId).ValueGeneratedOnAdd();
-
-        if (_database.IsNpgsql())
-            entity.ToTable(TableName, SchemaName);
-        else if (_database.IsSqlServer())
-            entity.ToTable(TableName, SchemaName);
-        else
-            entity.ToTable(TableName);
+        entity.Property(e => e.Name).HasMaxLength(512);
     }
 }

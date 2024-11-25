@@ -49,6 +49,7 @@ public static class OipModuleApplication
         builder.AddOpenApi(settings);
         builder.Services.AddControllersWithViews();
         builder.Services.AddSingleton(settings);
+        builder.Services.AddData(settings.ConnectionString);
         return builder;
     }
 
@@ -93,7 +94,7 @@ public static class OipModuleApplication
             .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
     }
 
-    private static void MapDefaultEndpoints(this WebApplication app, IBaseOipModuleAppSettings settings)
+    private static void MapDefaultEndpoints(this WebApplication app)
     {
         // All health checks must pass for app to be considered ready to accept traffic after starting
         app.MapHealthChecks("/health");
@@ -121,7 +122,7 @@ public static class OipModuleApplication
             app.UseHsts();
         }
 
-        app.MapDefaultEndpoints(settings);
+        app.MapDefaultEndpoints();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();

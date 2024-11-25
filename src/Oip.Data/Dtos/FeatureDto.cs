@@ -1,9 +1,9 @@
-﻿namespace Oip.Data.Entities;
+namespace Oip.Data.Dtos;
 
 /// <summary>
 /// It features in app
 /// </summary>
-public class FeatureEntity
+public class FeatureDto
 {
     /// <summary>
     /// Id

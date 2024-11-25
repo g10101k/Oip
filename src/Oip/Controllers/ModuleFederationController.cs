@@ -39,7 +39,7 @@ public class ModuleFederationController : ControllerBase
     [HttpPost("register-module")]
     public async Task<IActionResult> RegisterModule(RegisterModuleDto request)
     {
-        _logger.LogInformation("Trying register module: {module}", request.Name);
+        _logger.LogInformation("Trying register module: {Module}", request.Name);
 
         using HttpClient client = new HttpClient();
         var remoteEntryResponseTask = client.GetAsync(request.RemoteEntry);
@@ -70,7 +70,7 @@ public class ModuleFederationController : ControllerBase
             }
         }
 
-        _logger.LogInformation("Module registered: {module}", request.Name);
+        _logger.LogInformation("Module registered: {Module}", request.Name);
 
         return Ok();
     }
