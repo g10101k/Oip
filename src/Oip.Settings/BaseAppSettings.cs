@@ -134,6 +134,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         var configuration = configurationBuilder
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileName, true, true)
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileNameDevelopment, true, true)
+            .AddUserSecrets<TAppSettings>()
             .AddSpaConfig()
             .AddModuleConfig()
             .AddEnvironmentVariables()
