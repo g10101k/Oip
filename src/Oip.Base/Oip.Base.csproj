@@ -19,8 +19,7 @@
         <PackageReference Include="Polly" Version="8.5.0"/>
         <PackageReference Include="Polly.Extensions.Http" Version="3.0.0"/>
         <PackageReference Include="Riok.Mapperly" Version="4.1.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
-        
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>        
         <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1"/>
         <PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="8.0.11">
             <PrivateAssets>all</PrivateAssets>
@@ -33,9 +32,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Oip.Data.Postgres\Oip.Data.Postgres.csproj" />
-        <ProjectReference Include="..\Oip.Data.Sqlite\Oip.Data.Sqlite.csproj" />
-        <ProjectReference Include="..\Oip.DataData.SqlServer\Oip.DataData.SqlServer.csproj" />
         <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
         <ProjectReference Include="..\Oip.Settings\Oip.Settings.csproj"/>
     </ItemGroup>

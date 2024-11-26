@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using Oip.Base.Clients;
 using Oip.Base.Services;
 using Oip.Base.Settings;
+using Oip.Data.Contexts;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -82,7 +83,7 @@ public static class OipModuleApplication
                 Description = openApiSettings.Description,
             });
         });
-    }  
+    }
 
     /// <summary>
     /// Add a default liveness check to ensure app is responsive
@@ -132,6 +133,8 @@ public static class OipModuleApplication
             pattern: "{controller}/{action=Index}/{id?}");
         app.MapOpenApi(settings);
         app.MapFallbackToFile("index.html");
+        
+        OipContext.MigrateDb(settings.Provider, settings.NormalizedConnectionString);
         return app;
     }
 
