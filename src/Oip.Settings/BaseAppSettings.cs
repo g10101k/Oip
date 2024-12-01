@@ -73,7 +73,6 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     /// </summary>
     /// <param name="programArguments"></param>
     /// <param name="useEfCoreProvider"></param>
-    /// <param name="useSecrets"></param>
     /// <param name="jsonFileName"></param>
     /// <param name="jsonFileNameDevelopment"></param>
     /// <param name="appSettingsTable"></param>
@@ -136,11 +135,11 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     private static IConfigurationRoot BuildBaseConfiguration(ConfigurationBuilder configurationBuilder)
     {
         var configuration = configurationBuilder
-            //.AddJsonFile(Instance.AppSettingsOptions.JsonFileName, true, true)
-            //.AddJsonFile(Instance.AppSettingsOptions.JsonFileNameDevelopment, true, true)
+            .AddJsonFile(Instance.AppSettingsOptions.JsonFileName, true, true)
+            .AddJsonFile(Instance.AppSettingsOptions.JsonFileNameDevelopment, true, true)
             .AddUserSecrets<TAppSettings>()
-            //.AddSpaConfig()
-            //.AddModuleConfig()
+            .AddSpaConfig()
+            .AddModuleConfig()
             .AddEnvironmentVariables()
             .AddCommandLine(Instance.AppSettingsOptions.ProgrammeArguments)
             .Build();
