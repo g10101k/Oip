@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Oip.Base.Services;
-using Oip.Core.HostedServices;
 
 namespace Oip.Base.Runtime;
 

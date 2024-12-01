@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Oip.Data.Entities;
+﻿namespace Oip.Data.Entities;
 
 /// <summary>
 /// It features in app

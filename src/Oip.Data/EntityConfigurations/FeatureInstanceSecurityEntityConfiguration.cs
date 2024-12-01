@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Oip.Data.Contexts;
 using Oip.Data.Entities;
 using Oip.Data.Extensions;
 
@@ -12,7 +11,6 @@ namespace Oip.Data.EntityConfigurations;
 /// </summary>
 public class FeatureInstanceSecurityEntityConfiguration : IEntityTypeConfiguration<FeatureInstanceSecurityEntity>
 {
-    private const string TableName = "FeatureInstance";
     private readonly DatabaseFacade _database;
     private readonly bool _designTime;
 

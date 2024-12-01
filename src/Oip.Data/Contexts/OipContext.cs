@@ -18,7 +18,7 @@ public class OipContext : DbContext
     private readonly bool _designTime;
 
     /// <summary>
-    /// Migration history table name
+    /// Schema
     /// </summary>
     public const string SchemaName = "oip";
 

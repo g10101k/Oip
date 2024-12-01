@@ -39,7 +39,7 @@ public class FeatureRepository
                     Role = x.Role
                 })
             };
-                var result = await query.ToListAsync();
+        var result = await query.ToListAsync();
         return result;
     }
 
