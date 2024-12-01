@@ -25,14 +25,21 @@ public class FeatureRepository
     /// </summary>
     public async Task<IEnumerable<FeatureDto>> GetAll()
     {
-        var query = _db.Features
-            .Select(e => new FeatureDto()
+        var query = from feature in _db.Features
+            join featureSecurity in _db.FeatureSecurities on feature.FeatureId equals featureSecurity.FeatureId into
+                security
+            select new FeatureDto()
             {
-                FeatureId = e.FeatureId,
-                Name = e.Name,
-                Settings = e.Settings
-            });
-        var result = await query.ToListAsync();
+                FeatureId = feature.FeatureId,
+                Settings = feature.Settings,
+                Name = feature.Name,
+                FeatureSecurities = security.Select(x => new FeatureSecurityDto()
+                {
+                    Right = x.Right,
+                    Role = x.Role
+                })
+            };
+                var result = await query.ToListAsync();
         return result;
     }
 

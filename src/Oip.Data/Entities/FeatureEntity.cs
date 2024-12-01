@@ -16,7 +16,7 @@ public class FeatureEntity
     public string Name { get; set; } = null!;
 
     /// <summary>
-    /// Settings
+    /// Settings for feature
     /// </summary>
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string? Settings { get; set; }

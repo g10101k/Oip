@@ -19,4 +19,9 @@ public class FeatureDto
     /// Settings
     /// </summary>
     public string? Settings { get; set; }
+
+    /// <summary>
+    /// Securities
+    /// </summary>
+    public IEnumerable<FeatureSecurityDto> FeatureSecurities { get; set; } = null!;
 }
