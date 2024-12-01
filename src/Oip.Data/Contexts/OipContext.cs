@@ -49,8 +49,9 @@ public class OipContext : DbContext
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new FeatureEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new FeatureSecurityEntityConfiguration(Database, _designTime));
+        base.OnModelCreating(modelBuilder);
     }
 
     /// <summary>
@@ -69,15 +70,7 @@ public class OipContext : DbContext
                 builder.UseNpgsql(connectionString);
                 using (var context = new PostgresMigrationContext(builder.Options, false))
                 {
-                    context.Database.Migrate();
-                }
-
-                break;
-            case XpoProvider.SQLite:
-                builder.UseSqlite(connectionString);
-                using (var context = new SqliteMigrationContext(builder.Options, false))
-                {
-                    context.Database.Migrate();
+                    AddData(context);
                 }
 
                 break;
@@ -85,7 +78,7 @@ public class OipContext : DbContext
                 builder.UseSqlServer(connectionString);
                 using (var context = new MsSqlServerMigrationContext(builder.Options, false))
                 {
-                    context.Database.Migrate();
+                    AddData(context);
                 }
 
                 break;
@@ -96,37 +89,43 @@ public class OipContext : DbContext
         }
     }
 
-
-    /// <inheritdoc />
-    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    private static void AddData(OipContext context)
     {
-        ProcessSqliteIdentities(ChangeTracker.Entries());
-        return base.SaveChanges(acceptAllChangesOnSuccess);
-    }
+        context.Database.Migrate();
 
-    /// <inheritdoc />
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        ProcessSqliteIdentities(ChangeTracker.Entries());
-        return base.SaveChangesAsync(cancellationToken);
-    }
-
-
-    private void ProcessSqliteIdentities(IEnumerable<EntityEntry> entries)
-    {
-        if (!Database.IsSqlite())
-            return;
-
-        _ = entries
-            .Where(e => e.State == EntityState.Added)
-            .Select(e => e.Entity switch
-            {
-                FeatureEntity c => c.FeatureId = Set<FeatureEntity>().Any()
-                    ? Set<FeatureEntity>().Max(x => x.FeatureId) + 1
-                    : 1,
-                _ => (object)null!
-            })
-            .ToList();
+        if (!context.Features.Any())
+        {
+            context.Features.AddRange(
+                new FeatureEntity
+                {
+                    Name = "Test1",
+                    Settings = "{}",
+                    FeatureSecurities = new List<FeatureSecurityEntity>(){
+                        new FeatureSecurityEntity(){ Right="Read", Role="ReadOnly"},
+                        new FeatureSecurityEntity(){ Right="Write", Role="Write"},
+                    }
+                },
+                new FeatureEntity
+                {
+                    Name = "Test2",
+                    Settings = "{}",
+                    FeatureSecurities = new List<FeatureSecurityEntity>(){
+                        new FeatureSecurityEntity(){ Right="Read", Role="ReadOnly"},
+                        new FeatureSecurityEntity(){ Right="Write", Role="Write"},
+                    }
+                },
+                new FeatureEntity
+                {
+                    Name = "Test2",
+                    Settings = "{}",
+                    FeatureSecurities = new List<FeatureSecurityEntity>(){
+                        new FeatureSecurityEntity(){ Right="Read", Role="ReadOnly"},
+                        new FeatureSecurityEntity(){ Right="Write", Role="Write"},
+                    }
+                }
+            );
+            context.SaveChanges();
+        }
     }
 }
 
@@ -134,7 +133,4 @@ internal class MsSqlServerMigrationContext(DbContextOptions<OipContext> options,
     : OipContext(options, designTime);
 
 internal class PostgresMigrationContext(DbContextOptions<OipContext> options, bool designTime)
-    : OipContext(options, designTime);
-
-internal class SqliteMigrationContext(DbContextOptions<OipContext> options, bool designTime)
     : OipContext(options, designTime);

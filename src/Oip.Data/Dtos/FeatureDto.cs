@@ -1,3 +1,5 @@
+using Oip.Data.Entities;
+
 namespace Oip.Data.Dtos;
 
 /// <summary>
@@ -19,4 +21,15 @@ public class FeatureDto
     /// Settings
     /// </summary>
     public string? Settings { get; set; }
+
+    public IEnumerable<FeatureSecurityDto> FeatureSecurities { get; set; } = null!;
+}
+
+public class FeatureSecurityDto
+{
+    public int FeatureSecurityId { get; set; }
+
+    public string Role { get; set; }
+
+    public string Right { get; set; }
 }

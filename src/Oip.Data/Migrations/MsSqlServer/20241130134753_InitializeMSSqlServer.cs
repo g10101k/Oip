@@ -22,6 +22,20 @@ namespace Oip.Data.Migrations.MsSqlServer
                 constraints: table =>
                 {
                 });
+
+            migrationBuilder.CreateTable(
+                name: "FeatureSecurityEntity",
+                columns: table => new
+                {
+                    FeatureSecurityId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FeatureId = table.Column<int>(type: "int", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Right = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
+                },
+                constraints: table =>
+                {
+                });
         }
 
         /// <inheritdoc />
@@ -29,6 +43,9 @@ namespace Oip.Data.Migrations.MsSqlServer
         {
             migrationBuilder.DropTable(
                 name: "Features");
+
+            migrationBuilder.DropTable(
+                name: "FeatureSecurityEntity");
         }
     }
 }

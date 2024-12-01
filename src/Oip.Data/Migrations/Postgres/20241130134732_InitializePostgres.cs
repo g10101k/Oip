@@ -23,6 +23,20 @@ namespace Oip.Data.Migrations.Postgres
                 constraints: table =>
                 {
                 });
+
+            migrationBuilder.CreateTable(
+                name: "FeatureSecurityEntity",
+                columns: table => new
+                {
+                    FeatureSecurityId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FeatureId = table.Column<int>(type: "integer", nullable: false),
+                    Role = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Right = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
+                },
+                constraints: table =>
+                {
+                });
         }
 
         /// <inheritdoc />
@@ -30,6 +44,9 @@ namespace Oip.Data.Migrations.Postgres
         {
             migrationBuilder.DropTable(
                 name: "Features");
+
+            migrationBuilder.DropTable(
+                name: "FeatureSecurityEntity");
         }
     }
 }

@@ -277,4 +277,6 @@ Thumbs.db
 Oip.Security.db
 Oip.Security.db-shm
 Oip.Security.db-wal
-/Oip/oip.db
+Oip.db
+Oip.db-shm
+Oip.db-wal

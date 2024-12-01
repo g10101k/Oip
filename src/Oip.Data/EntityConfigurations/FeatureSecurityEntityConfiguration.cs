@@ -10,7 +10,7 @@ namespace Oip.Data.EntityConfigurations;
 /// <summary>
 /// <inheritdoc cref="IEntityTypeConfiguration{TEntity}"/>
 /// </summary>
-public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity>
+public class FeatureSecurityEntityConfiguration : IEntityTypeConfiguration<FeatureSecurityEntity>
 {
     private readonly DatabaseFacade _database;
     private readonly bool _designTime;
@@ -20,7 +20,7 @@ public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity
     /// </summary>
     /// <param name="database"></param>
     /// <param name="designTime"></param>
-    public FeatureEntityConfiguration(DatabaseFacade database, bool designTime = false)
+    public FeatureSecurityEntityConfiguration(DatabaseFacade database, bool designTime = false)
     {
         _database = database;
         _designTime = designTime;
@@ -30,22 +30,17 @@ public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity
     /// <inheritdoc/>
     /// </summary>
     /// <param name="entity"></param>
-    public void Configure(EntityTypeBuilder<FeatureEntity> entity)
+    public void Configure(EntityTypeBuilder<FeatureSecurityEntity> entity)
     {
         entity.SetTable(_database);
-        entity.SetPrimaryKey(_designTime, e => e.FeatureId);
-        entity.Property(e => e.FeatureId).ValueGeneratedOnAdd();
-        entity.Property(e => e.Name).HasMaxLength(512);
+        entity.SetPrimaryKey(_designTime, e => e.FeatureSecurityId);
+        entity.Property(e => e.FeatureSecurityId).ValueGeneratedOnAdd();
+        entity.Property(e => e.Role).HasMaxLength(255);
+        entity.Property(e => e.Right).HasMaxLength(255);
 
         if (_designTime)
         {
-            entity.Ignore(e => e.FeatureSecurities);
-        }
-        else
-        {
-            entity.HasMany(e => e.FeatureSecurities)
-                .WithOne(e => e.Feature)
-                .HasForeignKey(e => e.FeatureId);
+            entity.Ignore(e => e.Feature);
         }
     }
 }

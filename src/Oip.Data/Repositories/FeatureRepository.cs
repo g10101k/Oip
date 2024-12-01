@@ -25,12 +25,18 @@ public class FeatureRepository
     /// </summary>
     public async Task<IEnumerable<FeatureDto>> GetAll()
     {
-        var query = _db.Features
+        var query = _db.Features.Include(x => x.FeatureSecurities)
             .Select(e => new FeatureDto()
             {
                 FeatureId = e.FeatureId,
                 Name = e.Name,
-                Settings = e.Settings
+                Settings = e.Settings,
+                FeatureSecurities = e.FeatureSecurities.Select(sec => new FeatureSecurityDto()
+                {
+                    FeatureSecurityId = sec.FeatureSecurityId,
+                    Role = sec.Role,
+                    Right = sec.Right
+                })
             });
         var result = await query.ToListAsync();
         return result;
@@ -45,7 +51,12 @@ public class FeatureRepository
             new FeatureEntity
             {
                 Name = x.Name,
-                Settings = x.Settings
+                Settings = x.Settings,
+                FeatureSecurities = x.FeatureSecurities.Select(xx => new FeatureSecurityEntity()
+                {
+                    Role = xx.Role,
+                    Right = xx.Right
+                }).ToList()
             }
         ));
         await _db.SaveChangesAsync();

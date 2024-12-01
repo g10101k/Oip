@@ -39,6 +39,30 @@ namespace Oip.Data.Migrations.MsSqlServer
 
                     b.ToTable("Features");
                 });
+
+            modelBuilder.Entity("Oip.Data.Entities.FeatureSecurityEntity", b =>
+                {
+                    b.Property<int>("FeatureId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FeatureSecurityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeatureSecurityId"));
+
+                    b.Property<string>("Right")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.ToTable("FeatureSecurityEntity");
+                });
 #pragma warning restore 612, 618
         }
     }

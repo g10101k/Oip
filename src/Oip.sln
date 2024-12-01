@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Module.Example", "Oip.M
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFile", "SolutionFile", "{8A10B92E-9699-4796-AE1A-119AE3816ED0}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = ./../README.md
+		README.md = README.md
 		.gitignore = .gitignore
-		dotnet.yml = ./../.github/workflows/dotnet.yml
+		dotnet.yml = dotnet.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Base", "Oip.Base\Oip.Base.csproj", "{4D4422DD-26D7-4141-B75E-8AC8AD889FBF}"
@@ -64,9 +64,6 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{672A7BED-699B-486C-A0FC-F066AC588A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -158,11 +155,14 @@ Global
 		{4E4CB991-0520-499F-8493-58AA2336E8EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E4CB991-0520-499F-8493-58AA2336E8EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{2F562F31-B36E-4EC8-8F54-4F19F11D73B2} = {39A523DD-961A-4EA3-836F-CFC174F06CCF}
 		{D02836BE-B1E7-43D8-90D1-3A9A223DCE27} = {3E568419-974F-473F-8BB9-E63F5DEAD2F2}
 		{FA55734F-6ACE-4D48-AC75-64184FCC2942} = {3E568419-974F-473F-8BB9-E63F5DEAD2F2}
 		{CE56600D-93FF-4058-A459-D48E4851CE5D} = {3E568419-974F-473F-8BB9-E63F5DEAD2F2}
-		{2F562F31-B36E-4EC8-8F54-4F19F11D73B2} = {39A523DD-961A-4EA3-836F-CFC174F06CCF}
 		{56713101-0884-4211-B4EB-5E45BFD13481} = {CB608339-D36D-4C7A-9D74-5FCE63A30D02}
 		{296A8EA9-930A-4D7A-8C95-20553AA9A4B2} = {CB608339-D36D-4C7A-9D74-5FCE63A30D02}
 		{0461053F-99F4-4991-8444-C37D88B5D456} = {CB608339-D36D-4C7A-9D74-5FCE63A30D02}

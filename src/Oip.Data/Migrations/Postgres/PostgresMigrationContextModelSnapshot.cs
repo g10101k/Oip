@@ -39,6 +39,30 @@ namespace Oip.Data.Migrations.Postgres
 
                     b.ToTable("Features");
                 });
+
+            modelBuilder.Entity("Oip.Data.Entities.FeatureSecurityEntity", b =>
+                {
+                    b.Property<int>("FeatureId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FeatureSecurityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FeatureSecurityId"));
+
+                    b.Property<string>("Right")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.ToTable("FeatureSecurityEntity");
+                });
 #pragma warning restore 612, 618
         }
     }
