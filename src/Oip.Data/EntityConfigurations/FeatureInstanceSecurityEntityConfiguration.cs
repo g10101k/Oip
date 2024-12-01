@@ -33,7 +33,7 @@ public class FeatureInstanceSecurityEntityConfiguration : IEntityTypeConfigurati
     /// <param name="entity"></param>
     public void Configure(EntityTypeBuilder<FeatureInstanceSecurityEntity> entity)
     {
-        entity.SetTable(_database, TableName);
+        entity.SetTable(_database);
         entity.SetPrimaryKey(_designTime, e => e.FeatureInstanceSecurityId);
         entity.Property(e => e.FeatureInstanceSecurityId).ValueGeneratedOnAdd();
         

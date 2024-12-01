@@ -1,6 +1,4 @@
-using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Oip.Data.Entities;
 using Oip.Data.EntityConfigurations;
 using Oip.Settings.Enums;
@@ -91,17 +89,9 @@ public class OipContext : DbContext
                 }
 
                 break;
-            case XpoProvider.SQLite:
-                builder.UseSqlite(connectionString);
-                using (var context = new SqliteMigrationContext(builder.Options, false))
-                {
-                    context.Database.Migrate();
-                }
-
-                break;
             case XpoProvider.MSSqlServer:
                 builder.UseSqlServer(connectionString);
-                using (var context = new MsSqlServerMigrationContext(builder.Options, false))
+                using (var context = new SqlServerMigrationContext(builder.Options, false))
                 {
                     context.Database.Migrate();
                 }
@@ -113,46 +103,10 @@ public class OipContext : DbContext
                 throw new InvalidOperationException("Unknown provider");
         }
     }
-
-
-    /// <inheritdoc />
-    public override int SaveChanges(bool acceptAllChangesOnSuccess)
-    {
-        ProcessSqliteIdentities(ChangeTracker.Entries());
-        return base.SaveChanges(acceptAllChangesOnSuccess);
-    }
-
-    /// <inheritdoc />
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        ProcessSqliteIdentities(ChangeTracker.Entries());
-        return base.SaveChangesAsync(cancellationToken);
-    }
-
-
-    private void ProcessSqliteIdentities(IEnumerable<EntityEntry> entries)
-    {
-        if (!Database.IsSqlite())
-            return;
-
-        _ = entries
-            .Where(e => e.State == EntityState.Added)
-            .Select(e => e.Entity switch
-            {
-                FeatureEntity c => c.FeatureId = Set<FeatureEntity>().Any()
-                    ? Set<FeatureEntity>().Max(x => x.FeatureId) + 1
-                    : 1,
-                _ => (object)null!
-            })
-            .ToList();
-    }
 }
 
-internal class MsSqlServerMigrationContext(DbContextOptions<OipContext> options, bool designTime)
+internal class SqlServerMigrationContext(DbContextOptions<OipContext> options, bool designTime)
     : OipContext(options, designTime);
 
 internal class PostgresMigrationContext(DbContextOptions<OipContext> options, bool designTime)
-    : OipContext(options, designTime);
-
-internal class SqliteMigrationContext(DbContextOptions<OipContext> options, bool designTime)
     : OipContext(options, designTime);

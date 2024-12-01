@@ -12,7 +12,6 @@ namespace Oip.Data.EntityConfigurations;
 /// </summary>
 public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity>
 {
-    private const string TableName = "Feature";
     private readonly DatabaseFacade _database;
     private readonly bool _designTime;
 
@@ -33,7 +32,7 @@ public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity
     /// <param name="entity"></param>
     public void Configure(EntityTypeBuilder<FeatureEntity> entity)
     {
-        entity.SetTable(_database, TableName);
+        entity.SetTable(_database);
         entity.SetPrimaryKey(_designTime, e => e.FeatureId);
         entity.Property(e => e.FeatureId).ValueGeneratedOnAdd();
         entity.Property(e => e.Name).HasMaxLength(512);

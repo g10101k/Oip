@@ -16,18 +16,15 @@ public static class EntityExtension
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="database"></param>
-    /// <param name="tableName"></param>
     /// <param name="tableBuilder"></param>
     /// <typeparam name="TEntity"></typeparam>
     public static void SetTable<TEntity>(this EntityTypeBuilder<TEntity> builder, DatabaseFacade database,
-        string tableName,
         Action<TableBuilder<TEntity>>? tableBuilder = null)
         where TEntity : class
     {
-        if (database.IsNpgsql() && database.IsSqlServer())
+        var tableName = typeof(TEntity).Name.Replace("Entity", string.Empty);
+        if (database.IsNpgsql() || database.IsSqlServer())
             builder.ToTable(tableName, OipContext.SchemaName, tableBuilder ?? (_ => { }));
-        else if (database.IsSqlite())
-            builder.ToTable(tableName, tableBuilder ?? (_ => { }));
     }
 
     /// <summary>

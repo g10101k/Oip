@@ -18,10 +18,10 @@ public class FeatureSecurityEntity
     /// <summary>
     /// Right
     /// </summary>
-    public string Right { get; set; }
+    public string Right { get; set; } = null!;
 
     /// <summary>
     /// Role
     /// </summary>
-    public string Role { get; set; }
+    public string Role { get; set; } = null!;
 }
