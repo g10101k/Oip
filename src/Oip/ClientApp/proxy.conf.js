@@ -11,7 +11,7 @@ const PROXY_CONFIG = [
       "/health"
    ],
     target: target,
-    secure: true,
+    secure: false,
     headers: {
       Connection: 'Keep-Alive'
     },
