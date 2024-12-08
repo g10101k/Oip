@@ -1,16 +1,16 @@
-import {Component, OnDestroy, Renderer2, ViewChild, inject} from '@angular/core';
-import {NavigationEnd, Router} from '@angular/router';
-import {filter, Subscription} from 'rxjs';
-import {LayoutService} from "./layout/service/app.layout.service";
-import {AppSidebarComponent} from "./layout/app.sidebar.component";
-import {AppTopBarComponent} from './layout/app.topbar.component';
-import {getManifest} from '@angular-architects/module-federation';
-import {OnInit} from '@angular/core';
-import {PrimeNGConfig} from 'primeng/api';
-import {buildRoutes} from './utils/routes';
-import {CustomManifest, CustomRemoteConfig} from "shared-lib";
-import {AuthLibService} from "auth-lib";
-import {OidcSecurityService} from 'angular-auth-oidc-client';
+import { Component, OnDestroy, Renderer2, ViewChild, inject } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
+import { LayoutService } from "./layout/service/app.layout.service";
+import { AppSidebarComponent } from "./layout/app.sidebar.component";
+import { AppTopBarComponent } from './layout/app.topbar.component';
+import { getManifest } from '@angular-architects/module-federation';
+import { OnInit } from '@angular/core';
+import { PrimeNGConfig } from 'primeng/api';
+import { buildRoutes } from './utils/routes';
+import { CustomManifest, CustomRemoteConfig } from "shared-lib";
+import { AuthLibService } from "auth-lib";
+import { OidcSecurityService } from 'angular-auth-oidc-client';
 
 @Component({
   selector: 'app-root',
