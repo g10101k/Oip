@@ -89,9 +89,4 @@ public class AppSettingsOptions
     /// Normalize connection string
     /// </summary>
     public bool NormalizeConnectionString { get; set; } = true;
-
-    /// <summary>
-    /// Use Secret
-    /// </summary>
-    public bool UseSecrets { get; set; }
 }

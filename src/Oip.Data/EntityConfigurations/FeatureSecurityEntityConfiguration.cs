@@ -38,5 +38,10 @@ public class FeatureSecurityEntityConfiguration : IEntityTypeConfiguration<Featu
 
         entity.Property(e => e.Right).HasMaxLength(255);
         entity.Property(e => e.Role).HasMaxLength(255);
+
+        if (_designTime)
+        {
+            entity.Ignore(e => e.Feature);
+        }
     }
 }

@@ -7,7 +7,7 @@ using Oip.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Data.Migrations.MsSqlServer
+namespace Oip.Data.Migrations.SqlServer
 {
     [DbContext(typeof(SqlServerMigrationContext))]
     partial class SqlServerMigrationContextModelSnapshot : ModelSnapshot

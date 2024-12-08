@@ -11,7 +11,7 @@ internal class OipContextSqlServerMigrationFactory : IDesignTimeDbContextFactory
     public SqlServerMigrationContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<OipContext>();
-        var settings = DesignDbSettings.Initialize(args, false, true, false);
+        var settings = DesignDbSettings.Initialize(args, false, true);
         optionsBuilder.UseSqlServer(settings.NormalizedConnectionString);
         return new SqlServerMigrationContext(optionsBuilder.Options, true);
     }

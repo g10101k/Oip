@@ -24,4 +24,9 @@ public class FeatureSecurityEntity
     /// Role
     /// </summary>
     public string Role { get; set; } = null!;
+    
+    /// <summary>
+    /// Feature
+    /// </summary>
+    public FeatureEntity Feature { get; set; } = null!;
 }

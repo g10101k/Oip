@@ -11,7 +11,7 @@ internal class OipPostgresMigrationContextFactory : IDesignTimeDbContextFactory<
     public PostgresMigrationContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<OipContext>();
-        var settings = DesignDbSettings.Initialize(args, false, true, false);
+        var settings = DesignDbSettings.Initialize(args, false, true);
         optionsBuilder.UseNpgsql(settings.NormalizedConnectionString);
         return new PostgresMigrationContext(optionsBuilder.Options, true);
     }

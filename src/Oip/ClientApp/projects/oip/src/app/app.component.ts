@@ -1,21 +1,24 @@
-import { Component, OnDestroy, Renderer2, ViewChild } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { filter, Subscription } from 'rxjs';
-import { LayoutService } from "./layout/service/app.layout.service";
-import { AppSidebarComponent } from "./layout/app.sidebar.component";
-import { AppTopBarComponent } from './layout/app.topbar.component';
-import { getManifest } from '@angular-architects/module-federation';
-import { OnInit } from '@angular/core';
-import { PrimeNGConfig } from 'primeng/api';
-import { buildRoutes } from './utils/routes';
-import { CustomManifest, CustomRemoteConfig } from "shared-lib";
-import { AuthLibService } from "auth-lib";
+import {Component, OnDestroy, Renderer2, ViewChild, inject} from '@angular/core';
+import {NavigationEnd, Router} from '@angular/router';
+import {filter, Subscription} from 'rxjs';
+import {LayoutService} from "./layout/service/app.layout.service";
+import {AppSidebarComponent} from "./layout/app.sidebar.component";
+import {AppTopBarComponent} from './layout/app.topbar.component';
+import {getManifest} from '@angular-architects/module-federation';
+import {OnInit} from '@angular/core';
+import {PrimeNGConfig} from 'primeng/api';
+import {buildRoutes} from './utils/routes';
+import {CustomManifest, CustomRemoteConfig} from "shared-lib";
+import {AuthLibService} from "auth-lib";
+import {OidcSecurityService} from 'angular-auth-oidc-client';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private readonly oidcSecurityService = inject(OidcSecurityService);
+  private readonly primengConfig = inject(PrimeNGConfig);
 
   remotes: CustomRemoteConfig[] = [];
   title: string = "shell";
@@ -30,7 +33,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   @ViewChild(AppTopBarComponent) appTopbar!: AppTopBarComponent;
 
-  constructor(private primengConfig: PrimeNGConfig, public layoutService: LayoutService, public renderer: Renderer2, public router: Router) {
+  constructor(public layoutService: LayoutService, public renderer: Renderer2, public router: Router) {
     this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
       if (!this.menuOutsideClickListener) {
         this.menuOutsideClickListener = this.renderer.listen('document', 'click', event => {
@@ -127,6 +130,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.oidcSecurityService.checkAuth().subscribe((q) => {
+      console.log(q);
+    });
+    //this.oidcSecurityService.authorize();
+
     const manifest = getManifest<CustomManifest>();
     const routes = buildRoutes(manifest);
     this.router.resetConfig(routes);

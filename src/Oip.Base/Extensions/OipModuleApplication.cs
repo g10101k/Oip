@@ -51,6 +51,7 @@ public static class OipModuleApplication
         builder.Services.AddControllersWithViews();
         builder.Services.AddSingleton(settings);
         builder.Services.AddData(settings.ConnectionString);
+        builder.Services.AddCors();
         return builder;
     }
 
@@ -127,7 +128,7 @@ public static class OipModuleApplication
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
-
+        app.UseCors(options => options.AllowAnyOrigin());
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller}/{action=Index}/{id?}");

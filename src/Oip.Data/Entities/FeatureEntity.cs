@@ -20,4 +20,9 @@ public class FeatureEntity
     /// </summary>
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string? Settings { get; set; }
+    
+    /// <summary>
+    /// Feature Securities
+    /// </summary>
+    public ICollection<FeatureSecurityEntity> FeatureSecurities { get; set; } = new List<FeatureSecurityEntity>();
 }

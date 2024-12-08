@@ -52,7 +52,13 @@ public class FeatureRepository
             new FeatureEntity
             {
                 Name = x.Name,
-                Settings = x.Settings
+                Settings = x.Settings,
+                FeatureSecurities = x.FeatureSecurities.Select(xx=>new FeatureSecurityEntity()
+                {
+                    FeatureId = x.FeatureId,
+                    Right = xx.Right,
+                    Role = xx.Role
+                }).ToList()
             }
         ));
         await _db.SaveChangesAsync();

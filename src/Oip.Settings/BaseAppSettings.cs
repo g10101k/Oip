@@ -81,7 +81,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     /// <param name="normalizeConnectionString"></param>
     /// <returns></returns>
     public static TAppSettings Initialize(string[]? programArguments = null, bool? useEfCoreProvider = null,
-        bool? normalizeConnectionString = null, bool? useSecrets = null, string? jsonFileName = null,
+        bool? normalizeConnectionString = null, string? jsonFileName = null,
         string? jsonFileNameDevelopment = null,
         string? appSettingsTable = null, string? appSettingsSchema = null,
         Action<DbContextOptionsBuilder, XpoProvider, string>? builder = null)
@@ -103,8 +103,6 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
             _appSettingsOptions.Builder = builder;
         if (normalizeConnectionString is not null)
             _appSettingsOptions.NormalizeConnectionString = (bool)normalizeConnectionString;
-        if (useSecrets is not null)
-            _appSettingsOptions.UseSecrets = (bool)useSecrets;
         return Instance;
     }
 #pragma warning restore S107

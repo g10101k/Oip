@@ -9,7 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class AuthCallbackComponent implements OnInit {
 
   error: boolean = true;
-
+  message: string
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {
   }
 
@@ -17,6 +17,7 @@ export class AuthCallbackComponent implements OnInit {
     // check for error
     if (this.route?.snapshot?.fragment?.indexOf('error') >= 0) {
       this.error = true;
+      this.message = this.route.snapshot?.fragment;
       return;
     }
     await this.authService.completeAuthentication();

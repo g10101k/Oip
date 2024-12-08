@@ -34,6 +34,7 @@ import { TabViewModule } from "primeng/tabview";
 import { AuthGuardService, AuthService } from "../auth/auth.service";
 import { AuthCallbackComponent } from "./auth-callback/auth-callback.component";
 import { ConfigService } from "../auth/config.service";
+import {AuthConfigModule} from "./auth-config.module";
 
 @NgModule({
   declarations: [
@@ -67,7 +68,8 @@ import { ConfigService } from "../auth/config.service";
     RouterModule,
     AppConfigModule,
     CommonModule,
-    TabViewModule
+    TabViewModule,
+    AuthConfigModule
   ],
   providers: [
     CountryService, CustomerService, EventService, IconService, NodeService,
