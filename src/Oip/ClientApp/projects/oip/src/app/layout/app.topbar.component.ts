@@ -1,13 +1,15 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { LayoutService } from "./service/app.layout.service";
 import { ModuleTopBarService } from "shared-lib";
+import { OidcSecurityService } from "angular-auth-oidc-client";
 
 @Component({
   selector: 'app-topbar',
   templateUrl: './app.topbar.component.html'
 })
 export class AppTopBarComponent {
+  private readonly oidcSecurityService = inject(OidcSecurityService);
 
   items!: MenuItem[];
 
@@ -18,5 +20,9 @@ export class AppTopBarComponent {
   @ViewChild('topbarmenu') menu!: ElementRef;
 
   constructor(public layoutService: LayoutService, public topBarService: ModuleTopBarService) {
+  }
+
+  login() {
+    this.oidcSecurityService.authorize();
   }
 }

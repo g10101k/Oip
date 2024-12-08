@@ -15,9 +15,9 @@ import { AuthModule, LogLevel } from 'angular-auth-oidc-client';
         useRefreshToken: true,
         logLevel: LogLevel.Debug,
       },
-
     }),
   ],
   exports: [AuthModule],
 })
-export class AuthConfigModule {}
+export class AuthConfigModule {
+}
