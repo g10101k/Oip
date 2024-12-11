@@ -16,7 +16,8 @@ const PROXY_CONFIG = [
       Connection: 'Keep-Alive'
     },
     ws: true
-  }
+  },
+
 ]
 
 module.exports = PROXY_CONFIG;

@@ -86,7 +86,7 @@
             "port": 50000,
             "extraWebpackConfig": "projects/oip/webpack.config.js",
             "headers": {
-              "Content-Security-Policy": "script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
+              "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50001;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
               "Access-Control-Allow-Origin": "*",
               "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
             }

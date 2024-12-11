@@ -23,7 +23,6 @@ import { Chart } from 'chart.js'
     PanelMenuModule,
     ButtonModule,
     DashboardsRoutingModule,
-
   ],
   declarations: [DashboardComponent],
   providers: [LayoutService]

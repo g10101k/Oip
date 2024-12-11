@@ -1,50 +1,47 @@
 import { Routes } from '@angular/router';
 import { NotfoundComponent } from './demo/components/notfound/notfound.component';
-import { ModuleConfigComponent } from "./config/module-config.component";
-import { AuthCallbackComponent } from "./auth-callback/auth-callback.component";
-import { AuthGuardService } from "../auth/auth.service";
+import { AuthGuardService } from "./services/auth.service";
+import { inject } from "@angular/core";
 
 export const APP_ROUTES: Routes = [
   {
     path: '',
     loadChildren: () => import('./demo/components/dashboard/dashboard.module').then(m => m.DashboardModule),
-    canActivate: [AuthGuardService]
+    canActivate: [() => inject(AuthGuardService).canActivate()]
   },
   {
     path: 'blocks',
     loadChildren: () => import('./demo/components/primeblocks/primeblocks.module').then(m => m.PrimeBlocksModule),
-    canActivate: [AuthGuardService]
+    canActivate: [() => inject(AuthGuardService).canActivate()]
   },
   {
     path: 'uikit',
     loadChildren: () => import('./demo/components/uikit/uikit.module').then(m => m.UIkitModule),
-    canActivate: [AuthGuardService]
+    canActivate: [() => inject(AuthGuardService).canActivate()]
   },
   {
     path: 'utilities',
     loadChildren: () => import('./demo/components/utilities/utilities.module').then(m => m.UtilitiesModule),
-    canActivate: [AuthGuardService]
+    canActivate: [() => inject(AuthGuardService).canActivate()]
   },
   {
     path: 'documentation',
     loadChildren: () => import('./demo/components/documentation/documentation.module').then(m => m.DocumentationModule),
-    canActivate: [AuthGuardService]
-  },
-  {
-    path: 'auth-callback',
-    component: AuthCallbackComponent,
+    canActivate: [() => inject(AuthGuardService).canActivate()]
   },
   {
     path: 'pages', loadChildren: () => import('./demo/components/pages/pages.module').then(m => m.PagesModule)
   },
-  { path: 'auth', loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },
+  {
+    path: 'auth', loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule)
+  },
   {
     path: 'landing',
     loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule)
   },
   {
     path: 'config',
-    component: ModuleConfigComponent,
+    loadChildren: () => import('./layout/config/config.module').then(m => m.AppConfigModule),
     pathMatch: 'full',
   },
   {
@@ -54,7 +51,6 @@ export const APP_ROUTES: Routes = [
 ];
 
 export const APP_ROUTES_END: Routes = [
-
   {
     path: '**',
     component: NotfoundComponent,

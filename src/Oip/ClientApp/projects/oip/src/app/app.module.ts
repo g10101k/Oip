@@ -19,7 +19,7 @@ import { AppSidebarComponent } from "./layout/app.sidebar.component";
 import { AppLayoutComponent } from "./layout/app.layout.component";
 import { AppComponent } from "./app.component";
 import { NotfoundComponent } from "./demo/components/notfound/notfound.component";
-import { HashLocationStrategy, LocationStrategy, CommonModule } from "@angular/common";
+import { CommonModule } from "@angular/common";
 import { CountryService } from "./demo/service/country.service";
 import { CustomerService } from "./demo/service/customer.service";
 import { EventService } from "./demo/service/event.service";
@@ -31,10 +31,8 @@ import { LayoutService } from "./layout/service/app.layout.service";
 import { APP_ROUTES } from "./app.routes";
 import { ModuleConfigComponent } from "./config/module-config.component";
 import { TabViewModule } from "primeng/tabview";
-import { AuthGuardService, AuthService } from "../auth/auth.service";
-import { AuthCallbackComponent } from "./auth-callback/auth-callback.component";
-import { ConfigService } from "../auth/config.service";
-import {AuthConfigModule} from "./auth-config.module";
+import { AuthGuardService } from "./services/auth.service";
+import { AuthConfigModule } from "./auth-config.module";
 
 @NgModule({
   declarations: [
@@ -47,7 +45,6 @@ import {AuthConfigModule} from "./auth-config.module";
     AppComponent,
     NotfoundComponent,
     ModuleConfigComponent,
-    AuthCallbackComponent,
   ],
   imports: [
     RouterModule.forRoot(APP_ROUTES, {
@@ -73,7 +70,7 @@ import {AuthConfigModule} from "./auth-config.module";
   ],
   providers: [
     CountryService, CustomerService, EventService, IconService, NodeService,
-    PhotoService, ProductService, LayoutService, AuthGuardService, AuthService, ConfigService
+    PhotoService, ProductService, LayoutService, AuthGuardService
   ],
   bootstrap: [AppComponent]
 })

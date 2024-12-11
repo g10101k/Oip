@@ -7,3 +7,7 @@ https://github.com/angular-architects/module-federation-plugin/blob/main/libs/mf
 https://www.angulararchitects.io/blog/dynamic-module-federation-with-angular/
 
 https://volosoft.com/blog/how-to-configure-angular-modules-loaded-by-the-router
+
+
+# Security
+Use keycloak or other openid security
