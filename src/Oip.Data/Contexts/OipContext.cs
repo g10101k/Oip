@@ -87,6 +87,7 @@ public class OipContext : DbContext
                 {
                     context.Database.Migrate();
                 }
+
                 break;
             case XpoProvider.MSSqlServer:
                 builder.UseSqlServer(connectionString);
