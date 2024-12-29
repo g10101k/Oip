@@ -84,7 +84,6 @@
           "options": {
             "publicHost": "https://localhost:50000",
             "port": 50000,
-            "extraWebpackConfig": "projects/oip/webpack.config.js",
             "headers": {
               "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50001;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
               "Access-Control-Allow-Origin": "*",
@@ -95,8 +94,7 @@
         "extract-i18n": {
           "builder": "ngx-build-plus:extract-i18n",
           "options": {
-            "browserTarget": "oip:build",
-            "extraWebpackConfig": "projects/oip/webpack.config.js"
+            "browserTarget": "oip:build"
           }
         },
         "test": {
