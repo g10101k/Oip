@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthLibService} from 'auth-lib';
 
 @Component({
   selector: 'lib-other',
@@ -8,10 +7,8 @@ import {AuthLibService} from 'auth-lib';
 })
 export class OtherComponent implements OnInit {
 
-  // user = 'A';
-  user = this.service.user;
 
-  constructor(private service: AuthLibService) {
+  constructor() {
   }
 
   ngOnInit(): void {

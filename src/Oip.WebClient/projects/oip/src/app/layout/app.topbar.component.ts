@@ -1,7 +1,7 @@
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { LayoutService } from "./service/app.layout.service";
-import { ModuleTopBarService } from "shared-lib";
+import { ModuleTopBarService } from "common";
 import { OidcSecurityService } from "angular-auth-oidc-client";
 
 @Component({
