@@ -4,11 +4,12 @@ import { Product } from '../../api/product';
 import { ProductService } from '../../service/product.service';
 import { Subscription, debounceTime } from 'rxjs';
 import { LayoutService } from '../../../layout/service/app.layout.service';
+import { BaseComponent } from "common";
 
 @Component({
   templateUrl: './dashboard.component.html',
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent extends BaseComponent implements OnInit, OnDestroy {
   items!: MenuItem[];
   products!: Product[];
   chartData: any;
@@ -16,6 +17,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   subscription!: Subscription;
 
   constructor(private productService: ProductService, public layoutService: LayoutService) {
+    super();
     this.subscription = this.layoutService.configUpdate$
       .pipe(debounceTime(25))
       .subscribe((config) => {
@@ -31,6 +33,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       { label: 'Add New', icon: 'pi pi-fw pi-plus' },
       { label: 'Remove', icon: 'pi pi-fw pi-minus' }
     ];
+    super.ngOnInit();
+
   }
 
   initChart() {
@@ -44,7 +48,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       datasets: [
         {
           label: 'First Dataset',
-          data: [65, 59, 80, 81, 56, 55, 40],
+          data: [65, 59, 80, 81, 56, 55, this.id],
           fill: false,
           backgroundColor: documentStyle.getPropertyValue('--bluegray-700'),
           borderColor: documentStyle.getPropertyValue('--bluegray-700'),
@@ -93,6 +97,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    super.ngOnDestroy();
     if (this.subscription) {
       this.subscription.unsubscribe();
     }

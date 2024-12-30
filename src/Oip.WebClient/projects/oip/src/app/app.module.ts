@@ -12,7 +12,7 @@ import { IconService } from './demo/service/icon.service';
 import { NodeService } from './demo/service/node.service';
 import { PhotoService } from './demo/service/photo.service';
 import { AuthGuardService } from "./services/auth.service";
-import { AuthConfigModule } from "./auth-config.module";
+import { AuthConfigModule } from "common";
 
 @NgModule({
   declarations: [AppComponent, NotfoundComponent],

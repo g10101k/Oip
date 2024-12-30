@@ -1,32 +1,33 @@
-import { EventEmitter, Injectable, Output } from '@angular/core';
-import { TopBarItem } from "./top-bar.item";
+import { Injectable } from '@angular/core';
+import { TopBarDto } from "../dtos/top-bar.dto";
 
 @Injectable({
   providedIn: 'root'
 })
-export class ModuleTopBarService {
+export class TopBarService {
 
-  public topBarItems: TopBarItem[] = [];
+  topBarItems: TopBarDto[] = [];
 
-  private _activeIndex: number;
+  private _activeIndex: number | undefined;
 
-  public get availableTopBarItems():  TopBarItem[]
-  {
-    // Todo: https://github.com/g10101k/Oip/issues/43
+  get availableTopBarItems(): TopBarDto[] {
     return this.topBarItems;
   }
 
-  get activeTopBarItem(): TopBarItem | undefined {
+  get activeTopBarItem(): TopBarDto | undefined {
+    if (this._activeIndex === undefined) {
+      return undefined;
+    }
     return this.topBarItems[this._activeIndex];
   }
 
-  get activeIndex(): number {
+  get activeIndex(): number | undefined {
     return this._activeIndex;
   }
 
   set activeIndex(value: number) {
     this._activeIndex = value;
-    if (this.activeTopBarItem.click)
+    if (this.activeTopBarItem?.click)
       this.activeTopBarItem.click();
   }
 
@@ -34,7 +35,7 @@ export class ModuleTopBarService {
   }
 
   // Set tob bar items
-  setTopBarItems(items: TopBarItem[]) {
+  setTopBarItems(items: TopBarDto[]) {
     this.topBarItems = items;
   }
 

@@ -1,4 +1,4 @@
-import { RouterModule } from '@angular/router';
+import { RouterModule, UrlSegment } from '@angular/router';
 import { inject, NgModule } from '@angular/core';
 import { NotfoundComponent } from './demo/components/notfound/notfound.component';
 import { AppLayoutComponent } from "./layout/app.layout.component";
@@ -11,7 +11,7 @@ import { AuthGuardService } from "./services/auth.service";
         path: '', component: AppLayoutComponent,
         children: [
           {
-            path: '',
+            path: 'dashboard/:id',
             loadChildren: () => import('./demo/components/dashboard/dashboard.module').then(m => m.DashboardModule),
             canActivate: [() => inject(AuthGuardService).canActivate()],
           },
@@ -38,9 +38,14 @@ import { AuthGuardService } from "./services/auth.service";
           {
             path: 'config',
             loadChildren: () => import('./layout/config/config.module').then(m => m.AppConfigModule),
-            canActivate: [() => inject(AuthGuardService).canActivate()],
-            pathMatch: 'full',
+            canActivate: [() => inject(AuthGuardService).canActivate()]
           },
+          {
+            path: 'weather',
+            loadChildren: () => import('./demo/components/weather/weather.module').then(m => m.WeatherModule),
+            canActivate: [() => inject(AuthGuardService).canActivate()]
+          },
+
           {
             path: 'error',
             loadChildren: () => import('./demo/components/auth/error/error.module').then(m => m.ErrorModule)

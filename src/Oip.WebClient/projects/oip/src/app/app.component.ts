@@ -1,23 +1,23 @@
-import { Component, OnDestroy, Renderer2, ViewChild, inject, OnInit } from '@angular/core';
-import { PrimeNGConfig } from 'primeng/api';
-import { LoginResponse, OidcSecurityService } from 'angular-auth-oidc-client';
+import { Component, inject, OnInit } from '@angular/core';
+import { LoginResponse } from 'angular-auth-oidc-client';
+import { OipSecurityService } from "common";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
-  private readonly primengConfig = inject(PrimeNGConfig);
-  private readonly oidcSecurityService = inject(OidcSecurityService);
-
+  private readonly oipSecurityService = inject(OipSecurityService);
 
   constructor() {
   }
 
   ngOnInit() {
-    this.oidcSecurityService.checkAuth().subscribe((loginResponse: LoginResponse) => {
+    this.oipSecurityService.checkAuth().subscribe((loginResponse: LoginResponse) => {
+      this.oipSecurityService.getPayloadFromAccessToken().subscribe(x => {
+          console.log(x);
+        }
+      );
     });
-
-    this.primengConfig.ripple = true;
   }
 }

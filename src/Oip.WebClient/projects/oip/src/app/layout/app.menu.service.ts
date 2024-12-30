@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { MenuChangeEvent } from './api/menuchangeevent';
+import { BaseDataService } from "common";
 
 @Injectable({
     providedIn: 'root'
 })
-export class MenuService {
+export class MenuService extends BaseDataService{
 
     private menuSource = new Subject<MenuChangeEvent>();
     private resetSource = new Subject();
@@ -20,4 +21,11 @@ export class MenuService {
     reset() {
         this.resetSource.next(true);
     }
+
+    getMenu()
+    {
+      return this.sendRequest<any>(this.baseUrl + 'api/menu/get');
+    }
 }
+
+

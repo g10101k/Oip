@@ -5,10 +5,10 @@ import { AuthModule, LogLevel } from 'angular-auth-oidc-client';
   imports: [
     AuthModule.forRoot({
       config: {
-        authority: 'https://s-gbt-wsn-00010:8443/realms/master',
+        authority: 'https://s-gbt-wsn-00010:8443/realms/oip',
         redirectUrl: window.location.origin,
         postLogoutRedirectUri: window.location.origin,
-        clientId: 'oip-client',
+        clientId: 'oip',
         scope: 'openid profile email offline_access roles',
         responseType: 'code',
         silentRenew: true,

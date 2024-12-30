@@ -1,4 +1,4 @@
-<div class="grid">
+<div class="grid" *ngIf="isContent">
   <div class="col-12 lg:col-6 xl:col-3">
     <div class="card mb-0">
       <div class="flex justify-content-between mb-3">
@@ -70,14 +70,14 @@
       <p-table [value]="products" [paginator]="true" [rows]="5" responsiveLayout="scroll">
         <ng-template pTemplate="header">
           <tr>
-            <th>Image</th>
-            <th pSortableColumn="name">Name
+            <th id="image">Image</th>
+            <th id="name" pSortableColumn="name">Name
               <p-sortIcon field="name"></p-sortIcon>
             </th>
-            <th pSortableColumn="price">Price
+            <th id="price" pSortableColumn="price">Price
               <p-sortIcon field="price"></p-sortIcon>
             </th>
-            <th>View</th>
+            <th id="view">View</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
@@ -257,3 +257,14 @@
   </div>
 </div>
 
+<div class="card" *ngIf="isSettings">
+  <div>
+    <h5>Settings</h5>
+  </div>
+</div>
+
+<div class="card" *ngIf="isSecurity">
+  <div>
+    <h5>Security</h5>
+  </div>
+</div>
