@@ -1,11 +1,17 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NLog.Web;
 using Oip.Base.Clients;
+using Oip.Base.Middlewares;
 using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Data.Contexts;
@@ -45,6 +51,8 @@ public static class OipModuleApplication
     public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
+        builder.Logging.ClearProviders();
+        builder.Host.UseNLog();
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
@@ -52,6 +60,21 @@ public static class OipModuleApplication
         builder.Services.AddSingleton(settings);
         builder.Services.AddData(settings.ConnectionString);
         builder.Services.AddCors();
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.MetadataAddress = "https://s-gbt-wsn-00010:8443/realms/oip/.well-known/openid-configuration";
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = "https://s-gbt-wsn-00010:8443/realms/oip",
+                    ValidateAudience = false,
+                };
+                
+            });
+        
+        builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
+        builder.Services.AddAuthorization();
+
         return builder;
     }
 
@@ -117,7 +140,6 @@ public static class OipModuleApplication
     public static WebApplication BuildApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var app = builder.Build();
-        // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
@@ -128,6 +150,8 @@ public static class OipModuleApplication
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseCors(options => options.AllowAnyOrigin());
         app.MapControllerRoute(
             name: "default",
