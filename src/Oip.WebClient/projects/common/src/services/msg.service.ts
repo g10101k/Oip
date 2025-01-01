@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Message, MessageService } from "primeng/api";
+import { ToastMessageOptions, MessageService } from "primeng/api";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Injectable({
@@ -9,7 +9,7 @@ export class MsgService {
   protected readonly messageService: MessageService = inject(MessageService);
   private readonly lifetime: number = 2000;
 
-  add(msg: Message) {
+  add(msg: ToastMessageOptions) {
     this.messageService.add(msg);
   }
 
