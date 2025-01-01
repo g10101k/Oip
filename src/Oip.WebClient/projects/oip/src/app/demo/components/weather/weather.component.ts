@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { WeatherForecast } from './dtos/weather.forecast'
-import { BaseComponent, TopBarDto, TopBarService } from 'common'
+import { BaseComponent } from 'common'
 import { WeatherDataService } from "./weather-data.service";
 
 @Component({
@@ -10,7 +10,6 @@ import { WeatherDataService } from "./weather-data.service";
 export class WeatherComponent extends BaseComponent implements OnInit, OnDestroy {
 
   protected readonly dataService: WeatherDataService = inject(WeatherDataService);
-
   protected forecasts: WeatherForecast[] = [];
 
   constructor() {
