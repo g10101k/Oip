@@ -34,6 +34,12 @@ public class MenuController : Controller
                         Label = "Dashboard",
                         RouterLink = ["/dashboard/2"],
                         Icon = "pi pi-fw pi-home"
+                    },
+                    new MenuDto
+                    {
+                        Label = "Weather Forecast",
+                        RouterLink = ["/weather/1"],
+                        Icon = "pi pi-fw pi-sun"
                     }
                 ]
             }
@@ -65,8 +71,6 @@ public class MenuDto
     /// </summary>
     public List<string>? RouterLink { get; set; }
     
-    public dynamic QueryParams { get; set; }
-
     /// <summary>
     /// Url
     /// </summary>
