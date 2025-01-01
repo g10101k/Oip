@@ -41,7 +41,7 @@ import { AuthGuardService } from "./services/auth.service";
             canActivate: [() => inject(AuthGuardService).canActivate()]
           },
           {
-            path: 'weather',
+            path: 'weather/:id',
             loadChildren: () => import('./demo/components/weather/weather.module').then(m => m.WeatherModule),
             canActivate: [() => inject(AuthGuardService).canActivate()]
           },
