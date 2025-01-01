@@ -8,7 +8,6 @@ import { WeatherDataService } from "./weather-data.service";
   templateUrl: './weather.component.html'
 })
 export class WeatherComponent extends BaseComponent implements OnInit, OnDestroy {
-
   protected readonly dataService: WeatherDataService = inject(WeatherDataService);
   protected forecasts: WeatherForecast[] = [];
 
@@ -23,7 +22,7 @@ export class WeatherComponent extends BaseComponent implements OnInit, OnDestroy
   ngOnInit(): void {
     this.dataService.getData().then(result => {
       this.forecasts = result;
-    }, error => console.error(error));
+    }, error => this.msgService.error(error));
     super.ngOnInit();
   }
 }

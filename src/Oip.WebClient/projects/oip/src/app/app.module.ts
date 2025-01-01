@@ -13,14 +13,16 @@ import { NodeService } from './demo/service/node.service';
 import { PhotoService } from './demo/service/photo.service';
 import { AuthGuardService } from "./services/auth.service";
 import { AuthConfigModule } from "common";
+import { ToastModule } from "primeng/toast";
+import { MessageService } from "primeng/api";
 
 @NgModule({
   declarations: [AppComponent, NotfoundComponent],
-  imports: [AppRoutingModule, AppLayoutModule, AuthConfigModule],
+  imports: [AppRoutingModule, AppLayoutModule, AuthConfigModule, ToastModule],
   providers: [
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     CountryService, CustomerService, EventService, IconService, NodeService,
-    PhotoService, ProductService, AuthGuardService
+    PhotoService, ProductService, AuthGuardService, MessageService
   ],
   bootstrap: [AppComponent],
 })
