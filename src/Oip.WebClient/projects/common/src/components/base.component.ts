@@ -39,10 +39,10 @@ export class BaseComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.topBarService.setTopBarItems(this.topBarItems);
-    this.topBarService.activeIndex = 0;
     this.route.paramMap.subscribe(params => {
       this.id = params.get('id');
     });
+    this.topBarService.setTopBarItems(this.topBarItems);
+    this.topBarService.activeIndex = 0;
   }
 }
