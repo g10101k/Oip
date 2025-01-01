@@ -4,7 +4,7 @@
     <i class="pi pi-bars"></i>
   </button>
 
-  <p-tabView styleClass="tabview-custom" [(activeIndex)]="topBarService.activeIndex">
+  <p-tabView *ngIf="oipSecurityService.isAdmin" styleClass="tabview-custom" [(activeIndex)]="topBarService.activeIndex">
     <p-tabPanel *ngFor="let tab of topBarService.availableTopBarItems">
       <ng-template pTemplate="header">
         <i class="pi {{tab.icon}} top-bar-module-item-icon">&nbsp;</i>
@@ -24,7 +24,8 @@
       <i class="pi pi-calendar"></i>
       <span>Calendar</span>
     </button>
-    <button class="p-link layout-topbar-button" (click)="oidcSecurityService.authorize()">
+    <p-menu #userMenu [model]="items" [popup]="true" />
+    <button class="p-link layout-topbar-button" (click)="userMenuClick($event)">
       <i class="pi pi-user"></i>
       <span>Profile</span>
     </button>

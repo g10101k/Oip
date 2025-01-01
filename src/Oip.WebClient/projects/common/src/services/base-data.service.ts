@@ -1,9 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { lastValueFrom, Observable } from 'rxjs';
+import { SecurityService } from "./security.service";
 
 @Injectable()
 export class BaseDataService {
+  private readonly oipSecurityService: SecurityService = inject(SecurityService);
   private readonly http = inject(HttpClient);
 
   get baseUrl(): string {
@@ -12,7 +14,14 @@ export class BaseDataService {
 
   sendRequest<TResponse>(url: string, method: 'GET' | 'PUT' | 'POST' | 'DELETE' = 'GET', data: any = {}): Promise<TResponse> {
     const httpParams = new HttpParams({ fromObject: data });
-    const httpOptions = { withCredentials: true, body: httpParams };
+    let token = this.oipSecurityService.loginResponse.getValue()?.accessToken;
+
+    let headers: HttpHeaders;
+    if (token) {
+      headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    }
+
+    const httpOptions = { headers: headers, withCredentials: true, body: httpParams };
     let result: Observable<TResponse>;
     switch (method) {
       case 'GET':

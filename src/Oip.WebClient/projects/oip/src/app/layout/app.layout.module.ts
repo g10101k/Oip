@@ -20,6 +20,7 @@ import { AppLayoutComponent } from "./app.layout.component";
 import { ButtonModule } from "primeng/button";
 import { TabViewModule } from "primeng/tabview";
 import { SharedModule } from "primeng/api";
+import { MenuModule } from 'primeng/menu';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { SharedModule } from "primeng/api";
     ButtonModule,
     TabViewModule,
     SharedModule,
-    TabViewModule
+    TabViewModule,
+    MenuModule,
   ],
   exports: [AppLayoutComponent]
 })

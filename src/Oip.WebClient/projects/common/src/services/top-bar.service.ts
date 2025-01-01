@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { TopBarDto } from "../dtos/top-bar.dto";
+import { SecurityService } from "./security.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TopBarService {
-
   topBarItems: TopBarDto[] = [];
 
   private _activeIndex: number | undefined;
