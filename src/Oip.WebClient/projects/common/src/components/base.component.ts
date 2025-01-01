@@ -1,6 +1,7 @@
 import { Component, inject, OnDestroy, OnInit, } from '@angular/core';
 import { TopBarDto } from '../dtos/top-bar.dto'
 import { TopBarService } from '../services/top-bar.service'
+import { MsgService } from "../services/msg.service";
 import { ActivatedRoute } from "@angular/router";
 
 @Component({
@@ -11,6 +12,7 @@ export class BaseComponent implements OnInit, OnDestroy {
   id: string;
   readonly topBarService: TopBarService = inject(TopBarService);
   readonly route: ActivatedRoute = inject(ActivatedRoute);
+  readonly msgService = inject(MsgService);
 
   get isContent(): boolean {
     return this.topBarService.checkId('content');
