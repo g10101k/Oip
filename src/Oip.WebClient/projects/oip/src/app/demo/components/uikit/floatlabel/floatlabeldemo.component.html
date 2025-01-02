@@ -31,12 +31,12 @@
         <div class="field col-12 md:col-4">
             <span class="p-float-label p-input-icon-left">
                 <i class="pi pi-search"></i>
-                <input
+                <textarea
                     type="text"
                     id="lefticon"
                     pInputText
                     [(ngModel)]="value3"
-                />
+                ></textarea>
                 <label for="lefticon">Left Icon</label>
             </span>
         </div>
@@ -54,17 +54,17 @@
         </div>
         <div class="field col-12 md:col-4">
             <span class="p-float-label">
-                <p-calendar
+                <p-datepicker
                     inputId="calendar"
                     [(ngModel)]="value5"
-                ></p-calendar>
+                ></p-datepicker>
                 <label for="calendar">Calendar</label>
             </span>
         </div>
         <div class="field col-12 md:col-4">
             <span class="p-float-label">
-                <p-chips inputId="chips" [(ngModel)]="value6"></p-chips>
-                <label for="chips">Chips</label>
+                <p-chip inputId="chips" [(ngModel)]="value6"></p-chip>
+                <label for="chip">Chips</label>
             </span>
         </div>
         <div class="field col-12 md:col-4">

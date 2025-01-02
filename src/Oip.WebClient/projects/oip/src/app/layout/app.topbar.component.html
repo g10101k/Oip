@@ -18,17 +18,22 @@
     <i class="pi pi-ellipsis-v"></i>
   </button>
 
-  <div #topbarmenu class="layout-topbar-menu"
-       [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
+  <div #topbarmenu class="layout-topbar-menu">
     <button class="p-link layout-topbar-button">
       <i class="pi pi-calendar"></i>
       <span>Calendar</span>
     </button>
-    <p-menu #userMenu [model]="items" [popup]="true" />
+    <p-menu #userMenu [model]="items" [popup]="true"/>
     <button class="p-link layout-topbar-button" (click)="userMenuClick($event)">
       <i class="pi pi-user"></i>
       <span>Profile</span>
     </button>
+
+    <li>
+      <button type="button" class="topbar-item" (click)="toggleDarkMode()">
+        <i class="pi" [ngClass]="{ 'pi-moon': isDarkMode(), 'pi-sun': !isDarkMode() }"></i>
+      </button>
+    </li>
     <button class="p-link layout-topbar-button" [routerLink]="'/config'">
       <i class="pi pi-cog"></i>
       <span>Settings</span>

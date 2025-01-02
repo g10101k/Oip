@@ -15,11 +15,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "ngx-build-plus:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist",
             "index": "projects/oip/src/index.html",
-            "main": "projects/oip/src/main.ts",
+            "browser": "projects/oip/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -55,12 +55,9 @@
                 }
               ],
               "outputHashing": "all",
-              "extraWebpackConfig": "projects/oip/webpack.prod.config.js"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -69,11 +66,10 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "ngx-build-plus:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "oip:build:production",
-              "extraWebpackConfig": "projects/oip/webpack.prod.config.js"
+              "buildTarget": "oip:build:production"
             },
             "development": {
               "buildTarget": "oip:build:development",
@@ -92,7 +88,7 @@
           }
         },
         "extract-i18n": {
-          "builder": "ngx-build-plus:extract-i18n",
+          "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
             "buildTarget": "oip:build"
           }

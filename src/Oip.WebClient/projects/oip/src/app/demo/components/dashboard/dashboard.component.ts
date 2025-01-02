@@ -1,13 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, PrimeTemplate } from 'primeng/api';
 import { Product } from '../../api/product';
 import { ProductService } from '../../service/product.service';
 import { Subscription, debounceTime } from 'rxjs';
-import { LayoutService } from '../../../layout/service/app.layout.service';
 import { BaseComponent } from "common";
+import { NgIf, NgStyle, CurrencyPipe } from '@angular/common';
+import { TableModule } from 'primeng/table';
+import { ButtonDirective } from 'primeng/button';
+import { Menu } from 'primeng/menu';
+import { UIChart } from 'primeng/chart';
+import { AppConfigService } from "../../../layout/service/appconfigservice";
 
 @Component({
-  templateUrl: './dashboard.component.html',
+    templateUrl: './dashboard.component.html',
+    imports: [NgIf, NgStyle, TableModule, PrimeTemplate, ButtonDirective, Menu, UIChart, CurrencyPipe]
 })
 export class DashboardComponent extends BaseComponent implements OnInit, OnDestroy {
   items!: MenuItem[];
@@ -16,13 +22,10 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   chartOptions: any;
   subscription!: Subscription;
 
-  constructor(private productService: ProductService, public layoutService: LayoutService) {
+  constructor(private productService: ProductService, public layoutService: AppConfigService) {
     super();
-    this.subscription = this.layoutService.configUpdate$
-      .pipe(debounceTime(25))
-      .subscribe((config) => {
-        this.initChart();
-      });
+
+
   }
 
   ngOnInit() {

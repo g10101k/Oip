@@ -1,15 +1,18 @@
-import { Component, OnDestroy, Renderer2, ViewChild } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { Component, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
-import { LayoutService } from "./service/app.layout.service";
 import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppTopBarComponent } from './app.topbar.component';
+import { NgClass } from '@angular/common';
+import { AppFooterComponent } from './app.footer.component';
+import { AppConfigService } from "./service/appconfigservice";
 
 @Component({
   selector: 'app-layout',
-  templateUrl: './app.layout.component.html'
+  templateUrl: './app.layout.component.html',
+  imports: [NgClass, AppTopBarComponent, AppSidebarComponent, RouterOutlet, AppFooterComponent]
 })
-export class AppLayoutComponent implements OnDestroy {
+export class AppLayoutComponent implements OnDestroy, OnInit {
 
   overlayMenuOpenSubscription: Subscription;
 
@@ -21,7 +24,11 @@ export class AppLayoutComponent implements OnDestroy {
 
   @ViewChild(AppTopBarComponent) appTopbar!: AppTopBarComponent;
 
-  constructor(public layoutService: LayoutService, public renderer: Renderer2, public router: Router) {
+  constructor(public layoutService: AppConfigService, public renderer: Renderer2, public router: Router) {
+
+  }
+
+  ngOnInit(): void {
     this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
       if (!this.menuOutsideClickListener) {
         this.menuOutsideClickListener = this.renderer.listen('document', 'click', event => {
@@ -45,7 +52,7 @@ export class AppLayoutComponent implements OnDestroy {
         });
       }
 
-      if (this.layoutService.state.staticMenuMobileActive) {
+      if (this.layoutService.appState().staticMenuMobileActive) {
         this.blockBodyScroll();
       }
     });
@@ -58,9 +65,9 @@ export class AppLayoutComponent implements OnDestroy {
   }
 
   hideMenu() {
-    this.layoutService.state.overlayMenuActive = false;
-    this.layoutService.state.staticMenuMobileActive = false;
-    this.layoutService.state.menuHoverActive = false;
+    this.layoutService.appState().overlayMenuActive = false;
+    this.layoutService.appState().staticMenuMobileActive = false;
+    this.layoutService.appState().menuHoverActive = false;
     if (this.menuOutsideClickListener) {
       this.menuOutsideClickListener();
       this.menuOutsideClickListener = null;
@@ -69,7 +76,7 @@ export class AppLayoutComponent implements OnDestroy {
   }
 
   hideProfileMenu() {
-    this.layoutService.state.profileSidebarVisible = false;
+    this.layoutService.appState().profileSidebarVisible = false;
     if (this.profileMenuOutsideClickListener) {
       this.profileMenuOutsideClickListener();
       this.profileMenuOutsideClickListener = null;
@@ -95,15 +102,15 @@ export class AppLayoutComponent implements OnDestroy {
 
   get containerClass() {
     return {
-      'layout-theme-light': this.layoutService.config().colorScheme === 'light',
-      'layout-theme-dark': this.layoutService.config().colorScheme === 'dark',
-      'layout-overlay': this.layoutService.config().menuMode === 'overlay',
-      'layout-static': this.layoutService.config().menuMode === 'static',
-      'layout-static-inactive': this.layoutService.state.staticMenuDesktopInactive && this.layoutService.config().menuMode === 'static',
-      'layout-overlay-active': this.layoutService.state.overlayMenuActive,
-      'layout-mobile-active': this.layoutService.state.staticMenuMobileActive,
-      'p-input-filled': this.layoutService.config().inputStyle === 'filled',
-      'p-ripple-disabled': !this.layoutService.config().ripple
+      'layout-theme-light': this.layoutService.appState().colorScheme === 'light',
+      'layout-theme-dark': this.layoutService.appState().colorScheme === 'dark',
+      'layout-overlay': this.layoutService.appState().menuMode === 'overlay',
+      'layout-static': this.layoutService.appState().menuMode === 'static',
+      'layout-static-inactive': this.layoutService.appState().staticMenuDesktopInactive && this.layoutService.appState().menuMode === 'static',
+      'layout-overlay-active': this.layoutService.appState().overlayMenuActive,
+      'layout-mobile-active': this.layoutService.appState().staticMenuMobileActive,
+      'p-input-filled': this.layoutService.appState().inputStyle === 'filled',
+      'p-ripple-disabled': !this.layoutService.appState().ripple
     }
   }
 

@@ -11,30 +11,28 @@ import { WeatherDataService } from "./weather-data.service";
 
 
 @NgModule({
-  imports: [
-    CommonModule,
-    CurrencyPipe,
-    DatePipe,
-    TableModule,
-    TagModule,
-    TabViewModule,
-    RouterModule.forChild([
-      {
-        path: '',
-        component: WeatherComponent
-      },
-      {
-        path: 'weather',
-        component: WeatherComponent
-      }
-    ]),
-  ],
-  declarations: [
-    WeatherComponent,
-    WeatherSettingsComponent,
-    WeatherSecurityComponent,
-  ],
-  providers: [WeatherDataService]
+    imports: [
+        CommonModule,
+        CurrencyPipe,
+        DatePipe,
+        TableModule,
+        TagModule,
+        TabViewModule,
+        RouterModule.forChild([
+            {
+                path: '',
+                component: WeatherComponent
+            },
+            {
+                path: 'weather',
+                component: WeatherComponent
+            }
+        ]),
+        WeatherComponent,
+        WeatherSettingsComponent,
+        WeatherSecurityComponent,
+    ],
+    providers: [WeatherDataService]
 })
 export class WeatherModule {
 }

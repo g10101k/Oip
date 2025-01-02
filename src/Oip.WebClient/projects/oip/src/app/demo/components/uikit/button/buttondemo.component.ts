@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
+import { ButtonDirective, Button } from 'primeng/button';
+import { Ripple } from 'primeng/ripple';
+import { SplitButton } from 'primeng/splitbutton';
 
 @Component({
-    templateUrl: './buttondemo.component.html'
+    templateUrl: './buttondemo.component.html',
+    imports: [ButtonDirective, Ripple, Button, SplitButton]
 })
 export class ButtonDemoComponent implements OnInit {
 
@@ -24,5 +28,5 @@ export class ButtonDemoComponent implements OnInit {
         this.loading[index] = true;
         setTimeout(() => this.loading[index] = false, 1000);
     }
-    
+
 }

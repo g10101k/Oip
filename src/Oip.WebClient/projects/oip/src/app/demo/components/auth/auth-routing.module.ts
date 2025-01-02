@@ -1,15 +1,12 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Route, RouterModule } from '@angular/router';
 
-@NgModule({
-  imports: [RouterModule.forChild([
-    { path: 'error', loadChildren: () => import('./error/error.module').then(m => m.ErrorModule) },
-    { path: 'access', loadChildren: () => import('./access/access.module').then(m => m.AccessModule) },
-    { path: 'login', loadChildren: () => import('./login/login.module').then(m => m.LoginModule) },
-    { path: 'unauthorized', loadChildren: () => import('./unauthorized/unauthorized.module').then(m => m.UnauthorizedModule) },
-    { path: '**', redirectTo: '/notfound' }
-  ])],
-  exports: [RouterModule]
-})
-export class AuthRoutingModule {
-}
+
+export const AuthRouting: Route[] = [
+
+  { path: 'error', loadChildren: () => import('./error/error.module').then(m => m.ErrorModule) },
+  { path: 'access', loadChildren: () => import('./access/access.component').then(m => m.AccessComponent) },
+  { path: 'login', loadChildren: () => import('./login/login.module').then(m => m.LoginModule) },
+  { path: 'unauthorized', loadChildren: () => import('./unauthorized/unauthorized.module').then(m => m.UnauthorizedModule) },
+  { path: '**', redirectTo: '/notfound' }
+];

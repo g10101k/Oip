@@ -1,18 +1,21 @@
 import { inject, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
-import { LayoutService } from './service/app.layout.service';
 import { OidcSecurityService } from "angular-auth-oidc-client";
 import { MenuService } from "./app.menu.service";
+import { NgFor, NgIf } from '@angular/common';
+import { AppMenuitemComponent } from './app.menuitem.component';
+import { AppConfigService } from "./service/appconfigservice";
 
 @Component({
-  selector: 'app-menu',
-  templateUrl: './app.menu.component.html'
+    selector: 'app-menu',
+    templateUrl: './app.menu.component.html',
+    imports: [NgFor, NgIf, AppMenuitemComponent]
 })
 export class AppMenuComponent implements OnInit {
   protected readonly menuService = inject(MenuService);
   model: any[] = [];
 
-  constructor(public layoutService: LayoutService) {
+  constructor(public layoutService: AppConfigService) {
   }
 
   ngOnInit() {

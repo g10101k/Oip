@@ -8,8 +8,8 @@ import { ButtonModule } from 'primeng/button';
     imports: [
         CommonModule,
         UnauthorizedRoutingModule,
-        ButtonModule
-    ],
-    declarations: [UnauthorizedComponent]
+        ButtonModule,
+        UnauthorizedComponent
+    ]
 })
 export class UnauthorizedModule { }

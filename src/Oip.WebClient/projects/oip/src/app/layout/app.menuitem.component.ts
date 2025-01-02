@@ -1,15 +1,17 @@
 import { ChangeDetectorRef, Component, Host, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { MenuService } from './app.menu.service';
-import { LayoutService } from './service/app.layout.service';
+import { NgIf, NgClass, NgFor } from '@angular/common';
+import { Ripple } from 'primeng/ripple';
+import { AppConfigService } from "./service/appconfigservice";
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: '[app-menuitem]',
-  template: `
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: '[app-menuitem]',
+    template: `
     <ng-container>
       <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text">{{ item.label }}</div>
       <a *ngIf="(!item.routerLink || item.items) && item.visible !== false" [attr.href]="item.url"
@@ -40,17 +42,18 @@ import { LayoutService } from './service/app.layout.service';
       </ul>
     </ng-container>
   `,
-  animations: [
-    trigger('children', [
-      state('collapsed', style({
-        height: '0'
-      })),
-      state('expanded', style({
-        height: '*'
-      })),
-      transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
-    ])
-  ]
+    animations: [
+        trigger('children', [
+            state('collapsed', style({
+                height: '0'
+            })),
+            state('expanded', style({
+                height: '*'
+            })),
+            transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
+        ])
+    ],
+    imports: [NgIf, Ripple, NgClass, RouterLinkActive, RouterLink, NgFor]
 })
 export class AppMenuitemComponent implements OnInit, OnDestroy {
 
@@ -70,7 +73,7 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
 
   key: string = "";
 
-  constructor(public layoutService: LayoutService, private cd: ChangeDetectorRef, public router: Router, private menuService: MenuService) {
+  constructor(public layoutService: AppConfigService, private cd: ChangeDetectorRef, public router: Router, private menuService: MenuService) {
     this.menuSourceSubscription = this.menuService.menuSource$.subscribe(value => {
       Promise.resolve(null).then(() => {
         if (value.routeEvent) {

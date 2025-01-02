@@ -5,14 +5,13 @@ import { InputDemoComponent } from './inputdemo.component';
 import { InputDemoRoutingModule } from './inputdemo-routing.module';
 import { AutoCompleteModule } from "primeng/autocomplete";
 import { CalendarModule } from "primeng/calendar";
-import { ChipsModule } from "primeng/chips";
 import { ChipModule } from "primeng/chip";
 import { DropdownModule } from "primeng/dropdown";
 import { InputMaskModule } from "primeng/inputmask";
 import { InputNumberModule } from "primeng/inputnumber";
 import { CascadeSelectModule } from "primeng/cascadeselect";
 import { MultiSelectModule } from "primeng/multiselect";
-import { InputTextareaModule } from "primeng/inputtextarea";
+import { TextareaModule } from "primeng/textarea";
 import { InputTextModule } from "primeng/inputtext";
 import { RatingModule } from 'primeng/rating';
 import { KnobModule } from 'primeng/knob';
@@ -27,36 +26,37 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { SliderModule } from 'primeng/slider';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputGroupModule } from 'primeng/inputgroup';
+
 @NgModule({
-	imports: [
-		CommonModule,
-		FormsModule,
-		InputDemoRoutingModule,
-		AutoCompleteModule,
-		CalendarModule,
-		ChipsModule,
-		DropdownModule,
-		InputMaskModule,
-		InputNumberModule,
-		ColorPickerModule,
-		CascadeSelectModule,
-		MultiSelectModule,
-		ToggleButtonModule,
-		SliderModule,
-		InputTextareaModule,
-		RadioButtonModule,
-		InputTextModule,
-		RatingModule,
-		ChipModule,
-		KnobModule,
-		InputSwitchModule,
-		ListboxModule,
-		SelectButtonModule,
-		CheckboxModule,
-		ButtonModule,
-		InputGroupModule,
-		InputGroupAddonModule
-	],
-	declarations: [InputDemoComponent]
+    imports: [
+        CommonModule,
+        FormsModule,
+        InputDemoRoutingModule,
+        AutoCompleteModule,
+        CalendarModule,
+        ChipModule,
+        DropdownModule,
+        InputMaskModule,
+        InputNumberModule,
+        ColorPickerModule,
+        CascadeSelectModule,
+        MultiSelectModule,
+        ToggleButtonModule,
+        SliderModule,
+        TextareaModule,
+        RadioButtonModule,
+        InputTextModule,
+        RatingModule,
+        ChipModule,
+        KnobModule,
+        InputSwitchModule,
+        ListboxModule,
+        SelectButtonModule,
+        CheckboxModule,
+        ButtonModule,
+        InputGroupModule,
+        InputGroupAddonModule,
+        InputDemoComponent
+    ]
 })
 export class InputDemoModule { }

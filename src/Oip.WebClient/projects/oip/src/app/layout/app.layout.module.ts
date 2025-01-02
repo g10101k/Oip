@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { InputTextModule } from 'primeng/inputtext';
 import { SidebarModule } from 'primeng/sidebar';
 import { BadgeModule } from 'primeng/badge';
@@ -14,43 +12,41 @@ import { AppMenuitemComponent } from './app.menuitem.component';
 import { RouterModule } from '@angular/router';
 import { AppTopBarComponent } from './app.topbar.component';
 import { AppFooterComponent } from './app.footer.component';
-import { AppConfigModule } from './config/config.module';
+import { AppConfigModule } from './config/app.config.module';
 import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppLayoutComponent } from "./app.layout.component";
 import { ButtonModule } from "primeng/button";
 import { TabViewModule } from "primeng/tabview";
 import { SharedModule } from "primeng/api";
 import { MenuModule } from 'primeng/menu';
+import { CommonModule } from "@angular/common";
 
 @NgModule({
-  declarations: [
-    AppMenuitemComponent,
-    AppTopBarComponent,
-    AppFooterComponent,
-    AppMenuComponent,
-    AppSidebarComponent,
-    AppLayoutComponent,
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    InputTextModule,
-    SidebarModule,
-    BadgeModule,
-    RadioButtonModule,
-    InputSwitchModule,
-    RippleModule,
-    RouterModule,
-    AppConfigModule,
-    ButtonModule,
-    TabViewModule,
-    SharedModule,
-    TabViewModule,
-    MenuModule,
-  ],
-  exports: [AppLayoutComponent]
+    imports: [
+        FormsModule,
+        HttpClientModule,
+        CommonModule,
+        InputTextModule,
+        SidebarModule,
+        BadgeModule,
+        RadioButtonModule,
+        InputSwitchModule,
+        RippleModule,
+        RouterModule,
+        AppConfigModule,
+        ButtonModule,
+        TabViewModule,
+        SharedModule,
+        TabViewModule,
+        MenuModule,
+        AppMenuitemComponent,
+        AppTopBarComponent,
+        AppFooterComponent,
+        AppMenuComponent,
+        AppSidebarComponent,
+        AppLayoutComponent,
+    ],
+    exports: [AppLayoutComponent]
 })
 export class AppLayoutModule {
 }

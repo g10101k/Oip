@@ -3,136 +3,148 @@ import { Customer, Representative } from 'projects/oip/src/app/demo/api/customer
 import { CustomerService } from 'projects/oip/src/app/demo/service/customer.service';
 import { Product } from 'projects/oip/src/app/demo/api/product';
 import { ProductService } from 'projects/oip/src/app/demo/service/product.service';
-import { Table } from 'primeng/table';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { Table, TableModule } from 'primeng/table';
+import { MessageService, ConfirmationService, PrimeTemplate } from 'primeng/api';
+import { ButtonDirective, Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { MultiSelect } from 'primeng/multiselect';
+import { FormsModule } from '@angular/forms';
+import { DropdownModule } from 'primeng/dropdown';
+import { Slider } from 'primeng/slider';
+import { ProgressBar } from 'primeng/progressbar';
+import { NgClass, NgIf, CurrencyPipe, DatePipe } from '@angular/common';
+import { ToggleButton } from 'primeng/togglebutton';
+import { Toast } from 'primeng/toast';
+import { Ripple } from 'primeng/ripple';
+import { Rating } from 'primeng/rating';
 
 interface expandedRows {
-    [key: string]: boolean;
+  [key: string]: boolean;
 }
 
 @Component({
     templateUrl: './tabledemo.component.html',
-    providers: [MessageService, ConfirmationService]
+    providers: [MessageService, ConfirmationService],
+    imports: [TableModule, PrimeTemplate, ButtonDirective, InputText, MultiSelect, FormsModule, DropdownModule, Slider, ProgressBar, NgClass, ToggleButton, Toast, Ripple, Rating, Button, NgIf, CurrencyPipe, DatePipe]
 })
 export class TableDemoComponent implements OnInit {
 
-    customers1: Customer[] = [];
+  customers1: Customer[] = [];
 
-    customers2: Customer[] = [];
+  customers2: Customer[] = [];
 
-    customers3: Customer[] = [];
+  customers3: Customer[] = [];
 
-    selectedCustomers1: Customer[] = [];
+  selectedCustomers1: Customer[] = [];
 
-    selectedCustomer: Customer = {};
+  selectedCustomer: Customer = {};
 
-    representatives: Representative[] = [];
+  representatives: Representative[] = [];
 
-    statuses: any[] = [];
+  statuses: any[] = [];
 
-    products: Product[] = [];
+  products: Product[] = [];
 
-    rowGroupMetadata: any;
+  rowGroupMetadata: any;
 
-    expandedRows: expandedRows = {};
+  expandedRows: expandedRows = {};
 
-    activityValues: number[] = [0, 100];
+  activityValues: number[] = [0, 100];
 
-    isExpanded: boolean = false;
+  isExpanded: boolean = false;
 
-    idFrozen: boolean = false;
+  idFrozen: boolean = false;
 
-    loading: boolean = true;
+  loading: boolean = true;
 
-    @ViewChild('filter') filter!: ElementRef;
+  @ViewChild('filter') filter!: ElementRef;
 
-    constructor(private customerService: CustomerService, private productService: ProductService) { }
+  constructor(private customerService: CustomerService, private productService: ProductService) {
+  }
 
-    ngOnInit() {
-        this.customerService.getCustomersLarge().then(customers => {
-            this.customers1 = customers;
-            this.loading = false;
+  ngOnInit() {
+    this.customerService.getCustomersLarge().then(customers => {
+      this.customers1 = customers;
+      this.loading = false;
 
-            // @ts-ignore
-            this.customers1.forEach(customer => customer.date = new Date(customer.date));
-        });
-        this.customerService.getCustomersMedium().then(customers => this.customers2 = customers);
-        this.customerService.getCustomersLarge().then(customers => this.customers3 = customers);
-        this.productService.getProductsWithOrdersSmall().then(data => this.products = data);
+      // @ts-ignore
+      this.customers1.forEach(customer => customer.date = new Date(customer.date));
+    });
+    this.customerService.getCustomersMedium().then(customers => this.customers2 = customers);
+    this.customerService.getCustomersLarge().then(customers => this.customers3 = customers);
+    this.productService.getProductsWithOrdersSmall().then(data => this.products = data);
 
-        this.representatives = [
-            { name: 'Amy Elsner', image: 'amyelsner.png' },
-            { name: 'Anna Fali', image: 'annafali.png' },
-            { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-            { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-            { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-            { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-            { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-            { name: 'Onyama Limba', image: 'onyamalimba.png' },
-            { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-            { name: 'XuXue Feng', image: 'xuxuefeng.png' }
-        ];
+    this.representatives = [
+      { name: 'Amy Elsner', image: 'amyelsner.png' },
+      { name: 'Anna Fali', image: 'annafali.png' },
+      { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
+      { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
+      { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
+      { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
+      { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
+      { name: 'Onyama Limba', image: 'onyamalimba.png' },
+      { name: 'Stephen Shaw', image: 'stephenshaw.png' },
+      { name: 'XuXue Feng', image: 'xuxuefeng.png' }
+    ];
 
-        this.statuses = [
-            { label: 'Unqualified', value: 'unqualified' },
-            { label: 'Qualified', value: 'qualified' },
-            { label: 'New', value: 'new' },
-            { label: 'Negotiation', value: 'negotiation' },
-            { label: 'Renewal', value: 'renewal' },
-            { label: 'Proposal', value: 'proposal' }
-        ];
-    }
+    this.statuses = [
+      { label: 'Unqualified', value: 'unqualified' },
+      { label: 'Qualified', value: 'qualified' },
+      { label: 'New', value: 'new' },
+      { label: 'Negotiation', value: 'negotiation' },
+      { label: 'Renewal', value: 'renewal' },
+      { label: 'Proposal', value: 'proposal' }
+    ];
+  }
 
-    onSort() {
-        this.updateRowGroupMetaData();
-    }
+  onSort() {
+    this.updateRowGroupMetaData();
+  }
 
-    updateRowGroupMetaData() {
-        this.rowGroupMetadata = {};
+  updateRowGroupMetaData() {
+    this.rowGroupMetadata = {};
 
-        if (this.customers3) {
-            for (let i = 0; i < this.customers3.length; i++) {
-                const rowData = this.customers3[i];
-                const representativeName = rowData?.representative?.name || '';
+    if (this.customers3) {
+      for (let i = 0; i < this.customers3.length; i++) {
+        const rowData = this.customers3[i];
+        const representativeName = rowData?.representative?.name || '';
 
-                if (i === 0) {
-                    this.rowGroupMetadata[representativeName] = { index: 0, size: 1 };
-                }
-                else {
-                    const previousRowData = this.customers3[i - 1];
-                    const previousRowGroup = previousRowData?.representative?.name;
-                    if (representativeName === previousRowGroup) {
-                        this.rowGroupMetadata[representativeName].size++;
-                    }
-                    else {
-                        this.rowGroupMetadata[representativeName] = { index: i, size: 1 };
-                    }
-                }
-            }
-        }
-    }
-
-    expandAll() {
-        if (!this.isExpanded) {
-            this.products.forEach(product => product && product.name ? this.expandedRows[product.name] = true : '');
-
+        if (i === 0) {
+          this.rowGroupMetadata[representativeName] = { index: 0, size: 1 };
         } else {
-            this.expandedRows = {};
+          const previousRowData = this.customers3[i - 1];
+          const previousRowGroup = previousRowData?.representative?.name;
+          if (representativeName === previousRowGroup) {
+            this.rowGroupMetadata[representativeName].size++;
+          } else {
+            this.rowGroupMetadata[representativeName] = { index: i, size: 1 };
+          }
         }
-        this.isExpanded = !this.isExpanded;
+      }
     }
+  }
 
-    formatCurrency(value: number) {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
+  expandAll() {
+    if (!this.isExpanded) {
+      this.products.forEach(product => product && product.name ? this.expandedRows[product.name] = true : '');
 
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    } else {
+      this.expandedRows = {};
     }
+    this.isExpanded = !this.isExpanded;
+  }
 
-    clear(table: Table) {
-        table.clear();
-        this.filter.nativeElement.value = '';
-    }
+  formatCurrency(value: number) {
+    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  }
+
+  onGlobalFilter(table: Table, event: Event) {
+    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  clear(table: Table) {
+    table.clear();
+    this.filter.nativeElement.value = '';
+  }
 
 }

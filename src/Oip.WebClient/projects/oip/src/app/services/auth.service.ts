@@ -1,11 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { Router, UrlTree } from '@angular/router';
+import { CanActivate, Router, UrlTree } from '@angular/router';
 import { map, take } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { OidcSecurityService } from "angular-auth-oidc-client";
+import { AbstractAuthGuardService } from "../app.config";
 
 @Injectable()
-export class AuthGuardService {
+export class AuthGuardService implements AbstractAuthGuardService {
   private readonly oidcSecurityService = inject(OidcSecurityService);
   private readonly router = inject(Router);
 

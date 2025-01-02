@@ -1,9 +1,31 @@
 import { Component, OnInit } from '@angular/core';
-import { SelectItem } from 'primeng/api';
+import { SelectItem, PrimeTemplate } from 'primeng/api';
 import { CountryService } from 'projects/oip/src/app/demo/service/country.service';
+import { InputText } from 'primeng/inputtext';
+import { AutoComplete } from 'primeng/autocomplete';
+import { FormsModule } from '@angular/forms';
+import { Calendar } from 'primeng/calendar';
+import { InputNumber } from 'primeng/inputnumber';
+import { Chip } from 'primeng/chip';
+import { Slider } from 'primeng/slider';
+import { Rating } from 'primeng/rating';
+import { ColorPicker } from 'primeng/colorpicker';
+import { Knob } from 'primeng/knob';
+import { RadioButton } from 'primeng/radiobutton';
+import { Checkbox } from 'primeng/checkbox';
+import { InputSwitch } from 'primeng/inputswitch';
+import { Listbox } from 'primeng/listbox';
+import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelect } from 'primeng/multiselect';
+import { ToggleButton } from 'primeng/togglebutton';
+import { SelectButton } from 'primeng/selectbutton';
+import { InputGroup } from 'primeng/inputgroup';
+import { InputGroupAddon } from 'primeng/inputgroupaddon';
+import { ButtonDirective } from 'primeng/button';
 
 @Component({
-    templateUrl: './inputdemo.component.html'
+    templateUrl: './inputdemo.component.html',
+    imports: [InputText, AutoComplete, FormsModule, Calendar, InputNumber, Chip, Slider, Rating, ColorPicker, Knob, RadioButton, Checkbox, InputSwitch, Listbox, DropdownModule, MultiSelect, PrimeTemplate, ToggleButton, SelectButton, InputGroup, InputGroupAddon, ButtonDirective]
 })
 export class InputDemoComponent implements OnInit {
 
