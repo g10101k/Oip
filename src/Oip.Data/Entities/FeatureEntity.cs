@@ -22,7 +22,17 @@ public class FeatureEntity
     public string? Settings { get; set; }
     
     /// <summary>
+    /// Route link to component
+    /// </summary>
+    public string? RouterLink { get; set; }
+    
+    /// <summary>
     /// Feature Securities
     /// </summary>
     public ICollection<FeatureSecurityEntity> FeatureSecurities { get; set; } = new List<FeatureSecurityEntity>();
+    
+    /// <summary>
+    /// Instances
+    /// </summary>
+    public ICollection<FeatureInstanceEntity> FeatureInstances { get; set; } = new List<FeatureInstanceEntity>();
 }

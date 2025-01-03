@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using Oip.Module.Example.Controllers;
 
 #pragma warning disable CS1591
 
-namespace Oip.Module.Example.Controllers;
+namespace Oip.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -35,5 +35,31 @@ public class WeatherForecastController : ControllerBase
             })
             .ToArray());
     }
+
+    [HttpGet]
+    [Authorize(Roles = "admin")]
+    [Route("get-security")]
+    public IActionResult GetSecurity(string id)
+    {
+        return Ok(new WeatherForecastSecurityDto()
+        {
+            Read = ["admin"]
+        });
+    }
+
+    [HttpPut]
+    [Authorize(Roles = "admin")]
+    [Route("get-security")]
+    public IActionResult PutSecurity(string id, WeatherForecastSecurityDto security)
+    {
+        
+        return Ok(security);
+    }
 }
 #pragma warning restore CS1591
+
+
+public class WeatherForecastSecurityDto
+{
+    public List<string> Read { get; set; }
+}

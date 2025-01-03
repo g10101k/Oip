@@ -86,6 +86,7 @@ public class OipContext : DbContext
                 using (var context = new PostgresMigrationContext(builder.Options, false))
                 {
                     context.Database.Migrate();
+                    DefaultDataInsert(context);
                 }
 
                 break;
@@ -94,6 +95,7 @@ public class OipContext : DbContext
                 using (var context = new SqlServerMigrationContext(builder.Options, false))
                 {
                     context.Database.Migrate();
+                    DefaultDataInsert(context);
                 }
 
                 break;
@@ -102,6 +104,21 @@ public class OipContext : DbContext
             default:
                 throw new InvalidOperationException("Unknown provider");
         }
+    }
+
+    private static void DefaultDataInsert(OipContext context)
+    {
+        if (!context.Features.Any(x => x.Name == "Folder"))
+        {
+            context.Features.Add(new FeatureEntity { Name = "Folder" });
+        }
+
+        if (!context.Features.Any(x => x.Name == "Dashboard"))
+        {
+            context.Features.Add(new FeatureEntity { Name = "Dashboard", RouterLink = "/dashboard/" });
+        }
+
+        context.SaveChanges();
     }
 }
 

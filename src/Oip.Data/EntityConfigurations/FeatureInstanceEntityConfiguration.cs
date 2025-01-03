@@ -34,5 +34,20 @@ public class FeatureInstanceEntityConfiguration : IEntityTypeConfiguration<Featu
         entity.SetTable(_database);
         entity.SetPrimaryKey(_designTime, e => e.FeatureInstanceId);
         entity.Property(e => e.FeatureInstanceId).ValueGeneratedOnAdd();
+
+        entity.Property(e => e.Icon).HasMaxLength(64);
+        entity.Property(e => e.Label).HasMaxLength(128);
+        entity.Property(e => e.Url).HasMaxLength(1024);
+        entity.Property(e => e.Target).HasMaxLength(64);
+
+        if (_designTime)
+        {
+            entity.Ignore(e => e.Parent);
+            entity.Ignore(e => e.Feature);
+        }
+        else
+        {
+            entity.HasOne(e => e.Parent).WithMany(x => x.Items).HasForeignKey(e => e.ParentId);
+        }
     }
 }

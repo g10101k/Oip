@@ -69,9 +69,13 @@ public static class OipModuleApplication
                     ValidIssuer = "https://s-gbt-wsn-00010:8443/realms/oip",
                     ValidateAudience = false,
                 };
-                
             });
-        
+
+        builder.Services.AddMvc().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.DefaultIgnoreCondition
+                = JsonIgnoreCondition.WhenWritingNull;
+        });
         builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
         builder.Services.AddAuthorization();
 
@@ -158,7 +162,7 @@ public static class OipModuleApplication
             pattern: "{controller}/{action=Index}/{id?}");
         app.MapOpenApi(settings);
         app.MapFallbackToFile("index.html");
-        
+
         OipContext.MigrateDb(settings.Provider, settings.NormalizedConnectionString);
         return app;
     }

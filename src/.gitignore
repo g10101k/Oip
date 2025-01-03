@@ -273,3 +273,5 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# npm ignore
+package-lock.json

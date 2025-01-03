@@ -35,14 +35,17 @@ public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity
         entity.SetPrimaryKey(_designTime, e => e.FeatureId);
         entity.Property(e => e.FeatureId).ValueGeneratedOnAdd();
         entity.Property(e => e.Name).HasMaxLength(512);
-        
+        entity.Property(e => e.RouterLink).HasMaxLength(256);
+
         if (_designTime)
         {
             entity.Ignore(e => e.FeatureSecurities);
+            entity.Ignore(e => e.FeatureInstances);
         }
         else
         {
             entity.HasMany(e => e.FeatureSecurities).WithOne(e => e.Feature);
+            entity.HasMany(e => e.FeatureInstances).WithOne(e => e.Feature);
         }
     }
 }

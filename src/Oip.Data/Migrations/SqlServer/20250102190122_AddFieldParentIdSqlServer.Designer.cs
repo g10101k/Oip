@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oip.Data.Contexts;
 
@@ -11,9 +12,11 @@ using Oip.Data.Contexts;
 namespace Oip.Data.Migrations.SqlServer
 {
     [DbContext(typeof(SqlServerMigrationContext))]
-    partial class SqlServerMigrationContextModelSnapshot : ModelSnapshot
+    [Migration("20250102190122_AddFieldParentIdSqlServer")]
+    partial class AddFieldParentIdSqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,9 +38,8 @@ namespace Oip.Data.Migrations.SqlServer
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
 
-                    b.Property<string>("RouterLink")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                    b.Property<string>("RouteLink")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Settings")
                         .HasColumnType("nvarchar(max)");
@@ -67,6 +69,10 @@ namespace Oip.Data.Migrations.SqlServer
 
                     b.Property<int?>("ParentId")
                         .HasColumnType("int");
+
+                    b.Property<string>("RouterLink")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Settings")
                         .IsRequired()

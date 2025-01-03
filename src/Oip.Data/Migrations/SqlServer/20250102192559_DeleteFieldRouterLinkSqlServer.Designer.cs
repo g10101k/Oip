@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oip.Data.Contexts;
 
@@ -11,9 +12,11 @@ using Oip.Data.Contexts;
 namespace Oip.Data.Migrations.SqlServer
 {
     [DbContext(typeof(SqlServerMigrationContext))]
-    partial class SqlServerMigrationContextModelSnapshot : ModelSnapshot
+    [Migration("20250102192559_DeleteFieldRouterLinkSqlServer")]
+    partial class DeleteFieldRouterLinkSqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
