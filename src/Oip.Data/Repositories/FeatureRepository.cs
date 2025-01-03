@@ -53,7 +53,7 @@ public class FeatureRepository
             {
                 Name = x.Name,
                 Settings = x.Settings,
-                FeatureSecurities = x.FeatureSecurities.Select(xx=>new FeatureSecurityEntity()
+                FeatureSecurities = x.FeatureSecurities.Select(xx => new FeatureSecurityEntity()
                 {
                     FeatureId = x.FeatureId,
                     Right = xx.Right,
@@ -63,4 +63,48 @@ public class FeatureRepository
         ));
         await _db.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Get all
+    /// </summary>
+    public async Task<IEnumerable<FeatureInstanceDto>> GetFeatureForMenuAll()
+    {
+        var list = (from feature in _db.FeaturesInstances.Include(x => x.Items)!.ThenInclude(x => x.Feature)
+            where feature.ParentId == null
+            select feature).ToList();
+
+        var result = list.Select(ToDto);
+
+        return result;
+    }
+
+    private FeatureInstanceDto ToDto(FeatureInstanceEntity feature)
+    {
+        return new FeatureInstanceDto(feature.FeatureInstanceId, feature.FeatureId, feature.Label, feature.Icon,
+            feature.Feature?.RouterLink != null ? [$"{feature.Feature?.RouterLink}{feature.FeatureInstanceId}"] : null, feature.Url,
+            feature.Target, feature.Settings, feature.Items?.Select(ToDto).ToList());
+    }
 }
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="FeatureInstanceId"></param>
+/// <param name="FeatureId"></param>
+/// <param name="Label"></param>
+/// <param name="Icon"></param>
+/// <param name="RouterLink"></param>
+/// <param name="Url"></param>
+/// <param name="Target"></param>
+/// <param name="Settings"></param>
+/// <param name="Items">Childs</param>
+public record FeatureInstanceDto(
+    int FeatureInstanceId,
+    int FeatureId,
+    string Label,
+    string? Icon,
+    List<string>? RouterLink,
+    string? Url,
+    string? Target,
+    string? Settings,
+    List<FeatureInstanceDto>? Items);
