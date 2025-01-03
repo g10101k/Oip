@@ -1,5 +1,18 @@
-<div class="card" >
+<div class="card p-fluid">
+  <h5>Security</h5>
+  <div *ngFor="let item of securityData">
+    <div class="field">
+      <label htmlFor="name1">{{ item.name }} <span pTooltip="{{ item.description }}" tooltipPosition="right"
+                                                   class="pi pi-question-circle"></span>
+      </label>
+      <p-multiSelect
+        [options]="roles"
+        [(ngModel)]="item.roles"
+        placeholder="Select roles"/>
+    </div>
+
+  </div>
   <div>
-    <h5>Security</h5>
+    <p-button label="Save" icon="pi pi-check" iconPos="right" (click)="saveClick()" (keydown)="saveKeyDown($event)"/>
   </div>
 </div>

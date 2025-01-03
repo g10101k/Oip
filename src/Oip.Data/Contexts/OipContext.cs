@@ -30,7 +30,7 @@ public class OipContext : DbContext
     /// <summary>
     /// FeaturesInstances
     /// </summary>
-    public DbSet<FeatureInstanceEntity> FeaturesInstances => Set<FeatureInstanceEntity>();
+    public DbSet<FeatureInstanceEntity> FeatureInstances => Set<FeatureInstanceEntity>();
 
     /// <summary>
     /// FeatureInstanceSecurities

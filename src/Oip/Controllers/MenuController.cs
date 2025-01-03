@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Oip.Data.Repositories;
 
@@ -25,6 +26,7 @@ public class MenuController : Controller
     /// </summary>
     /// <returns></returns>
     [HttpGet("get")]
+    [Authorize]
     public async Task<IEnumerable<FeatureInstanceDto>> Get()
     {
         return await _featureRepository.GetFeatureForMenuAll();

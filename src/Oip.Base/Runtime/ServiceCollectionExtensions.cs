@@ -27,4 +27,5 @@ public static class ServiceCollectionExtensions
             .AddScoped(factory)
             .AddScoped<IStartupTask, TStartupTask>(sp => sp.GetRequiredService<TStartupTask>());
     }
+    
 }

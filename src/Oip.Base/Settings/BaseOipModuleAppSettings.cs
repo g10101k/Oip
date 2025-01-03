@@ -15,8 +15,5 @@ public class BaseOipModuleAppSettings : BaseAppSettings<BaseOipModuleAppSettings
     public SpaDevelopmentServerSettings SpaProxyServer { get; set; } = new();
 
     /// <inheritdoc />
-    public ModuleFederationSettings ModuleFederation { get; set; } = new();
-
-    /// <inheritdoc />
     public OpenTelemetrySettings Telemetry { get; set; } = new();
 }

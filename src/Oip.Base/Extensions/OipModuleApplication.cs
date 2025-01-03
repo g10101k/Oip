@@ -26,6 +26,8 @@ namespace Oip.Base.Extensions;
 /// </summary>
 public static class OipModuleApplication
 {
+    private const string Bearer = "Bearer";
+
     /// <summary>
     /// Initializes a new instance of the WebApplicationBuilder class with preconfigured defaults
     /// </summary>
@@ -38,7 +40,6 @@ public static class OipModuleApplication
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
-        builder.Services.AddHostedService<ModulesRegistryProcess>();
         builder.Services.AddControllersWithViews();
         builder.Services.AddSingleton(settings);
         return builder;
@@ -61,25 +62,11 @@ public static class OipModuleApplication
         builder.Services.AddSingleton(settings);
         builder.Services.AddData(settings.ConnectionString);
         builder.Services.AddCors();
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.MetadataAddress = "https://s-gbt-wsn-00010:8443/realms/oip/.well-known/openid-configuration";
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidIssuer = "https://s-gbt-wsn-00010:8443/realms/oip",
-                    ValidateAudience = false,
-                };
-            });
-
         builder.Services.AddMvc().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.DefaultIgnoreCondition
                 = JsonIgnoreCondition.WhenWritingNull;
         });
-        builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
-        builder.Services.AddAuthorization();
-
         return builder;
     }
 
@@ -105,6 +92,34 @@ public static class OipModuleApplication
                 options.IncludeXmlComments(filePath);
             }
 
+            options.AddSecurityDefinition(Bearer, new OpenApiSecurityScheme
+            {
+                Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = Bearer
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = Bearer
+                        },
+                        Scheme = "oauth2",
+                        Name = Bearer,
+                        In = ParameterLocation.Header,
+
+                    },
+                    new List<string>()
+                }
+            });
             options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
             {
                 Version = openApiSettings.Version,

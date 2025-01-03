@@ -9,7 +9,7 @@ import { ActivatedRoute } from "@angular/router";
   template: ''
 })
 export class BaseComponent implements OnInit, OnDestroy {
-  id: string;
+  id: number;
   readonly topBarService: TopBarService = inject(TopBarService);
   readonly route: ActivatedRoute = inject(ActivatedRoute);
   readonly msgService = inject(MsgService);
@@ -42,7 +42,7 @@ export class BaseComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
-      this.id = params.get('id');
+      this.id = +params.get('id');
     });
     this.topBarService.setTopBarItems(this.topBarItems);
     this.topBarService.activeIndex = 0;

@@ -69,7 +69,7 @@ public class FeatureRepository
     /// </summary>
     public async Task<IEnumerable<FeatureInstanceDto>> GetFeatureForMenuAll()
     {
-        var list = (from feature in _db.FeaturesInstances.Include(x => x.Items)!.ThenInclude(x => x.Feature)
+        var list = (from feature in _db.FeatureInstances.Include(x => x.Items)!.ThenInclude(x => x.Feature)
             where feature.ParentId == null
             select feature).ToList();
 
@@ -78,33 +78,66 @@ public class FeatureRepository
         return result;
     }
 
+    /// <summary>
+    /// Get instance security by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<List<FeatureSecurityDto>> GetSecurityByInstanceId(int id)
+    {
+        var query = from security in _db.FeatureInstanceSecurities
+            where security.FeatureInstanceId == id
+            select new FeatureSecurityDto
+            {
+                Right = security.Right,
+                Role = security.Role
+            };
+
+        return await query.ToListAsync();
+    }
+
+    /// <summary>
+    /// Update
+    /// </summary>
+    public async Task UpdateInstanceSecurity(int id, IEnumerable<FeatureSecurityDto> security)
+    {
+        var query =
+            from sec in _db.FeatureInstanceSecurities
+            where sec.FeatureInstanceId == id
+            select sec;
+        var list = await query.ToListAsync();
+
+        // delete
+        var listToDelete = list.Where(x => !security.Any(s => s.Right == x.Right && s.Role == x.Role)).ToList();
+        _db.FeatureInstanceSecurities.RemoveRange(listToDelete);
+        // add
+        var listToAdd = security.Where(x => !list.Exists(s => s.Right == x.Right && s.Role == x.Role))
+            .Select(x => new FeatureInstanceSecurityEntity()
+            {
+                FeatureInstanceId = id,
+                Right = x.Right,
+                Role = x.Role
+            }).ToList();
+        _db.FeatureInstanceSecurities.AddRange(listToAdd);
+
+        await _db.SaveChangesAsync();
+    }
+
     private FeatureInstanceDto ToDto(FeatureInstanceEntity feature)
     {
-        return new FeatureInstanceDto(feature.FeatureInstanceId, feature.FeatureId, feature.Label, feature.Icon,
-            feature.Feature?.RouterLink != null ? [$"{feature.Feature?.RouterLink}{feature.FeatureInstanceId}"] : null, feature.Url,
-            feature.Target, feature.Settings, feature.Items?.Select(ToDto).ToList());
+        return new FeatureInstanceDto()
+        {
+            FeatureInstanceId = feature.FeatureInstanceId,
+            FeatureId = feature.FeatureId,
+            Label = feature.Label,
+            Icon = feature.Icon,
+            RouterLink = feature.Feature?.RouterLink != null
+                ? [$"{feature.Feature?.RouterLink}{feature.FeatureInstanceId}"]
+                : null,
+            Url = feature.Url,
+            Target = feature.Target,
+            Settings = feature.Settings,
+            Items = feature.Items?.Select(ToDto).ToList()
+        };
     }
 }
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="FeatureInstanceId"></param>
-/// <param name="FeatureId"></param>
-/// <param name="Label"></param>
-/// <param name="Icon"></param>
-/// <param name="RouterLink"></param>
-/// <param name="Url"></param>
-/// <param name="Target"></param>
-/// <param name="Settings"></param>
-/// <param name="Items">Childs</param>
-public record FeatureInstanceDto(
-    int FeatureInstanceId,
-    int FeatureId,
-    string Label,
-    string? Icon,
-    List<string>? RouterLink,
-    string? Url,
-    string? Target,
-    string? Settings,
-    List<FeatureInstanceDto>? Items);
