@@ -2,12 +2,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Oip.Base.Runtime;
 
-namespace Oip.Core.HostedServices;
+namespace Oip.Base.Services;
 
 public class StartupRunnerHostedService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
 
+    /// <summary>
+    /// .ctor
+    /// </summary>
+    /// <param name="serviceProvider"></param>
     public StartupRunnerHostedService(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;

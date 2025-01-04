@@ -12,31 +12,34 @@ import { WeatherSecurityComponent } from "./weather-security/weather-security.co
 
 
 @NgModule({
-  imports: [
-    CommonModule,
-    AuthLibModule,
-    SharedLibModule,
-    CurrencyPipe,
-    DatePipe,
-    TableModule,
-    TagModule,
-    TabViewModule,
-    RouterModule.forChild([
-      {
-        path: '',
-        component: WeatherComponent
-      },
-      {
-        path: 'weather',
-        component: WeatherComponent
-      }
-    ]),
-  ],
-  declarations: [
-    WeatherComponent,
-    WeatherSettingsComponent,
-    WeatherSecurityComponent,
-  ]
+    imports: [
+        CommonModule,
+        AuthLibModule,
+        SharedLibModule,
+        CurrencyPipe,
+        DatePipe,
+        TableModule,
+        TagModule,
+        TabViewModule,
+        RouterModule.forChild([
+            {
+                path: '',
+                component: WeatherComponent
+            },
+            {
+                path: 'weather',
+                component: WeatherComponent
+            }
+        ]),
+    ],
+    exports: [
+        WeatherSecurityComponent
+    ],
+    declarations: [
+        WeatherComponent,
+        WeatherSettingsComponent,
+        WeatherSecurityComponent,
+    ]
 })
 export class WeatherModule {
 }

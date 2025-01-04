@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { WeatherForecast } from '../../../dtos/weather.forecast'
-import { TopBarItem, ModuleTopBarService } from 'shared-lib'
+import { TopBarItem, ModuleTopBarService } from 'common'
 
 @Component({
   selector: 'weather',
@@ -18,7 +18,6 @@ export class WeatherComponent implements OnInit, OnDestroy {
     { id: 'settings', icon: 'pi-cog', caption: 'Settings', },
     { id: 'security', icon: 'pi-lock', caption: 'Security', click: this.securityClick },
   ];
-
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public topBarService: ModuleTopBarService) {
     http.get<WeatherForecast[]>(baseUrl + 'api/weatherforecast').subscribe(result => {

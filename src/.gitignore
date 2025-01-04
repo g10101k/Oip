@@ -273,7 +273,5 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# db
-Oip.Security.db
-Oip.Security.db-shm
-Oip.Security.db-wal
+# npm ignore
+package-lock.json

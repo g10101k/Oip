@@ -7,3 +7,11 @@ https://github.com/angular-architects/module-federation-plugin/blob/main/libs/mf
 https://www.angulararchitects.io/blog/dynamic-module-federation-with-angular/
 
 https://volosoft.com/blog/how-to-configure-angular-modules-loaded-by-the-router
+
+# Security
+Use keycloak or other openid security
+
+## Known issues
+1) Using a token in SPA. This may result in token leakage when using iframe;
+2) Access to resources is checked on the resource server;
+3) Store token in localstorage
