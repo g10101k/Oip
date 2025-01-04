@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Oip.Core.HostedServices;
+using Oip.Base.Services;
 
 namespace Oip.Base.Runtime;
 
@@ -27,4 +27,5 @@ public static class ServiceCollectionExtensions
             .AddScoped(factory)
             .AddScoped<IStartupTask, TStartupTask>(sp => sp.GetRequiredService<TStartupTask>());
     }
+    
 }

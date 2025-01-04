@@ -81,7 +81,8 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     /// <param name="normalizeConnectionString"></param>
     /// <returns></returns>
     public static TAppSettings Initialize(string[]? programArguments = null, bool? useEfCoreProvider = null,
-        bool? normalizeConnectionString = null, string? jsonFileName = null, string? jsonFileNameDevelopment = null,
+        bool? normalizeConnectionString = null, string? jsonFileName = null,
+        string? jsonFileNameDevelopment = null,
         string? appSettingsTable = null, string? appSettingsSchema = null,
         Action<DbContextOptionsBuilder, XpoProvider, string>? builder = null)
     {

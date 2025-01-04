@@ -16,11 +16,8 @@
       "dom"
     ],
     "paths": {
-      "shared-lib": [
-        "./../../Oip/ClientApp/projects/shared-lib/src/public-api.ts"
-      ],
-      "auth-lib": [
-        "./../../Oip/ClientApp/projects/auth-lib/src/public-api.ts"
+      "common": [
+        "./../../Oip/ClientApp/projects/common/src/public-api.ts"
       ]
     },
     "useDefineForClassFields": false

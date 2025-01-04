@@ -1,15 +1,20 @@
 ﻿using System.Net;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using NLog.Web;
 using Oip.Base.Clients;
 using Oip.Base.Services;
 using Oip.Base.Settings;
+using Oip.Data.Contexts;
 using Polly;
 using Polly.Extensions.Http;
+
 
 namespace Oip.Base.Extensions;
 
@@ -18,6 +23,8 @@ namespace Oip.Base.Extensions;
 /// </summary>
 public static class OipModuleApplication
 {
+    private const string Bearer = "Bearer";
+
     /// <summary>
     /// Initializes a new instance of the WebApplicationBuilder class with preconfigured defaults
     /// </summary>
@@ -26,15 +33,15 @@ public static class OipModuleApplication
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
-        builder.AddOipClient(settings);
+        builder.AddHttpClients(settings);
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
-        builder.Services.AddHostedService<ModulesRegistryProcess>();
         builder.Services.AddControllersWithViews();
         builder.Services.AddSingleton(settings);
         return builder;
     }
+
 
     /// <summary>
     /// Initializes a new instance of the WebApplicationBuilder class with preconfigured defaults
@@ -44,17 +51,35 @@ public static class OipModuleApplication
     public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
+        builder.Logging.ClearProviders();
+        builder.Host.UseNLog();
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
+        builder.AddKeycloakClients(settings);
+        builder.Services.AddScoped<KeycloakService>();
         builder.Services.AddControllersWithViews();
         builder.Services.AddSingleton(settings);
+        builder.Services.AddData(settings.ConnectionString);
+        builder.Services.AddCors();
+        builder.Services.AddMvc().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.DefaultIgnoreCondition
+                = JsonIgnoreCondition.WhenWritingNull;
+        });
         return builder;
     }
 
-    private static void AddOipClient(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    private static void AddHttpClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         builder.Services.AddHttpClient<OipClient>(x => { x.BaseAddress = new Uri(settings.OipUrls); })
+            .AddPolicyHandler(GetRetryPolicy());
+        builder.AddKeycloakClients(settings);
+    }
+
+    private static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    {
+        builder.Services.AddHttpClient<KeycloakClient>(x => { x.BaseAddress = new Uri(settings.SecurityService.BaseUrl); })
             .AddPolicyHandler(GetRetryPolicy());
     }
 
@@ -74,6 +99,33 @@ public static class OipModuleApplication
                 options.IncludeXmlComments(filePath);
             }
 
+            options.AddSecurityDefinition(Bearer, new OpenApiSecurityScheme
+            {
+                Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = Bearer
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = Bearer
+                        },
+                        Scheme = "oauth2",
+                        Name = Bearer,
+                        In = ParameterLocation.Header,
+                    },
+                    new List<string>()
+                }
+            });
             options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
             {
                 Version = openApiSettings.Version,
@@ -81,7 +133,7 @@ public static class OipModuleApplication
                 Description = openApiSettings.Description,
             });
         });
-    }  
+    }
 
     /// <summary>
     /// Add a default liveness check to ensure app is responsive
@@ -93,7 +145,7 @@ public static class OipModuleApplication
             .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
     }
 
-    private static void MapDefaultEndpoints(this WebApplication app, IBaseOipModuleAppSettings settings)
+    private static void MapDefaultEndpoints(this WebApplication app)
     {
         // All health checks must pass for app to be considered ready to accept traffic after starting
         app.MapHealthChecks("/health");
@@ -114,23 +166,26 @@ public static class OipModuleApplication
     public static WebApplication BuildApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var app = builder.Build();
-        // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
 
-        app.MapDefaultEndpoints(settings);
+        app.MapDefaultEndpoints();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
-
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseCors(options => options.AllowAnyOrigin());
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller}/{action=Index}/{id?}");
         app.MapOpenApi(settings);
         app.MapFallbackToFile("index.html");
+
+        OipContext.MigrateDb(settings.Provider, settings.NormalizedConnectionString);
         return app;
     }
 
