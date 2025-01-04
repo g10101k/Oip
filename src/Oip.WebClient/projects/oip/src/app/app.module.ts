@@ -12,7 +12,7 @@ import { IconService } from './demo/service/icon.service';
 import { NodeService } from './demo/service/node.service';
 import { PhotoService } from './demo/service/photo.service';
 import { AuthGuardService } from "./services/auth.service";
-import { AuthConfigModule } from "common";
+import { AuthConfigModule, SecurityDataService } from "common";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 
@@ -22,7 +22,7 @@ import { MessageService } from "primeng/api";
   providers: [
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     CountryService, CustomerService, EventService, IconService, NodeService,
-    PhotoService, ProductService, AuthGuardService, MessageService
+    PhotoService, ProductService, AuthGuardService, MessageService, SecurityDataService
   ],
   bootstrap: [AppComponent],
 })

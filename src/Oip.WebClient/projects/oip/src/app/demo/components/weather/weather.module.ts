@@ -6,14 +6,13 @@ import { TableModule } from "primeng/table";
 import { TagModule } from "primeng/tag";
 import { TabViewModule } from "primeng/tabview";
 import { WeatherSettingsComponent } from "./weather-settings/weather-settings.component";
-import { WeatherSecurityComponent } from "./weather-security/weather-security.component";
 import { WeatherDataService } from "./weather-data.service";
 import { InputTextModule } from "primeng/inputtext";
 import { MultiSelectModule } from "primeng/multiselect";
 import { FormsModule } from "@angular/forms";
 import { TooltipModule } from "primeng/tooltip";
 import { ButtonModule } from "primeng/button";
-
+import { SecurityComponent } from "common";
 
 @NgModule({
   imports: [
@@ -38,11 +37,11 @@ import { ButtonModule } from "primeng/button";
     FormsModule,
     TooltipModule,
     ButtonModule,
+    SecurityComponent,
   ],
   declarations: [
     WeatherComponent,
     WeatherSettingsComponent,
-    WeatherSecurityComponent,
   ],
   providers: [WeatherDataService]
 })

@@ -1,10 +1,11 @@
 import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { AuthConfigModule, MsgService, PutSecurityDto, SecurityDataService, SecurityService } from "common";
+import { MsgService, PutSecurityDto, SecurityDataService } from "common";
 import { MultiSelectModule } from "primeng/multiselect";
 import { TooltipModule } from "primeng/tooltip";
 import { ButtonModule } from "primeng/button";
-import { AuthModule } from "angular-auth-oidc-client";
 import { FormsModule } from "@angular/forms";
+import { NgForOf } from "@angular/common";
+import { msg } from "ng-packagr/lib/utils/log";
 
 @Component({
   selector: 'security',
@@ -13,7 +14,8 @@ import { FormsModule } from "@angular/forms";
     MultiSelectModule,
     TooltipModule,
     FormsModule,
-    ButtonModule
+    ButtonModule,
+    NgForOf
   ],
   standalone: true
 })
@@ -43,7 +45,7 @@ export class SecurityComponent implements OnInit, OnDestroy {
   saveClick() {
     let request: PutSecurityDto = { id: this.id, securities: this.securityData };
     this.dataService.saveSecurity(request).then(result => {
-      console.log(result);
+      this.msgService.success('Saved security');
     }, error => this.msgService.error(error));
   }
 
