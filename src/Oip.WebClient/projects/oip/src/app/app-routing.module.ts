@@ -9,6 +9,7 @@ import { AuthGuardService } from "./services/auth.service";
     RouterModule.forRoot([
       {
         path: '', component: AppLayoutComponent,
+        canActivate: [() => inject(AuthGuardService).canActivate()],
         children: [
           {
             path: 'dashboard/:id',
