@@ -8,7 +8,7 @@ using Oip.Controllers.Api;
 namespace Oip.Controllers;
 
 /// <summary>
-/// Module federation controller
+/// Security controller
 /// </summary>
 [ApiController]
 [Route("api/security")]
@@ -22,7 +22,7 @@ public class SecurityController : ControllerBase
         _keycloakService = keycloakService;
     }
 
-    /// <summary>
+    /// <summary> 
     /// Get all roles
     /// </summary>
     /// <returns></returns>
