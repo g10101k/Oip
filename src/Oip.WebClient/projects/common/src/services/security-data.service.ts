@@ -1,14 +1,8 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BaseDataService, PutSecurityDto, SecurityDto } from "common";
-import { WeatherForecast } from "./dtos/weather.forecast";
 
 @Injectable()
-export class WeatherDataService extends BaseDataService {
-
-  getData() {
-    return this.sendRequest<WeatherForecast[]>(this.baseUrl + 'api/weatherforecast');
-  }
-
+export class SecurityDataService extends BaseDataService {
   getSecurity(id: number) {
     return this.sendRequest<SecurityDto[]>(this.baseUrl + `api/weatherforecast/get-security?id=${id}`);
   }

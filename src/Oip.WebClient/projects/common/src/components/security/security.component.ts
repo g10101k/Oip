@@ -1,14 +1,25 @@
 import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { WeatherDataService } from "../weather-data.service";
-import { MsgService, PutSecurityDto } from "common";
+import { AuthConfigModule, MsgService, PutSecurityDto, SecurityDataService, SecurityService } from "common";
+import { MultiSelectModule } from "primeng/multiselect";
+import { TooltipModule } from "primeng/tooltip";
+import { ButtonModule } from "primeng/button";
+import { AuthModule } from "angular-auth-oidc-client";
+import { FormsModule } from "@angular/forms";
 
 @Component({
-  selector: 'weather-security',
-  templateUrl: './weather-security.component.html'
+  selector: 'security',
+  templateUrl: './security.component.html',
+  imports: [
+    MultiSelectModule,
+    TooltipModule,
+    FormsModule,
+    ButtonModule
+  ],
+  standalone: true
 })
-export class WeatherSecurityComponent implements OnInit, OnDestroy {
+export class SecurityComponent implements OnInit, OnDestroy {
   msgService = inject(MsgService);
-  dataService = inject(WeatherDataService);
+  dataService = inject(SecurityDataService);
   securityData: any[];
   @Input() id: number | undefined = undefined;
   roles: string[] = [];

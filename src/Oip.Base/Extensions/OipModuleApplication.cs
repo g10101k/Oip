@@ -1,23 +1,20 @@
 ﻿using System.Net;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
 using Oip.Base.Clients;
-using Oip.Base.Middlewares;
 using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Data.Contexts;
 using Polly;
 using Polly.Extensions.Http;
+
 
 namespace Oip.Base.Extensions;
 
@@ -36,7 +33,7 @@ public static class OipModuleApplication
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
-        builder.AddOipClient(settings);
+        builder.AddHttpClients(settings);
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
@@ -44,6 +41,7 @@ public static class OipModuleApplication
         builder.Services.AddSingleton(settings);
         return builder;
     }
+
 
     /// <summary>
     /// Initializes a new instance of the WebApplicationBuilder class with preconfigured defaults
@@ -58,6 +56,8 @@ public static class OipModuleApplication
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication();
         builder.AddOpenApi(settings);
+        builder.AddKeycloakClients(settings);
+        builder.Services.AddScoped<KeycloakService>();
         builder.Services.AddControllersWithViews();
         builder.Services.AddSingleton(settings);
         builder.Services.AddData(settings.ConnectionString);
@@ -70,9 +70,16 @@ public static class OipModuleApplication
         return builder;
     }
 
-    private static void AddOipClient(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    private static void AddHttpClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         builder.Services.AddHttpClient<OipClient>(x => { x.BaseAddress = new Uri(settings.OipUrls); })
+            .AddPolicyHandler(GetRetryPolicy());
+        builder.AddKeycloakClients(settings);
+    }
+
+    private static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    {
+        builder.Services.AddHttpClient<KeycloakClient>(x => { x.BaseAddress = new Uri(settings.SecurityService.BaseUrl); })
             .AddPolicyHandler(GetRetryPolicy());
     }
 
@@ -115,7 +122,6 @@ public static class OipModuleApplication
                         Scheme = "oauth2",
                         Name = Bearer,
                         In = ParameterLocation.Header,
-
                     },
                     new List<string>()
                 }

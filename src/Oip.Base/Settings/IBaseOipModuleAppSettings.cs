@@ -16,14 +16,19 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// OpenAPI settings
     /// </summary>
     OpenApiSettings OpenApi { get; set; }
-    
+
     /// <summary>
     /// Spa proxy server settings
     /// </summary>
     SpaDevelopmentServerSettings SpaProxyServer { get; set; }
-    
+
     /// <summary>
     /// Open telemetry settings
     /// </summary>
     OpenTelemetrySettings Telemetry { get; set; }
+
+    /// <summary>
+    /// Security Service Settings
+    /// </summary>
+    SecurityServiceSettings SecurityService { get; set; }
 }

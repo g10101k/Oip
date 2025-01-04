@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
-import { AuthModule, LogLevel } from 'angular-auth-oidc-client';
+import { AbstractSecurityStorage, AuthModule, LogLevel } from 'angular-auth-oidc-client';
+import { SecurityStorageService } from "../services/security-storage.service";
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { AuthModule, LogLevel } from 'angular-auth-oidc-client';
       },
     })
   ],
-  exports: [AuthModule],
+  providers: [{ provide: AbstractSecurityStorage, useClass: SecurityStorageService }],
+  exports: [AuthModule]
 })
 export class AuthConfigModule {
 }

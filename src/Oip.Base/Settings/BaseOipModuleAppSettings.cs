@@ -16,4 +16,7 @@ public class BaseOipModuleAppSettings : BaseAppSettings<BaseOipModuleAppSettings
 
     /// <inheritdoc />
     public OpenTelemetrySettings Telemetry { get; set; } = new();
+    
+    /// <inheritdoc />
+    public SecurityServiceSettings SecurityService { get; set; } = new();
 }

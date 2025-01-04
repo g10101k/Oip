@@ -16,29 +16,29 @@ import { ButtonModule } from "primeng/button";
 
 
 @NgModule({
-    imports: [
-        CommonModule,
-        CurrencyPipe,
-        DatePipe,
-        TableModule,
-        TagModule,
-        TabViewModule,
-        RouterModule.forChild([
-            {
-                path: '',
-                component: WeatherComponent
-            },
-            {
-                path: 'weather',
-                component: WeatherComponent
-            }
-        ]),
-        InputTextModule,
-        MultiSelectModule,
-        FormsModule,
-        TooltipModule,
-        ButtonModule,
-    ],
+  imports: [
+    CommonModule,
+    CurrencyPipe,
+    DatePipe,
+    TableModule,
+    TagModule,
+    TabViewModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: WeatherComponent
+      },
+      {
+        path: 'weather',
+        component: WeatherComponent
+      }
+    ]),
+    InputTextModule,
+    MultiSelectModule,
+    FormsModule,
+    TooltipModule,
+    ButtonModule,
+  ],
   declarations: [
     WeatherComponent,
     WeatherSettingsComponent,
