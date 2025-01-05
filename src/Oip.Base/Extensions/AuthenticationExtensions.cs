@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Oip.Base.Middlewares;
+using Oip.Base.Settings;
 
 namespace Oip.Base.Extensions;
 
@@ -17,16 +17,19 @@ public static class AuthenticationExtensions
     /// Add auth service
     /// </summary>
     /// <param name="builder"></param>
+    /// <param name="settings"></param>
     /// <returns></returns>
-    public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder,
+        IBaseOipModuleAppSettings settings)
     {
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.MetadataAddress = "https://s-gbt-wsn-00010:8443/realms/oip/.well-known/openid-configuration";
+                options.MetadataAddress =
+                    $"{settings.SecurityService.BaseUrl}/realms/{settings.SecurityService.Realm}/.well-known/openid-configuration";
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = "https://s-gbt-wsn-00010:8443/realms/oip",
+                    ValidIssuer = $"{settings.SecurityService.BaseUrl}/realms/{settings.SecurityService.Realm}",
                     ValidateAudience = false,
                 };
             });

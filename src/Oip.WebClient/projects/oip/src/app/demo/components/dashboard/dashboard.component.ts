@@ -4,12 +4,12 @@ import { Product } from '../../api/product';
 import { ProductService } from '../../service/product.service';
 import { Subscription, debounceTime } from 'rxjs';
 import { LayoutService } from '../../../layout/service/app.layout.service';
-import { BaseComponent } from "common";
+import { BaseComponent, Feature } from "common";
 
 @Component({
   templateUrl: './dashboard.component.html',
 })
-export class DashboardComponent extends BaseComponent implements OnInit, OnDestroy {
+export class DashboardComponent extends BaseComponent implements OnInit, OnDestroy, Feature {
   items!: MenuItem[];
   products!: Product[];
   chartData: any;
@@ -102,4 +102,6 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
       this.subscription.unsubscribe();
     }
   }
+
+  controller: string = 'dashboard';
 }
