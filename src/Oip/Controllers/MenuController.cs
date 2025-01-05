@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Oip.Data.Repositories;
@@ -29,6 +30,9 @@ public class MenuController : Controller
     [Authorize]
     public async Task<IEnumerable<FeatureInstanceDto>> Get()
     {
-        return await _featureRepository.GetFeatureForMenuAll();
+        List<string> roleClaims = HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value)
+            .ToList();
+
+        return await _featureRepository.GetFeatureForMenuAll(roleClaims);
     }
 }

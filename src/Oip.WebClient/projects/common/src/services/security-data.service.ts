@@ -3,12 +3,12 @@ import { BaseDataService, PutSecurityDto, SecurityDto } from "common";
 
 @Injectable()
 export class SecurityDataService extends BaseDataService {
-  getSecurity(id: number) {
-    return this.sendRequest<SecurityDto[]>(this.baseUrl + `api/weatherforecast/get-security?id=${id}`);
+  getSecurity(controller: string, id: number) {
+    return this.sendRequest<SecurityDto[]>(this.baseUrl + `api/${controller}/get-security?id=${id}`);
   }
 
-  saveSecurity(request: PutSecurityDto) {
-    return this.sendRequest<any>(this.baseUrl + `api/weatherforecast/put-security`, 'PUT', request);
+  saveSecurity(controller: string, request: PutSecurityDto) {
+    return this.sendRequest<any>(this.baseUrl + `api/${controller}/put-security`, 'PUT', request);
   }
 
   getRealmRoles() {

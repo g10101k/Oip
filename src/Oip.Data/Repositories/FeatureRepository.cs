@@ -67,15 +67,17 @@ public class FeatureRepository
     /// <summary>
     /// Get all
     /// </summary>
-    public async Task<IEnumerable<FeatureInstanceDto>> GetFeatureForMenuAll()
+    public async Task<IEnumerable<FeatureInstanceDto>> GetFeatureForMenuAll(List<string> roles)
     {
-        var list = (from feature in _db.FeatureInstances.Include(x => x.Items)!.ThenInclude(x => x.Feature)
-            where feature.ParentId == null
-            select feature).ToList();
+        var query = from feature in _db.FeatureInstances
+                .Include(x => x.Feature)
+            join security in _db.FeatureInstanceSecurities on feature.FeatureInstanceId equals security
+                .FeatureInstanceId
+            where security.Right == "read" && roles.Contains(security.Role)
+            select feature;
+        var result = (await query.ToListAsync()).Where(x => x.Parent == null).Select(ToDto);
 
-        var result = list.Select(ToDto);
-
-        return result;
+        return result.ToList();
     }
 
     /// <summary>
@@ -131,13 +133,13 @@ public class FeatureRepository
             FeatureId = feature.FeatureId,
             Label = feature.Label,
             Icon = feature.Icon,
-            RouterLink = feature.Feature?.RouterLink != null
-                ? [$"{feature.Feature?.RouterLink}{feature.FeatureInstanceId}"]
+            RouterLink = feature.Feature.RouterLink != null
+                ? [$"{feature.Feature.RouterLink}{feature.FeatureInstanceId}"]
                 : null,
             Url = feature.Url,
             Target = feature.Target,
             Settings = feature.Settings,
-            Items = feature.Items?.Select(ToDto).ToList()
+            Items = feature.Items.Count == 0 ? null : feature.Items.Select(ToDto).ToList()
         };
     }
 }

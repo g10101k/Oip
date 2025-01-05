@@ -24,4 +24,9 @@ public class FeatureInstanceSecurityEntity
     /// Role (max 255 chars)
     /// </summary>
     public string Role { get; set; } = null!;
+    
+    /// <summary>
+    /// Feature Instance
+    /// </summary>
+    public FeatureInstanceEntity FeatureInstance { get; set; } = null!;
 }

@@ -8,7 +8,7 @@ using Oip.Data.Repositories;
 namespace Oip.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/weather")]
 public class WeatherForecastController : BaseFeatureController
 {
     private static readonly string[] Summaries =

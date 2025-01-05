@@ -23,7 +23,8 @@ export class SecurityComponent implements OnInit, OnDestroy {
   msgService = inject(MsgService);
   dataService = inject(SecurityDataService);
   securityData: any[];
-  @Input() id: number | undefined = undefined;
+  @Input() id: number;
+  @Input() controller: string;
   roles: string[] = [];
 
   constructor() {
@@ -33,7 +34,13 @@ export class SecurityComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.dataService.getSecurity(this.id).then(result => {
+    if (!this.id) {
+      this.msgService.error("Feature id not passed!");
+    }
+    if (!this.controller) {
+      this.msgService.error("Controller not passed!");
+    }
+    this.dataService.getSecurity(this.controller, this.id).then(result => {
       this.securityData = result;
     }, error => this.msgService.error(error));
 
@@ -44,7 +51,7 @@ export class SecurityComponent implements OnInit, OnDestroy {
 
   saveClick() {
     let request: PutSecurityDto = { id: this.id, securities: this.securityData };
-    this.dataService.saveSecurity(request).then(result => {
+    this.dataService.saveSecurity(this.controller, request).then(result => {
       this.msgService.success('Saved security');
     }, error => this.msgService.error(error));
   }

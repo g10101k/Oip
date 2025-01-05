@@ -11,6 +11,7 @@ import { PanelMenuModule } from 'primeng/panelmenu';
 import { DashboardsRoutingModule } from './dashboard-routing.module';
 import { LayoutService } from "../../../layout/service/app.layout.service";
 import { Chart } from 'chart.js'
+import { SecurityComponent } from "common";
 
 @NgModule({
   imports: [
@@ -23,6 +24,7 @@ import { Chart } from 'chart.js'
     PanelMenuModule,
     ButtonModule,
     DashboardsRoutingModule,
+    SecurityComponent,
   ],
   declarations: [DashboardComponent],
   providers: [LayoutService]
