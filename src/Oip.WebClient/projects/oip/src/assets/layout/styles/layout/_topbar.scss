@@ -83,6 +83,10 @@
     }
   }
 
+  .p-tabview {
+    margin-left: 1rem;
+  }
+
   .p-tabview-panels {
     display: none;
   }
@@ -95,6 +99,7 @@
     height: 4rem;
     color: var(--text-color-secondary)
   }
+
   .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
     color: var(--primary-color)
   }
