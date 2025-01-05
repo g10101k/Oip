@@ -39,7 +39,7 @@ public class FeatureInstanceEntity
     /// Parent id
     /// </summary>
     public int? ParentId { get; set; }
-    
+
     /// <summary>
     /// Parent instance
     /// </summary>
@@ -48,7 +48,12 @@ public class FeatureInstanceEntity
     /// <summary>
     /// Children
     /// </summary>
-    public List<FeatureInstanceEntity>? Items { get; set; }
+    public List<FeatureInstanceEntity> Items { get; set; } = new();
+
+    /// <summary>
+    /// Securities
+    /// </summary>
+    public List<FeatureInstanceSecurityEntity> Securities { get; set; } = new();
 
     /// <summary>
     /// Settings
@@ -59,4 +64,5 @@ public class FeatureInstanceEntity
     /// <summary>
     /// Feature
     /// </summary>
-    public FeatureEntity Feature { get; set; } = null!;}
+    public FeatureEntity Feature { get; set; } = null!;
+}

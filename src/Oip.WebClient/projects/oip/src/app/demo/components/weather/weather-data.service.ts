@@ -5,6 +5,6 @@ import { WeatherForecast } from "./dtos/weather.forecast";
 @Injectable()
 export class WeatherDataService extends BaseDataService {
   getData() {
-    return this.sendRequest<WeatherForecast[]>(this.baseUrl + 'api/weatherforecast');
+    return this.sendRequest<WeatherForecast[]>(this.baseUrl + 'api/weather');
   }
 }

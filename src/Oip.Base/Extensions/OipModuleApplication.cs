@@ -35,7 +35,7 @@ public static class OipModuleApplication
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
         builder.AddHttpClients(settings);
         builder.AddDefaultHealthChecks();
-        builder.AddDefaultAuthentication();
+        builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
         builder.Services.AddControllersWithViews();
         builder.Services.AddSingleton(settings);
@@ -54,7 +54,7 @@ public static class OipModuleApplication
         builder.Logging.ClearProviders();
         builder.Host.UseNLog();
         builder.AddDefaultHealthChecks();
-        builder.AddDefaultAuthentication();
+        builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
         builder.AddKeycloakClients(settings);
         builder.Services.AddScoped<KeycloakService>();

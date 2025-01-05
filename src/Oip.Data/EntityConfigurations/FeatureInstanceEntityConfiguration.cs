@@ -44,10 +44,12 @@ public class FeatureInstanceEntityConfiguration : IEntityTypeConfiguration<Featu
         {
             entity.Ignore(e => e.Parent);
             entity.Ignore(e => e.Feature);
+            entity.Ignore(e => e.Securities);
         }
         else
         {
             entity.HasOne(e => e.Parent).WithMany(x => x.Items).HasForeignKey(e => e.ParentId);
+            entity.HasMany(e => e.Securities).WithOne(x=>x.FeatureInstance).HasForeignKey(x=>x.FeatureInstanceId);
         }
     }
 }
