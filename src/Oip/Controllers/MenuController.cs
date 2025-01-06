@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Services;
 using Oip.Data.Repositories;
 
 namespace Oip.Controllers;
@@ -13,13 +14,15 @@ namespace Oip.Controllers;
 public class MenuController : Controller
 {
     private readonly FeatureRepository _featureRepository;
+    private readonly UserService _userService;
 
     /// <summary>
     /// .ctor
     /// </summary>
-    public MenuController(FeatureRepository featureRepository)
+    public MenuController(FeatureRepository featureRepository, UserService userService)
     {
         _featureRepository = featureRepository;
+        _userService = userService;
     }
 
     /// <summary>
@@ -30,9 +33,6 @@ public class MenuController : Controller
     [Authorize]
     public async Task<IEnumerable<FeatureInstanceDto>> Get()
     {
-        List<string> roleClaims = HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value)
-            .ToList();
-
-        return await _featureRepository.GetFeatureForMenuAll(roleClaims);
+        return await _featureRepository.GetFeatureForMenuAll(_userService.GetUserRoles());
     }
 }
