@@ -1,5 +1,17 @@
-<div class="card" >
-  <div>
-    <h5>Settings</h5>
+<div class="card">
+  <h5>Settings</h5>
+  <div class="col-12 md:col-12">
+    <div class="card p-fluid">
+      <h5>Weather settings</h5>
+      <div class="field grid">
+        <label for="dayCount" class="col-12 mb-2 md:col-2 md:mb-0">Day Count</label>
+        <div class="col-12 md:col-10">
+          <input pInputText [(ngModel)]="settings.dayCount" id="dayCount" type="text"/>
+        </div>
+      </div>
+      <div class="flex justify-content-end flex-wrap">
+        <p-button label="Save" (onClick)="saveButtonClick($event)" ></p-button>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,7 +1,7 @@
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { LayoutService } from "./service/app.layout.service";
-import { SecurityService, TopBarService } from "common";
+import { SecurityService, TopBarService } from "oip/common";
 import { Menu } from 'primeng/menu'
 import { OidcSecurityService } from "angular-auth-oidc-client";
 import { TabView } from "primeng/tabview";

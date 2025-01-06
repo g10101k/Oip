@@ -1,17 +1,17 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { SecurityService } from "common";
+import { SecurityService } from "oip/common";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
-  private readonly oipSecurityService = inject(SecurityService);
+  private readonly securityService = inject(SecurityService);
 
   constructor() {
   }
 
   ngOnInit() {
-    this.oipSecurityService.auth();
+    this.securityService.auth();
   }
 }

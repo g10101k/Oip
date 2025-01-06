@@ -18,10 +18,8 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
 
   auth() {
     super.checkAuth().subscribe((_response: LoginResponse) => {
-      console.log(_response);
       this.loginResponse.next(_response);
       this.getPayloadFromAccessToken().subscribe(_token => {
-          console.log(_token);
           this.token.next(_token);
         }
       );
