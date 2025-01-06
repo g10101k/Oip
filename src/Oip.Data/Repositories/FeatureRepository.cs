@@ -142,4 +142,38 @@ public class FeatureRepository
             Items = feature.Items.Count == 0 ? null : feature.Items.Select(ToDto).ToList()
         };
     }
+
+    /// <summary>
+    /// Get setting by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public string GetFeatureInstanceSettings(int id)
+    {
+        var settings = _db.FeatureInstances.Where(x => x.FeatureInstanceId == id).Select(x => x.Settings)
+            .FirstOrDefault();
+
+        if (settings == null)
+            throw new KeyNotFoundException($"Feature instance with id {id} not found");
+        return settings;
+    }
+
+    /// <summary>
+    /// Update feature instance settings
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="settings"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public void UpdateFeatureInstanceSettings(int id, string settings)
+    {
+        var featureInstance = _db.FeatureInstances.FirstOrDefault(x => x.FeatureInstanceId == id);
+
+        if (featureInstance == null)
+            throw new KeyNotFoundException($"Feature instance with id {id} not found");
+        
+        featureInstance.Settings = settings;
+        
+        _db.SaveChanges();
+    }
 }

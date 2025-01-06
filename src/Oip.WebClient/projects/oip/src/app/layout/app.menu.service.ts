@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { MenuChangeEvent } from './api/menuchangeevent';
-import { BaseDataService } from "common";
+import { BaseDataService } from "oip/common";
 
 @Injectable({
     providedIn: 'root'

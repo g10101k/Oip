@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Oip.Controllers.Api;
 using Oip.Data.Dtos;
 using Oip.Data.Repositories;
@@ -9,7 +10,7 @@ namespace Oip.Controllers;
 /// <summary>
 /// Base controller for feature
 /// </summary>
-public abstract class BaseFeatureController : Controller, IFeatureControllerSecurity
+public abstract class BaseFeatureController<TSettings> : Controller, IFeatureControllerSecurity where TSettings : class
 {
     /// <summary>
     /// Feature repository
@@ -45,7 +46,7 @@ public abstract class BaseFeatureController : Controller, IFeatureControllerSecu
 
         return result;
     }
-    
+
     /// <summary>
     /// Update security
     /// </summary>
@@ -74,6 +75,48 @@ public abstract class BaseFeatureController : Controller, IFeatureControllerSecu
         return Ok();
     }
 
+    /// <summary>
+    /// Get instance setting
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("get-feature-instance-settings")]
+    [Authorize]
+    public IActionResult GetFeatureInstanceSettings(int id)
+    {
+        var settingString = _featureRepository.GetFeatureInstanceSettings(id);
+        var result = JsonConvert.DeserializeObject<TSettings>(settingString);
+        if (result is null)
+            result = Activator.CreateInstance(typeof(TSettings)) as TSettings;
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Save settings
+    /// </summary>
+    /// <param name="request"></param>
+    [Authorize(Roles = "admin")]
+    [HttpPut("put-feature-instance-settings")]
+    public void SaveSettings(SaveSettingsRequest request)
+    {
+        var settingString = JsonConvert.SerializeObject(request.Settings);
+        _featureRepository.UpdateFeatureInstanceSettings(request.Id, settingString);
+    }
+
     /// <inheritdoc />
     public abstract List<SecurityResponse> GetFeatureRights();
+
+    /// <summary>
+    /// Save settings request
+    /// </summary>
+    /// <param name="Id"></param>
+    /// <param name="Settings"></param>
+    public class SaveSettingsRequest
+    {
+        /// <summary>Feature instance id</summary>
+        public int Id { get; set; }
+
+        /// <summary>Settings</summary>
+        public TSettings Settings { get; set; }
+    }
 }

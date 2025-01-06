@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Oip.Controllers.Api;
 using Oip.Data.Repositories;
 
-#pragma warning disable CS1591
-
 namespace Oip.Controllers;
 
+/// <summary>
+/// Feature controller example
+/// </summary>
 [ApiController]
 [Route("api/weather")]
-public class WeatherForecastController : BaseFeatureController
+public class WeatherForecastController : BaseFeatureController<WeatherFeatureSettings>
 {
     private static readonly string[] Summaries =
     {
@@ -24,11 +25,16 @@ public class WeatherForecastController : BaseFeatureController
     {
     }
 
-    [HttpGet]
-    [Authorize(Roles = "admin")]
-    public IActionResult Get()
+    /// <summary>
+    /// Get example data
+    /// </summary>
+    /// <param name="dayCount"></param>
+    /// <returns></returns>
+    [HttpGet("get")]
+    [Authorize()]
+    public IActionResult Get(int dayCount)
     {
-        return Ok(Enumerable.Range(1, 5).Select(index => new WeatherForecastResponse
+        return Ok(Enumerable.Range(1, dayCount).Select(index => new WeatherForecastResponse
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = Random.Shared.Next(-20, 55),
@@ -46,4 +52,15 @@ public class WeatherForecastController : BaseFeatureController
             new() { Code = "delete", Name = "Delete", Description = "Can delete edit data", Roles = ["admin"] },
         };
     }
+}
+
+/// <summary>
+/// Feature settings
+/// </summary>
+public class WeatherFeatureSettings
+{
+    /// <summary>
+    /// Day count
+    /// </summary>
+    public int DayCount { get; set; } = 5;
 }

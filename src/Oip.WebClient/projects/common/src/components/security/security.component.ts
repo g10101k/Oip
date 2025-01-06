@@ -1,5 +1,5 @@
 import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { MsgService, PutSecurityDto, SecurityDataService } from "common";
+import { MsgService, PutSecurityDto, SecurityDataService } from "oip/common";
 import { MultiSelectModule } from "primeng/multiselect";
 import { TooltipModule } from "primeng/tooltip";
 import { ButtonModule } from "primeng/button";
