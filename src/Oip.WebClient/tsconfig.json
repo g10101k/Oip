@@ -16,7 +16,7 @@
       "dom"
     ],
     "paths": {
-      "common": [
+      "oip/common": [
         "projects/common/src/public-api.ts"
       ]
     },

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BaseDataService, PutSecurityDto, SecurityDto } from "common";
+import { BaseDataService, PutSecurityDto, SecurityDto } from "oip/common";
 
 @Injectable()
 export class SecurityDataService extends BaseDataService {

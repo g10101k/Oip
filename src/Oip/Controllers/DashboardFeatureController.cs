@@ -2,13 +2,14 @@
 using Oip.Controllers.Api;
 using Oip.Data.Repositories;
 
-#pragma warning disable CS1591
-
 namespace Oip.Controllers;
 
+/// <summary>
+/// For example
+/// </summary>
 [ApiController]
 [Route("api/dashboard")]
-public class DashboardFeatureController : BaseFeatureController
+public class DashboardFeatureController : BaseFeatureController<DashboardSettings>
 {
     /// <summary>
     /// .ctor
@@ -19,6 +20,7 @@ public class DashboardFeatureController : BaseFeatureController
     }
 
 
+    /// <inheritdoc />
     public override List<SecurityResponse> GetFeatureRights()
     {
         return new()
@@ -26,4 +28,15 @@ public class DashboardFeatureController : BaseFeatureController
             new() { Code = "read", Name = "Read", Description = "Can view this feature", Roles = ["admin"] },
         };
     }
+}
+
+/// <summary>
+/// Settings
+/// </summary>
+public class DashboardSettings
+{
+    /// <summary>
+    /// Just for example
+    /// </summary>
+    public string Nothing { get; set; } = "default value";
 }

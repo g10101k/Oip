@@ -4,12 +4,13 @@ import { Product } from '../../api/product';
 import { ProductService } from '../../service/product.service';
 import { Subscription, debounceTime } from 'rxjs';
 import { LayoutService } from '../../../layout/service/app.layout.service';
-import { BaseComponent, Feature } from "common";
+import { BaseComponent, Feature } from "oip/common";
+import { DashboardSettingsDto } from "./dashboard-settings.dto";
 
 @Component({
   templateUrl: './dashboard.component.html',
 })
-export class DashboardComponent extends BaseComponent implements OnInit, OnDestroy, Feature {
+export class DashboardComponent extends BaseComponent<DashboardSettingsDto> implements OnInit, OnDestroy, Feature {
   items!: MenuItem[];
   products!: Product[];
   chartData: any;
@@ -22,10 +23,13 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
       .pipe(debounceTime(25))
       .subscribe((config) => {
         this.initChart();
+
       });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await super.ngOnInit();
+
     this.initChart();
     this.productService.getProductsSmall().then(data => this.products = data);
 
@@ -33,8 +37,6 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
       { label: 'Add New', icon: 'pi pi-fw pi-plus' },
       { label: 'Remove', icon: 'pi pi-fw pi-minus' }
     ];
-    super.ngOnInit();
-
   }
 
   initChart() {
@@ -96,8 +98,8 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     };
   }
 
-  ngOnDestroy() {
-    super.ngOnDestroy();
+  async ngOnDestroy() {
+    await super.ngOnDestroy();
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
