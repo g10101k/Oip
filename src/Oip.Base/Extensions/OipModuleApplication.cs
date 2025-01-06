@@ -57,18 +57,25 @@ public static class OipModuleApplication
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
         builder.AddKeycloakClients(settings);
-        builder.Services.AddScoped<KeycloakService>();
-        builder.Services.AddControllersWithViews();
+        builder.AddServices(settings);
+        return builder;
+    }
+
+    private static void AddServices(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    {
         builder.Services.AddSingleton(settings);
         builder.Services.AddData(settings.ConnectionString);
+        builder.Services.AddScoped<KeycloakService>();
+        builder.Services.AddScoped<UserService>();
         builder.Services.AddCors();
+        builder.Services.AddControllersWithViews();
         builder.Services.AddMvc().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.DefaultIgnoreCondition
                 = JsonIgnoreCondition.WhenWritingNull;
         });
-        return builder;
     }
+
 
     private static void AddHttpClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
@@ -79,7 +86,10 @@ public static class OipModuleApplication
 
     private static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
-        builder.Services.AddHttpClient<KeycloakClient>(x => { x.BaseAddress = new Uri(settings.SecurityService.BaseUrl); })
+        builder.Services.AddHttpClient<KeycloakClient>(x =>
+            {
+                x.BaseAddress = new Uri(settings.SecurityService.BaseUrl);
+            })
             .AddPolicyHandler(GetRetryPolicy());
     }
 
