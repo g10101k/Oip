@@ -104,6 +104,8 @@ public abstract class BaseFeatureController<TSettings> : Controller, IFeatureCon
     }
 
     /// <inheritdoc />
+    [Authorize(Roles = "admin")]
+    [HttpGet("get-feature-rights")]
     public abstract List<SecurityResponse> GetFeatureRights();
 
     /// <summary>
