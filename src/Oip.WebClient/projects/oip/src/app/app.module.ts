@@ -18,7 +18,7 @@ import { MessageService } from "primeng/api";
 
 @NgModule({
   declarations: [AppComponent, NotfoundComponent],
-  imports: [AppRoutingModule, AppLayoutModule, AuthConfigModule, ToastModule],
+  imports: [AuthConfigModule, AppRoutingModule, AppLayoutModule, ToastModule],
   providers: [
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     CountryService, CustomerService, EventService, IconService, NodeService,
