@@ -18,5 +18,9 @@ export * from './services/security-data.service';
 export * from './services/msg.service';
 export * from './services/auth.service';
 export * from './services/app.layout.service';
+
 // Interfaces
 export * from './interfaces/feature.interface';
+
+// Events
+export * from './events/menu-change.event'
