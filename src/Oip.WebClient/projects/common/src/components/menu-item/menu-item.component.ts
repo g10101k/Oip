@@ -51,7 +51,7 @@ import { LayoutService, MenuService } from "oip/common";
     ])
   ]
 })
-export class AppMenuitemComponent implements OnInit, OnDestroy {
+export class MenuItemComponent implements OnInit, OnDestroy {
 
   @Input() item: any;
 

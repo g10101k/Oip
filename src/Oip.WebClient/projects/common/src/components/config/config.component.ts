@@ -10,15 +10,7 @@ import { InputSwitchModule } from "primeng/inputswitch";
   selector: 'app-config',
   templateUrl: './config.component.html',
   standalone: true,
-  imports: [
-    NgClass,
-    RadioButtonModule,
-    FormsModule,
-    ButtonModule,
-    NgForOf,
-    NgIf,
-    InputSwitchModule
-  ]
+  imports: [NgClass, NgForOf, NgIf, RadioButtonModule, FormsModule, ButtonModule, InputSwitchModule]
 })
 export class ConfigComponent {
   @Input() minimal: boolean = false;

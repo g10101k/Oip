@@ -1,12 +1,11 @@
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { LayoutService } from "oip/common";
-import { SecurityService, TopBarService } from "oip/common";
+import { SecurityService, TopBarService, LayoutService } from "oip/common";
 import { Menu } from 'primeng/menu'
 
 @Component({
   selector: 'top-bar',
-  templateUrl: './top-bar.component.html'
+  templateUrl: './top-bar.component.html',
 })
 export class TopBarComponent implements OnInit {
   protected readonly oipSecurityService = inject(SecurityService);
@@ -15,16 +14,17 @@ export class TopBarComponent implements OnInit {
 
   items: MenuItem[] = [];
 
-  @ViewChild('menubutton') menuButton!: ElementRef;
+  @ViewChild('menuButton') menuButton!: ElementRef;
   @ViewChild('topbarmenubutton') topbarMenuButton!: ElementRef;
   @ViewChild('topbarmenu') menu!: ElementRef;
   @ViewChild('userMenu') userMenu!: Menu;
 
   ngOnInit() {
+    // on init
   }
 
   processToken(token: any) {
-    if (token && token.email) {
+    if (token?.email) {
       this.items = [
         {
           label: `${token.name}`,

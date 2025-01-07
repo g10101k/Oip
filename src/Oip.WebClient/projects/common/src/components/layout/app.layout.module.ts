@@ -9,23 +9,25 @@ import { BadgeModule } from 'primeng/badge';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { RippleModule } from 'primeng/ripple';
-import { AppMenuitemComponent } from './app.menuitem.component';
 import { RouterModule } from '@angular/router';
-import { TopBarComponent, FooterComponent, MenuComponent, ConfigComponent } from 'oip/common';
-import { AppSidebarComponent } from "./app.sidebar.component";
+import { TopBarComponent, FooterComponent, MenuComponent, SidebarComponent } from 'oip/common';
 import { AppLayoutComponent } from "./app.layout.component";
 import { ButtonModule } from "primeng/button";
 import { TabViewModule } from "primeng/tabview";
 import { SharedModule } from "primeng/api";
 import { MenuModule } from 'primeng/menu';
+import { MenuItemComponent } from "../menu-item/menu-item.component";
+import { NgForOf } from "@angular/common";
 
 @NgModule({
   declarations: [
-    AppMenuitemComponent,
-    TopBarComponent,
     MenuComponent,
-    AppSidebarComponent,
+    SidebarComponent,
     AppLayoutComponent,
+    MenuItemComponent,
+    TopBarComponent,
+    FooterComponent,
+
   ],
   imports: [
     BrowserModule,
@@ -44,10 +46,10 @@ import { MenuModule } from 'primeng/menu';
     SharedModule,
     TabViewModule,
     MenuModule,
-    FooterComponent,
-    ConfigComponent
+    NgForOf,
+    NgForOf,
   ],
-  exports: [AppLayoutComponent]
+  exports: [AppLayoutComponent, FooterComponent, TopBarComponent]
 })
 export class AppLayoutModule {
 }

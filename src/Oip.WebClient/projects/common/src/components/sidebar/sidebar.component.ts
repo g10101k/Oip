@@ -3,9 +3,8 @@ import { LayoutService } from "oip/common";
 
 @Component({
     selector: 'app-sidebar',
-    templateUrl: './app.sidebar.component.html'
+    templateUrl: './sidebar.component.html'
 })
-export class AppSidebarComponent {
+export class SidebarComponent {
     constructor(public layoutService: LayoutService, public el: ElementRef) { }
 }
-
