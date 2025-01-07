@@ -21,6 +21,5 @@ export class AppMenuComponent implements OnInit {
         this.model = menu;
       }
     )
-
   }
 }

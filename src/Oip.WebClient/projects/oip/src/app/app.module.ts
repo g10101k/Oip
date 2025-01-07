@@ -11,8 +11,7 @@ import { EventService } from './demo/service/event.service';
 import { IconService } from './demo/service/icon.service';
 import { NodeService } from './demo/service/node.service';
 import { PhotoService } from './demo/service/photo.service';
-import { AuthGuardService } from "./services/auth.service";
-import { AuthConfigModule, BaseDataService, SecurityDataService } from "oip/common";
+import { AuthConfigModule, BaseDataService, SecurityDataService, AuthGuardService } from "oip/common";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 

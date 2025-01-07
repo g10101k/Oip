@@ -16,6 +16,6 @@ export * from './services/top-bar.service';
 export * from './services/security.service';
 export * from './services/security-data.service';
 export * from './services/msg.service';
-
+export * from './services/auth.service';
 // Interfaces
 export * from './interfaces/feature.interface';
