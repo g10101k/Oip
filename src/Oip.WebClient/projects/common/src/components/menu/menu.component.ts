@@ -4,9 +4,9 @@ import { LayoutService, MenuService } from "oip/common";
 
 @Component({
   selector: 'app-menu',
-  templateUrl: './app.menu.component.html'
+  templateUrl: './menu.component.html'
 })
-export class AppMenuComponent implements OnInit {
+export class MenuComponent implements OnInit {
   protected readonly menuService = inject(MenuService);
   model: any[] = [];
 

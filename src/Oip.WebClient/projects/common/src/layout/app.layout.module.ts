@@ -9,11 +9,10 @@ import { BadgeModule } from 'primeng/badge';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { RippleModule } from 'primeng/ripple';
-import { AppMenuComponent } from './app.menu.component';
 import { AppMenuitemComponent } from './app.menuitem.component';
 import { RouterModule } from '@angular/router';
 import { TopBarComponent } from 'oip/common';
-import { FooterComponent } from 'oip/common';
+import { FooterComponent, MenuComponent } from 'oip/common';
 import { AppConfigModule } from './config/config.module';
 import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppLayoutComponent } from "./app.layout.component";
@@ -26,7 +25,7 @@ import { MenuModule } from 'primeng/menu';
   declarations: [
     AppMenuitemComponent,
     TopBarComponent,
-    AppMenuComponent,
+    MenuComponent,
     AppSidebarComponent,
     AppLayoutComponent,
   ],

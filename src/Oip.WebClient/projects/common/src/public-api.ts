@@ -4,7 +4,7 @@ export * from './components/security/security.component';
 export * from './components/topbar/top-bar.component';
 export * from './layout/app.layout.component';
 export * from './components/footer/footer.component'
-
+export * from './components/menu/menu.component';
 // Dtos
 export * from './dtos/top-bar.dto';
 export * from './dtos/security.dto';
