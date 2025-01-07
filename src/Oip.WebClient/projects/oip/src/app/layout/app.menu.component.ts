@@ -1,7 +1,6 @@
 import { inject, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
-import { LayoutService } from './service/app.layout.service';
-import { OidcSecurityService } from "angular-auth-oidc-client";
+import { LayoutService } from "oip/common";
 import { MenuService } from "./app.menu.service";
 
 @Component({

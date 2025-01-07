@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription, debounceTime } from 'rxjs';
-import { LayoutService } from 'projects/oip/src/app/layout/service/app.layout.service';
+import { LayoutService } from "oip/common";
 
 @Component({
     templateUrl: './chartsdemo.component.html'

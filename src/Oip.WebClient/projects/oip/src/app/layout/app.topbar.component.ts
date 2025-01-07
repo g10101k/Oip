@@ -1,6 +1,6 @@
 import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { LayoutService } from "./service/app.layout.service";
+import { LayoutService } from "oip/common";
 import { SecurityService, TopBarService } from "oip/common";
 import { Menu } from 'primeng/menu'
 import { OidcSecurityService } from "angular-auth-oidc-client";
@@ -23,7 +23,6 @@ export class AppTopBarComponent implements OnInit {
   @ViewChild('userMenu') userMenu!: Menu;
 
   ngOnInit() {
-
   }
 
   processToken(token: any) {
@@ -60,7 +59,7 @@ export class AppTopBarComponent implements OnInit {
     this.oipSecurityService.logoff().subscribe((result) => console.log(result));
   }
 
-  userMenuClick($event:any){
+  userMenuClick($event: any) {
     this.processToken(this.oipSecurityService.token.getValue());
     this.userMenu.toggle($event);
   }

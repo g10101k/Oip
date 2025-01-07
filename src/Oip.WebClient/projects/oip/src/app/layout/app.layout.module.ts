@@ -26,7 +26,6 @@ import { MenuModule } from 'primeng/menu';
   declarations: [
     AppMenuitemComponent,
     AppTopBarComponent,
-    AppFooterComponent,
     AppMenuComponent,
     AppSidebarComponent,
     AppLayoutComponent,
@@ -49,6 +48,7 @@ import { MenuModule } from 'primeng/menu';
     SharedModule,
     TabViewModule,
     MenuModule,
+    AppFooterComponent
   ],
   exports: [AppLayoutComponent]
 })

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { LayoutService } from '../service/app.layout.service';
+import { LayoutService } from "oip/common";
 import { MenuService } from '../app.menu.service';
 
 @Component({
