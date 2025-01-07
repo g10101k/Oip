@@ -1,7 +1,6 @@
 import { inject, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
-import { LayoutService } from "oip/common";
-import { MenuService } from "./app.menu.service";
+import { LayoutService, MenuService } from "oip/common";
 
 @Component({
   selector: 'app-menu',

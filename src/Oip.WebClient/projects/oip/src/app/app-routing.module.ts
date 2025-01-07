@@ -38,7 +38,7 @@ import { AuthGuardService } from "oip/common";
           },
           {
             path: 'config',
-            loadComponent: () => import('./layout/config/app.config.component').then(m => m.AppConfigComponent),
+            loadChildren: () => import('./layout/config/config.module').then(m => m.AppConfigModule),
             canActivate: [() => inject(AuthGuardService).canActivate()]
           },
           {
