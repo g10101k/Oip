@@ -2,9 +2,11 @@
 export * from './components/base.component';
 export * from './components/security/security.component';
 export * from './components/topbar/top-bar.component';
-export * from './layout/app.layout.component';
 export * from './components/footer/footer.component'
 export * from './components/menu/menu.component';
+export * from './components/config/config.component';
+export * from './layout/app.layout.component';
+
 // Dtos
 export * from './dtos/top-bar.dto';
 export * from './dtos/security.dto';
@@ -13,7 +15,6 @@ export * from './dtos/put-security.dto';
 // Nodules
 export * from './modules/auth-config.module';
 export * from './layout/app.layout.module'
-export * from './layout/config/config.module'
 
 // Services
 export * from './services/base-data.service';

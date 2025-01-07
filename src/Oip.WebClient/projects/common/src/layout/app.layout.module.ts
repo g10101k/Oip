@@ -11,9 +11,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { RippleModule } from 'primeng/ripple';
 import { AppMenuitemComponent } from './app.menuitem.component';
 import { RouterModule } from '@angular/router';
-import { TopBarComponent } from 'oip/common';
-import { FooterComponent, MenuComponent } from 'oip/common';
-import { AppConfigModule } from './config/config.module';
+import { TopBarComponent, FooterComponent, MenuComponent, ConfigComponent } from 'oip/common';
 import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppLayoutComponent } from "./app.layout.component";
 import { ButtonModule } from "primeng/button";
@@ -41,13 +39,13 @@ import { MenuModule } from 'primeng/menu';
     InputSwitchModule,
     RippleModule,
     RouterModule,
-    AppConfigModule,
     ButtonModule,
     TabViewModule,
     SharedModule,
     TabViewModule,
     MenuModule,
-    FooterComponent
+    FooterComponent,
+    ConfigComponent
   ],
   exports: [AppLayoutComponent]
 })

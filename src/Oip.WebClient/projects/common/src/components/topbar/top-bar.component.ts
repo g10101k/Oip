@@ -5,7 +5,7 @@ import { SecurityService, TopBarService } from "oip/common";
 import { Menu } from 'primeng/menu'
 
 @Component({
-  selector: 'app-topbar',
+  selector: 'top-bar',
   templateUrl: './top-bar.component.html'
 })
 export class TopBarComponent implements OnInit {
