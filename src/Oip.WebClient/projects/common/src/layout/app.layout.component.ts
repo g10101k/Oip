@@ -3,7 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { LayoutService } from "oip/common";
 import { AppSidebarComponent } from "./app.sidebar.component";
-import { AppTopBarComponent } from './app.topbar.component';
+import { TopBarComponent } from 'oip/common';
 
 @Component({
   selector: 'app-layout',
@@ -19,7 +19,7 @@ export class AppLayoutComponent implements OnDestroy {
 
   @ViewChild(AppSidebarComponent) appSidebar!: AppSidebarComponent;
 
-  @ViewChild(AppTopBarComponent) appTopbar!: AppTopBarComponent;
+  @ViewChild(TopBarComponent) appTopbar!: TopBarComponent;
 
   constructor(public layoutService: LayoutService, public renderer: Renderer2, public router: Router) {
     this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {

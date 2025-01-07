@@ -3,10 +3,10 @@ import { LayoutService } from "oip/common";
 
 @Component({
   selector: 'app-footer',
-  templateUrl: './app.footer.component.html',
+  templateUrl: './footer.component.html',
   standalone: true
 })
-export class AppFooterComponent {
+export class FooterComponent {
   constructor(public layoutService: LayoutService) {
   }
 }

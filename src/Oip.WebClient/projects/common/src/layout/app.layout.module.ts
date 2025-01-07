@@ -12,8 +12,8 @@ import { RippleModule } from 'primeng/ripple';
 import { AppMenuComponent } from './app.menu.component';
 import { AppMenuitemComponent } from './app.menuitem.component';
 import { RouterModule } from '@angular/router';
-import { AppTopBarComponent } from './app.topbar.component';
-import { AppFooterComponent } from './app.footer.component';
+import { TopBarComponent } from 'oip/common';
+import { FooterComponent } from 'oip/common';
 import { AppConfigModule } from './config/config.module';
 import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppLayoutComponent } from "./app.layout.component";
@@ -25,7 +25,7 @@ import { MenuModule } from 'primeng/menu';
 @NgModule({
   declarations: [
     AppMenuitemComponent,
-    AppTopBarComponent,
+    TopBarComponent,
     AppMenuComponent,
     AppSidebarComponent,
     AppLayoutComponent,
@@ -48,7 +48,7 @@ import { MenuModule } from 'primeng/menu';
     SharedModule,
     TabViewModule,
     MenuModule,
-    AppFooterComponent
+    FooterComponent
   ],
   exports: [AppLayoutComponent]
 })

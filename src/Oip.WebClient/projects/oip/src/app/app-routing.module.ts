@@ -1,8 +1,7 @@
 import { RouterModule, UrlSegment } from '@angular/router';
 import { inject, NgModule } from '@angular/core';
 import { NotfoundComponent } from './demo/components/notfound/notfound.component';
-import { AppLayoutComponent } from "./layout/app.layout.component";
-import { AuthGuardService } from "oip/common";
+import { AuthGuardService, AppLayoutComponent } from "oip/common";
 
 @NgModule({
   imports: [
@@ -38,7 +37,7 @@ import { AuthGuardService } from "oip/common";
           },
           {
             path: 'config',
-            loadChildren: () => import('./layout/config/config.module').then(m => m.AppConfigModule),
+            loadChildren: () => import('oip/common').then(m => m.AppConfigModule),
             canActivate: [() => inject(AuthGuardService).canActivate()]
           },
           {

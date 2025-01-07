@@ -3,14 +3,12 @@ import { MenuItem } from 'primeng/api';
 import { LayoutService } from "oip/common";
 import { SecurityService, TopBarService } from "oip/common";
 import { Menu } from 'primeng/menu'
-import { OidcSecurityService } from "angular-auth-oidc-client";
-import { TabView } from "primeng/tabview";
 
 @Component({
   selector: 'app-topbar',
-  templateUrl: './app.topbar.component.html'
+  templateUrl: './top-bar.component.html'
 })
-export class AppTopBarComponent implements OnInit {
+export class TopBarComponent implements OnInit {
   protected readonly oipSecurityService = inject(SecurityService);
   protected readonly layoutService = inject(LayoutService);
   protected readonly topBarService = inject(TopBarService);
