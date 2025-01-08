@@ -1,7 +1,7 @@
 import { RouterModule, UrlSegment } from '@angular/router';
 import { inject, NgModule } from '@angular/core';
 import { NotfoundComponent } from './demo/components/notfound/notfound.component';
-import { AuthGuardService, AppLayoutComponent } from "oip/common";
+import { AuthGuardService, AppLayoutComponent } from "oip-common";
 
 @NgModule({
   imports: [
@@ -37,7 +37,7 @@ import { AuthGuardService, AppLayoutComponent } from "oip/common";
           },
           {
             path: 'config',
-            loadComponent: () => import('oip/common').then(m => m.ConfigComponent),
+            loadComponent: () => import('oip-common').then(m => m.ConfigComponent),
             canActivate: [() => inject(AuthGuardService).canActivate()]
           },
           {

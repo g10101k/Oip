@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { LayoutService } from "oip/common";
+import { LayoutService } from "oip-common";
 
 @Component({
     selector: 'app-landing',

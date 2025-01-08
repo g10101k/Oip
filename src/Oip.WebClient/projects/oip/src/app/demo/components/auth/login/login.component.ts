@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { LayoutService } from "oip/common";
+import { LayoutService } from "oip-common";
 
 @Component({
     selector: 'app-login',

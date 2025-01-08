@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { WeatherForecast } from './dtos/weather.forecast'
-import { BaseComponent, Feature } from 'oip/common'
+import { BaseComponent, Feature } from 'oip-common'
 import { WeatherDataService } from "./weather-data.service";
 import { WeatherSettingsDto } from "./dtos/weather-settings.dto";
 
