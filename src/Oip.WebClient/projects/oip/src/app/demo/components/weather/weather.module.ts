@@ -12,7 +12,7 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { FormsModule } from "@angular/forms";
 import { TooltipModule } from "primeng/tooltip";
 import { ButtonModule } from "primeng/button";
-import { SecurityComponent } from "oip/common";
+import { SecurityComponent } from "oip-common";
 
 @NgModule({
   imports: [

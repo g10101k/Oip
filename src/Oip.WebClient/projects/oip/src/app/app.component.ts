@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { SecurityService } from "oip/common";
+import { SecurityService } from "oip-common";
 
 @Component({
   selector: 'app-root',

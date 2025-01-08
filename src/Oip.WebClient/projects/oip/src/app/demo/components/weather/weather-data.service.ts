@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { BaseDataService, PutSecurityDto, SecurityDto } from "oip/common";
+import { Injectable } from '@angular/core';
+import { BaseDataService } from "oip-common";
 import { WeatherForecast } from "./dtos/weather.forecast";
 
 @Injectable()

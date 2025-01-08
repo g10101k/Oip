@@ -13,7 +13,5 @@
     <ItemGroup>
       <TypeScriptConfiguration Remove="projects\oip\e2e\tsconfig.json" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="projects\oip\src\app\dtos\" />
-    </ItemGroup>
+
 </Project>
