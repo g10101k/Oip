@@ -8,14 +8,19 @@ export * from './components/config/config.component';
 export * from './components/layout/app.layout.component';
 export * from './components/sidebar/sidebar.component';
 export * from './components/logo/logo.component';
+export * from './components/notfound/notfound.component';
+export * from './components/auth/unauthorized/unauthorized.component';
+export * from './components/auth/error/error.component';
+
 // Dtos
 export * from './dtos/top-bar.dto';
 export * from './dtos/security.dto';
 export * from './dtos/put-security.dto';
 
-// Nodules
+// Modules
 export * from './modules/auth-config.module';
 export * from './components/layout/app.layout.module'
+export * from './components/auth/auth.module';
 
 // Services
 export * from './services/base-data.service';
