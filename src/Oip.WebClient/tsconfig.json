@@ -2,7 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "./dist/out-tsc",
+    "outDir": "./out-tsc",
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
@@ -16,8 +16,8 @@
       "dom"
     ],
     "paths": {
-      "oip/common": [
-        "projects/common/src/public-api.ts"
+      "oip-common": [
+        "./dist/oip-common"
       ]
     },
     "useDefineForClassFields": false
