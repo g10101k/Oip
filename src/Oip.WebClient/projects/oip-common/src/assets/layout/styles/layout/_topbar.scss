@@ -18,10 +18,9 @@
     color: var(--surface-900);
     font-size: 1.5rem;
     font-weight: 500;
-    width: 300px;
     border-radius: 12px;
 
-    img {
+    svg {
       height: 2.5rem;
       margin-right: .5rem;
     }
@@ -83,10 +82,6 @@
     }
   }
 
-  .p-tabview {
-    margin-left: 1rem;
-  }
-
   .p-tabview-panels {
     display: none;
   }
@@ -112,6 +107,7 @@
     .layout-topbar-logo {
       width: auto;
       order: 2;
+      display: none;
     }
 
     .layout-menu-button {

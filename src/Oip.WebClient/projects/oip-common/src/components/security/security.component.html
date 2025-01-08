@@ -14,7 +14,9 @@
 
   </div>
   <div>
-    <p-button label="Save" icon="pi pi-check" iconPos="right" (click)="saveClick()" (keydown)="saveKeyDown($event)"/>
+    <div class="flex justify-content-end flex-wrap">
+      <p-button label="Save" icon="pi pi-save" (click)="saveClick()" (keydown)="saveKeyDown($event)"/>
+    </div>
   </div>
 </div>
 

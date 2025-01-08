@@ -7,6 +7,7 @@ export * from './components/menu/menu.component';
 export * from './components/config/config.component';
 export * from './components/layout/app.layout.component';
 export * from './components/sidebar/sidebar.component';
+export * from './components/logo/logo.component';
 // Dtos
 export * from './dtos/top-bar.dto';
 export * from './dtos/security.dto';

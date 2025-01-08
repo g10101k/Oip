@@ -29,18 +29,13 @@
               "projects/oip/src/assets",
               {
                 "glob": "**/*",
-                "input": "./dist/oip-common/assets",
+                "input": "./projects/oip-common/src/assets",
                 "output": "/assets/"
               }
             ],
             "styles": [
               "projects/oip/src/styles.scss"
             ],
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "dist/oip-common/assets"
-              ]
-            },
             "scripts": []
           },
           "configurations": {

@@ -102,7 +102,7 @@ a {
   width: 300px;
   border-radius: 12px;
 }
-.layout-topbar .layout-topbar-logo img {
+.layout-topbar .layout-topbar-logo svg {
   height: 2.5rem;
   margin-right: 0.5rem;
 }
