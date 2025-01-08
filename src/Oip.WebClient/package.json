@@ -10,11 +10,11 @@
     "start:default": "ng serve --port 50000 --ssl --ssl-cert $HOME/.aspnet/https/${npm_package_name}.pem --ssl-key $HOME/.aspnet/https/${npm_package_name}.key",
     "build:oip": "ng build oip",
     "serve:dist": "concurrently \"serve dist/oip -l 5000 -s\" ",
-    "build": "npm run build:oip",
+    "build": "ng build oip",
+    "build:common": "ng build oip-common",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "run:all": "node node_modules/@angular-architects/module-federation/src/server/mf-dev-server.js"
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {

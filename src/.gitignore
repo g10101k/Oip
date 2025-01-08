@@ -235,10 +235,10 @@ node_modules
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-**/ClientApp/dist
 /dist-server
 /tmp
 /out-tsc
+dist/
 
 # dependencies
 /ClientApp/node_modules

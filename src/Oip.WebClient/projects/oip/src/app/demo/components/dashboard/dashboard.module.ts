@@ -9,9 +9,8 @@ import { ButtonModule } from 'primeng/button';
 import { StyleClassModule } from 'primeng/styleclass';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { DashboardsRoutingModule } from './dashboard-routing.module';
-import { LayoutService } from "../../../layout/service/app.layout.service";
+import { LayoutService, SecurityComponent } from "oip-common";
 import { Chart } from 'chart.js'
-import { SecurityComponent } from "oip/common";
 
 @NgModule({
   imports: [
