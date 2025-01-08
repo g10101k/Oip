@@ -21,6 +21,7 @@ import { MenuComponent } from "../menu/menu.component";
 import { SidebarComponent } from "../sidebar/sidebar.component";
 import { TopBarComponent } from "../topbar/top-bar.component";
 import { FooterComponent } from "../footer/footer.component";
+import { LogoComponent } from "../logo/logo.component";
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { FooterComponent } from "../footer/footer.component";
     MenuModule,
     NgForOf,
     NgForOf,
+    LogoComponent,
   ],
   exports: [AppLayoutComponent, FooterComponent, TopBarComponent]
 })

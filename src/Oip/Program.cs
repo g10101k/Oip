@@ -13,7 +13,6 @@ internal static class Program
         try
         {
             var settings = AppSettings.Initialize(args, false, true);
-
             var builder = OipModuleApplication.CreateShellBuilder(settings);
             var app = builder.BuildApp(settings);
             app.Run();
