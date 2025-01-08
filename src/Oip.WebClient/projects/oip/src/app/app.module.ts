@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { NotfoundComponent } from './demo/components/notfound/notfound.component';
 import { ProductService } from './demo/service/product.service';
 import { CountryService } from './demo/service/country.service';
 import { CustomerService } from './demo/service/customer.service';
@@ -15,7 +14,7 @@ import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 
 @NgModule({
-  declarations: [AppComponent, NotfoundComponent],
+  declarations: [AppComponent],
   imports: [AppRoutingModule, AppLayoutModule, AuthConfigModule, ToastModule],
   providers: [
     { provide: LocationStrategy, useClass: PathLocationStrategy },

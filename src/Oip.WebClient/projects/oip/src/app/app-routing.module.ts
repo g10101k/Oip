@@ -1,7 +1,6 @@
 import { RouterModule, UrlSegment } from '@angular/router';
 import { inject, NgModule } from '@angular/core';
-import { NotfoundComponent } from './demo/components/notfound/notfound.component';
-import { AuthGuardService, AppLayoutComponent } from "oip-common";
+import { AuthGuardService, AppLayoutComponent, NotfoundComponent } from "oip-common";
 
 @NgModule({
   imports: [
@@ -45,22 +44,21 @@ import { AuthGuardService, AppLayoutComponent } from "oip-common";
             loadChildren: () => import('./demo/components/weather/weather.module').then(m => m.WeatherModule),
             canActivate: [() => inject(AuthGuardService).canActivate()]
           },
-
           {
             path: 'error',
-            loadChildren: () => import('./demo/components/auth/error/error.module').then(m => m.ErrorModule)
+            loadComponent: () => import('oip-common').then(m => m.ErrorComponent)
           }
         ]
       },
       {
         path: 'unauthorized',
-        loadChildren: () => import('./demo/components/auth/unauthorized/unauthorized.module').then(m => m.UnauthorizedModule)
+        loadComponent: () => import('oip-common').then(m => m.UnauthorizedComponent)
       },
       {
         path: 'blocks',
         loadChildren: () => import('./demo/components/primeblocks/primeblocks.module').then(m => m.PrimeBlocksModule)
       },
-      { path: 'auth', loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },
+      { path: 'auth', loadChildren: () => import('oip-common').then(m => m.AuthModule) },
       {
         path: 'landing',
         loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule)
