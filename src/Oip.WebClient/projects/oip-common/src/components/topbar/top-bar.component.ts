@@ -4,6 +4,7 @@ import { Menu } from 'primeng/menu'
 import { SecurityService } from "../../services/security.service";
 import { LayoutService } from "../../services/app.layout.service";
 import { TopBarService } from "../../services/top-bar.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'top-bar',
@@ -13,7 +14,7 @@ export class TopBarComponent implements OnInit {
   protected readonly oipSecurityService = inject(SecurityService);
   protected readonly layoutService = inject(LayoutService);
   protected readonly topBarService = inject(TopBarService);
-
+  readonly router: Router = inject(Router);
   items: MenuItem[] = [];
 
   @ViewChild('menuButton') menuButton!: ElementRef;
@@ -30,12 +31,16 @@ export class TopBarComponent implements OnInit {
       this.items = [
         {
           label: `${token.name}`,
-          items: [
+          items: [{
+            label: 'Config',
+            icon: 'pi pi-cog',
+            command: () => this.router.navigate(['/config'])
+          },
             {
               label: 'Logout',
               icon: 'pi pi-sign-out',
               command: () => this.oipSecurityService.logout()
-            }
+            },
           ]
         }
       ]
