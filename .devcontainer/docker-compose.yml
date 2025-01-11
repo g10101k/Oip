@@ -1,0 +1,73 @@
+services:
+    
+  postgres:
+    image: postgres:16.3
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: keycloak
+      PGDATA: /data/postgres
+    volumes:
+      - postgres-data:/data/postgres
+    networks:
+      - backend-network
+    ports:
+      - 5432:5432
+    restart: unless-stopped  
+     
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-g101k@mail.ru}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - pgadminhome-data:/home/pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - backend-network
+      - bridge-network
+    restart: unless-stopped
+    depends_on: 
+      - postgres
+      
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: ["start-dev", "--import-realm"]
+    restart: unless-stopped
+    environment:
+      KC_DB: postgres
+      KC_DB_USERNAME: ${POSTGRES_USER:-postgres}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      KC_DB_URL: "jdbc:postgresql://postgres:5432/keycloak"
+      KC_METRICS_ENABLED: true 
+      KEYCLOAK_ADMIN: ${GF_ADMIN_USERNAME:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD:-P@ssw0rd}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${GF_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD:-P@ssw0rd}
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/data/cert/oip.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/data/cert/oip.key
+    networks:
+      - backend-network
+      - bridge-network
+    ports:
+      - 8080:8080
+      - 8443:8443
+      - 9000:9000
+    volumes:
+      - ${APPDATA}/ASP.NET/https:/opt/keycloak/data/cert/
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
+    depends_on:
+      - postgres
+
+networks:
+  backend-network: { }
+  bridge-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  pgadmin-data:
+  pgadminhome-data:    
