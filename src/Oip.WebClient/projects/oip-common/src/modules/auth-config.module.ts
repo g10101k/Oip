@@ -8,25 +8,39 @@ import {
 import { SecurityStorageService } from "../services/security-storage.service";
 import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
+import { Observable } from 'rxjs';
+
 
 export const httpLoaderFactory = (httpClient: HttpClient) => {
-  const config$ = httpClient.get<any>(`api/security/get-keycloak-client-settings`).pipe(
-    map((config: any) => {
-      console.log(config);
-      return {
-        authority: config.authority,
-        redirectUrl: window.location.origin,
-        postLogoutRedirectUri: window.location.origin,
-        clientId: config.clientId,
-        scope: config.scope,
-        responseType: config.responseType,
-        useRefreshToken: config.useRefreshToken,
-        silentRenew: config.silentRenew,
-        logLevel: config.logLevel,
-      };
-    })
-  );
-  return new StsConfigHttpLoader(config$);
+  const KEYCLOAK_SETTINGS_KEY = 'keycloak-client-settings';
+
+  let settingsSting = sessionStorage.getItem(KEYCLOAK_SETTINGS_KEY);
+  if (settingsSting) {
+    let config$ = new Observable<any>((sub) => {
+      sub.next(JSON.parse(settingsSting));
+    });
+    return new StsConfigHttpLoader(config$);
+  }
+  else {
+    const config$ = httpClient.get<any>(`api/security/get-keycloak-client-settings`).pipe(
+      map((config: any) => {
+        let authConfig = {
+          authority: config.authority,
+          redirectUrl: window.location.origin,
+          postLogoutRedirectUri: window.location.origin,
+          clientId: config.clientId,
+          scope: config.scope,
+          responseType: config.responseType,
+          useRefreshToken: config.useRefreshToken,
+          silentRenew: config.silentRenew,
+          logLevel: config.logLevel,
+        };
+        sessionStorage.setItem(KEYCLOAK_SETTINGS_KEY, JSON.stringify(authConfig));
+        return authConfig;
+      })
+    );
+    return new StsConfigHttpLoader(config$);
+  }
 }
 
 
