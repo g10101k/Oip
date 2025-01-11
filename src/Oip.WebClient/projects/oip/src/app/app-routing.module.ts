@@ -1,8 +1,6 @@
 import { RouterModule, UrlSegment } from '@angular/router';
 import { inject, NgModule } from '@angular/core';
-import { NotfoundComponent } from './demo/components/notfound/notfound.component';
-import { AppLayoutComponent } from "./layout/app.layout.component";
-import { AuthGuardService } from "./services/auth.service";
+import { AuthGuardService, AppLayoutComponent, NotfoundComponent } from "oip-common";
 
 @NgModule({
   imports: [
@@ -38,7 +36,7 @@ import { AuthGuardService } from "./services/auth.service";
           },
           {
             path: 'config',
-            loadChildren: () => import('./layout/config/config.module').then(m => m.AppConfigModule),
+            loadComponent: () => import('oip-common').then(m => m.ConfigComponent),
             canActivate: [() => inject(AuthGuardService).canActivate()]
           },
           {
@@ -46,22 +44,21 @@ import { AuthGuardService } from "./services/auth.service";
             loadChildren: () => import('./demo/components/weather/weather.module').then(m => m.WeatherModule),
             canActivate: [() => inject(AuthGuardService).canActivate()]
           },
-
           {
             path: 'error',
-            loadChildren: () => import('./demo/components/auth/error/error.module').then(m => m.ErrorModule)
+            loadComponent: () => import('oip-common').then(m => m.ErrorComponent)
           }
         ]
       },
       {
         path: 'unauthorized',
-        loadChildren: () => import('./demo/components/auth/unauthorized/unauthorized.module').then(m => m.UnauthorizedModule)
+        loadComponent: () => import('oip-common').then(m => m.UnauthorizedComponent)
       },
       {
         path: 'blocks',
         loadChildren: () => import('./demo/components/primeblocks/primeblocks.module').then(m => m.PrimeBlocksModule)
       },
-      { path: 'auth', loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },
+      { path: 'auth', loadChildren: () => import('oip-common').then(m => m.AuthModule) },
       {
         path: 'landing',
         loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule)

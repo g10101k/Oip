@@ -3,8 +3,7 @@ import { MenuItem } from 'primeng/api';
 import { Product } from '../../api/product';
 import { ProductService } from '../../service/product.service';
 import { Subscription, debounceTime } from 'rxjs';
-import { LayoutService } from '../../../layout/service/app.layout.service';
-import { BaseComponent, Feature } from "oip/common";
+import { LayoutService, BaseComponent, Feature } from "oip-common";
 import { DashboardSettingsDto } from "./dashboard-settings.dto";
 
 @Component({

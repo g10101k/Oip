@@ -1,0 +1,34 @@
+<div class="layout-topbar">
+  <button #menuButton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
+    <i class="pi pi-bars"></i>
+  </button>
+
+  <a class="layout-topbar-logo ml-2" routerLink="">
+    <logo width="36" height="36"></logo>
+    <span>OIP</span>
+  </a>
+
+  <p-tabView *ngIf="oipSecurityService.isAdmin" styleClass="tabview-custom" [(activeIndex)]="topBarService.activeIndex" class="ml-2">
+    <p-tabPanel *ngFor="let tab of topBarService.availableTopBarItems">
+      <ng-template pTemplate="header">
+        <i class="pi {{tab.icon}} top-bar-module-item-icon">&nbsp;</i>
+        <span class="top-bar-module-item-text">{{ tab.caption }}</span>
+      </ng-template>
+    </p-tabPanel>
+  </p-tabView>
+
+  <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button"
+          (click)="layoutService.showProfileSidebar()">
+    <i class="pi pi-ellipsis-v"></i>
+  </button>
+  <p-menu #userMenu [model]="items" [popup]="true" />
+
+  <div #topbarmenu class="layout-topbar-menu"
+       [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
+
+    <button class="p-link layout-topbar-button" (click)="userMenuClick($event)">
+      <i class="pi pi-user"></i>
+      <span>Profile</span>
+    </button>
+  </div>
+</div>
