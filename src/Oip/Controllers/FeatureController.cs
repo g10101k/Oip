@@ -39,6 +39,6 @@ public class FeatureController : ControllerBase
     [HttpPost("insert")]
     public async Task Insert(FeatureDto item)
     {
-        await _featureRepository.Insert(new[] { item });
+        await _featureRepository.Insert([item]);
     }
 }

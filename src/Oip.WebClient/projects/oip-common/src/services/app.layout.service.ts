@@ -43,8 +43,10 @@ export class LayoutService {
     menuHoverActive: false,
   };
 
-
-  // Get application UI settings from browser storage
+  /**
+   * Get application UI settings from browser storage
+   * @returns AppConfig
+   */
   private getAppConfigFromStorage(): AppConfig {
     let appConfigUiString = localStorage.getItem('appConfigUi');
     if (appConfigUiString != null) {

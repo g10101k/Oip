@@ -24,4 +24,9 @@ public class SecurityServiceSettings
     /// Realm
     /// </summary>
     public string Realm { get; set; } = default!;
+    
+    /// <summary>
+    /// Front settings
+    /// </summary>
+    public FrontSecuritySettings Front { get; set; }
 }
