@@ -1,20 +1,58 @@
 import { NgModule } from '@angular/core';
-import { AbstractSecurityStorage, AuthModule, LogLevel } from 'angular-auth-oidc-client';
+import {
+  AbstractSecurityStorage,
+  AuthModule,
+  StsConfigHttpLoader,
+  StsConfigLoader
+} from 'angular-auth-oidc-client';
 import { SecurityStorageService } from "../services/security-storage.service";
+import { HttpClient } from "@angular/common/http";
+import { map } from "rxjs/operators";
+import { Observable } from 'rxjs';
+
+/**
+ * Load keycloak settings from backend and save to sessionStorage
+ * @param httpClient
+ * @returns StsConfigHttpLoader
+ */
+export const httpLoaderFactory = (httpClient: HttpClient) => {
+  const KEYCLOAK_SETTINGS_KEY = 'keycloak-client-settings';
+  let settingsSting = sessionStorage.getItem(KEYCLOAK_SETTINGS_KEY);
+  if (settingsSting) {
+    let config$ = new Observable<any>((sub) => {
+      sub.next(JSON.parse(settingsSting));
+    });
+    return new StsConfigHttpLoader(config$);
+  }
+  else {
+    const config$ = httpClient.get<any>(`api/security/get-keycloak-client-settings`).pipe(
+      map((config: any) => {
+        let authConfig = {
+          authority: config.authority,
+          redirectUrl: window.location.origin,
+          postLogoutRedirectUri: window.location.origin,
+          clientId: config.clientId,
+          scope: config.scope,
+          responseType: config.responseType,
+          useRefreshToken: config.useRefreshToken,
+          silentRenew: config.silentRenew,
+          logLevel: config.logLevel,
+        };
+        sessionStorage.setItem(KEYCLOAK_SETTINGS_KEY, JSON.stringify(authConfig));
+        return authConfig;
+      })
+    );
+    return new StsConfigHttpLoader(config$);
+  }
+}
 
 @NgModule({
   imports: [
-      AuthModule.forRoot({
-      config: {
-        authority: 'https://s-gbt-wsn-00010:8443/realms/oip',
-        redirectUrl: window.location.origin,
-        postLogoutRedirectUri: window.location.origin,
-        clientId: 'oip-client',
-        scope: 'openid profile email offline_access roles',
-        responseType: 'code',
-        silentRenew: true,
-        useRefreshToken: true,
-        logLevel: LogLevel.Debug,
+    AuthModule.forRoot({
+      loader: {
+        provide: StsConfigLoader,
+        useFactory: httpLoaderFactory,
+        deps: [HttpClient],
       },
     })
   ],
