@@ -21,7 +21,7 @@ cd .devcontainer
 docker compose up
 ````
 
-Now you can startup Oip.csproj
+Now you can start up Oip.csproj
 
 # Security
 

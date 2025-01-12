@@ -10,15 +10,20 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <UserSecretsId>6439c53a-8832-4b63-a468-b55f6ca63b2b</UserSecretsId>
+        <Version>1.0.0</Version>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>.\..</DockerfileContext>
+        <DockerfileBuildArguments>-t oip/oip:dev</DockerfileBuildArguments>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.11"/>
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11"/>
-        <PackageReference Include="NLog" Version="5.3.4" />
-        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
+        <PackageReference Include="NLog" Version="5.3.4"/>
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
     </ItemGroup>
-    
+
     <ItemGroup>
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
         <ProjectReference Include="..\Oip.Data\Oip.Data.csproj"/>
@@ -37,11 +42,11 @@
     <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
         <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
         <Exec WorkingDirectory="$(SpaRoot)" Command="npm install"/>
-        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build -- --prod"/>
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build"/>
 
         <!-- Include the newly-built files in the publish output -->
         <ItemGroup>
-            <DistFiles Include="$(SpaRoot)dist\**; $(SpaRoot)dist-server\**"/>
+            <DistFiles Include="$(SpaRoot)dist\oip\**; $(SpaRoot)dist-server\**"/>
             <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
                 <RelativePath>wwwroot\%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
                 <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

@@ -7,15 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip", "Oip\Oip.csproj", "{6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Module.Example", "Oip.Module.Example\Oip.Module.Example.csproj", "{2F562F31-B36E-4EC8-8F54-4F19F11D73B2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFile", "SolutionFile", "{8A10B92E-9699-4796-AE1A-119AE3816ED0}"
-	ProjectSection(SolutionItems) = preProject
-		README.md = ./../README.md
-		.gitignore = .gitignore
-		dotnet.yml = ./../.github/workflows/dotnet.yml
-		..\.github\workflows\pullrequest.yml = ..\.github\workflows\pullrequest.yml
-		..\.github\workflows\publish.yml = ..\.github\workflows\publish.yml
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Base", "Oip.Base\Oip.Base.csproj", "{4D4422DD-26D7-4141-B75E-8AC8AD889FBF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{3E568419-974F-473F-8BB9-E63F5DEAD2F2}"
