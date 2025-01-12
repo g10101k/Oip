@@ -10,10 +10,13 @@ import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
 import { Observable } from 'rxjs';
 
-
+/**
+ * Load keycloak settings from backend and save to sessionStorage
+ * @param httpClient
+ * @returns StsConfigHttpLoader
+ */
 export const httpLoaderFactory = (httpClient: HttpClient) => {
   const KEYCLOAK_SETTINGS_KEY = 'keycloak-client-settings';
-
   let settingsSting = sessionStorage.getItem(KEYCLOAK_SETTINGS_KEY);
   if (settingsSting) {
     let config$ = new Observable<any>((sub) => {
@@ -42,7 +45,6 @@ export const httpLoaderFactory = (httpClient: HttpClient) => {
     return new StsConfigHttpLoader(config$);
   }
 }
-
 
 @NgModule({
   imports: [

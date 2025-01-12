@@ -43,6 +43,10 @@ public class WeatherForecastController : BaseFeatureController<WeatherFeatureSet
             .ToArray());
     }
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override List<SecurityResponse> GetFeatureRights()
     {
         return new()
