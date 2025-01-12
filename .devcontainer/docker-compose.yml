@@ -12,7 +12,7 @@ services:
     networks:
       - backend-network
     ports:
-      - 5432:5432
+      - "5432:5432"
     restart: unless-stopped  
      
   pgadmin:
@@ -53,9 +53,9 @@ services:
       - backend-network
       - bridge-network
     ports:
-      - 8080:8080
-      - 8443:8443
-      - 9000:9000
+      - "8080:8080"
+      - "8443:8443"
+      - "9000:9000"
     volumes:
       - ${APPDATA}/ASP.NET/https:/opt/keycloak/data/cert/
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
