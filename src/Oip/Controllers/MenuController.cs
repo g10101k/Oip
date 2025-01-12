@@ -11,7 +11,7 @@ namespace Oip.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/menu")]
-public class MenuController : Controller
+public class MenuController : ControllerBase
 {
     private readonly FeatureRepository _featureRepository;
     private readonly UserService _userService;
