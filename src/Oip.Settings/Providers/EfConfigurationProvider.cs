@@ -46,18 +46,21 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
                 {
                     MigrateAndFillData(context);
                 }
+
                 break;
             case XpoProvider.SQLite:
                 using (var context = new SqliteMigrationContext(builder.Options, _appSettingsOptions))
                 {
                     MigrateAndFillData(context);
                 }
+
                 break;
             case XpoProvider.MSSqlServer:
                 using (var context = new MsSqlServerMigrationContext(builder.Options, _appSettingsOptions))
                 {
                     MigrateAndFillData(context);
                 }
+
                 break;
             case XpoProvider.InMemoryDataStore:
                 break;
@@ -68,7 +71,8 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
 
     private void MigrateAndFillData(AppSettingsContext context)
     {
-        context.Database.Migrate();
+        if (!_appSettingsOptions.ExcludeMigration)
+            context.Database.Migrate();
         CreateAndSaveDefaultValues(context);
         Data = context.AppSettings.ToDictionary(c => c.Key, c => c.Value)!;
     }
@@ -142,7 +146,8 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
     /// <param name="prefix"></param>
     /// <param name="value"></param>
     /// <param name="key"></param>
-    private static void GenericToDictionary(Dictionary<string, string> dictionary, string prefix, object value, string key)
+    private static void GenericToDictionary(Dictionary<string, string> dictionary, string prefix, object value,
+        string key)
     {
         if (value.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
