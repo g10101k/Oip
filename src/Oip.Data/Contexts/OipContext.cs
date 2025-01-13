@@ -43,6 +43,11 @@ public class OipContext : DbContext
     public DbSet<FeatureSecurityEntity> FeatureSecurities => Set<FeatureSecurityEntity>();
 
     /// <summary>
+    /// Users
+    /// </summary>
+    public DbSet<UserEntity> Users => Set<UserEntity>();
+
+    /// <summary>
     /// .ctor
     /// </summary>
     public OipContext(DbContextOptions<OipContext> options, bool designTime = false) : base(options)
@@ -67,6 +72,8 @@ public class OipContext : DbContext
         modelBuilder.ApplyConfiguration(new FeatureInstanceEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new FeatureInstanceSecurityEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new FeatureSecurityEntityConfiguration(Database, _designTime));
+
+        modelBuilder.ApplyConfiguration(new UserEntityConfiguration(Database, _designTime));
     }
 
     /// <summary>

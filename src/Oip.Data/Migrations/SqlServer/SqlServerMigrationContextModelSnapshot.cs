@@ -130,6 +130,25 @@ namespace Oip.Data.Migrations.SqlServer
 
                     b.ToTable("FeatureSecurity", "oip");
                 });
+
+            modelBuilder.Entity("Oip.Data.Entities.UserEntity", b =>
+                {
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+
+                    b.ToTable("User", "oip");
+                });
 #pragma warning restore 612, 618
         }
     }

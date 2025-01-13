@@ -47,6 +47,11 @@ import { AuthGuardService, AppLayoutComponent, NotfoundComponent } from "oip-com
           {
             path: 'error',
             loadComponent: () => import('oip-common').then(m => m.ErrorComponent)
+          },
+          {
+            path: 'profile',
+            loadComponent: () => import('oip-common').then(m => m.ProfileComponent),
+            canActivate: [() => inject(AuthGuardService).canActivate()],
           }
         ]
       },
