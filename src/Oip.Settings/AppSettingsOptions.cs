@@ -22,6 +22,11 @@ public class AppSettingsOptions
     /// JSON file name (development)
     /// </summary>
     public string JsonFileNameDevelopment { get; set; } = "appsettings.Development.json";
+    
+    /// <summary>
+    /// Exclude migration (table create from root app)
+    /// </summary>
+    public bool ExcludeMigration { get; set; } 
 
     private string _appSettingsSchema = "settings";
 
