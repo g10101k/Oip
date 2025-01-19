@@ -75,15 +75,13 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
   key: string = "";
 
-  constructor(private cd: ChangeDetectorRef, public router: Router, private menuService: MenuService) {
+  constructor(private cd: ChangeDetectorRef, public router: Router, private readonly menuService: MenuService) {
     this.menuSourceSubscription = this.menuService.menuSource$.subscribe(value => {
       Promise.resolve(null).then(() => {
         if (value.routeEvent) {
           this.active = (value.key === this.key || value.key.startsWith(this.key + '-')) ? true : false;
-        } else {
-          if (value.key !== this.key && !value.key.startsWith(this.key + '-')) {
-            this.active = false;
-          }
+        } else if (value.key !== this.key && !value.key.startsWith(this.key + '-')) {
+          this.active = false;
         }
       });
     });

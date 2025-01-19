@@ -67,7 +67,7 @@ export class InputDemoComponent implements OnInit {
 
     valueKnob = 20;
 
-    constructor(private countryService: CountryService) { }
+    constructor(private readonly countryService: CountryService) { }
 
     ngOnInit() {
         this.countryService.getCountries().then(countries => {

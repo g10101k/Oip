@@ -40,7 +40,7 @@ export class OverlaysDemoComponent implements OnInit {
 
     visibleSidebar5: boolean = false;
 
-    constructor(private productService: ProductService, private confirmationService: ConfirmationService, private messageService: MessageService) { }
+    constructor(private readonly productService: ProductService, private readonly confirmationService: ConfirmationService, private readonly messageService: MessageService) { }
 
     ngOnInit() {
         this.productService.getProductsSmall().then(products => this.products = products);

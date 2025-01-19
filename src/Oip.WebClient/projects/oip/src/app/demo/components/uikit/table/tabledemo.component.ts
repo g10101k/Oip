@@ -18,7 +18,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 
-interface expandedRows {
+interface ExpandedRows {
     [key: string]: boolean;
 }
 
@@ -48,7 +48,7 @@ export class TableDemoComponent implements OnInit {
 
     rowGroupMetadata: any;
 
-    expandedRows: expandedRows = {};
+    expandedRows: ExpandedRows = {};
 
     activityValues: number[] = [0, 100];
 
@@ -60,7 +60,7 @@ export class TableDemoComponent implements OnInit {
 
     @ViewChild('filter') filter!: ElementRef;
 
-    constructor(private customerService: CustomerService, private productService: ProductService) { }
+    constructor(private readonly customerService: CustomerService, private readonly productService: ProductService) { }
 
     ngOnInit() {
         this.customerService.getCustomersLarge().then(customers => {
@@ -128,7 +128,7 @@ export class TableDemoComponent implements OnInit {
 
     expandAll() {
         if (!this.isExpanded) {
-            this.products.forEach(product => product && product.name ? this.expandedRows[product.name] = true : '');
+            this.products.forEach(product => product?.name ? this.expandedRows[product.name] = true : '');
 
         } else {
             this.expandedRows = {};

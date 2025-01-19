@@ -56,7 +56,7 @@ export class MediaDemoComponent implements OnInit {
         }
     ];
 
-    constructor(private productService: ProductService, private photoService: PhotoService) { }
+    constructor(private readonly productService: ProductService, private readonly photoService: PhotoService) { }
 
     ngOnInit() {
         this.productService.getProductsSmall().then(products => {
