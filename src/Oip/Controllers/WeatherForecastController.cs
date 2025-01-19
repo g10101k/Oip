@@ -32,6 +32,8 @@ public class WeatherForecastController : BaseFeatureController<WeatherFeatureSet
     /// <returns></returns>
     [HttpGet("get")]
     [Authorize()]
+    [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
+
     public IActionResult Get(int dayCount)
     {
         return Ok(Enumerable.Range(1, dayCount).Select(index => new WeatherForecastResponse
@@ -40,7 +42,7 @@ public class WeatherForecastController : BaseFeatureController<WeatherFeatureSet
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
-            .ToArray());
+            .ToList());
     }
 
     /// <summary>

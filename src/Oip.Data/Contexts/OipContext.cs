@@ -125,6 +125,11 @@ public class OipContext : DbContext
             context.Features.Add(new FeatureEntity { Name = "Dashboard", RouterLink = "/dashboard/" });
         }
 
+        if (!context.Features.Any(x => x.Name == "Weather"))
+        {
+            context.Features.Add(new FeatureEntity { Name = "Weather", RouterLink = "/weather/" });
+        }
+
         context.SaveChanges();
     }
 }

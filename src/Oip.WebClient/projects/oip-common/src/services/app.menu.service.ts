@@ -8,8 +8,8 @@ import { MenuChangeEvent } from "../events/menu-change.event";
 })
 export class MenuService extends BaseDataService {
 
-  private menuSource = new Subject<MenuChangeEvent>();
-  private resetSource = new Subject();
+  private readonly menuSource = new Subject<MenuChangeEvent>();
+  private readonly resetSource = new Subject();
 
   menuSource$ = this.menuSource.asObservable();
   resetSource$ = this.resetSource.asObservable();
@@ -24,6 +24,11 @@ export class MenuService extends BaseDataService {
 
   getMenu() {
     return this.sendRequest<any>(this.baseUrl + 'api/menu/get');
+  }
+
+  getAdminMenu(){
+    return this.sendRequest<any>(this.baseUrl + 'api/menu/get-admin-menu');
+
   }
 }
 

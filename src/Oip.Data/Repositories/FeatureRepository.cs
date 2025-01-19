@@ -176,4 +176,19 @@ public class FeatureRepository
         
         _db.SaveChanges();
     }
+
+    /// <summary>
+    /// Get admin menu 
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<FeatureInstanceDto>> GetAdminMenu()
+    {
+        var query = from feature in _db.FeatureInstances
+                .Include(x => x.Feature)
+           
+            select feature;
+        var result = (await query.ToListAsync()).Where(x => x.Parent == null).Select(ToDto);
+
+        return result.ToList();
+    }
 }

@@ -35,4 +35,15 @@ public class MenuController : ControllerBase
     {
         return await _featureRepository.GetFeatureForMenuAll(_userService.GetUserRoles());
     }
+
+    /// <summary>
+    /// Get admin menu for client app
+    /// </summary>  
+    /// <returns></returns>
+    [HttpGet("get-admin-menu")]
+    [Authorize(Roles = "admin")]
+    public async Task<IEnumerable<FeatureInstanceDto>> GetAdminMenu()
+    {
+        return await _featureRepository.GetAdminMenu();
+    }
 }
