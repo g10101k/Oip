@@ -1,19 +1,17 @@
-import { Component, ElementRef, inject, OnInit, Sanitizer, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu'
 import { SecurityService } from "../../services/security.service";
 import { LayoutService } from "../../services/app.layout.service";
 import { TopBarService } from "../../services/top-bar.service";
 import { Router } from "@angular/router";
-import { BaseDataService } from "../../services/base-data.service";
-import { DomSanitizer } from "@angular/platform-browser";
 import { UserService } from "../../services/user.service";
 
 @Component({
   selector: 'top-bar',
   templateUrl: './top-bar.component.html',
 })
-export class TopBarComponent implements OnInit {
+export class TopBarComponent {
   readonly securityService = inject(SecurityService);
   readonly layoutService = inject(LayoutService);
   readonly topBarService = inject(TopBarService);
@@ -26,9 +24,6 @@ export class TopBarComponent implements OnInit {
   @ViewChild('topbarmenu') menu!: ElementRef;
   @ViewChild('userMenu') userMenu!: Menu;
 
-  ngOnInit() {
-  }
-
   processToken(token: any) {
     if (token?.email) {
       this.items = [
@@ -37,7 +32,7 @@ export class TopBarComponent implements OnInit {
           items: [{
             label: 'Config',
             icon: 'pi pi-cog',
-            command: () => this.router.navigate(['/config'])
+            command: () => this.toUserConfig()
           },
             {
               label: 'Logout',
@@ -61,6 +56,10 @@ export class TopBarComponent implements OnInit {
         }
       ]
     }
+  }
+
+  toUserConfig() {
+    this.router.navigate(['/config']).then().catch();
   }
 
   userMenuClick($event: any) {
