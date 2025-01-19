@@ -1,19 +1,23 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, Sanitizer, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu'
 import { SecurityService } from "../../services/security.service";
 import { LayoutService } from "../../services/app.layout.service";
 import { TopBarService } from "../../services/top-bar.service";
 import { Router } from "@angular/router";
+import { BaseDataService } from "../../services/base-data.service";
+import { DomSanitizer } from "@angular/platform-browser";
+import { UserService } from "../../services/user.service";
 
 @Component({
   selector: 'top-bar',
   templateUrl: './top-bar.component.html',
 })
 export class TopBarComponent implements OnInit {
-  protected readonly oipSecurityService = inject(SecurityService);
-  protected readonly layoutService = inject(LayoutService);
-  protected readonly topBarService = inject(TopBarService);
+  readonly securityService = inject(SecurityService);
+  readonly layoutService = inject(LayoutService);
+  readonly topBarService = inject(TopBarService);
+  readonly userService = inject(UserService);
   readonly router: Router = inject(Router);
   items: MenuItem[] = [];
 
@@ -23,7 +27,6 @@ export class TopBarComponent implements OnInit {
   @ViewChild('userMenu') userMenu!: Menu;
 
   ngOnInit() {
-    // on init
   }
 
   processToken(token: any) {
@@ -39,7 +42,7 @@ export class TopBarComponent implements OnInit {
             {
               label: 'Logout',
               icon: 'pi pi-sign-out',
-              command: () => this.oipSecurityService.logout()
+              command: () => this.securityService.logout()
             },
           ]
         }
@@ -52,7 +55,7 @@ export class TopBarComponent implements OnInit {
             {
               label: 'Login',
               icon: 'pi pi-sign-in',
-              command: () => this.oipSecurityService.authorize()
+              command: () => this.securityService.authorize()
             }
           ]
         }
@@ -60,12 +63,8 @@ export class TopBarComponent implements OnInit {
     }
   }
 
-  click() {
-    this.oipSecurityService.logoff().subscribe((result) => console.log(result));
-  }
-
   userMenuClick($event: any) {
-    this.processToken(this.oipSecurityService.token.getValue());
+    this.processToken(this.securityService.token.getValue());
     this.userMenu.toggle($event);
   }
 }

@@ -102,6 +102,9 @@ export class LayoutService {
     }
   }
 
+  /**
+   * Show menu in mobile view
+   * */
   showProfileSidebar() {
     this.state.profileSidebarVisible = !this.state.profileSidebarVisible;
     if (this.state.profileSidebarVisible) {

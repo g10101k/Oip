@@ -11,7 +11,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
   loginResponse$ = this.loginResponse.asObservable();
   token = new BehaviorSubject<any>(null);
   token$ = this.token.asObservable();
-
+  userData: any;
   get isAdmin(): any {
     return this.token.getValue()?.realm_access?.roles?.includes('admin');
   }
@@ -19,6 +19,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
   auth() {
     super.checkAuth().subscribe((_response: LoginResponse) => {
       this.loginResponse.next(_response);
+      this.userData = _response.userData;
       this.getPayloadFromAccessToken().subscribe(_token => {
           this.token.next(_token);
         }

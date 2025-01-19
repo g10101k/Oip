@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Oip.Base.Helpers
+﻿namespace Oip.Base.Helpers
 {
     /// <summary>
-    /// Url helper exten
+    /// Url helper
     /// </summary>
     public static class UrlHelper
     {
@@ -19,7 +13,7 @@ namespace Oip.Base.Helpers
         /// <returns></returns>
         public static string UrlAppend(this string url, string part)
         {
-            return string.Format("{0}/{1}", url.TrimEnd('/'), part.TrimStart('/'));
+            return $"{url.TrimEnd('/')}/{part.TrimStart('/')}";
         }
     }
 }

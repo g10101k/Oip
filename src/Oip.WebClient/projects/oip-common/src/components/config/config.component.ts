@@ -6,12 +6,13 @@ import { ButtonModule } from "primeng/button";
 import { InputSwitchModule } from "primeng/inputswitch";
 import { LayoutService } from "../../services/app.layout.service";
 import { MenuService } from "../../services/app.menu.service";
+import { ProfileComponent } from "../profile/profile.component";
 
 @Component({
   selector: 'app-config',
   templateUrl: './config.component.html',
   standalone: true,
-  imports: [NgClass, NgForOf, NgIf, RadioButtonModule, FormsModule, ButtonModule, InputSwitchModule]
+  imports: [NgClass, NgForOf, NgIf, RadioButtonModule, FormsModule, ButtonModule, InputSwitchModule, ProfileComponent]
 })
 export class ConfigComponent {
   @Input() minimal: boolean = false;

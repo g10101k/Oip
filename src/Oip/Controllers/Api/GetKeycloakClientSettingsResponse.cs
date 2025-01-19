@@ -8,22 +8,22 @@ public class GetKeycloakClientSettingsResponse
     /// <summary>
     /// Authority
     /// </summary>
-    public string Authority { get; set; } = default!;
+    public string Authority { get; set; } = null!;
 
     /// <summary>
     /// Client id
     /// </summary>
-    public string ClientId { get; set; } = default!;
+    public string ClientId { get; set; } = null!;
 
     /// <summary>
     /// Scope
     /// </summary>
-    public string Scope { get; set; } = default!;
+    public string Scope { get; set; } = null!;
 
     /// <summary>
     /// Response Type
     /// </summary>
-    public string ResponseType { get; set; } = default!;
+    public string ResponseType { get; set; } = null!;
 
     /// <summary>
     /// Use Refresh Token

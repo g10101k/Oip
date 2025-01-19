@@ -1,9 +1,5 @@
-using System.Collections.Concurrent;
-using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Api;
-using Oip.Base.Clients;
 using Oip.Base.Helpers;
 using Oip.Base.Services;
 using Oip.Controllers.Api;
@@ -44,7 +40,7 @@ public class SecurityController : ControllerBase
     /// <returns></returns>
     [HttpGet("get-keycloak-client-settings")]
     [AllowAnonymous]
-    public async Task<GetKeycloakClientSettingsResponse> GetKeycloakClientSettings()
+    public GetKeycloakClientSettingsResponse GetKeycloakClientSettings()
     {
         var securitySettings = AppSettings.Instance.SecurityService;
         return new GetKeycloakClientSettingsResponse()
