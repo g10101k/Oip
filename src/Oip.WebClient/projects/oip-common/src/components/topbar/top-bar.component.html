@@ -8,7 +8,8 @@
     <span>OIP</span>
   </a>
 
-  <p-tabView *ngIf="oipSecurityService.isAdmin" styleClass="tabview-custom" [(activeIndex)]="topBarService.activeIndex" class="ml-2">
+  <p-tabView *ngIf="securityService.isAdmin" styleClass="tabview-custom" [(activeIndex)]="topBarService.activeIndex"
+             class="ml-2">
     <p-tabPanel *ngFor="let tab of topBarService.availableTopBarItems">
       <ng-template pTemplate="header">
         <i class="pi {{tab.icon}} top-bar-module-item-icon">&nbsp;</i>
@@ -17,18 +18,23 @@
     </p-tabPanel>
   </p-tabView>
 
+  <p-menu #userMenu [model]="items" [popup]="true"/>
+
   <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button"
           (click)="layoutService.showProfileSidebar()">
     <i class="pi pi-ellipsis-v"></i>
   </button>
-  <p-menu #userMenu [model]="items" [popup]="true" />
 
   <div #topbarmenu class="layout-topbar-menu"
        [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
-
-    <button class="p-link layout-topbar-button" (click)="userMenuClick($event)">
-      <i class="pi pi-user"></i>
-      <span>Profile</span>
+    <button class="p-link layout-topbar-button p-0" (click)="userMenuClick($event)"
+            (keydown)="userMenuClick($event)">
+      <p-avatar class="p-link flex align-items-center"
+                [image]="userService.photoLoaded ? userService.photo : null"
+                size="large"
+                shape="circle">{{ !userService.photoLoaded ? userService.shortLabel : null }}
+      </p-avatar>
+      <span class="ml-2">Profile</span>
     </button>
   </div>
 </div>

@@ -9,7 +9,14 @@ import { EventService } from './demo/service/event.service';
 import { IconService } from './demo/service/icon.service';
 import { NodeService } from './demo/service/node.service';
 import { PhotoService } from './demo/service/photo.service';
-import { AuthConfigModule, BaseDataService, SecurityDataService, AuthGuardService, AppLayoutModule } from "oip-common";
+import {
+  AuthConfigModule,
+  BaseDataService,
+  SecurityDataService,
+  AuthGuardService,
+  AppLayoutModule,
+  UserService
+} from "oip-common";
 import { ToastModule } from "primeng/toast";
 import { MessageService } from "primeng/api";
 
@@ -19,7 +26,7 @@ import { MessageService } from "primeng/api";
   providers: [
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     CountryService, CustomerService, EventService, IconService, NodeService,
-    PhotoService, ProductService, AuthGuardService, MessageService, SecurityDataService, BaseDataService
+    PhotoService, ProductService, AuthGuardService, MessageService, SecurityDataService, BaseDataService, UserService
   ],
   bootstrap: [AppComponent],
 })

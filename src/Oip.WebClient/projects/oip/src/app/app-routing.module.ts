@@ -1,4 +1,4 @@
-import { RouterModule, UrlSegment } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { inject, NgModule } from '@angular/core';
 import { AuthGuardService, AppLayoutComponent, NotfoundComponent } from "oip-common";
 
@@ -47,6 +47,11 @@ import { AuthGuardService, AppLayoutComponent, NotfoundComponent } from "oip-com
           {
             path: 'error',
             loadComponent: () => import('oip-common').then(m => m.ErrorComponent)
+          },
+          {
+            path: 'profile',
+            loadComponent: () => import('oip-common').then(m => m.ProfileComponent),
+            canActivate: [() => inject(AuthGuardService).canActivate()],
           }
         ]
       },

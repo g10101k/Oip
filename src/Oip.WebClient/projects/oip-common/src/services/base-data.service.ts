@@ -14,12 +14,12 @@ export class BaseDataService {
 
   sendRequest<TResponse>(url: string, method: 'GET' | 'PUT' | 'POST' | 'DELETE' = 'GET', data: any = {}): Promise<TResponse> {
     const httpParams = new HttpParams({ fromObject: data });
-    let token = this.oipSecurityService.loginResponse.getValue()?.accessToken;
+    //let token = this.oipSecurityService.loginResponse.getValue()?.accessToken;
 
     let headers: HttpHeaders;
-    if (token) {
-      headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-    }
+    //if (token) {
+    //  headers = new HttpHeaders({Authorization: `Bearer ${token}`});
+    //}
 
     const httpOptions = { headers: headers, withCredentials: true, body: httpParams };
     let result: Observable<TResponse>;
@@ -38,5 +38,19 @@ export class BaseDataService {
         break;
     }
     return lastValueFrom(result);
+  }
+
+  getBlob(url: string) {
+    let headers: HttpHeaders;
+    let token = this.oipSecurityService.loginResponse.getValue()?.accessToken;
+
+    //if (token) {
+    //  headers = new HttpHeaders({Authorization: `Bearer ${token}`});
+    //}
+    const httpOptions = { headers: headers, responseType: 'blob' as 'json', withCredentials: true, };
+
+    let result = this.http.get(url, httpOptions);
+    return lastValueFrom(result);
+
   }
 }

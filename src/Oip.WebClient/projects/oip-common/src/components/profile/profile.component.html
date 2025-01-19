@@ -1,0 +1,16 @@
+<p-avatar
+  [image]="userService.photoLoaded ? userService.photo : null"
+  styleClass="mr-2"
+  size="xlarge"
+  shape="circle"/>
+
+<div class="mt-2">
+  <p-fileUpload
+    mode="basic"
+    name="files"
+    chooseIcon="pi pi-upload"
+    url="/api/user-profile/post-user-photo"
+    accept="image/*" maxFileSize="1000000"
+    withCredentials="true"
+    chooseLabel="Change photo"/>
+</div>

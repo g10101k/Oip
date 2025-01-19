@@ -10,8 +10,4 @@
     <ItemGroup>
       <Script Include="tsconfig.json" />
     </ItemGroup>
-    <ItemGroup>
-      <TypeScriptConfiguration Remove="projects\oip\e2e\tsconfig.json" />
-    </ItemGroup>
-
 </Project>

@@ -9,7 +9,7 @@ namespace Oip.Data.EntityConfigurations;
 /// <summary>
 /// <inheritdoc cref="IEntityTypeConfiguration{TEntity}"/>
 /// </summary>
-public class FeatureInstanceSecurityEntityConfiguration : IEntityTypeConfiguration<FeatureInstanceSecurityEntity>
+public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 {
     private readonly DatabaseFacade _database;
     private readonly bool _designTime;
@@ -19,7 +19,7 @@ public class FeatureInstanceSecurityEntityConfiguration : IEntityTypeConfigurati
     /// </summary>
     /// <param name="database"></param>
     /// <param name="designTime"></param>
-    public FeatureInstanceSecurityEntityConfiguration(DatabaseFacade database, bool designTime = false)
+    public UserEntityConfiguration(DatabaseFacade database, bool designTime = false)
     {
         _database = database;
         _designTime = designTime;
@@ -29,18 +29,11 @@ public class FeatureInstanceSecurityEntityConfiguration : IEntityTypeConfigurati
     /// <inheritdoc/>
     /// </summary>
     /// <param name="entity"></param>
-    public void Configure(EntityTypeBuilder<FeatureInstanceSecurityEntity> entity)
+    public void Configure(EntityTypeBuilder<UserEntity> entity)
     {
         entity.SetTable(_database);
-        entity.SetPrimaryKey(_designTime, e => e.FeatureInstanceSecurityId);
-        entity.Property(e => e.FeatureInstanceSecurityId).ValueGeneratedOnAdd();
-
-        entity.Property(e => e.Right).HasMaxLength(255);
-        entity.Property(e => e.Role).HasMaxLength(255);
-
-        if (_designTime)
-        {
-            entity.Ignore(e => e.FeatureInstance);
-        }
+        entity.SetPrimaryKey(_designTime, e => e.UserId);
+        entity.Property(e => e.UserId).ValueGeneratedOnAdd();
+        entity.Property(e => e.Email).HasMaxLength(512);
     }
 }
