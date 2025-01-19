@@ -13,20 +13,20 @@ import { LayoutService, SecurityComponent } from "oip-common";
 import { Chart } from 'chart.js'
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    ChartModule,
-    MenuModule,
-    TableModule,
-    StyleClassModule,
-    PanelMenuModule,
-    ButtonModule,
-    DashboardsRoutingModule,
-    SecurityComponent,
-  ],
-  declarations: [DashboardComponent],
-  providers: [LayoutService]
+    imports: [
+        CommonModule,
+        FormsModule,
+        ChartModule,
+        MenuModule,
+        TableModule,
+        StyleClassModule,
+        PanelMenuModule,
+        ButtonModule,
+        DashboardsRoutingModule,
+        SecurityComponent,
+        DashboardComponent,
+    ],
+    providers: [LayoutService]
 })
 export class DashboardModule {
 }

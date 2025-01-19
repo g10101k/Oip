@@ -5,7 +5,7 @@ import {Observable} from "rxjs";
 
 @Injectable()
 export class AuthHttpInterceptor implements HttpInterceptor {
-  private securityService = inject(SecurityService);
+  private readonly securityService = inject(SecurityService);
 
   intercept(req: HttpRequest<any>, handler: HttpHandler): Observable<HttpEvent<any>> {
     let response = this.securityService.loginResponse.getValue();

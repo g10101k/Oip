@@ -18,26 +18,26 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { DialogModule } from 'primeng/dialog';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    CrudRoutingModule,
-    TableModule,
-    FileUploadModule,
-    FormsModule,
-    ButtonModule,
-    RippleModule,
-    ToastModule,
-    ToolbarModule,
-    RatingModule,
-    InputTextModule,
-    InputTextareaModule,
-    DropdownModule,
-    RadioButtonModule,
-    InputNumberModule,
-    DialogModule
-  ],
-  declarations: [CrudComponent],
-  providers: []
+    imports: [
+        CommonModule,
+        CrudRoutingModule,
+        TableModule,
+        FileUploadModule,
+        FormsModule,
+        ButtonModule,
+        RippleModule,
+        ToastModule,
+        ToolbarModule,
+        RatingModule,
+        InputTextModule,
+        InputTextareaModule,
+        DropdownModule,
+        RadioButtonModule,
+        InputNumberModule,
+        DialogModule,
+        CrudComponent
+    ],
+    providers: []
 })
 export class CrudModule {
 }

@@ -1,15 +1,32 @@
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { Menu } from 'primeng/menu'
+import { MenuItem, SharedModule } from 'primeng/api';
+import { Menu, MenuModule } from 'primeng/menu'
 import { SecurityService } from "../../services/security.service";
 import { LayoutService } from "../../services/app.layout.service";
 import { TopBarService } from "../../services/top-bar.service";
-import { Router } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { UserService } from "../../services/user.service";
+import { AvatarModule } from 'primeng/avatar';
+import { TabViewModule } from 'primeng/tabview';
+import { NgIf, NgFor, NgClass } from '@angular/common';
+import { LogoComponent } from '../logo/logo.component';
 
 @Component({
   selector: 'top-bar',
   templateUrl: './top-bar.component.html',
+  standalone: true,
+  imports: [
+    RouterLink,
+    LogoComponent,
+    NgIf,
+    TabViewModule,
+    NgFor,
+    SharedModule,
+    MenuModule,
+    NgClass,
+    AvatarModule,
+
+  ],
 })
 export class TopBarComponent {
   readonly securityService = inject(SecurityService);
