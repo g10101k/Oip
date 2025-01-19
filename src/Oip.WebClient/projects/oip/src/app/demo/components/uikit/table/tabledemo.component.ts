@@ -3,16 +3,30 @@ import { Customer, Representative } from 'projects/oip/src/app/demo/api/customer
 import { CustomerService } from 'projects/oip/src/app/demo/service/customer.service';
 import { Product } from 'projects/oip/src/app/demo/api/product';
 import { ProductService } from 'projects/oip/src/app/demo/service/product.service';
-import { Table } from 'primeng/table';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { Table, TableModule } from 'primeng/table';
+import { MessageService, ConfirmationService, SharedModule } from 'primeng/api';
+import { RatingModule } from 'primeng/rating';
+import { RippleModule } from 'primeng/ripple';
+import { ToastModule } from 'primeng/toast';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { NgClass, NgIf, CurrencyPipe, DatePipe } from '@angular/common';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { SliderModule } from 'primeng/slider';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
 
-interface expandedRows {
+interface ExpandedRows {
     [key: string]: boolean;
 }
 
 @Component({
     templateUrl: './tabledemo.component.html',
-    providers: [MessageService, ConfirmationService]
+    providers: [MessageService, ConfirmationService],
+    standalone: true,
+    imports: [TableModule, SharedModule, ButtonModule, InputTextModule, MultiSelectModule, FormsModule, DropdownModule, SliderModule, ProgressBarModule, NgClass, ToggleButtonModule, ToastModule, RippleModule, RatingModule, NgIf, CurrencyPipe, DatePipe]
 })
 export class TableDemoComponent implements OnInit {
 
@@ -34,7 +48,7 @@ export class TableDemoComponent implements OnInit {
 
     rowGroupMetadata: any;
 
-    expandedRows: expandedRows = {};
+    expandedRows: ExpandedRows = {};
 
     activityValues: number[] = [0, 100];
 
@@ -46,7 +60,7 @@ export class TableDemoComponent implements OnInit {
 
     @ViewChild('filter') filter!: ElementRef;
 
-    constructor(private customerService: CustomerService, private productService: ProductService) { }
+    constructor(private readonly customerService: CustomerService, private readonly productService: ProductService) { }
 
     ngOnInit() {
         this.customerService.getCustomersLarge().then(customers => {
@@ -114,7 +128,7 @@ export class TableDemoComponent implements OnInit {
 
     expandAll() {
         if (!this.isExpanded) {
-            this.products.forEach(product => product && product.name ? this.expandedRows[product.name] = true : '');
+            this.products.forEach(product => product?.name ? this.expandedRows[product.name] = true : '');
 
         } else {
             this.expandedRows = {};

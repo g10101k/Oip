@@ -19,7 +19,7 @@ export * from './dtos/put-security.dto';
 
 // Modules
 export * from './modules/auth-config.module';
-export * from './components/layout/app.layout.module'
+
 export * from './components/auth/auth.module';
 
 // Services

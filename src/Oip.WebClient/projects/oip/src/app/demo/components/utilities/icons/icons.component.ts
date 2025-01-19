@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { IconService } from 'projects/oip/src/app/demo/service/icon.service';
+import { NgFor } from '@angular/common';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
     templateUrl: './icons.component.html',
+    standalone: true,
+    imports: [InputTextModule, NgFor],
 })
 export class IconsComponent implements OnInit {
 
@@ -12,7 +16,7 @@ export class IconsComponent implements OnInit {
 
     selectedIcon: any;
 
-    constructor(private iconService: IconService) { }
+    constructor(private readonly iconService: IconService) { }
 
     ngOnInit() {
         this.iconService.getIcons().subscribe(data => {
