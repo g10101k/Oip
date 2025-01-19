@@ -1,11 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, SharedModule } from 'primeng/api';
 import { Product } from 'projects/oip/src/app/demo/api/product';
 import { ProductService } from 'projects/oip/src/app/demo/service/product.service';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { RippleModule } from 'primeng/ripple';
+import { TooltipModule } from 'primeng/tooltip';
+import { InputTextModule } from 'primeng/inputtext';
+import { SidebarModule } from 'primeng/sidebar';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TableModule } from 'primeng/table';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
     templateUrl: './overlaysdemo.component.html',
-    providers: [ConfirmationService, MessageService]
+    providers: [ConfirmationService, MessageService],
+    standalone: true,
+    imports: [ToastModule, DialogModule, SharedModule, ButtonModule, OverlayPanelModule, TableModule, ConfirmDialogModule, SidebarModule, InputTextModule, TooltipModule, RippleModule, ConfirmPopupModule]
 })
 export class OverlaysDemoComponent implements OnInit {
 
@@ -27,7 +40,7 @@ export class OverlaysDemoComponent implements OnInit {
 
     visibleSidebar5: boolean = false;
 
-    constructor(private productService: ProductService, private confirmationService: ConfirmationService, private messageService: MessageService) { }
+    constructor(private readonly productService: ProductService, private readonly confirmationService: ConfirmationService, private readonly messageService: MessageService) { }
 
     ngOnInit() {
         this.productService.getProductsSmall().then(products => this.products = products);

@@ -3,11 +3,26 @@ import { WeatherForecast } from './dtos/weather.forecast'
 import { BaseComponent, Feature } from 'oip-common'
 import { WeatherDataService } from "./weather-data.service";
 import { WeatherSettingsDto } from "./dtos/weather-settings.dto";
+import { SecurityComponent } from '../../../../../../oip-common/src/components/security/security.component';
+import { WeatherSettingsComponent } from './weather-settings/weather-settings.component';
+import { TagModule } from 'primeng/tag';
+import { SharedModule } from 'primeng/api';
+import { TableModule } from 'primeng/table';
+import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'weather',
-  templateUrl: './weather.component.html',
-  providers: [{ provide: 'controller', useValue: 'weather' }],
+    selector: 'weather',
+    templateUrl: './weather.component.html',
+    providers: [{ provide: 'controller', useValue: 'weather' }],
+    standalone: true,
+    imports: [
+        NgIf,
+        TableModule,
+        SharedModule,
+        TagModule,
+        WeatherSettingsComponent,
+        SecurityComponent,
+    ],
 })
 export class WeatherComponent extends BaseComponent<WeatherSettingsDto> implements OnInit, OnDestroy, Feature {
   controller: string = 'weather';

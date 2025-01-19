@@ -15,35 +15,33 @@ import { ButtonModule } from "primeng/button";
 import { SecurityComponent } from "oip-common";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    CurrencyPipe,
-    DatePipe,
-    TableModule,
-    TagModule,
-    TabViewModule,
-    RouterModule.forChild([
-      {
-        path: '',
-        component: WeatherComponent
-      },
-      {
-        path: 'weather',
-        component: WeatherComponent
-      }
-    ]),
-    InputTextModule,
-    MultiSelectModule,
-    FormsModule,
-    TooltipModule,
-    ButtonModule,
-    SecurityComponent,
-  ],
-  declarations: [
-    WeatherComponent,
-    WeatherSettingsComponent,
-  ],
-  providers: [WeatherDataService]
+    imports: [
+        CommonModule,
+        CurrencyPipe,
+        DatePipe,
+        TableModule,
+        TagModule,
+        TabViewModule,
+        RouterModule.forChild([
+            {
+                path: '',
+                component: WeatherComponent
+            },
+            {
+                path: 'weather',
+                component: WeatherComponent
+            }
+        ]),
+        InputTextModule,
+        MultiSelectModule,
+        FormsModule,
+        TooltipModule,
+        ButtonModule,
+        SecurityComponent,
+        WeatherComponent,
+        WeatherSettingsComponent,
+    ],
+    providers: [WeatherDataService]
 })
 export class WeatherModule {
 }

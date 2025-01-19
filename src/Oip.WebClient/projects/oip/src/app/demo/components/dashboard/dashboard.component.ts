@@ -1,13 +1,31 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, SharedModule } from 'primeng/api';
 import { Product } from '../../api/product';
 import { ProductService } from '../../service/product.service';
 import { Subscription, debounceTime } from 'rxjs';
 import { LayoutService, BaseComponent, Feature } from "oip-common";
 import { DashboardSettingsDto } from "./dashboard-settings.dto";
+import { SecurityComponent } from '../../../../../../oip-common/src/components/security/security.component';
+import { ChartModule } from 'primeng/chart';
+import { MenuModule } from 'primeng/menu';
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
+import { NgIf, NgStyle, CurrencyPipe } from '@angular/common';
 
 @Component({
-  templateUrl: './dashboard.component.html',
+    templateUrl: './dashboard.component.html',
+    standalone: true,
+    imports: [
+        NgIf,
+        NgStyle,
+        TableModule,
+        SharedModule,
+        ButtonModule,
+        MenuModule,
+        ChartModule,
+        SecurityComponent,
+        CurrencyPipe,
+    ],
 })
 export class DashboardComponent extends BaseComponent<DashboardSettingsDto> implements OnInit, OnDestroy, Feature {
   items!: MenuItem[];
@@ -16,13 +34,12 @@ export class DashboardComponent extends BaseComponent<DashboardSettingsDto> impl
   chartOptions: any;
   subscription!: Subscription;
 
-  constructor(private productService: ProductService, public layoutService: LayoutService) {
+  constructor(private readonly productService: ProductService, public layoutService: LayoutService) {
     super();
     this.subscription = this.layoutService.configUpdate$
       .pipe(debounceTime(25))
       .subscribe((config) => {
         this.initChart();
-
       });
   }
 
