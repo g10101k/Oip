@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Data.Contexts;
@@ -11,9 +12,11 @@ using Oip.Data.Contexts;
 namespace Oip.Data.Migrations.Postgres
 {
     [DbContext(typeof(PostgresMigrationContext))]
-    partial class PostgresMigrationContextModelSnapshot : ModelSnapshot
+    [Migration("20250112144340_AddUserPostgres")]
+    partial class AddUserPostgres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

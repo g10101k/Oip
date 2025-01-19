@@ -1,16 +1,17 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Text;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Oip.Base.Clients;
 
+/// <summary>
+/// Keycloak client
+/// </summary>
 public class KeycloakClient : HttpClient
 {
     private HttpClient _httpClient;
-    private AuthResponse _authResponse;
+    private AuthResponse? _authResponse;
 
 
     private static readonly Lazy<JsonSerializerSettings> Settings = new(CreateSerializerSettings, true);
@@ -28,6 +29,9 @@ public class KeycloakClient : HttpClient
         settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
     }
 
+    /// <summary>
+    /// Json settings
+    /// </summary>
     protected JsonSerializerSettings JsonSerializerSettings => Settings.Value;
 
     /// <inheritdoc />

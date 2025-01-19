@@ -1,4 +1,4 @@
-namespace Oip.Data.Repositories;
+namespace Oip.Data.Dtos;
 
 /// <summary>
 /// Feature Instance Dto

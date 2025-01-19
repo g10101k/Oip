@@ -22,6 +22,7 @@ import { SidebarComponent } from "../sidebar/sidebar.component";
 import { TopBarComponent } from "../topbar/top-bar.component";
 import { FooterComponent } from "../footer/footer.component";
 import { LogoComponent } from "../logo/logo.component";
+import { AvatarModule } from "primeng/avatar";
 
 @NgModule({
   declarations: [
@@ -50,8 +51,8 @@ import { LogoComponent } from "../logo/logo.component";
     TabViewModule,
     MenuModule,
     NgForOf,
-    NgForOf,
     LogoComponent,
+    AvatarModule,
   ],
   exports: [AppLayoutComponent, FooterComponent, TopBarComponent]
 })

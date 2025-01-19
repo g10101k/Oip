@@ -1,6 +1,5 @@
 using Oip.Base.Clients;
 using Oip.Base.Settings;
-using Oip.Settings;
 
 namespace Oip.Base.Services;
 

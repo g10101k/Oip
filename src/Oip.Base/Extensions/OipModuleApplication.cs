@@ -56,6 +56,7 @@ public static class OipModuleApplication
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
+        builder.Services.AddData(settings.ConnectionString);
         builder.AddKeycloakClients(settings);
         builder.AddServices(settings);
         return builder;
@@ -64,7 +65,6 @@ public static class OipModuleApplication
     private static void AddServices(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         builder.Services.AddSingleton(settings);
-        builder.Services.AddData(settings.ConnectionString);
         builder.Services.AddScoped<KeycloakService>();
         builder.Services.AddScoped<UserService>();
         builder.Services.AddCors();
