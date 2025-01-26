@@ -9,7 +9,7 @@ namespace Oip.Data.EntityConfigurations;
 /// <summary>
 /// <inheritdoc cref="IEntityTypeConfiguration{TEntity}"/>
 /// </summary>
-public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity>
+public class ModuleEntityConfiguration : IEntityTypeConfiguration<ModuleEntity>
 {
     private readonly DatabaseFacade _database;
     private readonly bool _designTime;
@@ -19,7 +19,7 @@ public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity
     /// </summary>
     /// <param name="database"></param>
     /// <param name="designTime"></param>
-    public FeatureEntityConfiguration(DatabaseFacade database, bool designTime = false)
+    public ModuleEntityConfiguration(DatabaseFacade database, bool designTime = false)
     {
         _database = database;
         _designTime = designTime;
@@ -29,23 +29,23 @@ public class FeatureEntityConfiguration : IEntityTypeConfiguration<FeatureEntity
     /// <inheritdoc/>
     /// </summary>
     /// <param name="entity"></param>
-    public void Configure(EntityTypeBuilder<FeatureEntity> entity)
+    public void Configure(EntityTypeBuilder<ModuleEntity> entity)
     {
         entity.SetTable(_database);
-        entity.SetPrimaryKey(_designTime, e => e.FeatureId);
-        entity.Property(e => e.FeatureId).ValueGeneratedOnAdd();
+        entity.SetPrimaryKey(_designTime, e => e.ModuleId);
+        entity.Property(e => e.ModuleId).ValueGeneratedOnAdd();
         entity.Property(e => e.Name).HasMaxLength(512);
         entity.Property(e => e.RouterLink).HasMaxLength(256);
 
         if (_designTime)
         {
-            entity.Ignore(e => e.FeatureSecurities);
-            entity.Ignore(e => e.FeatureInstances);
+            entity.Ignore(e => e.ModuleSecurities);
+            entity.Ignore(e => e.ModuleInstances);
         }
         else
         {
-            entity.HasMany(e => e.FeatureSecurities).WithOne(e => e.Feature);
-            entity.HasMany(e => e.FeatureInstances).WithOne(e => e.Feature);
+            entity.HasMany(e => e.ModuleSecurities).WithOne(e => e.Module);
+            entity.HasMany(e => e.ModuleInstances).WithOne(e => e.Module);
         }
     }
 }

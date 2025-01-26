@@ -15,27 +15,33 @@ namespace Oip.Data.Migrations.Postgres
                 name: "oip");
 
             migrationBuilder.CreateTable(
-                name: "Feature",
+                name: "Module",
                 schema: "oip",
                 columns: table => new
                 {
-                    FeatureId = table.Column<int>(type: "integer", nullable: false)
+                    ModuleId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
-                    Settings = table.Column<string>(type: "text", nullable: true)
+                    Settings = table.Column<string>(type: "text", nullable: true),
+                    RouterLink = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
                 });
 
             migrationBuilder.CreateTable(
-                name: "FeatureInstance",
+                name: "ModuleInstance",
                 schema: "oip",
                 columns: table => new
                 {
-                    FeatureInstanceId = table.Column<int>(type: "integer", nullable: false)
+                    ModuleInstanceId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FeatureId = table.Column<int>(type: "integer", nullable: false),
+                    ModuleId = table.Column<int>(type: "integer", nullable: false),
+                    Label = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Icon = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    Url = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    Target = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    ParentId = table.Column<int>(type: "integer", nullable: true),
                     Settings = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -43,13 +49,13 @@ namespace Oip.Data.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
-                name: "FeatureInstanceSecurity",
+                name: "ModuleInstanceSecurity",
                 schema: "oip",
                 columns: table => new
                 {
-                    FeatureInstanceSecurityId = table.Column<int>(type: "integer", nullable: false)
+                    ModuleInstanceSecurityId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FeatureInstanceId = table.Column<int>(type: "integer", nullable: false),
+                    ModuleInstanceId = table.Column<int>(type: "integer", nullable: false),
                     Right = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Role = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
@@ -58,15 +64,29 @@ namespace Oip.Data.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
-                name: "FeatureSecurity",
+                name: "ModuleSecurity",
                 schema: "oip",
                 columns: table => new
                 {
-                    FeatureSecurityId = table.Column<int>(type: "integer", nullable: false)
+                    ModuleSecurityId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FeatureId = table.Column<int>(type: "integer", nullable: false),
+                    ModuleId = table.Column<int>(type: "integer", nullable: false),
                     Right = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Role = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
+                },
+                constraints: table =>
+                {
+                });
+
+            migrationBuilder.CreateTable(
+                name: "User",
+                schema: "oip",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Email = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    Photo = table.Column<byte[]>(type: "bytea", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -77,19 +97,23 @@ namespace Oip.Data.Migrations.Postgres
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Feature",
+                name: "Module",
                 schema: "oip");
 
             migrationBuilder.DropTable(
-                name: "FeatureInstance",
+                name: "ModuleInstance",
                 schema: "oip");
 
             migrationBuilder.DropTable(
-                name: "FeatureInstanceSecurity",
+                name: "ModuleInstanceSecurity",
                 schema: "oip");
 
             migrationBuilder.DropTable(
-                name: "FeatureSecurity",
+                name: "ModuleSecurity",
+                schema: "oip");
+
+            migrationBuilder.DropTable(
+                name: "User",
                 schema: "oip");
         }
     }

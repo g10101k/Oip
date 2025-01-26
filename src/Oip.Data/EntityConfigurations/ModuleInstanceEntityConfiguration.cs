@@ -9,7 +9,7 @@ namespace Oip.Data.EntityConfigurations;
 /// <summary>
 /// <inheritdoc cref="IEntityTypeConfiguration{TEntity}"/>
 /// </summary>
-public class FeatureInstanceEntityConfiguration : IEntityTypeConfiguration<FeatureInstanceEntity>
+public class ModuleInstanceEntityConfiguration : IEntityTypeConfiguration<ModuleInstanceEntity>
 {
     private readonly DatabaseFacade _database;
     private readonly bool _designTime;
@@ -19,7 +19,7 @@ public class FeatureInstanceEntityConfiguration : IEntityTypeConfiguration<Featu
     /// </summary>
     /// <param name="database"></param>
     /// <param name="designTime"></param>
-    public FeatureInstanceEntityConfiguration(DatabaseFacade database, bool designTime = false)
+    public ModuleInstanceEntityConfiguration(DatabaseFacade database, bool designTime = false)
     {
         _database = database;
         _designTime = designTime;
@@ -29,11 +29,11 @@ public class FeatureInstanceEntityConfiguration : IEntityTypeConfiguration<Featu
     /// <inheritdoc/>
     /// </summary>
     /// <param name="entity"></param>
-    public void Configure(EntityTypeBuilder<FeatureInstanceEntity> entity)
+    public void Configure(EntityTypeBuilder<ModuleInstanceEntity> entity)
     {
         entity.SetTable(_database);
-        entity.SetPrimaryKey(_designTime, e => e.FeatureInstanceId);
-        entity.Property(e => e.FeatureInstanceId).ValueGeneratedOnAdd();
+        entity.SetPrimaryKey(_designTime, e => e.ModuleInstanceId);
+        entity.Property(e => e.ModuleInstanceId).ValueGeneratedOnAdd();
 
         entity.Property(e => e.Icon).HasMaxLength(64);
         entity.Property(e => e.Label).HasMaxLength(128);
@@ -43,13 +43,13 @@ public class FeatureInstanceEntityConfiguration : IEntityTypeConfiguration<Featu
         if (_designTime)
         {
             entity.Ignore(e => e.Parent);
-            entity.Ignore(e => e.Feature);
+            entity.Ignore(e => e.Module);
             entity.Ignore(e => e.Securities);
         }
         else
         {
             entity.HasOne(e => e.Parent).WithMany(x => x.Items).HasForeignKey(e => e.ParentId);
-            entity.HasMany(e => e.Securities).WithOne(x=>x.FeatureInstance).HasForeignKey(x=>x.FeatureInstanceId);
+            entity.HasMany(e => e.Securities).WithOne(x=>x.ModuleInstance).HasForeignKey(x=>x.ModuleInstanceId);
         }
     }
 }

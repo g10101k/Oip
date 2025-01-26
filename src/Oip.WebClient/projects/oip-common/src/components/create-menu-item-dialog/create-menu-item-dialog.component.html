@@ -1,16 +1,38 @@
-<p-button (click)="showDialog()" label="Show" (keydown)="showDialog()"/>
-<p-dialog header="Edit Profile" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-  <span class="p-text-secondary block mb-8">Update your information.</span>
+<p-dialog header="Create new menu item" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+  <span class="p-text-secondary block mb-4">Create new item</span>
   <div class="flex items-center gap-4 mb-4">
-    <label for="username" class="font-semibold w-24">Username</label>
-    <input pInputText id="username" class="flex-auto" autocomplete="off" />
+    <label for="menuLabel" class="font-semibold w-24">Label</label>
+    <input pInputText id="menuLabel" class="flex-auto" autocomplete="off" [(ngModel)]="label"/>
   </div>
-  <div class="flex items-center gap-4 mb-8">
-    <label for="email" class="font-semibold w-24">Email</label>
-    <input pInputText id="email" class="flex-auto" autocomplete="off" />
+  <div class="flex items-center gap-4 mb-4">
+    <label for="module" class="font-semibold w-24">Module</label>
+    <p-dropdown
+      id="module"
+      class="flex-auto"
+      [options]="modules"
+      [(ngModel)]="selectModule"
+      optionLabel="value"
+      optionValue="key"
+      placeholder="Select module"/>
+  </div>
+  <div class="flex items-center gap-4 mb-4">
+    <label for="module" class="font-semibold w-24">Module</label>
+    <p-dropdown
+      id="icon"
+      class="flex-auto"
+      [options]="icons"
+      [(ngModel)]="selectIcon"
+      placeholder="Select module">
+      <ng-template let-item pTemplate="item">
+        <div class="flex align-items-center gap-2">
+          <span [class]="item"></span>
+          <div>{{ item }}</div>
+        </div>
+      </ng-template>
+    </p-dropdown>
   </div>
   <div class="flex justify-end gap-2">
     <p-button label="Cancel" severity="secondary" (click)="changeVisible()" (keydown)="changeVisible()"/>
-    <p-button label="Save" (click)="changeVisible()" (keydown)="changeVisible()" />
+    <p-button label="Save" (click)="save()" (keydown)="save()"/>
   </div>
 </p-dialog>

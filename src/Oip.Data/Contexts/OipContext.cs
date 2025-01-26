@@ -23,24 +23,24 @@ public class OipContext : DbContext
     public const string SchemaName = "oip";
 
     /// <summary>
-    /// Features
+    /// Modules
     /// </summary>
-    public DbSet<FeatureEntity> Features => Set<FeatureEntity>();
+    public DbSet<ModuleEntity> Modules => Set<ModuleEntity>();
 
     /// <summary>
-    /// FeaturesInstances
+    /// Module Instances
     /// </summary>
-    public DbSet<FeatureInstanceEntity> FeatureInstances => Set<FeatureInstanceEntity>();
+    public DbSet<ModuleInstanceEntity> ModuleInstances => Set<ModuleInstanceEntity>();
 
     /// <summary>
-    /// FeatureInstanceSecurities
+    /// Module InstanceSecurities
     /// </summary>
-    public DbSet<FeatureInstanceSecurityEntity> FeatureInstanceSecurities => Set<FeatureInstanceSecurityEntity>();
+    public DbSet<ModuleInstanceSecurityEntity> ModuleInstanceSecurities => Set<ModuleInstanceSecurityEntity>();
 
     /// <summary>
-    /// FeatureSecurities
+    /// Module Securities
     /// </summary>
-    public DbSet<FeatureSecurityEntity> FeatureSecurities => Set<FeatureSecurityEntity>();
+    public DbSet<ModuleSecurityEntity> ModuleSecurities => Set<ModuleSecurityEntity>();
 
     /// <summary>
     /// Users
@@ -68,10 +68,10 @@ public class OipContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfiguration(new FeatureEntityConfiguration(Database, _designTime));
-        modelBuilder.ApplyConfiguration(new FeatureInstanceEntityConfiguration(Database, _designTime));
-        modelBuilder.ApplyConfiguration(new FeatureInstanceSecurityEntityConfiguration(Database, _designTime));
-        modelBuilder.ApplyConfiguration(new FeatureSecurityEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new ModuleEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new ModuleInstanceEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new ModuleInstanceSecurityEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new ModuleSecurityEntityConfiguration(Database, _designTime));
 
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration(Database, _designTime));
     }
@@ -115,19 +115,19 @@ public class OipContext : DbContext
 
     private static void DefaultDataInsert(OipContext context)
     {
-        if (!context.Features.Any(x => x.Name == "Folder"))
+        if (!context.Modules.Any(x => x.Name == "Folder"))
         {
-            context.Features.Add(new FeatureEntity { Name = "Folder" });
+            context.Modules.Add(new ModuleEntity { Name = "Folder" });
         }
 
-        if (!context.Features.Any(x => x.Name == "Dashboard"))
+        if (!context.Modules.Any(x => x.Name == "Dashboard"))
         {
-            context.Features.Add(new FeatureEntity { Name = "Dashboard", RouterLink = "/dashboard/" });
+            context.Modules.Add(new ModuleEntity { Name = "Dashboard", RouterLink = "/dashboard/" });
         }
 
-        if (!context.Features.Any(x => x.Name == "Weather"))
+        if (!context.Modules.Any(x => x.Name == "Weather"))
         {
-            context.Features.Add(new FeatureEntity { Name = "Weather", RouterLink = "/weather/" });
+            context.Modules.Add(new ModuleEntity { Name = "Weather", RouterLink = "/weather/" });
         }
 
         context.SaveChanges();

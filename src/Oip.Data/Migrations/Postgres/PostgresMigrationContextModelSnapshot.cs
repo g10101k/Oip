@@ -22,13 +22,13 @@ namespace Oip.Data.Migrations.Postgres
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Oip.Data.Entities.FeatureEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleEntity", b =>
                 {
-                    b.Property<int>("FeatureId")
+                    b.Property<int>("ModuleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FeatureId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -42,20 +42,11 @@ namespace Oip.Data.Migrations.Postgres
                     b.Property<string>("Settings")
                         .HasColumnType("text");
 
-                    b.ToTable("Feature", "oip");
+                    b.ToTable("Module", "oip");
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.FeatureInstanceEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceEntity", b =>
                 {
-                    b.Property<int>("FeatureId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FeatureInstanceId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FeatureInstanceId"));
-
                     b.Property<string>("Icon")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
@@ -64,6 +55,15 @@ namespace Oip.Data.Migrations.Postgres
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
+
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ModuleInstanceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleInstanceId"));
 
                     b.Property<int?>("ParentId")
                         .HasColumnType("integer");
@@ -80,19 +80,19 @@ namespace Oip.Data.Migrations.Postgres
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)");
 
-                    b.ToTable("FeatureInstance", "oip");
+                    b.ToTable("ModuleInstance", "oip");
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.FeatureInstanceSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceSecurityEntity", b =>
                 {
-                    b.Property<int>("FeatureInstanceId")
+                    b.Property<int>("ModuleInstanceId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FeatureInstanceSecurityId")
+                    b.Property<int>("ModuleInstanceSecurityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FeatureInstanceSecurityId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleInstanceSecurityId"));
 
                     b.Property<string>("Right")
                         .IsRequired()
@@ -104,19 +104,19 @@ namespace Oip.Data.Migrations.Postgres
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.ToTable("FeatureInstanceSecurity", "oip");
+                    b.ToTable("ModuleInstanceSecurity", "oip");
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.FeatureSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleSecurityEntity", b =>
                 {
-                    b.Property<int>("FeatureId")
+                    b.Property<int>("ModuleId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FeatureSecurityId")
+                    b.Property<int>("ModuleSecurityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FeatureSecurityId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleSecurityId"));
 
                     b.Property<string>("Right")
                         .IsRequired()
@@ -128,7 +128,7 @@ namespace Oip.Data.Migrations.Postgres
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.ToTable("FeatureSecurity", "oip");
+                    b.ToTable("ModuleSecurity", "oip");
                 });
 
             modelBuilder.Entity("Oip.Data.Entities.UserEntity", b =>

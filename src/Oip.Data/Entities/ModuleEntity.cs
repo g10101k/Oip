@@ -1,14 +1,14 @@
 ﻿namespace Oip.Data.Entities;
 
 /// <summary>
-/// It features in app
+/// Module entity
 /// </summary>
-public class FeatureEntity
+public class ModuleEntity
 {
     /// <summary>
     /// Id
     /// </summary>
-    public int FeatureId { get; set; }
+    public int ModuleId { get; set; }
 
     /// <summary>
     /// Name
@@ -16,7 +16,7 @@ public class FeatureEntity
     public string Name { get; set; } = null!;
 
     /// <summary>
-    /// Settings for feature
+    /// Settings for module
     /// </summary>
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string? Settings { get; set; }
@@ -27,12 +27,12 @@ public class FeatureEntity
     public string? RouterLink { get; set; }
     
     /// <summary>
-    /// Feature Securities
+    /// Module Securities
     /// </summary>
-    public ICollection<FeatureSecurityEntity> FeatureSecurities { get; set; } = new List<FeatureSecurityEntity>();
+    public ICollection<ModuleSecurityEntity> ModuleSecurities { get; set; } = new List<ModuleSecurityEntity>();
     
     /// <summary>
     /// Instances
     /// </summary>
-    public ICollection<FeatureInstanceEntity> FeatureInstances { get; set; } = new List<FeatureInstanceEntity>();
+    public ICollection<ModuleInstanceEntity> ModuleInstances { get; set; } = new List<ModuleInstanceEntity>();
 }

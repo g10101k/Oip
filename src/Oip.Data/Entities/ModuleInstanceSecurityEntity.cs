@@ -1,19 +1,19 @@
 namespace Oip.Data.Entities;
 
 /// <summary>
-/// Feature instance security entity
+/// Module instance security entity
 /// </summary>
-public class FeatureInstanceSecurityEntity
+public class ModuleInstanceSecurityEntity
 {
     /// <summary>
     /// Id
     /// </summary>
-    public int FeatureInstanceSecurityId { get; set; }
+    public int ModuleInstanceSecurityId { get; set; }
 
     /// <summary>
-    /// FeatureId
+    /// ModuleId
     /// </summary>
-    public int FeatureInstanceId { get; set; }
+    public int ModuleInstanceId { get; set; }
 
     /// <summary>
     /// Right (max 255 chars)
@@ -26,7 +26,7 @@ public class FeatureInstanceSecurityEntity
     public string Role { get; set; } = null!;
     
     /// <summary>
-    /// Feature Instance
+    /// Module Instance
     /// </summary>
-    public FeatureInstanceEntity FeatureInstance { get; set; } = null!;
+    public ModuleInstanceEntity ModuleInstance { get; set; } = null!;
 }

@@ -1,19 +1,19 @@
 namespace Oip.Data.Entities;
 
 /// <summary>
-/// Feature instance
+/// Module instance
 /// </summary>
-public class FeatureInstanceEntity
+public class ModuleInstanceEntity
 {
     /// <summary>
     /// Id
     /// </summary>
-    public int FeatureInstanceId { get; set; }
+    public int ModuleInstanceId { get; set; }
 
     /// <summary>
-    /// Feature id
+    /// Module id
     /// </summary>
-    public int FeatureId { get; set; }
+    public int ModuleId { get; set; }
 
     /// <summary>
     /// Label
@@ -43,17 +43,17 @@ public class FeatureInstanceEntity
     /// <summary>
     /// Parent instance
     /// </summary>
-    public FeatureInstanceEntity? Parent { get; set; }
+    public ModuleInstanceEntity? Parent { get; set; }
 
     /// <summary>
     /// Children
     /// </summary>
-    public List<FeatureInstanceEntity> Items { get; set; } = new();
+    public List<ModuleInstanceEntity> Items { get; set; } = new();
 
     /// <summary>
     /// Securities
     /// </summary>
-    public List<FeatureInstanceSecurityEntity> Securities { get; set; } = new();
+    public List<ModuleInstanceSecurityEntity> Securities { get; set; } = new();
 
     /// <summary>
     /// Settings
@@ -62,7 +62,7 @@ public class FeatureInstanceEntity
     public string Settings { get; set; } = null!;
 
     /// <summary>
-    /// Feature
+    /// Module
     /// </summary>
-    public FeatureEntity Feature { get; set; } = null!;
+    public ModuleEntity Module { get; set; } = null!;
 }

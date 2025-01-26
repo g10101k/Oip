@@ -1,15 +1,15 @@
 namespace Oip.Data.Dtos;
 
 /// <summary>
-/// Feature Instance Dto
+/// Module Instance Dto
 /// </summary>
-public class FeatureInstanceDto
+public class ModuleInstanceDto
 {
     /// <summary></summary>
-    public int FeatureInstanceId { get; init; }
+    public int ModuleInstanceId { get; init; }
 
     /// <summary></summary>
-    public int FeatureId { get; init; }
+    public int ModuleId { get; init; }
 
     /// <summary></summary>
     public string Label { get; init; } = null!;
@@ -30,5 +30,5 @@ public class FeatureInstanceDto
     public string? Settings { get; init; }
 
     /// <summary>Childs</summary>
-    public List<FeatureInstanceDto>? Items { get; init; }
+    public List<ModuleInstanceDto>? Items { get; init; }
 }

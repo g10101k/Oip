@@ -7,11 +7,12 @@ import { LayoutService } from "../../services/app.layout.service";
 import { MenuService } from "../../services/app.menu.service";
 import { RippleModule } from 'primeng/ripple';
 import { NgIf, NgClass, NgFor } from '@angular/common';
+import { MenuItem, MenuItemCommandEvent, PrimeIcons } from "primeng/api";
 
 @Component({
-    // eslint-disable-next-line @angular-eslint/component-selector
-    selector: '[app-menuitem]',
-    template: `
+  // eslint-disable-next-line @angular-eslint/component-selector
+  selector: '[app-menuitem]',
+  template: `
     <ng-container>
       <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text">{{ item.label }}</div>
       <a *ngIf="(!item.routerLink || item.items) && item.visible !== false" [attr.href]="item.url"
@@ -21,7 +22,7 @@ import { NgIf, NgClass, NgFor } from '@angular/common';
         <span class="layout-menuitem-text">{{ item.label }}</span>
         <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
       </a>
-      <a *ngIf="(item.routerLink && !item.items) && item.visible !== false" (click)="itemClick($event)"
+      <a *ngIf="(item.routerLink && !item.items) && item.visible !== false" (click)="itemClick($event) "
          [ngClass]="item.class"
          [routerLink]="item.routerLink" routerLinkActive="active-route"
          [routerLinkActiveOptions]="item.routerLinkActiveOptions||{ paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' }"
@@ -42,19 +43,19 @@ import { NgIf, NgClass, NgFor } from '@angular/common';
       </ul>
     </ng-container>
   `,
-    animations: [
-        trigger('children', [
-            state('collapsed', style({
-                height: '0'
-            })),
-            state('expanded', style({
-                height: '*'
-            })),
-            transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
-        ])
-    ],
-    standalone: true,
-    imports: [NgIf, RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor]
+  animations: [
+    trigger('children', [
+      state('collapsed', style({
+        height: '0'
+      })),
+      state('expanded', style({
+        height: '*'
+      })),
+      transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
+    ])
+  ],
+  standalone: true,
+  imports: [NgIf, RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor]
 })
 export class MenuItemComponent implements OnInit, OnDestroy {
   public layoutService: LayoutService = inject(LayoutService);
@@ -74,6 +75,14 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   menuResetSubscription: Subscription;
 
   key: string = "";
+  contextItem: any;
+
+  itemMenu: MenuItem[] = [
+    { label: 'New', icon: PrimeIcons.PLUS, command: (event) => this.newClick(event) },
+    { label: 'Rename', icon: PrimeIcons.FILE_EDIT },
+    { separator: true },
+    { label: 'Delete', icon: PrimeIcons.TRASH, command: (event) => this.deleteItem(event) },
+  ];
 
   constructor(private cd: ChangeDetectorRef, public router: Router, private readonly menuService: MenuService) {
     this.menuSourceSubscription = this.menuService.menuSource$.subscribe(value => {
@@ -156,5 +165,17 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     if (this.menuResetSubscription) {
       this.menuResetSubscription.unsubscribe();
     }
+  }
+
+
+  onContextMenu($event: MouseEvent, item: any) {
+    this.contextItem = item;
+    this.itemContextMenu.show($event);
+  }
+
+  private deleteItem(event: MenuItemCommandEvent) {
+    this.menuService.deleteItem(this.contextItem?.moduleInstanceId).then(() => {
+      this.msgService.success('Saved security');
+    }, error => this.msgService.error(error));
   }
 }

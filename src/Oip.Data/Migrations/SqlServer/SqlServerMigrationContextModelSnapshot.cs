@@ -22,13 +22,13 @@ namespace Oip.Data.Migrations.SqlServer
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Oip.Data.Entities.FeatureEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleEntity", b =>
                 {
-                    b.Property<int>("FeatureId")
+                    b.Property<int>("ModuleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeatureId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -42,20 +42,11 @@ namespace Oip.Data.Migrations.SqlServer
                     b.Property<string>("Settings")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Feature", "oip");
+                    b.ToTable("Module", "oip");
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.FeatureInstanceEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceEntity", b =>
                 {
-                    b.Property<int>("FeatureId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FeatureInstanceId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeatureInstanceId"));
-
                     b.Property<string>("Icon")
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
@@ -64,6 +55,15 @@ namespace Oip.Data.Migrations.SqlServer
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ModuleInstanceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleInstanceId"));
 
                     b.Property<int?>("ParentId")
                         .HasColumnType("int");
@@ -80,19 +80,19 @@ namespace Oip.Data.Migrations.SqlServer
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
-                    b.ToTable("FeatureInstance", "oip");
+                    b.ToTable("ModuleInstance", "oip");
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.FeatureInstanceSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceSecurityEntity", b =>
                 {
-                    b.Property<int>("FeatureInstanceId")
+                    b.Property<int>("ModuleInstanceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("FeatureInstanceSecurityId")
+                    b.Property<int>("ModuleInstanceSecurityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeatureInstanceSecurityId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleInstanceSecurityId"));
 
                     b.Property<string>("Right")
                         .IsRequired()
@@ -104,19 +104,19 @@ namespace Oip.Data.Migrations.SqlServer
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.ToTable("FeatureInstanceSecurity", "oip");
+                    b.ToTable("ModuleInstanceSecurity", "oip");
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.FeatureSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleSecurityEntity", b =>
                 {
-                    b.Property<int>("FeatureId")
+                    b.Property<int>("ModuleId")
                         .HasColumnType("int");
 
-                    b.Property<int>("FeatureSecurityId")
+                    b.Property<int>("ModuleSecurityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeatureSecurityId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleSecurityId"));
 
                     b.Property<string>("Right")
                         .IsRequired()
@@ -128,7 +128,7 @@ namespace Oip.Data.Migrations.SqlServer
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.ToTable("FeatureSecurity", "oip");
+                    b.ToTable("ModuleSecurity", "oip");
                 });
 
             modelBuilder.Entity("Oip.Data.Entities.UserEntity", b =>

@@ -1,14 +1,14 @@
 namespace Oip.Data.Dtos;
 
 /// <summary>
-/// It features in app
+/// It module in app
 /// </summary>
-public class FeatureDto
+public class ModuleDto
 {
     /// <summary>
     /// Id
     /// </summary>
-    public int FeatureId { get; set; }
+    public int ModuleId { get; set; }
 
     /// <summary>
     /// Name
@@ -23,5 +23,5 @@ public class FeatureDto
     /// <summary>
     /// Securities
     /// </summary>
-    public IEnumerable<FeatureSecurityDto> FeatureSecurities { get; set; } = null!;
+    public IEnumerable<ModuleSecurityDto> ModuleSecurities { get; set; } = null!;
 }

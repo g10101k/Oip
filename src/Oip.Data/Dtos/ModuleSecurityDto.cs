@@ -1,9 +1,9 @@
 namespace Oip.Data.Dtos;
 
 /// <summary>
-/// Feature security DTO
+/// Module security DTO
 /// </summary>
-public class FeatureSecurityDto
+public class ModuleSecurityDto
 {
     /// <summary>
     /// Right

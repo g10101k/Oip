@@ -9,23 +9,23 @@ namespace Oip.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/dashboard")]
-public class DashboardFeatureController : BaseFeatureController<DashboardSettings>
+public class DashboardModuleController : BaseModuleController<DashboardSettings>
 {
     /// <summary>
     /// .ctor
     /// </summary>
-    /// <param name="featureRepository"></param>
-    public DashboardFeatureController(FeatureRepository featureRepository) : base(featureRepository)
+    /// <param name="moduleRepository"></param>
+    public DashboardModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
     {
     }
 
 
     /// <inheritdoc />
-    public override List<SecurityResponse> GetFeatureRights()
+    public override List<SecurityResponse> GetModuleRights()
     {
         return new()
         {
-            new() { Code = "read", Name = "Read", Description = "Can view this feature", Roles = ["admin"] },
+            new() { Code = "read", Name = "Read", Description = "Can view this module", Roles = ["admin"] },
         };
     }
 }
