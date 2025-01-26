@@ -32,11 +32,12 @@ export class SecurityComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // on destroy
   }
 
   ngOnInit(): void {
     if (!this.id) {
-      this.msgService.error("Feature id not passed!");
+      this.msgService.error("Module id not passed!");
     }
     if (!this.controller) {
       this.msgService.error("Controller not passed!");

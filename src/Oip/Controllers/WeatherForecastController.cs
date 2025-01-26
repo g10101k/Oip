@@ -6,11 +6,11 @@ using Oip.Data.Repositories;
 namespace Oip.Controllers;
 
 /// <summary>
-/// Feature controller example
+/// Module controller example
 /// </summary>
 [ApiController]
 [Route("api/weather")]
-public class WeatherForecastController : BaseFeatureController<WeatherFeatureSettings>
+public class WeatherForecastController : BaseModuleController<WeatherModuleSettings>
 {
     private static readonly string[] Summaries =
     {
@@ -20,8 +20,8 @@ public class WeatherForecastController : BaseFeatureController<WeatherFeatureSet
     /// <summary>
     /// .ctor
     /// </summary>
-    /// <param name="featureRepository"></param>
-    public WeatherForecastController(FeatureRepository featureRepository) : base(featureRepository)
+    /// <param name="moduleRepository"></param>
+    public WeatherForecastController(ModuleRepository moduleRepository) : base(moduleRepository)
     {
     }
 
@@ -32,6 +32,8 @@ public class WeatherForecastController : BaseFeatureController<WeatherFeatureSet
     /// <returns></returns>
     [HttpGet("get")]
     [Authorize()]
+    [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
+
     public IActionResult Get(int dayCount)
     {
         return Ok(Enumerable.Range(1, dayCount).Select(index => new WeatherForecastResponse
@@ -40,18 +42,18 @@ public class WeatherForecastController : BaseFeatureController<WeatherFeatureSet
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
-            .ToArray());
+            .ToList());
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override List<SecurityResponse> GetFeatureRights()
+    public override List<SecurityResponse> GetModuleRights()
     {
         return new()
         {
-            new() { Code = "read", Name = "Read", Description = "Can view this feature", Roles = ["admin"] },
+            new() { Code = "read", Name = "Read", Description = "Can view this module", Roles = ["admin"] },
             new() { Code = "edit", Name = "Edit", Description = "Can edit data", Roles = ["admin"] },
             new() { Code = "delete", Name = "Delete", Description = "Can delete edit data", Roles = ["admin"] },
         };
@@ -59,9 +61,9 @@ public class WeatherForecastController : BaseFeatureController<WeatherFeatureSet
 }
 
 /// <summary>
-/// Feature settings
+/// Module settings
 /// </summary>
-public class WeatherFeatureSettings
+public class WeatherModuleSettings
 {
     /// <summary>
     /// Day count

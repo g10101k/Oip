@@ -57,7 +57,8 @@ services:
       - "8443:8443"
       - "9000:9000"
     volumes:
-      - ${APPDATA}/ASP.NET/https:/opt/keycloak/data/cert/
+      - $HOME/.aspnet/https:/opt/keycloak/data/cert/
+#      - ${APPDATA}/ASP.NET/https:/opt/keycloak/data/cert/
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
     depends_on:
       - postgres

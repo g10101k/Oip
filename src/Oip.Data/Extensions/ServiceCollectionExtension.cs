@@ -43,7 +43,7 @@ public static class ServiceCollectionExtension
                     }
                 }
             )
-            .AddScoped<FeatureRepository>()
+            .AddScoped<ModuleRepository>()
             .AddScoped<UserRepository>();
     }
 }
