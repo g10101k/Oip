@@ -1,4 +1,14 @@
-import { ChangeDetectorRef, Component, Host, HostBinding, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Host,
+  HostBinding,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { NavigationEnd, Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Subscription } from 'rxjs';
@@ -7,21 +17,30 @@ import { LayoutService } from "../../services/app.layout.service";
 import { MenuService } from "../../services/app.menu.service";
 import { RippleModule } from 'primeng/ripple';
 import { NgIf, NgClass, NgFor } from '@angular/common';
+import { MenuItem, MenuItemCommandEvent, PrimeIcons } from "primeng/api";
+import { CreateMenuItemDialogComponent } from "../create-menu-item-dialog/create-menu-item-dialog.component";
+import { ContextMenu, ContextMenuModule } from "primeng/contextmenu";
+import { MsgService } from "../../services/msg.service";
 
 @Component({
-    // eslint-disable-next-line @angular-eslint/component-selector
-    selector: '[app-menuitem]',
-    template: `
+  // eslint-disable-next-line @angular-eslint/component-selector
+  selector: '[app-menuitem]',
+  template: `
+    <create-menu-item-dialog [contextItem]="contextItem"></create-menu-item-dialog>
+    <p-contextMenu #itemContextMenu [model]="itemMenu" />
     <ng-container>
-      <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text">{{ item.label }}</div>
+      <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text" (contextmenu)="onContextMenu($event, item)">{{ item.label }}</div>
       <a *ngIf="(!item.routerLink || item.items) && item.visible !== false" [attr.href]="item.url"
          (click)="itemClick($event)"
-         [ngClass]="item.class" [attr.target]="item.target" tabindex="0" pRipple>
+         [ngClass]="item.class"
+         [attr.target]="item.target"
+         tabindex="0" pRipple
+         >
         <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
         <span class="layout-menuitem-text">{{ item.label }}</span>
         <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
       </a>
-      <a *ngIf="(item.routerLink && !item.items) && item.visible !== false" (click)="itemClick($event)"
+      <a *ngIf="(item.routerLink && !item.items) && item.visible !== false" (click)="itemClick($event) "
          [ngClass]="item.class"
          [routerLink]="item.routerLink" routerLinkActive="active-route"
          [routerLinkActiveOptions]="item.routerLinkActiveOptions||{ paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' }"
@@ -29,43 +48,42 @@ import { NgIf, NgClass, NgFor } from '@angular/common';
          [preserveFragment]="item.preserveFragment"
          [skipLocationChange]="item.skipLocationChange" [replaceUrl]="item.replaceUrl" [state]="item.state"
          [queryParams]="item.queryParams"
-         [attr.target]="item.target" tabindex="0" pRipple>
-        <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
+         [attr.target]="item.target" tabindex="0" pRipple
+         (contextmenu)="onContextMenu($event, item)">
+        <i [ngClass]="item.icon" class="layout-menuitem-icon" ></i>
         <span class="layout-menuitem-text">{{ item.label }}</span>
         <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
       </a>
 
-      <ul *ngIf="item.items && item.visible !== false" [@children]="submenuAnimation">
+      <ul *ngIf="item.items && item.visible !== false" [@children]="submenuAnimation" (contextmenu)="onContextMenu($event, item)">
         <ng-template ngFor let-child let-i="index" [ngForOf]="item.items">
           <li app-menuitem [item]="child" [index]="i" [parentKey]="key" [class]="child.badgeClass"></li>
         </ng-template>
       </ul>
     </ng-container>
   `,
-    animations: [
-        trigger('children', [
-            state('collapsed', style({
-                height: '0'
-            })),
-            state('expanded', style({
-                height: '*'
-            })),
-            transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
-        ])
-    ],
-    standalone: true,
-    imports: [NgIf, RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor]
+  animations: [
+    trigger('children', [
+      state('collapsed', style({
+        height: '0'
+      })),
+      state('expanded', style({
+        height: '*'
+      })),
+      transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
+    ])
+  ],
+  standalone: true,
+  imports: [NgIf, RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor, CreateMenuItemDialogComponent, ContextMenuModule]
 })
 export class MenuItemComponent implements OnInit, OnDestroy {
   public layoutService: LayoutService = inject(LayoutService);
-
   @Input() item: any;
-
   @Input() index!: number;
-
   @Input() @HostBinding('class.layout-root-menuitem') root!: boolean;
-
   @Input() parentKey!: string;
+  @ViewChild(CreateMenuItemDialogComponent) createMenuItemDialogComponent: CreateMenuItemDialogComponent;
+  @ViewChild('itemContextMenu') itemContextMenu: ContextMenu;
 
   active = false;
 
@@ -74,6 +92,15 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   menuResetSubscription: Subscription;
 
   key: string = "";
+  contextItem: any;
+
+  itemMenu: MenuItem[] = [
+    { label: 'New', icon: PrimeIcons.PLUS, command: (event) => this.newClick(event) },
+    { label: 'Edit', icon: PrimeIcons.FILE_EDIT },
+    { separator: true },
+    { label: 'Delete', icon: PrimeIcons.TRASH, command: (event) => this.deleteItem(event) },
+  ];
+  msgService = inject(MsgService);
 
   constructor(private cd: ChangeDetectorRef, public router: Router, private readonly menuService: MenuService) {
     this.menuSourceSubscription = this.menuService.menuSource$.subscribe(value => {
@@ -156,5 +183,20 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     if (this.menuResetSubscription) {
       this.menuResetSubscription.unsubscribe();
     }
+  }
+
+  private newClick(e: MenuItemCommandEvent) {
+    this.createMenuItemDialogComponent.showDialog();
+  }
+
+  onContextMenu($event: MouseEvent, item: any) {
+    this.contextItem = item;
+    this.itemContextMenu.show($event);
+  }
+
+  private deleteItem(event: MenuItemCommandEvent) {
+    this.menuService.deleteItem(this.contextItem?.moduleInstanceId).then(() => {
+      this.msgService.success('Saved security');
+    }, error => this.msgService.error(error));
   }
 }

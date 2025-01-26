@@ -63,7 +63,7 @@ export abstract class BaseComponent<TSettings> implements OnInit, OnDestroy {
   }
 
   async getSettings() {
-    await this.baseDataService.sendRequest<TSettings>(`api/${this.controller}/get-feature-instance-settings?id=${this.id}`).then(response => {
+    await this.baseDataService.sendRequest<TSettings>(`api/${this.controller}/get-module-instance-settings?id=${this.id}`).then(response => {
       this.settings = response;
     }).catch(error => {
       this.msgService.error(error);
@@ -71,7 +71,7 @@ export abstract class BaseComponent<TSettings> implements OnInit, OnDestroy {
   }
 
   async saveSettings(settings: TSettings) {
-    await this.baseDataService.sendRequest(`api/${this.controller}/put-feature-instance-settings`, 'PUT', {
+    await this.baseDataService.sendRequest(`api/${this.controller}/put-module-instance-settings`, 'PUT', {
       id: this.id,
       settings: settings
     }).then(response => {

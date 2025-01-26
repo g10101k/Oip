@@ -42,3 +42,4 @@ export * from './events/menu-change.event'
 export { AuthHttpInterceptor } from "./modules/auth-http-interceptor.service";
 export { SecurePipe } from "./modules/secure.pipe";
 export { httpLoaderFactory } from "./modules/http-loader.factory";
+export { AddModuleInstanceDto } from "./dtos/add-module-instance.dto";
