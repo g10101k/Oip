@@ -219,4 +219,19 @@ public class ModuleRepository
         });
         await _db.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Delete module instance
+    /// </summary>
+    /// <param name="id"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public async Task DeleteModuleInstance(int id)
+    {
+        var instance = await _db.ModuleInstances.FirstOrDefaultAsync(x => x.ModuleInstanceId == id);
+        if (instance == null)
+            throw new KeyNotFoundException($"Module instance with id {id} not found");
+        
+        _db.ModuleInstances.Remove(instance);
+        await _db.SaveChangesAsync();
+    }
 }

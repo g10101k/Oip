@@ -7,14 +7,6 @@ import { DropdownModule } from "primeng/dropdown";
 import { FormsModule } from "@angular/forms";
 import { PrimeIcons } from "primeng/api";
 import { AddModuleInstanceDto } from "../../dtos/add-module-instance.dto";
-
-export interface NewItemMenu {
-  module: string;
-  title: string;
-
-
-}
-
 @Component({
   selector: 'create-menu-item-dialog',
   standalone: true,

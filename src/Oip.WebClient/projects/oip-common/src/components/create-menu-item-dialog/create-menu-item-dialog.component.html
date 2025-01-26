@@ -1,5 +1,4 @@
 <p-dialog header="Create new menu item" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-  <span class="p-text-secondary block mb-4">Create new item</span>
   <div class="flex items-center gap-4 mb-4">
     <label for="menuLabel" class="font-semibold w-24">Label</label>
     <input pInputText id="menuLabel" class="flex-auto" autocomplete="off" [(ngModel)]="label"/>
@@ -16,20 +15,8 @@
       placeholder="Select module"/>
   </div>
   <div class="flex items-center gap-4 mb-4">
-    <label for="module" class="font-semibold w-24">Module</label>
-    <p-dropdown
-      id="icon"
-      class="flex-auto"
-      [options]="icons"
-      [(ngModel)]="selectIcon"
-      placeholder="Select module">
-      <ng-template let-item pTemplate="item">
-        <div class="flex align-items-center gap-2">
-          <span [class]="item"></span>
-          <div>{{ item }}</div>
-        </div>
-      </ng-template>
-    </p-dropdown>
+    <label for="icon" class="font-semibold w-24">Icon</label>
+    <input pInputText id="icon" class="flex-auto" [(ngModel)]="selectIcon"/>
   </div>
   <div class="flex justify-end gap-2">
     <p-button label="Cancel" severity="secondary" (click)="changeVisible()" (keydown)="changeVisible()"/>

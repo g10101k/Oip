@@ -68,5 +68,16 @@ public class MenuController : ControllerBase
     {
          await _moduleRepository.AddModuleInstance(addModuleInstanceDto);
     }
+    
+    /// <summary>
+    /// Add new module
+    /// </summary>  
+    /// <returns></returns> 
+    [HttpDelete("delete-module-instance")]
+    [Authorize(Roles = "admin")]
+    public async Task DeleteModuleInstance(int id)
+    {
+        await _moduleRepository.DeleteModuleInstance(id);
+    }
 }
 
