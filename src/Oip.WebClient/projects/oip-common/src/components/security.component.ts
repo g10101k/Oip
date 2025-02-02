@@ -3,42 +3,45 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { TooltipModule } from "primeng/tooltip";
 import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
-import { NgForOf } from "@angular/common";
 import { MsgService } from "./../services/msg.service";
 import { SecurityDataService } from "./../services/security-data.service";
 import { PutSecurityDto } from "./../dtos/put-security.dto";
+import { Fluid } from "primeng/fluid";
 
 @Component({
   selector: 'security',
-  template:`<div class="card p-fluid">
-  <h5>Security</h5>
-  <div *ngFor="let item of securityData">
-    <div class="field">
-      <label htmlFor="name1">{{ item.name }} <span pTooltip="{{ item.description }}" tooltipPosition="right"
-                                                   class="pi pi-question-circle"></span>
-      </label>
-      <p-multiSelect
-        [options]="roles"
-        [maxSelectedLabels]="10"
-        [(ngModel)]="item.roles"
-        placeholder="Select roles"/>
-    </div>
-
-  </div>
-  <div>
-    <div class="flex justify-content-end flex-wrap">
-      <p-button label="Save" icon="pi pi-save" (click)="saveClick()" (keydown)="saveKeyDown($event)"/>
-    </div>
-  </div>
-</div>
-
-`,
+  template: `
+    <p-fluid>
+      <div class="flex flex-col md:flex-row gap-8">
+        <div class="md:w-1/2">
+          <div class="card flex flex-col gap-4">
+            <div class="font-semibold text-xl">Security</div>
+            @for (item of securityData; track item.name) {
+              <div class="flex flex-col gap-2">
+                <label htmlFor="{{ item.name }} ">{{ item.name }} <span pTooltip="{{ item.description }}"
+                                                                        tooltipPosition="right"
+                                                                        class="pi pi-question-circle"></span>
+                </label>
+                <p-multiSelect [options]="roles"
+                               [maxSelectedLabels]="10"
+                               [(ngModel)]="item.roles"
+                               placeholder="Select roles"/>
+              </div>
+            }
+            <div class="flex justify-content-end flex-wrap">
+              <p-button label="Save" icon="pi pi-save" (click)="saveClick()" (keydown)="saveKeyDown($event)"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-fluid>
+  `,
   imports: [
     MultiSelectModule,
     TooltipModule,
     FormsModule,
     ButtonModule,
-    NgForOf
+    Fluid,
   ],
   standalone: true
 })

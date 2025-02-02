@@ -28,13 +28,12 @@ import { UserService } from "../services/user.service";
         </a>
       </div>
 
-      <p-tabs *ngIf="securityService.isAdmin" styleClass="tabview-custom" [(value)]="topBarService.activeId"
-              class="ml-2">
+      <p-tabs *ngIf="securityService.isAdmin && topBarService.topBarItems.length > 0" class="layout-topbar-tabs ml-2" [(value)]="topBarService.activeId">
         <p-tablist>
           @for (tab of topBarService.availableTopBarItems; track tab.id) {
             <p-tab [value]="tab.id">
-              <i class="pi {{tab.icon}} top-bar-module-item-icon">&nbsp;</i>
-              <span>{{ tab.caption }}</span>
+              <i class="pi {{tab.icon}}"></i>
+              <span>&nbsp;{{ tab.caption }}</span>
             </p-tab>
           }
         </p-tablist>
@@ -70,10 +69,7 @@ import { UserService } from "../services/user.service";
 
         <div class="layout-topbar-menu hidden lg:block">
           <div class="layout-topbar-menu-content">
-            <button type="button" class="layout-topbar-action" >
-              <i class="pi pi-cog"></i>
-              <span>Config</span>
-            </button>
+
             <button type="button" class="layout-topbar-action">
               <i class="pi pi-inbox"></i>
               <span>Messages</span>
@@ -102,9 +98,5 @@ export class AppTopbar {
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
-  }
-
-  userMenuAction() {
-
   }
 }

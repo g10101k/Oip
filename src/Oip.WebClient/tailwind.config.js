@@ -2,7 +2,7 @@
 const primeui = require('tailwindcss-primeui');
 module.exports = {
     darkMode: ['selector', '[class="app-dark"]'],
-    content: ['./projects/oip-common/**/*.{html,ts,scss,css}', './index.html'],
+    content: ['./projects/**/*.{html,ts,scss,css}', './index.html'],
     plugins: [primeui],
     theme: {
         screens: {
@@ -14,3 +14,4 @@ module.exports = {
         }
     }
 };
+

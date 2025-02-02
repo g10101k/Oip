@@ -98,7 +98,7 @@
 
 @media (max-width: 991px) {
   .layout-topbar {
-    padding: 0 2rem;
+    padding: 0 1rem;
 
     .layout-topbar-logo-container {
       width: auto;
@@ -145,10 +145,19 @@
         }
 
         span {
-          font-weight: medium;
           display: block;
         }
       }
+    }
+
+    .layout-topbar-tabs {
+      span {
+        display: none;
+      }
+    }
+
+    .layout-topbar-logo {
+      display: none;
     }
 
     .layout-topbar-menu-content {

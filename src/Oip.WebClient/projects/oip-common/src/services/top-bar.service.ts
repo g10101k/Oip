@@ -17,7 +17,7 @@ export class TopBarService {
     if (this._activeId === undefined) {
       return undefined;
     }
-    return this.topBarItems[this._activeId];
+    return this.topBarItems.find((topBarItem: TopBarDto) => topBarItem.id === this._activeId);
   }
 
   get activeId(): string | undefined {
