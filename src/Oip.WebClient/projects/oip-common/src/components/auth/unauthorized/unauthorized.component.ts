@@ -4,36 +4,40 @@ import { RippleModule } from "primeng/ripple";
 import { LogoComponent } from "../../logo.component";
 import { SecurityService } from "../../../services/security.service";
 import { AppFloatingConfigurator } from "../../app.floatingconfigurator";
+import { ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: 'unauthorized-error',
   template: `
+    <app-floating-configurator/>
     <div
-      class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
-      <div class="flex flex-column align-items-center justify-content-center">
+      class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
+      <div class="flex flex-col items-center justify-center">
+
         <div
-          style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
-          <div class="w-full surface-card py-8 px-5 sm:px-8 flex flex-column align-items-center"
-               style="border-radius:53px">
-            <div class="grid flex flex-column align-items-center">
-              <logo width="96" height="96"></logo>
-              <h1 class="text-900 font-bold text-5xl mb-2">Unauthorized</h1>
-              <span class="text-600 mb-5">Please login</span>
-              <img src="assets/demo/images/error/asset-error.svg" alt="Error" class="mb-5" width="80%">
-              <button pButton pRipple icon="pi pi-sign-in" label="Login" class="p-button-text" iconPos="right"
-                      (click)="securityService.authorize()"></button>
+          style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+          <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+            <div class="flex flex-col items-center justify-center">
+              <logo class="" width="96" height="96"/>
+            </div>
+            <div class="text-center mb-8">
+              <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome to OIP!</div>
+              <span class="text-muted-color font-medium">Sign in to continue</span>
+            </div>
+            <div>
+              <p-button label="Sign In" styleClass="w-full" (click)="securityService.authorize()"></p-button>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   `,
   imports: [
     ButtonModule,
     RippleModule,
     LogoComponent,
-    AppFloatingConfigurator
+    AppFloatingConfigurator,
+    ReactiveFormsModule,
   ]
 })
 export class UnauthorizedComponent {

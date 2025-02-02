@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -6,11 +6,16 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { LayoutService } from "../services/app.layout.service";
 import { AppConfigurator } from "./app.configurator";
 import { LogoComponent } from "./logo.component";
+import { SecurityService } from "../services/security.service";
+import { TopBarService } from "../services/top-bar.service";
+import { Tab, TabList, Tabs } from "primeng/tabs";
+import { AvatarModule } from "primeng/avatar";
+import { UserService } from "../services/user.service";
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, LogoComponent],
+  imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, LogoComponent, Tabs, TabList, Tab, AvatarModule],
   template: `
     <div class="layout-topbar">
       <div class="layout-topbar-logo-container">
@@ -23,6 +28,17 @@ import { LogoComponent } from "./logo.component";
         </a>
       </div>
 
+      <p-tabs *ngIf="securityService.isAdmin" styleClass="tabview-custom" [(value)]="topBarService.activeId"
+              class="ml-2">
+        <p-tablist>
+          @for (tab of topBarService.availableTopBarItems; track tab.id) {
+            <p-tab [value]="tab.id">
+              <i class="pi {{tab.icon}} top-bar-module-item-icon">&nbsp;</i>
+              <span>{{ tab.caption }}</span>
+            </p-tab>
+          }
+        </p-tablist>
+      </p-tabs>
 
       <div class="layout-topbar-actions">
         <div class="layout-config-menu">
@@ -54,17 +70,21 @@ import { LogoComponent } from "./logo.component";
 
         <div class="layout-topbar-menu hidden lg:block">
           <div class="layout-topbar-menu-content">
-            <button type="button" class="layout-topbar-action">
-              <i class="pi pi-calendar"></i>
-              <span>Calendar</span>
+            <button type="button" class="layout-topbar-action" routerLink="config">
+              <i class="pi pi-cog"></i>
+              <span>Config</span>
             </button>
             <button type="button" class="layout-topbar-action">
               <i class="pi pi-inbox"></i>
               <span>Messages</span>
             </button>
-            <button type="button" class="layout-topbar-action">
-              <i class="pi pi-user"></i>
-              <span>Profile</span>
+            <button class="layout-topbar-action" (click)="userMenuAction()" (keydown)="userMenuAction()">
+              <p-avatar class="p-link flex align-items-center"
+                        [image]="userService.photoLoaded ? userService.photo : null"
+                        size="normal"
+                        shape="circle">{{ !userService.photoLoaded ? userService.shortLabel : null }}
+              </p-avatar>
+              <span class="ml-2">Profile</span>
             </button>
           </div>
         </div>
@@ -73,11 +93,18 @@ import { LogoComponent } from "./logo.component";
 })
 export class AppTopbar {
   items!: MenuItem[];
+  securityService = inject(SecurityService);
+  topBarService = inject(TopBarService);
+  userService = inject(UserService);
 
   constructor(public layoutService: LayoutService) {
   }
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
+  }
+
+  userMenuAction() {
+
   }
 }
