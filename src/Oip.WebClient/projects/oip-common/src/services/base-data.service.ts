@@ -18,7 +18,7 @@ export class BaseDataService {
     let result: Observable<TResponse>;
     switch (method) {
       case 'GET':
-        result = this.http.get<TResponse>(url, { ...httpOptions, params: data });
+        result = this.http.get<TResponse>(url, {  params: data });
         break;
       case 'PUT':
         result = this.http.put<TResponse>(url, data, httpOptions);

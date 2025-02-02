@@ -1,4 +1,4 @@
-@use 'mixins' as *;
+@use './mixins' as *;
 
 .layout-topbar {
   position: fixed;
@@ -7,7 +7,7 @@
   left: 0;
   top: 0;
   width: 100%;
-  padding: 0 2rem;
+  padding: 0 1rem;
   background-color: var(--surface-card);
   transition: left var(--layout-section-transition-duration);
   display: flex;
@@ -41,7 +41,6 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    color: var(--text-color-secondary);
     border-radius: 50%;
     width: 2.5rem;
     height: 2.5rem;

@@ -1,9 +1,8 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { WeatherForecast } from './dtos/weather.forecast'
-import { BaseComponent, Feature } from 'oip-common'
+import { BaseComponent, Feature, SecurityComponent } from 'oip-common'
 import { WeatherDataService } from "./weather-data.service";
 import { WeatherSettingsDto } from "./dtos/weather-settings.dto";
-import { SecurityComponent } from '../../../../../../oip-common/src/components/security/security.component';
 import { WeatherSettingsComponent } from './weather-settings/weather-settings.component';
 import { TagModule } from 'primeng/tag';
 import { SharedModule } from 'primeng/api';
@@ -13,7 +12,7 @@ import { NgIf } from '@angular/common';
 @Component({
     selector: 'weather',
     templateUrl: './weather.component.html',
-    providers: [{ provide: 'controller', useValue: 'weather' }],
+    providers: [{ provide: 'controller', useValue: 'weather' }, WeatherDataService],
     standalone: true,
     imports: [
         NgIf,
