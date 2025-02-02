@@ -23,7 +23,7 @@ import { CreateMenuItemDialogComponent } from "./create-menu-item-dialog.compone
         <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true" ></li>
         <li *ngIf="item.separator" class="menu-separator"></li>
       </ng-container>
-      <div *ngIf="securityService.isAdmin" class="absolute bottom-0 right-0 m-2 flex">
+      <div *ngIf="securityService.isAdmin" class="flex items-center absolute right-0 bottom-0 m-4">
         <label for="adminMode" class="mr-2">All</label>
         <p-inputSwitch id="adminMode" [(ngModel)]="adminMode" (onChange)="onSettingButtonClick()"></p-inputSwitch>
       </div>

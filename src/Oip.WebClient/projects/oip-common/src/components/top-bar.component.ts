@@ -22,7 +22,7 @@ import { UserService } from "../services/user.service";
         <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
           <i class="pi pi-bars"></i>
         </button>
-        <a class="layout-topbar-logo ml-2" routerLink="">
+        <a class="layout-topbar-logo" routerLink="">
           <logo width="36" height="36"></logo>
           <span>OIP</span>
         </a>

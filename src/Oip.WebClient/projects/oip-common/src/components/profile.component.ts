@@ -15,27 +15,27 @@ import { MsgService, UserService } from "oip-common";
     ImageModule,
     AvatarModule
   ],
-  template: `<p-avatar
-  [image]="userService.photoLoaded ? userService.photo : null"
-  styleClass="mr-2"
-  size="xlarge"
-  shape="circle"/>
-
-<div class="mt-2">
-  <p-fileUpload
-    mode="basic"
-    name="files"
-    [auto]="true"
-    chooseIcon="pi pi-upload"
-    url="/api/user-profile/post-user-photo"
-    accept="image/*" maxFileSize="1000000"
-    withCredentials="true"
-    (onUpload)="onBasicUploadAuto($event)"
-    chooseLabel="Change photo"/>
-</div>
-`,
+  template: `
+    <p-avatar
+      [image]="userService.photoLoaded ? userService.photo : null"
+      styleClass="mr-2"
+      size="xlarge"
+      shape="circle"/>
+    <div class="mt-2">
+      <p-fileUpload
+        mode="basic"
+        name="files"
+        [auto]="true"
+        chooseIcon="pi pi-upload"
+        url="/api/user-profile/post-user-photo"
+        accept="image/*" maxFileSize="1000000"
+        withCredentials="true"
+        (onUpload)="onBasicUploadAuto($event)"
+        chooseLabel="Change photo"/>
+    </div>
+  `,
 })
-export class ProfileComponent  {
+export class ProfileComponent {
   userService = inject(UserService);
   readonly msgService = inject(MsgService);
 
