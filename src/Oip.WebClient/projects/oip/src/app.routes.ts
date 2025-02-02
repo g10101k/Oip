@@ -28,8 +28,8 @@ export const appRoutes: Routes = [
         canActivate: [() => inject(AuthGuardService).canActivate()],
       },
       {
-        path: 'buttons',
-        loadComponent: () => import('oip-common').then(m => m.ButtonDemo),
+        path: 'config',
+        loadComponent: () => import('oip-common').then(m => m.ConfigComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()],
       }
     ]

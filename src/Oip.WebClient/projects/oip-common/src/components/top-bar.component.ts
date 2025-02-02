@@ -70,7 +70,7 @@ import { UserService } from "../services/user.service";
 
         <div class="layout-topbar-menu hidden lg:block">
           <div class="layout-topbar-menu-content">
-            <button type="button" class="layout-topbar-action" routerLink="config">
+            <button type="button" class="layout-topbar-action" >
               <i class="pi pi-cog"></i>
               <span>Config</span>
             </button>
@@ -78,7 +78,7 @@ import { UserService } from "../services/user.service";
               <i class="pi pi-inbox"></i>
               <span>Messages</span>
             </button>
-            <button class="layout-topbar-action" (click)="userMenuAction()" (keydown)="userMenuAction()">
+            <button class="layout-topbar-action" routerLink="config">
               <p-avatar class="p-link flex align-items-center"
                         [image]="userService.photoLoaded ? userService.photo : null"
                         size="normal"

@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FileUploadModule } from "primeng/fileupload";
 import { ImageModule } from "primeng/image";
 import { AvatarModule } from "primeng/avatar";
-import { UserService } from "oip-common";
+import { MsgService, UserService } from "oip-common";
 
 @Component({
   selector: 'user-profile',
@@ -25,14 +25,21 @@ import { UserService } from "oip-common";
   <p-fileUpload
     mode="basic"
     name="files"
+    [auto]="true"
     chooseIcon="pi pi-upload"
     url="/api/user-profile/post-user-photo"
     accept="image/*" maxFileSize="1000000"
     withCredentials="true"
+    (onUpload)="onBasicUploadAuto($event)"
     chooseLabel="Change photo"/>
 </div>
 `,
 })
 export class ProfileComponent  {
   userService = inject(UserService);
+  readonly msgService = inject(MsgService);
+
+  onBasicUploadAuto($event) {
+    this.msgService.success('Successfully uploaded');
+  }
 }

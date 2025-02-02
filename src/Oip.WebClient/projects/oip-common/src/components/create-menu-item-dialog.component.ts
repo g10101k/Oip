@@ -6,6 +6,7 @@ import { DropdownModule } from "primeng/dropdown";
 import { FormsModule } from "@angular/forms";
 import { PrimeIcons } from "primeng/api";
 import { AddModuleInstanceDto, MenuService } from "oip-common";
+import { Select } from "primeng/select";
 @Component({
   selector: 'create-menu-item-dialog',
   standalone: true,
@@ -14,7 +15,8 @@ import { AddModuleInstanceDto, MenuService } from "oip-common";
     DialogModule,
     InputTextModule,
     DropdownModule,
-    FormsModule
+    FormsModule,
+    Select
   ],
   template: `<p-dialog header="Create new menu item" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
     <div class="flex items-center gap-4 mb-4">
@@ -23,7 +25,7 @@ import { AddModuleInstanceDto, MenuService } from "oip-common";
     </div>
     <div class="flex items-center gap-4 mb-4">
       <label for="module" class="font-semibold w-24">Module</label>
-      <p-dropdown
+      <p-select
         id="module"
         class="flex-auto"
         [options]="modules"
