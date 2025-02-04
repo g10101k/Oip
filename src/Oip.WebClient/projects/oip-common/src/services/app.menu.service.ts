@@ -27,8 +27,8 @@ export class MenuService extends BaseDataService {
     return this.sendRequest<any>(this.baseUrl + 'api/menu/get');
   }
 
-  getAdminMenu(){
-    return this.sendRequest<any>(this.baseUrl +     'api/menu/get-admin-menu' );
+  getAdminMenu() {
+    return this.sendRequest<any>(this.baseUrl + 'api/menu/get-admin-menu');
   }
 
   getModules() {

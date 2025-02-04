@@ -1,6 +1,5 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { TopBarDto } from "../dtos/top-bar.dto";
-import { SecurityService } from "./security.service";
 
 @Injectable({
   providedIn: 'root'
@@ -8,25 +7,25 @@ import { SecurityService } from "./security.service";
 export class TopBarService {
   topBarItems: TopBarDto[] = [];
 
-  private _activeIndex: number | undefined;
+  private _activeId: string | undefined;
 
   get availableTopBarItems(): TopBarDto[] {
     return this.topBarItems;
   }
 
   get activeTopBarItem(): TopBarDto | undefined {
-    if (this._activeIndex === undefined) {
+    if (this._activeId === undefined) {
       return undefined;
     }
-    return this.topBarItems[this._activeIndex];
+    return this.topBarItems.find((topBarItem: TopBarDto) => topBarItem.id === this._activeId);
   }
 
-  get activeIndex(): number | undefined {
-    return this._activeIndex;
+  get activeId(): string | undefined {
+    return this._activeId;
   }
 
-  set activeIndex(value: number) {
-    this._activeIndex = value;
+  set activeId(value: string | undefined) {
+    this._activeId = value;
     if (this.activeTopBarItem?.click)
       this.activeTopBarItem.click();
   }

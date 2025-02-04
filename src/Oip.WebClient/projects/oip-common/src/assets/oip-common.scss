@@ -1,16 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-//for prime flex grid system
-$gutter: .5rem;
-$doubleGutter: $gutter * 2;
-
-@import "./layout/styles/layout/layout.scss";
-
-/* PrimeNG */
-@import "primeng/resources/primeng.min.css";
-@import "primeflex/primeflex.scss";
-@import "primeicons/primeicons.css";
-
-/* Demos */
-@import "./demo/styles/flags/flags.scss";
-@import "./demo/styles/badges.scss";
-@import "./demo/styles/code.scss";
+@use './tailwind.css';
+@use './layout/layout.scss';
+@use 'primeicons/primeicons.css';
+@use './demo/demo.scss';
