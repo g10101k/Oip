@@ -69,10 +69,9 @@ import { UserService } from "../services/user.service";
 
         <div class="layout-topbar-menu hidden lg:block">
           <div class="layout-topbar-menu-content">
-
-            <button type="button" class="layout-topbar-action">
-              <i class="pi pi-inbox"></i>
-              <span>Messages</span>
+            <button type="button" class="layout-topbar-action" (click)="securityService.logout()" (keydown)="securityService.logout()">
+              <i class="pi pi-sign-out"></i>
+              <span>Logout</span>
             </button>
             <button class="layout-topbar-action" routerLink="config">
               <p-avatar class="p-link flex align-items-center"
