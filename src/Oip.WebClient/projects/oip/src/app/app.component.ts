@@ -4,10 +4,13 @@ import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    standalone: true,
-    imports: [ToastModule, RouterOutlet]
+  selector: 'app-root',
+  template: `
+    <p-toast/>
+    <router-outlet></router-outlet>
+  `,
+  standalone: true,
+  imports: [ToastModule, RouterOutlet]
 })
 export class AppComponent implements OnInit {
   private readonly securityService = inject(SecurityService);

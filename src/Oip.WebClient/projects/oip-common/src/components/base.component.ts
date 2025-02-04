@@ -44,17 +44,17 @@ export abstract class BaseComponent<TSettings> implements OnInit, OnDestroy {
   ];
 
   constructor() {
-
+    // do nothing
   }
 
   async ngOnDestroy() {
     this.topBarService.setTopBarItems([]);
-    this.topBarService.activeIndex = 0;
+    this.topBarService.activeId = this.topBarItems[0].id;
   }
 
   async ngOnInit() {
     this.topBarService.setTopBarItems(this.topBarItems);
-    this.topBarService.activeIndex = 0;
+    this.topBarService.activeId = this.topBarItems[0].id;
 
     this.route.paramMap.subscribe(params => {
       this.id = +params.get('id');

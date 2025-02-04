@@ -1,6 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BaseDataService } from "oip-common";
-import { WeatherForecast } from "./dtos/weather.forecast";
+
+export interface WeatherForecast {
+  date: string;
+  temperatureC: number;
+  temperatureF: number;
+  summary: string;
+}
+
+
 
 @Injectable()
 export class WeatherDataService extends BaseDataService {

@@ -1,17 +1,18 @@
 // Components
 export * from './components/base.component';
-export * from './components/security/security.component';
-export * from './components/topbar/top-bar.component';
-export * from './components/footer/footer.component'
-export * from './components/menu/menu.component';
-export * from './components/config/config.component';
-export * from './components/layout/app.layout.component';
-export * from './components/sidebar/sidebar.component';
-export * from './components/logo/logo.component';
-export * from './components/notfound/notfound.component';
+export * from './components/security.component';
+export * from './components/top-bar.component';
+export * from './components/footer.component'
+export * from './components/menu.component';
+export * from './components/app.layout.component';
+export * from './components/sidebar.component';
+export * from './components/logo.component';
+export * from './components/notfound.component';
 export * from './components/auth/unauthorized/unauthorized.component';
 export * from './components/auth/error/error.component';
-export * from './components/profile/profile.component';
+export * from './components/profile.component';
+export * from './components/buttondemo';
+export * from './components/config.component';
 // Dtos
 export * from './dtos/top-bar.dto';
 export * from './dtos/security.dto';
@@ -19,8 +20,6 @@ export * from './dtos/put-security.dto';
 
 // Modules
 export * from './modules/auth-config.module';
-
-export * from './components/auth/auth.module';
 
 // Services
 export * from './services/base-data.service';
