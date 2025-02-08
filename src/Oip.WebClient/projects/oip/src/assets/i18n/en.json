@@ -1,6 +1,7 @@
 {
 	"menuComponent": {
-		"all": "All"
+		"all": "All",
+		"new": "New"
 	},
 	"baseComponent": {
 		"content": "Content",

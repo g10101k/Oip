@@ -1,6 +1,7 @@
 {
 	"menuComponent": {
-		"all": "Все"
+		"all": "Все",
+		"new": "Добавить"
 	},
 	"baseComponent": {
 		"content": "Содержимое",
