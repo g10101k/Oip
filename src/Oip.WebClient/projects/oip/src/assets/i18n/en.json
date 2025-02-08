@@ -4,7 +4,13 @@
 		"new": "New"
 	},
 	"createMenuItemDialogComponent": {
-		"header": "Create new menu item"
+		"header": "Create new menu item",
+		"label": "Label",
+		"module": "Module",
+		"selectModule": "Select module",
+		"icon": "Icon",
+		"cancel": "Cancel",
+		"save": "Save"
 	},
 	"baseComponent": {
 		"content": "Content",

@@ -4,7 +4,13 @@
 		"new": "Добавить"
 	},
 	"createMenuItemDialogComponent": {
-		"header": "Новый элемент меню"
+		"header": "Новый элемент меню",
+		"label": "Имя",
+		"module": "Модуль",
+		"selectModule": "Выбери модуль",
+		"icon": "Иконка",
+		"cancel": "Отмена",
+		"save": "Сохранить"
 	},
 	"baseComponent": {
 		"content": "Содержимое",
