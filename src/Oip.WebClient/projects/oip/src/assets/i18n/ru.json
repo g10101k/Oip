@@ -3,6 +3,9 @@
 		"all": "Все",
 		"new": "Добавить"
 	},
+	"createMenuItemDialogComponent": {
+		"header": "Новый элемент меню"
+	},
 	"baseComponent": {
 		"content": "Содержимое",
 		"settings": "Настройки",

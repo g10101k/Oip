@@ -3,6 +3,9 @@
 		"all": "All",
 		"new": "New"
 	},
+	"createMenuItemDialogComponent": {
+		"header": "Create new menu item"
+	},
 	"baseComponent": {
 		"content": "Content",
 		"settings": "Settings",
