@@ -1,4 +1,4 @@
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withFetch } from '@angular/common/http';
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
@@ -15,6 +15,11 @@ import { NodeService } from "./app/demo/service/node.service";
 import { PhotoService } from "./app/demo/service/photo.service";
 import { ProductService } from "./app/demo/service/product.service";
 import { MessageService } from "primeng/api";
+import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
+import { TranslateHttpLoader } from "@ngx-translate/http-loader";
+
+const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
+  new TranslateHttpLoader(http);
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,6 +37,13 @@ export const appConfig: ApplicationConfig = {
     SecurityDataService,
     BaseDataService,
     UserService,
+    importProvidersFrom([TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: httpLoaderFactory,
+        deps: [HttpClient],
+      },
+    })]),
     provideRouter(appRoutes, withInMemoryScrolling({
       anchorScrolling: 'enabled',
       scrollPositionRestoration: 'enabled'
