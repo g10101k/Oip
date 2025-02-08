@@ -1,72 +1,75 @@
 {
-  "baseComponent": {
-    "content": "Content",
-    "settings": "Settings",
-    "security": "Security",
-    "success": "Save successfully"
-  },
-  "unauthorized": {
-    "welcomeToOip": "Welcome to OIP!",
-    "signInToContinue": "Sign in to continue",
-    "signIn": "Sign In"
-  },
-  "primeng": {
-    "dayNames": [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday"
-    ],
-    "dayNamesShort": [
-      "Sun",
-      "Mon",
-      "Tue",
-      "Wed",
-      "Thu",
-      "Fri",
-      "Sat"
-    ],
-    "dayNamesMin": [
-      "Su",
-      "Mo",
-      "Tu",
-      "We",
-      "Th",
-      "Fr",
-      "Sa"
-    ],
-    "monthNames": [
-      "January",
-      "asdf",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ],
-    "monthNamesShort": [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec"
-    ],
-    "today": "Today",
-    "weekHeader": "Wk"
-  }
+	"menuComponent": {
+		"all": "All"
+	},
+	"baseComponent": {
+		"content": "Content",
+		"settings": "Settings",
+		"security": "Security",
+		"success": "Save successfully"
+	},
+	"unauthorized": {
+		"welcomeToOip": "Welcome to OIP!",
+		"signInToContinue": "Sign in to continue",
+		"signIn": "Sign In"
+	},
+	"primeng": {
+		"dayNames": [
+			"Sunday",
+			"Monday",
+			"Tuesday",
+			"Wednesday",
+			"Thursday",
+			"Friday",
+			"Saturday"
+		],
+		"dayNamesShort": [
+			"Sun",
+			"Mon",
+			"Tue",
+			"Wed",
+			"Thu",
+			"Fri",
+			"Sat"
+		],
+		"dayNamesMin": [
+			"Su",
+			"Mo",
+			"Tu",
+			"We",
+			"Th",
+			"Fr",
+			"Sa"
+		],
+		"monthNames": [
+			"January",
+			"asdf",
+			"March",
+			"April",
+			"May",
+			"June",
+			"July",
+			"August",
+			"September",
+			"October",
+			"November",
+			"December"
+		],
+		"monthNamesShort": [
+			"Jan",
+			"Feb",
+			"Mar",
+			"Apr",
+			"May",
+			"Jun",
+			"Jul",
+			"Aug",
+			"Sep",
+			"Oct",
+			"Nov",
+			"Dec"
+		],
+		"today": "Today",
+		"weekHeader": "Wk"
+	}
 }
