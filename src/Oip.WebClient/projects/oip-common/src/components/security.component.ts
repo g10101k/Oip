@@ -7,6 +7,7 @@ import { MsgService } from "./../services/msg.service";
 import { SecurityDataService } from "./../services/security-data.service";
 import { PutSecurityDto } from "./../dtos/put-security.dto";
 import { Fluid } from "primeng/fluid";
+import { TranslatePipe, TranslateService } from "@ngx-translate/core";
 
 @Component({
   selector: 'security',
@@ -15,7 +16,7 @@ import { Fluid } from "primeng/fluid";
       <div class="flex flex-col md:flex-row gap-8">
         <div class="md:w-1/2">
           <div class="card flex flex-col gap-4">
-            <div class="font-semibold text-xl">Security</div>
+            <div class="font-semibold text-xl">{{ 'securityComponent.security' | translate }}</div>
             @for (item of securityData; track item.name) {
               <div class="flex flex-col gap-2">
                 <label htmlFor="{{ item.name }} ">{{ item.name }} <span pTooltip="{{ item.description }}"
@@ -29,7 +30,10 @@ import { Fluid } from "primeng/fluid";
               </div>
             }
             <div class="flex justify-content-end flex-wrap">
-              <p-button label="Save" icon="pi pi-save" (click)="saveClick()" (keydown)="saveKeyDown($event)"/>
+              <p-button label="{{ 'securityComponent.save' | translate }}"
+                        icon="pi pi-save"
+                        (click)="saveClick()"
+                        (keydown)="saveKeyDown($event)"/>
             </div>
           </div>
         </div>
@@ -42,12 +46,14 @@ import { Fluid } from "primeng/fluid";
     FormsModule,
     ButtonModule,
     Fluid,
+    TranslatePipe,
   ],
   standalone: true
 })
 export class SecurityComponent implements OnInit, OnDestroy {
-  msgService = inject(MsgService);
-  dataService = inject(SecurityDataService);
+  private readonly msgService = inject(MsgService);
+  private readonly dataService = inject(SecurityDataService);
+  private readonly translateService = inject(TranslateService);
   securityData: any[];
   @Input() id: number;
   @Input() controller: string;
@@ -79,7 +85,7 @@ export class SecurityComponent implements OnInit, OnDestroy {
   saveClick() {
     let request: PutSecurityDto = { id: this.id, securities: this.securityData };
     this.dataService.saveSecurity(this.controller, request).then(result => {
-      this.msgService.success('Saved security');
+      this.msgService.success(this.translateService.instant('securityComponent.savedSecurity'));
     }, error => this.msgService.error(error));
   }
 

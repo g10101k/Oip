@@ -11,7 +11,6 @@ export * from './components/notfound.component';
 export * from './components/auth/unauthorized/unauthorized.component';
 export * from './components/auth/error/error.component';
 export * from './components/profile.component';
-export * from './components/buttondemo';
 export * from './components/config.component';
 // Dtos
 export * from './dtos/top-bar.dto';

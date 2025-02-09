@@ -4,6 +4,7 @@ import { TopBarService } from '../services/top-bar.service'
 import { MsgService } from "../services/msg.service";
 import { ActivatedRoute } from "@angular/router";
 import { BaseDataService } from "../services/base-data.service";
+import { TranslateService } from "@ngx-translate/core";
 
 @Component({
   standalone: true,
@@ -14,6 +15,8 @@ export abstract class BaseComponent<TSettings> implements OnInit, OnDestroy {
   readonly route: ActivatedRoute = inject(ActivatedRoute);
   readonly msgService = inject(MsgService);
   readonly baseDataService = inject(BaseDataService);
+  readonly translateService = inject(TranslateService);
+
   /**
    * Feature settings
    */
@@ -38,9 +41,9 @@ export abstract class BaseComponent<TSettings> implements OnInit, OnDestroy {
   }
 
   public topBarItems: TopBarDto [] = [
-    { id: 'content', icon: 'pi-box', caption: 'Content', },
-    { id: 'settings', icon: 'pi-cog', caption: 'Settings', },
-    { id: 'security', icon: 'pi-lock', caption: 'Security', },
+    { id: 'content', icon: 'pi-box', caption: this.translateService.instant('baseComponent.content') },
+    { id: 'settings', icon: 'pi-cog', caption: this.translateService.instant('baseComponent.settings') },
+    { id: 'security', icon: 'pi-lock', caption: this.translateService.instant('baseComponent.security') },
   ];
 
   constructor() {
@@ -75,7 +78,7 @@ export abstract class BaseComponent<TSettings> implements OnInit, OnDestroy {
       id: this.id,
       settings: settings
     }).then(response => {
-      this.msgService.success('Save successfully.');
+      this.msgService.success(this.translateService.instant('baseComponent.success'));
     }).catch(error => {
       this.msgService.error(error);
     });
