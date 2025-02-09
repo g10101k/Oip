@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { SecurityService } from "oip-common";
+import { LayoutService, SecurityService } from "oip-common";
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { TranslateService } from '@ngx-translate/core';
@@ -18,14 +18,14 @@ export class AppComponent implements OnInit {
   private readonly securityService = inject(SecurityService);
   private readonly translateService = inject(TranslateService)
   private readonly primeNgConfig = inject(PrimeNG);
+  private readonly layoutService = inject(LayoutService);
 
   constructor() {
   }
 
   ngOnInit() {
     this.translateService.addLangs(['en', 'ru']);
-    const browserLang = this.translateService.getBrowserLang();
-    let lang = /en|ru/.exec(browserLang) ? browserLang : 'en';
+    let lang = /en|ru/.exec(this.layoutService.language()) ? this.layoutService.language() : 'en';
     this.translateService.setDefaultLang(lang);
     this.translate(lang);
     this.securityService.auth();

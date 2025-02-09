@@ -1,4 +1,20 @@
 {
+	"msgService": {
+		"success": "Успешно",
+		"info": "Информация",
+		"warn": "Внимание",
+		"error": "Ошибка",
+		"secondary": "Вспомогательный"
+	},
+	"securityComponent": {
+		"security": "Безопасность",
+		"save": "Сохранить",
+		"savedSecurity": "Настройки сохранены"
+	},
+	"profileComponent": {
+		"changePhoto": "Загрузить фото",
+		"successfullyUploaded": "Загружено"
+	},
 	"menuComponent": {
 		"all": "Все",
 		"new": "Добавить"
@@ -11,6 +27,13 @@
 		"icon": "Иконка",
 		"cancel": "Отмена",
 		"save": "Сохранить"
+	},
+	"configComponent": {
+		"profile": "Профиль",
+		"photo": "Фото",
+		"usePhoto256x256Pixel": "Используйте фото 256х256 пикселей",
+		"localization": "Язык",
+		"selectLanguage": "Выберите язык"
 	},
 	"baseComponent": {
 		"content": "Содержимое",

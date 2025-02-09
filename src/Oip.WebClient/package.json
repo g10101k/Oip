@@ -8,7 +8,7 @@
     "start": "run-script-os",
     "start:windows": "ng serve --port 50000 --ssl --ssl-cert \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem\" --ssl-key \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.key\"",
     "start:default": "ng serve --port 50000 --ssl --ssl-cert $HOME/.aspnet/https/${npm_package_name}.pem --ssl-key $HOME/.aspnet/https/${npm_package_name}.key",
-    "i18n:oip:extract": "ngx-translate-extract --input ./projects/oip-common/src ./projects/oip/src --output ./projects/oip/src/assets/i18n/{en,ru}.json --format namespaced-json",
+    "i18n:oip:extract": "ngx-translate-extract --input ./projects/oip-common/src ./projects/oip/src --output ./projects/oip/src/assets/i18n/{en,ru}.json --clean --format namespaced-json",
     "serve:dist": "concurrently \"serve dist/oip -l 5000 -s\" ",
     "build": "ng build oip",
     "build:oip": "ng build oip",

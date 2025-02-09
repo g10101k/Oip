@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="WeatherForecastController_Summaries_Freezing" xml:space="preserve">
+        <value>Freezing</value>
+    </data>
+    <data name="WeatherForecastController_Summaries_Bracing" xml:space="preserve">
+        <value>Bracing</value>
+    </data>
+    <data name="WeatherForecastController_Summaries_Chilly" xml:space="preserve">
+        <value>Chilly</value>
+    </data>
+    <data name="WeatherForecastController_Summaries_Cool" xml:space="preserve">
+        <value>Cool</value>
+    </data>
+    <data name="WeatherForecastController_Summaries_Mild" xml:space="preserve">
+        <value>Mild</value>
+    </data>
+    <data name="WeatherForecastController_Summaries_Warm" xml:space="preserve">
+        <value>Warm</value>
+    </data>
+    <data name="WeatherForecastController_Summaries_Balmy" xml:space="preserve">
+        <value>Balmy</value>
+    </data>
+    <data name="WeatherForecastController_Summaries_Hot" xml:space="preserve">
+        <value>Hot</value>
+    </data>
+    <data name="WeatherForecastController_Summaries_Sweltering" xml:space="preserve">
+        <value>Sweltering</value>
+    </data>
+    <data name="WeatherForecastController_Summaries_Scorching" xml:space="preserve">
+        <value>Scorching</value>
+    </data>
+    <data name="WeatherForecastController_GetModuleRights_Read" xml:space="preserve">
+        <value>Read</value>
+    </data>
+    <data name="WeatherForecastController_GetModuleRights_Edit" xml:space="preserve">
+        <value>Edit</value>
+    </data>
+    <data name="WeatherForecastController_GetModuleRights_Delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="WeatherForecastController_GetModuleRights_Can_view_this_module" xml:space="preserve">
+        <value>Can view this module</value>
+    </data>
+    <data name="WeatherForecastController_GetModuleRights_Can_edit_data" xml:space="preserve">
+        <value>Can edit data</value>
+    </data>
+    <data name="WeatherForecastController_GetModuleRights_Can_delete_edit_data" xml:space="preserve">
+        <value>Can delete data</value>
+    </data>
+</root>

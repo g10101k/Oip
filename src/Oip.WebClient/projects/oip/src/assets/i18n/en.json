@@ -1,4 +1,20 @@
 {
+	"msgService": {
+		"success": "Success",
+		"info": "Info",
+		"warn": "Warm",
+		"error": "Error",
+		"secondary": "Secondary"
+	},
+	"securityComponent": {
+		"security": "Security",
+		"save": "Save",
+		"savedSecurity": "Saved security"
+	},
+	"profileComponent": {
+		"changePhoto": "Change Photo",
+		"successfullyUploaded": "Successfully uploaded"
+	},
 	"menuComponent": {
 		"all": "All",
 		"new": "New"
@@ -11,6 +27,13 @@
 		"icon": "Icon",
 		"cancel": "Cancel",
 		"save": "Save"
+	},
+	"configComponent": {
+		"profile": "Profile",
+		"photo": "Photo",
+		"usePhoto256x256Pixel": "Use photo 256x256 pixel",
+		"localization": "Localization",
+		"selectLanguage": "Select Language"
 	},
 	"baseComponent": {
 		"content": "Content",
