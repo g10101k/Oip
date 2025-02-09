@@ -1,12 +1,13 @@
 import { Injectable, effect, signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
 
-export interface layoutConfig {
+export interface AppConfig {
   preset?: string;
   primary?: string;
   surface?: string | null;
   darkTheme?: boolean;
   menuMode?: string;
+  language?: string;
 }
 
 interface LayoutState {
@@ -26,7 +27,7 @@ interface MenuChangeEvent {
   providedIn: 'root'
 })
 export class LayoutService {
-  _config: layoutConfig = this.getAppConfigFromStorage();
+  _config: AppConfig = this.getAppConfigFromStorage();
 
   _state: LayoutState = {
     staticMenuDesktopInactive: false,
@@ -36,17 +37,17 @@ export class LayoutService {
     menuHoverActive: false
   };
 
-  layoutConfig = signal<layoutConfig>(this._config);
+  layoutConfig = signal<AppConfig>(this._config);
 
   layoutState = signal<LayoutState>(this._state);
 
-  private configUpdate = new Subject<layoutConfig>();
+  private readonly configUpdate = new Subject<AppConfig>();
 
-  private overlayOpen = new Subject<any>();
+  private readonly overlayOpen = new Subject<any>();
 
-  private menuSource = new Subject<MenuChangeEvent>();
+  private readonly menuSource = new Subject<MenuChangeEvent>();
 
-  private resetSource = new Subject();
+  private readonly resetSource = new Subject();
 
   menuSource$ = this.menuSource.asObservable();
 
@@ -67,6 +68,8 @@ export class LayoutService {
   getSurface = computed(() => this.layoutConfig().surface);
 
   isOverlay = computed(() => this.layoutConfig().menuMode === 'overlay');
+
+  language = computed(() => this.layoutConfig().language);
 
   transitionComplete = signal<boolean>(false);
 
@@ -93,24 +96,25 @@ export class LayoutService {
   }
 
   /**
-   * Get application UI settings from browser storage
+   * Get application settings from browser storage
    * @returns AppConfig
    */
-  private getAppConfigFromStorage(): layoutConfig {
+  private getAppConfigFromStorage(): AppConfig {
     let appConfigUiString = localStorage.getItem('layoutConfig');
     if (appConfigUiString != null) {
-      return JSON.parse(appConfigUiString) as layoutConfig;
+      return JSON.parse(appConfigUiString) as AppConfig;
     }
     return {
       preset: 'Aura',
       primary: 'emerald',
       surface: null,
       darkTheme: false,
-      menuMode: 'static'
+      menuMode: 'static',
+      language: 'en'
     } ;
   }
 
-  private handleDarkModeTransition(config: layoutConfig): void {
+  private handleDarkModeTransition(config: AppConfig): void {
     if ((document as any).startViewTransition) {
       this.startViewTransition(config);
     } else {
@@ -119,7 +123,7 @@ export class LayoutService {
     }
   }
 
-  private startViewTransition(config: layoutConfig): void {
+  private startViewTransition(config: AppConfig): void {
     const transition = (document as any).startViewTransition(() => {
       this.toggleDarkMode(config);
     });
@@ -131,7 +135,7 @@ export class LayoutService {
       .catch(() => {});
   }
 
-  toggleDarkMode(config?: layoutConfig): void {
+  toggleDarkMode(config?: AppConfig): void {
     const _config = config || this.layoutConfig();
     if (_config.darkTheme) {
       document.documentElement.classList.add('app-dark');

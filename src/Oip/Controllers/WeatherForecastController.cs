@@ -12,10 +12,15 @@ namespace Oip.Controllers;
 [Route("api/weather")]
 public class WeatherForecastController : BaseModuleController<WeatherModuleSettings>
 {
-    private static readonly string[] Summaries =
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+    private readonly string[] _summaries =
+    [
+        Resources.WeatherForecastController_Summaries_Freezing, Resources.WeatherForecastController_Summaries_Bracing,
+        Resources.WeatherForecastController_Summaries_Chilly, Resources.WeatherForecastController_Summaries_Cool,
+        Resources.WeatherForecastController_Summaries_Mild, Resources.WeatherForecastController_Summaries_Warm,
+        Resources.WeatherForecastController_Summaries_Balmy, Resources.WeatherForecastController_Summaries_Hot,
+        Resources.WeatherForecastController_Summaries_Sweltering,
+        Resources.WeatherForecastController_Summaries_Scorching
+    ];
 
     /// <summary>
     /// .ctor
@@ -33,14 +38,13 @@ public class WeatherForecastController : BaseModuleController<WeatherModuleSetti
     [HttpGet("get")]
     [Authorize()]
     [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
-
     public IActionResult Get(int dayCount)
     {
         return Ok(Enumerable.Range(1, dayCount).Select(index => new WeatherForecastResponse
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                Summary = _summaries[Random.Shared.Next(_summaries.Length)]
             })
             .ToList());
     }
@@ -53,9 +57,23 @@ public class WeatherForecastController : BaseModuleController<WeatherModuleSetti
     {
         return new()
         {
-            new() { Code = "read", Name = "Read", Description = "Can view this module", Roles = ["admin"] },
-            new() { Code = "edit", Name = "Edit", Description = "Can edit data", Roles = ["admin"] },
-            new() { Code = "delete", Name = "Delete", Description = "Can delete edit data", Roles = ["admin"] },
+            new()
+            {
+                Code = "read", Name = Resources.WeatherForecastController_GetModuleRights_Read,
+                Description = Resources.WeatherForecastController_GetModuleRights_Can_view_this_module,
+                Roles = ["admin"]
+            },
+            new()
+            {
+                Code = "edit", Name = Resources.WeatherForecastController_GetModuleRights_Edit,
+                Description = Resources.WeatherForecastController_GetModuleRights_Can_edit_data, Roles = ["admin"]
+            },
+            new()
+            {
+                Code = "delete", Name = Resources.WeatherForecastController_GetModuleRights_Delete,
+                Description = Resources.WeatherForecastController_GetModuleRights_Can_delete_edit_data,
+                Roles = ["admin"]
+            },
         };
     }
 }

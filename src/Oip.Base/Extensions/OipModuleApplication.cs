@@ -1,11 +1,14 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
 using Oip.Base.Clients;
@@ -59,6 +62,7 @@ public static class OipModuleApplication
         builder.Services.AddData(settings.ConnectionString);
         builder.AddKeycloakClients(settings);
         builder.AddServices(settings);
+        builder.AddLocalization();
         return builder;
     }
 
@@ -76,6 +80,22 @@ public static class OipModuleApplication
         });
     }
 
+
+    private static void AddLocalization(this WebApplicationBuilder builder)
+    {
+        builder.Services.Configure<RequestLocalizationOptions>(
+            options =>
+            {
+                var supportedCultures = new List<CultureInfo>
+                {
+                    new ("en"),
+                    new ("ru")
+                };
+                options.DefaultRequestCulture = new RequestCulture(culture: "en", uiCulture: "en");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
+    }
 
     private static void AddHttpClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
@@ -181,6 +201,9 @@ public static class OipModuleApplication
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
+        
+        var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+        app.UseRequestLocalization(localizeOptions.Value);
 
         app.MapDefaultEndpoints();
         app.UseHttpsRedirection();

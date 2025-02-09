@@ -3,6 +3,7 @@ import { FileUploadModule } from "primeng/fileupload";
 import { ImageModule } from "primeng/image";
 import { AvatarModule } from "primeng/avatar";
 import { MsgService, UserService } from "oip-common";
+import { TranslatePipe, TranslateService } from "@ngx-translate/core";
 
 @Component({
   selector: 'user-profile',
@@ -13,7 +14,8 @@ import { MsgService, UserService } from "oip-common";
     ImageModule,
     FileUploadModule,
     ImageModule,
-    AvatarModule
+    AvatarModule,
+    TranslatePipe
   ],
   template: `
     <p-avatar
@@ -31,15 +33,16 @@ import { MsgService, UserService } from "oip-common";
         accept="image/*" maxFileSize="1000000"
         withCredentials="true"
         (onUpload)="onBasicUploadAuto($event)"
-        chooseLabel="Change photo"/>
+        chooseLabel="{{'profileComponent.changePhoto' | translate}}"/>
     </div>
   `,
 })
 export class ProfileComponent {
-  userService = inject(UserService);
+  readonly userService = inject(UserService);
   readonly msgService = inject(MsgService);
+  readonly translateService = inject(TranslateService);
 
   onBasicUploadAuto($event) {
-    this.msgService.success('Successfully uploaded');
+    this.msgService.success(this.translateService.instant('profileComponent.successfullyUploaded'));
   }
 }

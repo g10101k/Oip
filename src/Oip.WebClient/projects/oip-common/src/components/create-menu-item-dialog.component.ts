@@ -7,6 +7,8 @@ import { FormsModule } from "@angular/forms";
 import { PrimeIcons } from "primeng/api";
 import { AddModuleInstanceDto, MenuService } from "oip-common";
 import { Select } from "primeng/select";
+import { TranslatePipe } from "@ngx-translate/core";
+
 @Component({
   selector: 'create-menu-item-dialog',
   standalone: true,
@@ -16,33 +18,42 @@ import { Select } from "primeng/select";
     InputTextModule,
     DropdownModule,
     FormsModule,
-    Select
+    Select,
+    TranslatePipe
   ],
-  template: `<p-dialog header="Create new menu item" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-    <div class="flex items-center gap-4 mb-4">
-      <label for="menuLabel" class="font-semibold w-24">Label</label>
-      <input pInputText id="menuLabel" class="flex-auto" autocomplete="off" [(ngModel)]="label"/>
-    </div>
-    <div class="flex items-center gap-4 mb-4">
-      <label for="module" class="font-semibold w-24">Module</label>
-      <p-select
-        id="module"
-        class="flex-auto"
-        [options]="modules"
-        [(ngModel)]="selectModule"
-        optionLabel="value"
-        optionValue="key"
-        placeholder="Select module"/>
-    </div>
-    <div class="flex items-center gap-4 mb-4">
-      <label for="icon" class="font-semibold w-24">Icon</label>
-      <input pInputText id="icon" class="flex-auto" [(ngModel)]="selectIcon"/>
-    </div>
-    <div class="flex justify-end gap-2">
-      <p-button label="Cancel" severity="secondary" (click)="changeVisible()" (keydown)="changeVisible()"/>
-      <p-button label="Save" (click)="save()" (keydown)="save()"/>
-    </div>
-  </p-dialog>
+  template: `
+    <p-dialog header="{{ 'createMenuItemDialogComponent.header' | translate }}" [modal]="true" [(visible)]="visible"
+              [style]="{ width: '25rem' }">
+      <div class="flex items-center gap-4 mb-4">
+        <label for="menuLabel"
+               class="font-semibold w-24">{{ 'createMenuItemDialogComponent.label' | translate }}</label>
+        <input pInputText id="menuLabel" class="flex-auto" autocomplete="off" [(ngModel)]="label"/>
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <label for="module" class="font-semibold w-24">{{ 'createMenuItemDialogComponent.module' | translate }}</label>
+        <p-select
+          id="module"
+          class="flex-auto"
+          [options]="modules"
+          [(ngModel)]="selectModule"
+          optionLabel="value"
+          optionValue="key"
+          placeholder="{{'createMenuItemDialogComponent.selectModule' | translate }}"/>
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <label for="icon" class="font-semibold w-24">{{ 'createMenuItemDialogComponent.icon' | translate }}</label>
+        <input pInputText id="icon" class="flex-auto" [(ngModel)]="selectIcon"/>
+      </div>
+      <div class="flex justify-end gap-2">
+        <p-button label="{{ 'createMenuItemDialogComponent.cancel' | translate }}"
+                  severity="secondary"
+                  (click)="changeVisible()"
+                  (keydown)="changeVisible()"/>
+        <p-button label="{{ 'createMenuItemDialogComponent.save' | translate }}"
+                  (click)="save()"
+                  (keydown)="save()"/>
+      </div>
+    </p-dialog>
   `
 })
 export class CreateMenuItemDialogComponent implements OnInit {
@@ -90,7 +101,7 @@ export class CreateMenuItemDialogComponent implements OnInit {
     this.visibleChange.emit(true);
   }
 
-  hide(){
+  hide() {
     this.visible = false;
     this.visibleChange.emit(this.visible);
   }
