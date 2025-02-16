@@ -1,6 +1,6 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { LoginResponse, LogoutAuthOptions, OidcSecurityService } from "angular-auth-oidc-client";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -8,10 +8,9 @@ import { BehaviorSubject, Observable, Subject } from "rxjs";
 export class SecurityService extends OidcSecurityService implements OnDestroy {
 
   loginResponse = new BehaviorSubject<LoginResponse>(null);
-  loginResponse$ = this.loginResponse.asObservable();
   token = new BehaviorSubject<any>(null);
-  token$ = this.token.asObservable();
   userData: any;
+
   get isAdmin(): any {
     return this.token.getValue()?.realm_access?.roles?.includes('admin');
   }

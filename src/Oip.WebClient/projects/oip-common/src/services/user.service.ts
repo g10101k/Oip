@@ -33,7 +33,7 @@ export class UserService {
   * Get user photo
   * */
   getUserPhoto() {
-    let url = `/api/user-profile/get-user-photo?email=${this.securityService.userData.email}`;
+    let url = `${this.baseDataService.baseUrl}api/user-profile/get-user-photo?email=${this.securityService.userData.email}`;
     this.baseDataService.getBlob(url)
       .then(data => {
         this.createImageFromBlob(data as Blob);

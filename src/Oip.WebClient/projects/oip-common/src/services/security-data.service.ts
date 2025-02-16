@@ -14,6 +14,6 @@ export class SecurityDataService extends BaseDataService {
   }
 
   getRealmRoles() {
-    return this.sendRequest<string[]>(`api/security/get-realm-roles`);
+    return this.sendRequest<string[]>(this.baseUrl + `api/security/get-realm-roles`);
   }
 }
