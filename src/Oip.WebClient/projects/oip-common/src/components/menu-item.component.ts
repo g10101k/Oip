@@ -1,13 +1,11 @@
 import {
   ChangeDetectorRef,
   Component,
-  Host,
   HostBinding,
   inject,
   Input,
   OnDestroy,
-  OnInit,
-  ViewChild
+  OnInit
 } from '@angular/core';
 import { NavigationEnd, Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
@@ -26,16 +24,16 @@ import { MsgService } from "./../services/msg.service";
   // eslint-disable-next-line @angular-eslint/component-selector
   selector: '[app-menuitem]',
   template: `
-    <create-menu-item-dialog [contextItem]="contextItem"></create-menu-item-dialog>
-    <p-contextMenu #itemContextMenu [model]="itemMenu" />
     <ng-container>
-      <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text" (contextmenu)="onContextMenu($event, item)">{{ item.label }}</div>
+      <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text"
+           (contextmenu)="onContextMenu($event, item)">{{ item.label }}
+      </div>
       <a *ngIf="(!item.routerLink || item.items) && item.visible !== false" [attr.href]="item.url"
          (click)="itemClick($event)"
          [ngClass]="item.class"
          [attr.target]="item.target"
          tabindex="0" pRipple
-         >
+      >
         <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
         <span class="layout-menuitem-text">{{ item.label }}</span>
         <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
@@ -50,14 +48,17 @@ import { MsgService } from "./../services/msg.service";
          [queryParams]="item.queryParams"
          [attr.target]="item.target" tabindex="0" pRipple
          (contextmenu)="onContextMenu($event, item)">
-        <i [ngClass]="item.icon" class="layout-menuitem-icon" ></i>
+        <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
         <span class="layout-menuitem-text">{{ item.label }}</span>
         <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
       </a>
 
-      <ul *ngIf="item.items && item.visible !== false" [@children]="submenuAnimation" (contextmenu)="onContextMenu($event, item)">
+      <ul *ngIf="item.items && item.visible !== false" [@children]="submenuAnimation"
+          (contextmenu)="onContextMenu($event, item)">
         <ng-template ngFor let-child let-i="index" [ngForOf]="item.items">
-          <li app-menuitem [item]="child" [index]="i" [parentKey]="key" [class]="child.badgeClass"></li>
+          <li app-menuitem [item]="child" [index]="i" [parentKey]="key" [class]="child.badgeClass"
+              [createMenuItemDialogComponent]="createMenuItemDialogComponent"
+              [contextMenu]="contextMenu"></li>
         </ng-template>
       </ul>
     </ng-container>
@@ -74,7 +75,7 @@ import { MsgService } from "./../services/msg.service";
     ])
   ],
   standalone: true,
-  imports: [NgIf, RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor, CreateMenuItemDialogComponent, ContextMenuModule]
+  imports: [NgIf, RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor, ContextMenuModule]
 })
 export class MenuItemComponent implements OnInit, OnDestroy {
   public layoutService: LayoutService = inject(LayoutService);
@@ -82,8 +83,8 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   @Input() index!: number;
   @Input() @HostBinding('class.layout-root-menuitem') root!: boolean;
   @Input() parentKey!: string;
-  @ViewChild(CreateMenuItemDialogComponent) createMenuItemDialogComponent: CreateMenuItemDialogComponent;
-  @ViewChild('itemContextMenu') itemContextMenu: ContextMenu;
+  @Input() createMenuItemDialogComponent: CreateMenuItemDialogComponent;
+  @Input() contextMenu: ContextMenu;
 
   active = false;
 
@@ -92,8 +93,6 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   menuResetSubscription: Subscription;
 
   key: string = "";
-  contextItem: any;
-
   itemMenu: MenuItem[] = [
     { label: 'New', icon: PrimeIcons.PLUS, command: (event) => this.newClick(event) },
     { label: 'Edit', icon: PrimeIcons.FILE_EDIT },
@@ -102,7 +101,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   ];
   msgService = inject(MsgService);
 
-  constructor(private cd: ChangeDetectorRef, public router: Router, private readonly menuService: MenuService) {
+  constructor(private readonly cd: ChangeDetectorRef, public router: Router, private readonly menuService: MenuService) {
     this.menuSourceSubscription = this.menuService.menuSource$.subscribe(value => {
       Promise.resolve(null).then(() => {
         if (value.routeEvent) {
@@ -190,12 +189,13 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   }
 
   onContextMenu($event: MouseEvent, item: any) {
-    this.contextItem = item;
-    this.itemContextMenu.show($event);
+    this.menuService.contextMenuItem = item;
+    this.contextMenu.model = this.itemMenu;
+    this.contextMenu.show($event);
   }
 
   private deleteItem(event: MenuItemCommandEvent) {
-    this.menuService.deleteItem(this.contextItem?.moduleInstanceId).then(() => {
+    this.menuService.deleteItem(this.menuService.contextMenuItem?.moduleInstanceId).then(() => {
       this.msgService.success('Saved security');
     }, error => this.msgService.error(error));
   }
