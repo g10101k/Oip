@@ -1,11 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { lastValueFrom, Observable } from 'rxjs';
-import { SecurityService } from "./security.service";
 
 @Injectable()
 export class BaseDataService {
-  private readonly oipSecurityService: SecurityService = inject(SecurityService);
   private readonly http = inject(HttpClient);
 
   get baseUrl(): string {
