@@ -14,6 +14,7 @@ export class MenuService extends BaseDataService {
 
   menuSource$ = this.menuSource.asObservable();
   resetSource$ = this.resetSource.asObservable();
+  contextMenuItem: any;
 
   onMenuStateChange(event: MenuChangeEvent) {
     this.menuSource.next(event);
