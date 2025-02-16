@@ -39,4 +39,9 @@ public class GetKeycloakClientSettingsResponse
     /// Log level None = 0, Debug = 1, Warn = 2, Error = 3 
     /// </summary>
     public int LogLevel { get; set; }
+
+    /// <summary>
+    /// Urls with auth
+    /// </summary>
+    public List<string> SecureRoutes { get; set; } = new();
 }

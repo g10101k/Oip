@@ -17,9 +17,6 @@ export * from './dtos/top-bar.dto';
 export * from './dtos/security.dto';
 export * from './dtos/put-security.dto';
 
-// Modules
-export * from './modules/auth-config.module';
-
 // Services
 export * from './services/base-data.service';
 export * from './services/top-bar.service';
@@ -37,7 +34,7 @@ export * from './interfaces/feature.interface';
 export * from './events/menu-change.event'
 
 // other
-export { AuthHttpInterceptor } from "./modules/auth-http-interceptor.service";
+export { langIntercept } from "./intercepts/i18n-intercept.service";
 export { SecurePipe } from "./modules/secure.pipe";
-export { httpLoaderFactory } from "./modules/http-loader.factory";
+export { httpLoaderAuthFactory } from "./modules/http-loader.factory";
 export { AddModuleInstanceDto } from "./dtos/add-module-instance.dto";
