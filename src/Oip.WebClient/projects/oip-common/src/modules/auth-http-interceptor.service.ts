@@ -10,18 +10,19 @@ export class AuthHttpInterceptor implements HttpInterceptor {
   private readonly layoutService = inject(LayoutService);
 
   intercept(req: HttpRequest<any>, handler: HttpHandler): Observable<HttpEvent<any>> {
-    let response = this.securityService.loginResponse.getValue();
+    let token: string = null;
+    this.securityService.getAccessToken().subscribe(x => {
+        token = x;
+      }
+    );
     let lang = this.layoutService.language() ? this.layoutService.language() : 'en';
-    if (response) {
-      let headers = req.headers
-        .set('Authorization', 'Bearer ' + response.accessToken)
-        .set('Accept-language', lang);
-      const authReq = req.clone({
-        headers: headers
-      });
-
-      return handler.handle(authReq);
+    let httpHeaders = req.headers.set('Accept-language', lang);
+    if (token) {
+       httpHeaders = httpHeaders
+        .set('Authorization', 'Bearer ' + token);
     }
-    return handler.handle(req);
-  }
+    const authReq = req.clone({
+      headers: httpHeaders
+    });
+    return handler.handle(authReq);  }
 }
