@@ -1,11 +1,17 @@
-import { HttpClient, provideHttpClient, withFetch } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
 import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
-import { AuthConfigModule, AuthGuardService, BaseDataService, SecurityDataService, UserService } from "oip-common";
+import {
+  AuthGuardService,
+  BaseDataService,
+  SecurityDataService,
+  UserService,
+  langIntercept, httpLoaderAuthFactory
+} from "oip-common";
 import { LocationStrategy, PathLocationStrategy } from "@angular/common";
 import { CountryService } from "./app/demo/service/country.service";
 import { CustomerService } from "./app/demo/service/customer.service";
@@ -17,14 +23,17 @@ import { ProductService } from "./app/demo/service/product.service";
 import { MessageService } from "primeng/api";
 import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
+import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from "angular-auth-oidc-client";
+import { SecurityStorageService } from "../../oip-common/src/services/security-storage.service";
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom(AuthConfigModule),
+    provideHttpClient(withInterceptors([authInterceptor(), langIntercept]), withFetch()),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
+    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     CountryService,
     CustomerService,
     EventService,
@@ -44,11 +53,17 @@ export const appConfig: ApplicationConfig = {
         deps: [HttpClient],
       },
     })]),
+    provideAuth({
+      loader: {
+        provide: StsConfigLoader,
+        useFactory: httpLoaderAuthFactory,
+        deps: [HttpClient],
+      },
+    }),
     provideRouter(appRoutes, withInMemoryScrolling({
       anchorScrolling: 'enabled',
       scrollPositionRestoration: 'enabled'
     }), withEnabledBlockingInitialNavigation()),
-    provideHttpClient(withFetch()),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {

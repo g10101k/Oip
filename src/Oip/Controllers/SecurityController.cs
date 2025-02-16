@@ -43,6 +43,14 @@ public class SecurityController : ControllerBase
     public GetKeycloakClientSettingsResponse GetKeycloakClientSettings()
     {
         var securitySettings = AppSettings.Instance.SecurityService;
+
+        HashSet<string> securityRoutes = new HashSet<string>();
+        securityRoutes.Add(AppSettings.Instance.OipUrls);
+        foreach (var q in securitySettings.Front.SecureRoutes)
+        {
+            securityRoutes.Add(q);
+        }
+
         return new GetKeycloakClientSettingsResponse()
         {
             Authority = securitySettings.BaseUrl.UrlAppend("realms").UrlAppend(securitySettings.Realm),
@@ -52,6 +60,7 @@ public class SecurityController : ControllerBase
             SilentRenew = securitySettings.Front.SilentRenew,
             UseRefreshToken = securitySettings.Front.UseRefreshToken,
             LogLevel = securitySettings.Front.LogLevel,
+            SecureRoutes = securityRoutes.ToList(),
         };
     }
 }
