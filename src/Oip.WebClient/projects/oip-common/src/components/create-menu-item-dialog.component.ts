@@ -8,6 +8,7 @@ import { PrimeIcons } from "primeng/api";
 import { AddModuleInstanceDto, MenuService } from "oip-common";
 import { Select } from "primeng/select";
 import { TranslatePipe } from "@ngx-translate/core";
+import { NgIf } from "@angular/common";
 
 @Component({
   selector: 'create-menu-item-dialog',
@@ -19,18 +20,24 @@ import { TranslatePipe } from "@ngx-translate/core";
     DropdownModule,
     FormsModule,
     Select,
-    TranslatePipe
+    TranslatePipe,
+    NgIf
   ],
   template: `
     <p-dialog header="{{ 'createMenuItemDialogComponent.header' | translate }}" [modal]="true" [(visible)]="visible"
-              [style]="{ width: '25rem' }">
+              [style]="{ width: '40rem' }">
+      <div class="flex items-center gap-4 mb-4" *ngIf="menuService.contextMenuItem">
+        <label for="parent"
+               class="font-semibold w-1/3">{{ 'createMenuItemDialogComponent.parentLabel' | translate }}</label>
+        <input pInputText id="parent" class="flex-auto" autocomplete="off" readonly [ngModel]="menuService.contextMenuItem?.label"/>
+      </div>
       <div class="flex items-center gap-4 mb-4">
         <label for="menuLabel"
-               class="font-semibold w-24">{{ 'createMenuItemDialogComponent.label' | translate }}</label>
+               class="font-semibold w-1/3">{{ 'createMenuItemDialogComponent.label' | translate }}</label>
         <input pInputText id="menuLabel" class="flex-auto" autocomplete="off" [(ngModel)]="label"/>
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="module" class="font-semibold w-24">{{ 'createMenuItemDialogComponent.module' | translate }}</label>
+        <label for="module" class="font-semibold w-1/3">{{ 'createMenuItemDialogComponent.module' | translate }}</label>
         <p-select
           id="module"
           class="flex-auto"
@@ -41,7 +48,7 @@ import { TranslatePipe } from "@ngx-translate/core";
           placeholder="{{'createMenuItemDialogComponent.selectModule' | translate }}"/>
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="icon" class="font-semibold w-24">{{ 'createMenuItemDialogComponent.icon' | translate }}</label>
+        <label for="icon" class="font-semibold w-1/3">{{ 'createMenuItemDialogComponent.icon' | translate }}</label>
         <input pInputText id="icon" class="flex-auto" [(ngModel)]="selectIcon"/>
       </div>
       <div class="flex justify-end gap-2">
@@ -61,7 +68,6 @@ export class CreateMenuItemDialogComponent implements OnInit {
   menuService = inject(MenuService);
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
-  @Input() contextItem: any;
 
   modules: any[] = [];
   selectModule: any;
@@ -90,7 +96,7 @@ export class CreateMenuItemDialogComponent implements OnInit {
       moduleId: this.selectModule,
       label: this.label,
       icon: this.selectIcon,
-      parentId: this.contextItem?.moduleInstanceId
+      parentId: this.menuService.contextMenuItem?.moduleInstanceId
     };
     this.menuService.addModuleInstance(item).then(() => {
       this.hide();
