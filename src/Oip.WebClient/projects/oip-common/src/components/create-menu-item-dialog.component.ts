@@ -29,7 +29,8 @@ import { NgIf } from "@angular/common";
       <div class="flex items-center gap-4 mb-4" *ngIf="menuService.contextMenuItem">
         <label for="parent"
                class="font-semibold w-1/3">{{ 'createMenuItemDialogComponent.parentLabel' | translate }}</label>
-        <input pInputText id="parent" class="flex-auto" autocomplete="off" readonly [ngModel]="menuService.contextMenuItem?.label"/>
+        <input pInputText id="parent" class="flex-auto" autocomplete="off" readonly
+               [ngModel]="menuService.contextMenuItem?.label"/>
       </div>
       <div class="flex items-center gap-4 mb-4">
         <label for="menuLabel"
@@ -48,7 +49,9 @@ import { NgIf } from "@angular/common";
           placeholder="{{'createMenuItemDialogComponent.selectModule' | translate }}"/>
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="icon" class="font-semibold w-1/3">{{ 'createMenuItemDialogComponent.icon' | translate }}</label>
+        <label for="icon" class="font-semibold w-1/3">{{ 'createMenuItemDialogComponent.icon' | translate }}
+        </label>
+        <i class="{{selectIcon}}"></i>
         <input pInputText id="icon" class="flex-auto" [(ngModel)]="selectIcon"/>
       </div>
       <div class="flex justify-end gap-2">
@@ -64,11 +67,10 @@ import { NgIf } from "@angular/common";
   `
 })
 export class CreateMenuItemDialogComponent implements OnInit {
-
   menuService = inject(MenuService);
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
-
+  @Input() editMode: boolean = false;
   modules: any[] = [];
   selectModule: any;
   label: string;

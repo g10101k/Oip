@@ -17,11 +17,8 @@ import { PrimeNG } from 'primeng/config';
 export class AppComponent implements OnInit {
   private readonly securityService = inject(SecurityService);
   private readonly translateService = inject(TranslateService)
-  private readonly primeNgConfig = inject(PrimeNG);
+  private readonly primeNg = inject(PrimeNG);
   private readonly layoutService = inject(LayoutService);
-
-  constructor() {
-  }
 
   ngOnInit() {
     this.translateService.addLangs(['en', 'ru']);
@@ -33,6 +30,6 @@ export class AppComponent implements OnInit {
 
   translate(lang: string) {
     this.translateService.use(lang);
-    this.translateService.get('primeng').subscribe(res => this.primeNgConfig.setTranslation(res));
+    this.translateService.get('primeng').subscribe(res => this.primeNg.setTranslation(res));
   }
 }

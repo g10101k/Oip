@@ -95,7 +95,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   key: string = "";
   itemMenu: MenuItem[] = [
     { label: 'New', icon: PrimeIcons.PLUS, command: (event) => this.newClick(event) },
-    { label: 'Edit', icon: PrimeIcons.FILE_EDIT },
+    { label: 'Edit', icon: PrimeIcons.FILE_EDIT, command: (event) => this.editClick(event)},
     { separator: true },
     { label: 'Delete', icon: PrimeIcons.TRASH, command: (event) => this.deleteItem(event) },
   ];
@@ -198,5 +198,11 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     this.menuService.deleteItem(this.menuService.contextMenuItem?.moduleInstanceId).then(() => {
       this.msgService.success('Saved security');
     }, error => this.msgService.error(error));
+  }
+
+  private editClick(event: MenuItemCommandEvent) {
+    this.createMenuItemDialogComponent.editMode = true;
+    this.createMenuItemDialogComponent.showDialog();
+
   }
 }
