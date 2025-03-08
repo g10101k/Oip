@@ -13,4 +13,4 @@ builder.Services.AddAppSettingsDbContext(settings);
 var app = builder.Build();
 app.MapGet("/", () => $"AppSettings.Instance.TestInt: {settings.TestInt}");
 
-app.Run();
+await app.RunAsync();
