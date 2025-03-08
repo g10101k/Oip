@@ -85,9 +85,8 @@ public abstract class BaseModuleController<TSettings> : Controller, IModuleContr
     public IActionResult GetModuleInstanceSettings(int id)
     {
         var settingString = _moduleRepository.GetModuleInstanceSettings(id);
-        var result = JsonConvert.DeserializeObject<TSettings>(settingString);
-        if (result is null)
-            result = Activator.CreateInstance(typeof(TSettings)) as TSettings;
+        var result = JsonConvert.DeserializeObject<TSettings>(settingString) ??
+                     Activator.CreateInstance(typeof(TSettings)) as TSettings;
         return Ok(result);
     }
 
