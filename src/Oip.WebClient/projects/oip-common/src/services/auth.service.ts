@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
-import { map, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { OidcSecurityService } from "angular-auth-oidc-client";
 
@@ -10,10 +10,9 @@ export class AuthGuardService {
   private readonly router = inject(Router);
 
   canActivate(): Observable<boolean | UrlTree> {
-    return this.oidcSecurityService.isAuthenticated$.pipe(
-      take(1),
+    return this.oidcSecurityService.isAuthenticated().pipe(
       map((authenticatedResult) => {
-        if (authenticatedResult.isAuthenticated) {
+        if (authenticatedResult) {
           return true;
         }
         return this.router.parseUrl('/unauthorized');
