@@ -13,7 +13,6 @@ import {
   langIntercept, httpLoaderAuthFactory
 } from "oip-common";
 import { LocationStrategy, PathLocationStrategy } from "@angular/common";
-import { CountryService } from "./app/demo/service/country.service";
 import { IconService } from "./app/demo/service/icon.service";
 import { ProductService } from "./app/demo/service/product.service";
 import { MessageService } from "primeng/api";
@@ -30,7 +29,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor(), langIntercept]), withFetch()),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
-    CountryService,
     IconService,
     ProductService,
     AuthGuardService,

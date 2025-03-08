@@ -22,7 +22,7 @@ public class ClaimsTransformation : IClaimsTransformation
         return Task.FromResult(principal);
     }
     
-    private void AddRolesFromRealmAccess(ClaimsPrincipal currentUser, ClaimsIdentity identity)
+    private static void AddRolesFromRealmAccess(ClaimsPrincipal currentUser, ClaimsIdentity identity)
     {
         var realmAccessJson = currentUser.FindFirst("realm_access")?.Value;
         if (realmAccessJson is null)
