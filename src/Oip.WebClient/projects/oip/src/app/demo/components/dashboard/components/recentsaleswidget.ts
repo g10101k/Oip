@@ -40,7 +40,7 @@ import { Product } from "../../../api/product";
 export class RecentSalesWidget {
     products!: Product[];
 
-    constructor(private productService: ProductService) {}
+    constructor(private readonly productService: ProductService) {}
 
     ngOnInit() {
         this.productService.getProductsSmall().then((data) => (this.products = data));
