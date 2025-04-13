@@ -1,3 +1,5 @@
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Oip.Data.Entities;
 using Oip.Data.EntityConfigurations;
@@ -115,22 +117,33 @@ public class OipContext : DbContext
 
     private static void DefaultDataInsert(OipContext context)
     {
-        if (!context.Modules.Any(x => x.Name == "Folder"))
-        {
-            context.Modules.Add(new ModuleEntity { Name = "Folder" });
-        }
-
-        if (!context.Modules.Any(x => x.Name == "Dashboard"))
-        {
-            context.Modules.Add(new ModuleEntity { Name = "Dashboard", RouterLink = "/dashboard/" });
-        }
-
-        if (!context.Modules.Any(x => x.Name == "Weather"))
-        {
-            context.Modules.Add(new ModuleEntity { Name = "Weather", RouterLink = "/weather/" });
-        }
+        AddModulesFromAssemblies(context);
 
         context.SaveChanges();
+    }
+
+    private static void AddModulesFromAssemblies(OipContext context)
+    {
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        var result = new List<Type>();
+        foreach (var assembly in assemblies)
+        {
+            IEnumerable<Type> types = assembly.GetTypes();
+            var baseCon = types.Where(x => x.BaseType?.Name.StartsWith("BaseModuleController") ?? false);
+            result.AddRange(baseCon);
+        }
+
+        foreach (var type in result)
+        {
+            var moduleName = type.Name.Replace("Controller", string.Empty);
+            RouteAttribute? attr = type.GetCustomAttribute<RouteAttribute>();
+            if (attr == null) continue;
+            var link = attr.Template.Replace("api", string.Empty);
+            if (!context.Modules.Any(x => x.Name == moduleName))
+            {
+                context.Modules.Add(new ModuleEntity { Name = moduleName, RouterLink = link });
+            }
+        }
     }
 }
 

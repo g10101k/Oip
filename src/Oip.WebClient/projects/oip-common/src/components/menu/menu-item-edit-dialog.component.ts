@@ -64,10 +64,10 @@ export class MenuItemEditDialogComponent {
     this.visibleChange.emit(this.visible);
   }
 
-  save() {
-    this.menuService.editModuleInstance(this.item).then(() => {
-      this.hide();
-    });
+  async save() {
+    await this.menuService.editModuleInstance(this.item);
+    await this.menuService.loadMenu();
+    this.hide();
   }
 
   hide() {

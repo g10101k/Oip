@@ -41,21 +41,25 @@ export abstract class BaseComponent<TSettings> implements OnInit, OnDestroy {
   }
 
   public topBarItems: TopBarDto [] = [
-    { id: 'content', icon: 'pi-box', caption: this.translateService.instant('baseComponent.content') },
-    { id: 'settings', icon: 'pi-cog', caption: this.translateService.instant('baseComponent.settings') },
-    { id: 'security', icon: 'pi-lock', caption: this.translateService.instant('baseComponent.security') },
+    { id: 'content', icon: 'pi-box', caption: '' },
+    { id: 'settings', icon: 'pi-cog', caption: '' },
+    { id: 'security', icon: 'pi-lock', caption: '' },
   ];
 
   constructor() {
-    // do nothing
+
   }
 
-  async ngOnDestroy() {
+  ngOnDestroy() {
     this.topBarService.setTopBarItems([]);
     this.topBarService.activeId = this.topBarItems[0].id;
   }
 
   async ngOnInit() {
+    this.translateService.get('baseComponent.content').subscribe(value => this.topBarItems[0].caption = value);
+    this.translateService.get('baseComponent.settings').subscribe(value => this.topBarItems[1].caption = value);
+    this.translateService.get('baseComponent.security').subscribe(value => this.topBarItems[2].caption = value);
+
     this.topBarService.setTopBarItems(this.topBarItems);
     this.topBarService.activeId = this.topBarItems[0].id;
 

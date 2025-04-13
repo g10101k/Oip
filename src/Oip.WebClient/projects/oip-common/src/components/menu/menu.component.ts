@@ -8,7 +8,6 @@ import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { DialogModule } from "primeng/dialog";
 import { MenuItemCommandEvent, PrimeIcons } from "primeng/api";
 import { InputTextModule } from "primeng/inputtext";
-import { MsgService } from './../../services/msg.service';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from "@angular/forms";
 import { MenuItemComponent } from './menu-item.component';
@@ -24,7 +23,7 @@ import { MenuItemEditDialogComponent } from "./menu-item-edit-dialog.component";
   template: `
     <div #emtpty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
       <ul class="layout-menu">
-        <ng-container *ngFor="let item of model; let i = index;">
+        <ng-container *ngFor="let item of menuService.menu; let i = index;">
           <li app-menuitem
               *ngIf="!item.separator"
               [item]="item"
@@ -37,7 +36,7 @@ import { MenuItemEditDialogComponent } from "./menu-item-edit-dialog.component";
         </ng-container>
         <div *ngIf="securityService.isAdmin" class="flex items-center absolute right-0 bottom-0 m-4">
           <label for="adminMode" class="mr-2">{{ 'menuComponent.all' | translate }}</label>
-          <p-inputSwitch id="adminMode" [(ngModel)]="adminMode" (onChange)="onSettingButtonClick()"></p-inputSwitch>
+          <p-inputSwitch id="adminMode" [(ngModel)]="menuService.adminMode" (onChange)="onSettingButtonClick()"></p-inputSwitch>
         </div>
       </ul>
     </div>
@@ -49,39 +48,22 @@ export class MenuComponent implements OnInit {
   readonly menuService = inject(MenuService);
   readonly layoutService = inject(LayoutService);
   readonly securityService = inject(SecurityService);
-  readonly msgService = inject(MsgService);
   readonly translateService = inject(TranslateService);
 
   @ViewChild(MenuItemCreateDialogComponent) menuItemCreateDialogComponent: MenuItemCreateDialogComponent;
   @ViewChild(MenuItemEditDialogComponent) menuItemEditDialogComponent: MenuItemEditDialogComponent;
   @ViewChild(ContextMenu) contextMenu: ContextMenu;
-  model: any[] = [];
-  adminMode: boolean = false;
 
   ngOnInit() {
-    this.loadMenu();
+    this.menuService.loadMenu().then();
   }
 
   private newClick(e: MenuItemCommandEvent) {
     this.menuItemCreateDialogComponent.showDialog();
   }
 
-  onSettingButtonClick() {
-    this.loadMenu();
-  }
-
-  loadMenu() {
-    if (this.adminMode) {
-      this.menuService.getAdminMenu().then(
-        menu => {
-          this.model = menu;
-        }, error => this.msgService.error(error));
-    } else {
-      this.menuService.getMenu().then(
-        menu => {
-          this.model = menu;
-        }, error => this.msgService.error(error));
-    }
+  async onSettingButtonClick() {
+    await this.menuService.loadMenu();
   }
 
   onContextMenu($event: MouseEvent) {

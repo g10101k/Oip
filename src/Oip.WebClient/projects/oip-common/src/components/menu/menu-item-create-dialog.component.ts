@@ -24,7 +24,7 @@ import { NgIf } from "@angular/common";
   ],
   template: `
     <p-dialog header="{{ 'menuItemCreateDialogComponent.header' | translate }}" [modal]="true" [(visible)]="visible"
-              [style]="{ width: '40rem' }">
+              [style]="{ width: '40rem',  height: '30rem'  }">
       <div class="flex items-center gap-4 mb-4 mt-1" *ngIf="menuService.contextMenuItem">
         <label for="parent"
                class="font-semibold w-1/3">{{ 'menuItemCreateDialogComponent.parentLabel' | translate }}</label>
@@ -39,13 +39,13 @@ import { NgIf } from "@angular/common";
       <div class="flex items-center gap-4 mb-4">
         <label for="module" class="font-semibold w-1/3">{{ 'menuItemCreateDialogComponent.module' | translate }}</label>
         <p-select
-          id="module"
-          class="flex-auto"
-          [options]="modules"
-          [(ngModel)]="selectModule"
-          optionLabel="value"
-          optionValue="key"
-          placeholder="{{'menuItemCreateDialogComponent.selectModule' | translate }}"/>
+            id="module"
+            class="flex-auto"
+            [options]="modules"
+            [(ngModel)]="selectModule"
+            optionLabel="value"
+            optionValue="key"
+            placeholder="{{'menuItemCreateDialogComponent.selectModule' | translate }}"/>
       </div>
       <div class="flex items-center gap-4 mb-4">
         <label for="icon" class="font-semibold w-1/3">{{ 'menuItemCreateDialogComponent.icon' | translate }}
@@ -72,7 +72,7 @@ export class MenuItemCreateDialogComponent implements OnInit {
   modules: any[] = [];
   selectModule: any;
   label: string;
-  selectIcon: string;
+  selectIcon: string = 'pi pi-box';
 
   ngOnInit(): void {
     this.menuService.getModules().then(data => {
@@ -85,16 +85,16 @@ export class MenuItemCreateDialogComponent implements OnInit {
     this.visibleChange.emit(this.visible);
   }
 
-  save() {
+  async save() {
     let item: AddModuleInstanceDto = {
       moduleId: this.selectModule,
       label: this.label,
       icon: this.selectIcon,
       parentId: this.menuService.contextMenuItem?.moduleInstanceId
     };
-    this.menuService.addModuleInstance(item).then(() => {
-      this.hide();
-    });
+    await this.menuService.addModuleInstance(item);
+    await this.menuService.loadMenu();
+    this.hide();
   }
 
   hide() {
