@@ -15,20 +15,6 @@
 		"changePhoto": "Загрузить фото",
 		"successfullyUploaded": "Загружено"
 	},
-	"menuComponent": {
-		"all": "Все",
-		"new": "Добавить"
-	},
-	"createMenuItemDialogComponent": {
-		"header": "Новый элемент меню",
-		"parentLabel": "Родительский узел",
-		"label": "Имя",
-		"module": "Модуль",
-		"selectModule": "Выбери модуль",
-		"icon": "Иконка",
-		"cancel": "Отмена",
-		"save": "Сохранить"
-	},
 	"configComponent": {
 		"profile": "Профиль",
 		"photo": "Фото",
@@ -41,6 +27,30 @@
 		"settings": "Настройки",
 		"security": "Безопасность",
 		"success": "Сохранено"
+	},
+	"menuComponent": {
+		"all": "Все",
+		"new": "Добавить"
+	},
+	"menuItemEditDialogComponent": {
+		"header": "Редактировать элемент меню",
+		"parentLabel": "Родительский узел",
+		"label": "Имя",
+		"module": "Модуль",
+		"selectModule": "Выбери модуль",
+		"icon": "Иконка",
+		"cancel": "Отмена",
+		"save": "Сохранить"
+	},
+	"menuItemCreateDialogComponent": {
+		"header": "Новый элемент меню",
+		"parentLabel": "Родительский узел",
+		"label": "Имя",
+		"module": "Модуль",
+		"selectModule": "Выбери модуль",
+		"icon": "Иконка",
+		"cancel": "Отмена",
+		"save": "Сохранить"
 	},
 	"unauthorized": {
 		"welcomeToOip": "Добро пожаловать в OIP!",

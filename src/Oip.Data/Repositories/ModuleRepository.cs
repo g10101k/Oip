@@ -39,7 +39,7 @@ public class ModuleRepository
                     Role = x.Role
                 })
             };
-        var result = await query.ToListAsync();
+        var result = await query.AsNoTracking().ToListAsync();
         return result;
     }
 
@@ -95,7 +95,7 @@ public class ModuleRepository
                 Role = security.Role
             };
 
-        return await query.ToListAsync();
+        return await query.AsNoTracking().ToListAsync();
     }
 
     /// <summary>
@@ -108,7 +108,13 @@ public class ModuleRepository
             where sec.ModuleInstanceId == id
             select sec;
         var list = await query.ToListAsync();
+        SyncRule(id, security, list);
 
+        await _db.SaveChangesAsync();
+    }
+
+    private void SyncRule(int id, IEnumerable<ModuleSecurityDto> security, List<ModuleInstanceSecurityEntity> list)
+    {
         // delete
         var listToDelete = list.Where(x => !security.Any(s => s.Right == x.Right && s.Role == x.Role)).ToList();
         _db.ModuleInstanceSecurities.RemoveRange(listToDelete);
@@ -121,11 +127,9 @@ public class ModuleRepository
                 Role = x.Role
             }).ToList();
         _db.ModuleInstanceSecurities.AddRange(listToAdd);
-
-        await _db.SaveChangesAsync();
     }
 
-    private ModuleInstanceDto ToDto(ModuleInstanceEntity module)
+    private static ModuleInstanceDto ToDto(ModuleInstanceEntity module)
     {
         return new ModuleInstanceDto()
         {
@@ -171,9 +175,9 @@ public class ModuleRepository
 
         if (moduleInstance == null)
             throw new KeyNotFoundException($"Module instance with id {id} not found");
-        
+
         moduleInstance.Settings = settings;
-        
+
         _db.SaveChanges();
     }
 
@@ -199,7 +203,7 @@ public class ModuleRepository
     {
         var query = from module in _db.Modules
             select new IntKeyValueDto(module.ModuleId, module.Name);
-        return await query.ToListAsync();
+        return await query.AsNoTracking().ToListAsync();
     }
 
     /// <summary>
@@ -215,10 +219,29 @@ public class ModuleRepository
             Icon = addModuleInstanceDto.Icon,
             Settings = string.Empty,
             ParentId = addModuleInstanceDto.ParentId,
-            Securities = [new ModuleInstanceSecurityEntity { Right = "read", Role = "admin" }]            
+            Securities = [new ModuleInstanceSecurityEntity { Right = "read", Role = "admin" }]
         });
         await _db.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Edit module instance
+    /// </summary>
+    /// <param name="editModel"></param>
+    public async Task EditModuleInstance(EditModuleInstanceDto editModel)
+    {
+        var instance =
+            await _db.ModuleInstances.Include(x => x.Securities)
+                .FirstOrDefaultAsync(x => x.ModuleInstanceId == editModel.ModuleInstanceId) ??
+            throw new KeyNotFoundException($"Module instance with id {editModel.ModuleInstanceId} not found");
+
+        instance.Label = editModel.Label;
+        instance.Icon = editModel.Icon;
+        _db.ModuleInstances.Update(instance);
+        
+        await _db.SaveChangesAsync();
+    }
+
 
     /// <summary>
     /// Delete module instance
@@ -230,7 +253,7 @@ public class ModuleRepository
         var instance = await _db.ModuleInstances.FirstOrDefaultAsync(x => x.ModuleInstanceId == id);
         if (instance == null)
             throw new KeyNotFoundException($"Module instance with id {id} not found");
-        
+
         _db.ModuleInstances.Remove(instance);
         await _db.SaveChangesAsync();
     }
