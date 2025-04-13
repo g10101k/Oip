@@ -24,7 +24,7 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
       size="xlarge"
       shape="circle"/>
     <div class="mt-2">
-      <p-fileUpload
+      <p-fileupload
         mode="basic"
         name="files"
         [auto]="true"

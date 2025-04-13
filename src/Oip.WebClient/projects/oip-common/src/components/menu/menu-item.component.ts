@@ -1,24 +1,18 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  HostBinding,
-  inject,
-  Input,
-  OnDestroy,
-  OnInit
-} from '@angular/core';
+import { ChangeDetectorRef, Component, HostBinding, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { LayoutService } from "./../services/app.layout.service";
-import { MenuService } from "./../services/app.menu.service";
+import { LayoutService } from "./../../services/app.layout.service";
+import { MenuService } from "./../../services/app.menu.service";
 import { RippleModule } from 'primeng/ripple';
 import { NgIf, NgClass, NgFor } from '@angular/common';
 import { MenuItem, MenuItemCommandEvent, PrimeIcons } from "primeng/api";
-import { CreateMenuItemDialogComponent } from "./create-menu-item-dialog.component";
+import { MenuItemCreateDialogComponent } from "./menu-item-create-dialog.component";
 import { ContextMenu, ContextMenuModule } from "primeng/contextmenu";
-import { MsgService } from "./../services/msg.service";
+import { MsgService } from "./../../services/msg.service";
+import { MenuItemEditDialogComponent } from "./menu-item-edit-dialog.component";
+import { ContextMenuItemDto } from "../../dtos/context-menu-item.dto";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -57,7 +51,8 @@ import { MsgService } from "./../services/msg.service";
           (contextmenu)="onContextMenu($event, item)">
         <ng-template ngFor let-child let-i="index" [ngForOf]="item.items">
           <li app-menuitem [item]="child" [index]="i" [parentKey]="key" [class]="child.badgeClass"
-              [createMenuItemDialogComponent]="createMenuItemDialogComponent"
+              [menuItemCreateDialogComponent]="menuItemCreateDialogComponent"
+              [menuItemEditDialogComponent]="menuItemEditDialogComponent"
               [contextMenu]="contextMenu"></li>
         </ng-template>
       </ul>
@@ -78,12 +73,13 @@ import { MsgService } from "./../services/msg.service";
   imports: [NgIf, RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor, ContextMenuModule]
 })
 export class MenuItemComponent implements OnInit, OnDestroy {
-  public layoutService: LayoutService = inject(LayoutService);
-  @Input() item: any;
+  public layoutService = inject(LayoutService);
+  @Input() item: ContextMenuItemDto;
   @Input() index!: number;
   @Input() @HostBinding('class.layout-root-menuitem') root!: boolean;
   @Input() parentKey!: string;
-  @Input() createMenuItemDialogComponent: CreateMenuItemDialogComponent;
+  @Input() menuItemCreateDialogComponent: MenuItemCreateDialogComponent;
+  @Input() menuItemEditDialogComponent: MenuItemEditDialogComponent;
   @Input() contextMenu: ContextMenu;
 
   active = false;
@@ -95,7 +91,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   key: string = "";
   itemMenu: MenuItem[] = [
     { label: 'New', icon: PrimeIcons.PLUS, command: (event) => this.newClick(event) },
-    { label: 'Edit', icon: PrimeIcons.FILE_EDIT },
+    { label: 'Edit', icon: PrimeIcons.FILE_EDIT, command: (event) => this.editClick(event) },
     { separator: true },
     { label: 'Delete', icon: PrimeIcons.TRASH, command: (event) => this.deleteItem(event) },
   ];
@@ -166,7 +162,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   }
 
   get submenuAnimation() {
-    return this.root ? 'expanded' : (this.active ? 'expanded' : 'collapsed');
+    return (this.root || this.active) ? 'expanded' : 'collapsed';
   }
 
   @HostBinding('class.active-menuitem')
@@ -185,7 +181,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   }
 
   private newClick(e: MenuItemCommandEvent) {
-    this.createMenuItemDialogComponent.showDialog();
+    this.menuItemCreateDialogComponent.showDialog();
   }
 
   onContextMenu($event: MouseEvent, item: any) {
@@ -198,5 +194,9 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     this.menuService.deleteItem(this.menuService.contextMenuItem?.moduleInstanceId).then(() => {
       this.msgService.success('Saved security');
     }, error => this.msgService.error(error));
+  }
+
+  private editClick(event: MenuItemCommandEvent) {
+    this.menuItemEditDialogComponent.showDialog();
   }
 }

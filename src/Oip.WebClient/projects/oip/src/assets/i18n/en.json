@@ -15,20 +15,6 @@
 		"changePhoto": "Change Photo",
 		"successfullyUploaded": "Successfully uploaded"
 	},
-	"menuComponent": {
-		"all": "All",
-		"new": "New"
-	},
-	"createMenuItemDialogComponent": {
-		"header": "Create new menu item",
-		"parentLabel": "Parent",
-		"label": "Label",
-		"module": "Module",
-		"selectModule": "Select module",
-		"icon": "Icon",
-		"cancel": "Cancel",
-		"save": "Save"
-	},
 	"configComponent": {
 		"profile": "Profile",
 		"photo": "Photo",
@@ -41,6 +27,30 @@
 		"settings": "Settings",
 		"security": "Security",
 		"success": "Save successfully"
+	},
+	"menuComponent": {
+		"all": "All",
+		"new": "New"
+	},
+	"menuItemEditDialogComponent": {
+		"header": "Edit menu item",
+		"parentLabel": "Parent",
+		"label": "Label",
+		"module": "Module",
+		"selectModule": "",
+		"icon": "Icon",
+		"cancel": "Cancel",
+		"save": "Save"
+	},
+	"menuItemCreateDialogComponent": {
+		"header": "Create new menu item",
+		"parentLabel": "Parent",
+		"label": "Label",
+		"module": "Module",
+		"selectModule": "Select module",
+		"icon": "Icon",
+		"cancel": "Cancel",
+		"save": "Save"
 	},
 	"unauthorized": {
 		"welcomeToOip": "Welcome to OIP!",

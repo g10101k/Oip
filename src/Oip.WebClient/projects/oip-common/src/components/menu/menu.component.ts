@@ -1,23 +1,26 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { MenuService } from "../services/app.menu.service";
-import { LayoutService } from "../services/app.layout.service";
+import { MenuService } from "../../services/app.menu.service";
+import { LayoutService } from "../../services/app.layout.service";
 import { NgFor, NgIf } from '@angular/common';
 import { ButtonModule } from "primeng/button";
-import { SecurityService } from "./../services/security.service";
+import { SecurityService } from "./../../services/security.service";
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { DialogModule } from "primeng/dialog";
 import { MenuItemCommandEvent, PrimeIcons } from "primeng/api";
 import { InputTextModule } from "primeng/inputtext";
-import { MsgService } from './../services/msg.service';
+import { MsgService } from './../../services/msg.service';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from "@angular/forms";
 import { MenuItemComponent } from './menu-item.component';
-import { CreateMenuItemDialogComponent } from "./create-menu-item-dialog.component";
+import { MenuItemCreateDialogComponent } from "./menu-item-create-dialog.component";
 import { TranslatePipe, TranslateService } from "@ngx-translate/core";
+import { MenuItemEditDialogComponent } from "./menu-item-edit-dialog.component";
 
 
 @Component({
+  imports: [NgFor, NgIf, MenuItemComponent, ButtonModule, ContextMenuModule, DialogModule, InputTextModule, MenuItemCreateDialogComponent, InputSwitchModule, FormsModule, TranslatePipe, MenuItemEditDialogComponent],
   selector: 'app-menu',
+  standalone: true,
   template: `
     <div #emtpty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
       <ul class="layout-menu">
@@ -27,7 +30,8 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
               [item]="item"
               [index]="i"
               [root]="true"
-              [createMenuItemDialogComponent]="createMenuItemDialogComponent"
+              [menuItemCreateDialogComponent]="menuItemCreateDialogComponent"
+              [menuItemEditDialogComponent]="menuItemEditDialogComponent"
               [contextMenu]="contextMenu"></li>
           <li *ngIf="item.separator" class="menu-separator"></li>
         </ng-container>
@@ -38,9 +42,8 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
       </ul>
     </div>
     <p-contextMenu [target]="emtpty"/>
-    <create-menu-item-dialog *ngIf="securityService.isAdmin"/>`,
-  standalone: true,
-  imports: [NgFor, NgIf, MenuItemComponent, ButtonModule, ContextMenuModule, DialogModule, InputTextModule, CreateMenuItemDialogComponent, InputSwitchModule, FormsModule, TranslatePipe]
+    <menu-item-create-dialog *ngIf="securityService.isAdmin"/>
+    <menu-item-edit-dialog *ngIf="securityService.isAdmin"/>`
 })
 export class MenuComponent implements OnInit {
   readonly menuService = inject(MenuService);
@@ -49,7 +52,8 @@ export class MenuComponent implements OnInit {
   readonly msgService = inject(MsgService);
   readonly translateService = inject(TranslateService);
 
-  @ViewChild(CreateMenuItemDialogComponent) createMenuItemDialogComponent: CreateMenuItemDialogComponent;
+  @ViewChild(MenuItemCreateDialogComponent) menuItemCreateDialogComponent: MenuItemCreateDialogComponent;
+  @ViewChild(MenuItemEditDialogComponent) menuItemEditDialogComponent: MenuItemEditDialogComponent;
   @ViewChild(ContextMenu) contextMenu: ContextMenu;
   model: any[] = [];
   adminMode: boolean = false;
@@ -59,7 +63,7 @@ export class MenuComponent implements OnInit {
   }
 
   private newClick(e: MenuItemCommandEvent) {
-    this.createMenuItemDialogComponent.showDialog();
+    this.menuItemCreateDialogComponent.showDialog();
   }
 
   onSettingButtonClick() {

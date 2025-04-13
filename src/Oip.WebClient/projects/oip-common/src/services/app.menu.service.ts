@@ -3,6 +3,8 @@ import { Subject } from 'rxjs';
 import { BaseDataService } from "./base-data.service";
 import { MenuChangeEvent } from "../events/menu-change.event";
 import { AddModuleInstanceDto } from "./../dtos/add-module-instance.dto";
+import { EditModuleInstanceDto } from "../dtos/edit-module-instance.dto";
+import { ContextMenuItemDto } from "../dtos/context-menu-item.dto";
 
 @Injectable({
   providedIn: 'root'
@@ -25,11 +27,11 @@ export class MenuService extends BaseDataService {
   }
 
   getMenu() {
-    return this.sendRequest<any>(this.baseUrl + 'api/menu/get');
+    return this.sendRequest<ContextMenuItemDto[]>(this.baseUrl + 'api/menu/get');
   }
 
   getAdminMenu() {
-    return this.sendRequest<any>(this.baseUrl + 'api/menu/get-admin-menu');
+    return this.sendRequest<ContextMenuItemDto[]>(this.baseUrl + 'api/menu/get-admin-menu');
   }
 
   getModules() {
@@ -42,6 +44,10 @@ export class MenuService extends BaseDataService {
 
   deleteItem(moduleInstanceId: number) {
     return this.sendRequest(this.baseUrl + 'api/menu/delete-module-instance?id=' + moduleInstanceId, "DELETE");
+  }
+
+  editModuleInstance(item: EditModuleInstanceDto) {
+    return this.sendRequest(this.baseUrl + 'api/menu/edit-module-instance', "POST", item);
   }
 }
 

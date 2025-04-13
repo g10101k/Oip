@@ -3,7 +3,7 @@ export * from './components/base.component';
 export * from './components/security.component';
 export * from './components/top-bar.component';
 export * from './components/footer.component'
-export * from './components/menu.component';
+export * from './components/menu/menu.component';
 export * from './components/app.layout.component';
 export * from './components/sidebar.component';
 export * from './components/logo.component';
@@ -12,6 +12,7 @@ export * from './components/auth/unauthorized/unauthorized.component';
 export * from './components/auth/error/error.component';
 export * from './components/profile.component';
 export * from './components/config.component';
+
 // Dtos
 export * from './dtos/top-bar.dto';
 export * from './dtos/security.dto';

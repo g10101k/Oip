@@ -73,6 +73,17 @@ public class MenuController : ControllerBase
     /// Add new module
     /// </summary>  
     /// <returns></returns> 
+    [HttpPost("edit-module-instance")]
+    [Authorize(Roles = "admin")]
+    public async Task EditModuleInstance(EditModuleInstanceDto editModel)
+    {
+        await _moduleRepository.EditModuleInstance(editModel);
+    }
+    
+    /// <summary>
+    /// Add new module
+    /// </summary>  
+    /// <returns></returns> 
     [HttpDelete("delete-module-instance")]
     [Authorize(Roles = "admin")]
     public async Task DeleteModuleInstance(int id)

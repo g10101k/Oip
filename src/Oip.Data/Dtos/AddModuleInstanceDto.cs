@@ -7,4 +7,14 @@ namespace Oip.Data.Dtos;
 /// <param name="Label"></param>
 /// <param name="Icon"></param>
 /// <param name="ParentId"></param>
-public record AddModuleInstanceDto(int ModuleId,  string Label, string? Icon, int? ParentId );
+public record AddModuleInstanceDto(int ModuleId, string Label, string? Icon, int? ParentId, string[]? ViewRoles);
+
+/// <summary>
+/// DTO for edit module instance
+/// </summary>
+/// <param name="ModuleInstanceId"></param>
+/// <param name="Label"></param>
+/// <param name="Icon"></param>
+/// <param name="ParentId"></param>
+/// <param name="ViewRoles"></param>
+public record EditModuleInstanceDto(int ModuleInstanceId, string Label, string? Icon, int? ParentId, string[]? ViewRoles);
