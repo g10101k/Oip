@@ -83,9 +83,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   @Input() contextMenu: ContextMenu;
 
   active = false;
-
   menuSourceSubscription: Subscription;
-
   menuResetSubscription: Subscription;
 
   key: string = "";
@@ -93,7 +91,11 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     { label: 'New', icon: PrimeIcons.PLUS, command: (event) => this.newClick(event) },
     { label: 'Edit', icon: PrimeIcons.FILE_EDIT, command: (event) => this.editClick(event) },
     { separator: true },
-    { label: 'Delete', icon: PrimeIcons.TRASH, command: (event) => this.deleteItem(event) },
+    {
+      label: 'Delete', icon: PrimeIcons.TRASH, command: (event) => {
+        this.deleteItem(event).then();
+      }
+    },
   ];
   msgService = inject(MsgService);
 
@@ -190,10 +192,10 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     this.contextMenu.show($event);
   }
 
-  private deleteItem(event: MenuItemCommandEvent) {
-    this.menuService.deleteItem(this.menuService.contextMenuItem?.moduleInstanceId).then(() => {
-      this.msgService.success('Saved security');
-    }, error => this.msgService.error(error));
+  private async deleteItem(event: MenuItemCommandEvent) {
+    await this.menuService.deleteItem(this.menuService.contextMenuItem?.moduleInstanceId);
+    this.msgService.success('Saved security');
+    await this.menuService.loadMenu();
   }
 
   private editClick(event: MenuItemCommandEvent) {

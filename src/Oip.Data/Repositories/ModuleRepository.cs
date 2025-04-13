@@ -138,13 +138,20 @@ public class ModuleRepository
             Label = module.Label,
             Icon = module.Icon,
             RouterLink = module.Module.RouterLink != null
-                ? [$"{module.Module.RouterLink}{module.ModuleInstanceId}"]
+                ? [UrlAppend(module.Module.RouterLink, module.ModuleInstanceId)]
                 : null,
             Url = module.Url,
             Target = module.Target,
             Settings = module.Settings,
             Items = module.Items.Count == 0 ? null : module.Items.Select(ToDto).ToList()
         };
+    }
+
+    private static string UrlAppend(string? url, int? part)
+    {
+        if (string.IsNullOrEmpty(url))
+            return string.Empty;
+        return part is not null ? $"{url.TrimEnd('/')}/{part}" : url;
     }
 
     /// <summary>
@@ -159,7 +166,7 @@ public class ModuleRepository
             .FirstOrDefault();
 
         if (settings == null)
-            throw new KeyNotFoundException($"Module instance with id {id} not found");
+                throw new KeyNotFoundException($"Module instance with id {id} not found");
         return settings;
     }
 
@@ -238,7 +245,7 @@ public class ModuleRepository
         instance.Label = editModel.Label;
         instance.Icon = editModel.Icon;
         _db.ModuleInstances.Update(instance);
-        
+
         await _db.SaveChangesAsync();
     }
 

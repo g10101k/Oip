@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { BaseDataService } from "./base-data.service";
 import { MenuChangeEvent } from "../events/menu-change.event";
-import { AddModuleInstanceDto } from "./../dtos/add-module-instance.dto";
+import { AddModuleInstanceDto } from "../dtos/add-module-instance.dto";
 import { EditModuleInstanceDto } from "../dtos/edit-module-instance.dto";
 import { ContextMenuItemDto } from "../dtos/context-menu-item.dto";
 
@@ -10,13 +10,19 @@ import { ContextMenuItemDto } from "../dtos/context-menu-item.dto";
   providedIn: 'root'
 })
 export class MenuService extends BaseDataService {
-
   private readonly menuSource = new Subject<MenuChangeEvent>();
   private readonly resetSource = new Subject();
 
   menuSource$ = this.menuSource.asObservable();
   resetSource$ = this.resetSource.asObservable();
   contextMenuItem: any;
+
+  public menu: any[] = [];
+  public adminMode: boolean = false;
+
+  async loadMenu() {
+    this.menu = (this.adminMode) ? await this.getAdminMenu() : await this.getMenu();
+  }
 
   onMenuStateChange(event: MenuChangeEvent) {
     this.menuSource.next(event);
