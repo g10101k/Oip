@@ -28,7 +28,8 @@ import { UserService } from "../services/user.service";
         </a>
       </div>
 
-      <p-tabs *ngIf="securityService.isAdmin && topBarService.topBarItems.length > 0" class="layout-topbar-tabs ml-2" [(value)]="topBarService.activeId">
+      <p-tabs *ngIf="securityService.isAdmin && topBarService.topBarItems.length > 0" class="layout-topbar-tabs ml-2"
+              [(value)]="topBarService.activeId">
         <p-tablist>
           @for (tab of topBarService.availableTopBarItems; track tab.id) {
             <p-tab [value]="tab.id">
@@ -69,7 +70,8 @@ import { UserService } from "../services/user.service";
 
         <div class="layout-topbar-menu hidden lg:block">
           <div class="layout-topbar-menu-content">
-            <button type="button" class="layout-topbar-action" (click)="securityService.logout()" (keydown)="securityService.logout()">
+            <button type="button" class="layout-topbar-action" (click)="securityService.logout()"
+                    (keydown)="logoutKeyDown($event)">
               <i class="pi pi-sign-out"></i>
               <span>Logout</span>
             </button>
@@ -97,5 +99,11 @@ export class AppTopbar {
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
+  }
+
+  logoutKeyDown($event: KeyboardEvent) {
+    if ($event.key === 'Enter') {
+      this.securityService.logout()
+    }
   }
 }
