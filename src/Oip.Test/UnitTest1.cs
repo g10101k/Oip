@@ -18,11 +18,11 @@ public class Tests
     [Test]
     public void Test1()
     {
-        var b = new DbContextOptionsBuilder<OipContext>();
+        var b = new DbContextOptionsBuilder<OipModuleContext>();
         b.UseSqlServer();
-        using var db = new OipContext(b.Options);
+        using var db = new OipModuleContext(b.Options);
         var currentAssembly = Assembly.GetExecutingAssembly();
-        var oipAssembly = typeof(OipContext).Assembly;
+        var oipAssembly = typeof(OipModuleContext).Assembly;
         var reportHandler = new OperationReportHandler(
             s => Console.WriteLine($"err:{s}"),
             s => Console.WriteLine($"warn:{s}"),
