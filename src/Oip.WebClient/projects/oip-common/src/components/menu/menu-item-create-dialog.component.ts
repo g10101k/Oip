@@ -24,7 +24,7 @@ import { NgIf } from "@angular/common";
   ],
   template: `
     <p-dialog header="{{ 'menuItemCreateDialogComponent.header' | translate }}" [modal]="true" [(visible)]="visible"
-              [style]="{ width: '40rem',  height: '30rem'  }">
+              [style]="{ width: '40rem' }">
       <div class="flex items-center gap-4 mb-4 mt-1" *ngIf="menuService.contextMenuItem">
         <label for="parent"
                class="font-semibold w-1/3">{{ 'menuItemCreateDialogComponent.parentLabel' | translate }}</label>
@@ -38,14 +38,14 @@ import { NgIf } from "@angular/common";
       </div>
       <div class="flex items-center gap-4 mb-4">
         <label for="module" class="font-semibold w-1/3">{{ 'menuItemCreateDialogComponent.module' | translate }}</label>
-        <p-select
-            id="module"
-            class="flex-auto"
-            [options]="modules"
-            [(ngModel)]="selectModule"
-            optionLabel="value"
-            optionValue="key"
-            placeholder="{{'menuItemCreateDialogComponent.selectModule' | translate }}"/>
+        <p-select id="module"
+                  class="flex-auto"
+                  [options]="modules"
+                  [(ngModel)]="selectModule"
+                  optionLabel="value"
+                  optionValue="key"
+                  appendTo="body"
+                  placeholder="{{'menuItemCreateDialogComponent.selectModule' | translate }}"/>
       </div>
       <div class="flex items-center gap-4 mb-4">
         <label for="icon" class="font-semibold w-1/3">{{ 'menuItemCreateDialogComponent.icon' | translate }}
