@@ -135,9 +135,10 @@ interface DbMigrationSettingsDto {
 })
 export class DbMigrationComponent extends BaseComponent<DbMigrationSettingsDto> implements OnInit, OnDestroy, Feature {
   controller: string = 'db-migration'
-  data: any;
+  data: MigrationDto[];
 
   async ngOnInit() {
+    this.titleService.setTitle('Db Migration');
     await super.ngOnInit();
     await this.refreshAction();
   }

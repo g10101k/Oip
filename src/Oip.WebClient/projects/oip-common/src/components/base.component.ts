@@ -5,6 +5,7 @@ import { MsgService } from "../services/msg.service";
 import { ActivatedRoute } from "@angular/router";
 import { BaseDataService } from "../services/base-data.service";
 import { TranslateService } from "@ngx-translate/core";
+import { Title } from "@angular/platform-browser";
 
 @Component({
   standalone: true,
@@ -16,6 +17,7 @@ export abstract class BaseComponent<TSettings> implements OnInit, OnDestroy {
   readonly msgService = inject(MsgService);
   readonly baseDataService = inject(BaseDataService);
   readonly translateService = inject(TranslateService);
+  readonly titleService = inject(Title);
 
   /**
    * Feature settings
