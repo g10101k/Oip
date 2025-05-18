@@ -66,4 +66,10 @@
     <data name="WeatherForecastController_GetModuleRights_Can_delete_edit_data" xml:space="preserve">
         <value>Can delete data</value>
     </data>
+    <data name="DataContextMigrationController_GetModuleRights_Can_this_module" xml:space="preserve">
+        <value>Can view this module</value>
+    </data>
+    <data name="DataContextMigrationController_GetModuleRights_Read" xml:space="preserve">
+        <value>Read</value>
+    </data>
 </root>

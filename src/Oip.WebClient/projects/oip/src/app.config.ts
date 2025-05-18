@@ -10,10 +10,11 @@ import {
   BaseDataService,
   SecurityDataService,
   UserService,
-  langIntercept, httpLoaderAuthFactory
+  langIntercept,
+  httpLoaderAuthFactory
 } from "oip-common";
 import { LocationStrategy, PathLocationStrategy } from "@angular/common";
-import { ProductService } from "./app/demo/service/product.service";
+import { ProductService } from "./app/service/product.service";
 import { MessageService } from "primeng/api";
 import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";

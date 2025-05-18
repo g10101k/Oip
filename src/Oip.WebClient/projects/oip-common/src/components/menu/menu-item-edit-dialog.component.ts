@@ -35,7 +35,6 @@ import { EditModuleInstanceDto } from "../../dtos/edit-module-instance.dto";
         <input pInputText id="icon" class="flex-auto" [(ngModel)]="item.icon"/>
       </div>
 
-
       <div class="flex justify-end gap-2">
         <p-button label="{{ 'menuItemEditDialogComponent.cancel' | translate }}"
                   severity="secondary"

@@ -10,12 +10,12 @@ export const appRoutes: Routes = [
     children: [
       {
         path: 'dashboard/:id',
-        loadComponent: () => import('./app/demo/components/dashboard/dashboard').then(m => m.Dashboard),
+        loadComponent: () => import('./app/components/dashboard/dashboard').then(m => m.Dashboard),
         canActivate: [() => inject(AuthGuardService).canActivate()],
       },
       {
         path: 'weather/:id',
-        loadComponent: () => import('./app/demo/components/weather/weather.component').then(m => m.WeatherComponent),
+        loadComponent: () => import('./app/components/weather/weather.component').then(m => m.WeatherComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
       },
       {
@@ -31,6 +31,11 @@ export const appRoutes: Routes = [
         path: 'config',
         loadComponent: () => import('oip-common').then(m => m.ConfigComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()],
+      },
+      {
+        path: 'db-migration/:id',
+        loadComponent: () => import('oip-common').then(m => m.DbMigrationComponent),
+        canActivate: [() => inject(AuthGuardService).canActivate()]
       }
     ]
   },

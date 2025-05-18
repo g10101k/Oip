@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Oip.Controllers.Api;
-using Oip.Data.Repositories;
+using Oip.Base.Api;
+using Oip.Base.Controllers;
+using Oip.Base.Data.Repositories;
 
 namespace Oip.Controllers;
 
@@ -18,7 +19,6 @@ public class DashboardModuleController : BaseModuleController<DashboardSettings>
     public DashboardModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
     {
     }
-
 
     /// <inheritdoc />
     public override List<SecurityResponse> GetModuleRights()

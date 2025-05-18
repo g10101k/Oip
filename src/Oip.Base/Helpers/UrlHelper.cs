@@ -13,6 +13,7 @@
         /// <returns></returns>
         public static string UrlAppend(this string url, string part)
         {
+            ArgumentNullException.ThrowIfNull(part);
             return $"{url.TrimEnd('/')}/{part.TrimStart('/')}";
         }
     }

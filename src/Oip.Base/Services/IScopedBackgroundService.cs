@@ -1,4 +1,4 @@
-﻿namespace Oip.Core.HostedServices;
+﻿namespace Oip.Base.Services;
 
 public interface IScopedBackgroundService
 {
