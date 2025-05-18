@@ -54,9 +54,9 @@ interface DbMigrationSettingsDto {
                     (click)="refreshAction()"/>
           <p-button icon="pi pi-filter-slash"
                     severity="secondary"
-                    [outlined]="true"
                     pTooltip="Clean filter"
                     tooltipPosition="bottom"
+                    [outlined]="true"
                     (click)="dt.clear()"/>
         </div>
         <div>
@@ -146,7 +146,10 @@ export class DbMigrationComponent extends BaseComponent<DbMigrationSettingsDto> 
   async refreshAction() {
     this.getData().then((response) => {
       this.data = response;
-    })
+    }).catch((error) => {
+      console.log(error);
+      this.msgService.error('Error refreshing database');
+    });
   }
 
   async getData() {
