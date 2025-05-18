@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Api;
+using Oip.Base.Controllers;
+using Oip.Base.Data.Repositories;
 using Oip.Controllers.Api;
-using Oip.Data.Repositories;
+using Oip.Properties;
 
 namespace Oip.Controllers;
 
@@ -36,7 +39,7 @@ public class WeatherForecastController : BaseModuleController<WeatherModuleSetti
     /// <param name="dayCount"></param>
     /// <returns></returns>
     [HttpGet("get")]
-    [Authorize()]
+    [Authorize]
     [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
     public IActionResult Get(int dayCount)
     {
@@ -88,3 +91,4 @@ public class WeatherModuleSettings
     /// </summary>
     public int DayCount { get; set; } = 5;
 }
+

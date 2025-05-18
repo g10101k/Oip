@@ -140,5 +140,17 @@ namespace Oip.Properties {
                 return ResourceManager.GetString("WeatherForecastController_GetModuleRights_Can_delete_edit_data", resourceCulture);
             }
         }
+        
+        internal static string DataContextMigrationController_GetModuleRights_Can_this_module {
+            get {
+                return ResourceManager.GetString("DataContextMigrationController_GetModuleRights_Can_this_module", resourceCulture);
+            }
+        }
+        
+        internal static string DataContextMigrationController_GetModuleRights_Read {
+            get {
+                return ResourceManager.GetString("DataContextMigrationController_GetModuleRights_Read", resourceCulture);
+            }
+        }
     }
 }

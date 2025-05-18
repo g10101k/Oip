@@ -26,6 +26,9 @@ export abstract class BaseComponent<TSettings> implements OnInit, OnDestroy {
    */
   id: number;
 
+  /*
+  * asp net controller without prefix 'api/'
+  * */
   abstract controller: string;
 
   get isContent(): boolean {

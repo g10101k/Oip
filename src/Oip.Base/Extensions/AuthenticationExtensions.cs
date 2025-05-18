@@ -29,8 +29,7 @@ public static class AuthenticationExtensions
                     .UrlAppend("realms")
                     .UrlAppend(settings.SecurityService.Realm);
 
-                options.MetadataAddress = urlWithRealm
-                    .UrlAppend(".well-known/openid-configuration");
+                options.MetadataAddress = urlWithRealm.UrlAppend(".well-known/openid-configuration");
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {

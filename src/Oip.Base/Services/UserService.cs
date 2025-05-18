@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Oip.Base.Services;
 
+/// <summary>
+/// User service
+/// </summary>
 public class UserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;

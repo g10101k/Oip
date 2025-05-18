@@ -14,10 +14,8 @@ using NLog.Web;
 using Oip.Base.Clients;
 using Oip.Base.Services;
 using Oip.Base.Settings;
-using Oip.Data.Contexts;
 using Polly;
 using Polly.Extensions.Http;
-
 
 namespace Oip.Base.Extensions;
 
@@ -59,15 +57,8 @@ public static class OipModuleApplication
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
-        builder.Services.AddData(settings.ConnectionString);
+        builder.Services.AddOipModuleContext(settings.ConnectionString);
         builder.AddKeycloakClients(settings);
-        builder.AddServices(settings);
-        builder.AddLocalization();
-        return builder;
-    }
-
-    private static void AddServices(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
         builder.Services.AddSingleton(settings);
         builder.Services.AddScoped<KeycloakService>();
         builder.Services.AddScoped<UserService>();
@@ -78,8 +69,9 @@ public static class OipModuleApplication
             options.JsonSerializerOptions.DefaultIgnoreCondition
                 = JsonIgnoreCondition.WhenWritingNull;
         });
+        builder.AddLocalization();
+        return builder;
     }
-
 
     private static void AddLocalization(this WebApplicationBuilder builder)
     {
@@ -88,8 +80,8 @@ public static class OipModuleApplication
             {
                 var supportedCultures = new List<CultureInfo>
                 {
-                    new ("en"),
-                    new ("ru")
+                    new("en"),
+                    new("ru")
                 };
                 options.DefaultRequestCulture = new RequestCulture(culture: "en", uiCulture: "en");
                 options.SupportedCultures = supportedCultures;
@@ -109,8 +101,7 @@ public static class OipModuleApplication
         builder.Services.AddHttpClient<KeycloakClient>(x =>
             {
                 x.BaseAddress = new Uri(settings.SecurityService.BaseUrl);
-            })
-            .AddPolicyHandler(GetRetryPolicy());
+            }).AddPolicyHandler(GetRetryPolicy());
     }
 
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
@@ -201,9 +192,9 @@ public static class OipModuleApplication
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
-        
+
         var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
-        app.UseRequestLocalization(localizeOptions.Value);
+        if (localizeOptions != null) app.UseRequestLocalization(localizeOptions.Value);
 
         app.MapDefaultEndpoints();
         app.UseHttpsRedirection();
@@ -218,7 +209,7 @@ public static class OipModuleApplication
         app.MapOpenApi(settings);
         app.MapFallbackToFile("index.html");
 
-        OipContext.MigrateDb(settings.Provider, settings.NormalizedConnectionString);
+        app.MigrateDatabase();
         return app;
     }
 

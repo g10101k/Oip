@@ -268,7 +268,6 @@ public partial class ApiException : Exception
     /// <param name="message"></param>
     /// <param name="statusCode"></param>
     /// <param name="response"></param>
-    /// <param name="headers"></param>
     /// <param name="innerException"></param>
     public ApiException(string message, HttpStatusCode statusCode, string response, Exception innerException)
         : base(
