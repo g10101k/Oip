@@ -1,0 +1,42 @@
+CREATE TABLE `tag`
+(
+    id               UInt32,
+    name             String,
+    descriptor       String,
+    eng_unit         String,
+    step             Float32,
+    zero             Float32,
+    span             Float32,
+    exception_min    Float32,
+    exception_max    Float32,
+    compressing      Bool,
+    comp_deviation   Float32,
+    comp_min_time    UInt32,
+    comp_max_time    UInt32,
+    scan             Bool,
+    scan_class       UInt8,
+    ext_field1       Float32,
+    ext_field2       Float32,
+    ext_field3       Float32,
+    ext_field4       Float32,
+    ext_field5       Float32,
+    archive          Bool,
+    typical_value    String,
+    archive_priority String,
+    StorageType      String,
+    Security         String,
+    Read_Only        Bool,
+    InstrumentTag    String,
+    Source           String,
+    Device           String,
+    Register         String,
+    Status           Enum('Sensor Failure' = -3, 'Device Failure' = -2, 'Bad' = -1, 'Good' = 0 ),
+    Formula          String,
+    ExecutionRate    String,
+    Exception        String,
+    CreationDate     String,
+    Creator          String
+
+)
+    ENGINE = MergeTree
+        ORDER BY `name`
