@@ -93,9 +93,7 @@ export class AppTopbar {
   securityService = inject(SecurityService);
   topBarService = inject(TopBarService);
   userService = inject(UserService);
-
-  constructor(public layoutService: LayoutService) {
-  }
+  layoutService = inject(LayoutService);
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
