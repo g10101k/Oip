@@ -4,35 +4,77 @@ using Oip.Rts.Base.Settings;
 
 namespace Oip.Rts.Base.Contexts;
 
+/// <summary>
 /// Real time storage context
+/// </summary>
 public class RtsContext : IDisposable, IAsyncDisposable
 {
     private readonly ClickHouseConnection _connection;
+    private bool _disposed;
 
+    /// <summary>
+    /// .ctor
+    /// </summary>
+    /// <param name="appSettings"></param>
     public RtsContext(AppSettings appSettings)
     {
         _connection = new ClickHouseConnection(appSettings.RtsConnectionString);
         _connection.Open();
     }
 
-    public void Dispose()
+    /// <summary>
+    /// Get ta
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    public List<Tag> GetTagsByFilter(string filter)
     {
-        _connection.Close();
-        _connection.Dispose();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _connection.CloseAsync();
-        await _connection.DisposeAsync();
+        return _connection.Query<Tag>(
+            QueryConstants.SelectFromDefaultTagWhereNameLikeFilter,
+            new { filter }
+        ).ToList();
     }
 
     public void AddTag(Tag tag)
     {
+        // Реализация добавления тега
     }
 
-    public List<Tag> GetTagsByFilter(string filter)
+    // Реализация IDisposable
+    public void Dispose()
     {
-        return _connection.Query<Tag>("SELECT * FROM default.Tag WHERE Name like @filter", new { filter }).ToList();
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        if (disposing)
+        {
+            _connection.Close();
+            _connection.Dispose();
+        }
+
+        _disposed = true;
+    }
+
+    // Реализация IAsyncDisposable
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed)
+            return;
+
+        await DisposeAsyncCore();
+        GC.SuppressFinalize(this);
+        _disposed = true;
+    }
+
+    protected virtual async ValueTask DisposeAsyncCore()
+    {
+        await _connection.CloseAsync();
+        await _connection.DisposeAsync();
     }
 }
