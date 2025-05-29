@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Oip.Base.Api;
+using Oip.Base.Controllers.Api;
 
 namespace Oip.Base.Controllers;
 

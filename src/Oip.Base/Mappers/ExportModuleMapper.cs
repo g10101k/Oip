@@ -1,3 +1,4 @@
+using Oip.Base.Controllers.Api;
 using Riok.Mapperly.Abstractions;
 
 namespace Oip.Base.Mappers;
@@ -13,5 +14,5 @@ public static partial class ExportModuleMapper
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public static partial Oip.Base.Clients.ModuleFederationDto ToClientDto(this Oip.Base.Api.ModuleFederationDto model);
+    public static partial Oip.Base.Clients.ModuleFederationDto ToClientDto(this ModuleFederationDto model);
 }

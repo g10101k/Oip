@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Api;
+using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
 
 namespace Oip.Base.Controllers;
