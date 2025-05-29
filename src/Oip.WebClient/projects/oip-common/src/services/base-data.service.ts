@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { lastValueFrom, Observable } from 'rxjs';
 
 
@@ -33,8 +33,7 @@ export class BaseDataService {
     method: 'GET' | 'PUT' | 'POST' | 'DELETE' = 'GET',
     data: any = {}
   ): Promise<TResponse> {
-    const httpParams = new HttpParams({ fromObject: data });
-    const httpOptions = { withCredentials: true, body: httpParams };
+    const httpOptions = { withCredentials: true};
     let result: Observable<TResponse>;
 
     switch (method) {
@@ -48,7 +47,12 @@ export class BaseDataService {
         result = this.http.post<TResponse>(url, data, httpOptions);
         break;
       case 'DELETE':
-        result = this.http.delete<TResponse>(url, httpOptions);
+        result = this.http.request<TResponse>('DELETE', url,
+          {
+            body: data,
+            headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+            withCredentials: true
+          });
         break;
     }
 

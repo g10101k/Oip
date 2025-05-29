@@ -49,6 +49,18 @@ public class ModuleController : ControllerBase
         await _moduleRepository.Insert([item]);
     }
     
+    
+    /// <summary>
+    /// delete
+    /// </summary>
+    /// <returns></returns>
+    [HttpDelete("delete")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
+    public async Task Delete(ModuleDeleteRequest request)
+    {
+        await _moduleRepository.DeleteModule(request.ModuleId);
+    }
+    
     /// <summary>
     /// Returns a list of all registered modules and indicates whether each one is currently loaded into the application.
     /// </summary>
