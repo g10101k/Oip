@@ -34,7 +34,10 @@
 	},
 	"menuItemEditDialogComponent": {
 		"header": "Редактировать элемент меню",
+		"parentLabel": "Родительский узел",
 		"label": "Имя",
+		"module": "Модуль",
+		"selectModule": "Выбери модуль",
 		"icon": "Иконка",
 		"cancel": "Отмена",
 		"save": "Сохранить"

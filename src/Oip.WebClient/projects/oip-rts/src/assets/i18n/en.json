@@ -34,7 +34,10 @@
 	},
 	"menuItemEditDialogComponent": {
 		"header": "Edit menu item",
+		"parentLabel": "Parent",
 		"label": "Label",
+		"module": "Module",
+		"selectModule": "",
 		"icon": "Icon",
 		"cancel": "Cancel",
 		"save": "Save"

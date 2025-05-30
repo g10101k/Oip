@@ -1,0 +1,6 @@
+﻿services:
+  oip.rts:
+    image: oip.rts
+    build:
+      context: .
+      dockerfile: Oip.Rts/Dockerfile

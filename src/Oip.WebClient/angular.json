@@ -120,6 +120,123 @@
         }
       }
     },
+    "oip-rts": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/oip-rts",
+      "sourceRoot": "projects/oip-rts/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/oip-rts",
+            "index": "projects/oip-rts/src/index.html",
+            "main": "projects/oip-rts/src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "projects/oip-rts/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/oip-rts/src/assets",
+              {
+                "glob": "**/*",
+                "input": "./projects/oip-common/src/assets",
+                "output": "/assets/"
+              }
+            ],
+            "styles": [
+              "projects/oip-rts/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/oip-rts/src/environments/environment.ts",
+                  "with": "projects/oip-rts/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "oip-rts:build:production"
+            },
+            "development": {
+              "buildTarget": "oip-rts:build:development",
+              "proxyConfig": "proxy.conf.js"
+            }
+          },
+          "defaultConfiguration": "development",
+          "options": {
+            "publicHost": "https://localhost:50000",
+            "port": 50000,
+            "headers": {
+              "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50001;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "oip-rts:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/oip-rts/src/test.ts",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "projects/oip-rts/tsconfig.spec.json",
+            "karmaConfig": "projects/oip-rts/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/oip-rts/src/favicon.ico",
+              "projects/oip-rts/src/assets"
+            ],
+            "styles": [
+              "projects/oip-rts/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    },
     "oip-common": {
       "projectType": "library",
       "root": "projects/oip-common",

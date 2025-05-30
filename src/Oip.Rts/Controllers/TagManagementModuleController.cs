@@ -6,10 +6,13 @@ using Oip.Rts.Base.Contexts;
 using Resources = Oip.Rts.Properties.Resources;
 
 namespace Oip.Rts.Controllers;
-
 /// <summary>
-/// Module controller example
+/// Controller for managing tags in the Tag Management module.
 /// </summary>
+/// <remarks>
+/// Provides endpoints to add new tags and retrieve tags using a name-based filter.  
+/// Also defines access rights required to use this module.
+/// </remarks>
 [ApiController]
 [Route("api/tag-management-module")]
 public class TagManagementModuleController : BaseModuleController<object>
@@ -17,19 +20,29 @@ public class TagManagementModuleController : BaseModuleController<object>
     private readonly RtsContext _rtsContext;
 
     /// <summary>
-    /// .ctor
+    /// Initializes a new instance of the <see cref="TagManagementModuleController"/> class.
     /// </summary>
-    /// <param name="rtsContext"></param>
-    /// <param name="moduleRepository"></param>
-    public TagManagementModuleController(RtsContext rtsContext, ModuleRepository moduleRepository) : base(moduleRepository)
+    /// <remarks>
+    /// The controller depends on an application context and a module repository 
+    /// for database access and modular behavior, respectively.
+    /// </remarks>
+    /// <param name="rtsContext">Application database context for tag operations.</param>
+    /// <param name="moduleRepository">Base module repository for module-level operations.</param>
+    public TagManagementModuleController(RtsContext rtsContext, ModuleRepository moduleRepository) 
+        : base(moduleRepository)
     {
         _rtsContext = rtsContext;
     }
 
     /// <summary>
-    /// Add tag
+    /// Adds a new tag.
     /// </summary>
-    /// <returns></returns>
+    /// <remarks>
+    /// Accepts a tag entity from the request body and stores it in the database.  
+    /// Returns HTTP 200 on success.
+    /// </remarks>
+    /// <param name="tag">Tag entity to be added.</param>
+    /// <returns>HTTP 200 OK on success.</returns>
     [HttpPost("add-tag")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult AddTag(TagEntity tag)
@@ -39,9 +52,14 @@ public class TagManagementModuleController : BaseModuleController<object>
     }
 
     /// <summary>
-    /// Get tag by name filter
+    /// Retrieves tags that match a given name filter.
     /// </summary>
-    /// <returns></returns>
+    /// <remarks>
+    /// Returns a list of tags whose names match the provided filter string.  
+    /// This is useful for searching or filtering tags by partial name.
+    /// </remarks>
+    /// <param name="filter">Name filter to search tags by.</param>
+    /// <returns>A list of matching tags.</returns>
     [HttpGet("get-tags-by-filter")]
     [ProducesResponseType<List<TagEntity>>(StatusCodes.Status200OK)]
     public IActionResult GetTagsByFilter(string filter)
@@ -50,9 +68,13 @@ public class TagManagementModuleController : BaseModuleController<object>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the security rights required for accessing this module.
     /// </summary>
-    /// <returns></returns>
+    /// <remarks>
+    /// This method defines the access control rules for the Tag Management module.  
+    /// It lists the roles and permissions necessary to interact with the module via the UI or API.
+    /// </remarks>
+    /// <returns>A list of security rights.</returns>
     public override List<SecurityResponse> GetModuleRights()
     {
         return new()
@@ -67,9 +89,6 @@ public class TagManagementModuleController : BaseModuleController<object>
         };
     }
 }
-
-
-
 public class CreateTagRequest
 {
 }
