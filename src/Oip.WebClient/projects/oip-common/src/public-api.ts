@@ -11,8 +11,9 @@ export * from './components/notfound.component';
 export * from './components/auth/unauthorized/unauthorized.component';
 export * from './components/auth/error/error.component';
 export * from './components/profile.component';
-export * from './components/config.component';
+export { ConfigComponent } from './components/config.component';
 export * from './components/db-migration/db-migration.component';
+export { AppModulesComponent } from './components/app-modules.component';
 
 // Dtos
 export * from './dtos/top-bar.dto';
@@ -29,6 +30,8 @@ export * from './services/auth.service';
 export * from './services/app.layout.service';
 export * from './services/app.menu.service'
 export * from './services/user.service';
+export * from './services/security-storage.service';
+
 // Interfaces
 export * from './interfaces/feature.interface';
 

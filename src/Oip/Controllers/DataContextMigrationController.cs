@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Api;
 using Oip.Base.Controllers;
+using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
 using Oip.Example.Data.Contexts;
 using Oip.Properties;

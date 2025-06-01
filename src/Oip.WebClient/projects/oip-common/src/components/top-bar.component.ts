@@ -23,7 +23,7 @@ import { UserService } from "../services/user.service";
           <i class="pi pi-bars"></i>
         </button>
         <a class="layout-topbar-logo" routerLink="">
-          <logo width="36" height="36"></logo>
+          <logo width="36px" height="36px"></logo>
           <span>OIP</span>
         </a>
       </div>

@@ -166,7 +166,7 @@ public class ModuleRepository
             .FirstOrDefault();
 
         if (settings == null)
-                throw new KeyNotFoundException($"Module instance with id {id} not found");
+            throw new KeyNotFoundException($"Module instance with id {id} not found");
         return settings;
     }
 
@@ -262,6 +262,21 @@ public class ModuleRepository
             throw new KeyNotFoundException($"Module instance with id {id} not found");
 
         _db.ModuleInstances.Remove(instance);
+        await _db.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Delete module instance
+    /// </summary>
+    /// <param name="id"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public async Task DeleteModule(int id)
+    {
+        var module = await _db.Modules.FirstOrDefaultAsync(x => x.ModuleId == id);
+        if (module == null)
+            throw new KeyNotFoundException($"Module with id {id} not found");
+
+        _db.Modules.Remove(module);
         await _db.SaveChangesAsync();
     }
 }

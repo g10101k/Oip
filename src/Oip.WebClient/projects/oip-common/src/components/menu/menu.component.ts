@@ -14,10 +14,11 @@ import { MenuItemComponent } from './menu-item.component';
 import { MenuItemCreateDialogComponent } from "./menu-item-create-dialog.component";
 import { TranslatePipe, TranslateService } from "@ngx-translate/core";
 import { MenuItemEditDialogComponent } from "./menu-item-edit-dialog.component";
+import { RouterLink } from "@angular/router";
 
 
 @Component({
-  imports: [NgFor, NgIf, MenuItemComponent, ButtonModule, ContextMenuModule, DialogModule, InputTextModule, MenuItemCreateDialogComponent, InputSwitchModule, FormsModule, TranslatePipe, MenuItemEditDialogComponent],
+  imports: [NgFor, NgIf, MenuItemComponent, ButtonModule, ContextMenuModule, DialogModule, InputTextModule, MenuItemCreateDialogComponent, InputSwitchModule, FormsModule, TranslatePipe, MenuItemEditDialogComponent, RouterLink],
   selector: 'app-menu',
   standalone: true,
   template: `
@@ -34,9 +35,10 @@ import { MenuItemEditDialogComponent } from "./menu-item-edit-dialog.component";
               [contextMenu]="contextMenu"></li>
           <li *ngIf="item.separator" class="menu-separator"></li>
         </ng-container>
-        <div *ngIf="securityService.isAdmin" class="flex items-center absolute right-0 bottom-0 m-4">
-          <label for="adminMode" class="mr-2">{{ 'menuComponent.all' | translate }}</label>
+        <div *ngIf="securityService.isAdmin" class="flex items-center absolute right-0 bottom-0 m-4 gap-2">
+          <label for="adminMode">{{ 'menuComponent.all' | translate }}</label>
           <p-inputSwitch id="adminMode" [(ngModel)]="menuService.adminMode" (onChange)="onSettingButtonClick()"></p-inputSwitch>
+          <a routerLink="/modules"> <i class="pi pi-cog" ></i></a>
         </div>
       </ul>
     </div>

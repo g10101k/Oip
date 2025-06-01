@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Oip.Base.Api;
+using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Repositories;
 
@@ -31,8 +31,8 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [Authorize(Roles = "admin")]
     [HttpGet("get-security")]
+    [Authorize(Roles = "admin")]
     public async Task<List<SecurityResponse>> GetSecurity(int id)
     {
         var roleRightPair = await _moduleRepository.GetSecurityByInstanceId(id);
@@ -51,8 +51,8 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [Authorize(Roles = "admin")]
     [HttpPut("put-security")]
+    [Authorize(Roles = "admin")]
     public async Task<IActionResult> PutSecurity(PutSecurityRequest request)
     {
         List<ModuleSecurityDto> securityDtos = new();

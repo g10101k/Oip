@@ -54,5 +54,26 @@
 		"signInToContinue": "Войдите чтобы продолжить",
 		"signIn": "Войти"
 	},
-	"primeng": ""
+  "appModulesComponent": {
+    "title": "Модули",
+    "refreshTooltip": "Обновить",
+    "table": {
+      "moduleId": "ID модуля",
+      "name": "Название",
+      "currentlyLoaded": "Загружен",
+      "yes": "Да",
+      "no": "Нет",
+      "deleteTooltip": "Удалить"
+    },
+    "confirm": {
+      "header": "Внимание",
+      "message": "Вы уверены, что хотите удалить модуль?",
+      "cancel": "Отмена",
+      "delete": "Удалить"
+    },
+    "messages": {
+      "deleteSuccess": "Модуль удален"
+    }
+  },
+  "primeng": ""
 }
