@@ -2,37 +2,43 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Repositories;
 
 namespace Oip.Base.Controllers;
 
 /// <summary>
-/// Base controller for module
+/// Base controller for module-specific operations.
+/// Provides functionality to manage module settings and security.
 /// </summary>
+/// <typeparam name="TSettings">The type representing module settings.</typeparam>
+/// <remarks>
+/// Inherit from this controller to implement module-specific logic and security configuration.
+/// </remarks>
 public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleControllerSecurity where TSettings : class
 {
     /// <summary>
-    /// Module repository
+    /// The repository used for module-related data access.
     /// </summary>
     private readonly ModuleRepository _moduleRepository;
 
     /// <summary>
-    /// .ctor
+    /// Initializes a new instance of the <see cref="BaseModuleController{TSettings}"/> class.
     /// </summary>
-    /// <param name="moduleRepository"></param>
+    /// <param name="moduleRepository">The module repository instance.</param>
     protected BaseModuleController(ModuleRepository moduleRepository)
     {
         _moduleRepository = moduleRepository;
     }
 
     /// <summary>
-    /// Get security for instance id
+    /// Gets the security configuration for the specified module instance ID.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <param name="id">The ID of the module instance.</param>
+    /// <returns>A list of <see cref="SecurityResponse"/> objects representing the security rights and associated roles.</returns>
     [HttpGet("get-security")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<List<SecurityResponse>> GetSecurity(int id)
     {
         var roleRightPair = await _moduleRepository.GetSecurityByInstanceId(id);
@@ -47,12 +53,12 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
     }
 
     /// <summary>
-    /// Update security
+    /// Updates the security configuration for the specified module instance.
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
+    /// <param name="request">The request containing the new security configuration.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the outcome of the operation.</returns>
     [HttpPut("put-security")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<IActionResult> PutSecurity(PutSecurityRequest request)
     {
         List<ModuleSecurityDto> securityDtos = new();
@@ -74,12 +80,12 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
     }
 
     /// <summary>
-    /// Get instance setting
+    /// Gets the settings for the specified module instance.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [Authorize]
+    /// <param name="id">The ID of the module instance.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the deserialized settings object.</returns>
     [HttpGet("get-module-instance-settings")]
+    [Authorize]
     public IActionResult GetModuleInstanceSettings(int id)
     {
         var settingString = _moduleRepository.GetModuleInstanceSettings(id);
@@ -89,31 +95,38 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
     }
 
     /// <summary>
-    /// Save settings
+    /// Saves the settings for the specified module instance.
     /// </summary>
-    /// <param name="request"></param>
-    [Authorize(Roles = "admin")]
+    /// <param name="request">The request containing the new settings and instance ID.</param>
     [HttpPut("put-module-instance-settings")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public void SaveSettings(SaveSettingsRequest request)
     {
         var settingString = JsonConvert.SerializeObject(request.Settings);
         _moduleRepository.UpdateModuleInstanceSettings(request.Id, settingString);
     }
 
-    /// <inheritdoc />
-    [Authorize(Roles = "admin")]
+    /// <summary>
+    /// Gets the list of security rights supported by the module.
+    /// </summary>
+    /// <returns>A list of <see cref="SecurityResponse"/> representing available rights.</returns>
     [HttpGet("get-module-rights")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public abstract List<SecurityResponse> GetModuleRights();
 
     /// <summary>
-    /// Save settings request
+    /// Represents a request to save module instance settings.
     /// </summary>
     public class SaveSettingsRequest
     {
-        /// <summary>Module instance id</summary>
+        /// <summary>
+        /// Gets or sets the ID of the module instance.
+        /// </summary>
         public int Id { get; set; }
 
-        /// <summary>Settings</summary>
+        /// <summary>
+        /// Gets or sets the settings object to be saved.
+        /// </summary>
         public TSettings Settings { get; set; }
     }
 }
