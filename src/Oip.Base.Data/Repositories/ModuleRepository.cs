@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Entities;
@@ -6,22 +7,26 @@ using Oip.Base.Data.Entities;
 namespace Oip.Base.Data.Repositories;
 
 /// <summary>
-/// Module Repository
+/// Provides methods to manage modules and their instances, including CRUD operations and security settings.
 /// </summary>
+/// <remarks>
+/// This repository encapsulates access to module data, such as module definitions, settings, instances, and associated security rules.
+/// </remarks>
 public class ModuleRepository
 {
     private readonly OipModuleContext _db;
 
     /// <summary>
-    /// .ctor
+    /// Initializes a new instance of the <see cref="ModuleRepository"/> class.
     /// </summary>
+    /// <param name="db">The database context for module operations.</param>
     public ModuleRepository(OipModuleContext db)
     {
         _db = db;
     }
 
     /// <summary>
-    /// Get all
+    /// Retrieves all available modules with their associated security settings.
     /// </summary>
     public async Task<IEnumerable<ModuleDto>> GetAll()
     {
@@ -44,8 +49,9 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Insert module
+    /// Inserts a list of new modules with associated security settings into the database.
     /// </summary>
+    /// <param name="list">The list of modules to insert.</param>
     public async Task Insert(IEnumerable<ModuleDto> list)
     {
         await _db.Modules.AddRangeAsync(list.Select(x =>
@@ -65,8 +71,10 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Get all
+    /// Retrieves all module instances available in the menu, filtered by user roles.
     /// </summary>
+    /// <param name="roles">List of user roles to filter modules by access.</param>
+    /// <returns>A collection of module instances accessible to the specified roles.</returns>
     public async Task<IEnumerable<ModuleInstanceDto>> GetModuleForMenuAll(List<string> roles)
     {
         var query = from module in _db.ModuleInstances
@@ -81,10 +89,10 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Get instance security by id
+    /// Retrieves the list of security settings associated with a specific module instance.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <param name="id">The ID of the module instance.</param>
+    /// <returns>A list of security roles and rights for the given module instance.</returns>
     public async Task<List<ModuleSecurityDto>> GetSecurityByInstanceId(int id)
     {
         var query = from security in _db.ModuleInstanceSecurities
@@ -99,8 +107,10 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Update
+    /// Updates the security rules for a given module instance.
     /// </summary>
+    /// <param name="id">The ID of the module instance.</param>
+    /// <param name="security">The updated list of security roles and rights.</param>
     public async Task UpdateInstanceSecurity(int id, IEnumerable<ModuleSecurityDto> security)
     {
         var query =
@@ -155,11 +165,11 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Get setting by id
+    /// Retrieves the settings string associated with a specific module instance.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    /// <exception cref="KeyNotFoundException"></exception>
+    /// <param name="id">The ID of the module instance.</param>
+    /// <returns>The settings string.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if the module instance is not found.</exception>
     public string GetModuleInstanceSettings(int id)
     {
         var settings = _db.ModuleInstances.Where(x => x.ModuleInstanceId == id).Select(x => x.Settings)
@@ -171,11 +181,11 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Update module instance settings
+    /// Updates the settings string of a specified module instance.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="settings"></param>
-    /// <exception cref="KeyNotFoundException"></exception>
+    /// <param name="id">The ID of the module instance.</param>
+    /// <param name="settings">The new settings string.</param>
+    /// <exception cref="KeyNotFoundException">Thrown if the module instance is not found.</exception>
     public void UpdateModuleInstanceSettings(int id, string settings)
     {
         var moduleInstance = _db.ModuleInstances.FirstOrDefault(x => x.ModuleInstanceId == id);
@@ -189,9 +199,9 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Get admin menu 
+    /// Retrieves the full list of module instances accessible by administrators.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A collection of all top-level module instances with admin access.</returns>
     public async Task<IEnumerable<ModuleInstanceDto>> GetAdminMenu()
     {
         var query = from module in _db.ModuleInstances
@@ -203,9 +213,9 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Get modules
+    /// Retrieves a list of all modules as key-value pairs.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A list of modules with ID and name.</returns>
     public async Task<IEnumerable<IntKeyValueDto>> GetModules()
     {
         var query = from module in _db.Modules
@@ -214,9 +224,9 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Add module instance
+    /// Adds a new module instance to the system with default security settings.
     /// </summary>
-    /// <param name="addModuleInstanceDto"></param>
+    /// <param name="addModuleInstanceDto">The data transfer object containing module instance details.</param>
     public async Task AddModuleInstance(AddModuleInstanceDto addModuleInstanceDto)
     {
         _db.ModuleInstances.Add(new ModuleInstanceEntity()
@@ -232,9 +242,9 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Edit module instance
+    /// Updates an existing module instance’s label and icon.
     /// </summary>
-    /// <param name="editModel"></param>
+    /// <param name="editModel">The data transfer object containing updated module instance data.</param>
     public async Task EditModuleInstance(EditModuleInstanceDto editModel)
     {
         var instance =
@@ -249,12 +259,11 @@ public class ModuleRepository
         await _db.SaveChangesAsync();
     }
 
-
     /// <summary>
-    /// Delete module instance
+    /// Deletes a module instance from the system by ID.
     /// </summary>
-    /// <param name="id"></param>
-    /// <exception cref="KeyNotFoundException"></exception>
+    /// <param name="id">The ID of the module instance to delete.</param>
+    /// <exception cref="KeyNotFoundException">Thrown if the module instance does not exist.</exception>
     public async Task DeleteModuleInstance(int id)
     {
         var instance = await _db.ModuleInstances.FirstOrDefaultAsync(x => x.ModuleInstanceId == id);
@@ -266,10 +275,10 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Delete module instance
+    /// Deletes a module by its ID.
     /// </summary>
-    /// <param name="id"></param>
-    /// <exception cref="KeyNotFoundException"></exception>
+    /// <param name="id">The ID of the module to delete.</param>
+    /// <exception cref="KeyNotFoundException">Thrown if the module does not exist.</exception>
     public async Task DeleteModule(int id)
     {
         var module = await _db.Modules.FirstOrDefaultAsync(x => x.ModuleId == id);
