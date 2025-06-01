@@ -8,7 +8,7 @@ const jsDocDescription = raw.description ?
     fmtToJSDocLine('No description', { eol: false });
 const jsDocLines = _.compact([
     _.size(raw.tags) && ` * @tags ${raw.tags.join(", ")}`,
-    ` * @name ${_.camelCase(routeName.usage)}`,
+    ` * @name ${_.camelCase(routeName.usage.replace(raw.moduleName, ""))}`,
     raw.summary && ` * @summary ${raw.summary}`,
     ` * @request ${_.upperCase(request.method)}:${raw.route}`,
     raw.deprecated && ` * @deprecated`,
