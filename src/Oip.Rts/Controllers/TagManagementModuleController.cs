@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Api;
 using Oip.Base.Controllers;
+using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Rts.Base.Contexts;
 using Resources = Oip.Rts.Properties.Resources;
 
 namespace Oip.Rts.Controllers;
+
 /// <summary>
 /// Controller for managing tags in the Tag Management module.
 /// </summary>
@@ -14,7 +16,7 @@ namespace Oip.Rts.Controllers;
 /// Also defines access rights required to use this module.
 /// </remarks>
 [ApiController]
-[Route("api/tag-management-module")]
+[Route("api/tag-management")]
 public class TagManagementModuleController : BaseModuleController<object>
 {
     private readonly RtsContext _rtsContext;
@@ -28,7 +30,7 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// </remarks>
     /// <param name="rtsContext">Application database context for tag operations.</param>
     /// <param name="moduleRepository">Base module repository for module-level operations.</param>
-    public TagManagementModuleController(RtsContext rtsContext, ModuleRepository moduleRepository) 
+    public TagManagementModuleController(RtsContext rtsContext, ModuleRepository moduleRepository)
         : base(moduleRepository)
     {
         _rtsContext = rtsContext;
@@ -81,14 +83,11 @@ public class TagManagementModuleController : BaseModuleController<object>
         {
             new()
             {
-                Code = "read",
+                Code = SecurityConstants.ReadRight,
                 Name = Resources.TagController_GetModuleRights_Read,
                 Description = Resources.TagController_GetModuleRights_Cat_view_this_module,
-                Roles = ["admin"]
+                Roles = [SecurityConstants.AdminRole]
             }
         };
     }
-}
-public class CreateTagRequest
-{
 }
