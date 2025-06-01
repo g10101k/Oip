@@ -4,32 +4,45 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 
 namespace Oip.Base.Controllers;
-
 /// <summary>
-/// Migration controller
+/// Base controller for managing database migrations.
 /// </summary>
+/// <remarks>
+/// Provides administrative endpoints to inspect and manage Entity Framework Core database migrations.
+/// Includes functionality to list all migrations, apply pending ones, or migrate to a specific version.
+/// Intended to be inherited and used in modules that expose migration endpoints.
+/// </remarks>
 [ApiController]
 public abstract class BaseDbMigrationController<TSettings> : BaseModuleController<TSettings> where TSettings : class
 {
     private readonly DbContext _dbContext;
 
     /// <summary>
-    /// .ctor
+    /// Initializes a new instance of the <see cref="BaseDbMigrationController{TSettings}"/> class.
     /// </summary>
+    /// <param name="repository">Module repository instance used for module-specific operations.</param>
+    /// <param name="dbContext">Entity Framework database context used for migration operations.</param>
     protected BaseDbMigrationController(ModuleRepository repository, DbContext dbContext) : base(repository)
     {
         _dbContext = dbContext;
     }
 
-    /// <summary> 
-    /// Get migration
+    /// <summary>
+    /// Retrieves all database migrations and their current state.
     /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = "admin")]
+    /// <remarks>
+    /// The returned list includes:
+    /// - Migrations that have been applied to the database.
+    /// - Pending migrations that exist in code but are not applied.
+    /// - Migrations defined in code regardless of their application status.
+    /// </remarks>
+    /// <returns>A list of <see cref="MigrationDto"/> objects containing migration metadata.</returns>
     [HttpGet("get-migrations")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public virtual async Task<IEnumerable<MigrationDto>> GetMigrations()
     {
         var result = new List<MigrationDto>();
@@ -68,11 +81,16 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     }
 
     /// <summary>
-    /// Применить миграцию БД
+    /// Applies all pending migrations to the database.
     /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = "admin")]
+    /// <remarks>
+    /// Uses Entity Framework Core's migration mechanism to bring the database schema
+    /// up to date with the current codebase. This operation is irreversible and should be
+    /// performed with caution in production environments.
+    /// </remarks>
+    /// <returns>HTTP 200 OK on success.</returns>
     [HttpGet("migrate")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<IActionResult> GetAppliedMigrations()
     {
         await _dbContext.Database.MigrateAsync();
@@ -80,11 +98,15 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     }
 
     /// <summary>
-    /// Применить миграцию БД
+    /// Applies a specific database migration by name.
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    [Authorize(Roles = "admin")]
+    /// <remarks>
+    /// This method allows applying or reverting to a specific migration by name.
+    /// Useful for targeted database updates or rolling back schema changes.
+    /// </remarks>
+    /// <param name="request">A request containing the name of the migration to apply.</param>
+    /// <returns>HTTP 200 OK on success.</returns>
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     [HttpPost("apply-migration")]
     public async Task<IActionResult> ApplyMigration(ApplyMigrationRequest request)
     {
@@ -93,26 +115,35 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     }
 }
 
+
 /// <summary>
-/// Модель миграции
+/// Data transfer object representing a database migration and its status.
 /// </summary>
 public class MigrationDto(string name, bool applied, bool pending, bool exist)
 {
-    /// <summary></summary>
+    /// <summary>
+    /// Name of the migration.
+    /// </summary>
     public string Name { get; set; } = name;
 
-    /// <summary></summary>
+    /// <summary>
+    /// Indicates whether the migration has been applied.
+    /// </summary>
     public bool Applied { get; set; } = applied;
 
-    /// <summary></summary>
+    /// <summary>
+    /// Indicates whether the migration is pending.
+    /// </summary>
     public bool Pending { get; set; } = pending;
 
-    /// <summary></summary>
+    /// <summary>
+    /// Indicates whether the migration exists in the codebase.
+    /// </summary>
     public bool Exist { get; set; } = exist;
 }
 
 /// <summary>
-/// Apply Migration Request
+/// Request model for applying a specific migration by name.
 /// </summary>
-/// <param name="Name">Migration name</param>
+/// <param name="Name">The name of the migration to apply.</param>
 public record ApplyMigrationRequest(string Name);
