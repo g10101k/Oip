@@ -1,4 +1,4 @@
-using Oip.Base.Api;
+using Oip.Base.Controllers.Api;
 
 namespace Oip.Base.Settings;
 

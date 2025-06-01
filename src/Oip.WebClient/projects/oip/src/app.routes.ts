@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuardService, NotfoundComponent, AppLayout } from "oip-common";
+import { AuthGuardService, NotfoundComponent, AppLayout, AppModulesComponent } from "oip-common";
 import { inject } from "@angular/core";
 
 export const appRoutes: Routes = [
@@ -35,6 +35,11 @@ export const appRoutes: Routes = [
       {
         path: 'db-migration/:id',
         loadComponent: () => import('oip-common').then(m => m.DbMigrationComponent),
+        canActivate: [() => inject(AuthGuardService).canActivate()]
+      },
+      {
+        path: 'modules',
+        loadComponent: () => import('oip-common').then(m => m.AppModulesComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
       }
     ]

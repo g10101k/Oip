@@ -1,4 +1,4 @@
-namespace Oip.Base.Api;
+namespace Oip.Base.Controllers.Api;
 
 /// <summary>
 /// Response front security settings
