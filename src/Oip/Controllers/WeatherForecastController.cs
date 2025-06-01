@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Controllers.Api;
 using Oip.Properties;
@@ -62,20 +63,23 @@ public class WeatherForecastController : BaseModuleController<WeatherModuleSetti
         {
             new()
             {
-                Code = "read", Name = Resources.WeatherForecastController_GetModuleRights_Read,
+                Code = SecurityConstants.ReadRight, 
+                Name = Resources.WeatherForecastController_GetModuleRights_Read,
                 Description = Resources.WeatherForecastController_GetModuleRights_Can_view_this_module,
-                Roles = ["admin"]
+                Roles = [SecurityConstants.AdminRole]
             },
             new()
             {
-                Code = "edit", Name = Resources.WeatherForecastController_GetModuleRights_Edit,
-                Description = Resources.WeatherForecastController_GetModuleRights_Can_edit_data, Roles = ["admin"]
+                Code = SecurityConstants.EditRight, 
+                Name = Resources.WeatherForecastController_GetModuleRights_Edit,
+                Description = Resources.WeatherForecastController_GetModuleRights_Can_edit_data, Roles = [SecurityConstants.AdminRole]
             },
             new()
             {
-                Code = "delete", Name = Resources.WeatherForecastController_GetModuleRights_Delete,
+                Code = SecurityConstants.DeleteRight, 
+                Name = Resources.WeatherForecastController_GetModuleRights_Delete,
                 Description = Resources.WeatherForecastController_GetModuleRights_Can_delete_edit_data,
-                Roles = ["admin"]
+                Roles = [SecurityConstants.AdminRole]
             },
         };
     }
