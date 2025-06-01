@@ -35,11 +35,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rts", "Rts", "{5019271F-8CB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rts", "Oip.Rts\Oip.Rts.csproj", "{181D9C29-D6FF-484F-B10D-41FC25B139BA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{16F7304A-5A0E-4A98-90BA-3CE152477435}"
-	ProjectSection(SolutionItems) = preProject
-		compose.yaml = compose.yaml
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rts.Base", "Oip.Rts.Base\Oip.Rts.Base.csproj", "{3DB082B5-3B07-4D97-8723-3901DA8C1E11}"
 EndProject
 Global
