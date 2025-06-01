@@ -152,5 +152,17 @@ namespace Oip.Properties {
                 return ResourceManager.GetString("DataContextMigrationController_GetModuleRights_Read", resourceCulture);
             }
         }
+        
+        internal static string DashboardModuleController_GetModuleRights_Read {
+            get {
+                return ResourceManager.GetString("DashboardModuleController_GetModuleRights_Read", resourceCulture);
+            }
+        }
+        
+        internal static string DashboardModuleController_GetModuleRights_Can_view_this_module {
+            get {
+                return ResourceManager.GetString("DashboardModuleController_GetModuleRights_Can_view_this_module", resourceCulture);
+            }
+        }
     }
 }
