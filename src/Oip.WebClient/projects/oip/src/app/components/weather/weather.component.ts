@@ -1,17 +1,16 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { BaseComponent, Feature, SecurityComponent } from 'oip-common'
-import { WeatherDataService, WeatherForecast } from "./weather-data.service";
+import { OipApi } from "./../../api/oip-api";
 import { WeatherSettingsComponent, WeatherSettingsDto } from './weather-settings.component';
 import { TagModule } from 'primeng/tag';
 import { SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { NgIf } from '@angular/common';
 
-
-
 @Component({
-    selector: 'weather',
-    template: `<div *ngIf="isContent" class="card">
+  selector: 'weather',
+  template: `
+    <div *ngIf="isContent" class="card">
       <div>
         <h5>Weather</h5>
         <p-table [value]="data" [tableStyle]="{'min-width': '50rem'}">
@@ -36,24 +35,25 @@ import { NgIf } from '@angular/common';
         </p-table>
       </div>
     </div>
-    <weather-settings *ngIf="isSettings" [(settings)]="settings" (settingsChange)="onSettingsChange($event)"></weather-settings>
+    <weather-settings *ngIf="isSettings" [(settings)]="settings"
+                      (settingsChange)="onSettingsChange($event)"></weather-settings>
     <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
-    `,
-    providers: [{ provide: 'controller', useValue: 'weather' }, WeatherDataService],
-    standalone: true,
-    imports: [
-        NgIf,
-        TableModule,
-        SharedModule,
-        TagModule,
-        WeatherSettingsComponent,
-        SecurityComponent,
-    ],
+  `,
+  providers: [{ provide: 'controller', useValue: 'weather' }, OipApi],
+  standalone: true,
+  imports: [
+    NgIf,
+    TableModule,
+    SharedModule,
+    TagModule,
+    WeatherSettingsComponent,
+    SecurityComponent,
+  ],
 })
 export class WeatherComponent extends BaseComponent<WeatherSettingsDto> implements OnInit, OnDestroy, Feature {
   controller: string = 'weather';
-  protected readonly dataService: WeatherDataService = inject(WeatherDataService);
-  protected data: WeatherForecast[] = [];
+  protected readonly dataService: OipApi<any> = inject(OipApi);
+  protected data: any = [];
 
   constructor() {
     super();
@@ -61,7 +61,7 @@ export class WeatherComponent extends BaseComponent<WeatherSettingsDto> implemen
 
   async ngOnInit() {
     await super.ngOnInit();
-    await this.dataService.getData(this.settings.dayCount).then(result => {
+    await this.dataService.api.weatherGetList({ dayCount: this.settings.dayCount }).then(result => {
       this.data = result;
     }, error => this.msgService.error(error));
   }
