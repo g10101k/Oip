@@ -10,7 +10,4 @@
     <ItemGroup>
       <Script Include="tsconfig.json" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="projects\oip\src\app\api\" />
-    </ItemGroup>
 </Project>
