@@ -10,7 +10,7 @@
     "start:default": "ng serve --port 50000 --ssl --ssl-cert $HOME/.aspnet/https/${npm_package_name}.pem --ssl-key $HOME/.aspnet/https/${npm_package_name}.key",
     "i18n:oip:extract": "ngx-translate-extract --input ./projects/oip-common/src ./projects/oip/src --output ./projects/oip/src/assets/i18n/{en,ru}.json --clean --format namespaced-json",
     "serve:dist": "concurrently \"serve dist/oip -l 5000 -s\" ",
-    "generate-api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx swagger-typescript-api generate -p https://localhost:5002/swagger/v1/swagger.json -o ./projects/oip/src/app/api --extract-enums --extract-responses --extract-request-body --extract-request-params -t ./templates --api-class-name=OipApi -n oip-api.ts",
+    "generate-api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx swagger-typescript-api generate -p https://localhost:5002/swagger/v1/swagger.json -o ./projects/oip/src/app/api --unwrap-response-data --extract-enums --extract-responses --extract-request-body --extract-request-params --modular --module-name-first-tag --t ./templates",
     "build": "ng build oip",
     "build:oip": "ng build oip",
     "build:common": "ng build oip-common",

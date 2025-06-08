@@ -1,6 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { BaseComponent, Feature, SecurityComponent } from 'oip-common'
-import { OipApi, WeatherModuleSettings } from "../../api/oip-api";
+import { BaseComponent, Feature, SecurityComponent, SecurityStorageService } from 'oip-common'
+import { WeatherForecast } from "../../api/WeatherForecast";
+import { WeatherModuleSettings } from "../../api/data-contracts";
 import { TagModule } from 'primeng/tag';
 import { SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
@@ -37,7 +38,7 @@ import { InputText } from "primeng/inputtext";
         </p-table>
       </div>
     </div>
-    <div *ngIf="isSettings"  class="flex flex-col md:flex-row gap-8">
+    <div *ngIf="isSettings" class="flex flex-col md:flex-row gap-8">
       <div class="md:w-1/2">
         <div class="card flex flex-col gap-4">
           <div class="font-semibold text-xl">Weather settings</div>
@@ -55,7 +56,7 @@ import { InputText } from "primeng/inputtext";
     </div>
     <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
   `,
-  providers: [{ provide: 'controller', useValue: 'weather' }, OipApi],
+  providers: [{ provide: 'controller', useValue: 'weather' }, WeatherForecast],
   standalone: true,
   imports: [
     NgIf,
@@ -70,7 +71,7 @@ import { InputText } from "primeng/inputtext";
 })
 export class WeatherComponent extends BaseComponent<WeatherModuleSettings> implements OnInit, OnDestroy, Feature {
   controller: string = 'weather';
-  protected readonly dataService: OipApi<any> = inject(OipApi);
+  protected readonly dataService = inject(WeatherForecast);
   protected data: any = [];
 
   constructor() {
@@ -79,8 +80,8 @@ export class WeatherComponent extends BaseComponent<WeatherModuleSettings> imple
 
   async ngOnInit() {
     await super.ngOnInit();
-    await this.dataService.api.weatherGetList({ dayCount: this.settings.dayCount }).then(result => {
-      this.data = result.data;
+    await this.dataService.weatherGetList({ dayCount: this.settings.dayCount }).then(result => {
+      this.data = result;
     }, error => {
       this.msgService.error(error);
     });
