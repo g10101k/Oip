@@ -1,9 +1,9 @@
 export interface Country {
-    name?: string;
-    code?: string;
+  name?: string;
+  code?: string;
 }
 
 export interface Representative {
-    name?: string;
-    image?: string;
+  name?: string;
+  image?: string;
 }

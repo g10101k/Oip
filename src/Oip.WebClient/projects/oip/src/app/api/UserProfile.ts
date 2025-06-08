@@ -10,10 +10,7 @@
  * ---------------------------------------------------------------
  */
 
-import {
-  UserProfileGetUserPhotoListParams,
-  UserProfilePostUserPhotoCreatePayload,
-} from "./data-contracts";
+import { UserProfileGetUserPhotoListParams, UserProfilePostUserPhotoCreatePayload, } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 export class UserProfile<
