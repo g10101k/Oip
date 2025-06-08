@@ -20,9 +20,7 @@ import {
   WeatherModuleSettingsSaveSettingsRequest,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
-import { Injectable } from "@angular/core";
 
-@Injectable({ providedIn: 'root' })
 export class WeatherForecast<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
