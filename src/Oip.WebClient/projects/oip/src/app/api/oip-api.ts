@@ -230,9 +230,63 @@ export interface WeatherModuleSettingsSaveSettingsRequest {
   settings?: WeatherModuleSettings;
 }
 
+export interface DashboardGetSecurityListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface DashboardGetModuleInstanceSettingsListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface DbMigrationGetSecurityListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface DbMigrationGetModuleInstanceSettingsListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface FolderGetSecurityListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface FolderGetModuleInstanceSettingsListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface MenuDeleteModuleInstanceDeleteParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface UserProfileGetUserPhotoListParams {
+  email?: string;
+}
+
 export interface UserProfilePostUserPhotoCreatePayload {
   /** @format binary */
   files?: File;
+}
+
+export interface WeatherGetListParams {
+  /** @format int32 */
+  dayCount?: number;
+}
+
+export interface WeatherGetSecurityListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface WeatherGetModuleInstanceSettingsListParams {
+  /** @format int32 */
+  id?: number;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -516,10 +570,7 @@ export class OipApi<
      * @secure
      */
     dashboardGetSecurityList: (
-      query?: {
-        /** @format int32 */
-        id?: number;
-      },
+      query: DashboardGetSecurityListParams,
       params: RequestParams = {},
     ) =>
       this.request<SecurityResponse[], any>({
@@ -563,10 +614,7 @@ export class OipApi<
      * @secure
      */
     dashboardGetModuleInstanceSettingsList: (
-      query?: {
-        /** @format int32 */
-        id?: number;
-      },
+      query: DashboardGetModuleInstanceSettingsListParams,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
@@ -682,10 +730,7 @@ export class OipApi<
      * @secure
      */
     dbMigrationGetSecurityList: (
-      query?: {
-        /** @format int32 */
-        id?: number;
-      },
+      query: DbMigrationGetSecurityListParams,
       params: RequestParams = {},
     ) =>
       this.request<SecurityResponse[], any>({
@@ -729,10 +774,7 @@ export class OipApi<
      * @secure
      */
     dbMigrationGetModuleInstanceSettingsList: (
-      query?: {
-        /** @format int32 */
-        id?: number;
-      },
+      query: DbMigrationGetModuleInstanceSettingsListParams,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
@@ -791,10 +833,7 @@ export class OipApi<
      * @secure
      */
     folderGetSecurityList: (
-      query?: {
-        /** @format int32 */
-        id?: number;
-      },
+      query: FolderGetSecurityListParams,
       params: RequestParams = {},
     ) =>
       this.request<SecurityResponse[], any>({
@@ -838,10 +877,7 @@ export class OipApi<
      * @secure
      */
     folderGetModuleInstanceSettingsList: (
-      query?: {
-        /** @format int32 */
-        id?: number;
-      },
+      query: FolderGetModuleInstanceSettingsListParams,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
@@ -981,10 +1017,7 @@ export class OipApi<
      * @secure
      */
     menuDeleteModuleInstanceDelete: (
-      query?: {
-        /** @format int32 */
-        id?: number;
-      },
+      query: MenuDeleteModuleInstanceDeleteParams,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
@@ -1158,9 +1191,7 @@ export class OipApi<
      * @secure
      */
     userProfileGetUserPhotoList: (
-      query?: {
-        email?: string;
-      },
+      query: UserProfileGetUserPhotoListParams,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
@@ -1202,13 +1233,7 @@ export class OipApi<
      * @request GET:/api/weather/get
      * @secure
      */
-    weatherGetList: (
-      query?: {
-        /** @format int32 */
-        dayCount?: number;
-      },
-      params: RequestParams = {},
-    ) =>
+    weatherGetList: (query: WeatherGetListParams, params: RequestParams = {}) =>
       this.request<WeatherForecastResponse[], any>({
         path: `/api/weather/get`,
         method: "GET",
@@ -1246,10 +1271,7 @@ export class OipApi<
      * @secure
      */
     weatherGetSecurityList: (
-      query?: {
-        /** @format int32 */
-        id?: number;
-      },
+      query: WeatherGetSecurityListParams,
       params: RequestParams = {},
     ) =>
       this.request<SecurityResponse[], any>({
@@ -1293,10 +1315,7 @@ export class OipApi<
      * @secure
      */
     weatherGetModuleInstanceSettingsList: (
-      query?: {
-        /** @format int32 */
-        id?: number;
-      },
+      query: WeatherGetModuleInstanceSettingsListParams,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
