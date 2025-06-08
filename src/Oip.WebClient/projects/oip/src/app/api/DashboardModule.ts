@@ -10,10 +10,16 @@
  * ---------------------------------------------------------------
  */
 
-import { DashboardSettingsSaveSettingsRequest, PutSecurityRequest, SecurityResponse, } from "./data-contracts";
+import {
+  DashboardGetModuleInstanceSettingsListParams,
+  DashboardGetSecurityListParams,
+  DashboardSettingsSaveSettingsRequest,
+  PutSecurityRequest,
+  SecurityResponse,
+} from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class DashboardModuleDataService<
+export class DashboardModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
@@ -42,10 +48,7 @@ export class DashboardModuleDataService<
    * @secure
    */
   dashboardGetSecurityList = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+    query: DashboardGetSecurityListParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
@@ -87,10 +90,7 @@ export class DashboardModuleDataService<
    * @secure
    */
   dashboardGetModuleInstanceSettingsList = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+    query: DashboardGetModuleInstanceSettingsListParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

@@ -10,10 +10,16 @@
  * ---------------------------------------------------------------
  */
 
-import { AddModuleInstanceDto, EditModuleInstanceDto, IntKeyValueDto, ModuleInstanceDto, } from "./data-contracts";
+import {
+  AddModuleInstanceDto,
+  EditModuleInstanceDto,
+  IntKeyValueDto,
+  MenuDeleteModuleInstanceDeleteParams,
+  ModuleInstanceDto,
+} from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class MenuDataService<
+export class Menu<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
@@ -25,7 +31,7 @@ export class MenuDataService<
    * @request GET:/api/menu/get
    * @secure
    */
-  getList = (params: RequestParams = {}) =>
+  menuGetList = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get`,
       method: "GET",
@@ -42,7 +48,7 @@ export class MenuDataService<
    * @request GET:/api/menu/get-admin-menu
    * @secure
    */
-  getAdminMenuList = (params: RequestParams = {}) =>
+  menuGetAdminMenuList = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get-admin-menu`,
       method: "GET",
@@ -59,7 +65,7 @@ export class MenuDataService<
    * @request GET:/api/menu/get-modules
    * @secure
    */
-  getModulesList = (params: RequestParams = {}) =>
+  menuGetModulesList = (params: RequestParams = {}) =>
     this.request<IntKeyValueDto[], any>({
       path: `/api/menu/get-modules`,
       method: "GET",
@@ -76,7 +82,7 @@ export class MenuDataService<
    * @request POST:/api/menu/add-module-instance
    * @secure
    */
-  addModuleInstanceCreate = (
+  menuAddModuleInstanceCreate = (
     data: AddModuleInstanceDto,
     params: RequestParams = {},
   ) =>
@@ -97,7 +103,7 @@ export class MenuDataService<
    * @request POST:/api/menu/edit-module-instance
    * @secure
    */
-  editModuleInstanceCreate = (
+  menuEditModuleInstanceCreate = (
     data: EditModuleInstanceDto,
     params: RequestParams = {},
   ) =>
@@ -118,11 +124,8 @@ export class MenuDataService<
    * @request DELETE:/api/menu/delete-module-instance
    * @secure
    */
-  deleteModuleInstanceDelete = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+  menuDeleteModuleInstanceDelete = (
+    query: MenuDeleteModuleInstanceDeleteParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

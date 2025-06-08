@@ -48,7 +48,6 @@ const wrapperArgs = _
 // RequestParams["type"]
 const requestContentKind = {
     "JSON": "ContentType.Json",
-    "JSON_API": "ContentType.JsonApi",
     "URL_ENCODED": "ContentType.UrlEncoded",
     "FORM_DATA": "ContentType.FormData",
     "TEXT": "ContentType.Text",
@@ -88,7 +87,7 @@ const describeReturnType = () => {
 <%~ routeDocs.lines %>
 
  */
-<%~ _.camelCase(route.routeName.usage.replace(route.raw.moduleName, ''));%> = (<%~ wrapperArgs %>)<%~ config.toJS ? `: ${describeReturnType()}` : "" %> =>
+<%~ route.routeName.usage %> = (<%~ wrapperArgs %>)<%~ config.toJS ? `: ${describeReturnType()}` : "" %> =>
     <%~ config.singleHttpClient ? 'this.http.request' : 'this.request' %><<%~ type %>, <%~ errorType %>>({
         path: `<%~ path %>`,
         method: '<%~ _.upperCase(method) %>',

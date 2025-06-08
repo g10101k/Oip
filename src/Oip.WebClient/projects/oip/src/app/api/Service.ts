@@ -13,7 +13,7 @@
 import { GetManifestResponse, RegisterModuleDto } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class ServiceDataService<
+export class Service<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
@@ -25,7 +25,7 @@ export class ServiceDataService<
    * @request GET:/api/service/get
    * @secure
    */
-  getList = (params: RequestParams = {}) =>
+  serviceGetList = (params: RequestParams = {}) =>
     this.request<Record<string, GetManifestResponse>, any>({
       path: `/api/service/get`,
       method: "GET",
@@ -42,7 +42,7 @@ export class ServiceDataService<
    * @request POST:/api/service/register-module
    * @secure
    */
-  registerModuleCreate = (
+  serviceRegisterModuleCreate = (
     data: RegisterModuleDto,
     params: RequestParams = {},
   ) =>

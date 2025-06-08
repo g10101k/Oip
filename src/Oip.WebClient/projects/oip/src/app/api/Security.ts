@@ -13,7 +13,7 @@
 import { GetKeycloakClientSettingsResponse } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
-export class SecurityDataService<
+export class Security<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
@@ -25,7 +25,7 @@ export class SecurityDataService<
    * @request GET:/api/security/get-realm-roles
    * @secure
    */
-  getRealmRolesList = (params: RequestParams = {}) =>
+  securityGetRealmRolesList = (params: RequestParams = {}) =>
     this.request<string[], any>({
       path: `/api/security/get-realm-roles`,
       method: "GET",
@@ -42,7 +42,7 @@ export class SecurityDataService<
    * @request GET:/api/security/get-keycloak-client-settings
    * @secure
    */
-  getKeycloakClientSettingsList = (params: RequestParams = {}) =>
+  securityGetKeycloakClientSettingsList = (params: RequestParams = {}) =>
     this.request<GetKeycloakClientSettingsResponse, any>({
       path: `/api/security/get-keycloak-client-settings`,
       method: "GET",

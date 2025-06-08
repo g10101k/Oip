@@ -99,6 +99,15 @@ export interface MigrationDto {
   exist?: boolean;
 }
 
+/** Represents a request to delete a module by its identifier. */
+export interface ModuleDeleteRequest {
+  /**
+   * Gets or sets the unique identifier of the module to be deleted.
+   * @format int32
+   */
+  moduleId?: number;
+}
+
 /** It module in app */
 export interface ModuleDto {
   /**
@@ -219,4 +228,63 @@ export interface WeatherModuleSettingsSaveSettingsRequest {
   id?: number;
   /** Module settings */
   settings?: WeatherModuleSettings;
+}
+
+export interface DashboardGetSecurityListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface DashboardGetModuleInstanceSettingsListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface DbMigrationGetSecurityListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface DbMigrationGetModuleInstanceSettingsListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface FolderGetSecurityListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface FolderGetModuleInstanceSettingsListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface MenuDeleteModuleInstanceDeleteParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface UserProfileGetUserPhotoListParams {
+  email?: string;
+}
+
+export interface UserProfilePostUserPhotoCreatePayload {
+  /** @format binary */
+  files?: File;
+}
+
+export interface WeatherGetListParams {
+  /** @format int32 */
+  dayCount?: number;
+}
+
+export interface WeatherGetSecurityListParams {
+  /** @format int32 */
+  id?: number;
+}
+
+export interface WeatherGetModuleInstanceSettingsListParams {
+  /** @format int32 */
+  id?: number;
 }

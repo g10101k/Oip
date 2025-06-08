@@ -10,10 +10,16 @@
  * ---------------------------------------------------------------
  */
 
-import { ObjectSaveSettingsRequest, PutSecurityRequest, SecurityResponse, } from "./data-contracts";
+import {
+  FolderGetModuleInstanceSettingsListParams,
+  FolderGetSecurityListParams,
+  ObjectSaveSettingsRequest,
+  PutSecurityRequest,
+  SecurityResponse,
+} from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class FolderModuleDataService<
+export class FolderModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
@@ -42,10 +48,7 @@ export class FolderModuleDataService<
    * @secure
    */
   folderGetSecurityList = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+    query: FolderGetSecurityListParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
@@ -87,10 +90,7 @@ export class FolderModuleDataService<
    * @secure
    */
   folderGetModuleInstanceSettingsList = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+    query: FolderGetModuleInstanceSettingsListParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

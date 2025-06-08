@@ -10,9 +10,13 @@
  * ---------------------------------------------------------------
  */
 
+import {
+  UserProfileGetUserPhotoListParams,
+  UserProfilePostUserPhotoCreatePayload,
+} from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class UserProfileDataService<
+export class UserProfile<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
@@ -24,10 +28,8 @@ export class UserProfileDataService<
    * @request GET:/api/user-profile/get-user-photo
    * @secure
    */
-  getUserPhotoList = (
-    query?: {
-      email?: string;
-    },
+  userProfileGetUserPhotoList = (
+    query: UserProfileGetUserPhotoListParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
@@ -46,11 +48,8 @@ export class UserProfileDataService<
    * @request POST:/api/user-profile/post-user-photo
    * @secure
    */
-  postUserPhotoCreate = (
-    data: {
-      /** @format binary */
-      files?: File;
-    },
+  userProfilePostUserPhotoCreate = (
+    data: UserProfilePostUserPhotoCreatePayload,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

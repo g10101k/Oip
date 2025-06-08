@@ -12,6 +12,8 @@
 
 import {
   ApplyMigrationRequest,
+  DbMigrationGetModuleInstanceSettingsListParams,
+  DbMigrationGetSecurityListParams,
   MigrationDto,
   ObjectSaveSettingsRequest,
   PutSecurityRequest,
@@ -19,7 +21,9 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class DataContextMigrationModuleDataService<SecurityDataType = unknown, > extends HttpClient<SecurityDataType> {
+export class DataContextMigrationModule<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -100,10 +104,7 @@ export class DataContextMigrationModuleDataService<SecurityDataType = unknown, >
    * @secure
    */
   dbMigrationGetSecurityList = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+    query: DbMigrationGetSecurityListParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
@@ -145,10 +146,7 @@ export class DataContextMigrationModuleDataService<SecurityDataType = unknown, >
    * @secure
    */
   dbMigrationGetModuleInstanceSettingsList = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+    query: DbMigrationGetModuleInstanceSettingsListParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

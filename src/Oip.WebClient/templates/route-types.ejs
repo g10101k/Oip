@@ -12,7 +12,7 @@ import { <%~ dataContracts.join(", ") %> } from "./<%~ config.fileNames.dataCont
 export namespace <%~ pascalCase(moduleName) %> {
     <% for (const route of routes) { %>
 
-        <%~ includeFile('@base/route-type.ejs', { ...it, route }) %>
+        <%~ includeFile('./route-type.ejs', { ...it, route }) %>
 
     <% } %>
 }

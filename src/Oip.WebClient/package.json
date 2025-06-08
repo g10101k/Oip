@@ -13,7 +13,7 @@
     "start:rts:default": "ng serve oip-rts --port 50003 --ssl --ssl-cert $HOME/.aspnet/https/${npm_package_name}.pem --ssl-key $HOME/.aspnet/https/${npm_package_name}.key",
     "i18n:oip:extract": "ngx-translate-extract --input ./projects/oip-common/src ./projects/oip/src --output ./projects/oip/src/assets/i18n/{en,ru}.json --clean --format namespaced-json",
     "serve:dist": "concurrently \"serve dist/oip -l 5000 -s\" ",
-    "generate-api-oip": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx swagger-typescript-api generate -p https://localhost:50002/swagger/v1/swagger.json -o ./projects/oip/src/app/api --extract-enums --modular --module-name-first-tag --templates ./templates",
+    "generate-api-oip": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx swagger-typescript-api generate -p https://localhost:5002/swagger/v1/swagger.json -o ./projects/oip/src/app/api --unwrap-response-data --extract-enums --extract-responses --extract-request-body --extract-request-params --modular --module-name-first-tag --t ./templates",
     "generate-api-oip-rts": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx swagger-typescript-api generate -p https://localhost:50003/swagger/v1/swagger.json -o ./projects/oip-rts/src/app/api --extract-enums --modular --module-name-first-tag --templates ./templates",
     "build": "ng build oip",
     "build:oip": "ng build oip",

@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { LoginResponse, LogoutAuthOptions, OidcSecurityService } from "angular-auth-oidc-client";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, lastValueFrom, Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
 /**
@@ -77,5 +77,14 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
       map((token) => {
         return token.exp < Math.floor(Date.now() / 1000);
       }));
+  }
+
+  gtoken() {
+    let q = this.getPayloadFromAccessToken().pipe(
+      map((token) => {
+        return token;
+      })
+    )
+    return lastValueFrom(q);
   }
 }

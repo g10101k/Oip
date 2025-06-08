@@ -14,11 +14,14 @@ import {
   PutSecurityRequest,
   SecurityResponse,
   WeatherForecastResponse,
+  WeatherGetListParams,
+  WeatherGetModuleInstanceSettingsListParams,
+  WeatherGetSecurityListParams,
   WeatherModuleSettingsSaveSettingsRequest,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class WeatherForecastDataService<
+export class WeatherForecast<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
@@ -30,13 +33,7 @@ export class WeatherForecastDataService<
    * @request GET:/api/weather/get
    * @secure
    */
-  weatherGetList = (
-    query?: {
-      /** @format int32 */
-      dayCount?: number;
-    },
-    params: RequestParams = {},
-  ) =>
+  weatherGetList = (query: WeatherGetListParams, params: RequestParams = {}) =>
     this.request<WeatherForecastResponse[], any>({
       path: `/api/weather/get`,
       method: "GET",
@@ -72,10 +69,7 @@ export class WeatherForecastDataService<
    * @secure
    */
   weatherGetSecurityList = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+    query: WeatherGetSecurityListParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
@@ -117,10 +111,7 @@ export class WeatherForecastDataService<
    * @secure
    */
   weatherGetModuleInstanceSettingsList = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+    query: WeatherGetModuleInstanceSettingsListParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
