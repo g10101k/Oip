@@ -129,7 +129,7 @@ export class HttpClient<SecurityDataType = unknown> {
                                               baseUrl,
                                               cancelToken,
                                               ...params
-                                            }: FullRequestParams): Promise<HttpResponse<T, E>> => {
+                                            }: FullRequestParams): Promise<T, E> => {
     const secureParams =
       ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
         this.securityWorker &&
@@ -139,7 +139,6 @@ export class HttpClient<SecurityDataType = unknown> {
     const queryString = query && this.toQueryString(query);
     const payloadFormatter = this.contentFormatters[type || ContentType.Json];
     const responseFormat = format || requestParams.format;
-
     return this.customFetch(
       `${baseUrl || this.baseUrl || ""}${path}${queryString ? `?${queryString}` : ""}`,
       {
@@ -163,7 +162,6 @@ export class HttpClient<SecurityDataType = unknown> {
       const r = response.clone() as HttpResponse<T, E>;
       r.data = null as unknown as T;
       r.error = null as unknown as E;
-
       const data = !responseFormat
         ? r
         : await response[responseFormat]()
@@ -173,11 +171,11 @@ export class HttpClient<SecurityDataType = unknown> {
             } else {
               r.error = data;
             }
-            return r;
+            return r.data;
           })
           .catch((e) => {
             r.error = e;
-            return r;
+            return r.error;
           });
 
       if (cancelToken) {

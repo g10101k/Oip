@@ -81,7 +81,7 @@ export class WeatherComponent extends BaseComponent<WeatherModuleSettings> imple
   async ngOnInit() {
     await super.ngOnInit();
     await this.dataService.weatherGetList({ dayCount: this.settings.dayCount }).then(result => {
-      this.data = result.data;
+      this.data = result;
     }, error => {
       this.msgService.error(error);
     });
