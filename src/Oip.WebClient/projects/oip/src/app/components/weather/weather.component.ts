@@ -1,11 +1,13 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { BaseComponent, Feature, SecurityComponent } from 'oip-common'
-import { OipApi } from "./../../api/oip-api";
-import { WeatherSettingsComponent, WeatherSettingsDto } from './weather-settings.component';
+import { OipApi, WeatherModuleSettings } from "../../api/oip-api";
 import { TagModule } from 'primeng/tag';
 import { SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { NgIf } from '@angular/common';
+import { Button } from "primeng/button";
+import { FormsModule } from "@angular/forms";
+import { InputText } from "primeng/inputtext";
 
 @Component({
   selector: 'weather',
@@ -35,8 +37,22 @@ import { NgIf } from '@angular/common';
         </p-table>
       </div>
     </div>
-    <weather-settings *ngIf="isSettings" [(settings)]="settings"
-                      (settingsChange)="onSettingsChange($event)"></weather-settings>
+    <div *ngIf="isSettings"  class="flex flex-col md:flex-row gap-8">
+      <div class="md:w-1/2">
+        <div class="card flex flex-col gap-4">
+          <div class="font-semibold text-xl">Weather settings</div>
+          <div class="grid grid-cols-12 gap-4">
+            <label for="dayCount" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Day Count</label>
+            <div class="col-span-12 md:col-span-10">
+              <input pInputText [(ngModel)]="settings.dayCount" id="dayCount" type="text"/>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <p-button label="Save" icon="pi pi-save" (onClick)="saveButtonClick()"></p-button>
+          </div>
+        </div>
+      </div>
+    </div>
     <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
   `,
   providers: [{ provide: 'controller', useValue: 'weather' }, OipApi],
@@ -46,11 +62,13 @@ import { NgIf } from '@angular/common';
     TableModule,
     SharedModule,
     TagModule,
-    WeatherSettingsComponent,
     SecurityComponent,
+    Button,
+    FormsModule,
+    InputText,
   ],
 })
-export class WeatherComponent extends BaseComponent<WeatherSettingsDto> implements OnInit, OnDestroy, Feature {
+export class WeatherComponent extends BaseComponent<WeatherModuleSettings> implements OnInit, OnDestroy, Feature {
   controller: string = 'weather';
   protected readonly dataService: OipApi<any> = inject(OipApi);
   protected data: any = [];
@@ -62,11 +80,13 @@ export class WeatherComponent extends BaseComponent<WeatherSettingsDto> implemen
   async ngOnInit() {
     await super.ngOnInit();
     await this.dataService.api.weatherGetList({ dayCount: this.settings.dayCount }).then(result => {
-      this.data = result;
-    }, error => this.msgService.error(error));
+      this.data = result.data;
+    }, error => {
+      this.msgService.error(error);
+    });
   }
 
-  async onSettingsChange($event: WeatherSettingsDto) {
-    await this.saveSettings($event)
+  async saveButtonClick() {
+    await this.saveSettings(this.settings);
   }
 }
