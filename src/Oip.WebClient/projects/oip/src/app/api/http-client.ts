@@ -129,7 +129,7 @@ export class HttpClient<SecurityDataType = unknown> {
                                               baseUrl,
                                               cancelToken,
                                               ...params
-                                            }: FullRequestParams): Promise<T, E> => {
+                                            }: FullRequestParams): Promise<T> => {
     const secureParams =
       ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
         this.securityWorker &&
@@ -173,10 +173,6 @@ export class HttpClient<SecurityDataType = unknown> {
             }
             return r.data;
           })
-          .catch((e) => {
-            r.error = e;
-            return r.error;
-          });
 
       if (cancelToken) {
         this.abortControllers.delete(cancelToken);
