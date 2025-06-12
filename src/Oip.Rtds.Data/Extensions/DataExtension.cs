@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Oip.Rtds.Data.Contexts;
+using Oip.Rtds.Data.Repositories;
+using Oip.Rtds.Data.Settings;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 
@@ -15,35 +17,42 @@ public static class DataExtension
     /// 
     /// </summary>
     /// <param name="services"></param>
-    /// <param name="connectionString"></param>
+    /// <param name="settings"></param>
     /// <returns></returns>
-    public static IServiceCollection AddRtdsDataContext(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddRtdsData(this IServiceCollection services, AppSettings settings)
     {
-        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(connectionString);
+        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
+        services.AddScoped<RtdsContext>();
         switch (connectionModel.Provider)
         {
             case XpoProvider.Postgres:
-                return services.AddDbContext<RtdsMetaContext>(option =>
+                services.AddDbContext<RtdsMetaContext>(option =>
                 {
                     option.UseNpgsql(connectionModel.NormalizeConnectionString,
                         x =>
                         {
-                            x.MigrationsHistoryTable(RtdsMetaContext.MigrationHistoryTableName, RtdsMetaContext.SchemaName); 
+                            x.MigrationsHistoryTable(RtdsMetaContext.MigrationHistoryTableName,
+                                RtdsMetaContext.SchemaName);
                             x.MigrationsAssembly("Oip.Rtds.Data.Postgres");
                         });
                 });
+                break;
             case XpoProvider.MSSqlServer:
-                return services.AddDbContext<RtdsMetaContext>(option =>
+                services.AddDbContext<RtdsMetaContext>(option =>
                 {
                     option.UseSqlServer(connectionModel.NormalizeConnectionString,
                         x =>
                         {
-                            x.MigrationsHistoryTable(RtdsMetaContext.MigrationHistoryTableName, RtdsMetaContext.SchemaName); 
+                            x.MigrationsHistoryTable(RtdsMetaContext.MigrationHistoryTableName,
+                                RtdsMetaContext.SchemaName);
                             x.MigrationsAssembly("Oip.Rtds.Data.SqlServer");
                         });
                 });
-            default:
-                return services;
+                break;
         }
+
+        services.AddScoped<RtdsContext>();
+        services.AddScoped<TagRepository>();
+        return services;
     }
 }

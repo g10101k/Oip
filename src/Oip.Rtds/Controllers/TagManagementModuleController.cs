@@ -4,7 +4,9 @@ using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Rtds.Data.Contexts;
+using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Entities;
+using Oip.Rtds.Data.Repositories;
 using Resources = Oip.Rts.Properties.Resources;
 
 namespace Oip.Rts.Controllers;
@@ -20,7 +22,7 @@ namespace Oip.Rts.Controllers;
 [Route("api/tag-management")]
 public class TagManagementModuleController : BaseModuleController<object>
 {
-    private readonly RtdsContext _rtdsContext;
+    private readonly TagRepository _tagRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TagManagementModuleController"/> class.
@@ -29,12 +31,12 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// The controller depends on an application context and a module repository 
     /// for database access and modular behavior, respectively.
     /// </remarks>
-    /// <param name="rtdsContext">Application database context for tag operations.</param>
+    /// <param name="tagRepository">Application database context for tag operations.</param>
     /// <param name="moduleRepository">Base module repository for module-level operations.</param>
-    public TagManagementModuleController(RtdsContext rtdsContext, ModuleRepository moduleRepository)
+    public TagManagementModuleController(TagRepository tagRepository, ModuleRepository moduleRepository)
         : base(moduleRepository)
     {
-        _rtdsContext = rtdsContext;
+        _tagRepository = tagRepository;
     }
 
     /// <summary>
@@ -48,9 +50,9 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// <returns>HTTP 200 OK on success.</returns>
     [HttpPost("add-tag")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult AddTag(TagEntity tag)
+    public async Task<IActionResult> AddTag(TagCreateDto tag)
     {
-        _rtdsContext.AddTag(tag);
+        await _tagRepository.AddTag(tag);
         return Ok();
     }
 
@@ -67,7 +69,7 @@ public class TagManagementModuleController : BaseModuleController<object>
     [ProducesResponseType<List<TagEntity>>(StatusCodes.Status200OK)]
     public IActionResult GetTagsByFilter(string filter)
     {
-        return Ok(_rtdsContext.GetTagsByFilter(filter));
+        return Ok(_tagRepository.GetTagsByFilter(filter));
     }
 
     /// <summary>

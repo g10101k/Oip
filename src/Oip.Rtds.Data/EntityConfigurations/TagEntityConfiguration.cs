@@ -34,7 +34,9 @@ public class TagEntityConfiguration : IEntityTypeConfiguration<TagEntity>
     {
         entity.SetTableWithSchema(_database, RtdsMetaContext.SchemaName);
         entity.SetPrimaryKey(_designTime, e => e.TagId);
+        entity.HasIndex(e => e.Name).IsUnique();
         entity.Property(e => e.TagId).ValueGeneratedOnAdd();
         entity.Property(e => e.Name).HasMaxLength(512);
+        entity.Property(e => e.Source).HasMaxLength(128);
     }
 }

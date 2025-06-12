@@ -16,8 +16,7 @@ internal static class Program
         {
             var settings = AppSettings.Initialize(args, false, true);
             var builder = OipModuleApplication.CreateShellBuilder(settings);
-            builder.Services.AddRtdsDataContext(settings.ConnectionString);
-            builder.Services.AddScoped<RtdsContext>();
+            builder.Services.AddRtdsData(settings);
             builder.Services.AddSingleton(AppSettings.Instance);
             var app = builder.BuildApp(settings);
             app.Run();

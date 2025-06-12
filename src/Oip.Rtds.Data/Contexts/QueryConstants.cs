@@ -25,9 +25,6 @@ internal static class QueryConstants
             @CreationDate, @Creator
         )";
     
-    public const string CheckTagNameSql = "SELECT count(TagId) FROM meta.Tag where Name LIKE @tagName";
-
-    
     public const string CreateTagTableSql = @"
 CREATE TABLE IF NOT EXISTS data.`{0}`
 (
