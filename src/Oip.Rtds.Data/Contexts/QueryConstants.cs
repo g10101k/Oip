@@ -1,4 +1,4 @@
-namespace Oip.Rts.Base.Contexts;
+namespace Oip.Rtds.Data.Contexts;
 
 internal static class QueryConstants
 {

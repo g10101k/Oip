@@ -1,6 +1,6 @@
-using Oip.Rts.Base.Enums;
+using Oip.Rtds.Data.Enums;
 
-namespace Oip.Rts.Base.Entities;
+namespace Oip.Rtds.Data.Entities;
 
 /// <summary>
 /// Represents the configuration and metadata of a tag.

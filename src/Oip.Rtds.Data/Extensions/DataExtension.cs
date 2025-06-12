@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Oip.Rts.Base.Contexts;
+using Oip.Rtds.Data.Contexts;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 
-namespace Oip.Rts.Base.Extensions;
+namespace Oip.Rtds.Data.Extensions;
 
 /// <summary>
 /// Data Example Context
@@ -17,7 +17,7 @@ public static class DataExtension
     /// <param name="services"></param>
     /// <param name="connectionString"></param>
     /// <returns></returns>
-    public static IServiceCollection AddExampleDataContext(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddRtdsDataContext(this IServiceCollection services, string connectionString)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(connectionString);
         switch (connectionModel.Provider)

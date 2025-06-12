@@ -3,8 +3,8 @@ using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
-using Oip.Rts.Base.Contexts;
-using Oip.Rts.Base.Entities;
+using Oip.Rtds.Data.Contexts;
+using Oip.Rtds.Data.Entities;
 using Resources = Oip.Rts.Properties.Resources;
 
 namespace Oip.Rts.Controllers;

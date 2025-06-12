@@ -1,12 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Oip.Base.Data.Entities;
 using Oip.Base.Data.Extensions;
-using Oip.Rts.Base.Contexts;
-using Oip.Rts.Base.Entities;
+using Oip.Rtds.Data.Contexts;
+using Oip.Rtds.Data.Entities;
 
-namespace Oip.Rts.Base.EntityConfigurations;
+namespace Oip.Rtds.Data.EntityConfigurations;
 
 /// <summary>
 /// <inheritdoc cref="IEntityTypeConfiguration{TEntity}"/>

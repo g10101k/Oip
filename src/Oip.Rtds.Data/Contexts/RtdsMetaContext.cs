@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Data.Extensions;
-using Oip.Rts.Base.Entities;
-using Oip.Rts.Base.EntityConfigurations;
+using Oip.Rtds.Data.Entities;
+using Oip.Rtds.Data.EntityConfigurations;
 
-namespace Oip.Rts.Base.Contexts;
+namespace Oip.Rtds.Data.Contexts;
 
 /// <summary>
 /// Represents the database context for RTDS (Real-Time Data System) metadata.

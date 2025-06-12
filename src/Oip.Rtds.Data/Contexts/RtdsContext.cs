@@ -1,10 +1,10 @@
-using Octonica.ClickHouseClient;
 using Dapper;
-using Oip.Rts.Base.Entities;
-using Oip.Rts.Base.Enums;
-using Oip.Rts.Base.Settings;
+using Octonica.ClickHouseClient;
+using Oip.Rtds.Data.Entities;
+using Oip.Rtds.Data.Enums;
+using Oip.Rtds.Data.Settings;
 
-namespace Oip.Rts.Base.Contexts;
+namespace Oip.Rtds.Data.Contexts;
 
 /// <summary>
 /// Provides a context for interacting with the real-time storage (RTS) using ClickHouse.

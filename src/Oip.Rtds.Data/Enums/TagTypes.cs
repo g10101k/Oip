@@ -1,4 +1,4 @@
-namespace Oip.Rts.Base.Enums
+namespace Oip.Rtds.Data.Enums
 {
     /// <summary>
     /// Defines the data types supported for tags
