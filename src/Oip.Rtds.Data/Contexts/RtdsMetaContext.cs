@@ -6,39 +6,61 @@ using Oip.Rts.Base.EntityConfigurations;
 namespace Oip.Rts.Base.Contexts;
 
 /// <summary>
-/// 
+/// Represents the database context for RTDS (Real-Time Data System) metadata.
+/// This context manages the storage and retrieval of tag configurations and related metadata.
 /// </summary>
+/// <remarks>
+/// This context is configured to work with the RTDS schema in the database.
+/// </remarks>
 public class RtdsMetaContext : DbContext
 {
     private readonly bool _designTime;
 
     /// <summary>
-    /// Schema
+    /// The name of the database schema used for RTDS metadata
     /// </summary>
     public const string SchemaName = "rtds";
 
+    /// <summary>
+    /// The name of the table used to store EF Core migration history
+    /// </summary>
     public const string MigrationHistoryTableName = "__MigrationHistory";
 
+    /// <summary>
+    /// Gets the DbSet for managing tag entities
+    /// </summary>
     public DbSet<TagEntity> Tags => Set<TagEntity>();
 
     /// <summary>
-    /// .ctor
+    /// Initializes a new instance of the <see cref="RtdsMetaContext"/> class
     /// </summary>
+    /// <param name="options">The options to be used by this context</param>
+    /// <param name="designTime">
+    /// Flag indicating whether the context is being created at design time (e.g. for migrations)
+    /// </param>
     public RtdsMetaContext(DbContextOptions<RtdsMetaContext> options, bool designTime = false) : base(options)
     {
         _designTime = designTime;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Configures the context options
     /// </summary>
+    /// <param name="optionsBuilder">The builder being used to configure the context</param>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the options builder is not properly configured
+    /// </exception>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
             throw new InvalidOperationException("OnConfiguring error");
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Configures the model that was discovered by convention from the entity types
+    /// exposed in <see cref="DbSet{TEntity}"/> properties on this context
+    /// </summary>
+    /// <param name="modelBuilder">The builder being used to construct the model</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
