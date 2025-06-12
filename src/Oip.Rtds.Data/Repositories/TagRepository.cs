@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Entities;
@@ -35,13 +36,13 @@ public class TagRepository
     /// <exception cref="NotSupportedException">
     /// Thrown when the specified tag value type is not supported
     /// </exception>
-    public async Task CreateTag(TagCreateDto tag)
+    public async Task AddTag(TagCreateDto tag)
     {
         var tableName = $"{tag.TagId:D6}";
         var valueType = GetClickHouseTypeFromTagType(tag.ValueType);
         var statusType = GenerateClickHouseEnum8<TagValueStatus>();
         await _rtdsContext.CreateTagTableAsync(tableName, valueType, statusType, tag.Partition);
-        
+
         _rtdsMetaContext.Tags.Add(new TagEntity
         {
             Name = tag.Name,
@@ -84,8 +85,63 @@ public class TagRepository
             Creator = tag.Creator,
             Partition = tag.Partition
         });
-        
+
         await _rtdsMetaContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Retrieves a list of <see cref="TagEntity"/> objects from the database that match the specified filter.
+    /// </summary>
+    /// <param name="filter">A string filter to apply to tag names (e.g., "Sensor%").</param>
+    /// <returns>A list of <see cref="TagEntity"/> objects matching the filter.</returns>
+    public List<TagGetDto> GetTagsByFilter(string filter)
+    {
+        return _rtdsMetaContext.Tags
+            .Where(tag => EF.Functions.Like(tag.Name, filter))
+            .Select(x => new TagGetDto()
+            {
+                TagId = x.TagId,
+                Name = x.Name,
+                ValueType = x.ValueType,
+                Source = x.Source,
+                Descriptor = x.Descriptor,
+                EngUnits = x.EngUnits,
+                InstrumentTag = x.InstrumentTag,
+                Archiving = x.Archiving,
+                Compressing = x.Compressing,
+                ExcDev = x.ExcDev,
+                ExcMin = x.ExcMin,
+                ExcMax = x.ExcMax,
+                CompDev = x.CompDev,
+                CompMin = x.CompMin,
+                CompMax = x.CompMax,
+                Zero = x.Zero,
+                Span = x.Span,
+                Location1 = x.Location1,
+                Location2 = x.Location2,
+                Location3 = x.Location3,
+                Location4 = x.Location4,
+                Location5 = x.Location5,
+                ExDesc = x.ExDesc,
+                Scan = x.Scan,
+                DigitalSet = x.DigitalSet,
+                Step = x.Step,
+                Future = x.Future,
+                UserInt1 = x.UserInt1,
+                UserInt2 = x.UserInt2,
+                UserInt3 = x.UserInt3,
+                UserInt4 = x.UserInt4,
+                UserInt5 = x.UserInt5,
+                UserReal1 = x.UserReal1,
+                UserReal2 = x.UserReal2,
+                UserReal3 = x.UserReal3,
+                UserReal4 = x.UserReal4,
+                UserReal5 = x.UserReal5,
+                CreationDate = x.CreationDate,
+                Creator = x.Creator,
+                Partition = x.Partition
+            })
+            .ToList();
     }
 
     /// <summary>
@@ -103,7 +159,7 @@ public class TagRepository
             TagTypes.Float32 => "Float32",
             TagTypes.Float64 => "Float64",
             TagTypes.Int16 => "Int32",
-            TagTypes.Int32 => "Int32",
+            TagTypes.Int32 => "Int32",  
             TagTypes.Digital => "UInt8",
             TagTypes.String => "String",
             TagTypes.Blob => "String", // Можно также использовать FixedString(N) или Base64

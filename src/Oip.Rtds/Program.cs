@@ -19,6 +19,7 @@ internal static class Program
             builder.Services.AddRtdsData(settings);
             builder.Services.AddSingleton(AppSettings.Instance);
             var app = builder.BuildApp(settings);
+            
             app.Run();
         }
         catch (Exception e)
