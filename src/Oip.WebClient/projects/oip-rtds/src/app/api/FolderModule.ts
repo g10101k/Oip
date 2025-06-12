@@ -11,20 +11,23 @@
  */
 
 import {
+  FolderGetModuleInstanceSettingsListParams,
+  FolderGetSecurityListParams,
   ObjectSaveSettingsRequest,
   PutSecurityRequest,
   SecurityResponse,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class FolderModuleDataService<
+export class FolderModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description This method defines the security model for the folder module. It currently includes only read access, limited to users with the administrator role.
    *
    * @tags FolderModule
    * @name folderGetModuleRightsList
+   * @summary Returns a list of rights (permissions) required to access the folder module.
    * @request GET:/api/folder/get-module-rights
    * @secure
    */
@@ -46,13 +49,7 @@ export class FolderModuleDataService<
    * @secure
    */
   folderGetSecurityList = (
-    query?: {
-      /**
-       * The ID of the module instance.
-       * @format int32
-       */
-      id?: number;
-    },
+    query: FolderGetSecurityListParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
@@ -94,13 +91,7 @@ export class FolderModuleDataService<
    * @secure
    */
   folderGetModuleInstanceSettingsList = (
-    query?: {
-      /**
-       * The ID of the module instance.
-       * @format int32
-       */
-      id?: number;
-    },
+    query: FolderGetModuleInstanceSettingsListParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

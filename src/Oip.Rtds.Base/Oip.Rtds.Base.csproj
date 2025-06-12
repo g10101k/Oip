@@ -6,6 +6,8 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <Nullable>enable</Nullable>
+
+        <RootNamespace>Oip.Rts.Base</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

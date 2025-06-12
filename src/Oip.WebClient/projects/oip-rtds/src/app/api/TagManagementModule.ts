@@ -15,10 +15,13 @@ import {
   PutSecurityRequest,
   SecurityResponse,
   TagEntity,
+  TagManagementGetModuleInstanceSettingsListParams,
+  TagManagementGetSecurityListParams,
+  TagManagementGetTagsByFilterListParams,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class TagManagementModuleDataService<
+export class TagManagementModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
@@ -49,10 +52,7 @@ export class TagManagementModuleDataService<
    * @secure
    */
   tagManagementGetTagsByFilterList = (
-    query?: {
-      /** Name filter to search tags by. */
-      filter?: string;
-    },
+    query: TagManagementGetTagsByFilterListParams,
     params: RequestParams = {},
   ) =>
     this.request<TagEntity[], any>({
@@ -90,13 +90,7 @@ export class TagManagementModuleDataService<
    * @secure
    */
   tagManagementGetSecurityList = (
-    query?: {
-      /**
-       * The ID of the module instance.
-       * @format int32
-       */
-      id?: number;
-    },
+    query: TagManagementGetSecurityListParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
@@ -138,13 +132,7 @@ export class TagManagementModuleDataService<
    * @secure
    */
   tagManagementGetModuleInstanceSettingsList = (
-    query?: {
-      /**
-       * The ID of the module instance.
-       * @format int32
-       */
-      id?: number;
-    },
+    query: TagManagementGetModuleInstanceSettingsListParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

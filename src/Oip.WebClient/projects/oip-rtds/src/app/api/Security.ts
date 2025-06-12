@@ -13,19 +13,19 @@
 import { GetKeycloakClientSettingsResponse } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
-export class SecurityDataService<
+export class Security<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description This endpoint is restricted to administrators. Useful for role management in the application UI or backend.
    *
    * @tags Security
    * @name getRealmRolesList
-   * @summary Get all roles
+   * @summary Retrieves all realm roles from Keycloak.
    * @request GET:/api/security/get-realm-roles
    * @secure
    */
-  getRealmRolesList = (params: RequestParams = {}) =>
+  securityGetRealmRolesList = (params: RequestParams = {}) =>
     this.request<string[], any>({
       path: `/api/security/get-realm-roles`,
       method: "GET",
@@ -34,15 +34,15 @@ export class SecurityDataService<
       ...params,
     });
   /**
-   * No description
+   * @description This endpoint is publicly accessible and provides client configuration such as authority URL, client ID, scopes, and secure routes for frontend OAuth2/OIDC initialization.
    *
    * @tags Security
    * @name getKeycloakClientSettingsList
-   * @summary Get keycloak client settings
+   * @summary Retrieves Keycloak client settings needed by frontend applications.
    * @request GET:/api/security/get-keycloak-client-settings
    * @secure
    */
-  getKeycloakClientSettingsList = (params: RequestParams = {}) =>
+  securityGetKeycloakClientSettingsList = (params: RequestParams = {}) =>
     this.request<GetKeycloakClientSettingsResponse, any>({
       path: `/api/security/get-keycloak-client-settings`,
       method: "GET",

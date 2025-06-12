@@ -10,48 +10,54 @@
  * ---------------------------------------------------------------
  */
 
-import { GetManifestResponse, RegisterModuleDto } from "./data-contracts";
+import {
+  UserProfileGetUserPhotoListParams,
+  UserProfilePostUserPhotoCreatePayload,
+} from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class ServiceDataService<
+export class UserProfile<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
-   * @tags Service
-   * @name getList
-   * @summary Get manifest for client app
-   * @request GET:/api/service/get
+   * @tags UserProfile
+   * @name getUserPhotoList
+   * @summary Get all roles
+   * @request GET:/api/user-profile/get-user-photo
    * @secure
    */
-  getList = (params: RequestParams = {}) =>
-    this.request<Record<string, GetManifestResponse>, any>({
-      path: `/api/service/get`,
+  userProfileGetUserPhotoList = (
+    query: UserProfileGetUserPhotoListParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, any>({
+      path: `/api/user-profile/get-user-photo`,
       method: "GET",
+      query: query,
       secure: true,
-      format: "json",
       ...params,
     });
   /**
    * No description
    *
-   * @tags Service
-   * @name registerModuleCreate
-   * @summary Registry module
-   * @request POST:/api/service/register-module
+   * @tags UserProfile
+   * @name postUserPhotoCreate
+   * @summary Get all roles
+   * @request POST:/api/user-profile/post-user-photo
    * @secure
    */
-  registerModuleCreate = (
-    data: RegisterModuleDto,
+  userProfilePostUserPhotoCreate = (
+    data: UserProfilePostUserPhotoCreatePayload,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
-      path: `/api/service/register-module`,
+      path: `/api/user-profile/post-user-photo`,
       method: "POST",
       body: data,
       secure: true,
-      type: ContentType.Json,
+      type: ContentType.FormData,
       ...params,
     });
 }

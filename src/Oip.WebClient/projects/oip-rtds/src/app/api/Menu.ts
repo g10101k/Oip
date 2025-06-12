@@ -14,23 +14,24 @@ import {
   AddModuleInstanceDto,
   EditModuleInstanceDto,
   IntKeyValueDto,
+  MenuDeleteModuleInstanceDeleteParams,
   ModuleInstanceDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class MenuDataService<
+export class Menu<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description Filters modules based on the roles of the current user and returns only those that are accessible.
    *
    * @tags Menu
    * @name getList
-   * @summary Get menu for client app
+   * @summary Retrieves the menu available to the current authenticated user.
    * @request GET:/api/menu/get
    * @secure
    */
-  getList = (params: RequestParams = {}) =>
+  menuGetList = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get`,
       method: "GET",
@@ -39,15 +40,15 @@ export class MenuDataService<
       ...params,
     });
   /**
-   * No description
+   * @description Returns all administrative modules for users with the Admin role.
    *
    * @tags Menu
    * @name getAdminMenuList
-   * @summary Get admin menu for client app
+   * @summary Retrieves the admin-specific menu.
    * @request GET:/api/menu/get-admin-menu
    * @secure
    */
-  getAdminMenuList = (params: RequestParams = {}) =>
+  menuGetAdminMenuList = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get-admin-menu`,
       method: "GET",
@@ -56,15 +57,15 @@ export class MenuDataService<
       ...params,
     });
   /**
-   * No description
+   * @description Useful for module management interfaces or system diagnostics.
    *
    * @tags Menu
    * @name getModulesList
-   * @summary Get admin menu for client app
+   * @summary Retrieves all available modules in the system.
    * @request GET:/api/menu/get-modules
    * @secure
    */
-  getModulesList = (params: RequestParams = {}) =>
+  menuGetModulesList = (params: RequestParams = {}) =>
     this.request<IntKeyValueDto[], any>({
       path: `/api/menu/get-modules`,
       method: "GET",
@@ -77,11 +78,11 @@ export class MenuDataService<
    *
    * @tags Menu
    * @name addModuleInstanceCreate
-   * @summary Add new module
+   * @summary Adds a new module instance to the system.
    * @request POST:/api/menu/add-module-instance
    * @secure
    */
-  addModuleInstanceCreate = (
+  menuAddModuleInstanceCreate = (
     data: AddModuleInstanceDto,
     params: RequestParams = {},
   ) =>
@@ -98,11 +99,11 @@ export class MenuDataService<
    *
    * @tags Menu
    * @name editModuleInstanceCreate
-   * @summary Add new module
+   * @summary Edits an existing module instance.
    * @request POST:/api/menu/edit-module-instance
    * @secure
    */
-  editModuleInstanceCreate = (
+  menuEditModuleInstanceCreate = (
     data: EditModuleInstanceDto,
     params: RequestParams = {},
   ) =>
@@ -119,15 +120,12 @@ export class MenuDataService<
    *
    * @tags Menu
    * @name deleteModuleInstanceDelete
-   * @summary Add new module
+   * @summary Deletes a module instance by its identifier.
    * @request DELETE:/api/menu/delete-module-instance
    * @secure
    */
-  deleteModuleInstanceDelete = (
-    query?: {
-      /** @format int32 */
-      id?: number;
-    },
+  menuDeleteModuleInstanceDelete = (
+    query: MenuDeleteModuleInstanceDeleteParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

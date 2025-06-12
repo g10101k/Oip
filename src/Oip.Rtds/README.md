@@ -1,4 +1,4 @@
-# 🏠 Oip.Rts — Real-Time Data Storage Service
+# 🏠 Oip.Rtds — Real-Time Data Storage Service
 
 **Oip.Rts** is a high-performance service for collecting, storing, and accessing real-time data, specifically designed
 for smart home systems. It allows telemetry from sensors to be stored, tag metadata to be managed, and historical data

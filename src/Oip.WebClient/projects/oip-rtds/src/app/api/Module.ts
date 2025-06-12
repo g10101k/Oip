@@ -10,22 +10,26 @@
  * ---------------------------------------------------------------
  */
 
-import { ModuleDeleteRequest, ModuleDto } from "./data-contracts";
+import {
+  ExistModuleDto,
+  ModuleDeleteRequest,
+  ModuleDto,
+} from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class ModuleDataService<
+export class Module<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description Only accessible to users with the Admin role.
    *
    * @tags Module
    * @name getAllList
-   * @summary Get all modules
+   * @summary Retrieves all modules stored in the system.
    * @request GET:/api/module/get-all
    * @secure
    */
-  getAllList = (params: RequestParams = {}) =>
+  moduleGetAllList = (params: RequestParams = {}) =>
     this.request<ModuleDto[], any>({
       path: `/api/module/get-all`,
       method: "GET",
@@ -38,11 +42,11 @@ export class ModuleDataService<
    *
    * @tags Module
    * @name insertCreate
-   * @summary Insert
+   * @summary Inserts a new module into the system.
    * @request POST:/api/module/insert
    * @secure
    */
-  insertCreate = (data: ModuleDto, params: RequestParams = {}) =>
+  moduleInsertCreate = (data: ModuleDto, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/module/insert`,
       method: "POST",
@@ -56,11 +60,14 @@ export class ModuleDataService<
    *
    * @tags Module
    * @name deleteDelete
-   * @summary delete
+   * @summary Deletes a module by its identifier.
    * @request DELETE:/api/module/delete
    * @secure
    */
-  deleteDelete = (data: ModuleDeleteRequest, params: RequestParams = {}) =>
+  moduleDeleteDelete = (
+    data: ModuleDeleteRequest,
+    params: RequestParams = {},
+  ) =>
     this.request<void, any>({
       path: `/api/module/delete`,
       method: "DELETE",
@@ -70,16 +77,16 @@ export class ModuleDataService<
       ...params,
     });
   /**
-   * @description This endpoint is restricted to users with administrative privileges. It aggregates module data from the database and compares it against the currently loaded modules in the application context, returning a combined view with load status flags.
+   * @description Compares all modules in the database with loaded modules in the application context. This information can be used for diagnostics and monitoring of active modules.
    *
    * @tags Module
    * @name getModulesWithLoadStatusList
-   * @summary Returns a list of all registered modules and indicates whether each one is currently loaded into the application.
+   * @summary Returns all registered modules and indicates whether each one is currently loaded into the application.
    * @request GET:/api/module/get-modules-with-load-status
    * @secure
    */
-  getModulesWithLoadStatusList = (params: RequestParams = {}) =>
-    this.request<ModuleDto[], any>({
+  moduleGetModulesWithLoadStatusList = (params: RequestParams = {}) =>
+    this.request<ExistModuleDto[], any>({
       path: `/api/module/get-modules-with-load-status`,
       method: "GET",
       secure: true,

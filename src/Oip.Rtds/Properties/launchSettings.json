@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "Oip.Rts": {
+    "Oip.Rtds": {
       "commandName": "Project",
       "launchBrowser": true,
       "applicationUrl": "https://localhost:5003",

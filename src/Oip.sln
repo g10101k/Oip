@@ -31,11 +31,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Example.Data.Postgres",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Example.Data.SqlServer", "Oip.Example.Data.SqlServer\Oip.Example.Data.SqlServer.csproj", "{5A6A0723-44D7-43C4-B533-39962E503D31}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rts", "Rts", "{5019271F-8CBB-40CB-B695-2CECE2924DE9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rtds", "Rtds", "{5019271F-8CBB-40CB-B695-2CECE2924DE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rts", "Oip.Rts\Oip.Rts.csproj", "{181D9C29-D6FF-484F-B10D-41FC25B139BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds", "Oip.Rtds\Oip.Rtds.csproj", "{181D9C29-D6FF-484F-B10D-41FC25B139BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rts.Base", "Oip.Rts.Base\Oip.Rts.Base.csproj", "{3DB082B5-3B07-4D97-8723-3901DA8C1E11}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds.Base", "Oip.Rtds.Base\Oip.Rtds.Base.csproj", "{3DB082B5-3B07-4D97-8723-3901DA8C1E11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

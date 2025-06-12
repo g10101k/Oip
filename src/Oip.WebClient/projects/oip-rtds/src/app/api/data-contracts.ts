@@ -43,6 +43,19 @@ export interface EditModuleInstanceDto {
   viewRoles?: string[] | null;
 }
 
+/** Data transfer object representing a module and its loaded status. */
+export interface ExistModuleDto {
+  /**
+   * Gets or sets the unique identifier of the module.
+   * @format int32
+   */
+  moduleId?: number;
+  /** Gets or sets the name of the module. */
+  name?: string | null;
+  /** Gets or sets a value indicating whether the module is currently loaded in the application. */
+  currentlyLoaded?: boolean;
+}
+
 /** Response front security settings */
 export interface GetKeycloakClientSettingsResponse {
   /** Authority */
@@ -328,4 +341,58 @@ export interface TagEntity {
    * Used to control how data is partitioned when creating the table.
    */
   partition?: string | null;
+}
+
+export interface FolderGetSecurityListParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
+  id?: number;
+}
+
+export interface FolderGetModuleInstanceSettingsListParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
+  id?: number;
+}
+
+export interface MenuDeleteModuleInstanceDeleteParams {
+  /**
+   * The unique identifier of the module instance to delete.
+   * @format int32
+   */
+  id?: number;
+}
+
+export interface TagManagementGetTagsByFilterListParams {
+  /** Name filter to search tags by. */
+  filter?: string;
+}
+
+export interface TagManagementGetSecurityListParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
+  id?: number;
+}
+
+export interface TagManagementGetModuleInstanceSettingsListParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
+  id?: number;
+}
+
+export interface UserProfileGetUserPhotoListParams {
+  email?: string;
+}
+
+export interface UserProfilePostUserPhotoCreatePayload {
+  /** @format binary */
+  files?: File;
 }

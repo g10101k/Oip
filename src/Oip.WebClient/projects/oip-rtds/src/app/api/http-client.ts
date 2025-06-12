@@ -10,6 +10,9 @@
  * ---------------------------------------------------------------
  */
 
+import { inject, Injectable } from "@angular/core";
+import { SecurityService } from "oip-common";
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -61,10 +64,18 @@ export enum ContentType {
   Text = "text/plain",
 }
 
+@Injectable({ providedIn: "root" })
 export class HttpClient<SecurityDataType = unknown> {
+  protected securityService = inject(SecurityService);
   public baseUrl: string = "";
   private securityData: SecurityDataType | null = null;
-  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
+  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] = (
+    securityData,
+  ) => ({
+    headers: {
+      Authorization: `Bearer ${securityData}`,
+    },
+  });
   private abortControllers = new Map<CancelToken, AbortController>();
   private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
     fetch(...fetchParams);
@@ -76,8 +87,10 @@ export class HttpClient<SecurityDataType = unknown> {
     referrerPolicy: "no-referrer",
   };
 
-  constructor(apiConfig: ApiConfig<SecurityDataType> = {}) {
-    Object.assign(this, apiConfig);
+  constructor() {
+    this.securityService.getAccessToken().subscribe((token) => {
+      this.securityData = token;
+    });
   }
 
   public setSecurityData = (data: SecurityDataType | null) => {
@@ -193,7 +206,7 @@ export class HttpClient<SecurityDataType = unknown> {
     baseUrl,
     cancelToken,
     ...params
-  }: FullRequestParams): Promise<HttpResponse<T, E>> => {
+  }: FullRequestParams): Promise<T> => {
     const secureParams =
       ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
         this.securityWorker &&
@@ -249,7 +262,7 @@ export class HttpClient<SecurityDataType = unknown> {
       }
 
       if (!response.ok) throw data;
-      return data;
+      return data.data;
     });
   };
 }
