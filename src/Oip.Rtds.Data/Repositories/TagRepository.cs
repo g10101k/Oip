@@ -6,25 +6,42 @@ using Oip.Rtds.Data.Enums;
 namespace Oip.Rtds.Data.Repositories;
 
 /// <summary>
-/// 
+/// Repository for managing tags and their associated data in RTDS (Real-Time Data System)
 /// </summary>
+/// <remarks>
+/// This repository handles both metadata (in RtdsMetaContext) and time-series data (in RtdsContext)
+/// </remarks>
 public class TagRepository
 {
     private readonly RtdsMetaContext _rtdsMetaContext;
     private readonly RtdsContext _rtdsContext;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TagRepository"/> class
+    /// </summary>
+    /// <param name="rtdsMetaContext">The context for tag metadata operations</param>
+    /// <param name="rtdsContext">The context for time-series data operations</param>
     public TagRepository(RtdsMetaContext rtdsMetaContext, RtdsContext rtdsContext)
     {
         _rtdsMetaContext = rtdsMetaContext;
         _rtdsContext = rtdsContext;
     }
 
-    public async Task AddTag(TagCreateDto tag)
+    /// <summary>
+    /// Creates a new tag with the specified configuration
+    /// </summary>
+    /// <param name="tag">The tag creation DTO containing all configuration parameters</param>
+    /// <returns>A task representing the asynchronous operation</returns>
+    /// <exception cref="NotSupportedException">
+    /// Thrown when the specified tag value type is not supported
+    /// </exception>
+    public async Task CreateTag(TagCreateDto tag)
     {
         var tableName = $"{tag.TagId:D6}";
         var valueType = GetClickHouseTypeFromTagType(tag.ValueType);
         var statusType = GenerateClickHouseEnum8<TagValueStatus>();
         await _rtdsContext.CreateTagTableAsync(tableName, valueType, statusType, tag.Partition);
+        
         _rtdsMetaContext.Tags.Add(new TagEntity
         {
             Name = tag.Name,
@@ -67,10 +84,18 @@ public class TagRepository
             Creator = tag.Creator,
             Partition = tag.Partition
         });
-        await _rtdsMetaContext.SaveChangesAsync();
         
+        await _rtdsMetaContext.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Converts a <see cref="TagTypes"/> enum value to the corresponding ClickHouse data type
+    /// </summary>
+    /// <param name="pointType">The tag type to convert</param>
+    /// <returns>The ClickHouse type name as string</returns>
+    /// <exception cref="NotSupportedException">
+    /// Thrown when the specified tag type is not supported
+    /// </exception>
     private static string GetClickHouseTypeFromTagType(TagTypes pointType)
     {
         return pointType switch
@@ -87,18 +112,10 @@ public class TagRepository
     }
 
     /// <summary>
-    /// Retrieves a list of <see cref="TagEntity"/> objects from the database that match the specified filter.
+    /// Generates a ClickHouse Enum8 type definition from a .NET enum type
     /// </summary>
-    /// <param name="filter">A string filter to apply to tag names (e.g., "Sensor%").</param>
-    /// <returns>A list of <see cref="TagEntity"/> objects matching the filter.</returns>
-    public List<TagEntity> GetTagsByFilter(string filter)
-    {
-        return _connection.Query<TagEntity>(
-            QueryConstants.SelectFromDefaultTagWhereNameLikeFilter,
-            new { filter }
-        ).ToList();
-    }
-    
+    /// <typeparam name="TEnum">The enum type to convert</typeparam>
+    /// <returns>ClickHouse Enum8 definition string</returns>
     private static string GenerateClickHouseEnum8<TEnum>() where TEnum : Enum
     {
         var values = Enum.GetValues(typeof(TEnum)).Cast<TEnum>();
