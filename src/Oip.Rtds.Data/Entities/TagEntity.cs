@@ -1,5 +1,7 @@
 using Oip.Rts.Base.Enums;
 
+namespace Oip.Rts.Base.Entities;
+
 /// <summary>
 /// Represents the configuration and metadata of a tag.
 /// </summary>
@@ -13,7 +15,7 @@ public class TagEntity
     /// <summary>
     /// Name of the tag.
     /// </summary>
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     /// <summary>
     /// Data type of the point (e.g., Float32, Int32, Digital, String, Blob).

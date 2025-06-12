@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -23,11 +24,28 @@ public static class EntityTypeBuilderExtension
         Action<TableBuilder<TEntity>>? tableBuilder = null)
         where TEntity : class
     {
-        var tableName = typeof(TEntity).Name.Replace("Entity", string.Empty);
-        if (database.IsNpgsql() || database.IsSqlServer())
-            builder.ToTable(tableName, OipModuleContext.SchemaName, tableBuilder ?? (_ => { }));
+        builder.SetTableWithSchema(database, OipModuleContext.SchemaName, tableBuilder);
     }
 
+    
+    /// <summary>
+    /// Set table by default and exec tableBuilder
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="database"></param>
+    /// <param name="schemaName"></param>
+    /// <param name="tableBuilder"></param>
+    /// <typeparam name="TEntity"></typeparam>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void SetTableWithSchema<TEntity>(this EntityTypeBuilder<TEntity> builder, DatabaseFacade database, string schemaName,
+        Action<TableBuilder<TEntity>>? tableBuilder = null)
+        where TEntity : class
+    {
+        var tableName = typeof(TEntity).Name.Replace("Entity", string.Empty);
+        if (database.IsNpgsql() || database.IsSqlServer())
+            builder.ToTable(tableName, schemaName, tableBuilder ?? (_ => { }));
+    }
+    
     /// <summary>
     /// Design without key but using with key
     /// </summary>

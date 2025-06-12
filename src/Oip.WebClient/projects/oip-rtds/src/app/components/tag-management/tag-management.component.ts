@@ -10,6 +10,7 @@ import { Checkbox } from "primeng/checkbox";
 import { Calendar } from "primeng/calendar";
 import { Button } from "primeng/button";
 import { InputText } from "primeng/inputtext";
+import { InputNumber } from "primeng/inputnumber";
 import { TagEntity } from "../../api/data-contracts";
 import { FormsModule } from "@angular/forms";
 
@@ -22,7 +23,10 @@ export enum TagTypes {
   String = 5,
   Blob = 6
 }
-export interface WeatherSettingsDto {}
+
+export interface WeatherSettingsDto {
+}
+
 @Component({
   selector: 'weather',
   template: `
@@ -110,11 +114,12 @@ export interface WeatherSettingsDto {}
               <input class="w-full" pInputText id="name" [(ngModel)]="selectedTag.name"/>
             </div>
           </div>
+
           <div class="grid grid-cols-12 gap-4 mt-4">
             <label for="valueType" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Value Type</label>
             <div class="col-span-4 md:col-span-4">
               <p-dropdown class="w-full" id="valueType" [options]="valueTypeOptions"
-                          [(ngModel)]="selectedTag.valueType"></p-dropdown>
+                          optionLabel="label" optionValue="value"></p-dropdown>
             </div>
 
             <label for="source" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Source</label>
@@ -122,77 +127,165 @@ export interface WeatherSettingsDto {}
               <input class="w-full" pInputText id="source" [(ngModel)]="selectedTag.source"/>
             </div>
           </div>
+
+          <!-- Группа: Описательные метаданные -->
           <div class="grid grid-cols-12 gap-4 mt-4">
             <label for="descriptor" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Descriptor</label>
             <div class="col-span-12 md:col-span-10">
               <input class="w-full" pInputText id="descriptor" [(ngModel)]="selectedTag.descriptor"/>
             </div>
           </div>
-          <div class="flex justify-end mt-4">
-            <p-button label="Save" icon="pi pi-save"></p-button>
-          </div>
-        </div>
 
-        <div *ngIf="selectedTag" class="flex flex-col md:flex-row gap-8">
-
-          <div class="p-grid p-formgrid">
-
-
-            <div class="p-col-12 p-md-6">
-              <label for="engUnits">Eng Units</label>
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <label for="engUnits" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Engineering
+              Units</label>
+            <div class="col-span-12 md:col-span-10">
               <input pInputText id="engUnits" [(ngModel)]="selectedTag.engUnits"/>
             </div>
+          </div>
 
-            <div class="p-col-12 p-md-6">
-              <label for="instrumentTag">Instrument Tag</label>
-              <input pInputText id="instrumentTag" [(ngModel)]="selectedTag.instrumentTag"/>
-            </div>
-
-            <div class="p-col-12 p-md-6">
-              <p-checkbox [(ngModel)]="selectedTag.archiving" binary="true" label="Archiving"></p-checkbox>
-              <p-checkbox [(ngModel)]="selectedTag.compressing" binary="true" label="Compressing"></p-checkbox>
-              <p-checkbox [(ngModel)]="selectedTag.scan" binary="true" label="Scan"></p-checkbox>
-              <p-checkbox [(ngModel)]="selectedTag.step" binary="true" label="Step"></p-checkbox>
-            </div>
-
-            <div class="p-col-12 p-md-6">
-              <label for="digitalSet">Digital Set</label>
-              <input pInputText id="digitalSet" [(ngModel)]="selectedTag.digitalSet"/>
-            </div>
-
-            <div class="p-col-12 p-md-12">
-              <label for="exDesc">Description</label>
-              <textarea pInputTextarea id="exDesc" [ngModel]="selectedTag.exDesc" rows="3"></textarea>
-            </div>
-
-
-            <ng-container *ngFor="let field of ['excDev', 'excMin', 'excMax', 'compDev', 'compMin', 'compMax', 'zero', 'span',
-                                           'location1', 'location2', 'location3', 'location4', 'location5',
-                                           'userInt1', 'userInt2', 'userInt3', 'userInt4', 'userInt5',
-                                           'userReal1', 'userReal2', 'userReal3', 'userReal4', 'userReal5']">
-              <div class="p-col-12 p-md-4">
-                <label [for]="field">{{ field }}</label>
-                <input pInputNumber [inputId]="field" [formControlName]="field" mode="decimal"/>
-              </div>
-            </ng-container>
-
-            <div class="p-col-12 p-md-6">
-              <label for="creationDate">Creation Date</label>
-              <p-calendar [ngModel]="selectedTag.creationDate" [showTime]="true" dateFormat="yy-mm-dd"></p-calendar>
-            </div>
-
-            <div class="p-col-12 p-md-6">
-              <label for="creator">Creator</label>
-              <input pInputText id="creator" [ngModel]="selectedTag.creator"/>
-            </div>
-
-            <div class="p-col-12">
-              <label for="partition">Partition</label>
-              <input pInputText id="partition" [ngModel]="selectedTag.partition"/>
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <label for="exDesc" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Extended
+              Description</label>
+            <div class="col-span-12 md:col-span-10">
+              <textarea pInputTextarea id="exDesc" [(ngModel)]="selectedTag.exDesc" rows="3"></textarea>
             </div>
           </div>
 
-          <p-button label="Save" type="submit" class="p-mt-3"></p-button>
+          <!-- Группа: Конфигурация архивирования -->
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div class="col-span-12 md:col-span-4">
+              <p-checkbox [(ngModel)]="selectedTag.archiving" binary="true" label="Archiving"></p-checkbox>
+            </div>
+            <div class="col-span-12 md:col-span-4">
+              <label for="excDev" class="flex items-center mb-2">Exception Deviation</label>
+              <p-inputNumber id="excDev" [(ngModel)]="selectedTag.excDev" mode="decimal"></p-inputNumber>
+            </div>
+            <div class="col-span-12 md:col-span-4">
+              <label for="excMin" class="flex items-center mb-2">Exception Min (sec)</label>
+              <p-inputNumber id="excMin" [(ngModel)]="selectedTag.excMin" mode="decimal"></p-inputNumber>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div class="col-span-12 md:col-span-4">
+              <label for="excMax" class="flex items-center mb-2">Exception Max (sec)</label>
+              <p-inputNumber id="excMax" [(ngModel)]="selectedTag.excMax" mode="decimal"></p-inputNumber>
+            </div>
+          </div>
+
+          <!-- Группа: Конфигурация компрессии -->
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div class="col-span-12 md:col-span-4">
+              <p-checkbox [(ngModel)]="selectedTag.compressing" binary="true" label="Compressing"></p-checkbox>
+            </div>
+            <div class="col-span-12 md:col-span-4">
+              <label for="compDev" class="flex items-center mb-2">Compression Deviation</label>
+              <p-inputNumber id="compDev" [(ngModel)]="selectedTag.compDev" mode="decimal"></p-inputNumber>
+            </div>
+            <div class="col-span-12 md:col-span-4">
+              <label for="compMin" class="flex items-center mb-2">Compression Min (sec)</label>
+              <p-inputNumber id="compMin" [(ngModel)]="selectedTag.compMin" mode="decimal"></p-inputNumber>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div class="col-span-12 md:col-span-4">
+              <label for="compMax" class="flex items-center mb-2">Compression Max (sec)</label>
+              <p-inputNumber id="compMax" [(ngModel)]="selectedTag.compMax" mode="decimal"></p-inputNumber>
+            </div>
+          </div>
+
+          <!-- Группа: Калибровка/масштабирование -->
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div class="col-span-12 md:col-span-6">
+              <label for="zero" class="flex items-center mb-2">Zero</label>
+              <p-inputNumber id="zero" [(ngModel)]="selectedTag.zero" mode="decimal"></p-inputNumber>
+            </div>
+            <div class="col-span-12 md:col-span-6">
+              <label for="span" class="flex items-center mb-2">Span</label>
+              <p-inputNumber id="span" [(ngModel)]="selectedTag.span" mode="decimal"></p-inputNumber>
+            </div>
+          </div>
+
+          <!-- Группа: Параметры интеграции -->
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <label for="source" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Source</label>
+            <div class="col-span-12 md:col-span-10">
+              <input pInputText id="source" [(ngModel)]="selectedTag.source"/>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <label for="instrumentTag" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Instrument
+              Tag</label>
+            <div class="col-span-12 md:col-span-10">
+              <input pInputText id="instrumentTag" [(ngModel)]="selectedTag.instrumentTag"/>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div class="col-span-12 md:col-span-4">
+              <p-checkbox [(ngModel)]="selectedTag.scan" binary="true" label="Scan"></p-checkbox>
+            </div>
+            <div class="col-span-12 md:col-span-4">
+              <p-checkbox [(ngModel)]="selectedTag.step" binary="true" label="Step"></p-checkbox>
+            </div>
+            <div class="col-span-12 md:col-span-4">
+              <p-checkbox [(ngModel)]="selectedTag.future" binary="true" label="Future"></p-checkbox>
+            </div>
+          </div>
+
+          <!-- Location параметры -->
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div *ngFor="let loc of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
+              <label [for]="'location' + loc" class="flex items-center mb-2">Location {{ loc }}</label>
+              <p-inputNumber [id]="'location' + loc" [(ngModel)]="selectedTag['location' + loc]"
+                             mode="decimal"></p-inputNumber>
+            </div>
+          </div>
+
+          <!-- Пользовательские поля -->
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div *ngFor="let num of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
+              <label [for]="'userInt' + num" class="flex items-center mb-2">User Int {{ num }}</label>
+              <p-inputNumber [id]="'userInt' + num" [(ngModel)]="selectedTag['userInt' + num]"
+                             mode="decimal"></p-inputNumber>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div *ngFor="let num of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
+              <label [for]="'userReal' + num" class="flex items-center mb-2">User Real {{ num }}</label>
+              <p-inputNumber [id]="'userReal' + num" [(ngModel)]="selectedTag['userReal' + num]"
+                             mode="decimal"></p-inputNumber>
+            </div>
+          </div>
+
+          <!-- Аудит -->
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div class="col-span-12 md:col-span-6">
+              <label for="creationDate" class="flex items-center mb-2">Creation Date</label>
+              <p-calendar id="creationDate" [(ngModel)]="selectedTag.creationDate" [showTime]="true"
+                          dateFormat="yy-mm-dd"></p-calendar>
+            </div>
+            <div class="col-span-12 md:col-span-6">
+              <label for="creator" class="flex items-center mb-2">Creator</label>
+              <input pInputText id="creator" [(ngModel)]="selectedTag.creator"/>
+            </div>
+          </div>
+
+          <!-- Конфигурация хранилища -->
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <label for="partition" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Partition</label>
+            <div class="col-span-12 md:col-span-10">
+              <input pInputText id="partition" [(ngModel)]="selectedTag.partition"/>
+            </div>
+          </div>
+
+          <div class="flex justify-end mt-4">
+            <p-button label="Save" icon="pi pi-save" (onClick)="saveTag()"></p-button>
+          </div>
         </div>
       </div>
     </div>
@@ -213,6 +306,7 @@ export interface WeatherSettingsDto {}
     Calendar,
     Button,
     InputText,
+    InputNumber,
     DatePipe,
     FormsModule,
     NgForOf,
@@ -244,6 +338,12 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
   }
 
   async onSettingsChange($event: WeatherSettingsDto) {
-    await this.saveSettings($event)
+    await this.saveSettings($event);
+  }
+
+  saveTag() {
+    // Реализация сохранения тега
+    console.log('Saving tag:', this.selectedTag);
+    // Здесь должен быть вызов API для сохранения изменений
   }
 }

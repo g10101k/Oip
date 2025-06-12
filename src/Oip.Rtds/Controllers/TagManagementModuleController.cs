@@ -4,6 +4,7 @@ using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Rts.Base.Contexts;
+using Oip.Rts.Base.Entities;
 using Resources = Oip.Rts.Properties.Resources;
 
 namespace Oip.Rts.Controllers;
@@ -19,7 +20,7 @@ namespace Oip.Rts.Controllers;
 [Route("api/tag-management")]
 public class TagManagementModuleController : BaseModuleController<object>
 {
-    private readonly RtsContext _rtsContext;
+    private readonly RtdsContext _rtdsContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TagManagementModuleController"/> class.
@@ -28,12 +29,12 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// The controller depends on an application context and a module repository 
     /// for database access and modular behavior, respectively.
     /// </remarks>
-    /// <param name="rtsContext">Application database context for tag operations.</param>
+    /// <param name="rtdsContext">Application database context for tag operations.</param>
     /// <param name="moduleRepository">Base module repository for module-level operations.</param>
-    public TagManagementModuleController(RtsContext rtsContext, ModuleRepository moduleRepository)
+    public TagManagementModuleController(RtdsContext rtdsContext, ModuleRepository moduleRepository)
         : base(moduleRepository)
     {
-        _rtsContext = rtsContext;
+        _rtdsContext = rtdsContext;
     }
 
     /// <summary>
@@ -49,7 +50,7 @@ public class TagManagementModuleController : BaseModuleController<object>
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult AddTag(TagEntity tag)
     {
-        _rtsContext.AddTag(tag);
+        _rtdsContext.AddTag(tag);
         return Ok();
     }
 
@@ -66,7 +67,7 @@ public class TagManagementModuleController : BaseModuleController<object>
     [ProducesResponseType<List<TagEntity>>(StatusCodes.Status200OK)]
     public IActionResult GetTagsByFilter(string filter)
     {
-        return Ok(_rtsContext.GetTagsByFilter(filter));
+        return Ok(_rtdsContext.GetTagsByFilter(filter));
     }
 
     /// <summary>

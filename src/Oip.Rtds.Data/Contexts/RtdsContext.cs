@@ -1,5 +1,6 @@
 using Octonica.ClickHouseClient;
 using Dapper;
+using Oip.Rts.Base.Entities;
 using Oip.Rts.Base.Enums;
 using Oip.Rts.Base.Settings;
 
@@ -8,17 +9,17 @@ namespace Oip.Rts.Base.Contexts;
 /// <summary>
 /// Provides a context for interacting with the real-time storage (RTS) using ClickHouse.
 /// </summary>
-public sealed class RtsContext : IDisposable, IAsyncDisposable
+public sealed class RtdsContext : IDisposable, IAsyncDisposable
 {
     private readonly ClickHouseConnection _connection;
     private bool _disposed;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RtsContext"/> class using the provided application settings.
+    /// Initializes a new instance of the <see cref="RtdsContext"/> class using the provided application settings.
     /// Opens the ClickHouse connection immediately.
     /// </summary>
     /// <param name="appSettings">Application settings containing the RTS connection string.</param>
-    public RtsContext(AppSettings appSettings)
+    public RtdsContext(AppSettings appSettings)
     {
         _connection = new ClickHouseConnection(appSettings.RtsConnectionString);
         _connection.Open();
@@ -136,7 +137,7 @@ public sealed class RtsContext : IDisposable, IAsyncDisposable
     #region IDisposable Support
 
     /// <summary>
-    /// Releases the unmanaged and managed resources used by the <see cref="RtsContext"/> instance.
+    /// Releases the unmanaged and managed resources used by the <see cref="RtdsContext"/> instance.
     /// </summary>
     public void Dispose()
     {
@@ -145,7 +146,7 @@ public sealed class RtsContext : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Releases the managed and optionally unmanaged resources used by the <see cref="RtsContext"/>.
+    /// Releases the managed and optionally unmanaged resources used by the <see cref="RtdsContext"/>.
     /// </summary>
     /// <param name="disposing">
     /// True to release both managed and unmanaged resources; false to release only unmanaged resources.
@@ -165,7 +166,7 @@ public sealed class RtsContext : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Asynchronously releases the unmanaged and managed resources used by the <see cref="RtsContext"/> instance.
+    /// Asynchronously releases the unmanaged and managed resources used by the <see cref="RtdsContext"/> instance.
     /// </summary>
     /// <returns>A <see cref="ValueTask"/> representing the asynchronous dispose operation.</returns>
     public async ValueTask DisposeAsync()
