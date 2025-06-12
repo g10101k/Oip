@@ -6,5 +6,9 @@
         <Nullable>enable</Nullable>
         <RootNamespace>Oip.Rtds.SqlServer</RootNamespace>
     </PropertyGroup>
-
+    
+    <ItemGroup>
+        <ProjectReference Include="..\Oip.Rtds.Data\Oip.Rtds.Data.csproj"/>
+    </ItemGroup>
+    
 </Project>

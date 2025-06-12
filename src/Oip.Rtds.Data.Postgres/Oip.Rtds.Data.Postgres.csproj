@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Oip.Rtds.Data\Oip.Rtds.Data.csproj" />
+    </ItemGroup>
+
 </Project>
