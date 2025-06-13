@@ -89,7 +89,7 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     /// performed with caution in production environments.
     /// </remarks>
     /// <returns>HTTP 200 OK on success.</returns>
-    [HttpGet("migrate")]
+    [HttpPost("migrate")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<IActionResult> GetAppliedMigrations()
     {
