@@ -2,25 +2,28 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Rtds.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Rtds.Data.Postgres.Migrations
+namespace Oip.Rtds.SqlServer.Migrations
 {
     [DbContext(typeof(RtdsMetaContext))]
-    partial class RtdsMetaContextModelSnapshot : ModelSnapshot
+    [Migration("20250613164952_ChangeType")]
+    partial class ChangeType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.11")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Oip.Rtds.Data.Entities.TagEntity", b =>
                 {
@@ -28,128 +31,128 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("TagId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TagId"));
 
                     b.Property<bool?>("Archiving")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<double?>("CompDev")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<int?>("CompMax")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("CompMin")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<bool?>("Compressing")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Creator")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Descriptor")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DigitalSet")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EngUnits")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ExDesc")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("ExcDev")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<int?>("ExcMax")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("ExcMin")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<bool?>("Future")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<string>("InstrumentTag")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Location1")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("Location2")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("Location3")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("Location4")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("Location5")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<string>("Partition")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("Scan")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Source")
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int?>("Span")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<bool?>("Step")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<int?>("UserInt1")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("UserInt2")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("UserInt3")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("UserInt4")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("UserInt5")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<double?>("UserReal1")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<double?>("UserReal2")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<double?>("UserReal3")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<double?>("UserReal4")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<double?>("UserReal5")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<int>("ValueType")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("Zero")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.HasKey("TagId");
 

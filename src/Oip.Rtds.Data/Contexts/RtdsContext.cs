@@ -1,7 +1,4 @@
-using Dapper;
 using Octonica.ClickHouseClient;
-using Oip.Rtds.Data.Entities;
-using Oip.Rtds.Data.Enums;
 using Oip.Rtds.Data.Settings;
 
 namespace Oip.Rtds.Data.Contexts;
@@ -25,8 +22,20 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
         _connection.Open();
     }
 
-  
+    ~RtdsContext()
+    {
+        // Clean up any unmanaged resources here.
+        Dispose(false);
+    }
 
+    /// <summary>
+    /// Asynchronously creates a new tag table in the RTDS using ClickHouse.
+    /// </summary>
+    /// <param name="tableName">The name of the tag table to create.</param>
+    /// <param name="valueType">The type of value stored in the tag table.</param>
+    /// <param name="statusType">The type of status stored in the tag table.</param>
+    /// <param name="partition">The partition for the tag table.</param>
+    /// <exception cref="InvalidOperationException">Thrown when a table with the same name already exists.</exception>
     public async Task CreateTagTableAsync(string tableName, string valueType, string statusType, string partition)
     {
         var sql = string.Format(QueryConstants.CreateTagTableSql, tableName, valueType, statusType, partition);
@@ -34,7 +43,6 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
         cmd.CommandText = sql;
         await cmd.ExecuteNonQueryAsync();
     }
-
 
     #region IDisposable Support
 

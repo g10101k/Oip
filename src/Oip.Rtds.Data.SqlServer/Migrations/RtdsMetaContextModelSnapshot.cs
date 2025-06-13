@@ -106,7 +106,8 @@ namespace Oip.Rtds.SqlServer.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Source")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int?>("Span")
                         .HasColumnType("int");
@@ -151,6 +152,9 @@ namespace Oip.Rtds.SqlServer.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("TagId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Tag", "rtds");
                 });

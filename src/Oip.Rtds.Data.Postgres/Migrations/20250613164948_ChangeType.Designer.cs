@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Rtds.Data.Contexts;
@@ -11,9 +12,11 @@ using Oip.Rtds.Data.Contexts;
 namespace Oip.Rtds.Data.Postgres.Migrations
 {
     [DbContext(typeof(RtdsMetaContext))]
-    partial class RtdsMetaContextModelSnapshot : ModelSnapshot
+    [Migration("20250613164948_ChangeType")]
+    partial class ChangeType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
