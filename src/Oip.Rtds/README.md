@@ -67,5 +67,5 @@ All `INSERT` and `SELECT` queries use Dapper parameters
 Table and column names are validated via regex (^[a-zA-Z0-9_]+$)
 No raw user input is interpolated into SQL
 
-* Dotnet app start at http://localhost:5003
-* Angular client start at http://localhost:50003
+* Dotnet app start at https://localhost:5003
+* Angular client start at https://localhost:50003
