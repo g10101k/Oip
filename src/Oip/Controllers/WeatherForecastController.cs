@@ -10,7 +10,7 @@ using Oip.Properties;
 namespace Oip.Controllers;
 
 /// <summary>
-/// Module controller example
+/// Controller for managing weather forecast data.
 /// </summary>
 [ApiController]
 [Route("api/weather")]
@@ -35,10 +35,10 @@ public class WeatherForecastController : BaseModuleController<WeatherModuleSetti
     }
 
     /// <summary>
-    /// Get example data
+    /// Retrieves example weather forecast data.
     /// </summary>
-    /// <param name="dayCount"></param>
-    /// <returns></returns>
+    /// <param name="dayCount">The number of days for which to retrieve the forecast.</param>
+    /// <returns>A list of WeatherForecastResponse objects representing the weather forecast.</returns>
     [HttpGet("get")]
     [Authorize]
     [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
