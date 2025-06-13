@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Oip.Base.Services;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Entities;
@@ -16,16 +17,19 @@ public class TagRepository
 {
     private readonly RtdsMetaContext _rtdsMetaContext;
     private readonly RtdsContext _rtdsContext;
+    private readonly UserService _userService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TagRepository"/> class
     /// </summary>
     /// <param name="rtdsMetaContext">The context for tag metadata operations</param>
     /// <param name="rtdsContext">The context for time-series data operations</param>
-    public TagRepository(RtdsMetaContext rtdsMetaContext, RtdsContext rtdsContext)
+    /// <param name="userService">The user service</param>
+    public TagRepository(RtdsMetaContext rtdsMetaContext, RtdsContext rtdsContext, UserService userService)
     {
         _rtdsMetaContext = rtdsMetaContext;
         _rtdsContext = rtdsContext;
+        _userService = userService;
     }
 
     /// <summary>
@@ -38,55 +42,65 @@ public class TagRepository
     /// </exception>
     public async Task AddTag(TagCreateDto tag)
     {
-        var tableName = $"{tag.TagId:D6}";
-        var valueType = GetClickHouseTypeFromTagType(tag.ValueType);
-        var statusType = GenerateClickHouseEnum8<TagValueStatus>();
-        await _rtdsContext.CreateTagTableAsync(tableName, valueType, statusType, tag.Partition);
-
-        _rtdsMetaContext.Tags.Add(new TagEntity
+        await _rtdsMetaContext.Database.BeginTransactionAsync();
+        try
         {
-            Name = tag.Name,
-            ValueType = tag.ValueType,
-            Source = tag.Source,
-            Descriptor = tag.Descriptor,
-            EngUnits = tag.EngUnits,
-            InstrumentTag = tag.InstrumentTag,
-            Archiving = tag.Archiving,
-            Compressing = tag.Compressing,
-            ExcDev = tag.ExcDev,
-            ExcMin = tag.ExcMin,
-            ExcMax = tag.ExcMax,
-            CompDev = tag.CompDev,
-            CompMin = tag.CompMin,
-            CompMax = tag.CompMax,
-            Zero = tag.Zero,
-            Span = tag.Span,
-            Location1 = tag.Location1,
-            Location2 = tag.Location2,
-            Location3 = tag.Location3,
-            Location4 = tag.Location4,
-            Location5 = tag.Location5,
-            ExDesc = tag.ExDesc,
-            Scan = tag.Scan,
-            DigitalSet = tag.DigitalSet,
-            Step = tag.Step,
-            Future = tag.Future,
-            UserInt1 = tag.UserInt1,
-            UserInt2 = tag.UserInt2,
-            UserInt3 = tag.UserInt3,
-            UserInt4 = tag.UserInt4,
-            UserInt5 = tag.UserInt5,
-            UserReal1 = tag.UserReal1,
-            UserReal2 = tag.UserReal2,
-            UserReal3 = tag.UserReal3,
-            UserReal4 = tag.UserReal4,
-            UserReal5 = tag.UserReal5,
-            CreationDate = tag.CreationDate,
-            Creator = tag.Creator,
-            Partition = tag.Partition
-        });
+            var tagEntity = await _rtdsMetaContext.Tags.AddAsync(new TagEntity
+            {
+                Name = tag.Name,
+                ValueType = tag.ValueType,
+                Source = tag.Source,
+                Descriptor = tag.Descriptor,
+                EngUnits = tag.EngUnits,
+                InstrumentTag = tag.InstrumentTag,
+                Archiving = tag.Archiving,
+                Compressing = tag.Compressing,
+                ExcDev = tag.ExcDev,
+                ExcMin = tag.ExcMin,
+                ExcMax = tag.ExcMax,
+                CompDev = tag.CompDev,
+                CompMin = tag.CompMin,
+                CompMax = tag.CompMax,
+                Zero = tag.Zero,
+                Span = tag.Span,
+                Location1 = tag.Location1,
+                Location2 = tag.Location2,
+                Location3 = tag.Location3,
+                Location4 = tag.Location4,
+                Location5 = tag.Location5,
+                ExDesc = tag.ExDesc,
+                Scan = tag.Scan,
+                DigitalSet = tag.DigitalSet,
+                Step = tag.Step,
+                Future = tag.Future,
+                UserInt1 = tag.UserInt1,
+                UserInt2 = tag.UserInt2,
+                UserInt3 = tag.UserInt3,
+                UserInt4 = tag.UserInt4,
+                UserInt5 = tag.UserInt5,
+                UserReal1 = tag.UserReal1,
+                UserReal2 = tag.UserReal2,
+                UserReal3 = tag.UserReal3,
+                UserReal4 = tag.UserReal4,
+                UserReal5 = tag.UserReal5,
+                CreationDate = DateTimeOffset.UtcNow,
+                Creator = _userService.GetUserEmail(),
+                Partition = tag.Partition
+            });
 
-        await _rtdsMetaContext.SaveChangesAsync();
+            await _rtdsMetaContext.SaveChangesAsync();
+            var tableName = $"{tagEntity.Entity.TagId:D6}";
+            var valueType = GetClickHouseTypeFromTagType(tag.ValueType);
+            var statusType = GenerateClickHouseEnum8<TagValueStatus>();
+
+            await _rtdsContext.CreateTagTableAsync(tableName, valueType, statusType, tag.Partition);
+            await _rtdsMetaContext.Database.CommitTransactionAsync();
+        }
+        catch (Exception e)
+        {
+            await _rtdsMetaContext.Database.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     /// <summary>
@@ -159,7 +173,7 @@ public class TagRepository
             TagTypes.Float32 => "Float32",
             TagTypes.Float64 => "Float64",
             TagTypes.Int16 => "Int32",
-            TagTypes.Int32 => "Int32",  
+            TagTypes.Int32 => "Int32",
             TagTypes.Digital => "UInt8",
             TagTypes.String => "String",
             TagTypes.Blob => "String", // Можно также использовать FixedString(N) или Base64

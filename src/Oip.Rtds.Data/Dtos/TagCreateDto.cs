@@ -193,18 +193,8 @@ public class TagCreateDto
     public double? UserReal5 { get; set; }
 
     /// <summary>
-    /// Date and time when the tag was created.
-    /// </summary>
-    public DateTimeOffset? CreationDate { get; set; }
-
-    /// <summary>
-    /// User or process that created the tag.
-    /// </summary>
-    public string? Creator { get; set; }
-
-    /// <summary>
-    /// ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(time)").
+    /// ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(Time)").
     /// Used to control how data is partitioned when creating the table.
     /// </summary>
-    public string Partition { get; set; } = "PARTITION BY toYear(time)";
+    public string Partition { get; set; } = "PARTITION BY toYear(Time)";
 }

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
+using Oip.Base.Services;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Entities;
@@ -49,6 +51,7 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// <param name="tag">Tag entity to be added.</param>
     /// <returns>HTTP 200 OK on success.</returns>
     [HttpPost("add-tag")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> AddTag(TagCreateDto tag)
     {
@@ -67,6 +70,7 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// <returns>A list of matching tags.</returns>
     [HttpGet("get-tags-by-filter")]
     [ProducesResponseType<List<TagEntity>>(StatusCodes.Status200OK)]
+    [Authorize]
     public IActionResult GetTagsByFilter(string filter)
     {
         return Ok(_tagRepository.GetTagsByFilter(filter));

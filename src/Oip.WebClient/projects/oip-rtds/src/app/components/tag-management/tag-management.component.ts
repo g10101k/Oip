@@ -13,6 +13,8 @@ import { InputText } from "primeng/inputtext";
 import { InputNumber } from "primeng/inputnumber";
 import { TagEntity } from "../../api/data-contracts";
 import { FormsModule } from "@angular/forms";
+import { Tooltip } from "primeng/tooltip";
+import { Textarea } from "primeng/textarea";
 
 export enum TagTypes {
   Float32 = 0,
@@ -28,10 +30,10 @@ export interface WeatherSettingsDto {
 }
 
 @Component({
-  selector: 'weather',
+  selector: 'tag-management',
   template: `
     <div *ngIf="isContent">
-      <div class="grid grid-cols-12 gap-4">
+      <div class="grid grid-cols-12">
         <div class="card col-span-12 xl:col-span-12">
           <div class="font-semibold text-xl">Tags</div>
           <p-table [value]="tags"
@@ -105,191 +107,200 @@ export interface WeatherSettingsDto {
             </ng-template>
           </p-table>
         </div>
+        <div *ngIf="selectedTag" class="grid grid-cols-12 col-span-12 xl:col-span-12 gap-4">
+          <div class="card col-span-6 xl:col-span-6 ">
+            <div class="font-semibold text-xl">Common</div>
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <label for="name" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Name</label>
+              <div class="col-span-12 md:col-span-10">
+                <input class="w-full" pInputText id="name" [(ngModel)]="selectedTag.name"/>
+              </div>
+            </div>
 
-        <div *ngIf="selectedTag" class="card col-span-6 xl:col-span-6">
-          <div class="font-semibold text-xl">Common</div>
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <label for="name" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Name</label>
-            <div class="col-span-12 md:col-span-10">
-              <input class="w-full" pInputText id="name" [(ngModel)]="selectedTag.name"/>
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <label for="valueType" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Value Type</label>
+              <div class="col-span-4 md:col-span-4">
+                <p-dropdown class="w-full" id="valueType" [options]="valueTypeOptions"
+                            optionLabel="label" optionValue="value"></p-dropdown>
+              </div>
+              <label for="source" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Source</label>
+              <div class="col-span-4 md:col-span-4">
+                <input class="w-full" pInputText id="source" [(ngModel)]="selectedTag.source"/>
+              </div>
+            </div>
+
+            <!-- Группа: Описательные метаданные -->
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <label for="descriptor"
+                     class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Descriptor</label>
+              <div class="col-span-12 md:col-span-10">
+                <input class="w-full" pInputText id="descriptor" [(ngModel)]="selectedTag.descriptor"/>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <label for="engUnits" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">UOM</label>
+              <div class="col-span-12 md:col-span-10">
+                <input pInputText id="engUnits" [(ngModel)]="selectedTag.engUnits"/>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <label for="exDesc" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Extended
+                Description</label>
+              <div class="col-span-12 md:col-span-10">
+                <textarea class="w-full" pTextarea id="exDesc" [(ngModel)]="selectedTag.exDesc"
+                          rows="3"></textarea>
+              </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <label for="valueType" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Value Type</label>
-            <div class="col-span-4 md:col-span-4">
-              <p-dropdown class="w-full" id="valueType" [options]="valueTypeOptions"
-                          optionLabel="label" optionValue="value"></p-dropdown>
+          <div class="card col-span-6 xl:col-span-6">
+            <div class="font-semibold text-xl">Конфигурация архивирования</div>
+            <div class="grid grid-cols-2 gap-4 mt-4">
+              <div class="col-span-1 md:col-span-1">
+                <div class="grid col-span-12 md:col-span-12">
+                  <label for="archiving" class="flex items-center mb-2">Archiving</label>
+                  <p-checkbox id="archiving" [(ngModel)]="selectedTag.archiving" binary="true"
+                              pTooltip="Archiving"></p-checkbox>
+                </div>
+                <div class="col-span-12 md:col-span-12">
+                  <label for="excDev" class="flex items-center mb-2">Exception Deviation</label>
+                  <p-inputNumber id="excDev" [(ngModel)]="selectedTag.excDev" mode="decimal"></p-inputNumber>
+                </div>
+                <div class="col-span-12 md:col-span-12">
+                  <label for="excMin" class="flex items-center mb-2">Exception Min (sec)</label>
+                  <p-inputNumber id="excMin" [(ngModel)]="selectedTag.excMin" mode="decimal"></p-inputNumber>
+                </div>
+                <div class="grid grid-cols-12 gap-4 mt-4">
+                  <div class="col-span-12 md:col-span-12">
+                    <label for="excMax" class="flex items-center mb-2">Exception Max (sec)</label>
+                    <p-inputNumber id="excMax" [(ngModel)]="selectedTag.excMax" mode="decimal"></p-inputNumber>
+                  </div>
+                </div>
+              </div>
+              <div class="col-span-1 md:col-span-1">
+                <!-- Группа: Конфигурация компрессии -->
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                  <label for="excMax" class="flex items-center mb-2">Exception Max (sec)</label>
+                  <p-checkbox [(ngModel)]="selectedTag.compressing" binary="true" label="Compressing"></p-checkbox>
+                </div>
+                <div class="col-span-12 md:col-span-4">
+                  <label for="compDev" class="flex items-center mb-2">Compression Deviation</label>
+                  <p-inputNumber id="compDev" [(ngModel)]="selectedTag.compDev" mode="decimal"></p-inputNumber>
+                </div>
+                <div class="col-span-12 md:col-span-4">
+                  <label for="compMin" class="flex items-center mb-2">Compression Min (sec)</label>
+                  <p-inputNumber id="compMin" [(ngModel)]="selectedTag.compMin" mode="decimal"></p-inputNumber>
+                </div>
+
+                <div class="grid grid-cols-12 gap-4 mt-4">
+                  <div class="col-span-12 md:col-span-4">
+                    <label for="compMax" class="flex items-center mb-2">Compression Max (sec)</label>
+                    <p-inputNumber id="compMax" [(ngModel)]="selectedTag.compMax" mode="decimal"></p-inputNumber>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <label for="source" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Source</label>
-            <div class="col-span-4 md:col-span-4">
-              <input class="w-full" pInputText id="source" [(ngModel)]="selectedTag.source"/>
-            </div>
+
           </div>
+          <div *ngIf="selectedTag" class="card col-span-6 xl:col-span-6">
 
-          <!-- Группа: Описательные метаданные -->
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <label for="descriptor" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Descriptor</label>
-            <div class="col-span-12 md:col-span-10">
-              <input class="w-full" pInputText id="descriptor" [(ngModel)]="selectedTag.descriptor"/>
+            <!-- Группа: Калибровка/масштабирование -->
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <div class="col-span-12 md:col-span-6">
+                <label for="zero" class="flex items-center mb-2">Zero</label>
+                <p-inputNumber id="zero" [(ngModel)]="selectedTag.zero" mode="decimal"></p-inputNumber>
+              </div>
+              <div class="col-span-12 md:col-span-6">
+                <label for="span" class="flex items-center mb-2">Span</label>
+                <p-inputNumber id="span" [(ngModel)]="selectedTag.span" mode="decimal"></p-inputNumber>
+              </div>
             </div>
-          </div>
 
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <label for="engUnits" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Engineering
-              Units</label>
-            <div class="col-span-12 md:col-span-10">
-              <input pInputText id="engUnits" [(ngModel)]="selectedTag.engUnits"/>
+            <!-- Группа: Параметры интеграции -->
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <label for="source" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Source</label>
+              <div class="col-span-12 md:col-span-10">
+                <input pInputText id="source" [(ngModel)]="selectedTag.source"/>
+              </div>
             </div>
-          </div>
 
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <label for="exDesc" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Extended
-              Description</label>
-            <div class="col-span-12 md:col-span-10">
-              <textarea pInputTextarea id="exDesc" [(ngModel)]="selectedTag.exDesc" rows="3"></textarea>
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <label for="instrumentTag" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Instrument
+                Tag</label>
+              <div class="col-span-12 md:col-span-10">
+                <input pInputText id="instrumentTag" [(ngModel)]="selectedTag.instrumentTag"/>
+              </div>
             </div>
-          </div>
 
-          <!-- Группа: Конфигурация архивирования -->
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div class="col-span-12 md:col-span-4">
-              <p-checkbox [(ngModel)]="selectedTag.archiving" binary="true" label="Archiving"></p-checkbox>
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <div class="col-span-12 md:col-span-4">
+                <p-checkbox [(ngModel)]="selectedTag.scan" binary="true" label="Scan"></p-checkbox>
+              </div>
+              <div class="col-span-12 md:col-span-4">
+                <p-checkbox [(ngModel)]="selectedTag.step" binary="true" title="Step"></p-checkbox>
+              </div>
+              <div class="col-span-12 md:col-span-4">
+                <p-checkbox [(ngModel)]="selectedTag.future" binary="true" label="Future"></p-checkbox>
+              </div>
             </div>
-            <div class="col-span-12 md:col-span-4">
-              <label for="excDev" class="flex items-center mb-2">Exception Deviation</label>
-              <p-inputNumber id="excDev" [(ngModel)]="selectedTag.excDev" mode="decimal"></p-inputNumber>
-            </div>
-            <div class="col-span-12 md:col-span-4">
-              <label for="excMin" class="flex items-center mb-2">Exception Min (sec)</label>
-              <p-inputNumber id="excMin" [(ngModel)]="selectedTag.excMin" mode="decimal"></p-inputNumber>
-            </div>
-          </div>
 
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div class="col-span-12 md:col-span-4">
-              <label for="excMax" class="flex items-center mb-2">Exception Max (sec)</label>
-              <p-inputNumber id="excMax" [(ngModel)]="selectedTag.excMax" mode="decimal"></p-inputNumber>
+            <!-- Location параметры -->
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <div *ngFor="let loc of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
+                <label [for]="'location' + loc" class="flex items-center mb-2">Location {{ loc }}</label>
+                <p-inputNumber [id]="'location' + loc" [(ngModel)]="selectedTag['location' + loc]"
+                               mode="decimal"></p-inputNumber>
+              </div>
             </div>
-          </div>
 
-          <!-- Группа: Конфигурация компрессии -->
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div class="col-span-12 md:col-span-4">
-              <p-checkbox [(ngModel)]="selectedTag.compressing" binary="true" label="Compressing"></p-checkbox>
+            <!-- Пользовательские поля -->
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <div *ngFor="let num of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
+                <label [for]="'userInt' + num" class="flex items-center mb-2">User Int {{ num }}</label>
+                <p-inputNumber [id]="'userInt' + num" [(ngModel)]="selectedTag['userInt' + num]"
+                               mode="decimal"></p-inputNumber>
+              </div>
             </div>
-            <div class="col-span-12 md:col-span-4">
-              <label for="compDev" class="flex items-center mb-2">Compression Deviation</label>
-              <p-inputNumber id="compDev" [(ngModel)]="selectedTag.compDev" mode="decimal"></p-inputNumber>
-            </div>
-            <div class="col-span-12 md:col-span-4">
-              <label for="compMin" class="flex items-center mb-2">Compression Min (sec)</label>
-              <p-inputNumber id="compMin" [(ngModel)]="selectedTag.compMin" mode="decimal"></p-inputNumber>
-            </div>
-          </div>
 
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div class="col-span-12 md:col-span-4">
-              <label for="compMax" class="flex items-center mb-2">Compression Max (sec)</label>
-              <p-inputNumber id="compMax" [(ngModel)]="selectedTag.compMax" mode="decimal"></p-inputNumber>
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <div *ngFor="let num of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
+                <label [for]="'userReal' + num" class="flex items-center mb-2">User Real {{ num }}</label>
+                <p-inputNumber [id]="'userReal' + num" [(ngModel)]="selectedTag['userReal' + num]"
+                               mode="decimal"></p-inputNumber>
+              </div>
             </div>
-          </div>
 
-          <!-- Группа: Калибровка/масштабирование -->
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div class="col-span-12 md:col-span-6">
-              <label for="zero" class="flex items-center mb-2">Zero</label>
-              <p-inputNumber id="zero" [(ngModel)]="selectedTag.zero" mode="decimal"></p-inputNumber>
+            <!-- Аудит -->
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <div class="col-span-12 md:col-span-6">
+                <label for="creationDate" class="flex items-center mb-2">Creation Date</label>
+                <p-calendar id="creationDate" [(ngModel)]="selectedTag.creationDate" [showTime]="true"
+                            dateFormat="yy-mm-dd"></p-calendar>
+              </div>
+              <div class="col-span-12 md:col-span-6">
+                <label for="creator" class="flex items-center mb-2">Creator</label>
+                <input pInputText id="creator" [(ngModel)]="selectedTag.creator"/>
+              </div>
             </div>
-            <div class="col-span-12 md:col-span-6">
-              <label for="span" class="flex items-center mb-2">Span</label>
-              <p-inputNumber id="span" [(ngModel)]="selectedTag.span" mode="decimal"></p-inputNumber>
-            </div>
-          </div>
 
-          <!-- Группа: Параметры интеграции -->
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <label for="source" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Source</label>
-            <div class="col-span-12 md:col-span-10">
-              <input pInputText id="source" [(ngModel)]="selectedTag.source"/>
+            <!-- Конфигурация хранилища -->
+            <div class="grid grid-cols-12 gap-4 mt-4">
+              <label for="partition" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Partition</label>
+              <div class="col-span-12 md:col-span-10">
+                <input pInputText id="partition" [(ngModel)]="selectedTag.partition"/>
+              </div>
             </div>
-          </div>
 
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <label for="instrumentTag" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Instrument
-              Tag</label>
-            <div class="col-span-12 md:col-span-10">
-              <input pInputText id="instrumentTag" [(ngModel)]="selectedTag.instrumentTag"/>
+            <div class="flex justify-end mt-4">
+              <p-button label="Save" icon="pi pi-save" (onClick)="saveTag()"></p-button>
             </div>
-          </div>
-
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div class="col-span-12 md:col-span-4">
-              <p-checkbox [(ngModel)]="selectedTag.scan" binary="true" label="Scan"></p-checkbox>
-            </div>
-            <div class="col-span-12 md:col-span-4">
-              <p-checkbox [(ngModel)]="selectedTag.step" binary="true" label="Step"></p-checkbox>
-            </div>
-            <div class="col-span-12 md:col-span-4">
-              <p-checkbox [(ngModel)]="selectedTag.future" binary="true" label="Future"></p-checkbox>
-            </div>
-          </div>
-
-          <!-- Location параметры -->
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div *ngFor="let loc of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
-              <label [for]="'location' + loc" class="flex items-center mb-2">Location {{ loc }}</label>
-              <p-inputNumber [id]="'location' + loc" [(ngModel)]="selectedTag['location' + loc]"
-                             mode="decimal"></p-inputNumber>
-            </div>
-          </div>
-
-          <!-- Пользовательские поля -->
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div *ngFor="let num of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
-              <label [for]="'userInt' + num" class="flex items-center mb-2">User Int {{ num }}</label>
-              <p-inputNumber [id]="'userInt' + num" [(ngModel)]="selectedTag['userInt' + num]"
-                             mode="decimal"></p-inputNumber>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div *ngFor="let num of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
-              <label [for]="'userReal' + num" class="flex items-center mb-2">User Real {{ num }}</label>
-              <p-inputNumber [id]="'userReal' + num" [(ngModel)]="selectedTag['userReal' + num]"
-                             mode="decimal"></p-inputNumber>
-            </div>
-          </div>
-
-          <!-- Аудит -->
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <div class="col-span-12 md:col-span-6">
-              <label for="creationDate" class="flex items-center mb-2">Creation Date</label>
-              <p-calendar id="creationDate" [(ngModel)]="selectedTag.creationDate" [showTime]="true"
-                          dateFormat="yy-mm-dd"></p-calendar>
-            </div>
-            <div class="col-span-12 md:col-span-6">
-              <label for="creator" class="flex items-center mb-2">Creator</label>
-              <input pInputText id="creator" [(ngModel)]="selectedTag.creator"/>
-            </div>
-          </div>
-
-          <!-- Конфигурация хранилища -->
-          <div class="grid grid-cols-12 gap-4 mt-4">
-            <label for="partition" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Partition</label>
-            <div class="col-span-12 md:col-span-10">
-              <input pInputText id="partition" [(ngModel)]="selectedTag.partition"/>
-            </div>
-          </div>
-
-          <div class="flex justify-end mt-4">
-            <p-button label="Save" icon="pi pi-save" (onClick)="saveTag()"></p-button>
           </div>
         </div>
       </div>
     </div>
-
     <div *ngIf="isSettings"></div>
     <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
   `,
@@ -310,6 +321,8 @@ export interface WeatherSettingsDto {
     DatePipe,
     FormsModule,
     NgForOf,
+    Tooltip,
+    Textarea,
   ],
 })
 export class TagManagement extends BaseComponent<WeatherSettingsDto> implements OnInit, OnDestroy, Feature {

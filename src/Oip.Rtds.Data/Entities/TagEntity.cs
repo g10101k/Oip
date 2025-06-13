@@ -206,5 +206,5 @@ public class TagEntity
     /// ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(time)").
     /// Used to control how data is partitioned when creating the table.
     /// </summary>
-    public string Partition { get; set; } = "PARTITION BY toYear(time)";
+    public string Partition { get; set; } = "PARTITION BY toYear(Time)";
 }
