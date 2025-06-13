@@ -57,11 +57,12 @@ services:
       - "8443:8443"
       - "9000:9000"
     volumes:
-      - $HOME/.aspnet/https:/opt/keycloak/data/cert/
-      #      - ${APPDATA}/ASP.NET/https:/opt/keycloak/data/cert/
+      # - $HOME/.aspnet/https:/opt/keycloak/data/cert/
+      - ${APPDATA}/ASP.NET/https:/opt/keycloak/data/cert/
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
     depends_on:
       - postgres
+    
     
   clickhouse:
     image: clickhouse/clickhouse-server:latest
@@ -83,7 +84,6 @@ services:
     networks:
       - bridge-network
 
-  # Optional: DBeaver web version
   dbeaver:
     image: dbeaver/cloudbeaver:latest
     container_name: dbeaver
@@ -95,14 +95,50 @@ services:
       - clickhouse
     networks:
       - bridge-network
+  
+  ollama:
+    image: ollama/ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [ "gpu" ]
+              count: all
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: always
+    networks:
+      backend-network:
+  
+  n8n:
+    image: n8nio/n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=P@ssw0rd
+      - NODE_ENV=production
+      - GENERIC_TIMEZONE=Europe/Moscow
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      backend-network:
+  
 networks:
   backend-network: { }
   bridge-network:
     driver: bridge
 
 volumes:
+  n8n_data:
   postgres-data:
   pgadmin-data:
   pgadminhome-data:
   clickhouse_data:
   dbeaver-data:
+  ollama:
