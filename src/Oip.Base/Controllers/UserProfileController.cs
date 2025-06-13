@@ -34,7 +34,7 @@ public class UserProfileController : ControllerBase
         var userDto = _userRepository.GetUserByEmail(email);
         if (userDto?.Photo != null)
             return new FileContentResult(userDto.Photo, "image/jpeg");
-        return new NotFoundResult();
+        return new NoContentResult();
     }
 
     /// <summary> 
