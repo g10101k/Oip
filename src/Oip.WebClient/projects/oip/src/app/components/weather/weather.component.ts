@@ -56,7 +56,7 @@ import { InputText } from "primeng/inputtext";
     </div>
     <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
   `,
-  providers: [{ provide: 'controller', useValue: 'weather' }, WeatherForecast],
+  providers: [WeatherForecast],
   standalone: true,
   imports: [
     NgIf,
