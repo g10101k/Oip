@@ -37,6 +37,7 @@ public static class ServiceCollectionExtension
                                 x =>
                                 {
                                     x.MigrationsHistoryTable(migrationHistoryTableName, migrationHistorySchemaName);
+                                    x.MigrationsAssembly("Oip.Base.Data.Postgres");
                                 });
                             break;
                         case XpoProvider.MSSqlServer:
@@ -44,6 +45,7 @@ public static class ServiceCollectionExtension
                                 x =>
                                 {
                                     x.MigrationsHistoryTable(migrationHistoryTableName, migrationHistorySchemaName);
+                                    x.MigrationsAssembly("Oip.Base.Data.SqlServer");
                                 });
                             break;
                         default:
