@@ -4,8 +4,12 @@ using Oip.Rtds.Data.Settings;
 namespace Oip.Rtds.Data.Contexts;
 
 /// <summary>
-/// Provides a context for interacting with the real-time storage (RTS) using ClickHouse.
+/// ClickHouse database context for real-time data storage operations.
 /// </summary>
+/// <remarks>
+/// Manages database connections and provides methods for tag table creation.
+/// Handles both synchronous and asynchronous resource cleanup.
+/// </remarks>
 public sealed class RtdsContext : IDisposable, IAsyncDisposable
 {
     private readonly ClickHouseConnection _connection;
@@ -15,16 +19,21 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// Initializes a new instance of the <see cref="RtdsContext"/> class using the provided application settings.
     /// Opens the ClickHouse connection immediately.
     /// </summary>
-    /// <param name="appSettings">Application settings containing the RTS connection string.</param>
+    /// <param name="appSettings">Application configuration containing connection string.</param>
+    /// <remarks>
+    /// Immediately opens a connection to the ClickHouse database.
+    /// </remarks>
     public RtdsContext(AppSettings appSettings)
     {
         _connection = new ClickHouseConnection(appSettings.RtsConnectionString);
         _connection.Open();
     }
 
+    /// <summary>
+    /// Finalizer for releasing unmanaged resources.
+    /// </summary>
     ~RtdsContext()
     {
-        // Clean up any unmanaged resources here.
         Dispose(false);
     }
 
