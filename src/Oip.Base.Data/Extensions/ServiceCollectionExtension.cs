@@ -21,7 +21,8 @@ public static class ServiceCollectionExtension
     /// <param name="migrationHistorySchemaName"></param>
     /// <returns></returns>
     public static IServiceCollection AddOipModuleContext(this IServiceCollection services, string connectionString,
-        string migrationHistoryTableName = "OipMigrationHistory", string migrationHistorySchemaName = "oip")
+        string migrationHistoryTableName = OipModuleContext.MigrationHistoryTableName,
+        string migrationHistorySchemaName = OipModuleContext.SchemaName)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(connectionString);
         return services.AddDbContext<OipModuleContext>(option =>
