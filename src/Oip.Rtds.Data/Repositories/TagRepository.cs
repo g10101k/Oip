@@ -96,7 +96,7 @@ public class TagRepository
             await _rtdsContext.CreateTagTableAsync(tableName, valueType, statusType, tag.Partition);
             await _rtdsMetaContext.Database.CommitTransactionAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await _rtdsMetaContext.Database.RollbackTransactionAsync();
             throw;
