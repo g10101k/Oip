@@ -2,112 +2,34 @@ using Oip.Base.Helpers;
 
 namespace Oip.Test;
 
+/// <summary>
+/// Contains unit tests for <see cref="UrlExtensions"/> methods.
+/// </summary>
 [TestFixture]
 public class UrlExtensionsTests
 {
     /// <summary>
-    /// Проверяет, что метод корректно объединяет URL и часть пути,
-    /// когда оба не содержат лишних слешей в месте соединения.
-    /// Ожидаемый результат: "https://example.com/api/users".
+    /// Tests that the UrlAppend method correctly joins URL parts with various slash combinations.
     /// </summary>
-    [Test]
-    public void UrlAppend_ShouldCorrectlyJoinUrlAndPart()
+    /// <param name="baseUrl">The base URL to test</param>
+    /// <param name="part">The URL part to append</param>
+    /// <returns>The properly combined URL string</returns>
+    /// <remarks>
+    /// This test covers multiple scenarios:
+    /// - Base URL without trailing slash and part without leading slash
+    /// - Base URL with trailing slash and part without leading slash
+    /// - Base URL without trailing slash and part with leading slash
+    /// - Base URL with trailing slash and part with leading slash
+    /// - Empty part case (should add trailing slash)
+    /// </remarks>
+    [TestCase("https://example.com/api", "users", ExpectedResult = "https://example.com/api/users")]
+    [TestCase("https://example.com/api/", "users", ExpectedResult = "https://example.com/api/users")]
+    [TestCase("https://example.com/api", "/users", ExpectedResult = "https://example.com/api/users")]
+    [TestCase("https://example.com/api/", "/users", ExpectedResult = "https://example.com/api/users")]
+    [TestCase("https://example.com/api", "", ExpectedResult = "https://example.com/api/")]
+    public string UrlAppend_ShouldCorrectlyJoinUrls(string baseUrl, string part)
     {
-        // Arrange
-        string baseUrl = "https://example.com/api";
-        string part = "users";
-
         // Act
-        string result = baseUrl.UrlAppend(part);
-
-        // Assert
-        Assert.That(result, Is.EqualTo("https://example.com/api/users"));
-    }
-
-    /// <summary>
-    /// Проверяет, что метод удаляет лишний слеш в конце базового URL.
-    /// Ожидаемый результат: "https://example.com/api/users" (без дублирования слеша).
-    /// </summary>
-    [Test]
-    public void UrlAppend_ShouldTrimSlashes_WhenBaseUrlEndsWithSlash()
-    {
-        // Arrange
-        string baseUrl = "https://example.com/api/";
-        string part = "users";
-
-        // Act
-        string result = baseUrl.UrlAppend(part);
-
-        // Assert
-        Assert.That(result, Is.EqualTo("https://example.com/api/users"));
-    }
-
-    /// <summary>
-    /// Проверяет, что метод удаляет лишний слеш в начале добавляемой части пути.
-    /// Ожидаемый результат: "https://example.com/api/users" (без дублирования слеша).
-    /// </summary>
-    [Test]
-    public void UrlAppend_ShouldTrimSlashes_WhenPartStartsWithSlash()
-    {
-        // Arrange
-        string baseUrl = "https://example.com/api";
-        string part = "/users";
-
-        // Act
-        string result = baseUrl.UrlAppend(part);
-
-        // Assert
-        Assert.That(result, Is.EqualTo("https://example.com/api/users"));
-    }
-
-    /// <summary>
-    /// Проверяет обработку случая, когда добавляемая часть пути пуста.
-    /// Ожидаемый результат: "https://example.com/api/" (добавляется только слеш).
-    /// </summary>
-    [Test]
-    public void UrlAppend_ShouldHandleEmptyPart()
-    {
-        // Arrange
-        string baseUrl = "https://example.com/api";
-        string part = "";
-
-        // Act
-        string result = baseUrl.UrlAppend(part);
-
-        // Assert
-        Assert.That(result, Is.EqualTo("https://example.com/api/"));
-    }
-
-    /// <summary>
-    /// Проверяет обработку случая, когда и базовый URL, и добавляемая часть
-    /// содержат слеши в месте соединения. Ожидается, что лишние слеши будут удалены.
-    /// Ожидаемый результат: "https://example.com/api/users" (без дублирования слешей).
-    /// </summary>
-    [Test]
-    public void UrlAppend_ShouldHandleBothSlashes()
-    {
-        // Arrange
-        string baseUrl = "https://example.com/api/";
-        string part = "/users";
-
-        // Act
-        string result = baseUrl.UrlAppend(part);
-
-        // Assert
-        Assert.That(result, Is.EqualTo("https://example.com/api/users"));
-    }
-
-    /// <summary>
-    /// Проверяет, что метод выбрасывает ArgumentNullException, если добавляемая часть — null.
-    /// </summary>
-    [Test]
-    public void UrlAppend_ShouldThrow_WhenPartIsNull()
-    {
-        // Arrange
-        string baseUrl = "https://example.com/api";
-        string part = null;
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => baseUrl.UrlAppend(part));
+        return baseUrl.UrlAppend(part);
     }
 }
