@@ -1,20 +1,20 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { BaseComponent, Feature, SecurityComponent } from 'oip-common'
-import { TagModule } from 'primeng/tag';
-import { SharedModule } from 'primeng/api';
-import { TableModule } from 'primeng/table';
-import { DatePipe, NgForOf, NgIf } from '@angular/common';
-import { TagManagementModule } from "../../api/TagManagementModule";
-import { DropdownModule } from "primeng/dropdown";
-import { Checkbox } from "primeng/checkbox";
-import { Calendar } from "primeng/calendar";
-import { Button } from "primeng/button";
-import { InputText } from "primeng/inputtext";
-import { InputNumber } from "primeng/inputnumber";
-import { TagEntity } from "../../api/data-contracts";
-import { FormsModule } from "@angular/forms";
-import { Tooltip } from "primeng/tooltip";
-import { Textarea } from "primeng/textarea";
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {BaseComponent, Feature, SecurityComponent} from 'oip-common'
+import {TagModule} from 'primeng/tag';
+import {SharedModule} from 'primeng/api';
+import {TableModule} from 'primeng/table';
+import {DatePipe, NgForOf, NgIf} from '@angular/common';
+import {TagManagementModule} from "../../api/TagManagementModule";
+import {DropdownModule} from "primeng/dropdown";
+import {Checkbox} from "primeng/checkbox";
+import {Calendar} from "primeng/calendar";
+import {Button} from "primeng/button";
+import {InputText} from "primeng/inputtext";
+import {InputNumber} from "primeng/inputnumber";
+import {TagEntity} from "../../api/data-contracts";
+import {FormsModule} from "@angular/forms";
+import {Tooltip} from "primeng/tooltip";
+import {Textarea} from "primeng/textarea";
 
 export enum TagTypes {
   Float32 = 0,
@@ -85,7 +85,7 @@ export interface WeatherSettingsDto {
                 <td>{{ tag.source }}</td>
                 <td>{{ tag.engUnits }}</td>
                 <td>
-                  <p-tag [value]="tag.scan ? 'Yes' : 'No'" [severity]="tag.scan ? 'success' : 'danger'"/>
+                  <p-tag [value]="tag.scan ? 'Yes' : 'No'" [severity]="tag.scan ? 'info' : 'warn'"/>
                 </td>
                 <td>
                   <p-tag [value]="tag.archiving ? 'Yes' : 'No'" [severity]="tag.archiving ? 'info' : 'warn'"/>
@@ -129,7 +129,7 @@ export interface WeatherSettingsDto {
               </div>
             </div>
 
-            <!-- Группа: Описательные метаданные -->
+            <!-- Group: Descriptive Metadata -->
             <div class="grid grid-cols-12 gap-4 mt-4">
               <label for="descriptor"
                      class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Descriptor</label>
@@ -156,9 +156,9 @@ export interface WeatherSettingsDto {
           </div>
 
           <div class="card col-span-6 xl:col-span-6">
-            <div class="font-semibold text-xl">Конфигурация архивирования</div>
+            <div class="font-semibold text-xl">Configuration of Archiving</div>
             <div class="grid grid-cols-2 gap-4 mt-4">
-              <div class="col-span-1 md:col-span-1">
+              <div class="grid col-span-1 md:col-span-1 gap-4">
                 <div class="grid col-span-12 md:col-span-12">
                   <label for="archiving" class="flex items-center mb-2">Archiving</label>
                   <p-checkbox id="archiving" [(ngModel)]="selectedTag.archiving" binary="true"
@@ -179,11 +179,10 @@ export interface WeatherSettingsDto {
                   </div>
                 </div>
               </div>
-              <div class="col-span-1 md:col-span-1">
-                <!-- Группа: Конфигурация компрессии -->
-                <div class="grid grid-cols-1 gap-4 mt-4">
-                  <label for="excMax" class="flex items-center mb-2">Exception Max (sec)</label>
-                  <p-checkbox [(ngModel)]="selectedTag.compressing" binary="true" label="Compressing"></p-checkbox>
+              <div class="grid col-span-1 md:col-span-1 gap-4">
+                <div class="grid grid-cols-1">
+                  <label for="compressing" class="flex items-center mb-2">Compressing</label>
+                  <p-checkbox id="compressing" [(ngModel)]="selectedTag.compressing" binary="true" pTooltip="Compressing"></p-checkbox>
                 </div>
                 <div class="col-span-12 md:col-span-4">
                   <label for="compDev" class="flex items-center mb-2">Compression Deviation</label>
@@ -194,11 +193,22 @@ export interface WeatherSettingsDto {
                   <p-inputNumber id="compMin" [(ngModel)]="selectedTag.compMin" mode="decimal"></p-inputNumber>
                 </div>
 
-                <div class="grid grid-cols-12 gap-4 mt-4">
+                <div class="grid grid-cols-12">
                   <div class="col-span-12 md:col-span-4">
                     <label for="compMax" class="flex items-center mb-2">Compression Max (sec)</label>
                     <p-inputNumber id="compMax" [(ngModel)]="selectedTag.compMax" mode="decimal"></p-inputNumber>
                   </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-12 col-span-2 gap-4">
+                <div class="col-span-12 md:col-span-6">
+                  <label for="zero" class="flex items-center mb-2">Zero</label>
+                  <p-inputNumber id="zero" [(ngModel)]="selectedTag.zero" mode="decimal"></p-inputNumber>
+                </div>
+                <div class="col-span-12 md:col-span-6">
+                  <label for="span" class="flex items-center mb-2">Span</label>
+                  <p-inputNumber id="span" [(ngModel)]="selectedTag.span" mode="decimal"></p-inputNumber>
                 </div>
               </div>
             </div>
@@ -332,13 +342,13 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
   selectedTag: TagEntity;
 
   valueTypeOptions = [
-    { label: 'Float32', value: 0 },
-    { label: 'Float64', value: 1 },
-    { label: 'Int16', value: 2 },
-    { label: 'Int32', value: 3 },
-    { label: 'Digital', value: 4 },
-    { label: 'String', value: 5 },
-    { label: 'Blob', value: 6 },
+    {label: 'Float32', value: 0},
+    {label: 'Float64', value: 1},
+    {label: 'Int16', value: 2},
+    {label: 'Int32', value: 3},
+    {label: 'Digital', value: 4},
+    {label: 'String', value: 5},
+    {label: 'Blob', value: 6},
   ];
 
   getTagTypeName(type: TagTypes): string {
@@ -347,11 +357,7 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
 
   async ngOnInit() {
     await super.ngOnInit();
-    this.tags = await this.tagManagementModuleDataService.tagManagementGetTagsByFilterList({ filter: '%' });
-  }
-
-  async onSettingsChange($event: WeatherSettingsDto) {
-    await this.saveSettings($event);
+    this.tags = await this.tagManagementModuleDataService.tagManagementGetTagsByFilterList({filter: '%'});
   }
 
   saveTag() {
