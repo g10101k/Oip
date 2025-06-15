@@ -14,11 +14,11 @@ namespace Oip.Rtds.Data.Extensions;
 public static class DataExtension
 {
     /// <summary>
-    /// 
+    /// Adds RTDS data services to the dependency injection container.
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="settings"></param>
-    /// <returns></returns>
+    /// <param name="services">The service collection.</param>
+    /// <param name="settings">The application settings.</param>
+    /// <returns>The modified service collection.</returns>
     public static IServiceCollection AddRtdsData(this IServiceCollection services, AppSettings settings)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
