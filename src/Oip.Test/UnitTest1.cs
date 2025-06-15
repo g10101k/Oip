@@ -34,9 +34,9 @@ public class Tests
             .CreateServiceCollection(db)
             .BuildServiceProvider()
             .GetService<IMigrationsScaffolder>();
-        var migration = scaffolder
+        var migration = scaffolder?
             .ScaffoldMigration("test", "MyProject");
-        var code = migration.MigrationCode;
+        var code = migration?.MigrationCode;
         Console.WriteLine(code);
     }
 }
