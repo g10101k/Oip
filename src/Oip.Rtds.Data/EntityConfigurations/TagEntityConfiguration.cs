@@ -38,5 +38,9 @@ public class TagEntityConfiguration : IEntityTypeConfiguration<TagEntity>
         entity.Property(e => e.TagId).ValueGeneratedOnAdd();
         entity.Property(e => e.Name).HasMaxLength(512);
         entity.Property(e => e.Source).HasMaxLength(128);
+        entity.Property(e => e.Creator).HasMaxLength(256);
+        entity.Property(e => e.Partition).HasMaxLength(128);
+        entity.Property(e => e.Source).HasMaxLength(128);
+        
     }
 }
