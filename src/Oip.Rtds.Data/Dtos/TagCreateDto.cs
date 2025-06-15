@@ -25,7 +25,7 @@ public class TagCreateDto
     /// <summary>
     /// Single-letter code indicating the point source (e.g., 'R', 'L').
     /// </summary>
-    public string? Source { get; set; }
+    public string Source { get; set; }
 
     /// <summary>
     /// Description of the point (used as a comment or label).
@@ -85,37 +85,17 @@ public class TagCreateDto
     /// <summary>
     /// The minimum expected value of the signal.
     /// </summary>
-    public int? Zero { get; set; }
+    public double Zero { get; set; } = 0.0d;
 
     /// <summary>
     /// The range between the zero and the maximum value.
     /// </summary>
-    public int? Span { get; set; }
+    public double Span { get; set; } = 100.0d;
 
     /// <summary>
-    /// Interface-specific parameter: Location1 (usually the Interface ID).
+    /// The range between the zero and the maximum value.
     /// </summary>
-    public int? Location1 { get; set; }
-
-    /// <summary>
-    /// Interface-specific parameter: Location2.
-    /// </summary>
-    public int? Location2 { get; set; }
-
-    /// <summary>
-    /// Interface-specific parameter: Location3.
-    /// </summary>
-    public int? Location3 { get; set; }
-
-    /// <summary>
-    /// Interface-specific parameter: Location4.
-    /// </summary>
-    public int? Location4 { get; set; }
-
-    /// <summary>
-    /// Interface-specific parameter: Location5.
-    /// </summary>
-    public int? Location5 { get; set; }
+    public double TypicalValue { get; set; }  = 50.0d;
 
     /// <summary>
     /// Extended description, often used by interfaces.
@@ -125,7 +105,7 @@ public class TagCreateDto
     /// <summary>
     /// Indicates whether the point is being scanned by the interface.
     /// </summary>
-    public bool? Scan { get; set; }
+    public bool Scan { get; set; }
 
     /// <summary>
     /// Associated digital state set name (for digital-type points).
@@ -135,65 +115,10 @@ public class TagCreateDto
     /// <summary>
     /// Indicates whether values are treated as step (true) or interpolated (false).
     /// </summary>
-    public bool? Step { get; set; }
+    public bool Step { get; set; }
 
     /// <summary>
-    /// Indicates whether this point stores future (forecast) values.
-    /// </summary>
-    public bool? Future { get; set; }
-
-    /// <summary>
-    /// User-defined integer field #1.
-    /// </summary>
-    public int? UserInt1 { get; set; }
-
-    /// <summary>
-    /// User-defined integer field #2.
-    /// </summary>
-    public int? UserInt2 { get; set; }
-
-    /// <summary>
-    /// User-defined integer field #3.
-    /// </summary>
-    public int? UserInt3 { get; set; }
-
-    /// <summary>
-    /// User-defined integer field #4.
-    /// </summary>
-    public int? UserInt4 { get; set; }
-
-    /// <summary>
-    /// User-defined integer field #5.
-    /// </summary>
-    public int? UserInt5 { get; set; }
-
-    /// <summary>
-    /// User-defined floating-point field #1.
-    /// </summary>
-    public double? UserReal1 { get; set; }
-
-    /// <summary>
-    /// User-defined floating-point field #2.
-    /// </summary>
-    public double? UserReal2 { get; set; }
-
-    /// <summary>
-    /// User-defined floating-point field #3.
-    /// </summary>
-    public double? UserReal3 { get; set; }
-
-    /// <summary>
-    /// User-defined floating-point field #4.
-    /// </summary>
-    public double? UserReal4 { get; set; }
-
-    /// <summary>
-    /// User-defined floating-point field #5.
-    /// </summary>
-    public double? UserReal5 { get; set; }
-
-    /// <summary>
-    /// ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(Time)").
+    /// ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(time)").
     /// Used to control how data is partitioned when creating the table.
     /// </summary>
     public string Partition { get; set; } = "PARTITION BY toYear(Time)";
