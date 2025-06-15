@@ -65,6 +65,7 @@ public class RtdsMetaContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new TagEntityConfiguration(Database, _designTime));
+        
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }
 }
