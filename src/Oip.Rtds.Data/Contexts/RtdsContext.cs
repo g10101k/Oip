@@ -29,6 +29,19 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Creates the database if it doesn't exist.
+    /// </summary>
+    /// <param name="databaseName">The name of the database to create.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task EnsureDatabaseCreatedAsync(string databaseName = "data")
+    {
+        var sql = $"CREATE DATABASE IF NOT EXISTS {databaseName}";
+        await using var cmd = _connection.CreateCommand();
+        cmd.CommandText = sql;
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    /// <summary>
     /// Asynchronously creates a new tag table in the RTDS using ClickHouse.
     /// </summary>
     /// <param name="tableName">The name of the tag table to create.</param>
@@ -38,6 +51,7 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// <exception cref="InvalidOperationException">Thrown when a table with the same name already exists.</exception>
     public async Task CreateTagTableAsync(string tableName, string valueType, string statusType, string partition)
     {
+        await EnsureDatabaseCreatedAsync(); // Ensure database exists before creating table
         var sql = string.Format(QueryConstants.CreateTagTableSql, tableName, valueType, statusType, partition);
         await using var cmd = _connection.CreateCommand();
         cmd.CommandText = sql;
