@@ -1,30 +1,20 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {BaseComponent, Feature, SecurityComponent} from 'oip-common'
-import {TagModule} from 'primeng/tag';
-import {SharedModule} from 'primeng/api';
-import {TableModule} from 'primeng/table';
-import {DatePipe, NgForOf, NgIf} from '@angular/common';
-import {TagManagementModule} from "../../api/TagManagementModule";
-import {DropdownModule} from "primeng/dropdown";
-import {Checkbox} from "primeng/checkbox";
-import {Calendar} from "primeng/calendar";
-import {Button} from "primeng/button";
-import {InputText} from "primeng/inputtext";
-import {InputNumber} from "primeng/inputnumber";
-import {TagEntity} from "../../api/data-contracts";
-import {FormsModule} from "@angular/forms";
-import {Tooltip} from "primeng/tooltip";
-import {Textarea} from "primeng/textarea";
-
-export enum TagTypes {
-  Float32 = 0,
-  Float64 = 1,
-  Int16 = 2,
-  Int32 = 3,
-  Digital = 4,
-  String = 5,
-  Blob = 6
-}
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { BaseComponent, Feature, SecurityComponent } from 'oip-common'
+import { TagModule } from 'primeng/tag';
+import { SharedModule } from 'primeng/api';
+import { TableModule } from 'primeng/table';
+import { DatePipe, NgIf } from '@angular/common';
+import { TagManagementModule } from "../../api/TagManagementModule";
+import { DropdownModule } from "primeng/dropdown";
+import { Checkbox } from "primeng/checkbox";
+import { Calendar } from "primeng/calendar";
+import { Button } from "primeng/button";
+import { InputText } from "primeng/inputtext";
+import { InputNumber } from "primeng/inputnumber";
+import { TagEntity, TagTypes } from "../../api/data-contracts";
+import { FormsModule } from "@angular/forms";
+import { Tooltip } from "primeng/tooltip";
+import { Textarea } from "primeng/textarea";
 
 export interface WeatherSettingsDto {
 }
@@ -108,7 +98,7 @@ export interface WeatherSettingsDto {
           </p-table>
         </div>
         <div *ngIf="selectedTag" class="grid grid-cols-12 col-span-12 xl:col-span-12 gap-4">
-          <div class="card col-span-6 xl:col-span-6 ">
+          <div class="card col-span-6 xl:col-span-6">
             <div class="font-semibold text-xl">Common</div>
             <div class="grid grid-cols-12 gap-4 mt-4">
               <label for="name" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Name</label>
@@ -123,9 +113,9 @@ export interface WeatherSettingsDto {
                 <p-dropdown class="w-full" id="valueType" [options]="valueTypeOptions"
                             optionLabel="label" optionValue="value"></p-dropdown>
               </div>
-              <label for="source" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Source</label>
+              <label for="interface" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Interface</label>
               <div class="col-span-4 md:col-span-4">
-                <input class="w-full" pInputText id="source" [(ngModel)]="selectedTag.source"/>
+                <input class="w-full" pInputText id="interface" [(ngModel)]="selectedTag.interface"/>
               </div>
             </div>
 
@@ -139,18 +129,9 @@ export interface WeatherSettingsDto {
             </div>
 
             <div class="grid grid-cols-12 gap-4 mt-4">
-              <label for="engUnits" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">UOM</label>
+              <label for="uom" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">UOM</label>
               <div class="col-span-12 md:col-span-10">
-                <input pInputText id="engUnits" [(ngModel)]="selectedTag.engUnits"/>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-12 gap-4 mt-4">
-              <label for="exDesc" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Extended
-                Description</label>
-              <div class="col-span-12 md:col-span-10">
-                <textarea class="w-full" pTextarea id="exDesc" [(ngModel)]="selectedTag.exDesc"
-                          rows="3"></textarea>
+                <input pInputText id="uom" [(ngModel)]="selectedTag.uom"/>
               </div>
             </div>
           </div>
@@ -160,48 +141,39 @@ export interface WeatherSettingsDto {
             <div class="grid grid-cols-2 gap-4 mt-4">
               <div class="grid col-span-1 md:col-span-1 gap-4">
                 <div class="grid col-span-12 md:col-span-12">
-                  <label for="archiving" class="flex items-center mb-2">Archiving</label>
-                  <p-checkbox id="archiving" [(ngModel)]="selectedTag.archiving" binary="true"
+                  <label for="active" class="flex items-center mb-2">Active</label>
+                  <p-checkbox id="active" [(ngModel)]="selectedTag.active" binary="true"
                               pTooltip="Archiving"></p-checkbox>
                 </div>
                 <div class="col-span-12 md:col-span-12">
-                  <label for="excDev" class="flex items-center mb-2">Exception Deviation</label>
-                  <p-inputNumber id="excDev" [(ngModel)]="selectedTag.excDev" mode="decimal"></p-inputNumber>
-                </div>
-                <div class="col-span-12 md:col-span-12">
-                  <label for="excMin" class="flex items-center mb-2">Exception Min (sec)</label>
-                  <p-inputNumber id="excMin" [(ngModel)]="selectedTag.excMin" mode="decimal"></p-inputNumber>
-                </div>
-                <div class="grid grid-cols-12 gap-4 mt-4">
-                  <div class="col-span-12 md:col-span-12">
-                    <label for="excMax" class="flex items-center mb-2">Exception Max (sec)</label>
-                    <p-inputNumber id="excMax" [(ngModel)]="selectedTag.excMax" mode="decimal"></p-inputNumber>
-                  </div>
+                  <label for="errorCalculation" class="flex items-center mb-2">Error</label>
+                  <p-inputNumber id="errorCalculation" [(ngModel)]="selectedTag.errorCalculation" mode="decimal"></p-inputNumber>
                 </div>
               </div>
               <div class="grid col-span-1 md:col-span-1 gap-4">
                 <div class="grid grid-cols-1">
                   <label for="compressing" class="flex items-center mb-2">Compressing</label>
-                  <p-checkbox id="compressing" [(ngModel)]="selectedTag.compressing" binary="true" pTooltip="Compressing"></p-checkbox>
+                  <p-checkbox id="compressing" [(ngModel)]="selectedTag.compressing" binary="true"
+                              pTooltip="Compressing"></p-checkbox>
                 </div>
                 <div class="col-span-12 md:col-span-4">
                   <label for="compDev" class="flex items-center mb-2">Compression Deviation</label>
-                  <p-inputNumber id="compDev" [(ngModel)]="selectedTag.compDev" mode="decimal"></p-inputNumber>
+                  <p-inputNumber id="compDev" [(ngModel)]="selectedTag.compressing" mode="decimal"></p-inputNumber>
                 </div>
                 <div class="col-span-12 md:col-span-4">
                   <label for="compMin" class="flex items-center mb-2">Compression Min (sec)</label>
-                  <p-inputNumber id="compMin" [(ngModel)]="selectedTag.compMin" mode="decimal"></p-inputNumber>
+                  <p-inputNumber id="compMin" [(ngModel)]="selectedTag.compressionMinTime" mode="decimal"></p-inputNumber>
                 </div>
 
                 <div class="grid grid-cols-12">
                   <div class="col-span-12 md:col-span-4">
                     <label for="compMax" class="flex items-center mb-2">Compression Max (sec)</label>
-                    <p-inputNumber id="compMax" [(ngModel)]="selectedTag.compMax" mode="decimal"></p-inputNumber>
+                    <p-inputNumber id="compMax" [(ngModel)]="selectedTag.compressionMaxTime" mode="decimal"></p-inputNumber>
                   </div>
                 </div>
               </div>
 
-              <div class="grid grid-cols-12 col-span-2 gap-4">
+              <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-12 md:col-span-6">
                   <label for="zero" class="flex items-center mb-2">Zero</label>
                   <p-inputNumber id="zero" [(ngModel)]="selectedTag.zero" mode="decimal"></p-inputNumber>
@@ -217,7 +189,7 @@ export interface WeatherSettingsDto {
           </div>
           <div *ngIf="selectedTag" class="card col-span-6 xl:col-span-6">
 
-            <!-- Группа: Калибровка/масштабирование -->
+            <!-- Group: Calibration/scaling -->
             <div class="grid grid-cols-12 gap-4 mt-4">
               <div class="col-span-12 md:col-span-6">
                 <label for="zero" class="flex items-center mb-2">Zero</label>
@@ -229,11 +201,11 @@ export interface WeatherSettingsDto {
               </div>
             </div>
 
-            <!-- Группа: Параметры интеграции -->
+            <!-- Group: Integration parameters -->
             <div class="grid grid-cols-12 gap-4 mt-4">
               <label for="source" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Source</label>
               <div class="col-span-12 md:col-span-10">
-                <input pInputText id="source" [(ngModel)]="selectedTag.source"/>
+                <input pInputText id="source" [(ngModel)]="selectedTag.interface"/>
               </div>
             </div>
 
@@ -252,38 +224,10 @@ export interface WeatherSettingsDto {
               <div class="col-span-12 md:col-span-4">
                 <p-checkbox [(ngModel)]="selectedTag.step" binary="true" title="Step"></p-checkbox>
               </div>
-              <div class="col-span-12 md:col-span-4">
-                <p-checkbox [(ngModel)]="selectedTag.future" binary="true" label="Future"></p-checkbox>
-              </div>
+
             </div>
 
-            <!-- Location параметры -->
-            <div class="grid grid-cols-12 gap-4 mt-4">
-              <div *ngFor="let loc of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
-                <label [for]="'location' + loc" class="flex items-center mb-2">Location {{ loc }}</label>
-                <p-inputNumber [id]="'location' + loc" [(ngModel)]="selectedTag['location' + loc]"
-                               mode="decimal"></p-inputNumber>
-              </div>
-            </div>
-
-            <!-- Пользовательские поля -->
-            <div class="grid grid-cols-12 gap-4 mt-4">
-              <div *ngFor="let num of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
-                <label [for]="'userInt' + num" class="flex items-center mb-2">User Int {{ num }}</label>
-                <p-inputNumber [id]="'userInt' + num" [(ngModel)]="selectedTag['userInt' + num]"
-                               mode="decimal"></p-inputNumber>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-12 gap-4 mt-4">
-              <div *ngFor="let num of [1,2,3,4,5]" class="col-span-12 md:col-span-2">
-                <label [for]="'userReal' + num" class="flex items-center mb-2">User Real {{ num }}</label>
-                <p-inputNumber [id]="'userReal' + num" [(ngModel)]="selectedTag['userReal' + num]"
-                               mode="decimal"></p-inputNumber>
-              </div>
-            </div>
-
-            <!-- Аудит -->
+            <!-- Audit -->
             <div class="grid grid-cols-12 gap-4 mt-4">
               <div class="col-span-12 md:col-span-6">
                 <label for="creationDate" class="flex items-center mb-2">Creation Date</label>
@@ -296,7 +240,7 @@ export interface WeatherSettingsDto {
               </div>
             </div>
 
-            <!-- Конфигурация хранилища -->
+            <!-- Storage configuration -->
             <div class="grid grid-cols-12 gap-4 mt-4">
               <label for="partition" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Partition</label>
               <div class="col-span-12 md:col-span-10">
@@ -330,7 +274,6 @@ export interface WeatherSettingsDto {
     InputNumber,
     DatePipe,
     FormsModule,
-    NgForOf,
     Tooltip,
     Textarea,
   ],
@@ -342,13 +285,13 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
   selectedTag: TagEntity;
 
   valueTypeOptions = [
-    {label: 'Float32', value: 0},
-    {label: 'Float64', value: 1},
-    {label: 'Int16', value: 2},
-    {label: 'Int32', value: 3},
-    {label: 'Digital', value: 4},
-    {label: 'String', value: 5},
-    {label: 'Blob', value: 6},
+    { label: 'Float32', value: 0 },
+    { label: 'Float64', value: 1 },
+    { label: 'Int16', value: 2 },
+    { label: 'Int32', value: 3 },
+    { label: 'Digital', value: 4 },
+    { label: 'String', value: 5 },
+    { label: 'Blob', value: 6 },
   ];
 
   getTagTypeName(type: TagTypes): string {
@@ -357,12 +300,12 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
 
   async ngOnInit() {
     await super.ngOnInit();
-    this.tags = await this.tagManagementModuleDataService.tagManagementGetTagsByFilterList({filter: '%'});
+    this.tags = await this.tagManagementModuleDataService.tagManagementGetTagsByFilterList({ filter: '%' });
   }
 
   saveTag() {
-    // Реализация сохранения тега
+    // Implementation to save the tag
     console.log('Saving tag:', this.selectedTag);
-    // Здесь должен быть вызов API для сохранения изменений
+    // Here should be an API call to save the changes
   }
 }

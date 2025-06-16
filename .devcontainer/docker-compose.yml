@@ -80,7 +80,7 @@ services:
       - TZ=UTC
       - CLICKHOUSE_DB=default
       - CLICKHOUSE_USER=admin
-      - CLICKHOUSE_PASSWORD=admin123
+      - CLICKHOUSE_PASSWORD=P@ssw0rd
     networks:
       - bridge-network
 

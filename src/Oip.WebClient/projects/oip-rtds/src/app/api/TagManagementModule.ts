@@ -14,6 +14,7 @@ import {
   ObjectSaveSettingsRequest,
   PutSecurityRequest,
   SecurityResponse,
+  TagCreateDto,
   TagEntity,
   TagManagementGetModuleInstanceSettingsListParams,
   TagManagementGetSecurityListParams,
@@ -33,7 +34,10 @@ export class TagManagementModule<
    * @request POST:/api/tag-management/add-tag
    * @secure
    */
-  tagManagementAddTagCreate = (data: TagEntity, params: RequestParams = {}) =>
+  tagManagementAddTagCreate = (
+    data: TagCreateDto,
+    params: RequestParams = {},
+  ) =>
     this.request<void, any>({
       path: `/api/tag-management/add-tag`,
       method: "POST",

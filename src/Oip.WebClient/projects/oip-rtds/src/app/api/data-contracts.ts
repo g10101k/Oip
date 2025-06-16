@@ -10,15 +10,15 @@
  * ---------------------------------------------------------------
  */
 
-/** @format int32 */
+/** Defines the data types supported for tags */
 export enum TagTypes {
-  Value0 = 0,
-  Value1 = 1,
-  Value2 = 2,
-  Value3 = 3,
-  Value4 = 4,
-  Value5 = 5,
-  Value6 = 6,
+  Float32 = "Float32",
+  Float64 = "Float64",
+  Int16 = "Int16",
+  Int32 = "Int32",
+  Digital = "Digital",
+  String = "String",
+  Blob = "Blob",
 }
 
 /** DTO for create module instance */
@@ -30,6 +30,12 @@ export interface AddModuleInstanceDto {
   /** @format int32 */
   parentId?: number | null;
   viewRoles?: string[] | null;
+}
+
+/** Request model for applying a specific migration by name. */
+export interface ApplyMigrationRequest {
+  /** The name of the migration to apply. */
+  name?: string | null;
 }
 
 /** DTO for edit module instance */
@@ -90,6 +96,18 @@ export interface IntKeyValueDto {
   /** @format int32 */
   key?: number;
   value?: string | null;
+}
+
+/** Data transfer object representing a database migration and its status. */
+export interface MigrationDto {
+  /** Name of the migration. */
+  name?: string | null;
+  /** Indicates whether the migration has been applied. */
+  applied?: boolean;
+  /** Indicates whether the migration is pending. */
+  pending?: boolean;
+  /** Indicates whether the migration exists in the codebase. */
+  exist?: boolean;
 }
 
 /** Represents a request to delete a module by its identifier. */
@@ -183,6 +201,79 @@ export interface SecurityResponse {
 }
 
 /** Represents the configuration and metadata of a tag. */
+export interface TagCreateDto {
+  /**
+   * Unique identifier of the tag.
+   * @format int32
+   */
+  tagId?: number | null;
+  /** Name of the tag. */
+  name: string | null;
+  /** Defines the data types supported for tags */
+  valueType?: TagTypes;
+  /** The interface associated with the tag. */
+  interface?: string | null;
+  /** Description of the point (used as a comment or label). */
+  descriptor?: string | null;
+  /** Engineering units (e.g., °C, PSI, m³/h). */
+  uom?: string | null;
+  /** Reference to the source signal or channel tag. */
+  instrumentTag?: string | null;
+  /** Indicates whether the point is archived. */
+  active?: boolean;
+  /** Indicates whether compression is enabled for this tag. */
+  compressing?: boolean;
+  /**
+   * Minimum time (in milliseconds) between compressed values.
+   * Values received within this period are discarded, regardless of their error margin.
+   * @format int32
+   */
+  compressionMinTime?: number | null;
+  /**
+   * Maximum time (in milliseconds) between compressed values.
+   * @format int32
+   */
+  compressionMaxTime?: number | null;
+  /**
+   * The minimum expected value of the signal.
+   * @format double
+   */
+  zero?: number;
+  /**
+   * The range between the zero and the maximum value.
+   * @format double
+   */
+  span?: number;
+  /** Indicates whether the point is being scanned by the interface. */
+  scan?: boolean | null;
+  /** Associated digital state set name (for digital-type points). */
+  digitalSet?: string | null;
+  /** Indicates whether values are treated as step (true) or interpolated (false). */
+  step?: boolean;
+  /**
+   * Formula used to calculate the time associated with the tag's value.
+   * Default `now()`;
+   */
+  timeCalculation?: string | null;
+  /** Formula used to calculate error values for the tag. */
+  errorCalculation?: string | null;
+  /** User-defined calculation or formula associated with the tag's value. */
+  valueCaclulation?: string | null;
+  /**
+   * Date and time when the tag was created.
+   * @format date-time
+   */
+  creationDate?: string;
+  /** User or process that created the tag. */
+  creator?: string | null;
+  /**
+   * ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(time)").
+   * Used to control how data is partitioned when creating the table.
+   */
+  partition?: string | null;
+}
+
+/** Represents the configuration and metadata of a tag. */
 export interface TagEntity {
   /**
    * Unique identifier of the tag.
@@ -190,150 +281,62 @@ export interface TagEntity {
    */
   tagId?: number;
   /** Name of the tag. */
-  name?: string | null;
+  name: string | null;
+  /** Defines the data types supported for tags */
   valueType?: TagTypes;
-  /** Single-letter code indicating the point source (e.g., 'R', 'L'). */
-  source?: string | null;
+  /** The interface associated with the tag. */
+  interface?: string | null;
   /** Description of the point (used as a comment or label). */
   descriptor?: string | null;
   /** Engineering units (e.g., °C, PSI, m³/h). */
-  engUnits?: string | null;
+  uom?: string | null;
   /** Reference to the source signal or channel tag. */
   instrumentTag?: string | null;
   /** Indicates whether the point is archived. */
-  archiving?: boolean | null;
+  active?: boolean;
   /** Indicates whether compression is enabled for this tag. */
-  compressing?: boolean | null;
+  compressing?: boolean;
   /**
-   * Exception deviation: minimum change required to store a new value.
-   * @format double
-   */
-  excDev?: number | null;
-  /**
-   * Minimum time (in seconds) between archived values.
+   * Minimum time (in milliseconds) between compressed values.
+   * Values received within this period are discarded, regardless of their error margin.
    * @format int32
    */
-  excMin?: number | null;
+  compressionMinTime?: number | null;
   /**
-   * Maximum time (in seconds) between archived values.
+   * Maximum time (in milliseconds) between compressed values.
    * @format int32
    */
-  excMax?: number | null;
-  /**
-   * Compression deviation: minimum change required to pass compression filter.
-   * @format double
-   */
-  compDev?: number | null;
-  /**
-   * Minimum time (in seconds) between compressed values.
-   * @format int32
-   */
-  compMin?: number | null;
-  /**
-   * Maximum time (in seconds) between compressed values.
-   * @format int32
-   */
-  compMax?: number | null;
+  compressionMaxTime?: number | null;
   /**
    * The minimum expected value of the signal.
-   * @format int32
+   * @format double
    */
-  zero?: number | null;
+  zero?: number;
   /**
    * The range between the zero and the maximum value.
-   * @format int32
+   * @format double
    */
-  span?: number | null;
-  /**
-   * Interface-specific parameter: Location1 (usually the Interface ID).
-   * @format int32
-   */
-  location1?: number | null;
-  /**
-   * Interface-specific parameter: Location2.
-   * @format int32
-   */
-  location2?: number | null;
-  /**
-   * Interface-specific parameter: Location3.
-   * @format int32
-   */
-  location3?: number | null;
-  /**
-   * Interface-specific parameter: Location4.
-   * @format int32
-   */
-  location4?: number | null;
-  /**
-   * Interface-specific parameter: Location5.
-   * @format int32
-   */
-  location5?: number | null;
-  /** Extended description, often used by interfaces. */
-  exDesc?: string | null;
+  span?: number;
   /** Indicates whether the point is being scanned by the interface. */
   scan?: boolean | null;
   /** Associated digital state set name (for digital-type points). */
   digitalSet?: string | null;
   /** Indicates whether values are treated as step (true) or interpolated (false). */
-  step?: boolean | null;
-  /** Indicates whether this point stores future (forecast) values. */
-  future?: boolean | null;
+  step?: boolean;
   /**
-   * User-defined integer field #1.
-   * @format int32
+   * Formula used to calculate the time associated with the tag's value.
+   * Default `now()`;
    */
-  userInt1?: number | null;
-  /**
-   * User-defined integer field #2.
-   * @format int32
-   */
-  userInt2?: number | null;
-  /**
-   * User-defined integer field #3.
-   * @format int32
-   */
-  userInt3?: number | null;
-  /**
-   * User-defined integer field #4.
-   * @format int32
-   */
-  userInt4?: number | null;
-  /**
-   * User-defined integer field #5.
-   * @format int32
-   */
-  userInt5?: number | null;
-  /**
-   * User-defined floating-point field #1.
-   * @format double
-   */
-  userReal1?: number | null;
-  /**
-   * User-defined floating-point field #2.
-   * @format double
-   */
-  userReal2?: number | null;
-  /**
-   * User-defined floating-point field #3.
-   * @format double
-   */
-  userReal3?: number | null;
-  /**
-   * User-defined floating-point field #4.
-   * @format double
-   */
-  userReal4?: number | null;
-  /**
-   * User-defined floating-point field #5.
-   * @format double
-   */
-  userReal5?: number | null;
+  timeCalculation?: string | null;
+  /** Formula used to calculate error values for the tag. */
+  errorCalculation?: string | null;
+  /** User-defined calculation or formula associated with the tag's value. */
+  valueCaclulation?: string | null;
   /**
    * Date and time when the tag was created.
    * @format date-time
    */
-  creationDate?: string | null;
+  creationDate?: string;
   /** User or process that created the tag. */
   creator?: string | null;
   /**
@@ -362,6 +365,22 @@ export interface FolderGetModuleInstanceSettingsListParams {
 export interface MenuDeleteModuleInstanceDeleteParams {
   /**
    * The unique identifier of the module instance to delete.
+   * @format int32
+   */
+  id?: number;
+}
+
+export interface RtdsMetaDataContextMigrationModuleGetSecurityListParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
+  id?: number;
+}
+
+export interface RtdsMetaDataContextMigrationModuleGetModuleInstanceSettingsListParams {
+  /**
+   * The ID of the module instance.
    * @format int32
    */
   id?: number;

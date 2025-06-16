@@ -23,9 +23,9 @@ public class TagEntity
     public TagTypes ValueType { get; set; }
 
     /// <summary>
-    /// Single-letter code indicating the point source (e.g., 'R', 'L').
+    /// The interface associated with the tag.
     /// </summary>
-    public string? Source { get; set; }
+    public string? Interface { get; set; }
 
     /// <summary>
     /// Description of the point (used as a comment or label).
@@ -35,7 +35,7 @@ public class TagEntity
     /// <summary>
     /// Engineering units (e.g., °C, PSI, m³/h).
     /// </summary>
-    public string? EngUnits { get; set; }
+    public string? Uom { get; set; }
 
     /// <summary>
     /// Reference to the source signal or channel tag.
@@ -45,62 +45,33 @@ public class TagEntity
     /// <summary>
     /// Indicates whether the point is archived.
     /// </summary>
-    public bool? Archiving { get; set; }
+    public bool Active { get; set; }
 
     /// <summary>
     /// Indicates whether compression is enabled for this tag.
     /// </summary>
-    public bool? Compressing { get; set; }
+    public bool Compressing { get; set; } = false;
 
     /// <summary>
-    /// Exception deviation: minimum change required to store a new value.
+    /// Minimum time (in milliseconds) between compressed values.
+    /// Values received within this period are discarded, regardless of their error margin.
     /// </summary>
-    public double? ExcDev { get; set; }
+    public uint? CompressionMinTime { get; set; }
 
     /// <summary>
-    /// Minimum time (in seconds) between archived values.
+    /// Maximum time (in milliseconds) between compressed values.
     /// </summary>
-    public int? ExcMin { get; set; }
-
-    /// <summary>
-    /// Maximum time (in seconds) between archived values.
-    /// </summary>
-    public int? ExcMax { get; set; }
-
-    /// <summary>
-    /// Compression deviation: minimum change required to pass compression filter.
-    /// </summary>
-    public double? CompDev { get; set; }
-
-    /// <summary>
-    /// Minimum time (in seconds) between compressed values.
-    /// </summary>
-    public int? CompMin { get; set; }
-
-    /// <summary>
-    /// Maximum time (in seconds) between compressed values.
-    /// </summary>
-    public int? CompMax { get; set; }
+    public uint? CompressionMaxTime { get; set; }
 
     /// <summary>
     /// The minimum expected value of the signal.
     /// </summary>
-    public double Zero { get; set; } = 0.0d;
+    public double Zero { get; set; }
 
     /// <summary>
     /// The range between the zero and the maximum value.
     /// </summary>
     public double Span { get; set; } = 100.0d;
-
-    /// <summary>
-    /// The typical value.
-    /// </summary>
-    public double TypicalValue { get; set; }  = 50.0d;
-
-    /// <summary>
-    /// Extended description, often used by interfaces.
-    /// </summary>
-    public string? ExDesc { get; set; }
 
     /// <summary>
     /// Indicates whether the point is being scanned by the interface.
@@ -116,6 +87,26 @@ public class TagEntity
     /// Indicates whether values are treated as step (true) or interpolated (false).
     /// </summary>
     public bool Step { get; set; }
+
+    /// <summary>
+    /// Formula used to calculate the time associated with the tag's value.
+    /// Default `now()`;
+    /// </summary>
+    public string? TimeCalculation { get; set; }
+
+    /// <summary>
+    /// Formula used to calculate error values for the tag.
+    /// </summary>
+    public string? ErrorCalculation { get; set; }
+
+    /// <summary>
+    /// User-defined calculation or formula associated with the tag's value.
+    /// </summary>
+    /// <remarks>
+    /// This property allows for custom calculations or transformations to be applied to the raw tag value.
+    /// It can contain any valid expression or formula, depending on the RTDS configuration.
+    /// </remarks>
+    public string? ValueCalculation { get; set; }
 
     /// <summary>
     /// Date and time when the tag was created.

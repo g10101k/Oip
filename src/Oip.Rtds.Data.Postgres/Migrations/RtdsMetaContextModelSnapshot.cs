@@ -30,68 +30,42 @@ namespace Oip.Rtds.Data.Postgres.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("TagId"));
 
-                    b.Property<bool?>("Archiving")
+                    b.Property<bool>("Active")
                         .HasColumnType("boolean");
 
-                    b.Property<double?>("CompDev")
-                        .HasColumnType("double precision");
-
-                    b.Property<int?>("CompMax")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("CompMin")
-                        .HasColumnType("integer");
-
-                    b.Property<bool?>("Compressing")
+                    b.Property<bool>("Compressing")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTimeOffset?>("CreationDate")
+                    b.Property<long?>("CompressionMaxTime")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CompressionMinTime")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Creator")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("Descriptor")
-                        .HasColumnType("text");
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
 
                     b.Property<string>("DigitalSet")
                         .HasColumnType("text");
 
-                    b.Property<string>("EngUnits")
+                    b.Property<string>("ErrorCalculation")
                         .HasColumnType("text");
-
-                    b.Property<string>("ExDesc")
-                        .HasColumnType("text");
-
-                    b.Property<double?>("ExcDev")
-                        .HasColumnType("double precision");
-
-                    b.Property<int?>("ExcMax")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ExcMin")
-                        .HasColumnType("integer");
-
-                    b.Property<bool?>("Future")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("InstrumentTag")
                         .HasColumnType("text");
 
-                    b.Property<int?>("Location1")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Location2")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Location3")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Location4")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Location5")
-                        .HasColumnType("integer");
+                    b.Property<string>("Interface")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -100,56 +74,32 @@ namespace Oip.Rtds.Data.Postgres.Migrations
 
                     b.Property<string>("Partition")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<bool?>("Scan")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Source")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                    b.Property<double>("Span")
+                        .HasColumnType("double precision");
 
-                    b.Property<int?>("Span")
-                        .HasColumnType("integer");
-
-                    b.Property<bool?>("Step")
+                    b.Property<bool>("Step")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("UserInt1")
-                        .HasColumnType("integer");
+                    b.Property<string>("TimeCalculation")
+                        .HasColumnType("text");
 
-                    b.Property<int?>("UserInt2")
-                        .HasColumnType("integer");
+                    b.Property<string>("Uom")
+                        .HasColumnType("text");
 
-                    b.Property<int?>("UserInt3")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("UserInt4")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("UserInt5")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("UserReal1")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("UserReal2")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("UserReal3")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("UserReal4")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("UserReal5")
-                        .HasColumnType("double precision");
+                    b.Property<string>("ValueCaclulation")
+                        .HasColumnType("text");
 
                     b.Property<int>("ValueType")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("Zero")
-                        .HasColumnType("integer");
+                    b.Property<double>("Zero")
+                        .HasColumnType("double precision");
 
                     b.HasKey("TagId");
 

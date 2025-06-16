@@ -49,29 +49,27 @@ public class TagRepository
             {
                 Name = tag.Name,
                 ValueType = tag.ValueType,
-                Source = tag.Source,
+                Interface = tag.Interface,
                 Descriptor = tag.Descriptor,
-                EngUnits = tag.EngUnits,
+                Uom = tag.Uom,
                 InstrumentTag = tag.InstrumentTag,
-                Archiving = tag.Archiving,
+                Active = tag.Active,
                 Compressing = tag.Compressing,
-                ExcDev = tag.ExcDev,
-                ExcMin = tag.ExcMin,
-                ExcMax = tag.ExcMax,
-                CompDev = tag.CompDev,
-                CompMin = tag.CompMin,
-                CompMax = tag.CompMax,
+                CompressionMinTime = tag.CompressionMinTime,
+                CompressionMaxTime = tag.CompressionMaxTime,
                 Zero = tag.Zero,
                 Span = tag.Span,
-                ExDesc = tag.ExDesc,
                 Scan = tag.Scan,
                 DigitalSet = tag.DigitalSet,
                 Step = tag.Step,
                 CreationDate = DateTimeOffset.UtcNow,
                 Creator = _userService.GetUserEmail() ?? throw new InvalidOperationException("User not found"),
-                Partition = tag.Partition
+                Partition = tag.Partition,
+                ValueCalculation = tag.ValueCalculation,
+                TimeCalculation = tag.TimeCalculation,
+                ErrorCalculation = tag.ErrorCalculation
             });
-
+            
             await _rtdsMetaContext.SaveChangesAsync();
             var tableName = $"{tagEntity.Entity.TagId:D6}";
             var valueType = GetClickHouseTypeFromTagType(tag.ValueType);
@@ -101,29 +99,29 @@ public class TagRepository
                 TagId = x.TagId,
                 Name = x.Name,
                 ValueType = x.ValueType,
-                Source = x.Source,
+                Interface = x.Interface,
                 Descriptor = x.Descriptor,
-                EngUnits = x.EngUnits,
+                Uom = x.Uom,
                 InstrumentTag = x.InstrumentTag,
-                Archiving = x.Archiving,
+                Active = x.Active,
                 Compressing = x.Compressing,
-                ExcDev = x.ExcDev,
-                ExcMin = x.ExcMin,
-                ExcMax = x.ExcMax,
-                CompDev = x.CompDev,
-                CompMin = x.CompMin,
-                CompMax = x.CompMax,
+                CompressionMinTime = x.CompressionMinTime,
+                CompressionMaxTime = x.CompressionMaxTime,
                 Zero = x.Zero,
                 Span = x.Span,
-                ExDesc = x.ExDesc,
                 Scan = x.Scan,
                 DigitalSet = x.DigitalSet,
                 Step = x.Step,
                 CreationDate = x.CreationDate,
                 Creator = x.Creator,
-                Partition = x.Partition
+                Partition = x.Partition,
+                ValueCaclulation = x.ValueCalculation,
+                TimeCalculation = x.TimeCalculation,
+                ErrorCalculation = x.ErrorCalculation,
             })
             .ToList();
+
+
     }
 
     /// <summary>
