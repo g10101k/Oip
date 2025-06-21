@@ -1,6 +1,7 @@
 import { IsActiveMatchOptions, Params, QueryParamsHandling } from "@angular/router";
 
 export interface ContextMenuItemDto {
+  url: any;
   class: string | string[] | Set<string> | { [p: string]: any } | null | undefined;
   command: any;
   disabled: boolean;
