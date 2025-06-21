@@ -1,5 +1,5 @@
 // Components
-export * from './components/base.component';
+export * from './components/base-module.component';
 export * from './components/security.component';
 export * from './components/top-bar.component';
 export * from './components/footer.component'
@@ -12,13 +12,14 @@ export * from './components/auth/unauthorized/unauthorized.component';
 export * from './components/auth/error/error.component';
 export * from './components/profile.component';
 export { ConfigComponent } from './components/config.component';
-export * from './components/db-migration/db-migration.component';
+export * from './components/db-migration.component';
 export { AppModulesComponent } from './components/app-modules.component';
 
 // Dtos
 export * from './dtos/top-bar.dto';
 export * from './dtos/security.dto';
 export * from './dtos/put-security.dto';
+export * from './dtos/no-settings.dto';
 
 // Services
 export * from './services/base-data.service';
