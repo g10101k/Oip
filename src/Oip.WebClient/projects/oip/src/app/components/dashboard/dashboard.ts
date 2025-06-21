@@ -4,7 +4,7 @@ import { StatsWidget } from './components/statswidget';
 import { RecentSalesWidget } from './components/recentsaleswidget';
 import { BestSellingWidget } from './components/bestsellingwidget';
 import { RevenueStreamWidget } from './components/revenuestreamwidget';
-import { BaseComponent, Feature, SecurityComponent } from "oip-common";
+import { BaseModuleComponent, Feature, NoSettingsDto, SecurityComponent } from "oip-common";
 import { NgIf } from "@angular/common";
 
 interface DashboardSettingsDto {
@@ -28,7 +28,7 @@ interface DashboardSettingsDto {
     <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
   `
 })
-export class Dashboard extends BaseComponent<DashboardSettingsDto> implements Feature {
+export class Dashboard extends BaseModuleComponent<DashboardSettingsDto, NoSettingsDto> implements Feature {
   controller: string = 'dashboard';
 }
 
