@@ -15,7 +15,7 @@ import { InputText } from "primeng/inputtext";
   template: `
     <div *ngIf="isContent" class="card">
       <div>
-        <h5>Weather</h5>
+        <h5>{{ this.titleService.getTitle() }}</h5>
         <p-table [value]="data" [tableStyle]="{'min-width': '50rem'}">
           <ng-template pTemplate="header" let-columns>
             <tr>

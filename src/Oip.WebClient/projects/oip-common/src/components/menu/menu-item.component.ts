@@ -139,7 +139,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     });
 
     if (activeRoute) {
-      this.menuService.onMenuStateChange({ key: this.key, routeEvent: true });
+      this.menuService.onMenuStateChange({ key: this.key, item: this.item, routeEvent: true });
     }
   }
 
@@ -160,7 +160,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
       this.active = !this.active;
     }
 
-    this.menuService.onMenuStateChange({ key: this.key });
+    this.menuService.onMenuStateChange({ key: this.key, item: this.item });
   }
 
   get submenuAnimation() {
