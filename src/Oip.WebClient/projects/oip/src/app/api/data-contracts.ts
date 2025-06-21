@@ -230,61 +230,61 @@ export interface WeatherModuleSettingsSaveSettingsRequest {
   settings?: WeatherModuleSettings;
 }
 
-export interface DashboardGetSecurityListParams {
+export interface DashboardGetSecurityParams {
   /** @format int32 */
   id?: number;
 }
 
-export interface DashboardGetModuleInstanceSettingsListParams {
+export interface DashboardGetModuleInstanceSettingsParams {
   /** @format int32 */
   id?: number;
 }
 
-export interface DbMigrationGetSecurityListParams {
+export interface DbMigrationGetSecurityParams {
   /** @format int32 */
   id?: number;
 }
 
-export interface DbMigrationGetModuleInstanceSettingsListParams {
+export interface DbMigrationGetModuleInstanceSettingsParams {
   /** @format int32 */
   id?: number;
 }
 
-export interface FolderGetSecurityListParams {
+export interface FolderGetSecurityParams {
   /** @format int32 */
   id?: number;
 }
 
-export interface FolderGetModuleInstanceSettingsListParams {
+export interface FolderGetModuleInstanceSettingsParams {
   /** @format int32 */
   id?: number;
 }
 
-export interface MenuDeleteModuleInstanceDeleteParams {
+export interface MenuDeleteModuleInstanceParams {
   /** @format int32 */
   id?: number;
 }
 
-export interface UserProfileGetUserPhotoListParams {
+export interface UserProfileGetUserPhotoParams {
   email?: string;
 }
 
-export interface UserProfilePostUserPhotoCreatePayload {
+export interface UserProfilePostUserPhotoPayload {
   /** @format binary */
   files?: File;
 }
 
-export interface WeatherGetListParams {
+export interface WeatherForecastModuleGetParams {
   /** @format int32 */
   dayCount?: number;
 }
 
-export interface WeatherGetSecurityListParams {
+export interface WeatherForecastModuleGetSecurityParams {
   /** @format int32 */
   id?: number;
 }
 
-export interface WeatherGetModuleInstanceSettingsListParams {
+export interface WeatherForecastModuleGetModuleInstanceSettingsParams {
   /** @format int32 */
   id?: number;
 }

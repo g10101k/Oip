@@ -10,15 +10,17 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from "@angular/core";
 import {
-  DashboardGetModuleInstanceSettingsListParams,
-  DashboardGetSecurityListParams,
+  DashboardGetModuleInstanceSettingsParams,
+  DashboardGetSecurityParams,
   DashboardSettingsSaveSettingsRequest,
   PutSecurityRequest,
   SecurityResponse,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
+@Injectable()
 export class DashboardModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -26,11 +28,11 @@ export class DashboardModule<
    * No description
    *
    * @tags DashboardModule
-   * @name dashboardGetModuleRightsList
+   * @name dashboardGetModuleRights
    * @request GET:/api/dashboard/get-module-rights
    * @secure
    */
-  dashboardGetModuleRightsList = (params: RequestParams = {}) =>
+  dashboardGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/dashboard/get-module-rights`,
       method: "GET",
@@ -42,13 +44,13 @@ export class DashboardModule<
    * No description
    *
    * @tags DashboardModule
-   * @name dashboardGetSecurityList
+   * @name dashboardGetSecurity
    * @summary Get security for instance id
    * @request GET:/api/dashboard/get-security
    * @secure
    */
-  dashboardGetSecurityList = (
-    query: DashboardGetSecurityListParams,
+  dashboardGetSecurity = (
+    query: DashboardGetSecurityParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
@@ -63,12 +65,12 @@ export class DashboardModule<
    * No description
    *
    * @tags DashboardModule
-   * @name dashboardPutSecurityUpdate
+   * @name dashboardPutSecurity
    * @summary Update security
    * @request PUT:/api/dashboard/put-security
    * @secure
    */
-  dashboardPutSecurityUpdate = (
+  dashboardPutSecurity = (
     data: PutSecurityRequest,
     params: RequestParams = {},
   ) =>
@@ -84,13 +86,13 @@ export class DashboardModule<
    * No description
    *
    * @tags DashboardModule
-   * @name dashboardGetModuleInstanceSettingsList
+   * @name dashboardGetModuleInstanceSettings
    * @summary Get instance setting
    * @request GET:/api/dashboard/get-module-instance-settings
    * @secure
    */
-  dashboardGetModuleInstanceSettingsList = (
-    query: DashboardGetModuleInstanceSettingsListParams,
+  dashboardGetModuleInstanceSettings = (
+    query: DashboardGetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
@@ -104,11 +106,11 @@ export class DashboardModule<
    * No description
    *
    * @tags DashboardModule
-   * @name dashboardPutModuleInstanceSettingsUpdate
+   * @name dashboardPutModuleInstanceSettings
    * @request PUT:/api/dashboard/put-module-instance-settings
    * @secure
    */
-  dashboardPutModuleInstanceSettingsUpdate = (
+  dashboardPutModuleInstanceSettings = (
     data: DashboardSettingsSaveSettingsRequest,
     params: RequestParams = {},
   ) =>

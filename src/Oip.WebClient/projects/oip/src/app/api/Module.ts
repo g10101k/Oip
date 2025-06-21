@@ -10,9 +10,11 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from "@angular/core";
 import { ModuleDeleteRequest, ModuleDto } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
+@Injectable()
 export class Module<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -20,12 +22,12 @@ export class Module<
    * No description
    *
    * @tags Module
-   * @name moduleGetAllList
+   * @name moduleGetAll
    * @summary Get all modules
    * @request GET:/api/module/get-all
    * @secure
    */
-  moduleGetAllList = (params: RequestParams = {}) =>
+  moduleGetAll = (params: RequestParams = {}) =>
     this.request<ModuleDto[], any>({
       path: `/api/module/get-all`,
       method: "GET",
@@ -37,12 +39,12 @@ export class Module<
    * No description
    *
    * @tags Module
-   * @name moduleInsertCreate
+   * @name moduleInsert
    * @summary Insert
    * @request POST:/api/module/insert
    * @secure
    */
-  moduleInsertCreate = (data: ModuleDto, params: RequestParams = {}) =>
+  moduleInsert = (data: ModuleDto, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/module/insert`,
       method: "POST",
@@ -55,15 +57,12 @@ export class Module<
    * No description
    *
    * @tags Module
-   * @name moduleDeleteDelete
+   * @name moduleDelete
    * @summary delete
    * @request DELETE:/api/module/delete
    * @secure
    */
-  moduleDeleteDelete = (
-    data: ModuleDeleteRequest,
-    params: RequestParams = {},
-  ) =>
+  moduleDelete = (data: ModuleDeleteRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/module/delete`,
       method: "DELETE",
@@ -76,12 +75,12 @@ export class Module<
    * @description This endpoint is restricted to users with administrative privileges. It aggregates module data from the database and compares it against the currently loaded modules in the application context, returning a combined view with load status flags.
    *
    * @tags Module
-   * @name moduleGetModulesWithLoadStatusList
+   * @name moduleGetModulesWithLoadStatus
    * @summary Returns a list of all registered modules and indicates whether each one is currently loaded into the application.
    * @request GET:/api/module/get-modules-with-load-status
    * @secure
    */
-  moduleGetModulesWithLoadStatusList = (params: RequestParams = {}) =>
+  moduleGetModulesWithLoadStatus = (params: RequestParams = {}) =>
     this.request<ModuleDto[], any>({
       path: `/api/module/get-modules-with-load-status`,
       method: "GET",

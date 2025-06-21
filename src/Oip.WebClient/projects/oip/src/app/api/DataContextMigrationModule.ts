@@ -10,10 +10,11 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from "@angular/core";
 import {
   ApplyMigrationRequest,
-  DbMigrationGetModuleInstanceSettingsListParams,
-  DbMigrationGetSecurityListParams,
+  DbMigrationGetModuleInstanceSettingsParams,
+  DbMigrationGetSecurityParams,
   MigrationDto,
   ObjectSaveSettingsRequest,
   PutSecurityRequest,
@@ -21,6 +22,7 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
+@Injectable()
 export class DataContextMigrationModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -28,11 +30,11 @@ export class DataContextMigrationModule<
    * No description
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationGetModuleRightsList
+   * @name dbMigrationGetModuleRights
    * @request GET:/api/db-migration/get-module-rights
    * @secure
    */
-  dbMigrationGetModuleRightsList = (params: RequestParams = {}) =>
+  dbMigrationGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/db-migration/get-module-rights`,
       method: "GET",
@@ -44,12 +46,12 @@ export class DataContextMigrationModule<
    * No description
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationGetMigrationsList
+   * @name dbMigrationGetMigrations
    * @summary Get migration
    * @request GET:/api/db-migration/get-migrations
    * @secure
    */
-  dbMigrationGetMigrationsList = (params: RequestParams = {}) =>
+  dbMigrationGetMigrations = (params: RequestParams = {}) =>
     this.request<MigrationDto[], any>({
       path: `/api/db-migration/get-migrations`,
       method: "GET",
@@ -61,12 +63,12 @@ export class DataContextMigrationModule<
    * No description
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationMigrateList
+   * @name dbMigrationMigrate
    * @summary Применить миграцию БД
    * @request GET:/api/db-migration/migrate
    * @secure
    */
-  dbMigrationMigrateList = (params: RequestParams = {}) =>
+  dbMigrationMigrate = (params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/db-migration/migrate`,
       method: "GET",
@@ -77,12 +79,12 @@ export class DataContextMigrationModule<
    * No description
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationApplyMigrationCreate
+   * @name dbMigrationApplyMigration
    * @summary Применить миграцию БД
    * @request POST:/api/db-migration/apply-migration
    * @secure
    */
-  dbMigrationApplyMigrationCreate = (
+  dbMigrationApplyMigration = (
     data: ApplyMigrationRequest,
     params: RequestParams = {},
   ) =>
@@ -98,13 +100,13 @@ export class DataContextMigrationModule<
    * No description
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationGetSecurityList
+   * @name dbMigrationGetSecurity
    * @summary Get security for instance id
    * @request GET:/api/db-migration/get-security
    * @secure
    */
-  dbMigrationGetSecurityList = (
-    query: DbMigrationGetSecurityListParams,
+  dbMigrationGetSecurity = (
+    query: DbMigrationGetSecurityParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
@@ -119,12 +121,12 @@ export class DataContextMigrationModule<
    * No description
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationPutSecurityUpdate
+   * @name dbMigrationPutSecurity
    * @summary Update security
    * @request PUT:/api/db-migration/put-security
    * @secure
    */
-  dbMigrationPutSecurityUpdate = (
+  dbMigrationPutSecurity = (
     data: PutSecurityRequest,
     params: RequestParams = {},
   ) =>
@@ -140,13 +142,13 @@ export class DataContextMigrationModule<
    * No description
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationGetModuleInstanceSettingsList
+   * @name dbMigrationGetModuleInstanceSettings
    * @summary Get instance setting
    * @request GET:/api/db-migration/get-module-instance-settings
    * @secure
    */
-  dbMigrationGetModuleInstanceSettingsList = (
-    query: DbMigrationGetModuleInstanceSettingsListParams,
+  dbMigrationGetModuleInstanceSettings = (
+    query: DbMigrationGetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
@@ -160,11 +162,11 @@ export class DataContextMigrationModule<
    * No description
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationPutModuleInstanceSettingsUpdate
+   * @name dbMigrationPutModuleInstanceSettings
    * @request PUT:/api/db-migration/put-module-instance-settings
    * @secure
    */
-  dbMigrationPutModuleInstanceSettingsUpdate = (
+  dbMigrationPutModuleInstanceSettings = (
     data: ObjectSaveSettingsRequest,
     params: RequestParams = {},
   ) =>

@@ -10,15 +10,17 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from "@angular/core";
 import {
-  FolderGetModuleInstanceSettingsListParams,
-  FolderGetSecurityListParams,
+  FolderGetModuleInstanceSettingsParams,
+  FolderGetSecurityParams,
   ObjectSaveSettingsRequest,
   PutSecurityRequest,
   SecurityResponse,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
+@Injectable()
 export class FolderModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -26,11 +28,11 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderGetModuleRightsList
+   * @name folderGetModuleRights
    * @request GET:/api/folder/get-module-rights
    * @secure
    */
-  folderGetModuleRightsList = (params: RequestParams = {}) =>
+  folderGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/folder/get-module-rights`,
       method: "GET",
@@ -42,13 +44,13 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderGetSecurityList
+   * @name folderGetSecurity
    * @summary Get security for instance id
    * @request GET:/api/folder/get-security
    * @secure
    */
-  folderGetSecurityList = (
-    query: FolderGetSecurityListParams,
+  folderGetSecurity = (
+    query: FolderGetSecurityParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
@@ -63,15 +65,12 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderPutSecurityUpdate
+   * @name folderPutSecurity
    * @summary Update security
    * @request PUT:/api/folder/put-security
    * @secure
    */
-  folderPutSecurityUpdate = (
-    data: PutSecurityRequest,
-    params: RequestParams = {},
-  ) =>
+  folderPutSecurity = (data: PutSecurityRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/folder/put-security`,
       method: "PUT",
@@ -84,13 +83,13 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderGetModuleInstanceSettingsList
+   * @name folderGetModuleInstanceSettings
    * @summary Get instance setting
    * @request GET:/api/folder/get-module-instance-settings
    * @secure
    */
-  folderGetModuleInstanceSettingsList = (
-    query: FolderGetModuleInstanceSettingsListParams,
+  folderGetModuleInstanceSettings = (
+    query: FolderGetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
@@ -104,11 +103,11 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderPutModuleInstanceSettingsUpdate
+   * @name folderPutModuleInstanceSettings
    * @request PUT:/api/folder/put-module-instance-settings
    * @secure
    */
-  folderPutModuleInstanceSettingsUpdate = (
+  folderPutModuleInstanceSettings = (
     data: ObjectSaveSettingsRequest,
     params: RequestParams = {},
   ) =>
