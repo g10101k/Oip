@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { BaseComponent, Feature, SecurityComponent, SecurityStorageService } from 'oip-common'
-import { WeatherForecast } from "../../api/WeatherForecast";
+import { BaseModuleComponent, Feature, SecurityComponent, SecurityStorageService } from 'oip-common'
+import { WeatherForecastModule } from "../../api/WeatherForecastModule";
 import { WeatherModuleSettings } from "../../api/data-contracts";
 import { TagModule } from 'primeng/tag';
 import { SharedModule } from 'primeng/api';
@@ -9,6 +9,7 @@ import { NgIf } from '@angular/common';
 import { Button } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { InputText } from "primeng/inputtext";
+import { NoSettingsDto } from "oip-common";
 
 @Component({
   selector: 'weather',
@@ -56,7 +57,7 @@ import { InputText } from "primeng/inputtext";
     </div>
     <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
   `,
-  providers: [{ provide: 'controller', useValue: 'weather' }, WeatherForecast],
+  providers: [WeatherForecastModule],
   standalone: true,
   imports: [
     NgIf,
@@ -69,9 +70,8 @@ import { InputText } from "primeng/inputtext";
     InputText,
   ],
 })
-export class WeatherComponent extends BaseComponent<WeatherModuleSettings> implements OnInit, OnDestroy, Feature {
-  controller: string = 'weather';
-  protected readonly dataService = inject(WeatherForecast);
+export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherModuleSettings, NoSettingsDto> implements OnInit, OnDestroy, Feature {
+  protected readonly dataService = inject(WeatherForecastModule);
   protected data: any = [];
 
   constructor() {
@@ -80,7 +80,7 @@ export class WeatherComponent extends BaseComponent<WeatherModuleSettings> imple
 
   async ngOnInit() {
     await super.ngOnInit();
-    await this.dataService.weatherGetList({ dayCount: this.settings.dayCount }).then(result => {
+    await this.dataService.weatherForecastModuleGet({ dayCount: this.settings.dayCount }).then(result => {
       this.data = result;
     }, error => {
       this.msgService.error(error);
