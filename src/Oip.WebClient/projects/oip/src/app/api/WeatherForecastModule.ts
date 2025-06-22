@@ -15,8 +15,8 @@ import {
   PutSecurityRequest,
   SecurityResponse,
   WeatherForecastModuleGetModuleInstanceSettingsParams,
-  WeatherForecastModuleGetParams,
   WeatherForecastModuleGetSecurityParams,
+  WeatherForecastModuleGetWeatherForecastParams,
   WeatherForecastResponse,
   WeatherModuleSettingsSaveSettingsRequest,
 } from "./data-contracts";
@@ -30,17 +30,17 @@ export class WeatherForecastModule<
    * No description
    *
    * @tags WeatherForecastModule
-   * @name weatherForecastModuleGet
+   * @name weatherForecastModuleGetWeatherForecast
    * @summary Get example data
-   * @request GET:/api/weather-forecast-module/get
+   * @request GET:/api/weather-forecast-module/get-weather-forecast
    * @secure
    */
-  weatherForecastModuleGet = (
-    query: WeatherForecastModuleGetParams,
+  weatherForecastModuleGetWeatherForecast = (
+    query: WeatherForecastModuleGetWeatherForecastParams,
     params: RequestParams = {},
   ) =>
     this.request<WeatherForecastResponse[], any>({
-      path: `/api/weather-forecast-module/get`,
+      path: `/api/weather-forecast-module/get-weather-forecast`,
       method: "GET",
       query: query,
       secure: true,
