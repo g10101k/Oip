@@ -42,7 +42,7 @@ public class WeatherForecastModuleController : BaseModuleController<WeatherModul
     /// </summary>
     /// <param name="dayCount"></param>
     /// <returns></returns>
-    [HttpGet("get")]
+    [HttpGet("get-weather-forecast")]
     [Authorize]
     [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
     public IActionResult Get(int dayCount)

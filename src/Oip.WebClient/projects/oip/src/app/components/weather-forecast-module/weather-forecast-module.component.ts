@@ -1,29 +1,55 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BaseModuleComponent, Feature, SecurityComponent, SecurityStorageService } from 'oip-common'
 import { WeatherForecastModule } from "../../api/WeatherForecastModule";
-import { WeatherModuleSettings } from "../../api/data-contracts";
+import { WeatherForecastResponse, WeatherModuleSettings } from "../../api/data-contracts";
 import { TagModule } from 'primeng/tag';
-import { SharedModule } from 'primeng/api';
-import { TableModule } from 'primeng/table';
+import { FilterMetadata, SharedModule } from 'primeng/api';
+import { Table, TableModule } from 'primeng/table';
 import { NgIf } from '@angular/common';
 import { Button } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { InputText } from "primeng/inputtext";
-import { NoSettingsDto } from "oip-common";
+
+interface WeatherModuleLocalSettings {
+  first: number;
+  rows: number;
+  filters: {
+    [p: string]: FilterMetadata | FilterMetadata[],
+  };
+}
 
 @Component({
-  selector: 'weather',
+  selector: 'weather-forecast-module',
   template: `
     <div *ngIf="isContent" class="card">
       <div>
-        <h5>{{ this.titleService.getTitle() }}</h5>
-        <p-table [value]="data" [tableStyle]="{'min-width': '50rem'}">
+        <h5>{{ this.title }}</h5>
+        <p-table #table
+                 [value]="data"
+                 (onFilter)="onFilter()">
+          >
           <ng-template pTemplate="header" let-columns>
             <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Temperature C</th>
-              <th scope="col">Temperature F</th>
-              <th scope="col">Summary</th>
+              <th pSortableColumn="date" scope="col">
+                Date
+                <p-sortIcon field="date"/>
+                <p-columnFilter type="date" field="date" display="menu"/>
+              </th>
+              <th pSortableColumn="temperatureC" scope="col">
+                Temperature C
+                <p-sortIcon field="temperatureC"/>
+                <p-columnFilter type="numeric" field="temperatureC" display="menu"/>
+              </th>
+              <th pSortableColumn="temperatureF" scope="col">
+                Temperature F
+                <p-sortIcon field="temperatureF"/>
+                <p-columnFilter type="numeric" field="temperatureF" display="menu"/>
+              </th>
+              <th pSortableColumn="summary" scope="col">
+                Summary
+                <p-sortIcon field="summary"/>
+                <p-columnFilter type="text" field="summary" display="menu"/>
+              </th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-forecast let-columns="columns">
@@ -50,7 +76,7 @@ import { NoSettingsDto } from "oip-common";
             </div>
           </div>
           <div class="flex justify-end">
-            <p-button label="Save" icon="pi pi-save" (onClick)="saveButtonClick()"></p-button>
+            <p-button label="Save" icon="pi pi-save" (onClick)="saveSettings(settings)"></p-button>
           </div>
         </div>
       </div>
@@ -58,7 +84,6 @@ import { NoSettingsDto } from "oip-common";
     <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
   `,
   providers: [WeatherForecastModule],
-  standalone: true,
   imports: [
     NgIf,
     TableModule,
@@ -70,9 +95,10 @@ import { NoSettingsDto } from "oip-common";
     InputText,
   ],
 })
-export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherModuleSettings, NoSettingsDto> implements OnInit, OnDestroy, Feature {
+export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings> implements OnInit, OnDestroy, Feature {
+  @ViewChild('table') table!: Table;
   protected readonly dataService = inject(WeatherForecastModule);
-  protected data: any = [];
+  protected data: WeatherForecastResponse[] = [];
 
   constructor() {
     super();
@@ -80,14 +106,16 @@ export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherM
 
   async ngOnInit() {
     await super.ngOnInit();
-    await this.dataService.weatherForecastModuleGet({ dayCount: this.settings.dayCount }).then(result => {
+    await this.dataService.weatherForecastModuleGetWeatherForecast({ dayCount: this.settings.dayCount }).then(result => {
       this.data = result;
     }, error => {
+      console.error('Error fetching weather data:', error);
       this.msgService.error(error);
     });
+    this.table.filters = this.localSettings().filters;
   }
 
-  async saveButtonClick() {
-    await this.saveSettings(this.settings);
+  onFilter() {
+    this.localSettings.update((settings) => ({ ...settings, filters: this.table.filters }));
   }
 }
