@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, OnInit, Signal, signal, } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit, Signal, signal, WritableSignal, } from '@angular/core';
 import { TopBarDto } from '../dtos/top-bar.dto'
 import { TopBarService } from '../services/top-bar.service'
 import { MsgService } from "../services/msg.service";
@@ -58,14 +58,19 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   /**
    * A signal representing the local application settings.  Changes to this signal
    * propagate updates to the underlying local store settings.
-   * @type {Signal<TLocalStoreSettings>}
+   * @type {WritableSignal<TLocalStoreSettings>}
    */
-  public localSettings: Signal<TLocalStoreSettings> = signal<TLocalStoreSettings>(this._localSettings);
+  public localSettings: WritableSignal<TLocalStoreSettings> = signal<TLocalStoreSettings>(this._localSettings);
   /**
    * A Subject emitting updates to local store settings. Observables can subscribe to this Subject to react to changes in local settings.
    * @type {Subject<TLocalStoreSettings>}
    */
   public localSettingsUpdate: Subject<TLocalStoreSettings> = new Subject<TLocalStoreSettings>();
+  /**
+   * The title of the component. Get from Title in ngOnInit
+   * @type {string}
+   */
+  public title: string;
 
   /**
    * Updates local settings and persists them to local storage.
@@ -84,10 +89,10 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   private getLocalStorageSettings(): TLocalStoreSettings {
     try {
       const localStorageSettingsString = localStorage.getItem(`Instance_${this.id}`);
+      console.log(localStorageSettingsString);
       if (localStorageSettingsString != null) {
         return JSON.parse(localStorageSettingsString) as TLocalStoreSettings;
       }
-      return {} as TLocalStoreSettings;
     } catch (error) {
       this.msgService.error(error, "Error parsing layoutConfig:");
       return {} as TLocalStoreSettings;
@@ -178,8 +183,9 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     }));
     this.subscriptions.push(this.route.paramMap.subscribe(params => {
       this.id = +params.get('id');
+      this.getSettings();
     }));
-    await this.getSettings();
+    this.title = this.titleService.getTitle()
   }
 
   /**
@@ -192,7 +198,6 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     }).catch(error => {
       this.msgService.error(error);
     })
-
     this.getLocalStorageSettings();
   }
 
