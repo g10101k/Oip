@@ -12,18 +12,16 @@
 
 /** DTO for create module instance */
 export interface AddModuleInstanceDto {
-  /** @format int32 */
   moduleId?: number;
   label?: string | null;
   icon?: string | null;
-  /** @format int32 */
   parentId?: number | null;
   viewRoles?: string[] | null;
 }
 
-/** Apply Migration Request */
+/** Represents a request to apply a specific migration. */
 export interface ApplyMigrationRequest {
-  /** Migration name */
+  /** The name of the migration to apply. */
   name?: string | null;
 }
 
@@ -35,10 +33,7 @@ export interface DashboardSettings {
 
 /** Save settings request */
 export interface DashboardSettingsSaveSettingsRequest {
-  /**
-   * Module instance id
-   * @format int32
-   */
+  /** Module instance id */
   id?: number;
   /** Settings */
   settings?: DashboardSettings;
@@ -46,11 +41,9 @@ export interface DashboardSettingsSaveSettingsRequest {
 
 /** DTO for edit module instance */
 export interface EditModuleInstanceDto {
-  /** @format int32 */
   moduleInstanceId?: number;
   label?: string | null;
   icon?: string | null;
-  /** @format int32 */
   parentId?: number | null;
   viewRoles?: string[] | null;
 }
@@ -69,10 +62,7 @@ export interface GetKeycloakClientSettingsResponse {
   useRefreshToken?: boolean;
   /** Silent Renew */
   silentRenew?: boolean;
-  /**
-   * Log level None = 0, Debug = 1, Warn = 2, Error = 3
-   * @format int32
-   */
+  /** Log level None = 0, Debug = 1, Warn = 2, Error = 3 */
   logLevel?: number;
   /** Urls with auth */
   secureRoutes?: string[] | null;
@@ -86,34 +76,31 @@ export interface GetManifestResponse {
 
 /** Int Key Value DTO */
 export interface IntKeyValueDto {
-  /** @format int32 */
   key?: number;
   value?: string | null;
 }
 
-/** Модель миграции */
+/** DTO represents a migration status. */
 export interface MigrationDto {
+  /** Name of the migration. */
   name?: string | null;
+  /** Indicates whether the migration has been applied to the database. */
   applied?: boolean;
+  /** Indicates whether the migration is pending application. */
   pending?: boolean;
+  /** Indicates whether the migration exists. */
   exist?: boolean;
 }
 
 /** Represents a request to delete a module by its identifier. */
 export interface ModuleDeleteRequest {
-  /**
-   * Gets or sets the unique identifier of the module to be deleted.
-   * @format int32
-   */
+  /** Gets or sets the unique identifier of the module to be deleted. */
   moduleId?: number;
 }
 
 /** It module in app */
 export interface ModuleDto {
-  /**
-   * Id
-   * @format int32
-   */
+  /** Id */
   moduleId?: number;
   /** Name */
   name?: string | null;
@@ -125,17 +112,23 @@ export interface ModuleDto {
 
 /** Module Instance Dto */
 export interface ModuleInstanceDto {
-  /** @format int32 */
+  /** Unique identifier for the module instance. */
   moduleInstanceId?: number;
-  /** @format int32 */
+  /** Identifier for the module. */
   moduleId?: number;
+  /** The label for the module instance. */
   label?: string | null;
+  /** Icon associated with the module instance. see https://primeng.org/icons */
   icon?: string | null;
+  /** Route link. */
   routerLink?: string[] | null;
+  /** URL for the module instance. */
   url?: string | null;
+  /** The target. */
   target?: string | null;
+  /** Configuration settings for the module instance. */
   settings?: string | null;
-  /** Childs */
+  /** Child module instances. */
   items?: ModuleInstanceDto[] | null;
 }
 
@@ -149,10 +142,7 @@ export interface ModuleSecurityDto {
 
 /** Save settings request */
 export interface ObjectSaveSettingsRequest {
-  /**
-   * Module instance id
-   * @format int32
-   */
+  /** Module instance id */
   id?: number;
   /** Settings */
   settings?: any;
@@ -160,10 +150,7 @@ export interface ObjectSaveSettingsRequest {
 
 /** Put security dto */
 export interface PutSecurityRequest {
-  /**
-   * Instance id
-   * @format int32
-   */
+  /** Instance id */
   id?: number;
   /** Securities */
   securities?: SecurityResponse[] | null;
@@ -191,20 +178,11 @@ export interface SecurityResponse {
 
 /** Response */
 export interface WeatherForecastResponse {
-  /**
-   * Date
-   * @format date-time
-   */
-  date?: string;
-  /**
-   * Temp in ºC
-   * @format int32
-   */
+  /** Date */
+  date?: Date;
+  /** Temp in ºC */
   temperatureC?: number;
-  /**
-   * Temp in ºF
-   * @format int32
-   */
+  /** Temp in ºF */
   temperatureF?: number;
   /** Summary */
   summary?: string | null;
@@ -212,56 +190,43 @@ export interface WeatherForecastResponse {
 
 /** Module settings */
 export interface WeatherModuleSettings {
-  /**
-   * Day count
-   * @format int32
-   */
+  /** Day count */
   dayCount?: number;
 }
 
 /** Save settings request */
 export interface WeatherModuleSettingsSaveSettingsRequest {
-  /**
-   * Module instance id
-   * @format int32
-   */
+  /** Module instance id */
   id?: number;
   /** Module settings */
   settings?: WeatherModuleSettings;
 }
 
 export interface DashboardGetSecurityParams {
-  /** @format int32 */
   id?: number;
 }
 
 export interface DashboardGetModuleInstanceSettingsParams {
-  /** @format int32 */
   id?: number;
 }
 
 export interface DbMigrationGetSecurityParams {
-  /** @format int32 */
   id?: number;
 }
 
 export interface DbMigrationGetModuleInstanceSettingsParams {
-  /** @format int32 */
   id?: number;
 }
 
 export interface FolderGetSecurityParams {
-  /** @format int32 */
   id?: number;
 }
 
 export interface FolderGetModuleInstanceSettingsParams {
-  /** @format int32 */
   id?: number;
 }
 
 export interface MenuDeleteModuleInstanceParams {
-  /** @format int32 */
   id?: number;
 }
 
@@ -270,21 +235,17 @@ export interface UserProfileGetUserPhotoParams {
 }
 
 export interface UserProfilePostUserPhotoPayload {
-  /** @format binary */
   files?: File;
 }
 
-export interface WeatherForecastModuleGetParams {
-  /** @format int32 */
+export interface WeatherForecastModuleGetWeatherForecastParams {
   dayCount?: number;
 }
 
 export interface WeatherForecastModuleGetSecurityParams {
-  /** @format int32 */
   id?: number;
 }
 
 export interface WeatherForecastModuleGetModuleInstanceSettingsParams {
-  /** @format int32 */
   id?: number;
 }
