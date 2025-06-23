@@ -10,12 +10,14 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from "@angular/core";
 import {
-  UserProfileGetUserPhotoListParams,
-  UserProfilePostUserPhotoCreatePayload,
+  UserProfileGetUserPhotoParams,
+  UserProfilePostUserPhotoPayload,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
+@Injectable()
 export class UserProfile<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -23,13 +25,13 @@ export class UserProfile<
    * No description
    *
    * @tags UserProfile
-   * @name userProfileGetUserPhotoList
+   * @name userProfileGetUserPhoto
    * @summary Get all roles
    * @request GET:/api/user-profile/get-user-photo
    * @secure
    */
-  userProfileGetUserPhotoList = (
-    query: UserProfileGetUserPhotoListParams,
+  userProfileGetUserPhoto = (
+    query: UserProfileGetUserPhotoParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
@@ -43,13 +45,13 @@ export class UserProfile<
    * No description
    *
    * @tags UserProfile
-   * @name userProfilePostUserPhotoCreate
+   * @name userProfilePostUserPhoto
    * @summary Get all roles
    * @request POST:/api/user-profile/post-user-photo
    * @secure
    */
-  userProfilePostUserPhotoCreate = (
-    data: UserProfilePostUserPhotoCreatePayload,
+  userProfilePostUserPhoto = (
+    data: UserProfilePostUserPhotoPayload,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

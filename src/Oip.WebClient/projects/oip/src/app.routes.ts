@@ -14,8 +14,8 @@ export const appRoutes: Routes = [
         canActivate: [() => inject(AuthGuardService).canActivate()],
       },
       {
-        path: 'weather/:id',
-        loadComponent: () => import('./app/components/weather/weather.component').then(m => m.WeatherComponent),
+        path: 'weather-forecast-module/:id',
+        loadComponent: () => import('./app/components/weather-forecast-module/weather-forecast-module.component').then(m => m.WeatherForecastModuleComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
       },
       {

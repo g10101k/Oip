@@ -12,15 +12,19 @@ namespace Oip.Controllers;
 /// Module controller example
 /// </summary>
 [ApiController]
-[Route("api/weather")]
-public class WeatherForecastController : BaseModuleController<WeatherModuleSettings>
+[Route("api/weather-forecast-module")]
+public class WeatherForecastModuleController : BaseModuleController<WeatherModuleSettings>
 {
     private readonly string[] _summaries =
     [
-        Resources.WeatherForecastController_Summaries_Freezing, Resources.WeatherForecastController_Summaries_Bracing,
-        Resources.WeatherForecastController_Summaries_Chilly, Resources.WeatherForecastController_Summaries_Cool,
-        Resources.WeatherForecastController_Summaries_Mild, Resources.WeatherForecastController_Summaries_Warm,
-        Resources.WeatherForecastController_Summaries_Balmy, Resources.WeatherForecastController_Summaries_Hot,
+        Resources.WeatherForecastController_Summaries_Freezing, 
+        Resources.WeatherForecastController_Summaries_Bracing,
+        Resources.WeatherForecastController_Summaries_Chilly, 
+        Resources.WeatherForecastController_Summaries_Cool,
+        Resources.WeatherForecastController_Summaries_Mild, 
+        Resources.WeatherForecastController_Summaries_Warm,
+        Resources.WeatherForecastController_Summaries_Balmy, 
+        Resources.WeatherForecastController_Summaries_Hot,
         Resources.WeatherForecastController_Summaries_Sweltering,
         Resources.WeatherForecastController_Summaries_Scorching
     ];
@@ -29,7 +33,7 @@ public class WeatherForecastController : BaseModuleController<WeatherModuleSetti
     /// .ctor
     /// </summary>
     /// <param name="moduleRepository"></param>
-    public WeatherForecastController(ModuleRepository moduleRepository) : base(moduleRepository)
+    public WeatherForecastModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
     {
     }
 
@@ -38,7 +42,7 @@ public class WeatherForecastController : BaseModuleController<WeatherModuleSetti
     /// </summary>
     /// <param name="dayCount"></param>
     /// <returns></returns>
-    [HttpGet("get")]
+    [HttpGet("get-weather-forecast")]
     [Authorize]
     [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
     public IActionResult Get(int dayCount)

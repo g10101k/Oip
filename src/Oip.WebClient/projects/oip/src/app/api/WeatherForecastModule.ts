@@ -10,32 +10,37 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from "@angular/core";
 import {
   PutSecurityRequest,
   SecurityResponse,
+  WeatherForecastModuleGetModuleInstanceSettingsParams,
+  WeatherForecastModuleGetSecurityParams,
+  WeatherForecastModuleGetWeatherForecastParams,
   WeatherForecastResponse,
-  WeatherGetListParams,
-  WeatherGetModuleInstanceSettingsListParams,
-  WeatherGetSecurityListParams,
   WeatherModuleSettingsSaveSettingsRequest,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class WeatherForecast<
+@Injectable()
+export class WeatherForecastModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
-   * @tags WeatherForecast
-   * @name weatherGetList
+   * @tags WeatherForecastModule
+   * @name weatherForecastModuleGetWeatherForecast
    * @summary Get example data
-   * @request GET:/api/weather/get
+   * @request GET:/api/weather-forecast-module/get-weather-forecast
    * @secure
    */
-  weatherGetList = (query: WeatherGetListParams, params: RequestParams = {}) =>
+  weatherForecastModuleGetWeatherForecast = (
+    query: WeatherForecastModuleGetWeatherForecastParams,
+    params: RequestParams = {},
+  ) =>
     this.request<WeatherForecastResponse[], any>({
-      path: `/api/weather/get`,
+      path: `/api/weather-forecast-module/get-weather-forecast`,
       method: "GET",
       query: query,
       secure: true,
@@ -45,15 +50,15 @@ export class WeatherForecast<
   /**
    * No description
    *
-   * @tags WeatherForecast
-   * @name weatherGetModuleRightsList
+   * @tags WeatherForecastModule
+   * @name weatherForecastModuleGetModuleRights
    * @summary <inheritdoc />
-   * @request GET:/api/weather/get-module-rights
+   * @request GET:/api/weather-forecast-module/get-module-rights
    * @secure
    */
-  weatherGetModuleRightsList = (params: RequestParams = {}) =>
+  weatherForecastModuleGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
-      path: `/api/weather/get-module-rights`,
+      path: `/api/weather-forecast-module/get-module-rights`,
       method: "GET",
       secure: true,
       format: "json",
@@ -62,18 +67,18 @@ export class WeatherForecast<
   /**
    * No description
    *
-   * @tags WeatherForecast
-   * @name weatherGetSecurityList
+   * @tags WeatherForecastModule
+   * @name weatherForecastModuleGetSecurity
    * @summary Get security for instance id
-   * @request GET:/api/weather/get-security
+   * @request GET:/api/weather-forecast-module/get-security
    * @secure
    */
-  weatherGetSecurityList = (
-    query: WeatherGetSecurityListParams,
+  weatherForecastModuleGetSecurity = (
+    query: WeatherForecastModuleGetSecurityParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
-      path: `/api/weather/get-security`,
+      path: `/api/weather-forecast-module/get-security`,
       method: "GET",
       query: query,
       secure: true,
@@ -83,18 +88,18 @@ export class WeatherForecast<
   /**
    * No description
    *
-   * @tags WeatherForecast
-   * @name weatherPutSecurityUpdate
+   * @tags WeatherForecastModule
+   * @name weatherForecastModulePutSecurity
    * @summary Update security
-   * @request PUT:/api/weather/put-security
+   * @request PUT:/api/weather-forecast-module/put-security
    * @secure
    */
-  weatherPutSecurityUpdate = (
+  weatherForecastModulePutSecurity = (
     data: PutSecurityRequest,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
-      path: `/api/weather/put-security`,
+      path: `/api/weather-forecast-module/put-security`,
       method: "PUT",
       body: data,
       secure: true,
@@ -104,18 +109,18 @@ export class WeatherForecast<
   /**
    * No description
    *
-   * @tags WeatherForecast
-   * @name weatherGetModuleInstanceSettingsList
+   * @tags WeatherForecastModule
+   * @name weatherForecastModuleGetModuleInstanceSettings
    * @summary Get instance setting
-   * @request GET:/api/weather/get-module-instance-settings
+   * @request GET:/api/weather-forecast-module/get-module-instance-settings
    * @secure
    */
-  weatherGetModuleInstanceSettingsList = (
-    query: WeatherGetModuleInstanceSettingsListParams,
+  weatherForecastModuleGetModuleInstanceSettings = (
+    query: WeatherForecastModuleGetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
-      path: `/api/weather/get-module-instance-settings`,
+      path: `/api/weather-forecast-module/get-module-instance-settings`,
       method: "GET",
       query: query,
       secure: true,
@@ -124,17 +129,17 @@ export class WeatherForecast<
   /**
    * No description
    *
-   * @tags WeatherForecast
-   * @name weatherPutModuleInstanceSettingsUpdate
-   * @request PUT:/api/weather/put-module-instance-settings
+   * @tags WeatherForecastModule
+   * @name weatherForecastModulePutModuleInstanceSettings
+   * @request PUT:/api/weather-forecast-module/put-module-instance-settings
    * @secure
    */
-  weatherPutModuleInstanceSettingsUpdate = (
+  weatherForecastModulePutModuleInstanceSettings = (
     data: WeatherModuleSettingsSaveSettingsRequest,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
-      path: `/api/weather/put-module-instance-settings`,
+      path: `/api/weather-forecast-module/put-module-instance-settings`,
       method: "PUT",
       body: data,
       secure: true,

@@ -114,6 +114,6 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
         public int Id { get; set; }
 
         /// <summary>Settings</summary>
-        public TSettings Settings { get; set; }
+        public TSettings Settings { get; set; } = null!;
     }
 }

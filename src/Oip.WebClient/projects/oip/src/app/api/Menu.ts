@@ -10,15 +10,17 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from "@angular/core";
 import {
   AddModuleInstanceDto,
   EditModuleInstanceDto,
   IntKeyValueDto,
-  MenuDeleteModuleInstanceDeleteParams,
+  MenuDeleteModuleInstanceParams,
   ModuleInstanceDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
+@Injectable()
 export class Menu<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -26,12 +28,12 @@ export class Menu<
    * No description
    *
    * @tags Menu
-   * @name menuGetList
+   * @name menuGet
    * @summary Get menu for client app
    * @request GET:/api/menu/get
    * @secure
    */
-  menuGetList = (params: RequestParams = {}) =>
+  menuGet = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get`,
       method: "GET",
@@ -43,12 +45,12 @@ export class Menu<
    * No description
    *
    * @tags Menu
-   * @name menuGetAdminMenuList
+   * @name menuGetAdminMenu
    * @summary Get admin menu for client app
    * @request GET:/api/menu/get-admin-menu
    * @secure
    */
-  menuGetAdminMenuList = (params: RequestParams = {}) =>
+  menuGetAdminMenu = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get-admin-menu`,
       method: "GET",
@@ -60,12 +62,12 @@ export class Menu<
    * No description
    *
    * @tags Menu
-   * @name menuGetModulesList
+   * @name menuGetModules
    * @summary Get admin menu for client app
    * @request GET:/api/menu/get-modules
    * @secure
    */
-  menuGetModulesList = (params: RequestParams = {}) =>
+  menuGetModules = (params: RequestParams = {}) =>
     this.request<IntKeyValueDto[], any>({
       path: `/api/menu/get-modules`,
       method: "GET",
@@ -77,12 +79,12 @@ export class Menu<
    * No description
    *
    * @tags Menu
-   * @name menuAddModuleInstanceCreate
+   * @name menuAddModuleInstance
    * @summary Add new module
    * @request POST:/api/menu/add-module-instance
    * @secure
    */
-  menuAddModuleInstanceCreate = (
+  menuAddModuleInstance = (
     data: AddModuleInstanceDto,
     params: RequestParams = {},
   ) =>
@@ -98,12 +100,12 @@ export class Menu<
    * No description
    *
    * @tags Menu
-   * @name menuEditModuleInstanceCreate
+   * @name menuEditModuleInstance
    * @summary Add new module
    * @request POST:/api/menu/edit-module-instance
    * @secure
    */
-  menuEditModuleInstanceCreate = (
+  menuEditModuleInstance = (
     data: EditModuleInstanceDto,
     params: RequestParams = {},
   ) =>
@@ -119,13 +121,13 @@ export class Menu<
    * No description
    *
    * @tags Menu
-   * @name menuDeleteModuleInstanceDelete
+   * @name menuDeleteModuleInstance
    * @summary Add new module
    * @request DELETE:/api/menu/delete-module-instance
    * @secure
    */
-  menuDeleteModuleInstanceDelete = (
-    query: MenuDeleteModuleInstanceDeleteParams,
+  menuDeleteModuleInstance = (
+    query: MenuDeleteModuleInstanceParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({

@@ -10,9 +10,11 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from "@angular/core";
 import { GetKeycloakClientSettingsResponse } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
+@Injectable()
 export class Security<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -20,12 +22,12 @@ export class Security<
    * No description
    *
    * @tags Security
-   * @name securityGetRealmRolesList
+   * @name securityGetRealmRoles
    * @summary Get all roles
    * @request GET:/api/security/get-realm-roles
    * @secure
    */
-  securityGetRealmRolesList = (params: RequestParams = {}) =>
+  securityGetRealmRoles = (params: RequestParams = {}) =>
     this.request<string[], any>({
       path: `/api/security/get-realm-roles`,
       method: "GET",
@@ -37,12 +39,12 @@ export class Security<
    * No description
    *
    * @tags Security
-   * @name securityGetKeycloakClientSettingsList
+   * @name securityGetKeycloakClientSettings
    * @summary Get keycloak client settings
    * @request GET:/api/security/get-keycloak-client-settings
    * @secure
    */
-  securityGetKeycloakClientSettingsList = (params: RequestParams = {}) =>
+  securityGetKeycloakClientSettings = (params: RequestParams = {}) =>
     this.request<GetKeycloakClientSettingsResponse, any>({
       path: `/api/security/get-keycloak-client-settings`,
       method: "GET",

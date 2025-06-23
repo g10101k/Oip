@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BaseComponent, Feature, SecurityComponent } from 'oip-common'
+import { BaseModuleComponent, Feature, NoSettingsDto, SecurityComponent } from 'oip-common'
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
@@ -133,12 +133,11 @@ interface DbMigrationSettingsDto {
   `,
   providers: [ConfirmationService],
 })
-export class DbMigrationComponent extends BaseComponent<DbMigrationSettingsDto> implements OnInit, OnDestroy, Feature {
+export class DbMigrationComponent extends BaseModuleComponent<DbMigrationSettingsDto, NoSettingsDto> implements OnInit, OnDestroy, Feature {
   controller: string = 'db-migration'
   data: MigrationDto[];
 
   async ngOnInit() {
-    this.titleService.setTitle('Db Migration');
     await super.ngOnInit();
     await this.refreshAction();
   }

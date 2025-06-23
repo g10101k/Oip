@@ -10,9 +10,11 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from "@angular/core";
 import { GetManifestResponse, RegisterModuleDto } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
+@Injectable()
 export class Service<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -20,12 +22,12 @@ export class Service<
    * No description
    *
    * @tags Service
-   * @name serviceGetList
+   * @name serviceGet
    * @summary Get manifest for client app
    * @request GET:/api/service/get
    * @secure
    */
-  serviceGetList = (params: RequestParams = {}) =>
+  serviceGet = (params: RequestParams = {}) =>
     this.request<Record<string, GetManifestResponse>, any>({
       path: `/api/service/get`,
       method: "GET",
@@ -37,12 +39,12 @@ export class Service<
    * No description
    *
    * @tags Service
-   * @name serviceRegisterModuleCreate
+   * @name serviceRegisterModule
    * @summary Registry module
    * @request POST:/api/service/register-module
    * @secure
    */
-  serviceRegisterModuleCreate = (
+  serviceRegisterModule = (
     data: RegisterModuleDto,
     params: RequestParams = {},
   ) =>
