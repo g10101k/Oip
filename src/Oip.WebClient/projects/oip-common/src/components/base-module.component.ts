@@ -76,9 +76,11 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @return {void}
    */
   private onConfigUpdate(): void {
-    this._localSettings = { ...this.localSettings() };
-    this.localSettingsUpdate.next(this._localSettings);
-    localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this._localSettings))
+    if (this.localSettings() == {} as TLocalStoreSettings) {
+      this._localSettings = { ...this.localSettings() };
+      this.localSettingsUpdate.next(this._localSettings);
+      localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this._localSettings))
+    }
   }
 
   private getLocalStorageSettings() {
