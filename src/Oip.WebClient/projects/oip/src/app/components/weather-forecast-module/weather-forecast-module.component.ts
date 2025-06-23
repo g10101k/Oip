@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { BaseModuleComponent, Feature, SecurityComponent, SecurityStorageService } from 'oip-common'
+import { BaseModuleComponent, Feature, SecurityComponent } from 'oip-common'
 import { WeatherForecastModule } from "../../api/WeatherForecastModule";
 import { WeatherForecastResponse, WeatherModuleSettings } from "../../api/data-contracts";
 import { TagModule } from 'primeng/tag';
@@ -112,7 +112,8 @@ export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherM
       console.error('Error fetching weather data:', error);
       this.msgService.error(error);
     });
-    this.table.filters = this.localSettings().filters;
+    if (this.localSettings().filters)
+      this.table.filters = this.localSettings().filters;
   }
 
   onFilter() {

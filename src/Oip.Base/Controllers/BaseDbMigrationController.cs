@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
+using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
 
 namespace Oip.Base.Controllers;
@@ -24,13 +25,13 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
         _dbContext = dbContext;
     }
 
-    /// <summary> 
-    /// Get migration
+    /// <summary>
+    /// Gets the list of migrations.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An enumerable of MigrationDto objects representing the migrations.</returns>
     [Authorize(Roles = "admin")]
     [HttpGet("get-migrations")]
-    public virtual async Task<IEnumerable<MigrationDto>> GetMigrations()
+    public async Task<IEnumerable<MigrationDto>> GetMigrations()
     {
         var result = new List<MigrationDto>();
         var allMigrations = _dbContext.Database.GetMigrations();
@@ -68,22 +69,22 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     }
 
     /// <summary>
-    /// Применить миграцию БД
+    /// Migrate database
     /// </summary>
     /// <returns></returns>
     [Authorize(Roles = "admin")]
-    [HttpGet("migrate")]
-    public async Task<IActionResult> GetAppliedMigrations()
+    [HttpGet("migrate-database")]
+    public async Task<IActionResult> MigrateDatabase()
     {
         await _dbContext.Database.MigrateAsync();
         return Ok();
     }
 
     /// <summary>
-    /// Применить миграцию БД
+    /// Applies a specific migration to the database.
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
+    /// <param name="request">The request containing the name of the migration to apply.</param>
+    /// <returns>An IActionResult representing the result of the operation.</returns>
     [Authorize(Roles = "admin")]
     [HttpPost("apply-migration")]
     public async Task<IActionResult> ApplyMigration(ApplyMigrationRequest request)
@@ -94,25 +95,7 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
 }
 
 /// <summary>
-/// Модель миграции
+/// Represents a request to apply a specific migration.
 /// </summary>
-public class MigrationDto(string name, bool applied, bool pending, bool exist)
-{
-    /// <summary></summary>
-    public string Name { get; set; } = name;
-
-    /// <summary></summary>
-    public bool Applied { get; set; } = applied;
-
-    /// <summary></summary>
-    public bool Pending { get; set; } = pending;
-
-    /// <summary></summary>
-    public bool Exist { get; set; } = exist;
-}
-
-/// <summary>
-/// Apply Migration Request
-/// </summary>
-/// <param name="Name">Migration name</param>
+/// <param name="Name">The name of the migration to apply.</param>
 public record ApplyMigrationRequest(string Name);

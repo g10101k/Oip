@@ -87,7 +87,6 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
       if (localStorageSettingsString != null) {
         this.localSettings.set(JSON.parse(localStorageSettingsString) as TLocalStoreSettings);
       }
-      this.localSettings.set({} as TLocalStoreSettings);
     } catch (error) {
       this.msgService.error(error, "Error parsing layoutConfig:");
       this.localSettings.set({} as TLocalStoreSettings);
