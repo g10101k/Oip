@@ -54,7 +54,6 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @type {TLocalStoreSettings}
    */
   public _localSettings: TLocalStoreSettings = {} as TLocalStoreSettings;
-
   /**
    * A signal representing the local application settings.  Changes to this signal
    * propagate updates to the underlying local store settings.
@@ -76,26 +75,22 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Updates local settings and persists them to local storage.
    * @return {void}
    */
-  onConfigUpdate(): void {
+  private onConfigUpdate(): void {
     this._localSettings = { ...this.localSettings() };
-    this.localSettingsUpdate.next(this.localSettings());
-    localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this.localSettings()))
+    this.localSettingsUpdate.next(this._localSettings);
+    localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this._localSettings))
   }
 
-  /**
-   * Get module settings from browser storage
-   * @returns AppConfig
-   */
-  private getLocalStorageSettings(): TLocalStoreSettings {
+  private getLocalStorageSettings() {
     try {
       const localStorageSettingsString = localStorage.getItem(`Instance_${this.id}`);
-      console.log(localStorageSettingsString);
       if (localStorageSettingsString != null) {
-        return JSON.parse(localStorageSettingsString) as TLocalStoreSettings;
+        this.localSettings.set(JSON.parse(localStorageSettingsString) as TLocalStoreSettings);
       }
+      this.localSettings.set({} as TLocalStoreSettings);
     } catch (error) {
       this.msgService.error(error, "Error parsing layoutConfig:");
-      return {} as TLocalStoreSettings;
+      this.localSettings.set({} as TLocalStoreSettings);
     }
   }
 
@@ -154,6 +149,13 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
         this.onConfigUpdate();
       }
     });
+    this.subscriptions.push(this.route.url.subscribe(url => {
+      this.controller = url[0].path;
+    }));
+    this.subscriptions.push(this.route.paramMap.subscribe(params => {
+      this.id = +params.get('id');
+      this.getLocalStorageSettings();
+    }));
   }
 
   /**
@@ -178,13 +180,9 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
 
     this.topBarService.setTopBarItems(this.topBarItems);
     this.topBarService.activeId = this.topBarItems[0].id;
-    this.subscriptions.push(this.route.url.subscribe(url => {
-      this.controller = url[0].path;
-    }));
-    this.subscriptions.push(this.route.paramMap.subscribe(params => {
-      this.id = +params.get('id');
-      this.getSettings();
-    }));
+
+    await this.getSettings();
+
     this.title = this.titleService.getTitle()
   }
 
@@ -198,7 +196,6 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     }).catch(error => {
       this.msgService.error(error);
     })
-    this.getLocalStorageSettings();
   }
 
   /**
