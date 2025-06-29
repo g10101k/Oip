@@ -28,6 +28,20 @@ export interface EditModuleInstanceDto {
   viewRoles?: string[] | null;
 }
 
+/** Module settings. */
+export interface FolderModuleSettings {
+  /** HTML content for the module. */
+  html?: string | null;
+}
+
+/** Save settings request */
+export interface FolderModuleSettingsSaveSettingsRequest {
+  /** Module instance id */
+  id?: number;
+  /** Module settings. */
+  settings?: FolderModuleSettings;
+}
+
 /** Response front security settings */
 export interface GetKeycloakClientSettingsResponse {
   /** Authority */
@@ -136,21 +150,16 @@ export interface SecurityResponse {
   roles?: string[] | null;
 }
 
-export interface FolderGetSecurityParams {
+export interface FolderModuleGetSecurityParams {
+  id?: number;
+}
+
+export interface FolderModuleGetModuleInstanceSettingsParams {
   id?: number;
 }
 
 export interface MenuDeleteModuleInstanceParams {
   id?: number;
-}
-
-export interface SettingsGetModuleInstanceSettingsParams {
-  id?: number;
-}
-
-export interface SettingsPutModuleInstanceSettingsParams {
-  id?: number;
-  settings?: string;
 }
 
 export interface UserProfileGetUserPhotoParams {

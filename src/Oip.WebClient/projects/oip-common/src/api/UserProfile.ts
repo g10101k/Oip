@@ -17,7 +17,7 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class UserProfile<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {

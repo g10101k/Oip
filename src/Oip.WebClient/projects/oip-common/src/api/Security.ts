@@ -14,7 +14,7 @@ import { Injectable } from "@angular/core";
 import { GetKeycloakClientSettingsResponse } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class Security<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
