@@ -6,13 +6,14 @@ import { AddModuleInstanceDto } from "../dtos/add-module-instance.dto";
 import { EditModuleInstanceDto } from "../dtos/edit-module-instance.dto";
 import { ContextMenuItemDto } from "../dtos/context-menu-item.dto";
 import { Title } from "@angular/platform-browser";
+import { Menu } from "../api/Menu";
 
 @Injectable({ providedIn: 'root' })
 export class MenuService extends BaseDataService {
   private readonly menuSource = new Subject<MenuChangeEvent>();
   private readonly resetSource = new Subject();
   private readonly titleService = inject(Title);
-
+  private readonly menuDataService = inject(Menu);
   menuSource$ = this.menuSource.asObservable();
   resetSource$ = this.resetSource.asObservable();
   contextMenuItem: any;
@@ -39,11 +40,11 @@ export class MenuService extends BaseDataService {
   }
 
   getMenu() {
-    return this.sendRequest<ContextMenuItemDto[]>(this.baseUrl + 'api/menu/get');
+    return this.menuDataService.menuGet();
   }
 
   getAdminMenu() {
-    return this.sendRequest<ContextMenuItemDto[]>(this.baseUrl + 'api/menu/get-admin-menu');
+    return this.menuDataService.menuGetAdminMenu();
   }
 
   getModules() {
