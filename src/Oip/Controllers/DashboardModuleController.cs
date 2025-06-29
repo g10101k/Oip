@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Constants;
 using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
+using Oip.Properties;
 
 namespace Oip.Controllers;
 
@@ -25,7 +27,13 @@ public class DashboardModuleController : BaseModuleController<DashboardSettings>
     {
         return new()
         {
-            new() { Code = "read", Name = "Read", Description = "Can view this module", Roles = ["admin"] },
+            new()
+            {
+                Code = SecurityConstants.Delete,
+                Name = Resources.DashboardModuleController_GetModuleRights_Read, 
+                Description = Resources.DashboardModuleController_GetModuleRights_Can_view_this_module, 
+                Roles = [SecurityConstants.AdminRole]
+            },
         };
     }
 }

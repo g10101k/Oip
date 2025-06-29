@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Constants;
 using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
@@ -17,13 +18,13 @@ public class WeatherForecastModuleController : BaseModuleController<WeatherModul
 {
     private readonly string[] _summaries =
     [
-        Resources.WeatherForecastController_Summaries_Freezing, 
+        Resources.WeatherForecastController_Summaries_Freezing,
         Resources.WeatherForecastController_Summaries_Bracing,
-        Resources.WeatherForecastController_Summaries_Chilly, 
+        Resources.WeatherForecastController_Summaries_Chilly,
         Resources.WeatherForecastController_Summaries_Cool,
-        Resources.WeatherForecastController_Summaries_Mild, 
+        Resources.WeatherForecastController_Summaries_Mild,
         Resources.WeatherForecastController_Summaries_Warm,
-        Resources.WeatherForecastController_Summaries_Balmy, 
+        Resources.WeatherForecastController_Summaries_Balmy,
         Resources.WeatherForecastController_Summaries_Hot,
         Resources.WeatherForecastController_Summaries_Sweltering,
         Resources.WeatherForecastController_Summaries_Scorching
@@ -66,20 +67,24 @@ public class WeatherForecastModuleController : BaseModuleController<WeatherModul
         {
             new()
             {
-                Code = "read", Name = Resources.WeatherForecastController_GetModuleRights_Read,
+                Code = SecurityConstants.Read,
+                Name = Resources.WeatherForecastController_GetModuleRights_Read,
                 Description = Resources.WeatherForecastController_GetModuleRights_Can_view_this_module,
-                Roles = ["admin"]
+                Roles = [SecurityConstants.AdminRole]
             },
             new()
             {
-                Code = "edit", Name = Resources.WeatherForecastController_GetModuleRights_Edit,
-                Description = Resources.WeatherForecastController_GetModuleRights_Can_edit_data, Roles = ["admin"]
+                Code = SecurityConstants.Edit, 
+                Name = Resources.WeatherForecastController_GetModuleRights_Edit,
+                Description = Resources.WeatherForecastController_GetModuleRights_Can_edit_data, 
+                Roles = [SecurityConstants.AdminRole]
             },
             new()
             {
-                Code = "delete", Name = Resources.WeatherForecastController_GetModuleRights_Delete,
+                Code = SecurityConstants.Delete,
+                Name = Resources.WeatherForecastController_GetModuleRights_Delete,
                 Description = Resources.WeatherForecastController_GetModuleRights_Can_delete_edit_data,
-                Roles = ["admin"]
+                Roles = [SecurityConstants.AdminRole]
             },
         };
     }
@@ -95,4 +100,3 @@ public class WeatherModuleSettings
     /// </summary>
     public int DayCount { get; set; } = 5;
 }
-
