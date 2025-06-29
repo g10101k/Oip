@@ -72,4 +72,10 @@
     <data name="DataContextMigrationController_GetModuleRights_Read" xml:space="preserve">
         <value>Read</value>
     </data>
+    <data name="DashboardModuleController_GetModuleRights_Read" xml:space="preserve">
+        <value>Read</value>
+    </data>
+    <data name="DashboardModuleController_GetModuleRights_Can_view_this_module" xml:space="preserve">
+        <value>Can view this module</value>
+    </data>
 </root>
