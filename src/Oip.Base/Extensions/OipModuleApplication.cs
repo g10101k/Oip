@@ -75,18 +75,17 @@ public static class OipModuleApplication
 
     private static void AddLocalization(this WebApplicationBuilder builder)
     {
-        builder.Services.Configure<RequestLocalizationOptions>(
-            options =>
+        builder.Services.Configure<RequestLocalizationOptions>(options =>
+        {
+            var supportedCultures = new List<CultureInfo>
             {
-                var supportedCultures = new List<CultureInfo>
-                {
-                    new("en"),
-                    new("ru")
-                };
-                options.DefaultRequestCulture = new RequestCulture(culture: "en", uiCulture: "en");
-                options.SupportedCultures = supportedCultures;
-                options.SupportedUICultures = supportedCultures;
-            });
+                new("en"),
+                new("ru")
+            };
+            options.DefaultRequestCulture = new RequestCulture(culture: "en", uiCulture: "en");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+        });
     }
 
     private static void AddHttpClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
