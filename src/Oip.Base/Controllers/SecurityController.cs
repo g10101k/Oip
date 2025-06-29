@@ -12,6 +12,7 @@ namespace Oip.Base.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/security")]
+[ApiExplorerSettings(GroupName = "base")]
 public class SecurityController : ControllerBase
 {
     private readonly KeycloakService _keycloakService;

@@ -11,6 +11,7 @@ namespace Oip.Base.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/service")]
+[ApiExplorerSettings(GroupName = "base")]
 public class ServiceController : ControllerBase
 {
     private static readonly ConcurrentDictionary<string, GetManifestResponse> Modules = new();

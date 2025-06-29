@@ -22,7 +22,7 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class WeatherForecastModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {

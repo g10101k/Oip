@@ -14,11 +14,11 @@ namespace Oip.Base.Extensions;
 public static class AuthenticationExtensions
 {
     /// <summary>
-    /// Add auth service
+    /// Configures default authentication using JWT Bearer scheme.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="settings"></param>
-    /// <returns></returns>
+    /// <param name="builder">The web application builder.</param>
+    /// <param name="settings">The base Oip module application settings.</param>
+    /// <returns>The configured web application builder.</returns>
     public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder,
         IBaseOipModuleAppSettings settings)
     {

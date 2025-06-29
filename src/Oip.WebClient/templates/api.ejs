@@ -14,7 +14,7 @@ import { <%~ dataContracts.join(", ") %> } from "./<%~ config.fileNames.dataCont
 <% } %>
 import { Injectable } from "@angular/core";
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class <%= apiClassName %><SecurityDataType = unknown><% if (!config.singleHttpClient) { %> extends HttpClient<SecurityDataType> <% } %> {
 <% if(config.singleHttpClient) { %>
   http: HttpClient<SecurityDataType>;

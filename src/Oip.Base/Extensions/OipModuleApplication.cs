@@ -75,18 +75,17 @@ public static class OipModuleApplication
 
     private static void AddLocalization(this WebApplicationBuilder builder)
     {
-        builder.Services.Configure<RequestLocalizationOptions>(
-            options =>
+        builder.Services.Configure<RequestLocalizationOptions>(options =>
+        {
+            var supportedCultures = new List<CultureInfo>
             {
-                var supportedCultures = new List<CultureInfo>
-                {
-                    new("en"),
-                    new("ru")
-                };
-                options.DefaultRequestCulture = new RequestCulture(culture: "en", uiCulture: "en");
-                options.SupportedCultures = supportedCultures;
-                options.SupportedUICultures = supportedCultures;
-            });
+                new("en"),
+                new("ru")
+            };
+            options.DefaultRequestCulture = new RequestCulture(culture: "en", uiCulture: "en");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+        });
     }
 
     private static void AddHttpClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
@@ -99,9 +98,9 @@ public static class OipModuleApplication
     private static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         builder.Services.AddHttpClient<KeycloakClient>(x =>
-            {
-                x.BaseAddress = new Uri(settings.SecurityService.BaseUrl);
-            }).AddPolicyHandler(GetRetryPolicy());
+        {
+            x.BaseAddress = new Uri(settings.SecurityService.BaseUrl);
+        }).AddPolicyHandler(GetRetryPolicy());
     }
 
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
@@ -152,6 +151,21 @@ public static class OipModuleApplication
                 Version = openApiSettings.Version,
                 Title = openApiSettings.Title,
                 Description = openApiSettings.Description,
+            });
+
+            options.SwaggerDoc("base", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "Base services",
+                Description = "Base services",
+            });
+
+            options.DocInclusionPredicate((docName, apiDesc) =>
+            {
+                if (docName == "v1")
+                    return apiDesc.GroupName is null || apiDesc.GroupName == docName;
+
+                return apiDesc.GroupName == docName;
             });
         });
     }
@@ -218,7 +232,12 @@ public static class OipModuleApplication
         if (!settings.OpenApi.Publish)
             return;
         app.UseSwagger();
-        app.UseSwaggerUI(x => { x.EnableTryItOutByDefault(); });
+        app.UseSwaggerUI(x =>
+        {
+            x.EnableTryItOutByDefault();
+            x.SwaggerEndpoint("/swagger/v1/swagger.json", "Module OIP service");
+            x.SwaggerEndpoint("/swagger/base/swagger.json", "Base OIP service");
+        });
     }
 
     private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()

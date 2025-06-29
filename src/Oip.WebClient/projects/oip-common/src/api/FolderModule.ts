@@ -12,15 +12,15 @@
 
 import { Injectable } from "@angular/core";
 import {
-  FolderGetModuleInstanceSettingsParams,
-  FolderGetSecurityParams,
-  ObjectSaveSettingsRequest,
+  FolderModuleGetModuleInstanceSettingsParams,
+  FolderModuleGetSecurityParams,
+  FolderModuleSettingsSaveSettingsRequest,
   PutSecurityRequest,
   SecurityResponse,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class FolderModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -28,13 +28,13 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderGetModuleRights
-   * @request GET:/api/folder/get-module-rights
+   * @name folderModuleGetModuleRights
+   * @request GET:/api/folder-module/get-module-rights
    * @secure
    */
-  folderGetModuleRights = (params: RequestParams = {}) =>
+  folderModuleGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
-      path: `/api/folder/get-module-rights`,
+      path: `/api/folder-module/get-module-rights`,
       method: "GET",
       secure: true,
       format: "json",
@@ -44,17 +44,17 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderGetSecurity
+   * @name folderModuleGetSecurity
    * @summary Get security for instance id
-   * @request GET:/api/folder/get-security
+   * @request GET:/api/folder-module/get-security
    * @secure
    */
-  folderGetSecurity = (
-    query: FolderGetSecurityParams,
+  folderModuleGetSecurity = (
+    query: FolderModuleGetSecurityParams,
     params: RequestParams = {},
   ) =>
     this.request<SecurityResponse[], any>({
-      path: `/api/folder/get-security`,
+      path: `/api/folder-module/get-security`,
       method: "GET",
       query: query,
       secure: true,
@@ -65,14 +65,17 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderPutSecurity
+   * @name folderModulePutSecurity
    * @summary Update security
-   * @request PUT:/api/folder/put-security
+   * @request PUT:/api/folder-module/put-security
    * @secure
    */
-  folderPutSecurity = (data: PutSecurityRequest, params: RequestParams = {}) =>
+  folderModulePutSecurity = (
+    data: PutSecurityRequest,
+    params: RequestParams = {},
+  ) =>
     this.request<void, any>({
-      path: `/api/folder/put-security`,
+      path: `/api/folder-module/put-security`,
       method: "PUT",
       body: data,
       secure: true,
@@ -83,17 +86,17 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderGetModuleInstanceSettings
+   * @name folderModuleGetModuleInstanceSettings
    * @summary Get instance setting
-   * @request GET:/api/folder/get-module-instance-settings
+   * @request GET:/api/folder-module/get-module-instance-settings
    * @secure
    */
-  folderGetModuleInstanceSettings = (
-    query: FolderGetModuleInstanceSettingsParams,
+  folderModuleGetModuleInstanceSettings = (
+    query: FolderModuleGetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
-      path: `/api/folder/get-module-instance-settings`,
+      path: `/api/folder-module/get-module-instance-settings`,
       method: "GET",
       query: query,
       secure: true,
@@ -103,16 +106,16 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderPutModuleInstanceSettings
-   * @request PUT:/api/folder/put-module-instance-settings
+   * @name folderModulePutModuleInstanceSettings
+   * @request PUT:/api/folder-module/put-module-instance-settings
    * @secure
    */
-  folderPutModuleInstanceSettings = (
-    data: ObjectSaveSettingsRequest,
+  folderModulePutModuleInstanceSettings = (
+    data: FolderModuleSettingsSaveSettingsRequest,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
-      path: `/api/folder/put-module-instance-settings`,
+      path: `/api/folder-module/put-module-instance-settings`,
       method: "PUT",
       body: data,
       secure: true,

@@ -14,7 +14,7 @@ import { Injectable } from "@angular/core";
 import { ModuleDeleteRequest, ModuleDto } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class Module<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {

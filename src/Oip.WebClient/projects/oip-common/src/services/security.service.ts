@@ -78,13 +78,4 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
         return token.exp < Math.floor(Date.now() / 1000);
       }));
   }
-
-  gtoken() {
-    let q = this.getPayloadFromAccessToken().pipe(
-      map((token) => {
-        return token;
-      })
-    )
-    return lastValueFrom(q);
-  }
 }

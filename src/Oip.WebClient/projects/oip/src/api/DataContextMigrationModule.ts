@@ -22,7 +22,7 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class DataContextMigrationModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -47,7 +47,7 @@ export class DataContextMigrationModule<
    *
    * @tags DataContextMigrationModule
    * @name dbMigrationGetMigrations
-   * @summary Get migration
+   * @summary Gets the list of migrations.
    * @request GET:/api/db-migration/get-migrations
    * @secure
    */
@@ -63,14 +63,14 @@ export class DataContextMigrationModule<
    * No description
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationMigrate
-   * @summary Применить миграцию БД
-   * @request GET:/api/db-migration/migrate
+   * @name dbMigrationMigrateDatabase
+   * @summary Migrate database
+   * @request GET:/api/db-migration/migrate-database
    * @secure
    */
-  dbMigrationMigrate = (params: RequestParams = {}) =>
+  dbMigrationMigrateDatabase = (params: RequestParams = {}) =>
     this.request<void, any>({
-      path: `/api/db-migration/migrate`,
+      path: `/api/db-migration/migrate-database`,
       method: "GET",
       secure: true,
       ...params,
@@ -80,7 +80,7 @@ export class DataContextMigrationModule<
    *
    * @tags DataContextMigrationModule
    * @name dbMigrationApplyMigration
-   * @summary Применить миграцию БД
+   * @summary Applies a specific migration to the database.
    * @request POST:/api/db-migration/apply-migration
    * @secure
    */

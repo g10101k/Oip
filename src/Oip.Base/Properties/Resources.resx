@@ -36,4 +36,10 @@
     <data name="ModuleModuleController_GetModuleRights_Can_delete_data_in_module" xml:space="preserve">
         <value>Can delete data in module</value>
     </data>
+    <data name="FolderModuleController_GetModuleRights_read" xml:space="preserve">
+        <value>read</value>
+    </data>
+    <data name="FolderModuleController_GetModuleRights_Can_view_this_module" xml:space="preserve">
+        <value>Can view this module</value>
+    </data>
 </root>

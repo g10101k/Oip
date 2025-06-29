@@ -11,55 +11,49 @@
  */
 
 import { Injectable } from "@angular/core";
-import {
-  UserProfileGetUserPhotoParams,
-  UserProfilePostUserPhotoPayload,
-} from "./data-contracts";
+import { GetManifestResponse, RegisterModuleDto } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable()
-export class UserProfile<
+@Injectable({ providedIn: "root" })
+export class Service<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
-   * @tags UserProfile
-   * @name userProfileGetUserPhoto
-   * @summary Get all roles
-   * @request GET:/api/user-profile/get-user-photo
+   * @tags Service
+   * @name serviceGet
+   * @summary Get manifest for client app
+   * @request GET:/api/service/get
    * @secure
    */
-  userProfileGetUserPhoto = (
-    query: UserProfileGetUserPhotoParams,
-    params: RequestParams = {},
-  ) =>
-    this.request<void, any>({
-      path: `/api/user-profile/get-user-photo`,
+  serviceGet = (params: RequestParams = {}) =>
+    this.request<Record<string, GetManifestResponse>, any>({
+      path: `/api/service/get`,
       method: "GET",
-      query: query,
       secure: true,
+      format: "json",
       ...params,
     });
   /**
    * No description
    *
-   * @tags UserProfile
-   * @name userProfilePostUserPhoto
-   * @summary Get all roles
-   * @request POST:/api/user-profile/post-user-photo
+   * @tags Service
+   * @name serviceRegisterModule
+   * @summary Registry module
+   * @request POST:/api/service/register-module
    * @secure
    */
-  userProfilePostUserPhoto = (
-    data: UserProfilePostUserPhotoPayload,
+  serviceRegisterModule = (
+    data: RegisterModuleDto,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
-      path: `/api/user-profile/post-user-photo`,
+      path: `/api/service/register-module`,
       method: "POST",
       body: data,
       secure: true,
-      type: ContentType.FormData,
+      type: ContentType.Json,
       ...params,
     });
 }
