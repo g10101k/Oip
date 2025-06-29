@@ -152,6 +152,21 @@ public static class OipModuleApplication
                 Title = openApiSettings.Title,
                 Description = openApiSettings.Description,
             });
+
+            options.SwaggerDoc("base", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "Base services",
+                Description = "Base services",
+            });
+
+            options.DocInclusionPredicate((docName, apiDesc) =>
+            {
+                if (docName == "v1")
+                    return apiDesc.GroupName is null || apiDesc.GroupName == docName;
+
+                return apiDesc.GroupName == docName;
+            });
         });
     }
 
@@ -217,7 +232,12 @@ public static class OipModuleApplication
         if (!settings.OpenApi.Publish)
             return;
         app.UseSwagger();
-        app.UseSwaggerUI(x => { x.EnableTryItOutByDefault(); });
+        app.UseSwaggerUI(x =>
+        {
+            x.EnableTryItOutByDefault();
+            x.SwaggerEndpoint("/swagger/v1/swagger.json", "Module OIP service");
+            x.SwaggerEndpoint("/swagger/base/swagger.json", "Base OIP service");
+        });
     }
 
     private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
