@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
+using Oip.Base.Properties;
 
 namespace Oip.Base.Controllers;
 
@@ -8,8 +10,9 @@ namespace Oip.Base.Controllers;
 /// Folder module
 /// </summary>
 [ApiController]
-[Route("api/folder")]
-public class FolderModuleController : BaseModuleController<object>
+[Route("api/folder-module")]
+[ApiExplorerSettings(GroupName = "base")]
+public class FolderModuleController : BaseModuleController<FolderModuleSettings>
 {
     /// <summary>
     /// .ctor
@@ -18,13 +21,30 @@ public class FolderModuleController : BaseModuleController<object>
     public FolderModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
     {
     }
-
+    
     /// <inheritdoc />
     public override List<SecurityResponse> GetModuleRights()
     {
         return new()
         {
-            new() { Code = "read", Name = "Read", Description = "Can view this module", Roles = ["admin"] },
+            new()
+            {
+                Code = Resources.FolderModuleController_GetModuleRights_read,
+                Name = Resources.FolderModuleController_GetModuleRights_read,
+                Description = Resources.FolderModuleController_GetModuleRights_Can_view_this_module, 
+                Roles = ["admin"]
+            },
         };
     }
+}
+
+/// <summary>
+/// Module settings.
+/// </summary>
+public class FolderModuleSettings
+{
+    /// <summary>
+    /// HTML content for the module.
+    /// </summary>
+    public string Html { get; set; } = string.Empty;
 }

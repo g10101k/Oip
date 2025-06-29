@@ -11,6 +11,7 @@ namespace Oip.Base.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/menu")]
+[ApiExplorerSettings(GroupName = "base")]
 public class MenuController : ControllerBase
 {
     private readonly ModuleRepository _moduleRepository;

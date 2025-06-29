@@ -11,6 +11,7 @@ namespace Oip.Base.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/user-profile")]
+[ApiExplorerSettings(GroupName = "base")]
 public class UserProfileController : ControllerBase
 {
     private readonly UserService _userService;
