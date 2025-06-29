@@ -8,6 +8,12 @@ import { TranslateService } from "@ngx-translate/core";
 import { Title } from "@angular/platform-browser";
 import { Subject, Subscription } from "rxjs";
 
+interface BaseComponentLocalization {
+  security: string;
+  settings: string;
+  content: string;
+}
+
 @Component({ standalone: true, template: '' })
 export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSettings> implements OnInit, OnDestroy {
   /**
@@ -175,9 +181,13 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @return {Promise<void>} A promise that resolves when the initialization is complete.
    */
   async ngOnInit(): Promise<void> {
-    this.translateService.get('baseComponent.content').subscribe(value => this.topBarItems[0].caption = value);
-    this.translateService.get('baseComponent.settings').subscribe(value => this.topBarItems[1].caption = value);
-    this.translateService.get('baseComponent.security').subscribe(value => this.topBarItems[2].caption = value);
+    this.subscriptions.push(
+      this.translateService.get('baseComponent').subscribe((value: BaseComponentLocalization) => {
+        this.topBarItems[0].caption = value.content;
+        this.topBarItems[1].caption = value.settings;
+        this.topBarItems[2].caption = value.security;
+      })
+    );
 
     this.topBarService.setTopBarItems(this.topBarItems);
     this.topBarService.activeId = this.topBarItems[0].id;
