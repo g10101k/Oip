@@ -52,6 +52,16 @@
     "cancel": "Cancel",
     "save": "Save"
   },
+  "menuItemComponent": {
+    "new": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteItemConfirmHeader": "Delete",
+    "deleteItemConfirmMessage": "Are you sure you want to delete the item?",
+    "deleteItemSuccessMessage": "Successfully deleted",
+    "deleteItemConfirmRejectButtonPropsLabel": "Cancel",
+    "deleteItemConfirmAcceptButtonPropsLabel": "Delete"
+  },
   "unauthorized": {
     "welcomeToOip": "Welcome to OIP!",
     "signInToContinue": "Sign in to continue",

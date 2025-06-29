@@ -98,9 +98,9 @@ public static class OipModuleApplication
     private static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         builder.Services.AddHttpClient<KeycloakClient>(x =>
-            {
-                x.BaseAddress = new Uri(settings.SecurityService.BaseUrl);
-            }).AddPolicyHandler(GetRetryPolicy());
+        {
+            x.BaseAddress = new Uri(settings.SecurityService.BaseUrl);
+        }).AddPolicyHandler(GetRetryPolicy());
     }
 
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
