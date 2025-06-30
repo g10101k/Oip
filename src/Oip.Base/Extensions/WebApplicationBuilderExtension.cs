@@ -15,44 +15,6 @@ namespace Oip.Base.Extensions;
 /// </summary>
 public static class WebApplicationBuilderExtension
 {
-    /// <summary>
-    /// Adds the <see cref="OipModuleContext"/> to the service collection based on the specified database provider.
-    /// </summary>
-    /// <param name="builder">The current <see cref="WebApplicationBuilder"/>.</param>
-    /// <param name="provider">The database provider to use (e.g., Postgres, MSSqlServer).</param>
-    /// <param name="connectionString">The connection string to the database.</param>
-    /// <exception cref="InvalidOperationException">Thrown if the specified provider is not supported.</exception>
-    public static void AddOipModuleContext(this WebApplicationBuilder builder, XpoProvider provider,
-        string connectionString)
-    {
-        switch (provider)
-        {
-            case XpoProvider.Postgres:
-                builder.Services.AddDbContext<OipModuleContext>(option =>
-                {
-                    option.UseNpgsql(connectionString, x =>
-                    {
-                        x.MigrationsAssembly("Oip.Base.Data.Postgres");
-                        x.MigrationsHistoryTable(OipModuleContext.MigrationHistoryTableName,
-                            OipModuleContext.SchemaName);
-                    });
-                });
-                break;
-            case XpoProvider.MSSqlServer:
-                builder.Services.AddDbContext<OipModuleContext>(option =>
-                {
-                    option.UseSqlServer(connectionString, x =>
-                    {
-                        x.MigrationsAssembly("Oip.Base.Data.SqlServer");
-                        x.MigrationsHistoryTable(OipModuleContext.MigrationHistoryTableName,
-                            OipModuleContext.SchemaName);
-                    });
-                });
-                break;
-            case XpoProvider.InMemoryDataStore:
-                throw new InvalidOperationException("Provider InMemoryDataStore is not supported");
-        }
-    }
 
     /// <summary>
     /// Applies any pending migrations for the OIP module context and registers discovered modules from loaded assemblies.
