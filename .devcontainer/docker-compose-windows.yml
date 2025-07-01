@@ -1,0 +1,4 @@
+services:
+  keycloak:
+    volumes:
+      - ${APPDATA}/ASP.NET/https:/opt/keycloak/data/cert/

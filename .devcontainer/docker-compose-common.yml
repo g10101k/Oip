@@ -1,5 +1,4 @@
 services:
-    
   postgres:
     image: postgres:16.3
     environment:
@@ -57,8 +56,6 @@ services:
       - "8443:8443"
       - "9000:9000"
     volumes:
-      - $HOME/.aspnet/https:/opt/keycloak/data/cert/
-#      - ${APPDATA}/ASP.NET/https:/opt/keycloak/data/cert/
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
     depends_on:
       - postgres
