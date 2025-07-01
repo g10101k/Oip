@@ -17,31 +17,35 @@ public class UserProfileController : ControllerBase
     private readonly UserService _userService;
     private readonly UserRepository _userRepository;
 
-    /// <summary>.ctor</summary>
+    /// <summary>
+    /// Security controller
+    /// </summary>
     public UserProfileController(UserService userService, UserRepository userRepository)
     {
         _userService = userService;
         _userRepository = userRepository;
     }
 
-    /// <summary> 
-    /// Get all roles
+    /// <summary>
+    /// Gets the user photo.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="email">The email address of the user.</param>
+    /// <returns>The user's photo as a file content result, or a NotFoundResult if the photo is not found.</returns>
     [HttpGet("get-user-photo")]
     [Authorize]
     public async Task<IActionResult> GetUserPhoto(string email)
     {
-        var userDto = _userRepository.GetUserByEmail(email);
+        var userDto = await _userRepository.GetUserByEmail(email);
         if (userDto?.Photo != null)
             return new FileContentResult(userDto.Photo, "image/jpeg");
         return new NotFoundResult();
     }
 
-    /// <summary> 
-    /// Get all roles
+    /// <summary>
+    /// Uploads a user photo.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="files">The uploaded image file.</param>
+    /// <returns>An OkResult indicating successful upload.</returns>
     [HttpPost("post-user-photo")]
     [Authorize]
     public async Task<IActionResult> OnPostUploadAsync(IFormFile files)
@@ -56,7 +60,6 @@ public class UserProfileController : ControllerBase
         }
 
         _userRepository.UpsertUserPhoto(_userService.GetUserEmail()!, ms.ToArray());
-
         return Ok();
     }
 }

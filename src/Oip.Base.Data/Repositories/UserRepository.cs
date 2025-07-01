@@ -22,13 +22,13 @@ public class UserRepository
     }
 
     /// <summary>
-    /// Get user by email
+    /// Gets a user by email address.
     /// </summary>
-    /// <param name="email"></param>
-    /// <returns></returns>
-    public GetUserDto? GetUserByEmail(string email)
+    /// <param name="email">The email address of the user.</param>
+    /// <returns>A <see cref="GetUserDto"/> representing the user, or null if no user is found with the given email.</returns>
+    public async Task<GetUserDto?> GetUserByEmail(string email)
     {
-        var user = _moduleContext.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefault();
+        var user = await _moduleContext.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefaultAsync();
         if (user == null)
             return null;
         else
@@ -36,10 +36,10 @@ public class UserRepository
     }
 
     /// <summary>
-    /// Update user photo
+    /// Upserts a user's photo.
     /// </summary>
-    /// <param name="email"></param>
-    /// <param name="photo"></param>
+    /// <param name="email">The email of the user.</param>
+    /// <param name="photo">The user's photo as a byte array.</param>
     public void UpsertUserPhoto(string email, byte[] photo)
     {
         var user = _moduleContext.Users.FirstOrDefault(x => x.Email == email);
