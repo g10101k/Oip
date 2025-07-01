@@ -1,0 +1,6 @@
+include:
+  - docker-compose-common.yaml
+services:
+  keycloak:
+    volumes:
+      - $HOME/.aspnet/https:/opt/keycloak/data/cert/
