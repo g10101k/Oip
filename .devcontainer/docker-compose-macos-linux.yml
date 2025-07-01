@@ -1,5 +1,5 @@
 include:
-  - docker-compose-common.yaml
+  - docker-compose-common.yml
 services:
   keycloak:
     volumes:
