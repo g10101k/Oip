@@ -3,7 +3,7 @@ using Oip.Settings.Example;
 
 var settings = AppSettings.Initialize(new AppSettingsOptions
 {
-    ProgrammeArguments = args,
+    ProgramArguments = args,
     AppSettingsTable = "TestSettingsTableName",
 }); 
 
