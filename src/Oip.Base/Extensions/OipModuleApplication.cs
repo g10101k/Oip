@@ -33,7 +33,7 @@ public static class OipModuleApplication
     /// <returns></returns>
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
-        var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
+        var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
         builder.AddHttpClients(settings);
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication(settings);
@@ -51,7 +51,7 @@ public static class OipModuleApplication
     /// <returns></returns>
     public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
     {
-        var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgrammeArguments);
+        var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
         builder.Logging.ClearProviders();
         builder.Host.UseNLog();
         builder.AddDefaultHealthChecks();
