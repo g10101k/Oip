@@ -17,8 +17,8 @@ In Typescript, routing is defined in `app.routes.ts`:
 ```typescript
 {
   path: 'weather-forecast-module/:id',
-          loadComponent: () => import('./app/components/weather-forecast-module/weather-forecast-module.component').then(m => m.WeatherForecastModuleComponent),
-          canActivate: [() => inject(AuthGuardService).canActivate()]
+  loadComponent: () => import('./app/components/weather-forecast-module/weather-forecast-module.component').then(m => m.WeatherForecastModuleComponent),
+  canActivate: [() => inject(AuthGuardService).canActivate()]
 },
 ```
 Here are the core ideas of `BaseModuleController`:
