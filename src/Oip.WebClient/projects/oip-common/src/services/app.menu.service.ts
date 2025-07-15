@@ -4,15 +4,14 @@ import { BaseDataService } from "./base-data.service";
 import { MenuChangeEvent } from "../events/menu-change.event";
 import { AddModuleInstanceDto } from "../dtos/add-module-instance.dto";
 import { EditModuleInstanceDto } from "../dtos/edit-module-instance.dto";
-import { ContextMenuItemDto } from "../dtos/context-menu-item.dto";
-import { Title } from "@angular/platform-browser";
 import { Menu } from "../api/Menu";
+import { AppTitleService } from "./app-title.service";
 
 @Injectable({ providedIn: 'root' })
 export class MenuService extends BaseDataService {
   private readonly menuSource = new Subject<MenuChangeEvent>();
   private readonly resetSource = new Subject();
-  private readonly titleService = inject(Title);
+  private readonly titleService = inject(AppTitleService);
   private readonly menuDataService = inject(Menu);
   menuSource$ = this.menuSource.asObservable();
   resetSource$ = this.resetSource.asObservable();

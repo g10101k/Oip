@@ -1,12 +1,21 @@
-import { Component, effect, inject, OnDestroy, OnInit, Signal, signal, WritableSignal, } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  effect,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { TopBarDto } from '../dtos/top-bar.dto'
 import { TopBarService } from '../services/top-bar.service'
 import { MsgService } from "../services/msg.service";
 import { ActivatedRoute } from "@angular/router";
 import { BaseDataService } from "../services/base-data.service";
 import { TranslateService } from "@ngx-translate/core";
-import { Title } from "@angular/platform-browser";
 import { Subject, Subscription } from "rxjs";
+import { AppTitleService } from "../services/app-title.service";
 
 interface BaseComponentLocalization {
   security: string;
@@ -21,28 +30,39 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @type {TopBarService}
    */
   public readonly topBarService: TopBarService = inject(TopBarService);
+
   /**
    * Provides access to information about the current route.
    * This includes route parameters, data, and the route's path.
    */
   public readonly route: ActivatedRoute = inject(ActivatedRoute);
+
   /**
    * Provides access to messaging services.
    */
   public readonly msgService = inject(MsgService);
+
   /**
    * Provides access to base data service functionality.
    * @deprecated The method should not be used
    */
   public readonly baseDataService: BaseDataService = inject(BaseDataService);
+
   /**
    * Provides access to translation functionality.
    */
   public readonly translateService = inject(TranslateService);
+
   /**
    * Provides access to the application's title service.
    */
-  public readonly titleService = inject(Title);
+  public readonly appTitleService = inject(AppTitleService);
+
+  /**
+   * Reference to the ChangeDetector. Used to trigger change detection manually.
+   */
+  private changeDetectorRef: ChangeDetectorRef = inject(ChangeDetectorRef);
+
   /**
    * Represents a subscription to an observable.
    * Manages the lifecycle of receiving data from the observable and allows unsubscribing to stop receiving data.
@@ -60,17 +80,20 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @type {TLocalStoreSettings}
    */
   public _localSettings: TLocalStoreSettings = {} as TLocalStoreSettings;
+
   /**
    * A signal representing the local application settings.  Changes to this signal
    * propagate updates to the underlying local store settings.
    * @type {WritableSignal<TLocalStoreSettings>}
    */
   public localSettings: WritableSignal<TLocalStoreSettings> = signal<TLocalStoreSettings>(this._localSettings);
+
   /**
    * A Subject emitting updates to local store settings. Observables can subscribe to this Subject to react to changes in local settings.
    * @type {Subject<TLocalStoreSettings>}
    */
   public localSettingsUpdate: Subject<TLocalStoreSettings> = new Subject<TLocalStoreSettings>();
+
   /**
    * The title of the component. Get from Title in ngOnInit
    * @type {string}
@@ -82,7 +105,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @return {void}
    */
   private onConfigUpdate(): void {
-    if (this.localSettings() !== {} as TLocalStoreSettings) {
+    if (Object.keys(this.localSettings()).length > 0) {
       this._localSettings = { ...this.localSettings() };
       this.localSettingsUpdate.next(this._localSettings);
       localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this._localSettings))
@@ -165,13 +188,17 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     }));
   }
 
+
   /**
-   * Clears the top bar items and sets the active ID to the first item.
+   * Lifecycle hook that is called when a component is destroyed.
+   * Unsubscribes from all subscriptions to prevent memory leaks,
+   * resets the top bar items to an empty array, and sets the active ID
+   * to the ID of the first top bar item (if available).
    */
   ngOnDestroy() {
     this.topBarService.setTopBarItems([]);
     this.topBarService.activeId = this.topBarItems[0].id;
-    this.subscriptions.map(s => s.unsubscribe());
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   /**
@@ -194,7 +221,10 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
 
     await this.getSettings();
 
-    this.title = this.titleService.getTitle()
+    this.subscriptions.push(this.appTitleService.title$.subscribe(title => {
+      this.title = title;
+      this.changeDetectorRef.detectChanges();
+    }));
   }
 
   /**
@@ -202,11 +232,11 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @return {Promise<void>} A promise that resolves when settings are retrieved.
    */
   async getSettings(): Promise<void> {
-    await this.baseDataService.sendRequest<TBackendStoreSettings>(`${this.baseDataService.baseUrl}api/${this.controller}/get-module-instance-settings?id=${this.id}`).then(response => {
-      this.settings = response;
-    }).catch(error => {
+    try {
+      this.settings = await this.baseDataService.sendRequest<TBackendStoreSettings>(`${this.baseDataService.baseUrl}api/${this.controller}/get-module-instance-settings?id=${this.id}`);
+    } catch (error) {
       this.msgService.error(error);
-    })
+    }
   }
 
   /**
@@ -218,7 +248,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     await this.baseDataService.sendRequest(`api/${this.controller}/put-module-instance-settings`, 'PUT', {
       id: this.id,
       settings: settings
-    }).then(response => {
+    }).then(() => {
       this.msgService.success(this.translateService.instant('baseComponent.success'));
     }).catch(error => {
       this.msgService.error(error);
