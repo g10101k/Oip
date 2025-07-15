@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { BaseModuleComponent, Feature, SecurityComponent } from 'oip-common'
+import { BaseModuleComponent, SecurityComponent } from 'oip-common'
 import { WeatherForecastModule } from "../../../api/WeatherForecastModule";
 import { WeatherForecastResponse, WeatherModuleSettings } from "../../../api/data-contracts";
 import { TagModule } from 'primeng/tag';
@@ -95,7 +95,7 @@ interface WeatherModuleLocalSettings {
     InputText,
   ],
 })
-export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings> implements OnInit, OnDestroy, Feature {
+export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings> implements OnInit, OnDestroy {
   @ViewChild('table') table!: Table;
   protected readonly dataService = inject(WeatherForecastModule);
   protected data: WeatherForecastResponse[] = [];
