@@ -3,9 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Title } from "@angular/platform-browser";
 
 /**
- * A route guard that ensures the user is authenticated and has a valid access token.
- * If the access token is expired, it attempts to refresh the session.
- * If authentication fails or refresh is unsuccessful, redirects to the unauthorized page.
+ * Service to manage the application title.
  */
 @Injectable({ providedIn: 'root' })
 export class AppTitleService {
