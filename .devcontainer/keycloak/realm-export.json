@@ -614,6 +614,28 @@
       },
       "notBefore": 0,
       "groups": []
+    },
+    {
+      "id": "002f5860-4fe3-4f45-9767-75015f34ec00",
+      "createdTimestamp": 1678886400000,
+      "username": "admin",
+      "firstName": "admin",
+      "lastName": "admin",
+      "email": "admin@admin.ru",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "P@ssw0rd",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin", "default-roles-oip" ],
+      "clientRoles": {
+        "oip-client": ["offline_access", "admin", "uma_protection", "uma_authorization"]
+      },
+      "groups": []
     }
   ],
   "scopeMappings": [
