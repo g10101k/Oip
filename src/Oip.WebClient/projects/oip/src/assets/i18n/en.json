@@ -40,7 +40,8 @@
     "selectModule": "",
     "icon": "Icon",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "security": "Security - read"
   },
   "menuItemCreateDialogComponent": {
     "header": "Create new menu item",
