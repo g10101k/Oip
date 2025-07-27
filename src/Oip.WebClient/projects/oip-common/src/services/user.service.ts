@@ -1,6 +1,6 @@
-import { inject, Injectable } from '@angular/core';
-import { SecurityService } from './security.service';
-import { BaseDataService } from './base-data.service';
+import {inject, Injectable} from '@angular/core';
+import {SecurityService} from './security.service';
+import {BaseDataService} from './base-data.service';
 
 /**
  * UserService is responsible for retrieving and handling user-related data,
@@ -32,6 +32,11 @@ export class UserService {
   get shortLabel(): string {
     let data = this.securityService.userData;
     return data.given_name[0] + data.family_name[0];
+  }
+
+  get userName(): string {
+    let data = this.securityService.userData;
+    return `${data.given_name} ${data.family_name}`;
   }
 
   /**
