@@ -1,4 +1,1 @@
-docker compose \
--f docker-compose-common.yml \
--f docker-compose-unix.yml \
-up -d
+docker compose -f common.yml -f unix.yml up -d
