@@ -12,13 +12,6 @@ export class AppTitleService {
   public title$ = this.titleSubject.asObservable();
 
   /**
-   * Get the title of the current HTML document.
-   */
-  getTitle(): string {
-    return this.titleSubject.value;
-  }
-
-  /**
    * Set the title of the current HTML document.
    * @param newTitle
    */

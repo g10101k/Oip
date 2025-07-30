@@ -15,13 +15,6 @@
     "changePhoto": "Загрузить фото",
     "successfullyUploaded": "Загружено"
   },
-  "configComponent": {
-    "profile": "Профиль",
-    "photo": "Фото",
-    "usePhoto256x256Pixel": "Используйте фото 256х256 пикселей",
-    "localization": "Язык",
-    "selectLanguage": "Выберите язык"
-  },
   "baseComponent": {
     "content": "Содержимое",
     "settings": "Настройки",
@@ -68,26 +61,6 @@
     "deleteItemConfirmRejectButtonPropsLabel": "Отмена",
     "deleteItemConfirmAcceptButtonPropsLabel": "Удалить"
   },
-  "appModulesComponent": {
-    "title": "Модули",
-    "refreshTooltip": "Обновить",
-    "table": {
-      "moduleId": "ID модуля",
-      "name": "Название",
-      "currentlyLoaded": "Загружен",
-      "yes": "Да",
-      "no": "Нет",
-      "deleteTooltip": "Удалить"
-    },
-    "confirm": {
-      "header": "Внимание",
-      "message": "Вы уверены, что хотите удалить модуль?",
-      "cancel": "Отмена",
-      "delete": "Удалить"
-    },
-    "messages": {
-      "deleteSuccess": "Модуль удален"
-    }
-  },
+
   "primeng": ""
 }

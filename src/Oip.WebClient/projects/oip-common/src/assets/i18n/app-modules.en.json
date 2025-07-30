@@ -1,0 +1,23 @@
+{
+  "app-modules": {
+    "title": "Modules",
+    "refreshTooltip": "Refresh",
+    "table": {
+      "moduleId": "Module ID",
+      "name": "Name",
+      "currentlyLoaded": "Currently Loaded",
+      "yes": "Yes",
+      "no": "No",
+      "deleteTooltip": "Delete"
+    },
+    "confirm": {
+      "header": "Warning",
+      "message": "Are you sure you want to delete the module?",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "messages": {
+      "deleteSuccess": "Module deleted"
+    }
+  }
+}

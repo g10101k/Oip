@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Tooltip } from "primeng/tooltip";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
-import { TranslatePipe, TranslateService } from "@ngx-translate/core";
+import { TranslateService } from "@ngx-translate/core";
 import { BaseDataService } from "./../services/base-data.service";
 import { Tag } from "primeng/tag";
 import { ButtonModule } from 'primeng/button';
@@ -10,15 +10,35 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { MsgService } from "../services/msg.service";
 import { ConfirmationService } from "primeng/api";
 import { ConfirmDialog } from "primeng/confirmdialog";
+import { L10nService } from "../services/l10n.service";
+import { Module } from "../api/Module";
+import { ModuleDto } from "../api/data-contracts";
+import { AppTitleService } from "../services/app-title.service";
 
-export interface ExistModuleDto {
-  moduleId: number;
-  name: string;
-  currentlyLoaded: boolean;
+interface L10n {
+  confirm: {
+    header: string;
+    message: string;
+    cancel: string;
+    delete: string;
+  },
+  title: string;
+  messages: {
+    deleteSuccess: string;
+  },
+  table: {
+    deleteTooltip: string;
+    currentlyLoaded: string;
+    yes: string;
+    no: string;
+    name: string;
+    moduleId: string;
+  },
+  refreshTooltip: string;
 }
 
 @Component({
-  imports: [FormsModule, TableModule, TranslatePipe, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog],
+  imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog],
   providers: [ConfirmationService],
   selector: 'app-modules',
   template: `
@@ -26,7 +46,7 @@ export interface ExistModuleDto {
     <div class="flex flex-col md:flex-row gap-4">
       <div class="card w-full">
         <div class="font-semibold text-xl mb-4">
-          {{ 'appModulesComponent.title' | translate }}
+          {{ l10n.title }}
         </div>
         <div class="mb-4">
           <p-toolbar>
@@ -34,7 +54,7 @@ export interface ExistModuleDto {
               icon="pi pi-refresh"
               severity="secondary"
               (onClick)="refreshAction()"
-              [pTooltip]="'appModulesComponent.refreshTooltip' | translate"
+              [pTooltip]="l10n.refreshTooltip"
               tooltipPosition="bottom"
               rounded="true"
               text="true"
@@ -44,9 +64,9 @@ export interface ExistModuleDto {
         <p-table class="mt-4" [value]="modules" [paginator]="true" [rows]="100">
           <ng-template pTemplate="header">
             <tr>
-              <th>{{ 'appModulesComponent.table.moduleId' | translate }}</th>
-              <th>{{ 'appModulesComponent.table.name' | translate }}</th>
-              <th>{{ 'appModulesComponent.table.currentlyLoaded' | translate }}</th>
+              <th>{{ l10n.table.moduleId }}</th>
+              <th>{{ l10n.table.name }}</th>
+              <th>{{ l10n.table.currentlyLoaded }}</th>
               <th style="width: 4rem"></th>
             </tr>
           </ng-template>
@@ -56,9 +76,7 @@ export interface ExistModuleDto {
               <td>{{ module.name }}</td>
               <td>
                 <p-tag
-                  [value]="module.currentlyLoaded
-                ? ('appModulesComponent.table.yes' | translate)
-                : ('appModulesComponent.table.no' | translate)"
+                  [value]="module.currentlyLoaded ? l10n.table.yes : l10n.table.no"
                   [severity]="module.currentlyLoaded ? 'success' : 'danger'"
                 ></p-tag>
               </td>
@@ -66,7 +84,7 @@ export interface ExistModuleDto {
                 <p-button
                   icon="pi pi-trash"
                   (onClick)="deleteModule(module)"
-                  [pTooltip]="'appModulesComponent.table.deleteTooltip' | translate"
+                  [pTooltip]="l10n.table.deleteTooltip"
                   tooltipPosition="bottom"
                   severity="danger"
                   rounded="true"
@@ -82,35 +100,39 @@ export interface ExistModuleDto {
 })
 export class AppModulesComponent implements OnInit {
   protected dataService = inject(BaseDataService);
-  protected modules: ExistModuleDto[] = [];
-  private msgService = inject(MsgService);
-  private confirmationService = inject(ConfirmationService);
-  private translate = inject(TranslateService);
+  protected modules: ModuleDto[] = [];
+  protected msgService = inject(MsgService);
+  protected confirmationService = inject(ConfirmationService);
+  protected l10nService = inject(L10nService);
+  protected l10n: L10n = {} as L10n;
+  protected titleService = inject(AppTitleService);
+  private moduleService = inject(Module);
 
-  ngOnInit(): void {
-    this.refreshAction();
+  async ngOnInit() {
+    (await this.l10nService.get('app-modules')).subscribe((l) => {
+        this.l10n = l;
+      }
+    );
+    this.titleService.setTitle(this.l10n.title);
+    await this.refreshAction();
   }
 
-  refreshAction(): void {
-    this.dataService
-      .sendRequest<ExistModuleDto[]>(`api/module/get-modules-with-load-status`)
-      .then(data => this.modules = data)
-      .catch(error => console.error(error));
+  async refreshAction() {
+    this.modules = await this.moduleService.moduleGetModulesWithLoadStatus()
   }
 
-  deleteModule(module: ExistModuleDto) {
-    console.log(module);
+  deleteModule(module: ModuleDto) {
     this.confirmationService.confirm({
-      header: this.translate.instant('appModulesComponent.confirm.header'),
-      message: this.translate.instant('appModulesComponent.confirm.message'),
+      header: this.l10n.confirm.header,
+      message: this.l10n.confirm.message,
       icon: 'pi pi-trash',
       rejectButtonProps: {
-        label: this.translate.instant('appModulesComponent.confirm.cancel'),
+        label: this.l10n.confirm.cancel,
         severity: 'secondary',
         outlined: true,
       },
       acceptButtonProps: {
-        label: this.translate.instant('appModulesComponent.confirm.delete'),
+        label: this.l10n.confirm.delete,
         severity: 'danger',
       },
       accept: async () => {
@@ -118,10 +140,7 @@ export class AppModulesComponent implements OnInit {
           .sendRequest(`api/module/delete`, 'DELETE', { moduleId: module.moduleId })
           .then(() => this.refreshAction())
           .catch(error => console.error(error));
-
-        this.msgService.success(
-          this.translate.instant('appModulesComponent.messages.deleteSuccess')
-        );
+        this.msgService.success(this.l10n.messages.deleteSuccess);
       },
     });
   }
