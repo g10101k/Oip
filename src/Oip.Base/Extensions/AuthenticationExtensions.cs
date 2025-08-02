@@ -35,6 +35,7 @@ public static class AuthenticationExtensions
                 {
                     ValidIssuer = urlWithRealm,
                     ValidateAudience = false,
+                    ClockSkew = TimeSpan.FromSeconds(settings.SecurityService.ClockSkewSeconds),
                 };
             });
         builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();

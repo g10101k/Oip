@@ -24,6 +24,11 @@ public class SecurityServiceSettings
     /// Realm
     /// </summary>
     public string Realm { get; set; } = default!;
+
+    /// <summary>
+    /// The number of seconds to allow for clock skew when validating tokens. Default value = 5
+    /// </summary>
+    public int ClockSkewSeconds { get; set; } = 5;
     
     /// <summary>
     /// Front settings
