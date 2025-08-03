@@ -49,4 +49,9 @@ public class ModuleInstanceDto
     /// Child module instances.
     /// </summary>
     public List<ModuleInstanceDto>? Items { get; init; }
+
+    /// <summary>
+    /// Securities
+    /// </summary>
+    public List<string>? Securities { get; set; }
 }

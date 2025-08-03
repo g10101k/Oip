@@ -33,7 +33,7 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
         accept="image/*" maxFileSize="1000000"
         withCredentials="true"
         (onUpload)="onBasicUploadAuto($event)"
-        chooseLabel="{{'profileComponent.changePhoto' | translate}}"/>
+        chooseLabel="{{'profileComponent.changePhoto' | translate }}"/>
     </div>
   `,
 })

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NotificationsWidget } from './components/notificationswidget';
+import { NotificationsWidgetComponent } from './components/notifications-widget.component';
 import { StatsWidget } from './components/statswidget';
 import { RecentSalesWidget } from './components/recentsaleswidget';
 import { BestSellingWidget } from './components/bestsellingwidget';
@@ -9,7 +9,7 @@ import { NgIf } from "@angular/common";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StatsWidget, RecentSalesWidget, BestSellingWidget, RevenueStreamWidget, NotificationsWidget, NgIf, SecurityComponent],
+  imports: [StatsWidget, RecentSalesWidget, BestSellingWidget, RevenueStreamWidget, NotificationsWidgetComponent, NgIf, SecurityComponent],
   template: `
     <div *ngIf="isContent" class="grid grid-cols-12 gap-4">
       <app-stats-widget class="contents"/>
@@ -25,6 +25,6 @@ import { NgIf } from "@angular/common";
     <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
   `
 })
-export class Dashboard extends BaseModuleComponent<NoSettingsDto, NoSettingsDto> {
+export class DashboardComponent extends BaseModuleComponent<NoSettingsDto, NoSettingsDto> {
 }
 

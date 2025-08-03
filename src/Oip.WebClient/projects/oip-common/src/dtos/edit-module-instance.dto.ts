@@ -4,4 +4,5 @@ export interface EditModuleInstanceDto {
   parentId: number;
   label: string;
   icon: string;
+  viewRoles: string[];
 }

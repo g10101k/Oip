@@ -23,9 +23,7 @@ interface MenuChangeEvent {
   routeEvent?: boolean;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({  providedIn: 'root' })
 export class LayoutService {
   _config: AppConfig = this.getAppConfigFromStorage();
 

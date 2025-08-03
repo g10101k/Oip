@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuardService, NotfoundComponent, AppLayout, AppModulesComponent } from "oip-common";
+import { AuthGuardService, NotfoundComponent, AppLayout } from "oip-common";
 import { inject } from "@angular/core";
 
 export const appRoutes: Routes = [
@@ -10,7 +10,7 @@ export const appRoutes: Routes = [
     children: [
       {
         path: 'dashboard/:id',
-        loadComponent: () => import('./app/components/dashboard/dashboard').then(m => m.Dashboard),
+        loadComponent: () => import('./app/components/dashboard/dashboard.component').then(m => m.DashboardComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()],
       },
       {

@@ -7,6 +7,7 @@ import { FormsModule } from "@angular/forms";
 import { MenuService, SecurityDataService } from "oip-common";
 import { TranslatePipe } from "@ngx-translate/core";
 import { EditModuleInstanceDto } from "../../dtos/edit-module-instance.dto";
+import { MultiSelectModule } from "primeng/multiselect";
 
 @Component({
   imports: [
@@ -15,7 +16,8 @@ import { EditModuleInstanceDto } from "../../dtos/edit-module-instance.dto";
     InputTextModule,
     DropdownModule,
     FormsModule,
-    TranslatePipe
+    TranslatePipe,
+    MultiSelectModule
   ],
   selector: 'menu-item-edit-dialog',
   standalone: true,
@@ -33,6 +35,17 @@ import { EditModuleInstanceDto } from "../../dtos/edit-module-instance.dto";
         </label>
         <i class="{{item.icon}}"></i>
         <input pInputText id="icon" class="flex-auto" [(ngModel)]="item.icon"/>
+      </div>
+
+      <div class="flex items-center gap-4 mb-4">
+        <label for="security"
+               class="font-semibold w-1/3">{{ 'menuItemEditDialogComponent.security' | translate }} </label>
+        <p-multiSelect [options]="roles"
+                       [maxSelectedLabels]="10"
+                       [(ngModel)]="item.viewRoles"
+                       placeholder="Select roles"
+                       appendTo="body"
+                       class="flex-auto"/>
       </div>
 
       <div class="flex justify-end gap-2">
@@ -56,7 +69,7 @@ export class MenuItemEditDialogComponent {
 
   modules: any[] = [];
   roles: string[] = [];
-  item: EditModuleInstanceDto = { icon: "", label: "", moduleId: 0, moduleInstanceId: 0, parentId: 0 };
+  item: EditModuleInstanceDto = { icon: "", label: "", viewRoles: [""], moduleId: 0, moduleInstanceId: 0, parentId: 0 };
 
   changeVisible() {
     this.visible = !this.visible;
@@ -74,18 +87,17 @@ export class MenuItemEditDialogComponent {
     this.visibleChange.emit(this.visible);
   }
 
-  showDialog() {
+  async showDialog() {
     this.item = {
       moduleInstanceId: this.menuService.contextMenuItem?.moduleInstanceId,
       moduleId: this.menuService.contextMenuItem?.moduleId,
       parentId: this.menuService.contextMenuItem?.parentId,
       label: this.menuService.contextMenuItem?.label,
-      icon: this.menuService.contextMenuItem?.icon
+      icon: this.menuService.contextMenuItem?.icon,
+      viewRoles: this.menuService.contextMenuItem?.securities,
     };
 
-    this.securityDataService.getRealmRoles().then((roles) => {
-      this.roles = roles;
-    });
+    this.roles = await this.securityDataService.getRealmRoles();
     this.menuService.getModules().then(data => {
       this.modules = data;
     });

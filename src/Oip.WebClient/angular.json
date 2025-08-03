@@ -117,6 +117,20 @@
             ],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/oip/src/**",
+              "projects/oip/src/**"
+            ]
+          },
+          "configurations": {
+            "strict": {
+              "strict": true
+            }
+          }
         }
       }
     },

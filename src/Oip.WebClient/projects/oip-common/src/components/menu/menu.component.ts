@@ -35,11 +35,6 @@ import { RouterLink } from "@angular/router";
               [contextMenu]="contextMenu"></li>
           <li *ngIf="item.separator" class="menu-separator"></li>
         </ng-container>
-        <div *ngIf="securityService.isAdmin" class="flex items-center absolute right-0 bottom-0 m-4 gap-2">
-          <label for="adminMode">{{ 'menuComponent.all' | translate }}</label>
-          <p-inputSwitch id="adminMode" [(ngModel)]="menuService.adminMode" (onChange)="onSettingButtonClick()"></p-inputSwitch>
-          <a routerLink="/modules"> <i class="pi pi-cog" ></i></a>
-        </div>
       </ul>
     </div>
     <p-contextMenu [target]="emtpty"/>
@@ -62,10 +57,6 @@ export class MenuComponent implements OnInit {
 
   private newClick(e: MenuItemCommandEvent) {
     this.menuItemCreateDialogComponent.showDialog();
-  }
-
-  async onSettingButtonClick() {
-    await this.menuService.loadMenu();
   }
 
   onContextMenu($event: MouseEvent) {

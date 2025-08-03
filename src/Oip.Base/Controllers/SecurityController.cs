@@ -34,7 +34,7 @@ public class SecurityController : ControllerBase
     public async Task<IEnumerable<string>> GetRealmRoles()
     {
         var realmRoles = await _keycloakService.GetRealmRoles();
-        return realmRoles.Select(x => x.Name);
+        return realmRoles.Select(x => x.Name).ToList();
     }
 
     /// <summary> 
@@ -63,7 +63,7 @@ public class SecurityController : ControllerBase
             SilentRenew = securitySettings.Front.SilentRenew,
             UseRefreshToken = securitySettings.Front.UseRefreshToken,
             LogLevel = securitySettings.Front.LogLevel,
-            SecureRoutes = securityRoutes.ToList(),
+            SecureRoutes = securityRoutes.ToList()
         };
     }
 }

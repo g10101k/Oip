@@ -21,8 +21,9 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Get all
+    /// Get all modules.
     /// </summary>
+    /// <return>A collection of module DTOs.</return>
     public async Task<IEnumerable<ModuleDto>> GetAll()
     {
         var query = from module in _db.Modules
@@ -39,13 +40,14 @@ public class ModuleRepository
                     Role = x.Role
                 })
             };
-        var result = await query.AsNoTracking().ToListAsync();
+        var result = await query.ToListAsync();
         return result;
     }
 
     /// <summary>
     /// Insert module
     /// </summary>
+    /// <param name="list">The list of module to insert.</param>
     public async Task Insert(IEnumerable<ModuleDto> list)
     {
         await _db.Modules.AddRangeAsync(list.Select(x =>
@@ -69,13 +71,14 @@ public class ModuleRepository
     /// </summary>
     public async Task<IEnumerable<ModuleInstanceDto>> GetModuleForMenuAll(List<string> roles)
     {
-        var query = from module in _db.ModuleInstances
-                .Include(x => x.Module)
-            join security in _db.ModuleInstanceSecurities on module.ModuleInstanceId equals security
-                .ModuleInstanceId
-            where security.Right == "read" && roles.Contains(security.Role)
-            select module;
-        var result = (await query.ToListAsync()).Where(x => x.Parent == null).Select(ToDto);
+        var query = await _db.ModuleInstances
+            .Include(x => x.Module)
+            .Include(x => x.Securities)
+            .Where(m => m.Securities
+                .Any(s => s.Right == "read" && roles.Contains(s.Role)))
+            .ToListAsync();
+
+        var result = query.Where(x => x.Parent == null).Select(ToDto);
 
         return result.ToList();
     }
@@ -129,6 +132,11 @@ public class ModuleRepository
         _db.ModuleInstanceSecurities.AddRange(listToAdd);
     }
 
+    /// <summary>
+    /// Converts a <see cref="ModuleInstanceEntity"/> to a <see cref="ModuleInstanceDto"/>.
+    /// </summary>
+    /// <param name="module">The <see cref="ModuleInstanceEntity"/> to convert.</param>
+    /// <return>The converted <see cref="ModuleInstanceDto"/>.</return>
     private static ModuleInstanceDto ToDto(ModuleInstanceEntity module)
     {
         return new ModuleInstanceDto()
@@ -143,15 +151,20 @@ public class ModuleRepository
             Url = module.Url,
             Target = module.Target,
             Settings = module.Settings,
-            Items = module.Items.Count == 0 ? null : module.Items.Select(ToDto).ToList()
+            Items = module.Items.Count == 0 ? null : module.Items.Select(ToDto).ToList(),
+            Securities = module.Securities.Select(s => s.Role).ToList()
         };
     }
 
+    /// <summary>
+    /// Appends a URL part to the base URL.
+    /// </summary>
+    /// <param name="url">The base URL.</param>
+    /// <param name="part">The URL part to append.</param>
+    /// <returns>The resulting URL.</returns>
     private static string UrlAppend(string? url, int? part)
     {
-        if (string.IsNullOrEmpty(url))
-            return string.Empty;
-        return part is not null ? $"{url.TrimEnd('/')}/{part}" : url;
+        return string.IsNullOrEmpty(url) ? string.Empty : $"{url.TrimEnd('/')}/{part}";
     }
 
     /// <summary>
@@ -189,9 +202,9 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Get admin menu 
+    /// Gets all top-level module instances for the admin menu.
     /// </summary>
-    /// <returns></returns>
+    /// <return>An enumerable collection of ModuleInstanceDto objects representing the admin menu.</return>
     public async Task<IEnumerable<ModuleInstanceDto>> GetAdminMenu()
     {
         var query = from module in _db.ModuleInstances
@@ -205,7 +218,7 @@ public class ModuleRepository
     /// <summary>
     /// Get modules
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A collection of integer key-value pairs representing modules.</returns>
     public async Task<IEnumerable<IntKeyValueDto>> GetModules()
     {
         var query = from module in _db.Modules
@@ -237,18 +250,45 @@ public class ModuleRepository
     /// <param name="editModel"></param>
     public async Task EditModuleInstance(EditModuleInstanceDto editModel)
     {
-        var instance =
-            await _db.ModuleInstances.Include(x => x.Securities)
-                .FirstOrDefaultAsync(x => x.ModuleInstanceId == editModel.ModuleInstanceId) ??
-            throw new KeyNotFoundException($"Module instance with id {editModel.ModuleInstanceId} not found");
+        var instance = await _db.ModuleInstances
+                           .Include(x => x.Securities)
+                           .FirstOrDefaultAsync(x => x.ModuleInstanceId == editModel.ModuleInstanceId)
+                       ?? throw new KeyNotFoundException(
+                           $"Module instance with id {editModel.ModuleInstanceId} not found");
 
         instance.Label = editModel.Label;
         instance.Icon = editModel.Icon;
-        _db.ModuleInstances.Update(instance);
+
+        if (editModel.ViewRoles != null)
+        {
+            var rolesToRemove = instance.Securities
+                .Where(s => !editModel.ViewRoles.Contains(s.Role))
+                .ToList();
+
+            foreach (var roleEntity in rolesToRemove)
+            {
+                _db.ModuleInstanceSecurities.Remove(roleEntity);
+            }
+
+            var existingRoles = instance.Securities.Select(s => s.Role).ToHashSet();
+            var newRoles = editModel.ViewRoles
+                .Where(role => !existingRoles.Contains(role))
+                .Select(role => new ModuleInstanceSecurityEntity
+                {
+                    ModuleInstance = instance,
+                    ModuleInstanceId = instance.ModuleInstanceId,
+                    Role = role,
+                    Right = "read"
+                });
+
+            foreach (var newRole in newRoles)
+            {
+                _db.ModuleInstanceSecurities.Add(newRole);
+            }
+        }
 
         await _db.SaveChangesAsync();
     }
-
 
     /// <summary>
     /// Delete module instance
@@ -266,7 +306,7 @@ public class ModuleRepository
     }
 
     /// <summary>
-    /// Delete module instance
+    /// Delete module
     /// </summary>
     /// <param name="id"></param>
     /// <exception cref="KeyNotFoundException"></exception>
