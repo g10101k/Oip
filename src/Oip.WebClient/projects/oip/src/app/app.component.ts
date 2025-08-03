@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.translateService.addLangs(['en', 'ru']);
-    let lang = /en|ru/.exec(this.layoutService.language()) ? this.layoutService.language() : 'en';
+    const lang = /en|ru/.exec(this.layoutService.language()) ? this.layoutService.language() : 'en';
     this.translateService.setDefaultLang(lang);
     this.translate(lang);
     this.securityService.auth();

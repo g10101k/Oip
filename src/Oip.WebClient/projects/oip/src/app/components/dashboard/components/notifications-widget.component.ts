@@ -72,7 +72,7 @@ import { MenuModule } from 'primeng/menu';
         </ul>
     </div>`
 })
-export class NotificationsWidget {
+export class NotificationsWidgetComponent {
     items = [
         { label: 'Add New', icon: 'pi pi-fw pi-plus' },
         { label: 'Remove', icon: 'pi pi-fw pi-trash' }
