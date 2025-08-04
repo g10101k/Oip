@@ -1,6 +1,7 @@
-import {inject, Injectable} from '@angular/core';
-import {SecurityService} from './security.service';
-import {BaseDataService} from './base-data.service';
+import { inject, Injectable } from '@angular/core';
+import { SecurityService } from './security.service';
+import { BaseDataService } from './base-data.service';
+import { map } from "rxjs";
 
 /**
  * UserService is responsible for retrieving and handling user-related data,
@@ -10,9 +11,19 @@ import {BaseDataService} from './base-data.service';
 export class UserService {
   private readonly securityService = inject(SecurityService);
   private readonly baseDataService = inject(BaseDataService);
+  private _shortLabel: string = '';
+  private _userName: string = '';
+  private _email: string = '';
 
   constructor() {
-    this.getUserPhoto();
+    this.securityService.user.subscribe(data => {
+      if (data) {
+        this._shortLabel = data.given_name[0] + data.family_name[0];
+        this._userName = `${data.given_name} ${data.family_name}`;
+        this._email = data.email;
+        this.getUserPhoto();
+      }
+    });
   }
 
   /**
@@ -29,14 +40,12 @@ export class UserService {
    * Returns a short label composed of the user's initials.
    * Typically used for avatar display when a photo is unavailable.
    */
-  get shortLabel(): string {
-    let data = this.securityService.userData;
-    return data.given_name[0] + data.family_name[0];
+  get shortLabel() {
+    return this._shortLabel;
   }
 
   get userName(): string {
-    let data = this.securityService.userData;
-    return `${data.given_name} ${data.family_name}`;
+    return this._userName;
   }
 
   /**
@@ -44,7 +53,7 @@ export class UserService {
    * and updates the `photo` and `photoLoaded` properties accordingly.
    */
   getUserPhoto(): void {
-    let url = `${this.baseDataService.baseUrl}api/user-profile/get-user-photo?email=${this.securityService.userData.email}`;
+    let url = `${this.baseDataService.baseUrl}api/user-profile/get-user-photo?email=${this._email}`;
     this.baseDataService.getBlob(url)
       .then(data => {
         this.createImageFromBlob(data as Blob);
@@ -52,6 +61,8 @@ export class UserService {
       }, error => {
         console.log(error);
       });
+
+
   }
 
   /**

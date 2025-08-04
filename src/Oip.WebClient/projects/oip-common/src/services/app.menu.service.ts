@@ -1,18 +1,21 @@
 import { inject, Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, take } from 'rxjs';
 import { BaseDataService } from "./base-data.service";
 import { MenuChangeEvent } from "../events/menu-change.event";
 import { AddModuleInstanceDto } from "../dtos/add-module-instance.dto";
 import { EditModuleInstanceDto } from "../dtos/edit-module-instance.dto";
 import { Menu } from "../api/Menu";
 import { AppTitleService } from "./app-title.service";
+import { SecurityService } from "./security.service";
 
-@Injectable({ providedIn: 'root' })
+
+@Injectable()
 export class MenuService extends BaseDataService {
   private readonly menuSource = new Subject<MenuChangeEvent>();
   private readonly resetSource = new Subject();
   private readonly titleService = inject(AppTitleService);
   private readonly menuDataService = inject(Menu);
+  private readonly securityService = inject(SecurityService)
   menuSource$ = this.menuSource.asObservable();
   resetSource$ = this.resetSource.asObservable();
   contextMenuItem: any;
@@ -21,7 +24,10 @@ export class MenuService extends BaseDataService {
   public adminMode: boolean = false;
 
   async loadMenu() {
-    this.menu = (this.adminMode) ? await this.getAdminMenu() : await this.getMenu();
+    this.securityService.onLogin.pipe(take(1)).subscribe(async x => {
+      console.log("loadMenu")
+      this.menu = (this.adminMode) ? await this.menuDataService.menuGetAdminMenu() : await this.menuDataService.menuGet();
+    })
   }
 
   /**
@@ -36,14 +42,6 @@ export class MenuService extends BaseDataService {
 
   reset() {
     this.resetSource.next(true);
-  }
-
-  getMenu() {
-    return this.menuDataService.menuGet();
-  }
-
-  getAdminMenu() {
-    return this.menuDataService.menuGetAdminMenu();
   }
 
   getModules() {

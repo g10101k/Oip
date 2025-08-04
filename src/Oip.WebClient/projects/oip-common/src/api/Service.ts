@@ -14,7 +14,7 @@ import { Injectable } from "@angular/core";
 import { GetManifestResponse, RegisterModuleDto } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
+@Injectable()
 export class Service<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {

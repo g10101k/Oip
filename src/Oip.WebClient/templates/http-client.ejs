@@ -59,7 +59,7 @@ export class HttpClient<SecurityDataType = unknown> {
     private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"]  =
       (securityData) => ({
         headers: {
-          Authorization: `Bearer ${securityData}`,
+          Authorization: `Bearer ${this.securityService.accessToken}`,
         },
       });
     private abortControllers = new Map<CancelToken, AbortController>();

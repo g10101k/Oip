@@ -27,6 +27,14 @@ const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: Http
 export const appConfig: ApplicationConfig = {
   providers: [
     ConfigService,
+    provideAuth({
+      loader: {
+        provide: StsConfigLoader,
+        useFactory: httpLoaderAuthFactory,
+        deps: [ConfigService],
+      },
+    }),
+    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     provideHttpClient(withInterceptors([authInterceptor(), langIntercept]), withFetch()),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     ProductService,
@@ -42,14 +50,7 @@ export const appConfig: ApplicationConfig = {
         deps: [HttpClient],
       },
     })]),
-    provideAuth({
-      loader: {
-        provide: StsConfigLoader,
-        useFactory: httpLoaderAuthFactory,
-        deps: [ConfigService],
-      },
-    }),
-    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
+
     provideRouter(appRoutes, withInMemoryScrolling({
       anchorScrolling: 'enabled',
       scrollPositionRestoration: 'enabled'

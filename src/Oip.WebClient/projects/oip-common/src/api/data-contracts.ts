@@ -68,7 +68,7 @@ export interface GetManifestResponse {
   baseUrl?: string | null;
 }
 
-/** Int Key Value DTO */
+/** Represents a key-value pair where the key is an integer and the value is a string. */
 export interface IntKeyValueDto {
   key?: number;
   value?: string | null;
@@ -112,6 +112,8 @@ export interface ModuleInstanceDto {
   settings?: string | null;
   /** Child module instances. */
   items?: ModuleInstanceDto[] | null;
+  /** Securities */
+  securities?: string[] | null;
 }
 
 /** Module security DTO */

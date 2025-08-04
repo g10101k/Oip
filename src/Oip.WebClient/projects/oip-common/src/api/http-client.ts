@@ -66,14 +66,14 @@ export enum ContentType {
 
 @Injectable({ providedIn: "root" })
 export class HttpClient<SecurityDataType = unknown> {
-  protected securityService = inject(SecurityService);
+  private readonly securityService = inject(SecurityService);
   public baseUrl: string = "";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] = (
     securityData,
   ) => ({
     headers: {
-      Authorization: `Bearer ${securityData}`,
+      Authorization: `Bearer ${this.securityService.accessToken}`,
     },
   });
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -89,6 +89,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   constructor() {
     this.securityService.getAccessToken().subscribe((token) => {
+
       this.securityData = token;
     });
   }
@@ -210,7 +211,7 @@ export class HttpClient<SecurityDataType = unknown> {
     const secureParams =
       ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
         this.securityWorker &&
-        (await this.securityWorker(this.securityData))) ||
+        (await this.securityWorker(this.securityService.accessToken))) ||
       {};
     const requestParams = this.mergeRequestParams(params, secureParams);
     const queryString = query && this.toQueryString(query);

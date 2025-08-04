@@ -23,19 +23,10 @@ export class AuthGuardService {
    * @returns {Observable<boolean | UrlTree>} A stream resolving to true (allow), or UrlTree (redirect).
    */
   canActivate(): Observable<boolean | UrlTree> {
-    return combineLatest([
-      this.oidcSecurityService.isAuthenticated(),
-      this.oidcSecurityService.isTokenExpired()
-    ]).pipe(map(([authenticated, tokenExpired]) => {
+    return this.oidcSecurityService.isAuthenticated().pipe(map(authenticated => {
       if (!authenticated) {
         return this.router.parseUrl('/unauthorized');
       }
-      if (!tokenExpired) {
-        return true;
-      }
-
-      // Token is expired; attempt to refresh
-      return this.tryRefreshToken()
     }));
   }
 

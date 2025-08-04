@@ -20,7 +20,7 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
+@Injectable()
 export class DashboardModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {

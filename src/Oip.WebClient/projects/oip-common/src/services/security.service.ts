@@ -6,7 +6,7 @@ import {
   PublicEventsService,
   EventTypes
 } from "angular-auth-oidc-client";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { filter, map } from "rxjs/operators";
 
 /**
@@ -16,7 +16,7 @@ import { filter, map } from "rxjs/operators";
  * It provides helper methods for checking authentication, managing tokens,
  * determining user roles, and performing logout and refresh operations.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class SecurityService extends OidcSecurityService implements OnDestroy {
   /**
    * Handles angular OIDC events.
@@ -24,19 +24,18 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
   private readonly publicEventsService = inject(PublicEventsService);
 
   /**
-   * Stores the latest login response from checkAuth().
-   */
-  loginResponse = new BehaviorSubject<LoginResponse>(null);
-
-  /**
    * Stores the decoded access token payload.
    */
-  payload = new BehaviorSubject<any>(null);
+  public payload = new BehaviorSubject<any>(null);
 
   /**
    * Stores user-specific data from the login response.
    */
-  userData: any;
+  public user = new Subject<any>();
+
+  public accessToken: string | null = null;
+
+  public onLogin = new Subject<boolean>();
 
   /**
    * Initializes service and subscribes to authentication events.
@@ -46,19 +45,17 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
     super();
     this.publicEventsService.registerForEvents()
       .pipe(filter(event => event.type === EventTypes.NewAuthenticationResult))
-      .subscribe(() => {
-        this.auth()
-      });
-  }
+      .subscribe((event) => {
+        console.log(event)
 
-  /**
-   * Returns the ID token for the sign-in.
-   * @returns A string with the id token.
-   */
-  override getAccessToken(): Observable<string> {
-    return this.loginResponse.pipe(
-      map(data => data?.accessToken)
-    );
+        this.getAuthenticationResult().subscribe((s) => {
+          console.log("getAuthenticationResult");
+          console.log(s.access_token)
+          this.accessToken = s.access_token;
+
+          this.onLogin.next(true)
+        })
+      });
   }
 
   /**
@@ -76,13 +73,42 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    */
   auth() {
     super.checkAuth().subscribe((_response: LoginResponse) => {
-      this.loginResponse.next(_response);
-      this.userData = _response.userData;
-      this.getPayloadFromAccessToken().subscribe(_token => {
-          this.payload.next(_token);
+      console.log('checkAuth()')
+      console.log(_response)
+      if (!_response.isAuthenticated){
+        this.forceRefreshSession().subscribe(x=>{
+          console.log('checkAuth()')
+          console.log(x)
+        })
+        return;
+      }
+
+
+      this.isTokenExpired().subscribe((isExpired) => {
+        if (isExpired) {
+          console.log("auth.checkAuth.isExpired - true")
+
+          console.log(_response)
+        } else {
+          console.log("auth.checkAuth.isExpired - false")
+
+          console.log(_response)
+
+          this.processLoginResponse(_response);
+          this.onLogin.next(true)
+          this.getPayloadFromAccessToken().subscribe(payload => {
+              console.log("getPayloadFromAccessToken")
+              this.payload.next(payload);
+            }
+          );
         }
-      );
+      })
     });
+  }
+
+  private processLoginResponse(_response: LoginResponse) {
+    this.accessToken = _response.accessToken;
+    this.user.next(_response.userData);
   }
 
   /**
@@ -99,7 +125,6 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    * Completes the BehaviorSubjects when the service is destroyed to avoid memory leaks.
    */
   ngOnDestroy(): void {
-    this.loginResponse.complete();
     this.payload.complete();
   }
 

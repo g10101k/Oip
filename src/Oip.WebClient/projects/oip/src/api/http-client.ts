@@ -73,7 +73,7 @@ export class HttpClient<SecurityDataType = unknown> {
     securityData,
   ) => ({
     headers: {
-      Authorization: `Bearer ${securityData}`,
+      Authorization: `Bearer ${this.securityService.accessToken}`,
     },
   });
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -89,6 +89,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   constructor() {
     this.securityService.getAccessToken().subscribe((token) => {
+
       this.securityData = token;
     });
   }
