@@ -1,7 +1,5 @@
-import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {lastValueFrom, map, Observable} from 'rxjs';
-import {OpenIdConfiguration, StsConfigHttpLoader} from "angular-auth-oidc-client";
+import { Injectable } from '@angular/core';
+import { OpenIdConfiguration } from 'angular-auth-oidc-client';
 
 
 /**
@@ -9,7 +7,7 @@ import {OpenIdConfiguration, StsConfigHttpLoader} from "angular-auth-oidc-client
  * using Angular's HttpClient. It supports standard HTTP methods and automatic
  * credential handling.
  */
-@Injectable({  providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ConfigService {
   public readonly config: OpenIdConfiguration;
 

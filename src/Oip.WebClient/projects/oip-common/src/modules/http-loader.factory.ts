@@ -1,7 +1,6 @@
-import {HttpClient} from "@angular/common/http";
-import {map, Observable, lastValueFrom, firstValueFrom, of} from "rxjs";
-import {OpenIdConfiguration, StsConfigHttpLoader} from "angular-auth-oidc-client";
-import {ConfigService} from "../services/config.service";
+import { of } from "rxjs";
+import { StsConfigHttpLoader } from "angular-auth-oidc-client";
+import { ConfigService } from "../services/config.service";
 
 /**
  * Load keycloak settings from backend and save to sessionStorage

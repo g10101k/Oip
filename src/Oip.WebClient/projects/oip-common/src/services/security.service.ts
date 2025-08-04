@@ -44,17 +44,17 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
   constructor() {
     super();
     this.publicEventsService.registerForEvents()
-      .pipe(filter(event => event.type === EventTypes.NewAuthenticationResult))
       .subscribe((event) => {
-        console.log(event)
-
-        this.getAuthenticationResult().subscribe((s) => {
-          console.log("getAuthenticationResult");
-          console.log(s.access_token)
-          this.accessToken = s.access_token;
-
-          this.onLogin.next(true)
-        })
+        switch (event.type) {
+          case EventTypes.CheckingAuthFinished:
+            this.setLoginAndComplete()
+            break;
+          case EventTypes.NewAuthenticationResult:
+            this.getAuthenticationResult().subscribe((s) => {
+              this.accessToken = s.access_token;
+            })
+            break;
+        }
       });
   }
 
@@ -72,43 +72,39 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    * and decoded token payload if authenticated.
    */
   auth() {
-    super.checkAuth().subscribe((_response: LoginResponse) => {
-      console.log('checkAuth()')
-      console.log(_response)
-      if (!_response.isAuthenticated){
-        this.forceRefreshSession().subscribe(x=>{
-          console.log('checkAuth()')
-          console.log(x)
+    super.getRefreshToken().subscribe(token => {
+      if (token) {
+        super.forceRefreshSession().subscribe(x => {
+          super.checkAuth().subscribe((_response: LoginResponse) => {
+            this.processLoginResponse(_response);
+            this.getPayloadFromAccessToken().subscribe(payload => {
+                this.payload.next(payload);
+              }
+            );
+          });
         })
-        return;
-      }
-
-
-      this.isTokenExpired().subscribe((isExpired) => {
-        if (isExpired) {
-          console.log("auth.checkAuth.isExpired - true")
-
-          console.log(_response)
-        } else {
-          console.log("auth.checkAuth.isExpired - false")
-
-          console.log(_response)
-
+      } else {
+        super.checkAuth().subscribe((_response: LoginResponse) => {
           this.processLoginResponse(_response);
-          this.onLogin.next(true)
           this.getPayloadFromAccessToken().subscribe(payload => {
-              console.log("getPayloadFromAccessToken")
               this.payload.next(payload);
             }
           );
-        }
-      })
-    });
+        });
+      }
+    })
+  }
+
+  setLoginAndComplete() {
+    console.log("setLoginAndComplete()");
+    console.log(this.accessToken);
+    this.onLogin.next(true);
   }
 
   private processLoginResponse(_response: LoginResponse) {
     this.accessToken = _response.accessToken;
     this.user.next(_response.userData);
+    console.log(_response);
   }
 
   /**
