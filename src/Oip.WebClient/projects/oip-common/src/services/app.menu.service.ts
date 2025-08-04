@@ -24,9 +24,14 @@ export class MenuService extends BaseDataService {
   public adminMode: boolean = false;
 
   async loadMenu() {
-    this.securityService.onLogin.pipe(take(1)).subscribe(async x => {
+    if (this.securityService.accessToken)
       this.menu = (this.adminMode) ? await this.menuDataService.menuGetAdminMenu() : await this.menuDataService.menuGet();
-    });
+    else {
+      this.securityService.onLogin.pipe(take(1)).subscribe(async x => {
+        this.menu = (this.adminMode) ? await this.menuDataService.menuGetAdminMenu() : await this.menuDataService.menuGet();
+      });
+    }
+
   }
 
   /**
