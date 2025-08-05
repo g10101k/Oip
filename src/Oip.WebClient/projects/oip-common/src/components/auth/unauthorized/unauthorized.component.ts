@@ -25,7 +25,7 @@ import { TranslatePipe } from "@ngx-translate/core";
               <span class="text-muted-color font-medium">{{ 'unauthorized.signInToContinue' | translate }}</span>
             </div>
             <div>
-              <p-button label="{{ 'unauthorized.signIn' | translate }}" styleClass="w-full" (click)="securityService.authorize()"></p-button>
+              <p-button label="{{ 'unauthorized.signIn' | translate }}" styleClass="w-full" ></p-button>
             </div>
           </div>
         </div>
@@ -42,5 +42,4 @@ import { TranslatePipe } from "@ngx-translate/core";
   ]
 })
 export class UnauthorizedComponent {
-  protected readonly securityService = inject(SecurityService);
 }

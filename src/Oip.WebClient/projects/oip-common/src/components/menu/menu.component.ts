@@ -12,13 +12,12 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from "@angular/forms";
 import { MenuItemComponent } from './menu-item.component';
 import { MenuItemCreateDialogComponent } from "./menu-item-create-dialog.component";
-import { TranslatePipe, TranslateService } from "@ngx-translate/core";
+import { TranslateService } from "@ngx-translate/core";
 import { MenuItemEditDialogComponent } from "./menu-item-edit-dialog.component";
-import { RouterLink } from "@angular/router";
 
 
 @Component({
-  imports: [NgFor, NgIf, MenuItemComponent, ButtonModule, ContextMenuModule, DialogModule, InputTextModule, MenuItemCreateDialogComponent, InputSwitchModule, FormsModule, TranslatePipe, MenuItemEditDialogComponent, RouterLink],
+  imports: [NgFor, NgIf, MenuItemComponent, ButtonModule, ContextMenuModule, DialogModule, InputTextModule, MenuItemCreateDialogComponent, InputSwitchModule, FormsModule, MenuItemEditDialogComponent],
   selector: 'app-menu',
   standalone: true,
   template: `

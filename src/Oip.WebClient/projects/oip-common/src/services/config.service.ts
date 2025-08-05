@@ -1,7 +1,5 @@
-import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {lastValueFrom, map, Observable} from 'rxjs';
-import {OpenIdConfiguration, StsConfigHttpLoader} from "angular-auth-oidc-client";
+import { Injectable} from '@angular/core';
+
 
 
 /**
@@ -11,7 +9,7 @@ import {OpenIdConfiguration, StsConfigHttpLoader} from "angular-auth-oidc-client
  */
 @Injectable({  providedIn: 'root'})
 export class ConfigService {
-  public readonly config: OpenIdConfiguration;
+  public readonly config: any;
 
   constructor() {
     const KEYCLOAK_SETTINGS_KEY = 'keycloak-client-settings';
@@ -22,7 +20,7 @@ export class ConfigService {
       fetch(`api/security/get-keycloak-client-settings`)
         .then(res => res.json())
         .then((config: any) => {
-          let authConfig: OpenIdConfiguration = {
+          let authConfig = {
             authority: config.authority,
             redirectUrl: window.location.origin,
             postLogoutRedirectUri: window.location.origin,
@@ -39,7 +37,7 @@ export class ConfigService {
     }
   }
 
-  getConfig(): OpenIdConfiguration {
+  getConfig() {
     return this.config;
   }
 }

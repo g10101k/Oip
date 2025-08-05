@@ -70,7 +70,7 @@ import { UserService } from "../services/user.service";
 
         <div class="layout-topbar-menu hidden lg:block">
           <div class="layout-topbar-menu-content">
-            <button type="button" class="layout-topbar-action" (click)="securityService.logout()"
+            <button type="button" class="layout-topbar-action"
                     (keydown)="logoutKeyDown($event)">
               <i class="pi pi-sign-out"></i>
               <span>Logout</span>
@@ -103,7 +103,7 @@ export class AppTopbar {
 
   logoutKeyDown($event: KeyboardEvent) {
     if ($event.key === 'Enter') {
-      this.securityService.logout()
+      //this.securityService.logout()
     }
   }
 }

@@ -31,7 +31,6 @@ export * from './services/auth.service';
 export * from './services/app.layout.service';
 export * from './services/app.menu.service'
 export * from './services/user.service';
-export * from './services/security-storage.service';
 export * from './services/config.service';
 
 // Events
@@ -40,5 +39,4 @@ export * from './events/menu-change.event'
 // other
 export { langIntercept } from "./intercepts/i18n-intercept.service";
 export { SecurePipe } from "./modules/secure.pipe";
-export { httpLoaderAuthFactory } from "./modules/http-loader.factory";
 export { AddModuleInstanceDto } from "./dtos/add-module-instance.dto";

@@ -1,25 +1,24 @@
 import { HttpClient, provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
 import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
 import {
-  AuthGuardService,
+
   BaseDataService,
   SecurityDataService,
-  SecurityStorageService,
   UserService,
   langIntercept,
-  httpLoaderAuthFactory, ConfigService
+  ConfigService
 } from "oip-common";
 import { LocationStrategy, PathLocationStrategy } from "@angular/common";
 import { ProductService } from "./app/service/product.service";
 import { MessageService } from "primeng/api";
 import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
-import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from "angular-auth-oidc-client";
+import { AutoRefreshTokenService, provideKeycloak, UserActivityService, withAutoRefreshToken } from "keycloak-angular";
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
@@ -27,10 +26,29 @@ const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: Http
 export const appConfig: ApplicationConfig = {
   providers: [
     ConfigService,
-    provideHttpClient(withInterceptors([authInterceptor(), langIntercept]), withFetch()),
+    provideHttpClient(withInterceptors([langIntercept]), withFetch()),
+    provideKeycloak({
+      config: {
+        url: 'https://localhost:8443',
+        realm: 'oip',
+        clientId: 'oip-client'
+      },
+      initOptions: {
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html'
+      },
+      features: [
+        withAutoRefreshToken({
+          onInactivityTimeout: 'logout',
+          sessionTimeout: 60000
+        })
+      ],
+      providers: [AutoRefreshTokenService, UserActivityService]
+    }),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     ProductService,
-    AuthGuardService,
     MessageService,
     SecurityDataService,
     BaseDataService,
@@ -42,14 +60,7 @@ export const appConfig: ApplicationConfig = {
         deps: [HttpClient],
       },
     })]),
-    provideAuth({
-      loader: {
-        provide: StsConfigLoader,
-        useFactory: httpLoaderAuthFactory,
-        deps: [ConfigService],
-      },
-    }),
-    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
+
     provideRouter(appRoutes, withInMemoryScrolling({
       anchorScrolling: 'enabled',
       scrollPositionRestoration: 'enabled'
