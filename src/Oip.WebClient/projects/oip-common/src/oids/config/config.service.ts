@@ -70,7 +70,7 @@ export class ConfigurationService {
   }
 
   private loadConfigs(): Observable<OpenIdConfiguration[]> {
-    return this.loader.loadConfigs();
+    return of(this.loader.loadConfigs());
   }
 
   private configsAlreadySaved(): boolean {
@@ -95,14 +95,14 @@ export class ConfigurationService {
     return value || null;
   }
 
-  private prepareAndSaveConfigs(
-    passedConfigs: OpenIdConfiguration[]
-  ): Observable<OpenIdConfiguration[]> {
+  private prepareAndSaveConfigs(passedConfigs: OpenIdConfiguration[]): Observable<OpenIdConfiguration[]> {
     if (!this.configValidationService.validateConfigs(passedConfigs)) {
       return of([]);
     }
 
     this.createUniqueIds(passedConfigs);
+
+    this.mergeConfigFromStorage(passedConfigs);
 
     const allHandleConfigs$ = passedConfigs.map((x) => this.handleConfig(x));
 
@@ -199,5 +199,10 @@ export class ConfigurationService {
       currentConfig.useRefreshToken = false;
       currentConfig.usePushedAuthorisationRequests = false;
     }
+  }
+
+  private mergeConfigFromStorage(passedConfigs: OpenIdConfiguration[]) {
+    passedConfigs.forEach(config => {
+    });
   }
 }

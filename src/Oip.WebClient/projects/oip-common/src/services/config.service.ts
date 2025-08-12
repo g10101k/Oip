@@ -31,6 +31,7 @@ export class ConfigService {
             silentRenew: config.silentRenew,
             logLevel: config.logLevel,
             secureRoutes: config.secureRoutes,
+            disableRefreshIdTokenAuthTimeValidation: true
           };
           this.config = authConfig;
           localStorage.setItem(KEYCLOAK_SETTINGS_KEY, JSON.stringify(authConfig));
