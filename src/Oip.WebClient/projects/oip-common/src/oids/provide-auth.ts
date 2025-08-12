@@ -14,7 +14,7 @@ import { AbstractLoggerService } from './logging/abstract-logger.service';
 import { ConsoleLoggerService } from './logging/console-logger.service';
 import { OidcSecurityService } from './oidc.security.service';
 import { AbstractSecurityStorage } from './storage/abstract-security-storage';
-import { DefaultSessionStorageService } from './storage/default-sessionstorage.service';
+import { DefaultStorageService } from './storage/default-storage.service';
 
 /**
  * A feature to be used with `provideAuth`.
@@ -47,10 +47,7 @@ export function _provideAuth(passedConfig: PassedInitialConfig): Provider[] {
       useFactory: createStaticLoader,
       deps: [PASSED_CONFIG],
     },
-    {
-      provide: AbstractSecurityStorage,
-      useClass: DefaultSessionStorageService,
-    },
+    { provide: AbstractSecurityStorage, useClass: DefaultStorageService, },
     { provide: AbstractLoggerService, useClass: ConsoleLoggerService },
   ];
 }
