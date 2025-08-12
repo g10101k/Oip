@@ -23,10 +23,7 @@ export class RefreshSessionIframeService {
     allConfigs: OpenIdConfiguration[],
     customParams?: { [key: string]: string | number | boolean }
   ): Observable<boolean> {
-    this.loggerService.logDebug(
-      config,
-      'BEGIN refresh session Authorize Iframe renew'
-    );
+    this.loggerService.logDebug(config, 'BEGIN refresh session Authorize Iframe renew');
 
     return this.urlService
       .getRefreshSessionSilentRenewUrl(config, customParams)

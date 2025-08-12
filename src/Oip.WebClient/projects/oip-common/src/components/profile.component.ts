@@ -24,16 +24,15 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
       size="xlarge"
       shape="circle"/>
     <div class="mt-2">
-      <p-fileupload
-        mode="basic"
-        name="files"
-        [auto]="true"
-        chooseIcon="pi pi-upload"
-        url="/api/user-profile/post-user-photo"
-        accept="image/*" maxFileSize="1000000"
-        withCredentials="true"
-        (onUpload)="onBasicUploadAuto($event)"
-        chooseLabel="{{'profileComponent.changePhoto' | translate }}"/>
+      <p-fileupload mode="basic"
+                    name="files"
+                    [auto]="true"
+                    chooseIcon="pi pi-upload"
+                    url="/api/user-profile/post-user-photo"
+                    accept="image/*" maxFileSize="1000000"
+                    withCredentials="true"
+                    (onUpload)="onBasicUploadAuto($event)"
+                    chooseLabel="{{'profileComponent.changePhoto' | translate }}"/>
     </div>
   `,
 })

@@ -34,29 +34,24 @@ export class ConfigurationService {
     return Object.values(this.configsInternal);
   }
 
-  getOpenIDConfiguration(
-    configId?: string
-  ): Observable<OpenIdConfiguration | null> {
+  getOpenIDConfiguration(configId?: string): OpenIdConfiguration | null {
     if (this.configsAlreadySaved()) {
-      return of(this.getConfig(configId));
+      return (this.getConfig(configId));
     }
-
-    return this.getOpenIDConfigurations(configId).pipe(
-      map((result) => result.currentConfig)
-    );
+    let config = this.getOpenIDConfigurations(configId);
+    return config.currentConfig;
   }
 
-  getOpenIDConfigurations(configId?: string): Observable<{
+  getOpenIDConfigurations(configId?: string): {
     allConfigs: OpenIdConfiguration[];
     currentConfig: OpenIdConfiguration | null;
-  }> {
-    return this.loadConfigs().pipe(
-      concatMap((allConfigs) => this.prepareAndSaveConfigs(allConfigs)),
-      map((allPreparedConfigs) => ({
-        allConfigs: allPreparedConfigs,
-        currentConfig: this.getConfig(configId),
-      }))
-    );
+  } {
+    let allConfigs = this.loadConfigs();
+    this.prepareAndSaveConfigs(allConfigs);
+    return {
+      allConfigs: allConfigs,
+      currentConfig: this.getConfig(configId),
+    }
   }
 
   hasAtLeastOneConfig(): boolean {
@@ -69,8 +64,8 @@ export class ConfigurationService {
     this.configsInternal[configId as string] = readyConfig;
   }
 
-  private loadConfigs(): Observable<OpenIdConfiguration[]> {
-    return of(this.loader.loadConfigs());
+  private loadConfigs(): OpenIdConfiguration[] {
+    return this.loader.loadConfigs();
   }
 
   private configsAlreadySaved(): boolean {

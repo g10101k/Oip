@@ -4,7 +4,7 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthOptions } from '../auth-options';
 import { AuthStateService } from '../auth-state/auth-state.service';
@@ -119,7 +119,9 @@ function checkAuth(
   authOptions?: AuthOptions,
   configId?: string
 ): Observable<boolean> {
-  return configurationService.getOpenIDConfiguration(configId).pipe(
+  let config = configurationService.getOpenIDConfiguration(configId);
+
+  return of(config).pipe(
     map((configuration) => {
       const isAuthenticated =
         authStateService.areAuthStorageTokensValid(configuration);

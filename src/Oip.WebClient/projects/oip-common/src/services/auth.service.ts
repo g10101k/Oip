@@ -22,12 +22,11 @@ export class AuthGuardService {
    *
    * @returns {Observable<boolean | UrlTree>} A stream resolving to true (allow), or UrlTree (redirect).
    */
-  canActivate(): Observable<boolean | UrlTree> {
-    return this.oidcSecurityService.isAuthenticated().pipe(map(authenticated => {
-      if (!authenticated) {
-        return this.router.parseUrl('/unauthorized');
-      }
-    }));
+  canActivate(): boolean | UrlTree {
+    if (this.oidcSecurityService.isAuthenticated()){
+      return true;
+    }
+    return this.router.parseUrl('/unauthorized');
   }
 
   /**

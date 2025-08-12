@@ -5,7 +5,7 @@ import {
   RouterStateSnapshot,
   UrlTree,
 } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { CheckAuthService } from '../auth-state/check-auth.service';
 import { ConfigurationService } from '../config/config.service';
@@ -73,7 +73,9 @@ function checkAuth(
   autoLoginService: AutoLoginService,
   loginService: LoginService
 ): Observable<boolean> {
-  return configurationService.getOpenIDConfiguration().pipe(
+  let config = configurationService.getOpenIDConfiguration();
+
+  return of(config).pipe(
     switchMap((config) => {
       const allConfigs = configurationService.getAllConfigurations();
 

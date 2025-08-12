@@ -73,7 +73,7 @@ export class HttpClient<SecurityDataType = unknown> {
     securityData,
   ) => ({
     headers: {
-      Authorization: `Bearer ${this.securityService.accessToken}`,
+      Authorization: `Bearer ${this.securityService.getAccessToken()}`,
     },
   });
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -88,10 +88,7 @@ export class HttpClient<SecurityDataType = unknown> {
   };
 
   constructor() {
-    this.securityService.getAccessToken().subscribe((token) => {
 
-      this.securityData = token;
-    });
   }
 
   public setSecurityData = (data: SecurityDataType | null) => {
@@ -198,20 +195,20 @@ export class HttpClient<SecurityDataType = unknown> {
   };
 
   public request = async <T = any, E = any>({
-    body,
-    secure,
-    path,
-    type,
-    query,
-    format,
-    baseUrl,
-    cancelToken,
-    ...params
-  }: FullRequestParams): Promise<T> => {
+                                              body,
+                                              secure,
+                                              path,
+                                              type,
+                                              query,
+                                              format,
+                                              baseUrl,
+                                              cancelToken,
+                                              ...params
+                                            }: FullRequestParams): Promise<T> => {
     const secureParams =
       ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
         this.securityWorker &&
-        (await this.securityWorker(this.securityService.accessToken))) ||
+        (await this.securityWorker(this.securityService.getAccessToken()))) ||
       {};
     const requestParams = this.mergeRequestParams(params, secureParams);
     const queryString = query && this.toQueryString(query);
@@ -245,18 +242,18 @@ export class HttpClient<SecurityDataType = unknown> {
       const data = !responseFormat
         ? r
         : await response[responseFormat]()
-            .then((data) => {
-              if (r.ok) {
-                r.data = data;
-              } else {
-                r.error = data;
-              }
-              return r;
-            })
-            .catch((e) => {
-              r.error = e;
-              return r;
-            });
+          .then((data) => {
+            if (r.ok) {
+              r.data = data;
+            } else {
+              r.error = data;
+            }
+            return r;
+          })
+          .catch((e) => {
+            r.error = e;
+            return r;
+          });
 
       if (cancelToken) {
         this.abortControllers.delete(cancelToken);

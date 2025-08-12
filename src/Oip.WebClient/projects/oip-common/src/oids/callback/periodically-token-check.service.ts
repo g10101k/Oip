@@ -25,25 +25,16 @@ export class PeriodicallyTokenCheckService {
   private readonly loggerService = inject(LoggerService);
   private readonly userService = inject(UserService);
   private readonly authStateService = inject(AuthStateService);
-  private readonly refreshSessionIframeService = inject(
-    RefreshSessionIframeService
-  );
-  private readonly refreshSessionRefreshTokenService = inject(
-    RefreshSessionRefreshTokenService
-  );
+  private readonly refreshSessionIframeService = inject(RefreshSessionIframeService);
+  private readonly refreshSessionRefreshTokenService = inject(RefreshSessionRefreshTokenService);
   private readonly intervalService = inject(IntervalService);
-  private readonly storagePersistenceService = inject(
-    StoragePersistenceService
-  );
+  private readonly storagePersistenceService = inject(StoragePersistenceService);
   private readonly publicEventsService = inject(PublicEventsService);
   private readonly configurationService = inject(ConfigurationService);
 
-  startTokenValidationPeriodically(
-    allConfigs: OpenIdConfiguration[],
-    currentConfig: OpenIdConfiguration
-  ): void {
-    const configsWithSilentRenewEnabled =
-      this.getConfigsWithSilentRenewEnabled(allConfigs);
+  startTokenValidationPeriodically(allConfigs: OpenIdConfiguration[], currentConfig: OpenIdConfiguration): void {
+    console.log('startTokenValidationPeriodically')
+    const configsWithSilentRenewEnabled = this.getConfigsWithSilentRenewEnabled(allConfigs);
 
     if (configsWithSilentRenewEnabled.length <= 0) {
       return;
@@ -80,20 +71,12 @@ export class PeriodicallyTokenCheckService {
       .subscribe({
         next: (objectWithConfigIds) => {
           for (const [configId, _] of Object.entries(objectWithConfigIds)) {
-            this.configurationService
-              .getOpenIDConfiguration(configId)
-              .subscribe((config) => {
-                this.loggerService.logDebug(
-                  config,
-                  'silent renew, periodic check finished!'
-                );
+            let config = this.configurationService.getOpenIDConfiguration(configId);
 
-                if (
-                  this.flowHelper.isCurrentFlowCodeFlowWithRefreshTokens(config)
-                ) {
-                  this.flowsDataService.resetSilentRenewRunning(config);
-                }
-              });
+            this.loggerService.logDebug(config, 'silent renew, periodic check finished!');
+            if (this.flowHelper.isCurrentFlowCodeFlowWithRefreshTokens(config)) {
+              this.flowsDataService.resetSilentRenewRunning(config);
+            }
           }
         },
         error: (error) => {
@@ -155,9 +138,9 @@ export class PeriodicallyTokenCheckService {
     allConfigs: OpenIdConfiguration[]
   ): Observable<boolean | CallbackContext | null> {
     this.loggerService.logDebug(configuration, 'starting silent renew...');
-
-    return this.configurationService
-      .getOpenIDConfiguration(configuration.configId)
+    let config = this.configurationService
+      .getOpenIDConfiguration(configuration.configId);
+    return of(config)
       .pipe(
         switchMap((config) => {
           if (!config?.silentRenew) {

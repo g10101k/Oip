@@ -54,8 +54,7 @@ export class CheckAuthService {
 
     this.publicEventsService.fireEvent(EventTypes.CheckingAuth);
 
-    const stateParamFromUrl =
-      this.currentUrlService.getStateParamFromCurrentUrl(url);
+    const stateParamFromUrl = this.currentUrlService.getStateParamFromCurrentUrl(url);
     const config = this.getConfig(configuration, url);
 
     if (!config) {
@@ -137,26 +136,17 @@ export class CheckAuthService {
     );
   }
 
-  private getConfig(
-    configuration: OpenIdConfiguration,
-    url: string | undefined
-  ): OpenIdConfiguration | null {
-    const stateParamFromUrl =
-      this.currentUrlService.getStateParamFromCurrentUrl(url);
+  private getConfig(configuration: OpenIdConfiguration, url: string | undefined): OpenIdConfiguration | null {
+    const stateParamFromUrl = this.currentUrlService.getStateParamFromCurrentUrl(url);
 
     return Boolean(stateParamFromUrl)
       ? this.getConfigurationWithUrlState([configuration], stateParamFromUrl)
       : configuration;
   }
 
-  private checkAuthWithConfig(
-    config: OpenIdConfiguration,
-    allConfigs: OpenIdConfiguration[],
-    url?: string
-  ): Observable<LoginResponse> {
+  private checkAuthWithConfig(config: OpenIdConfiguration, allConfigs: OpenIdConfiguration[], url?: string): Observable<LoginResponse> {
     if (!config) {
-      const errorMessage =
-        'Please provide at least one configuration before setting up the module';
+      const errorMessage = 'Please provide at least one configuration before setting up the module';
 
       this.loggerService.logError(config, errorMessage);
 
@@ -193,10 +183,7 @@ export class CheckAuthService {
 
     const { configId, authority } = config;
 
-    this.loggerService.logDebug(
-      config,
-      `Working with config '${configId}' using '${authority}'`
-    );
+    this.loggerService.logDebug(config, `Working with config '${configId}' using '${authority}'`);
 
     if (this.popupService.isCurrentlyInPopup(config)) {
       this.popupService.sendMessageToMainWindow(currentUrl, config);
@@ -215,17 +202,10 @@ export class CheckAuthService {
 
     const isCallback = this.callbackService.isCallback(currentUrl, config);
 
-    this.loggerService.logDebug(
-      config,
-      `currentUrl to check auth with: '${currentUrl}'`
-    );
+    this.loggerService.logDebug(config, `currentUrl to check auth with: '${currentUrl}'`);
 
     const callback$ = isCallback
-      ? this.callbackService.handleCallbackAndFireEvents(
-          currentUrl,
-          config,
-          allConfigs
-        )
+      ? this.callbackService.handleCallbackAndFireEvents(currentUrl, config, allConfigs)
       : of({});
 
     return callback$.pipe(
@@ -284,28 +264,19 @@ export class CheckAuthService {
     );
   }
 
-  private startCheckSessionAndValidation(
-    config: OpenIdConfiguration,
-    allConfigs: OpenIdConfiguration[]
-  ): void {
+  private startCheckSessionAndValidation(config: OpenIdConfiguration, allConfigs: OpenIdConfiguration[]): void {
     if (this.checkSessionService.isCheckSessionConfigured(config)) {
       this.checkSessionService.start(config);
     }
 
-    this.periodicallyTokenCheckService.startTokenValidationPeriodically(
-      allConfigs,
-      config
-    );
+    this.periodicallyTokenCheckService.startTokenValidationPeriodically(allConfigs, config);
 
     if (this.silentRenewService.isSilentRenewConfigured(config)) {
       this.silentRenewService.getOrCreateIframe(config);
     }
   }
 
-  private getConfigurationWithUrlState(
-    configurations: OpenIdConfiguration[],
-    stateFromUrl: string | null
-  ): OpenIdConfiguration | null {
+  private getConfigurationWithUrlState(configurations: OpenIdConfiguration[], stateFromUrl: string | null): OpenIdConfiguration | null {
     if (!stateFromUrl) {
       return null;
     }

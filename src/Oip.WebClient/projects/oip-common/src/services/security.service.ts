@@ -43,19 +43,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    */
   constructor() {
     super();
-    this.publicEventsService.registerForEvents()
-      .subscribe((event) => {
-        switch (event.type) {
-          case EventTypes.CheckingAuthFinished:
-            this.setLoginAndComplete()
-            break;
-          case EventTypes.NewAuthenticationResult:
-            this.getAuthenticationResult().subscribe((s) => {
-              this.accessToken = s.access_token;
-            })
-            break;
-        }
-      });
+
   }
 
   /**
@@ -72,27 +60,24 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    * and decoded token payload if authenticated.
    */
   auth() {
-    super.getRefreshToken().subscribe(token => {
-      if (token) {
-        super.forceRefreshSession().subscribe(x => {
-          super.checkAuth().subscribe((_response: LoginResponse) => {
-            this.processLoginResponse(_response);
-            this.getPayloadFromAccessToken().subscribe(payload => {
-                this.payload.next(payload);
-              }
-            );
-          });
-        })
-      } else {
+   /*if (this.getRefreshToken()) {
+      super.forceRefreshSession().subscribe(x => {
         super.checkAuth().subscribe((_response: LoginResponse) => {
           this.processLoginResponse(_response);
-          this.getPayloadFromAccessToken().subscribe(payload => {
-              this.payload.next(payload);
-            }
-          );
+          this.payload.next(this.getPayloadFromAccessToken());
         });
-      }
-    })
+      })
+    } else {
+      super.checkAuth().subscribe((_response: LoginResponse) => {
+        this.processLoginResponse(_response);
+        this.payload.next(this.getPayloadFromAccessToken());
+      });
+    }
+*/
+    super.checkAuth().subscribe((_response: LoginResponse) => {
+      this.processLoginResponse(_response);
+      this.payload.next(this.getPayloadFromAccessToken());
+    });
   }
 
   setLoginAndComplete() {
@@ -129,10 +114,9 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    *
    * @returns {Observable<boolean>} Observable that emits true if the token is expired.
    */
-  isTokenExpired(): Observable<boolean> {
-    return this.getPayloadFromAccessToken().pipe(
-      map((payload) => {
-        return payload.exp < Math.floor(Date.now() / 1000);
-      }));
+  isTokenExpired(): boolean {
+
+    let pay = this.getPayloadFromAccessToken();
+    return pay.exp < Math.floor(Date.now() / 1000);
   }
 }

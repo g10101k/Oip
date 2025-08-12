@@ -51,17 +51,10 @@ export class CallbackService {
         );
 
         callback$ =
-          this.implicitFlowCallbackService.authenticatedImplicitFlowCallback(
-            config,
-            allConfigs,
-            hash
-          );
+          this.implicitFlowCallbackService.authenticatedImplicitFlowCallback(config, allConfigs, hash);
       } else {
         callback$ =
-          this.implicitFlowCallbackService.authenticatedImplicitFlowCallback(
-            config,
-            allConfigs
-          );
+          this.implicitFlowCallbackService.authenticatedImplicitFlowCallback(config, allConfigs);
       }
     }
 
