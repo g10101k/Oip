@@ -30,10 +30,7 @@ export class CodeFlowCallbackHandlerService {
   ): Observable<CallbackContext> {
     const code = this.urlService.getUrlParameter(urlToCheck, 'code');
     const state = this.urlService.getUrlParameter(urlToCheck, 'state');
-    const sessionState = this.urlService.getUrlParameter(
-      urlToCheck,
-      'session_state'
-    );
+    const sessionState = this.urlService.getUrlParameter(urlToCheck, 'session_state');
 
     if (!state) {
       this.loggerService.logDebug(config, 'no state in url');
@@ -111,6 +108,7 @@ export class CodeFlowCallbackHandlerService {
         switchMap((response) => {
           if (response) {
             const authResult: AuthResult = {
+              // @ts-ignore
               ...response,
               state: callbackContext.state,
               session_state: callbackContext.sessionState,
