@@ -20,12 +20,15 @@ export class AppComponent implements OnInit {
   private readonly primeNg = inject(PrimeNG);
   private readonly layoutService = inject(LayoutService);
 
+  constructor() {
+    this.securityService.auth();
+  }
+
   ngOnInit() {
     this.translateService.addLangs(['en', 'ru']);
     const lang = /en|ru/.exec(this.layoutService.language()) ? this.layoutService.language() : 'en';
     this.translateService.setDefaultLang(lang);
     this.translate(lang);
-    this.securityService.auth();
   }
 
   translate(lang: string) {

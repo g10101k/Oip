@@ -9,8 +9,7 @@ import {
   AuthGuardService,
   BaseDataService,
   SecurityDataService,
-  SecurityStorageService,
-  UserService,
+  MyUserService,
   langIntercept,
   httpLoaderAuthFactory, ConfigService
 } from "oip-common";
@@ -19,7 +18,7 @@ import { ProductService } from "./app/service/product.service";
 import { MessageService } from "primeng/api";
 import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
-import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from "angular-auth-oidc-client";
+import { authInterceptor, provideAuth, StsConfigLoader } from "../../oip-common/src/oids";
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
@@ -34,7 +33,6 @@ export const appConfig: ApplicationConfig = {
         deps: [ConfigService],
       },
     }),
-    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     provideHttpClient(withInterceptors([authInterceptor(), langIntercept]), withFetch()),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     ProductService,
@@ -42,7 +40,7 @@ export const appConfig: ApplicationConfig = {
     MessageService,
     SecurityDataService,
     BaseDataService,
-    UserService,
+    MyUserService,
     importProvidersFrom([TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
