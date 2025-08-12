@@ -10,7 +10,7 @@ import { SecurityService } from "../services/security.service";
 import { TopBarService } from "../services/top-bar.service";
 import { Tab, TabList, Tabs } from "primeng/tabs";
 import { AvatarModule } from "primeng/avatar";
-import { UserService } from "../services/user.service";
+import { MyUserService } from "../services/my-user.service";
 
 @Component({
   selector: 'app-topbar',
@@ -92,7 +92,7 @@ export class AppTopbar {
   items!: MenuItem[];
   securityService = inject(SecurityService);
   topBarService = inject(TopBarService);
-  userService = inject(UserService);
+  userService = inject(MyUserService);
 
   constructor(public layoutService: LayoutService) {
   }

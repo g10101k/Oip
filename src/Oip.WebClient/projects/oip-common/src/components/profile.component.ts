@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FileUploadModule } from "primeng/fileupload";
 import { ImageModule } from "primeng/image";
 import { AvatarModule } from "primeng/avatar";
-import { MsgService, UserService } from "oip-common";
+import { MsgService, MyUserService } from "oip-common";
 import { TranslatePipe, TranslateService } from "@ngx-translate/core";
 
 @Component({
@@ -38,7 +38,7 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
   `,
 })
 export class ProfileComponent {
-  readonly userService = inject(UserService);
+  readonly userService = inject(MyUserService);
   readonly msgService = inject(MsgService);
   readonly translateService = inject(TranslateService);
 

@@ -6,7 +6,7 @@ import { FormsModule } from "@angular/forms";
 import { Select, SelectChangeEvent } from "primeng/select";
 import { TableModule } from "primeng/table";
 import { LayoutService } from "../services/app.layout.service";
-import { UserService } from "../services/user.service";
+import { MyUserService } from "../services/my-user.service";
 import { InputSwitch } from "primeng/inputswitch";
 import { NgIf } from "@angular/common";
 import { RouterLink } from "@angular/router";
@@ -76,7 +76,7 @@ interface L10n {
 export class ConfigComponent implements OnInit {
   private readonly layoutService = inject(LayoutService);
   private readonly l10nService = inject(L10nService);
-  protected readonly userService = inject(UserService);
+  protected readonly userService = inject(MyUserService);
   protected readonly securityService = inject(SecurityService);
   protected readonly menuService = inject(MenuService);
   protected l10n = {} as L10n;
