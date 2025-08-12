@@ -1,5 +1,5 @@
 import { of } from "rxjs";
-import { StsConfigHttpLoader } from "angular-auth-oidc-client";
+import { StsConfigHttpLoader } from "../oids"
 import { ConfigService } from "../services/config.service";
 
 /**
@@ -9,5 +9,5 @@ import { ConfigService } from "../services/config.service";
  */
 export const httpLoaderAuthFactory = (config: ConfigService) => {
   let q = config.getConfig();
-  return new StsConfigHttpLoader(of(q));
+  return new StsConfigHttpLoader(q);
 }
