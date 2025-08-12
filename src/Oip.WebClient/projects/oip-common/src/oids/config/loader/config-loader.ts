@@ -8,46 +8,29 @@ export class OpenIdConfigLoader {
 }
 
 export abstract class StsConfigLoader {
-  abstract loadConfigs(): Observable<OpenIdConfiguration[]>;
+  abstract loadConfigs(): OpenIdConfiguration[];
 }
 
 export class StsConfigStaticLoader implements StsConfigLoader {
-  constructor(
-    private readonly passedConfigs: OpenIdConfiguration | OpenIdConfiguration[]
-  ) {}
+  constructor(private readonly passedConfigs: OpenIdConfiguration | OpenIdConfiguration[]) {
+  }
 
-  loadConfigs(): Observable<OpenIdConfiguration[]> {
+  loadConfigs(): OpenIdConfiguration[] {
     if (Array.isArray(this.passedConfigs)) {
-      return of(this.passedConfigs);
+      return (this.passedConfigs);
     }
-
-    return of([this.passedConfigs]);
+    return ([this.passedConfigs]);
   }
 }
 
 export class StsConfigHttpLoader implements StsConfigLoader {
-  constructor(
-    private readonly configs$:
-      | Observable<OpenIdConfiguration>
-      | Observable<OpenIdConfiguration>[]
-      | Observable<OpenIdConfiguration[]>
-  ) {}
+  constructor(private readonly configs$: | OpenIdConfiguration | OpenIdConfiguration[]) {
+  }
 
-  loadConfigs(): Observable<OpenIdConfiguration[]> {
+  loadConfigs(): OpenIdConfiguration[] {
     if (Array.isArray(this.configs$)) {
-      return forkJoin(this.configs$);
+      return this.configs$ as OpenIdConfiguration[];
     }
-
-    const singleConfigOrArray = this.configs$ as Observable<unknown>;
-
-    return singleConfigOrArray.pipe(
-      map((value: unknown) => {
-        if (Array.isArray(value)) {
-          return value as OpenIdConfiguration[];
-        }
-
-        return [value] as OpenIdConfiguration[];
-      })
-    );
+    return [this.configs$] as OpenIdConfiguration[];
   }
 }
