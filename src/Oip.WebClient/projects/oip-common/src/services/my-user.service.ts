@@ -7,8 +7,8 @@ import { map } from "rxjs";
  * UserService is responsible for retrieving and handling user-related data,
  * including the user's photo and short label for avatar display.
  */
-@Injectable()
-export class UserService {
+@Injectable({ providedIn: 'root' })
+export class MyUserService {
   private readonly securityService = inject(SecurityService);
   private readonly baseDataService = inject(BaseDataService);
   private _shortLabel: string = '';

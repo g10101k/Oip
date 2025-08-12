@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { OpenIdConfiguration } from 'angular-auth-oidc-client';
+import { OpenIdConfiguration } from "../oids";
 
 
 /**
@@ -9,7 +9,7 @@ import { OpenIdConfiguration } from 'angular-auth-oidc-client';
  */
 @Injectable({ providedIn: 'root' })
 export class ConfigService {
-  public readonly config: OpenIdConfiguration;
+  public config: OpenIdConfiguration;
 
   constructor() {
     const KEYCLOAK_SETTINGS_KEY = 'keycloak-client-settings';
@@ -32,6 +32,7 @@ export class ConfigService {
             logLevel: config.logLevel,
             secureRoutes: config.secureRoutes,
           };
+          this.config = authConfig;
           localStorage.setItem(KEYCLOAK_SETTINGS_KEY, JSON.stringify(authConfig));
         });
     }

@@ -1,13 +1,13 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
+import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { filter, map } from "rxjs/operators";
 import {
   LoginResponse,
   LogoutAuthOptions,
   OidcSecurityService,
   PublicEventsService,
   EventTypes
-} from "angular-auth-oidc-client";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { filter, map } from "rxjs/operators";
+} from "../oids";
 
 /**
  * SecurityService extends OidcSecurityService to manage authentication,
