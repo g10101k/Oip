@@ -69,10 +69,9 @@ export class HttpClient<SecurityDataType = unknown> {
   private readonly securityService = inject(SecurityService);
   public baseUrl: string = "";
   private securityData: SecurityDataType | null = null;
-  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] = (
-    securityData,
-  ) => ({
+  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] = (securityData,) => ({
     headers: {
+      Authorization: `Bearer ${this.securityService.getAccessToken()}`,
     },
   });
   private abortControllers = new Map<CancelToken, AbortController>();
