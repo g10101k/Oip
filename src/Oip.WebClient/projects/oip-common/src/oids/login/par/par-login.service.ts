@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { from, Observable, of, throwError } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { AuthOptions } from '../../auth-options';
 import { CheckAuthService } from '../../auth-state/check-auth.service';
@@ -48,8 +48,8 @@ export class ParLoginService {
       'BEGIN Authorize OIDC Flow, no auth data'
     );
 
-    this.authWellKnownService
-      .queryAndStoreAuthWellKnownEndPoints(configuration)
+    from(this.authWellKnownService
+      .queryAndStoreAuthWellKnownEndPoints(configuration))
       .pipe(
         switchMap(() =>
           this.parService.postParRequest(configuration, authOptions)
@@ -107,8 +107,8 @@ export class ParLoginService {
       'BEGIN Authorize OIDC Flow with popup, no auth data'
     );
 
-    return this.authWellKnownService
-      .queryAndStoreAuthWellKnownEndPoints(configuration)
+    return from(this.authWellKnownService
+      .queryAndStoreAuthWellKnownEndPoints(configuration))
       .pipe(
         switchMap(() =>
           this.parService.postParRequest(configuration, authOptions)

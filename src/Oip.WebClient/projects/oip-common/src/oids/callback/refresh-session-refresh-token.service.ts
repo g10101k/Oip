@@ -15,27 +15,25 @@ export class RefreshSessionRefreshTokenService {
   private readonly flowsService = inject(FlowsService);
   private readonly intervalService = inject(IntervalService);
 
-  refreshSessionWithRefreshTokens(
+  async refreshSessionWithRefreshTokens(
     config: OpenIdConfiguration,
     allConfigs: OpenIdConfiguration[],
     customParamsRefresh?: { [key: string]: string | number | boolean }
-  ): Observable<CallbackContext> {
+  ): Promise<CallbackContext> {
     this.loggerService.logDebug(config, 'BEGIN refresh session Authorize');
     let refreshTokenFailed = false;
 
-    return this.flowsService
-      .processRefreshToken(config, allConfigs, customParamsRefresh)
-      .pipe(
-        catchError((error) => {
-          this.resetAuthDataService.resetAuthorizationData(config, allConfigs);
-          refreshTokenFailed = true;
-
-          return throwError(() => new Error(error));
-        }),
-        finalize(
-          () =>
-            refreshTokenFailed && this.intervalService.stopPeriodicTokenCheck()
-        )
-      );
+    try {
+      return this.flowsService
+        .processRefreshToken(config, allConfigs, customParamsRefresh);
+    }
+    catch (error) {
+      this.resetAuthDataService.resetAuthorizationData(config, allConfigs);
+      refreshTokenFailed = true;
+      throw new Error(error)
+    }
+    finally {
+      refreshTokenFailed && this.intervalService.stopPeriodicTokenCheck()
+    }
   }
 }

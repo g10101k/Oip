@@ -24,10 +24,13 @@ export class CodeFlowCallbackHandlerService {
   private readonly dataService = inject(DataService);
 
   // STEP 1 Code Flow
-  codeFlowCallback(
-    urlToCheck: string,
-    config: OpenIdConfiguration
-  ): Observable<CallbackContext> {
+  codeFlowCallback(urlToCheck: string, config: OpenIdConfiguration): Observable<CallbackContext> {
+    const error = this.urlService.getUrlParameter(urlToCheck, 'error');
+    if (error) {
+      const desc = this.urlService.getUrlParameter(urlToCheck, 'error_description');
+      return throwError(()=> new Error(desc));
+    }
+
     const code = this.urlService.getUrlParameter(urlToCheck, 'code');
     const state = this.urlService.getUrlParameter(urlToCheck, 'state');
     const sessionState = this.urlService.getUrlParameter(urlToCheck, 'session_state');
@@ -44,11 +47,7 @@ export class CodeFlowCallbackHandlerService {
       return throwError(() => new Error('no code in url'));
     }
 
-    this.loggerService.logDebug(
-      config,
-      'running validation for callback',
-      urlToCheck
-    );
+    this.loggerService.logDebug(config, 'running validation for callback', urlToCheck);
 
     const initialCallbackContext: CallbackContext = {
       code,

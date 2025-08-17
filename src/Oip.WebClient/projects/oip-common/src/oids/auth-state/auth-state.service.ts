@@ -203,14 +203,9 @@ export class AuthStateService {
     return idTokenExpired;
   }
 
-  hasAccessTokenExpiredIfExpiryExists(
-    configuration: OpenIdConfiguration
-  ): boolean {
+  hasAccessTokenExpiredIfExpiryExists(configuration: OpenIdConfiguration): boolean {
     const { renewTimeBeforeTokenExpiresInSeconds } = configuration;
-    const accessTokenExpiresIn = this.storagePersistenceService.read(
-      'access_token_expires_at',
-      configuration
-    );
+    const accessTokenExpiresIn = this.storagePersistenceService.read('access_token_expires_at', configuration);
     const accessTokenHasNotExpired =
       this.tokenValidationService.validateAccessTokenNotExpired(
         accessTokenExpiresIn,
@@ -220,10 +215,7 @@ export class AuthStateService {
     const hasExpired = !accessTokenHasNotExpired;
 
     if (hasExpired) {
-      this.publicEventsService.fireEvent<boolean>(
-        EventTypes.TokenExpired,
-        hasExpired
-      );
+      this.publicEventsService.fireEvent<boolean>(EventTypes.TokenExpired, hasExpired);
     }
 
     return hasExpired;
@@ -257,26 +249,17 @@ export class AuthStateService {
     }
   }
 
-  private persistAccessTokenExpirationTime(
-    authResult: AuthResult | null,
-    configuration: OpenIdConfiguration
-  ): void {
+  private persistAccessTokenExpirationTime(authResult: AuthResult | null, configuration: OpenIdConfiguration): void {
     if (authResult?.expires_in) {
       const accessTokenExpiryTime =
         new Date(new Date().toUTCString()).valueOf() +
         authResult.expires_in * 1000;
 
-      this.storagePersistenceService.write(
-        'access_token_expires_at',
-        accessTokenExpiryTime,
-        configuration
-      );
+      this.storagePersistenceService.write('access_token_expires_at', accessTokenExpiryTime, configuration);
     }
   }
 
-  private composeAuthenticatedResult(
-    allConfigs: OpenIdConfiguration[]
-  ): AuthenticatedResult {
+  private composeAuthenticatedResult(allConfigs: OpenIdConfiguration[]): AuthenticatedResult {
     if (allConfigs.length === 1) {
       const { configId } = allConfigs[0];
 
@@ -291,9 +274,7 @@ export class AuthStateService {
     return this.checkAllConfigsIfTheyAreAuthenticated(allConfigs);
   }
 
-  private composeUnAuthenticatedResult(
-    allConfigs: OpenIdConfiguration[]
-  ): AuthenticatedResult {
+  private composeUnAuthenticatedResult(allConfigs: OpenIdConfiguration[]): AuthenticatedResult {
     if (allConfigs.length === 1) {
       const { configId } = allConfigs[0];
 

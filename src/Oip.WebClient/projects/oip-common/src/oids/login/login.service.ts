@@ -20,10 +20,10 @@ export class LoginService {
   );
   private readonly popupService = inject(PopUpService);
 
-  login(
+  async login(
     configuration: OpenIdConfiguration | null,
     authOptions?: AuthOptions
-  ): void {
+  ): Promise<void> {
     if (!configuration) {
       throw new Error(
         'Please provide a configuration before setting up the module'
@@ -43,7 +43,7 @@ export class LoginService {
     if (usePushedAuthorisationRequests) {
       return this.parLoginService.loginPar(configuration, authOptions);
     } else {
-      return this.standardLoginService.loginStandard(
+      return await this.standardLoginService.loginStandard(
         configuration,
         authOptions
       );

@@ -213,9 +213,7 @@ export class CheckAuthService {
         const isAuthenticated =
           this.authStateService.areAuthStorageTokensValid(config);
 
-        this.loggerService.logDebug(
-          config,
-          `checkAuth completed. Firing events now. isAuthenticated: ${isAuthenticated}`
+        this.loggerService.logDebug(config, `checkAuth completed. Firing events now. isAuthenticated: ${isAuthenticated}`
         );
 
         if (isAuthenticated) {

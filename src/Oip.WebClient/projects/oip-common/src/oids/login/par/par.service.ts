@@ -50,35 +50,33 @@ export class ParService {
       );
     }
 
-    return this.urlService
-      .createBodyForParCodeFlowRequest(configuration, authOptions)
+    let data = this.urlService
+      .createBodyForParCodeFlowRequest(configuration, authOptions);
+
+    return this.dataService
+      .post(parEndpoint, data, configuration, headers)
       .pipe(
-        switchMap((data) => {
-          return this.dataService
-            .post(parEndpoint, data, configuration, headers)
-            .pipe(
-              retry(2),
-              map((response: any) => {
-                this.loggerService.logDebug(
-                  configuration,
-                  'par response: ',
-                  response
-                );
+        retry(2),
+        map((response: any) => {
+          this.loggerService.logDebug(
+            configuration,
+            'par response: ',
+            response
+          );
 
-                return {
-                  expiresIn: response.expires_in,
-                  requestUri: response.request_uri,
-                };
-              }),
-              catchError((error) => {
-                const errorMessage = `There was an error on ParService postParRequest`;
+          return {
+            expiresIn: response.expires_in,
+            requestUri: response.request_uri,
+          };
+        }),
+        catchError((error) => {
+          const errorMessage = `There was an error on ParService postParRequest`;
 
-                this.loggerService.logError(configuration, errorMessage, error);
+          this.loggerService.logError(configuration, errorMessage, error);
 
-                return throwError(() => new Error(errorMessage));
-              })
-            );
+          return throwError(() => new Error(errorMessage));
         })
       );
+
   }
 }

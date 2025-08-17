@@ -27,30 +27,20 @@ export class AuthWellKnownService {
     );
   }
 
-  queryAndStoreAuthWellKnownEndPoints(
-    config: OpenIdConfiguration | null
-  ): Observable<AuthWellKnownEndpoints> {
+  async queryAndStoreAuthWellKnownEndPoints(config: OpenIdConfiguration | null): Promise<AuthWellKnownEndpoints> {
     if (!config) {
-      return throwError(
-        () =>
-          new Error(
-            'Please provide a configuration before setting up the module'
-          )
-      );
+      throw new Error('Please provide a configuration before setting up the module');
     }
 
-    return this.dataService.getWellKnownEndPointsForConfig(config).pipe(
-      tap((mappedWellKnownEndpoints) =>
-        this.storeWellKnownEndpoints(config, mappedWellKnownEndpoints)
-      ),
-      catchError((error) => {
-        this.publicEventsService.fireEvent(
-          EventTypes.ConfigLoadingFailed,
-          null
-        );
-
-        return throwError(() => new Error(error));
+    try {
+      let mappedWellKnownEndpoints = this.dataService.getWellKnownEndPointsForConfig(config);
+      mappedWellKnownEndpoints.then(endpoints => {
+        this.storeWellKnownEndpoints(config, endpoints)
       })
-    );
+      return mappedWellKnownEndpoints;
+    } catch (error) {
+      this.publicEventsService.fireEvent(EventTypes.ConfigLoadingFailed, null);
+      throw new Error(error);
+    }
   }
 }

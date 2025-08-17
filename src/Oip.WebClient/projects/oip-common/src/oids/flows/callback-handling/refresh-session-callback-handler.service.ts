@@ -14,16 +14,10 @@ export class RefreshSessionCallbackHandlerService {
   private readonly flowsDataService = inject(FlowsDataService);
 
   // STEP 1 Refresh session
-  refreshSessionWithRefreshTokens(
-    config: OpenIdConfiguration
-  ): Observable<CallbackContext> {
-    const stateData =
-      this.flowsDataService.getExistingOrCreateAuthStateControl(config);
+  refreshSessionWithRefreshTokens(config: OpenIdConfiguration): CallbackContext {
+    const stateData = this.flowsDataService.getExistingOrCreateAuthStateControl(config);
 
-    this.loggerService.logDebug(
-      config,
-      'RefreshSession created. Adding myautostate: ' + stateData
-    );
+    this.loggerService.logDebug(config, 'RefreshSession created. Adding myautostate: ' + stateData);
     const refreshToken = this.authStateService.getRefreshToken(config);
     const idToken = this.authStateService.getIdToken(config);
 
@@ -45,18 +39,13 @@ export class RefreshSessionCallbackHandlerService {
         'found refresh code, obtaining new credentials with refresh code'
       );
       // Nonce is not used with refresh tokens; but Key cloak may send it anyway
-      this.flowsDataService.setNonce(
-        TokenValidationService.refreshTokenNoncePlaceholder,
-        config
-      );
+      this.flowsDataService.setNonce(TokenValidationService.refreshTokenNoncePlaceholder, config);
 
-      return of(callbackContext);
+      return callbackContext;
     } else {
       const errorMessage = 'no refresh token found, please login';
-
       this.loggerService.logError(config, errorMessage);
-
-      return throwError(() => new Error(errorMessage));
+      throw new Error(errorMessage);
     }
   }
 }

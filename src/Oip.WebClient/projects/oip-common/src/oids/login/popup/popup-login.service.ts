@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { from, Observable, of, throwError } from 'rxjs';
 import { switchMap, take, tap } from 'rxjs/operators';
 import { AuthOptions } from '../../auth-options';
 import { CheckAuthService } from '../../auth-state/check-auth.service';
@@ -49,8 +49,8 @@ export class PopUpLoginService {
       'BEGIN Authorize OIDC Flow with popup, no auth data'
     );
 
-    return this.authWellKnownService
-      .queryAndStoreAuthWellKnownEndPoints(configuration)
+    return from(this.authWellKnownService
+      .queryAndStoreAuthWellKnownEndPoints(configuration))
       .pipe(
         switchMap(() =>
           this.urlService.getAuthorizeUrl(configuration, authOptions)

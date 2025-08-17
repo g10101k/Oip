@@ -7,6 +7,7 @@ import { LoggerService } from '../../logging/logger.service';
 import { RedirectService } from '../../utils/redirect/redirect.service';
 import { UrlService } from '../../utils/url/url.service';
 import { ResponseTypeValidationService } from '../response-type-validation/response-type-validation.service';
+import { from } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class StandardLoginService {
@@ -19,52 +20,34 @@ export class StandardLoginService {
   private readonly authWellKnownService = inject(AuthWellKnownService);
   private readonly flowsDataService = inject(FlowsDataService);
 
-  loginStandard(
-    configuration: OpenIdConfiguration,
-    authOptions?: AuthOptions
-  ): void {
-    if (
-      !this.responseTypeValidationService.hasConfigValidResponseType(
-        configuration
-      )
-    ) {
-      this.loggerService.logError(configuration, 'Invalid response type!');
+  async loginStandard(configuration: OpenIdConfiguration, authOptions?: AuthOptions): Promise<void> {
+    const invalidResponseType = !this.responseTypeValidationService.hasConfigValidResponseType(configuration);
 
+    if (invalidResponseType) {
+      this.loggerService.logError(configuration, 'Invalid response type!');
       return;
     }
 
-    this.loggerService.logDebug(
-      configuration,
-      'BEGIN Authorize OIDC Flow, no auth data'
-    );
+    this.loggerService.logDebug(configuration, 'BEGIN Authorize OIDC Flow, no auth data');
     this.flowsDataService.setCodeFlowInProgress(configuration);
 
-    this.authWellKnownService
-      .queryAndStoreAuthWellKnownEndPoints(configuration)
-      .subscribe(() => {
-        const { urlHandler } = authOptions || {};
+    const end = await this.authWellKnownService
+      .queryAndStoreAuthWellKnownEndPoints(configuration);
 
-        this.flowsDataService.resetSilentRenewRunning(configuration);
+    const { urlHandler } = authOptions || {};
+    this.flowsDataService.resetSilentRenewRunning(configuration);
+    let url = await this.urlService.getAuthorizeUrl(configuration, authOptions);
 
-        this.urlService
-          .getAuthorizeUrl(configuration, authOptions)
-          .subscribe((url) => {
-            if (!url) {
-              this.loggerService.logError(
-                configuration,
-                'Could not create URL',
-                url
-              );
+    if (!url) {
+      this.loggerService.logError(configuration, 'Could not create URL', url);
+      return;
+    }
 
-              return;
-            }
+    if (urlHandler) {
+      urlHandler(url);
+    } else {
+      this.redirectService.redirectTo(url);
+    }
 
-            if (urlHandler) {
-              urlHandler(url);
-            } else {
-              this.redirectService.redirectTo(url);
-            }
-          });
-      });
   }
 }

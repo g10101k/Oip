@@ -310,13 +310,13 @@ export class StateValidationService {
               return of(toReturn);
             }
 
-            return this.validateDefault(
+            return of(this.validateDefault(
               isCurrentFlowImplicitFlowWithAccessToken,
               isCurrentFlowCodeFlow,
               toReturn,
               configuration,
               callbackContext
-            );
+            ));
           })
         );
     } else {
@@ -326,13 +326,13 @@ export class StateValidationService {
       );
     }
 
-    return this.validateDefault(
+    return of(this.validateDefault(
       isCurrentFlowImplicitFlowWithAccessToken,
       isCurrentFlowCodeFlow,
       toReturn,
       configuration,
       callbackContext
-    );
+    ));
   }
 
   private validateDefault(
@@ -341,7 +341,7 @@ export class StateValidationService {
     toReturn: StateValidationResult,
     configuration: OpenIdConfiguration,
     callbackContext: CallbackContext
-  ): Observable<StateValidationResult> {
+  ): StateValidationResult {
     // flow id_token
     if (!isCurrentFlowImplicitFlowWithAccessToken && !isCurrentFlowCodeFlow) {
       toReturn.authResponseIsValid = true;
@@ -349,7 +349,7 @@ export class StateValidationService {
       this.handleSuccessfulValidation(configuration);
       this.handleUnsuccessfulValidation(configuration);
 
-      return of(toReturn);
+      return toReturn;
     }
 
     // only do check if id_token returned, no always the case when using refresh tokens
@@ -364,38 +364,33 @@ export class StateValidationService {
         isCurrentFlowCodeFlow &&
         !(toReturn.decodedIdToken.at_hash as string)
       ) {
-        this.loggerService.logDebug(
-          configuration,
-          'Code Flow active, and no at_hash in the id_token, skipping check!'
-        );
+        this.loggerService.logDebug(configuration, 'Code Flow active, and no at_hash in the id_token, skipping check!');
       } else {
-        return this.tokenValidationService
+        const valid = this.tokenValidationService
           .validateIdTokenAtHash(
             toReturn.accessToken,
             toReturn.decodedIdToken.at_hash,
             idTokenHeader.alg, // 'RS256'
             configuration
-          )
-          .pipe(
-            map((valid: boolean) => {
-              if (!valid || !toReturn.accessToken) {
-                this.loggerService.logWarning(
-                  configuration,
-                  'authCallback incorrect at_hash'
-                );
-                toReturn.state = ValidationResult.IncorrectAtHash;
-                this.handleUnsuccessfulValidation(configuration);
-
-                return toReturn;
-              } else {
-                toReturn.authResponseIsValid = true;
-                toReturn.state = ValidationResult.Ok;
-                this.handleSuccessfulValidation(configuration);
-
-                return toReturn;
-              }
-            })
           );
+
+        if (!valid || !toReturn.accessToken) {
+          this.loggerService.logWarning(
+            configuration,
+            'authCallback incorrect at_hash'
+          );
+          toReturn.state = ValidationResult.IncorrectAtHash;
+          this.handleUnsuccessfulValidation(configuration);
+
+          return toReturn;
+        } else {
+          toReturn.authResponseIsValid = true;
+          toReturn.state = ValidationResult.Ok;
+          this.handleSuccessfulValidation(configuration);
+
+          return toReturn;
+        }
+
       }
     }
 
@@ -403,7 +398,7 @@ export class StateValidationService {
     toReturn.state = ValidationResult.Ok;
     this.handleSuccessfulValidation(configuration);
 
-    return of(toReturn);
+    return toReturn;
   }
 
   private isIdTokenAfterRefreshTokenRequestValid(

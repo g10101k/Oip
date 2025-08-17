@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  forkJoin,
+  forkJoin, from, lastValueFrom,
   Observable,
   of,
   throwError,
@@ -79,13 +79,10 @@ export class RefreshSessionService {
     extraCustomParams?: { [key: string]: string | number | boolean }
   ): Observable<LoginResponse> {
     const { customParamsRefreshTokenRequest, configId } = config;
-    const mergedParams = {
-      ...customParamsRefreshTokenRequest,
-      ...extraCustomParams,
-    };
+    const mergedParams = { ...customParamsRefreshTokenRequest, ...extraCustomParams, };
 
     if (this.flowHelper.isCurrentFlowCodeFlowWithRefreshTokens(config)) {
-      return this.startRefreshSession(config, allConfigs, mergedParams).pipe(
+      return from(this.startRefreshSession(config, allConfigs, mergedParams)).pipe(
         map(() => {
           const isAuthenticated =
             this.authStateService.areAuthStorageTokensValid(config);
@@ -198,45 +195,36 @@ export class RefreshSessionService {
     }
   }
 
-  private startRefreshSession(
+  private async startRefreshSession(
     config: OpenIdConfiguration,
     allConfigs: OpenIdConfiguration[],
     extraCustomParams?: { [key: string]: string | number | boolean }
-  ): Observable<boolean | CallbackContext | null> {
-    const isSilentRenewRunning =
-      this.flowsDataService.isSilentRenewRunning(config);
+  ): Promise<boolean | CallbackContext | null> {
+    const isSilentRenewRunning = this.flowsDataService.isSilentRenewRunning(config);
 
-    this.loggerService.logDebug(
-      config,
-      `Checking: silentRenewRunning: ${isSilentRenewRunning}`
-    );
+    this.loggerService.logDebug(config, `Checking: silentRenewRunning: ${isSilentRenewRunning}`);
     const shouldBeExecuted = !isSilentRenewRunning;
 
     if (!shouldBeExecuted) {
-      return of(null);
+      return null;
+    }
+    await this.authWellKnownService.queryAndStoreAuthWellKnownEndPoints(config);
+
+    this.flowsDataService.setSilentRenewRunning(config);
+
+    if (this.flowHelper.isCurrentFlowCodeFlowWithRefreshTokens(config)) {
+      // Refresh Session using Refresh tokens
+      return this.refreshSessionRefreshTokenService.refreshSessionWithRefreshTokens(
+        config,
+        allConfigs,
+        extraCustomParams
+      );
     }
 
-    return this.authWellKnownService
-      .queryAndStoreAuthWellKnownEndPoints(config)
-      .pipe(
-        switchMap(() => {
-          this.flowsDataService.setSilentRenewRunning(config);
-
-          if (this.flowHelper.isCurrentFlowCodeFlowWithRefreshTokens(config)) {
-            // Refresh Session using Refresh tokens
-            return this.refreshSessionRefreshTokenService.refreshSessionWithRefreshTokens(
-              config,
-              allConfigs,
-              extraCustomParams
-            );
-          }
-
-          return this.refreshSessionIframeService.refreshSessionWithIframe(
-            config,
-            allConfigs,
-            extraCustomParams
-          );
-        })
-      );
+    return await lastValueFrom(this.refreshSessionIframeService.refreshSessionWithIframe(
+      config,
+      allConfigs,
+      extraCustomParams
+    ));
   }
 }

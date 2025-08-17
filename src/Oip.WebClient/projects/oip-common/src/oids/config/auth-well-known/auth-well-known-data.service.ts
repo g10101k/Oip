@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { lastValueFrom, Observable, throwError } from 'rxjs';
 import { map, retry } from 'rxjs/operators';
 import { DataService } from '../../api/data.service';
 import { LoggerService } from '../../logging/logger.service';
@@ -13,47 +13,33 @@ export class AuthWellKnownDataService {
   private readonly loggerService = inject(LoggerService);
   private readonly http = inject(DataService);
 
-  getWellKnownEndPointsForConfig(
-    config: OpenIdConfiguration
-  ): Observable<AuthWellKnownEndpoints> {
+  public async getWellKnownEndPointsForConfig(config: OpenIdConfiguration): Promise<AuthWellKnownEndpoints> {
     const { authWellknownEndpointUrl, authWellknownEndpoints = {} } = config;
 
     if (!authWellknownEndpointUrl) {
       const errorMessage = 'no authWellknownEndpoint given!';
-
       this.loggerService.logError(config, errorMessage);
-
-      return throwError(() => new Error(errorMessage));
+      throw new Error(errorMessage);
     }
 
-    return this.getWellKnownDocument(authWellknownEndpointUrl, config).pipe(
-      map(
-        (wellKnownEndpoints) =>
-          ({
-            issuer: wellKnownEndpoints.issuer,
-            jwksUri: wellKnownEndpoints.jwks_uri,
-            authorizationEndpoint: wellKnownEndpoints.authorization_endpoint,
-            tokenEndpoint: wellKnownEndpoints.token_endpoint,
-            userInfoEndpoint: wellKnownEndpoints.userinfo_endpoint,
-            endSessionEndpoint: wellKnownEndpoints.end_session_endpoint,
-            checkSessionIframe: wellKnownEndpoints.check_session_iframe,
-            revocationEndpoint: wellKnownEndpoints.revocation_endpoint,
-            introspectionEndpoint: wellKnownEndpoints.introspection_endpoint,
-            parEndpoint:
-              wellKnownEndpoints.pushed_authorization_request_endpoint,
-          } as AuthWellKnownEndpoints)
-      ),
-      map((mappedWellKnownEndpoints) => ({
-        ...mappedWellKnownEndpoints,
-        ...authWellknownEndpoints,
-      }))
-    );
+    let wellKnownEndpoints = await this.getWellKnownDocument(authWellknownEndpointUrl, config)
+    let mappedWellKnownEndpoints = {
+      issuer: wellKnownEndpoints.issuer,
+      jwksUri: wellKnownEndpoints.jwks_uri,
+      authorizationEndpoint: wellKnownEndpoints.authorization_endpoint,
+      tokenEndpoint: wellKnownEndpoints.token_endpoint,
+      userInfoEndpoint: wellKnownEndpoints.userinfo_endpoint,
+      endSessionEndpoint: wellKnownEndpoints.end_session_endpoint,
+      checkSessionIframe: wellKnownEndpoints.check_session_iframe,
+      revocationEndpoint: wellKnownEndpoints.revocation_endpoint,
+      introspectionEndpoint: wellKnownEndpoints.introspection_endpoint,
+      parEndpoint: wellKnownEndpoints.pushed_authorization_request_endpoint,
+    } as AuthWellKnownEndpoints;
+
+    return { ...mappedWellKnownEndpoints, ...authWellknownEndpoints, }
   }
 
-  private getWellKnownDocument(
-    wellKnownEndpoint: string,
-    config: OpenIdConfiguration
-  ): Observable<any> {
+  private async getWellKnownDocument(wellKnownEndpoint: string, config: OpenIdConfiguration): Promise<any> {
     let url = wellKnownEndpoint;
     const wellKnownSuffix = config.authWellknownUrlSuffix || WELL_KNOWN_SUFFIX;
 
@@ -61,6 +47,6 @@ export class AuthWellKnownDataService {
       url = `${wellKnownEndpoint}${wellKnownSuffix}`;
     }
 
-    return this.http.get(url, config).pipe(retry(2));
+    return await this.http.getAsync(url, config);
   }
 }

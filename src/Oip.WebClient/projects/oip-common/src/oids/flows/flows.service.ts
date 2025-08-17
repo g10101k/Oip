@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 import { OpenIdConfiguration } from '../config/openid-configuration';
 import { CallbackContext } from './callback-context';
@@ -135,42 +135,38 @@ export class FlowsService {
       );
   }
 
-  processRefreshToken(
+  async processRefreshToken(
     config: OpenIdConfiguration,
     allConfigs: OpenIdConfiguration[],
     customParamsRefresh?: { [key: string]: string | number | boolean }
-  ): Observable<CallbackContext> {
-    return this.refreshSessionCallbackHandlerService
-      .refreshSessionWithRefreshTokens(config)
-      .pipe(
-        concatMap((callbackContext) =>
-          this.refreshTokenCallbackHandlerService.refreshTokensRequestTokens(
-            callbackContext,
-            config,
-            customParamsRefresh
-          )
-        ),
-        concatMap((callbackContext) =>
-          this.historyJwtKeysCallbackHandlerService.callbackHistoryAndResetJwtKeys(
-            callbackContext,
-            config,
-            allConfigs
-          )
-        ),
-        concatMap((callbackContext) =>
-          this.stateValidationCallbackHandlerService.callbackStateValidation(
-            callbackContext,
-            config,
-            allConfigs
-          )
-        ),
-        concatMap((callbackContext) =>
-          this.userHandlerService.callbackUser(
-            callbackContext,
-            config,
-            allConfigs
-          )
-        )
-      );
+  ): Promise<CallbackContext> {
+    let callbackContext = this.refreshSessionCallbackHandlerService
+      .refreshSessionWithRefreshTokens(config);
+
+    await lastValueFrom(this.refreshTokenCallbackHandlerService.refreshTokensRequestTokens(
+      callbackContext,
+      config,
+      customParamsRefresh
+    ));
+
+    await lastValueFrom(this.historyJwtKeysCallbackHandlerService.callbackHistoryAndResetJwtKeys(
+      callbackContext,
+      config,
+      allConfigs));
+
+    await lastValueFrom(this.stateValidationCallbackHandlerService.callbackStateValidation(
+      callbackContext,
+      config,
+      allConfigs
+    ));
+
+    await lastValueFrom(this.userHandlerService.callbackUser(
+      callbackContext,
+      config,
+      allConfigs
+    ));
+
+    return callbackContext;
+
   }
 }

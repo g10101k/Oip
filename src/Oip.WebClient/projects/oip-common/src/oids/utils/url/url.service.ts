@@ -19,9 +19,7 @@ export class UrlService {
   private readonly loggerService = inject(LoggerService);
   private readonly flowsDataService = inject(FlowsDataService);
   private readonly flowHelper = inject(FlowHelper);
-  private readonly storagePersistenceService = inject(
-    StoragePersistenceService
-  );
+  private readonly storagePersistenceService = inject(StoragePersistenceService);
   private readonly jwtWindowCryptoService = inject(JwtWindowCryptoService);
 
   getUrlParameter(urlToCheck: string, name: string): string {
@@ -55,10 +53,7 @@ export class UrlService {
     return u;
   }
 
-  queryParametersExist(
-    expected: URLSearchParams,
-    actual: URLSearchParams
-  ): boolean {
+  queryParametersExist(expected: URLSearchParams, actual: URLSearchParams): boolean {
     let r = true;
 
     expected.forEach((v, k) => {
@@ -115,15 +110,15 @@ export class UrlService {
     );
   }
 
-  getRefreshSessionSilentRenewUrl(
+  async getRefreshSessionSilentRenewUrl(
     config: OpenIdConfiguration,
     customParams?: { [key: string]: string | number | boolean }
-  ): Observable<string | null> {
+  ): Promise<string | null> {
     if (this.flowHelper.isCurrentFlowCodeFlow(config)) {
-      return this.createUrlCodeFlowWithSilentRenew(config, customParams);
+      return await this.createUrlCodeFlowWithSilentRenew(config, customParams);
     }
 
-    return of(this.createUrlImplicitFlowWithSilentRenew(config, customParams));
+    return this.createUrlImplicitFlowWithSilentRenew(config, customParams);
   }
 
   getAuthorizeParUrl(
@@ -178,19 +173,16 @@ export class UrlService {
     return `${authorizationUrl}?${params}`;
   }
 
-  getAuthorizeUrl(
-    config: OpenIdConfiguration | null,
-    authOptions?: AuthOptions
-  ): Observable<string | null> {
+  async getAuthorizeUrl(config: OpenIdConfiguration | null, authOptions?: AuthOptions): Promise<string | null> {
     if (!config) {
-      return of(null);
+      return null;
     }
 
     if (this.flowHelper.isCurrentFlowCodeFlow(config)) {
-      return this.createUrlCodeFlowAuthorize(config, authOptions);
+      return await this.createUrlCodeFlowAuthorize(config, authOptions);
     }
 
-    return of(this.createUrlImplicitFlowAuthorize(config, authOptions) || '');
+    return this.createUrlImplicitFlowAuthorize(config, authOptions) || '';
   }
 
   getEndSessionEndpoint(configuration: OpenIdConfiguration): {
@@ -373,70 +365,64 @@ export class UrlService {
     return params.toString();
   }
 
-  createBodyForParCodeFlowRequest(
+  async createBodyForParCodeFlowRequest(
     configuration: OpenIdConfiguration,
     authOptions?: AuthOptions
-  ): Observable<string | null> {
+  ): Promise<string | null> {
     const redirectUrl = this.getRedirectUrl(configuration, authOptions);
 
     if (!redirectUrl) {
-      return of(null);
+      return null;
     }
 
-    const state =
-      this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
+    const state = this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
     const nonce = this.flowsDataService.createNonce(configuration);
 
-    this.loggerService.logDebug(
-      configuration,
-      'Authorize created. adding myautostate: ' + state
-    );
+    this.loggerService.logDebug(configuration, 'Authorize created. adding myautostate: ' + state);
 
-    // code_challenge with "S256"
-    const codeVerifier =
-      this.flowsDataService.createCodeVerifier(configuration);
+    //  with "S256"
+    const codeVerifier = this.flowsDataService.createCodeVerifier(configuration);
 
-    return this.jwtWindowCryptoService.generateCodeChallenge(codeVerifier).pipe(
-      map((codeChallenge: string) => {
-        const {
-          clientId,
-          responseType,
-          scope,
-          hdParam,
-          customParamsAuthRequest,
-        } = configuration;
-        let params = this.createHttpParams('');
+    let codeChallenge = await this.jwtWindowCryptoService.generateCodeChallenge(codeVerifier);
 
-        params = params.set('client_id', clientId ?? '');
-        params = params.append('redirect_uri', redirectUrl);
-        params = params.append('response_type', responseType ?? '');
-        params = params.append('scope', scope ?? '');
-        params = params.append('nonce', nonce);
-        params = params.append('state', state);
-        params = params.append('code_challenge', codeChallenge);
-        params = params.append('code_challenge_method', 'S256');
+    const {
+      clientId,
+      responseType,
+      scope,
+      hdParam,
+      customParamsAuthRequest,
+    } = configuration;
+    let params = this.createHttpParams('');
 
-        if (hdParam) {
-          params = params.append('hd', hdParam);
-        }
+    params = params.set('client_id', clientId ?? '');
+    params = params.append('redirect_uri', redirectUrl);
+    params = params.append('response_type', responseType ?? '');
+    params = params.append('scope', scope ?? '');
+    params = params.append('nonce', nonce);
+    params = params.append('state', state);
+    params = params.append('code_challenge', codeChallenge);
+    params = params.append('_method', 'S256');
 
-        if (customParamsAuthRequest) {
-          params = this.appendCustomParams(
-            { ...customParamsAuthRequest },
-            params
-          );
-        }
+    if (hdParam) {
+      params = params.append('hd', hdParam);
+    }
 
-        if (authOptions?.customParams) {
-          params = this.appendCustomParams(
-            { ...authOptions.customParams },
-            params
-          );
-        }
+    if (customParamsAuthRequest) {
+      params = this.appendCustomParams(
+        { ...customParamsAuthRequest },
+        params
+      );
+    }
 
-        return params.toString();
-      })
-    );
+    if (authOptions?.customParams) {
+      params = this.appendCustomParams(
+        { ...authOptions.customParams },
+        params
+      );
+    }
+
+    return params.toString();
+
   }
 
   getPostLogoutRedirectUrl(configuration: OpenIdConfiguration): string | null {
@@ -587,8 +573,7 @@ export class UrlService {
     configuration: OpenIdConfiguration,
     customParams?: { [key: string]: string | number | boolean }
   ): string | null {
-    const state =
-      this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
+    const state = this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
     const nonce = this.flowsDataService.createNonce(configuration);
     const silentRenewUrl = this.getSilentRenewUrl(configuration);
 
@@ -596,16 +581,9 @@ export class UrlService {
       return null;
     }
 
-    this.loggerService.logDebug(
-      configuration,
-      'RefreshSession created. adding myautostate: ',
-      state
-    );
+    this.loggerService.logDebug(configuration, 'RefreshSession created. adding myautostate: ', state);
 
-    const authWellKnownEndPoints = this.storagePersistenceService.read(
-      'authWellKnownEndPoints',
-      configuration
-    );
+    const authWellKnownEndPoints = this.storagePersistenceService.read('authWellKnownEndPoints', configuration);
 
     if (authWellKnownEndPoints) {
       return this.createAuthorizeUrl(
@@ -619,64 +597,49 @@ export class UrlService {
       );
     }
 
-    this.loggerService.logError(
-      configuration,
-      'authWellKnownEndpoints is undefined'
-    );
+    this.loggerService.logError(configuration, 'authWellKnownEndpoints is undefined');
 
     return null;
   }
 
-  private createUrlCodeFlowWithSilentRenew(
+  private async createUrlCodeFlowWithSilentRenew(
     configuration: OpenIdConfiguration,
     customParams?: { [key: string]: string | number | boolean }
-  ): Observable<string> {
-    const state =
-      this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
+  ): Promise<string> {
+    const state = this.flowsDataService.getExistingOrCreateAuthStateControl(configuration);
     const nonce = this.flowsDataService.createNonce(configuration);
 
-    this.loggerService.logDebug(
-      configuration,
-      'RefreshSession created. adding myautostate: ' + state
-    );
+    this.loggerService.logDebug(configuration, 'RefreshSession created. adding myautostate: ' + state);
 
     // code_challenge with "S256"
-    const codeVerifier =
-      this.flowsDataService.createCodeVerifier(configuration);
+    const codeVerifier = this.flowsDataService.createCodeVerifier(configuration);
 
-    return this.jwtWindowCryptoService.generateCodeChallenge(codeVerifier).pipe(
-      map((codeChallenge: string) => {
-        const silentRenewUrl = this.getSilentRenewUrl(configuration);
+    let codeChallenge = await this.jwtWindowCryptoService.generateCodeChallenge(codeVerifier);
 
-        if (!silentRenewUrl) {
-          return '';
-        }
+    const silentRenewUrl = this.getSilentRenewUrl(configuration);
 
-        const authWellKnownEndPoints = this.storagePersistenceService.read(
-          'authWellKnownEndPoints',
-          configuration
-        );
+    if (!silentRenewUrl) {
+      return null;
+    }
 
-        if (authWellKnownEndPoints) {
-          return this.createAuthorizeUrl(
-            codeChallenge,
-            silentRenewUrl,
-            nonce,
-            state,
-            configuration,
-            'none',
-            customParams
-          );
-        }
+    const authWellKnownEndPoints = this.storagePersistenceService.read('authWellKnownEndPoints', configuration);
 
-        this.loggerService.logWarning(
-          configuration,
-          'authWellKnownEndpoints is undefined'
-        );
+    if (authWellKnownEndPoints) {
+      return this.createAuthorizeUrl(
+        codeChallenge,
+        silentRenewUrl,
+        nonce,
+        state,
+        configuration,
+        'none',
+        customParams
+      );
+    }
 
-        return '';
-      })
-    );
+    this.loggerService.logWarning(configuration, 'authWellKnownEndpoints is undefined');
+
+    return '';
+
   }
 
   private createUrlImplicitFlowAuthorize(
@@ -725,71 +688,56 @@ export class UrlService {
     return null;
   }
 
-  private createUrlCodeFlowAuthorize(
+  private async createUrlCodeFlowAuthorize(
     config: OpenIdConfiguration,
     authOptions?: AuthOptions
-  ): Observable<string | null> {
-    const state =
-      this.flowsDataService.getExistingOrCreateAuthStateControl(config);
+  ): Promise<string | null> {
+    const state = this.flowsDataService.getExistingOrCreateAuthStateControl(config);
     const nonce = this.flowsDataService.createNonce(config);
 
-    this.loggerService.logDebug(
-      config,
-      'Authorize created. adding myautostate: ' + state
-    );
+    this.loggerService.logDebug(config, 'Authorize created. adding myautostate: ' + state);
 
     const redirectUrl = this.getRedirectUrl(config, authOptions);
 
     if (!redirectUrl) {
-      return of(null);
+      return null;
     }
 
-    return this.getCodeChallenge(config).pipe(
-      map((codeChallenge: string) => {
-        const authWellKnownEndPoints = this.storagePersistenceService.read(
-          'authWellKnownEndPoints',
-          config
-        );
+    const codeChallenge = await this.getCodeChallenge(config)
 
-        if (authWellKnownEndPoints) {
-          const { customParams } = authOptions || {};
 
-          return this.createAuthorizeUrl(
-            codeChallenge,
-            redirectUrl,
-            nonce,
-            state,
-            config,
-            '',
-            customParams
-          );
-        }
+    const authWellKnownEndPoints = this.storagePersistenceService.read('authWellKnownEndPoints', config);
 
-        this.loggerService.logError(
-          config,
-          'authWellKnownEndpoints is undefined'
-        );
+    if (authWellKnownEndPoints) {
+      const { customParams } = authOptions || {};
 
-        return '';
-      })
-    );
+      return this.createAuthorizeUrl(
+        codeChallenge,
+        redirectUrl,
+        nonce,
+        state,
+        config,
+        '',
+        customParams
+      );
+    }
+
+    this.loggerService.logError(config, 'authWellKnownEndpoints is undefined');
+    return '';
   }
 
-  private getCodeChallenge(config: OpenIdConfiguration): Observable<string> {
+  private async getCodeChallenge(config: OpenIdConfiguration): Promise<string> {
     if (config.disablePkce) {
-      return of('');
+      return '';
     }
 
     // code_challenge with "S256"
     const codeVerifier = this.flowsDataService.createCodeVerifier(config);
 
-    return this.jwtWindowCryptoService.generateCodeChallenge(codeVerifier);
+    return await this.jwtWindowCryptoService.generateCodeChallenge(codeVerifier);
   }
 
-  private getRedirectUrl(
-    configuration: OpenIdConfiguration,
-    authOptions?: AuthOptions
-  ): string | null {
+  private getRedirectUrl(configuration: OpenIdConfiguration, authOptions?: AuthOptions): string | null {
     let { redirectUrl } = configuration;
 
     if (authOptions?.redirectUrl) {

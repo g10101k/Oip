@@ -97,11 +97,8 @@ export class OidcSecurityService {
     return this.callbackService.stsCallback$;
   }
 
-  preloadAuthWellKnownDocument(
-    configId?: string
-  ): Observable<AuthWellKnownEndpoints> {
+  async preloadAuthWellKnownDocument(configId?: string): Promise<AuthWellKnownEndpoints> {
     let config = this.configurationService.getOpenIDConfiguration(configId);
-
     return this.authWellKnownService.queryAndStoreAuthWellKnownEndPoints(config);
   }
 
@@ -332,9 +329,7 @@ export class OidcSecurityService {
    *
    * @returns An `Observable<LoginResponse>` containing all information about the login
    */
-  forceRefreshSession(
-    customParams?: { [key: string]: string | number | boolean },
-    configId?: string
+  forceRefreshSession(customParams?: { [key: string]: string | number | boolean }, configId?: string
   ): Observable<LoginResponse> {
     let config = this.configurationService.getOpenIDConfigurations(configId);
 
@@ -461,11 +456,11 @@ export class OidcSecurityService {
    *
    * @returns A string with the authorize URL or null
    */
-  getAuthorizeUrl(
+  async getAuthorizeUrl(
     customParams?: { [p: string]: string | number | boolean },
     configId?: string
-  ): Observable<string | null> {
+  ): Promise<string | null> {
     let config = this.configurationService.getOpenIDConfiguration(configId);
-    return this.urlService.getAuthorizeUrl(config, customParams ? { customParams } : undefined);
+    return await this.urlService.getAuthorizeUrl(config, customParams ? { customParams } : undefined);
   }
 }

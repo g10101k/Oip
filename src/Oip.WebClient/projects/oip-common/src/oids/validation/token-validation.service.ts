@@ -292,9 +292,9 @@ export class TokenValidationService {
       this.loggerService.logDebug(
         configuration,
         'Validate_id_token_nonce failed, dataIdToken.nonce: ' +
-          dataIdToken.nonce +
-          ' local_nonce:' +
-          localNonce
+        dataIdToken.nonce +
+        ' local_nonce:' +
+        localNonce
       );
 
       return false;
@@ -316,9 +316,9 @@ export class TokenValidationService {
       this.loggerService.logDebug(
         configuration,
         'Validate_id_token_iss failed, dataIdToken.iss: ' +
-          dataIdToken.iss +
-          ' authWellKnownEndpoints issuer:' +
-          authWellKnownEndpointsIssuer
+        dataIdToken.iss +
+        ' authWellKnownEndpoints issuer:' +
+        authWellKnownEndpointsIssuer
       );
 
       return false;
@@ -343,9 +343,9 @@ export class TokenValidationService {
         this.loggerService.logDebug(
           configuration,
           'Validate_id_token_aud array failed, dataIdToken.aud: ' +
-            dataIdToken.aud +
-            ' client_id:' +
-            aud
+          dataIdToken.aud +
+          ' client_id:' +
+          aud
         );
 
         return false;
@@ -356,9 +356,9 @@ export class TokenValidationService {
       this.loggerService.logDebug(
         configuration,
         'Validate_id_token_aud failed, dataIdToken.aud: ' +
-          dataIdToken.aud +
-          ' client_id:' +
-          aud
+        dataIdToken.aud +
+        ' client_id:' +
+        aud
       );
 
       return false;
@@ -400,9 +400,9 @@ export class TokenValidationService {
       this.loggerService.logDebug(
         configuration,
         'ValidateStateFromHashCallback failed, state: ' +
-          state +
-          ' local_state:' +
-          localState
+        state +
+        ' local_state:' +
+        localState
       );
 
       return false;
@@ -540,16 +540,8 @@ export class TokenValidationService {
   // access_token C2: Take the left- most half of the hash and base64url- encode it.
   // access_token C3: The value of at_hash in the ID Token MUST match the value produced in the previous step if at_hash
   // is present in the ID Token.
-  validateIdTokenAtHash(
-    accessToken: string,
-    atHash: string,
-    idTokenAlg: string,
-    configuration: OpenIdConfiguration
-  ): Observable<boolean> {
-    this.loggerService.logDebug(
-      configuration,
-      'at_hash from the server:' + atHash
-    );
+  async validateIdTokenAtHash(accessToken: string, atHash: string, idTokenAlg: string, configuration: OpenIdConfiguration): Promise<boolean> {
+    this.loggerService.logDebug(configuration, 'at_hash from the server:' + atHash);
 
     // 'sha256' 'sha384' 'sha512'
     let sha = 'SHA-256';
@@ -559,33 +551,17 @@ export class TokenValidationService {
     } else if (idTokenAlg.includes('512')) {
       sha = 'SHA-512';
     }
+    const hash = await this.jwtWindowCryptoService.generateAtHash('' + accessToken, sha);
 
-    return this.jwtWindowCryptoService
-      .generateAtHash('' + accessToken, sha)
-      .pipe(
-        mergeMap((hash: string) => {
-          this.loggerService.logDebug(
-            configuration,
-            'at_hash client validation not decoded:' + hash
-          );
-          if (hash === atHash) {
-            return of(true); // isValid;
-          } else {
-            return this.jwtWindowCryptoService
-              .generateAtHash('' + decodeURIComponent(accessToken), sha)
-              .pipe(
-                map((newHash: string) => {
-                  this.loggerService.logDebug(
-                    configuration,
-                    '-gen access--' + hash
-                  );
+    this.loggerService.logDebug(configuration, 'at_hash client validation not decoded:' + hash);
+    if (hash === atHash) {
+      return true; // isValid;
+    } else {
+      const newHash = await this.jwtWindowCryptoService.generateAtHash('' + decodeURIComponent(accessToken), sha);
+      this.loggerService.logDebug(configuration, '-gen access--' + hash);
 
-                  return newHash === atHash;
-                })
-              );
-          }
-        })
-      );
+      return newHash === atHash;
+    }
   }
 
   private millisToMinutesAndSeconds(millis: number): string {
