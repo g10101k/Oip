@@ -116,22 +116,20 @@ export class CheckAuthService {
     }
 
     return this.checkAuthWithConfig(configuration, allConfigs).pipe(
-      switchMap((loginResponse) => {
+      switchMap(async (loginResponse) => {
         const { isAuthenticated } = loginResponse;
 
         if (isAuthenticated) {
-          return of(loginResponse);
+          return (loginResponse);
         }
 
-        return this.refreshSessionService
+        let loginResponseAfterRefreshSession = await this.refreshSessionService
           .forceRefreshSession(configuration, allConfigs)
-          .pipe(
-            tap((loginResponseAfterRefreshSession) => {
-              if (loginResponseAfterRefreshSession?.isAuthenticated) {
-                this.startCheckSessionAndValidation(configuration, allConfigs);
-              }
-            })
-          );
+
+        if (loginResponseAfterRefreshSession?.isAuthenticated) {
+          this.startCheckSessionAndValidation(configuration, allConfigs);
+        }
+        return loginResponseAfterRefreshSession;
       })
     );
   }

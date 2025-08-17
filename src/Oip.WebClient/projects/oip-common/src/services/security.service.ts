@@ -59,37 +59,16 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    * Initiates authentication check and updates login response, user data,
    * and decoded token payload if authenticated.
    */
-  auth() {
-   /*if (this.getRefreshToken()) {
-      super.forceRefreshSession().subscribe(x => {
-        super.checkAuth().subscribe((_response: LoginResponse) => {
-          this.processLoginResponse(_response);
-          this.payload.next(this.getPayloadFromAccessToken());
-        });
-      })
-    } else {
-      super.checkAuth().subscribe((_response: LoginResponse) => {
-        this.processLoginResponse(_response);
-        this.payload.next(this.getPayloadFromAccessToken());
-      });
-    }
-*/
+   auth() {
     super.checkAuth().subscribe((_response: LoginResponse) => {
       this.processLoginResponse(_response);
       this.payload.next(this.getPayloadFromAccessToken());
     });
   }
 
-  setLoginAndComplete() {
-    console.log("setLoginAndComplete()");
-    console.log(this.accessToken);
-    this.onLogin.next(true);
-  }
-
   private processLoginResponse(_response: LoginResponse) {
     this.accessToken = _response.accessToken;
     this.user.next(_response.userData);
-    console.log(_response);
   }
 
   /**

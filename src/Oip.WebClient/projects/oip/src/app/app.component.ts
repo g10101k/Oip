@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
   private readonly layoutService = inject(LayoutService);
 
   constructor() {
-    this.securityService.auth();
+    this.securityService.auth()
   }
 
   ngOnInit() {

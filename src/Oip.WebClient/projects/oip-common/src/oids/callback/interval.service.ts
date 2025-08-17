@@ -21,8 +21,6 @@ export class IntervalService {
   }
 
   startPeriodicTokenCheck(repeatAfterSeconds: number): Observable<unknown> {
-    console.warn('interval startPeriodicTokenCheck', repeatAfterSeconds);
-
     const millisecondsDelayBetweenTokenCheck = repeatAfterSeconds * 1000;
 
     return new Observable((subscriber) => {

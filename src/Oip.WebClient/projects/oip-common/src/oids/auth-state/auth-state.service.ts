@@ -204,15 +204,8 @@ export class AuthStateService {
   }
 
   hasAccessTokenExpiredIfExpiryExists(configuration: OpenIdConfiguration): boolean {
-    const { renewTimeBeforeTokenExpiresInSeconds } = configuration;
-    const accessTokenExpiresIn = this.storagePersistenceService.read('access_token_expires_at', configuration);
-    const accessTokenHasNotExpired =
-      this.tokenValidationService.validateAccessTokenNotExpired(
-        accessTokenExpiresIn,
-        configuration,
-        renewTimeBeforeTokenExpiresInSeconds
-      );
-    const hasExpired = !accessTokenHasNotExpired;
+
+    const hasExpired = !this.accessTokenHasNotExpired(configuration);
 
     if (hasExpired) {
       this.publicEventsService.fireEvent<boolean>(EventTypes.TokenExpired, hasExpired);
@@ -221,16 +214,21 @@ export class AuthStateService {
     return hasExpired;
   }
 
+
+  public accessTokenHasNotExpired(configuration: OpenIdConfiguration): boolean {
+    const { renewTimeBeforeTokenExpiresInSeconds } = configuration;
+    const accessTokenExpiresIn = this.storagePersistenceService.read('access_token_expires_at', configuration);
+
+    return this.tokenValidationService.validateAccessTokenNotExpired(
+      accessTokenExpiresIn,
+      configuration,
+      renewTimeBeforeTokenExpiresInSeconds
+    );
+  }
+
   isAuthenticated(configuration: OpenIdConfiguration | null): boolean {
     if (!configuration) {
-      throwError(
-        () =>
-          new Error(
-            'Please provide a configuration before setting up the module'
-          )
-      );
-
-      return false;
+      throw new Error('Please provide a configuration before setting up the module');
     }
 
     const hasAccessToken =

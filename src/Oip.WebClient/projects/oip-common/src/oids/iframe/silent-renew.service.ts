@@ -19,7 +19,8 @@ const IFRAME_FOR_SILENT_RENEW_IDENTIFIER = 'myiFrameForSilentRenew';
 
 export const getFrameId = (configId?: string): string => `${IFRAME_FOR_SILENT_RENEW_IDENTIFIER}_${configId}`;
 type RefreshSessionWithIFrameCompleted =
-  {success: true, authResult: AuthResult | null, configId?: string } | {success: false, configId?: string};
+  { success: true, authResult: AuthResult | null, configId?: string } | { success: false, configId?: string };
+
 @Injectable({ providedIn: 'root' })
 export class SilentRenewService {
   private readonly refreshSessionWithIFrameCompletedInternal$ =
@@ -148,13 +149,13 @@ export class SilentRenewService {
     }
 
     callback$.subscribe({
-      next: ({authResult}) => {
-        this.refreshSessionWithIFrameCompletedInternal$.next({authResult, configId: config.configId, success: true});
+      next: ({ authResult }) => {
+        this.refreshSessionWithIFrameCompletedInternal$.next({ authResult, configId: config.configId, success: true });
         this.flowsDataService.resetSilentRenewRunning(config);
       },
       error: (err: unknown) => {
         this.loggerService.logError(config, 'Error: ' + err);
-        this.refreshSessionWithIFrameCompletedInternal$.next({configId: config.configId, success: false});
+        this.refreshSessionWithIFrameCompletedInternal$.next({ configId: config.configId, success: false });
         this.flowsDataService.resetSilentRenewRunning(config);
       },
     });

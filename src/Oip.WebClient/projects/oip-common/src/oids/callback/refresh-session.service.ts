@@ -52,68 +52,61 @@ export class RefreshSessionService {
   );
   private readonly userService = inject(UserService);
 
-  userForceRefreshSession(
+  async userForceRefreshSession(
     config: OpenIdConfiguration | null,
     allConfigs: OpenIdConfiguration[],
     extraCustomParams?: { [key: string]: string | number | boolean }
-  ): Observable<LoginResponse> {
+  ): Promise<LoginResponse> {
     if (!config) {
-      return throwError(
-        () =>
-          new Error(
-            'Please provide a configuration before setting up the module'
-          )
-      );
+      throw new Error('Please provide a configuration before setting up the module');
     }
-
     this.persistCustomParams(extraCustomParams, config);
 
-    return this.forceRefreshSession(config, allConfigs, extraCustomParams).pipe(
-      tap(() => this.flowsDataService.resetSilentRenewRunning(config))
-    );
+    let loginResponsePromise = this.forceRefreshSession(config, allConfigs, extraCustomParams)
+
+    this.flowsDataService.resetSilentRenewRunning(config)
+
+    return loginResponsePromise;
   }
 
-  forceRefreshSession(
+  async forceRefreshSession(
     config: OpenIdConfiguration,
     allConfigs: OpenIdConfiguration[],
     extraCustomParams?: { [key: string]: string | number | boolean }
-  ): Observable<LoginResponse> {
+  ): Promise<LoginResponse> {
     const { customParamsRefreshTokenRequest, configId } = config;
     const mergedParams = { ...customParamsRefreshTokenRequest, ...extraCustomParams, };
 
     if (this.flowHelper.isCurrentFlowCodeFlowWithRefreshTokens(config)) {
-      return from(this.startRefreshSession(config, allConfigs, mergedParams)).pipe(
-        map(() => {
-          const isAuthenticated =
-            this.authStateService.areAuthStorageTokensValid(config);
+      await this.startRefreshSession(config, allConfigs, mergedParams);
 
-          if (isAuthenticated) {
-            return {
-              idToken: this.authStateService.getIdToken(config),
-              accessToken: this.authStateService.getAccessToken(config),
-              userData: this.userService.getUserDataFromStore(config),
-              isAuthenticated,
-              configId,
-            } as LoginResponse;
-          }
+      const isAuthenticated = this.authStateService.areAuthStorageTokensValid(config);
 
-          return {
-            isAuthenticated: false,
-            errorMessage: '',
-            userData: null,
-            idToken: '',
-            accessToken: '',
-            configId,
-          };
-        })
-      );
+      if (isAuthenticated) {
+        return {
+          idToken: this.authStateService.getIdToken(config),
+          accessToken: this.authStateService.getAccessToken(config),
+          userData: this.userService.getUserDataFromStore(config),
+          isAuthenticated,
+          configId,
+        } as LoginResponse;
+      }
+
+      return {
+        isAuthenticated: false,
+        errorMessage: '',
+        userData: null,
+        idToken: '',
+        accessToken: '',
+        configId,
+      };
     }
 
     const { silentRenewTimeoutInSeconds } = config;
     const timeOutTime = (silentRenewTimeoutInSeconds ?? 0) * 1000;
 
-    return forkJoin([
-      this.startRefreshSession(config, allConfigs, extraCustomParams),
+    return await lastValueFrom(forkJoin([
+      from(this.startRefreshSession(config, allConfigs, extraCustomParams)),
       this.silentRenewService.refreshSessionWithIFrameCompleted$.pipe(
         filter((result) => result?.configId === config.configId),
         take(1)
@@ -126,17 +119,11 @@ export class RefreshSessionService {
             const scalingDuration = 1000;
             const currentAttempt = index + 1;
 
-            if (
-              !(error instanceof TimeoutError) ||
-              currentAttempt > MAX_RETRY_ATTEMPTS
-            ) {
+            if (!(error instanceof TimeoutError) || currentAttempt > MAX_RETRY_ATTEMPTS) {
               return throwError(() => new Error(error));
             }
 
-            this.loggerService.logDebug(
-              config,
-              `forceRefreshSession timeout. Attempt #${currentAttempt}`
-            );
+            this.loggerService.logDebug(config, `forceRefreshSession timeout. Attempt #${currentAttempt}`);
 
             this.flowsDataService.resetSilentRenewRunning(config);
 
@@ -145,8 +132,7 @@ export class RefreshSessionService {
         );
       }),
       map(([_, refreshCompleted]) => {
-        const isAuthenticated =
-          this.authStateService.areAuthStorageTokensValid(config);
+        const isAuthenticated = this.authStateService.areAuthStorageTokensValid(config);
 
         if (isAuthenticated) {
           const authResult = refreshCompleted.success ? refreshCompleted.authResult : null
@@ -169,7 +155,7 @@ export class RefreshSessionService {
           configId,
         };
       })
-    );
+    ));
   }
 
   private persistCustomParams(

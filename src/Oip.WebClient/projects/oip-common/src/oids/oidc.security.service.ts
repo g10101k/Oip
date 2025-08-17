@@ -168,10 +168,27 @@ export class OidcSecurityService {
    *
    * @returns A boolean whether the config is authenticated or not.
    */
-  isAuthenticated(configId?: string): boolean {
+  async isAuthenticated(configId?: string): Promise<boolean> {
     let config = this.configurationService.getOpenIDConfiguration(configId);
 
-    return this.authStateService.isAuthenticated(config);
+    const isAuthenticated = this.authStateService.isAuthenticated(config);
+
+    if (isAuthenticated) {
+      const accessTokenHasNotExpired = this.authStateService.accessTokenHasNotExpired(config);
+      if (accessTokenHasNotExpired) {
+        return true;
+      } else {
+        if (this.authStateService.getRefreshToken(config)) {
+          let config = this.configurationService.getOpenIDConfigurations(configId);
+          let q = await this.refreshSessionService.userForceRefreshSession(config.currentConfig, config.allConfigs, null);
+          return q.isAuthenticated;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    return isAuthenticated;
   }
 
   /**
@@ -329,15 +346,12 @@ export class OidcSecurityService {
    *
    * @returns An `Observable<LoginResponse>` containing all information about the login
    */
-  forceRefreshSession(customParams?: { [key: string]: string | number | boolean }, configId?: string
-  ): Observable<LoginResponse> {
+  async forceRefreshSession(
+    customParams?: { [key: string]: string | number | boolean },
+    configId?: string
+  ): Promise<LoginResponse> {
     let config = this.configurationService.getOpenIDConfigurations(configId);
-
-    return this.refreshSessionService.userForceRefreshSession(
-      config.currentConfig,
-      config.allConfigs,
-      customParams
-    )
+    return await this.refreshSessionService.userForceRefreshSession(config.currentConfig, config.allConfigs, customParams);
   }
 
   /**

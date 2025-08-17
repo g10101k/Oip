@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
-import { catchError, map } from 'rxjs/operators';
-import { Observable, combineLatest, of, lastValueFrom } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest, of, lastValueFrom, from } from 'rxjs';
 import { SecurityService } from "./security.service";
 
 /**
@@ -22,33 +22,14 @@ export class AuthGuardService {
    *
    * @returns {Observable<boolean | UrlTree>} A stream resolving to true (allow), or UrlTree (redirect).
    */
-  canActivate(): boolean | UrlTree {
-    if (this.oidcSecurityService.isAuthenticated()){
-      return true;
-    }
-    return this.router.parseUrl('/unauthorized');
-  }
-
-  /**
-   * Attempts to refresh the session using the refresh token.
-   * If successful, allows route activation; otherwise, redirects to `/unauthorized`.
-   *
-   * @returns {boolean | UrlTree} A stream resolving to true or redirect UrlTree.
-   */
-  tryRefreshToken(): boolean | UrlTree {
-    let result: boolean | UrlTree;
-    let observableRefreshToken = this.oidcSecurityService.forceRefreshSession().pipe(
-      map(refreshSuccess => {
-        return refreshSuccess ? true : this.router.parseUrl('/unauthorized');
+  canActivate(): Observable<boolean | UrlTree> {
+    return from(this.oidcSecurityService.isAuthenticated()).pipe(
+      map((result) => {
+        if (result) {
+          return true;
+        }
+        return this.router.parseUrl('/unauthorized');
       }),
-      catchError((err) => {
-        console.warn(err);
-        return of(this.router.parseUrl('/unauthorized'))
-      })
     )
-    lastValueFrom(observableRefreshToken).then(_result => {
-      result = _result;
-    });
-    return result;
   }
 }

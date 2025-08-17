@@ -33,7 +33,6 @@ export class PeriodicallyTokenCheckService {
   private readonly configurationService = inject(ConfigurationService);
 
   startTokenValidationPeriodically(allConfigs: OpenIdConfiguration[], currentConfig: OpenIdConfiguration): void {
-    console.log('startTokenValidationPeriodically')
     const configsWithSilentRenewEnabled = this.getConfigsWithSilentRenewEnabled(allConfigs);
 
     if (configsWithSilentRenewEnabled.length <= 0) {
@@ -125,7 +124,7 @@ export class PeriodicallyTokenCheckService {
   }
 
   private createRefreshEventForConfig(configuration: OpenIdConfiguration, allConfigs: OpenIdConfiguration[]): Observable<boolean | CallbackContext | null> {
-    this.loggerService.logError(configuration, 'starting silent renew...');
+    this.loggerService.logDebug(configuration, 'starting silent renew...');
 
     let config = this.configurationService.getOpenIDConfiguration(configuration.configId);
     return of(config)
