@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
-import { catchError, map } from 'rxjs/operators';
-import { Observable, combineLatest, of, lastValueFrom } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest, of, lastValueFrom, forkJoin } from 'rxjs';
 import { SecurityService } from "./security.service";
 
 /**
@@ -23,20 +23,22 @@ export class AuthGuardService {
    * @returns {Observable<boolean | UrlTree>} A stream resolving to true (allow), or UrlTree (redirect).
    */
   canActivate(): Observable<boolean | UrlTree> {
+
     return combineLatest([
       this.oidcSecurityService.isAuthenticated(),
       this.oidcSecurityService.isTokenExpired()
-    ]).pipe(map(([authenticated, tokenExpired]) => {
-      if (!authenticated) {
-        return this.router.parseUrl('/unauthorized');
-      }
-      if (!tokenExpired) {
-        return true;
-      }
+    ]).pipe(
+      switchMap(([authenticated, tokenExpired]) => {
+        if (!authenticated) {
+          return of(this.router.parseUrl('/unauthorized'));
+        }
+        if (!tokenExpired) {
+          return of(true);
+        }
 
-      // Token is expired; attempt to refresh
-      return this.tryRefreshToken()
-    }));
+        // Token is expired; attempt to refresh
+        return this.tryRefreshToken()
+      }));
   }
 
   /**
@@ -45,9 +47,8 @@ export class AuthGuardService {
    *
    * @returns {boolean | UrlTree} A stream resolving to true or redirect UrlTree.
    */
-  tryRefreshToken(): boolean | UrlTree {
-    let result: boolean | UrlTree;
-    let observableRefreshToken = this.oidcSecurityService.forceRefreshSession().pipe(
+  tryRefreshToken(): Observable<boolean | UrlTree> {
+    return this.oidcSecurityService.forceRefreshSession().pipe(
       map(refreshSuccess => {
         return refreshSuccess ? true : this.router.parseUrl('/unauthorized');
       }),
@@ -56,9 +57,5 @@ export class AuthGuardService {
         return of(this.router.parseUrl('/unauthorized'))
       })
     )
-    lastValueFrom(observableRefreshToken).then(_result => {
-      result = _result;
-    });
-    return result;
   }
 }

@@ -21,11 +21,11 @@ export class AppComponent implements OnInit {
   private readonly layoutService = inject(LayoutService);
 
   ngOnInit() {
+    this.securityService.auth();
     this.translateService.addLangs(['en', 'ru']);
     const lang = /en|ru/.exec(this.layoutService.language()) ? this.layoutService.language() : 'en';
     this.translateService.setDefaultLang(lang);
     this.translate(lang);
-    this.securityService.auth();
   }
 
   translate(lang: string) {
