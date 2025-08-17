@@ -1,9 +1,8 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MenuService } from "../../services/app.menu.service";
-import { LayoutService } from "../../services/app.layout.service";
 import { NgFor, NgIf } from '@angular/common';
 import { ButtonModule } from "primeng/button";
-import { SecurityService } from "./../../services/security.service";
+import { SecurityService } from "../../services/security.service";
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { DialogModule } from "primeng/dialog";
 import { MenuItemCommandEvent, PrimeIcons } from "primeng/api";
@@ -12,13 +11,12 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from "@angular/forms";
 import { MenuItemComponent } from './menu-item.component';
 import { MenuItemCreateDialogComponent } from "./menu-item-create-dialog.component";
-import { TranslatePipe, TranslateService } from "@ngx-translate/core";
+import { TranslateService } from "@ngx-translate/core";
 import { MenuItemEditDialogComponent } from "./menu-item-edit-dialog.component";
-import { RouterLink } from "@angular/router";
 
 
 @Component({
-  imports: [NgFor, NgIf, MenuItemComponent, ButtonModule, ContextMenuModule, DialogModule, InputTextModule, MenuItemCreateDialogComponent, InputSwitchModule, FormsModule, TranslatePipe, MenuItemEditDialogComponent, RouterLink],
+  imports: [NgFor, NgIf, MenuItemComponent, ButtonModule, ContextMenuModule, DialogModule, InputTextModule, MenuItemCreateDialogComponent, InputSwitchModule, FormsModule, MenuItemEditDialogComponent],
   selector: 'app-menu',
   standalone: true,
   template: `
@@ -43,7 +41,6 @@ import { RouterLink } from "@angular/router";
 })
 export class MenuComponent implements OnInit {
   readonly menuService = inject(MenuService);
-  readonly layoutService = inject(LayoutService);
   readonly securityService = inject(SecurityService);
   readonly translateService = inject(TranslateService);
 
