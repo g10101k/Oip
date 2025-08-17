@@ -7,42 +7,31 @@ import { CryptoService } from '../utils/crypto/crypto.service';
 export class JwtWindowCryptoService {
   private readonly cryptoService = inject(CryptoService);
 
-  generateCodeChallenge(codeVerifier: string): Observable<string> {
-    return this.calcHash(codeVerifier).pipe(
-      map((challengeRaw: string) => this.base64UrlEncode(challengeRaw))
-    );
+  generateCodeChallenge(codeVerifier: string): string {
+    let challengeRaw = this.calcHash(codeVerifier);
+    return this.base64UrlEncode(challengeRaw);
   }
 
-  generateAtHash(accessToken: string, algorithm: string): Observable<string> {
-    return this.calcHash(accessToken, algorithm).pipe(
-      map((tokenHash) => {
-        const substr: string = tokenHash.substr(0, tokenHash.length / 2);
-        const tokenHashBase64: string = btoa(substr);
+  generateAtHash(accessToken: string, algorithm: string): string {
+    let tokenHash = this.calcHash(accessToken, algorithm);
 
-        return tokenHashBase64
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_')
-          .replace(/=/g, '');
-      })
-    );
+    const substr: string = tokenHash.substr(0, tokenHash.length / 2);
+    const tokenHashBase64: string = btoa(substr);
+
+    return tokenHashBase64
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+
   }
 
-  private calcHash(
-    valueToHash: string,
-    algorithm = 'SHA-256'
-  ): Observable<string> {
+  private calcHash(valueToHash: string, algorithm = 'SHA-256'): string {
     const msgBuffer: Uint8Array = new TextEncoder().encode(valueToHash);
+    let hashBuffer = this.cryptoService.getCrypto().subtle.digest(algorithm, msgBuffer)
 
-    return from(
-      this.cryptoService.getCrypto().subtle.digest(algorithm, msgBuffer)
-    ).pipe(
-      map((hashBuffer: unknown) => {
-        const buffer = hashBuffer as ArrayBuffer;
-        const hashArray: number[] = Array.from(new Uint8Array(buffer));
-
-        return this.toHashString(hashArray);
-      })
-    );
+    const buffer = hashBuffer as ArrayBuffer;
+    const hashArray: number[] = Array.from(new Uint8Array(buffer));
+    return this.toHashString(hashArray);
   }
 
   private toHashString(byteArray: number[]): string {
