@@ -99,7 +99,8 @@ public static class OipModuleApplication
     {
         builder.Services.AddHttpClient<KeycloakClient>(x =>
         {
-            x.BaseAddress = new Uri(settings.SecurityService.BaseUrl);
+            var url = settings.SecurityService.InternalUrl ?? settings.SecurityService.BaseUrl;
+            x.BaseAddress = new Uri(url);
         }).AddPolicyHandler(GetRetryPolicy());
     }
 
