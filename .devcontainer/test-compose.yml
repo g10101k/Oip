@@ -1,0 +1,86 @@
+services:
+  oip:
+    build:
+      context: ../src
+      dockerfile: ./Oip/Dockerfile
+      args: [ '--force-recreate' ]
+    ports:
+      - "50000:50000"
+    volumes:
+      - ./https:/https:ro
+    environment:
+      TZ: Europe/Moscow
+      ConnectionString: XpoProvider=Postgres;Server=postgres;Database=oip;uid=postgres;pwd=postgres;
+      SecurityService:BaseUrl: https://localhost:8443/
+      SecurityService:DockerUrl: https://keycloak:8443/
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:50000
+      ASPNETCORE_Kestrel__Certificates__Default__Password: P@ssw0rd
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/oip.pfx
+    networks:
+      - backend-network
+    extra_hosts: 
+      - host.docker.internal:host-gateway
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16.3
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: keycloak
+      PGDATA: /data/postgres
+    networks:
+      - backend-network
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d keycloak" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: [ "start-dev", "--import-realm" ]
+    restart: unless-stopped
+    environment:
+      KC_DB: postgres
+      KC_DB_USERNAME: ${POSTGRES_USER:-postgres}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      KC_DB_URL: "jdbc:postgresql://postgres:5432/keycloak"
+      KC_METRICS_ENABLED: true
+      KEYCLOAK_ADMIN: ${GF_ADMIN_USERNAME:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD:-P@ssw0rd}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${GF_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD:-P@ssw0rd}
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/data/cert/oip.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/data/cert/oip.key
+    networks:
+      - backend-network
+      - bridge-network
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "9000:9000"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
+      - ./https:/opt/keycloak/data/cert/:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e 'GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+networks:
+  backend-network: { }
+  bridge-network:
+    driver: bridge

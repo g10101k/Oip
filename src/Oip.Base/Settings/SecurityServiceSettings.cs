@@ -6,9 +6,14 @@ namespace Oip.Base.Settings;
 public class SecurityServiceSettings
 {
     /// <summary>
-    /// Url
+    /// Public Url for client
     /// </summary>
     public string BaseUrl { get; set; } = default!;
+
+    /// <summary>
+    /// Internal Url for KeycloakClient if app run in docker container
+    /// </summary>
+    public string? DockerUrl { get; set; }
 
     /// <summary>
     /// Client
@@ -29,7 +34,7 @@ public class SecurityServiceSettings
     /// The number of seconds to allow for clock skew when validating tokens. Default value = 5
     /// </summary>
     public int ClockSkewSeconds { get; set; } = 5;
-    
+
     /// <summary>
     /// Front settings
     /// </summary>

@@ -97,10 +97,23 @@ public static class OipModuleApplication
 
     private static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
-        builder.Services.AddHttpClient<KeycloakClient>(x =>
+        var httpClientBuilder = builder.Services.AddHttpClient<KeycloakClient>(httpClient =>
         {
-            x.BaseAddress = new Uri(settings.SecurityService.BaseUrl);
+            var url = settings.SecurityService.DockerUrl ?? settings.SecurityService.BaseUrl;
+            httpClient.BaseAddress = new Uri(url);
         }).AddPolicyHandler(GetRetryPolicy());
+
+        if (builder.Environment.IsDevelopment() && settings.SecurityService.DockerUrl is not null)
+        {
+            httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                HttpClientHandler handler = new HttpClientHandler();
+
+                handler.ServerCertificateCustomValidationCallback =
+                    (message, cert, chain, errors) => true;
+                return handler;
+            });
+        }
     }
 
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)

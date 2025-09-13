@@ -12,7 +12,7 @@ import {
   SecurityStorageService,
   UserService,
   langIntercept,
-  httpLoaderAuthFactory, ConfigService
+  httpLoaderAuthFactory
 } from "oip-common";
 import { LocationStrategy, PathLocationStrategy } from "@angular/common";
 import { ProductService } from "./app/service/product.service";
@@ -26,7 +26,6 @@ const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: Http
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    ConfigService,
     provideHttpClient(withInterceptors([authInterceptor(), langIntercept]), withFetch()),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     ProductService,
@@ -46,7 +45,7 @@ export const appConfig: ApplicationConfig = {
       loader: {
         provide: StsConfigLoader,
         useFactory: httpLoaderAuthFactory,
-        deps: [ConfigService],
+        deps: [HttpClient],
       },
     }),
     { provide: AbstractSecurityStorage, useClass: SecurityStorageService },

@@ -6,7 +6,9 @@
     "localization": "Язык",
     "selectLanguage": "Выберите язык",
     "all": "Показать все меню",
+    "moduleManagement": "Управление модулями",
     "modules": "Модули",
-    "menu": "Меню"
+    "menu": "Меню",
+    "goTo": "Перейти"
   }
 }

@@ -34,7 +34,8 @@ interface MenuItemComponentTranslation {
     <ng-container>
       <p-confirm-dialog/>
       <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text"
-           (contextmenu)="onContextMenu($event, item)">{{ item.label }}
+           (contextmenu)="onContextMenu($event, item)">
+        {{ item.label }}
       </div>
       <a *ngIf="(!item.routerLink || item.items) && item.visible !== false" [attr.href]="item.url"
          (click)="itemClick($event)"
@@ -104,7 +105,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private localization: MenuItemComponentTranslation = {} as MenuItemComponentTranslation;
 
-  private key: string = "";
+  protected key: string = "";
 
   constructor(private readonly cd: ChangeDetectorRef, public router: Router, private readonly menuService: MenuService) {
     this.subscriptions.push(this.menuService.menuSource$.subscribe(value => {

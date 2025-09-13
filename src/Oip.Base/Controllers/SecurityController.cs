@@ -56,6 +56,7 @@ public class SecurityController : ControllerBase
 
         return new GetKeycloakClientSettingsResponse()
         {
+            // Use base url from settings
             Authority = securitySettings.BaseUrl.UrlAppend("realms").UrlAppend(securitySettings.Realm),
             ClientId = securitySettings.Front.ClientId,
             Scope = securitySettings.Front.Scope,

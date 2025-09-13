@@ -1,4 +1,0 @@
-services:
-  keycloak:
-    volumes:
-      - $HOME/.aspnet/https:/opt/keycloak/data/cert/

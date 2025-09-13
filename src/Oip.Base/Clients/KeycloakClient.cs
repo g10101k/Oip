@@ -8,7 +8,7 @@ namespace Oip.Base.Clients;
 /// <summary>
 /// Keycloak client
 /// </summary>
-public class KeycloakClient : HttpClient
+public sealed class KeycloakClient : HttpClient
 {
     private HttpClient _httpClient;
     private AuthResponse? _authResponse;
@@ -32,7 +32,7 @@ public class KeycloakClient : HttpClient
     /// <summary>
     /// Json settings
     /// </summary>
-    protected JsonSerializerSettings JsonSerializerSettings => Settings.Value;
+    private JsonSerializerSettings JsonSerializerSettings => Settings.Value;
 
     /// <inheritdoc />
     public KeycloakClient(HttpClient httpClient)
@@ -49,7 +49,7 @@ public class KeycloakClient : HttpClient
     /// <param name="clientId"></param>
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
-    public virtual async Task<AuthResponse> Authentication(string clientId, string secret, string realm,
+    public async Task<AuthResponse> Authentication(string clientId, string secret, string realm,
         CancellationToken cancellationToken)
     {
         if (clientId == null) throw new ArgumentNullException(nameof(clientId));
@@ -117,7 +117,7 @@ public class KeycloakClient : HttpClient
     /// <param name="realm"></param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <exception cref="ApiException">A server side error occurred.</exception>
-    public virtual async Task<List<Role>> GetRoles(string realm, CancellationToken cancellationToken)
+    public async Task<List<Role>> GetRoles(string realm, CancellationToken cancellationToken)
     {
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _authResponse.AccessToken);
@@ -158,7 +158,7 @@ public class KeycloakClient : HttpClient
     /// Object response result
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    protected struct ObjectResponseResult<T>
+    private struct ObjectResponseResult<T>
     {
         /// <summary>
         /// .ctor
@@ -191,7 +191,7 @@ public class KeycloakClient : HttpClient
     /// <typeparam name="T">The type of object to deserialize.</typeparam>
     /// <returns>An <see cref="ObjectResponseResult{T}"/> containing the deserialized object and the response text.</returns>
     /// <exception cref="ApiException">Thrown if deserialization fails.</exception>
-    protected virtual async Task<ObjectResponseResult<T>> ReadObjectResponseAsync<T>(
+    private async Task<ObjectResponseResult<T>> ReadObjectResponseAsync<T>(
         HttpResponseMessage? response,
         CancellationToken cancellationToken, bool readResponseAsString = false)
     {
