@@ -1,1 +1,0 @@
-docker compose -f common.yml -f unix.yml up -d
