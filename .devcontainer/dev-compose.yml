@@ -1,32 +1,4 @@
 services:
-  oip:
-    build:
-      context: ../src
-      dockerfile: ./Oip/Dockerfile
-      args: [ '--force-recreate' ]
-    ports:
-      - "50000:50000"
-    volumes:
-      - ./https:/https:ro
-    environment:
-      TZ: Europe/Moscow
-      ConnectionString: XpoProvider=Postgres;Server=postgres;Database=oip;uid=postgres;pwd=postgres;
-      SecurityService:BaseUrl: https://localhost:8443/
-      SecurityService:InternalUrl: https://keycloak:8443/
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: https://+:50000
-      ASPNETCORE_Kestrel__Certificates__Default__Password: P@ssw0rd
-      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/oip.pfx
-    networks:
-      - backend-network
-    extra_hosts: 
-      - host.docker.internal:host-gateway
-    depends_on:
-      postgres:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-
   postgres:
     image: postgres:16.3
     environment:

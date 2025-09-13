@@ -11,14 +11,9 @@ public class SecurityServiceSettings
     public string BaseUrl { get; set; } = default!;
 
     /// <summary>
-    /// Docker internal URL for security service.
+    /// Internal Url for KeycloakClient if app run in docker container
     /// </summary>
     public string? DockerUrl { get; set; }
-
-    /// <summary>
-    /// Internal Url for KeycloakClient if app run in container
-    /// </summary>
-    public string? InternalUrl { get; set; }
 
     /// <summary>
     /// Client

@@ -15,11 +15,13 @@ dotnet dev-certs https --trust
 To start dev containers use:
 
 ````shell
-docker compose up keycloak --build --force-recreate
+docker compose -f dev-compose.yml up
 ````
 
 ## Test Container Startup
 
+To start dev containers use:
+
 ````shell
-docker compose up --build --force-recreate
+docker compose -f test-compose.yml up --build --force-recreate
 ````

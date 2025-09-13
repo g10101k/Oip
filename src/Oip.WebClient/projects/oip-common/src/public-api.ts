@@ -32,7 +32,6 @@ export * from './services/app.layout.service';
 export * from './services/app.menu.service'
 export * from './services/user.service';
 export * from './services/security-storage.service';
-export * from './services/config.service';
 
 // Events
 export * from './events/menu-change.event'

@@ -22,6 +22,7 @@ interface L10n {
   photo: string;
   usePhoto256x256Pixel: string;
   selectLanguage: string;
+  moduleManagement: string;
   localization: string;
 }
 
@@ -68,7 +69,11 @@ interface L10n {
               <p-inputSwitch id="oip-app-config-admin-mode" [(ngModel)]="menuService.adminMode"
                              (onChange)="onSwitchChange()"></p-inputSwitch>
             </div>
-            <p-button routerLink="/modules" icon="pi pi-cog" label="test"/>
+            <div class="flex items-center gap-2">
+              <label for="oip-app-config-admin-mode">{{ l10n.moduleManagement }}</label>
+              <p-button routerLink="/modules" icon="pi pi-cog" label="{{ l10n.goTo }}"/>
+
+            </div>
           </div>
         </div>
       </div>
