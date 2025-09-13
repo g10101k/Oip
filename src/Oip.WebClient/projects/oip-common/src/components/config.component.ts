@@ -24,6 +24,7 @@ interface L10n {
   selectLanguage: string;
   moduleManagement: string;
   localization: string;
+  goTo: string;
 }
 
 @Component({
