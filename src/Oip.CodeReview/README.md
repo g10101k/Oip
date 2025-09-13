@@ -1,29 +1,31 @@
 # LLM code review
 
-## Review all diff
+## Review all changes
+
 ````shell
 dotnet run ./Oip.CodeReview \
---WorkDir=/Users/igortulakov/Projects/Oip/ \
---SourceBranch=add-feature \
+--WorkDir=/path/to/project/ \
+--SourceBranch=your-branch \
 --TargetBranch=main
 ````
 
-## Review single file diff
+## Review changes in a single file
+
 ````shell
 dotnet run ./Oip.CodeReview \
---WorkDir=/Users/igortulakov/Projects/Oip/ \
---SourceBranch=code-review-change \
+--WorkDir=/path/to/project/ \
+--SourceBranch=your-branch \
 --TargetBranch=main \
---FilePath=./src/Oip.CodeReview/README.md
+--FilePath=/path/to/project/src/Oip.CodeReview/Program.cs
 ````
 
-## Create prompt for past in public LLM
+## Generate a prompt for a public LLM
 
 ````shell
 dotnet run ./Oip.CodeReview \
 --WorkDir=/Users/igortulakov/Projects/Oip/ \
 --SourceBranch=code-review-change \
 --TargetBranch=main \
---FilePath=./src/Oip.CodeReview/README.md \
+--FilePath=/path/to/project/src/Oip.CodeReview/Program.cs \
 --PromptOnly=true
 ````
