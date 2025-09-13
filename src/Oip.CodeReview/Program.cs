@@ -22,7 +22,7 @@ public static class Program
 
         GitFetchBranch(config.WorkDir, config.SourceBranch);
 
-        var diff = GetDiffUsingGitCli(config.WorkDir, config.SourceBranch, config.TargetBranch);
+        var diff = GetDiffUsingGitCli(config.WorkDir, config.SourceBranch, config.TargetBranch, config.FilePath);
 
         var promptFormat =
             @"You are an experienced developer. Conduct a code review. 
@@ -35,7 +35,6 @@ Diff:
 
         var prompt = string.Format(promptFormat, diff);
         Console.WriteLine(prompt);
-        Console.WriteLine("====================");
 
         await foreach (var stream in ollamaApiClient.GenerateAsync(prompt))
             Console.Write(stream?.Response);
@@ -47,10 +46,13 @@ Diff:
     /// <param name="repoPath">The path to the Git repository.</param>
     /// <param name="sourceBranch">The source branch.</param>
     /// <param name="targetBranch">The target branch.</param>
+    /// <param name="filePath"></param>
     /// <returns>The diff output as a string.</returns>
-    private static string GetDiffUsingGitCli(string repoPath, string sourceBranch, string targetBranch)
+    private static string GetDiffUsingGitCli(string repoPath, string sourceBranch, string targetBranch,
+        string? filePath = null)
     {
-        return GitProcessStartInfo(repoPath, $"diff -w {targetBranch}...{sourceBranch}");
+        return GitProcessStartInfo(repoPath,
+            $"diff -w --inter-hunk-context=100 --ignore-all-space {targetBranch}...{sourceBranch} {filePath}".Trim());
     }
 
     private static void GitFetchBranch(string repoPath, string targetBranch)
