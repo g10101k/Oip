@@ -17,37 +17,35 @@ public static class Program
     {
         var config = BindConfig(args);
 
-        OllamaApiClient ollamaApiClient = new OllamaApiClient(new Uri(config.Ollama.Url));
+        var ollamaApiClient = new OllamaApiClient(new Uri(config.Ollama.Url));
         ollamaApiClient.SelectedModel = config.Ollama.Model;
 
         GitFetchBranch(config.WorkDir, config.SourceBranch);
 
         var diff = GetDiffUsingGitCli(config.WorkDir, config.SourceBranch, config.TargetBranch, config.FilePath);
 
-        var promptFormat =
-            @"You are an experienced developer. Conduct a code review. 
-Be strict and find all possible problems: bugs, vulnerabilities, style, performance.
-Structure your answer with the headings: **Critical issues**, **Suggestions**, **Questions**.
-
-
-Diff:
-{0}";
+        var promptFormat = await File.ReadAllTextAsync("prompt.txt");
 
         var prompt = string.Format(promptFormat, diff);
-        Console.WriteLine(prompt);
-
-        await foreach (var stream in ollamaApiClient.GenerateAsync(prompt))
-            Console.Write(stream?.Response);
+        if (config.PromptOnly)
+        {
+            Console.WriteLine(prompt);
+        }
+        else
+        {
+            await foreach (var stream in ollamaApiClient.GenerateAsync(prompt))
+                Console.Write(stream?.Response);
+        }
     }
 
     /// <summary>
-    /// Retrieves the diff between two branches using the Git command-line interface.
+    /// Retrieves the diff between two branches using the Git command-line interface
     /// </summary>
-    /// <param name="repoPath">The path to the Git repository.</param>
-    /// <param name="sourceBranch">The source branch.</param>
-    /// <param name="targetBranch">The target branch.</param>
-    /// <param name="filePath"></param>
-    /// <returns>The diff output as a string.</returns>
+    /// <param name="repoPath">The path to the Git repository</param>
+    /// <param name="sourceBranch">The source branch</param>
+    /// <param name="targetBranch">The target branch</param>
+    /// <param name="filePath">Optional path to specific file for diff comparison</param>
+    /// <returns>The diff output as a string</returns>
     private static string GetDiffUsingGitCli(string repoPath, string sourceBranch, string targetBranch,
         string? filePath = null)
     {
@@ -85,8 +83,8 @@ Diff:
         process.StartInfo = processStartInfo;
         process.Start();
 
-        string output = process.StandardOutput.ReadToEnd();
-        string error = process.StandardError.ReadToEnd();
+        var output = process.StandardOutput.ReadToEnd();
+        var error = process.StandardError.ReadToEnd();
 
         process.WaitForExit();
 
@@ -99,10 +97,10 @@ Diff:
     }
 
     /// <summary>
-    /// Binds configuration settings from various sources.
+    /// Binds configuration settings from various sources
     /// </summary>
-    /// <param name="args">Command line arguments.</param>
-    /// <returns>The configured application settings.</returns>
+    /// <param name="args">Command line arguments</param>
+    /// <returns>The configured application settings</returns>
     private static AppSettings BindConfig(string[] args)
     {
         var configuration = new ConfigurationBuilder()
@@ -112,10 +110,10 @@ Diff:
                 $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
                 optional: true)
             .AddEnvironmentVariables()
+            .AddUserSecrets<AppSettings>()
             .AddCommandLine(args)
             .Build();
 
-        // Bind settings to classes
         var appConfig = new AppSettings();
         configuration.Bind(appConfig);
         return appConfig;
