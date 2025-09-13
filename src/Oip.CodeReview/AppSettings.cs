@@ -26,6 +26,11 @@ public class AppSettings
     public string? FilePath { get; set; }
 
     /// <summary>
+    /// When true, only prompts the user for confirmation before executing actions.
+    /// </summary>
+    public bool PromptOnly { get; set; }
+
+    /// <summary>
     /// Represents the Ollama settings.
     /// </summary>
     public OllamaSettings Ollama { get; set; } = null!;
