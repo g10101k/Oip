@@ -16,7 +16,8 @@
     "build:oip": "ng build oip",
     "build:common": "ng build oip-common",
     "test": "ng test",
-    "lint": "ng lint",
+    "lint": "ng lint --fix",
+    "prettier": "npx prettier --write projects/",
     "e2e": "ng e2e"
   },
   "private": true,
