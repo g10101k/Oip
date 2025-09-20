@@ -23,8 +23,11 @@ to be quickly retrieved for analysis, visualization, or automation.
 ```sql
 CREATE TABLE ` tag_12345 `
 (
-    `time`  DateTime64(3), 
-    `value` Nullable(Float32) ,
+    `
+    time `  DateTime64(3), `
+    value ` Nullable(
+    Float32
+) ,
     `status` Enum(
         'Good' = 0,
         'Questionable' = -1,
@@ -59,9 +62,11 @@ public class Tag
     // ... other fields
 }
 ````
+
 ---
 
 ## 🔒 Security
+
 All `INSERT` and `SELECT` queries use Dapper parameters
 
 Table and column names are validated via regex (^[a-zA-Z0-9_]+$)
@@ -69,3 +74,25 @@ No raw user input is interpolated into SQL
 
 * Dotnet app start at https://localhost:5003
 * Angular client start at https://localhost:50003
+
+## DbMigration
+
+For *nix system:
+
+````shell
+migration_name=Initialization
+dotnet ef migrations add "${migration_name}" --verbose --context RtdsMetaContext --project ./../Oip.Rtds.Data.Postgres --output-dir Migrations -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
+dotnet ef migrations add "${migration_name}" --verbose --context RtdsMetaContext --project ./../Oip.Rtds.Data.SqlServer --output-dir Migrations -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
+````
+
+For windows:
+
+````shell
+set migration_name=MigrationName
+dotnet ef migrations add "%migration_name%" --context RtdsMetaContext --project ./../Oip.Rtds.Data.Postgres --output-dir Migrations -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
+dotnet ef migrations add "%migration_name%" --context RtdsMetaContext --project ./../Oip.Rtds.Data.SqlServer --output-dir Migrations -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
+````
+
+## Why need RtdsMetaContext? 
+
+For modules, user and other
