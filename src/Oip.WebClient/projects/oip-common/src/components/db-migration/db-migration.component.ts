@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { BaseComponent, Feature, SecurityComponent } from 'oip-common'
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, SharedModule } from 'primeng/api';
@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmDialog } from "primeng/confirmdialog";
 import { NgIf } from "@angular/common";
 import { Tooltip } from "primeng/tooltip";
+import { ActivatedRoute } from "@angular/router";
 
 export interface MigrationDto {
   name: string,
@@ -134,10 +135,14 @@ interface DbMigrationSettingsDto {
   providers: [ConfirmationService],
 })
 export class DbMigrationComponent extends BaseComponent<DbMigrationSettingsDto> implements OnInit, OnDestroy, Feature {
-  controller: string = 'db-migration'
+  private readonly activatedRoute = inject(ActivatedRoute);
+  controller: string = ''
   data: MigrationDto[];
 
   async ngOnInit() {
+    this.activatedRoute.url.subscribe((url) => {
+      this.controller = url[0].toString();
+    })
     this.titleService.setTitle('Db Migration');
     await super.ngOnInit();
     await this.refreshAction();

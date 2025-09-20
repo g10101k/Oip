@@ -12,8 +12,8 @@ using Oip.Rtds.Data.Contexts;
 namespace Oip.Rtds.SqlServer.Migrations
 {
     [DbContext(typeof(RtdsMetaContext))]
-    [Migration("20250615113700_Initialize")]
-    partial class Initialize
+    [Migration("20250920082658_Initialization")]
+    partial class Initialization
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -95,7 +95,7 @@ namespace Oip.Rtds.SqlServer.Migrations
                     b.Property<string>("Uom")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ValueCaclulation")
+                    b.Property<string>("ValueCalculation")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ValueType")

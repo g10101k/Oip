@@ -1,5 +1,4 @@
 using Octonica.ClickHouseClient;
-using Oip.Rtds.Data.Settings;
 
 namespace Oip.Rtds.Data.Contexts;
 
@@ -23,7 +22,7 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// <remarks>
     /// Immediately opens a connection to the ClickHouse database.
     /// </remarks>
-    public RtdsContext(AppSettings appSettings)
+    public RtdsContext(IRtdsAppSettings appSettings)
     {
         _connection = new ClickHouseConnection(appSettings.RtsConnectionString);
         _connection.Open();

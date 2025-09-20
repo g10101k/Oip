@@ -1,10 +1,11 @@
 using Oip.Base.Settings;
+using Oip.Rtds.Data;
 using Oip.Settings;
 
-namespace Oip.Rtds.Data.Settings;
+namespace Oip.Rts.Settings;
 
 /// <inheritdoc cref="IBaseOipModuleAppSettings"/>
-public class AppSettings: BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
+public class AppSettings: BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings, IRtdsAppSettings
 {
     /// <summary>
     /// 

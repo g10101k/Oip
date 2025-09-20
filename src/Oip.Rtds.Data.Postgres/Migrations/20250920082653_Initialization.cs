@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Oip.Rtds.Data.Postgres.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Initialization : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,7 +39,7 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                     Step = table.Column<bool>(type: "boolean", nullable: false),
                     TimeCalculation = table.Column<string>(type: "text", nullable: true),
                     ErrorCalculation = table.Column<string>(type: "text", nullable: true),
-                    ValueCaclulation = table.Column<string>(type: "text", nullable: true),
+                    ValueCalculation = table.Column<string>(type: "text", nullable: true),
                     CreationDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Creator = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Partition = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false)

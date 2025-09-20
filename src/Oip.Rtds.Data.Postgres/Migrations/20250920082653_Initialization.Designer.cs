@@ -12,8 +12,8 @@ using Oip.Rtds.Data.Contexts;
 namespace Oip.Rtds.Data.Postgres.Migrations
 {
     [DbContext(typeof(RtdsMetaContext))]
-    [Migration("20250615113655_Initialize")]
-    partial class Initialize
+    [Migration("20250920082653_Initialization")]
+    partial class Initialization
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -95,7 +95,7 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                     b.Property<string>("Uom")
                         .HasColumnType("text");
 
-                    b.Property<string>("ValueCaclulation")
+                    b.Property<string>("ValueCalculation")
                         .HasColumnType("text");
 
                     b.Property<int>("ValueType")

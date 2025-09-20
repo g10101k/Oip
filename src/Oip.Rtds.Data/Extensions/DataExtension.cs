@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Oip.Base.Settings;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Repositories;
-using Oip.Rtds.Data.Settings;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 
@@ -19,7 +19,7 @@ public static class DataExtension
     /// <param name="services">The service collection.</param>
     /// <param name="settings">The application settings.</param>
     /// <returns>The modified service collection.</returns>
-    public static IServiceCollection AddRtdsData(this IServiceCollection services, AppSettings settings)
+    public static IServiceCollection AddRtdsData(this IServiceCollection services, IBaseOipModuleAppSettings settings)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
         services.AddScoped<RtdsContext>();

@@ -92,7 +92,7 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                     b.Property<string>("Uom")
                         .HasColumnType("text");
 
-                    b.Property<string>("ValueCaclulation")
+                    b.Property<string>("ValueCalculation")
                         .HasColumnType("text");
 
                     b.Property<int>("ValueType")

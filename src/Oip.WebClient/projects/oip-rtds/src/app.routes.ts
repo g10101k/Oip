@@ -12,6 +12,10 @@ export const appRoutes: Routes = [
         path: 'tag-management/:id',
         loadComponent: () => import('./app/components/tag-management/tag-management.component').then(m => m.TagManagement),
         canActivate: [() => inject(AuthGuardService).canActivate()],
+      }, {
+        path: 'rtds-meta-data-context-migration-module/:id',
+        loadComponent: () => import('oip-common').then(m => m.DbMigrationComponent),
+        canActivate: [() => inject(AuthGuardService).canActivate()],
       },
       {
         path: 'error',

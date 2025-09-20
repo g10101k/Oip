@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Oip.Rtds.SqlServer.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialize : Migration
+    public partial class Initialization : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,7 +38,7 @@ namespace Oip.Rtds.SqlServer.Migrations
                     Step = table.Column<bool>(type: "bit", nullable: false),
                     TimeCalculation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ErrorCalculation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ValueCaclulation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ValueCalculation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Creator = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Partition = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false)

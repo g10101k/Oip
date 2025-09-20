@@ -1,9 +1,9 @@
 using NLog;
 using NLog.Web;
 using Oip.Base.Extensions;
-using Oip.Rtds.Data.Contexts;
+using Oip.Rtds.Data;
 using Oip.Rtds.Data.Extensions;
-using Oip.Rtds.Data.Settings;
+using Oip.Rts.Settings;
 
 namespace Oip.Rts;
 
@@ -17,7 +17,7 @@ internal static class Program
             var settings = AppSettings.Initialize(args, false, true);
             var builder = OipModuleApplication.CreateShellBuilder(settings);
             builder.Services.AddRtdsData(settings);
-            builder.Services.AddSingleton(AppSettings.Instance);
+            builder.Services.AddSingleton<IRtdsAppSettings>(AppSettings.Instance);
             var app = builder.BuildApp(settings);
             
             app.Run();

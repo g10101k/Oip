@@ -92,7 +92,7 @@ namespace Oip.Rtds.SqlServer.Migrations
                     b.Property<string>("Uom")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ValueCaclulation")
+                    b.Property<string>("ValueCalculation")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ValueType")
