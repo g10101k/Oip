@@ -1,7 +1,7 @@
 <yandex>
     <users>
         <admin>
-            <password>admin123</password>
+            <password>P@ssw0rd</password>
             <networks>
                 <ip>::/0</ip>
             </networks>
