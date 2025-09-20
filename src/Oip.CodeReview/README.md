@@ -4,8 +4,8 @@
 
 ````shell
 dotnet run ./Oip.CodeReview \
---WorkDir=/path/to/project/ \
---SourceBranch=your-branch \
+--WorkDir=/Users/igortulakov/Projects/Lukoil-SKPP/ \
+--SourceBranch=add-tank-reconciliation-module-tests \
 --TargetBranch=main
 ````
 
@@ -13,19 +13,20 @@ dotnet run ./Oip.CodeReview \
 
 ````shell
 dotnet run ./Oip.CodeReview \
---WorkDir=/path/to/project/ \
---SourceBranch=your-branch \
+--WorkDir=/Users/igortulakov/Projects/Lukoil-SKPP/ \
+--SourceBranch=add-tank-reconciliation-module-tests \
 --TargetBranch=main \
---FilePath=/path/to/project/src/Oip.CodeReview/Program.cs
+--FilePath=./src/Indusoft.Lukoil.Skpp.UiTest/TankReconciliationModuleTests.cs
+
+
 ````
 
 ## Generate a prompt for a public LLM
 
 ````shell
 dotnet run ./Oip.CodeReview \
---WorkDir=/Users/igortulakov/Projects/Oip/ \
---SourceBranch=code-review-change \
+--WorkDir=/Users/igortulakov/Projects/Lukoil-SKPP/ \
+--SourceBranch=handle-no-case-from-smb \
 --TargetBranch=main \
---FilePath=/path/to/project/src/Oip.CodeReview/Program.cs \
 --PromptOnly=true
 ````
