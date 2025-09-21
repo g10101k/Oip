@@ -19,23 +19,26 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
   ],
   template: `
     <p-avatar
-      [image]="userService.photoLoaded ? userService.photo : null"
-      styleClass="mr-2"
+      id="oip-user-profile-photo-avatar"
+      shape="circle"
       size="xlarge"
-      shape="circle"/>
+      styleClass="mr-2"
+      [image]="userService.photoLoaded ? userService.photo : null" />
     <div class="mt-2">
       <p-fileupload
+        accept="image/*"
+        chooseIcon="pi pi-upload"
+        chooseLabel="{{ 'profileComponent.changePhoto' | translate }}"
+        id="oip-user-profile-file-upload"
+        maxFileSize="1000000"
         mode="basic"
         name="files"
-        [auto]="true"
-        chooseIcon="pi pi-upload"
         url="/api/user-profile/post-user-photo"
-        accept="image/*" maxFileSize="1000000"
         withCredentials="true"
-        (onUpload)="onBasicUploadAuto($event)"
-        chooseLabel="{{'profileComponent.changePhoto' | translate}}"/>
+        [auto]="true"
+        (onUpload)="onBasicUploadAuto($event)" />
     </div>
-  `,
+  `
 })
 export class ProfileComponent {
   readonly userService = inject(UserService);

@@ -8,7 +8,7 @@ namespace Oip.Base.Clients;
 /// <summary>
 /// Keycloak client
 /// </summary>
-public class KeycloakClient : HttpClient
+public sealed class KeycloakClient : HttpClient
 {
     private HttpClient _httpClient;
     private AuthResponse? _authResponse;
@@ -32,7 +32,7 @@ public class KeycloakClient : HttpClient
     /// <summary>
     /// Json settings
     /// </summary>
-    protected JsonSerializerSettings JsonSerializerSettings => Settings.Value;
+    private JsonSerializerSettings JsonSerializerSettings => Settings.Value;
 
     /// <inheritdoc />
     public KeycloakClient(HttpClient httpClient)
@@ -49,7 +49,7 @@ public class KeycloakClient : HttpClient
     /// <param name="clientId"></param>
     /// <returns>Success</returns>
     /// <exception cref="ApiException">A server side error occurred.</exception>
-    public virtual async Task<AuthResponse> Authentication(string clientId, string secret, string realm,
+    public async Task<AuthResponse> Authentication(string clientId, string secret, string realm,
         CancellationToken cancellationToken)
     {
         if (clientId == null) throw new ArgumentNullException(nameof(clientId));
@@ -117,7 +117,7 @@ public class KeycloakClient : HttpClient
     /// <param name="realm"></param>
     /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
     /// <exception cref="ApiException">A server side error occurred.</exception>
-    public virtual async Task<List<Role>> GetRoles(string realm, CancellationToken cancellationToken)
+    public async Task<List<Role>> GetRoles(string realm, CancellationToken cancellationToken)
     {
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _authResponse.AccessToken);
@@ -158,7 +158,7 @@ public class KeycloakClient : HttpClient
     /// Object response result
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    protected struct ObjectResponseResult<T>
+    private struct ObjectResponseResult<T>
     {
         /// <summary>
         /// .ctor
@@ -183,15 +183,15 @@ public class KeycloakClient : HttpClient
     }
 
     /// <summary>
-    /// 
+    /// Reads and deserializes the response content as an object of type T.
     /// </summary>
-    /// <param name="response"></param>
-    /// <param name="cancellationToken"></param>
-    /// <param name="readResponseAsString"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    /// <exception cref="ApiException"></exception>
-    protected virtual async Task<ObjectResponseResult<T>> ReadObjectResponseAsync<T>(
+    /// <param name="response">The HTTP response message.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <param name="readResponseAsString">Whether to read the response content as a string before deserializing.</param>
+    /// <typeparam name="T">The type of object to deserialize.</typeparam>
+    /// <returns>An <see cref="ObjectResponseResult{T}"/> containing the deserialized object and the response text.</returns>
+    /// <exception cref="ApiException">Thrown if deserialization fails.</exception>
+    private async Task<ObjectResponseResult<T>> ReadObjectResponseAsync<T>(
         HttpResponseMessage? response,
         CancellationToken cancellationToken, bool readResponseAsString = false)
     {
@@ -263,12 +263,8 @@ public partial class ApiException : Exception
     }
 
     /// <summary>
-    /// 
+    /// Exception for API calls.
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="statusCode"></param>
-    /// <param name="response"></param>
-    /// <param name="innerException"></param>
     public ApiException(string message, HttpStatusCode statusCode, string response, Exception innerException)
         : base(
             message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null)
@@ -280,23 +276,80 @@ public partial class ApiException : Exception
     }
 }
 
+/// <summary>
+/// Authentication response.
+/// </summary>
 public class AuthResponse
 {
-    [JsonProperty("access_token")] public string AccessToken { get; set; }
-    [JsonProperty("expires_in")] public int ExpiresIn { get; set; }
+    /// <summary>
+    /// The access token.
+    /// </summary>
+    [JsonProperty("access_token")] 
+    public string AccessToken { get; set; }
+
+    /// <summary>
+    /// The number of seconds the access token is valid for.
+    /// </summary>
+    [JsonProperty("expires_in")] 
+    public int ExpiresIn { get; set; }
+
+    /// <summary>
+    /// The date and time the access token expires.
+    /// </summary>
     public DateTimeOffset ExpiresOn { get; set; }
-    [JsonProperty("refresh_expires_in")] public int RefreshExpiresIn { get; set; }
-    [JsonProperty("token_type")] public string TokenType { get; set; }
-    [JsonProperty("not_before_policy")] public int NotBeforePolicy { get; set; }
+
+    /// <summary>
+    /// The number of seconds the refresh token is valid for.
+    /// </summary>
+    [JsonProperty("refresh_expires_in")] 
+    public int RefreshExpiresIn { get; set; }
+
+    /// <summary>
+    /// The type of the token.
+    /// </summary>
+    [JsonProperty("token_type")] 
+    public string TokenType { get; set; }
+
+    /// <summary>
+    /// The number of seconds before the access token is valid.
+    /// </summary>
+    [JsonProperty("not_before_policy")] 
+    public int NotBeforePolicy { get; set; }
     [JsonProperty("scope")] public string Scope { get; set; }
 }
 
+/// <summary>
+/// Role
+/// </summary>
 public class Role
 {
+    /// <summary>
+    /// Role identifier.
+    /// </summary>
     public string Id { get; set; }
+
+    /// <summary>
+    /// Name
+    /// </summary>
     public string Name { get; set; }
+
+    /// <summary>
+    /// Description
+    /// </summary>
     public string Description { get; set; }
+
+    /// <summary>
+    /// Indicates whether the role is composite.
+    /// </summary>
     public bool Composite { get; set; }
+
+    /// <summary>
+    /// Indicates whether the role is assigned to a client.
+    /// </summary>
     public bool ClientRole { get; set; }
+
+    /// <summary>
+    /// The container ID associated with the role.
+    /// </summary>
     public string ContainerId { get; set; }
 }

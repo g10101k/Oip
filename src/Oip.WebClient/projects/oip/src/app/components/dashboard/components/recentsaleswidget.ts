@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -37,7 +37,7 @@ import { Product } from "../../../api/product";
     </div>`,
     providers: [ProductService]
 })
-export class RecentSalesWidget {
+export class RecentSalesWidget implements OnInit {
     products!: Product[];
 
     constructor(private readonly productService: ProductService) {}

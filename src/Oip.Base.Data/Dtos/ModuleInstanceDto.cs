@@ -5,30 +5,53 @@ namespace Oip.Base.Data.Dtos;
 /// </summary>
 public class ModuleInstanceDto
 {
-    /// <summary></summary>
+    /// <summary>
+    /// Unique identifier for the module instance.
+    /// </summary>
     public int ModuleInstanceId { get; init; }
 
-    /// <summary></summary>
+    /// <summary>
+    /// Identifier for the module.
+    /// </summary>
     public int ModuleId { get; init; }
 
-    /// <summary></summary>
+    /// <summary>
+    /// The label for the module instance.
+    /// </summary>
     public string Label { get; init; } = null!;
 
-    /// <summary></summary>
+    /// <summary>
+    /// Icon associated with the module instance. see https://primeng.org/icons
+    /// </summary>
     public string? Icon { get; init; }
 
-    /// <summary></summary>
+    /// <summary>
+    /// Route link.
+    /// </summary>
     public List<string>? RouterLink { get; init; }
 
-    /// <summary></summary>
+    /// <summary>
+    /// URL for the module instance.
+    /// </summary>
     public string? Url { get; init; }
 
-    /// <summary></summary>
+    /// <summary>
+    /// The target.
+    /// </summary>
     public string? Target { get; init; }
 
-    /// <summary></summary>
+    /// <summary>
+    /// Configuration settings for the module instance.
+    /// </summary>
     public string? Settings { get; init; }
 
-    /// <summary>Childs</summary>
+    /// <summary>
+    /// Child module instances.
+    /// </summary>
     public List<ModuleInstanceDto>? Items { get; init; }
+
+    /// <summary>
+    /// Securities
+    /// </summary>
+    public List<string>? Securities { get; set; }
 }

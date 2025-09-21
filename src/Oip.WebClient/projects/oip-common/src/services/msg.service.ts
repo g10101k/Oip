@@ -29,12 +29,10 @@ export class MsgService {
   }
 
   error(detail: any, summary: any = this.translate.instant('msgService.error'), life: number = this.lifetime) {
-    console.error(detail);
     if (detail instanceof HttpErrorResponse) {
       summary = `Error: ${detail.status} ${detail.statusText}`;
       detail = `${detail.name} \r\n ${detail.message}`;
     }
-
     this.messageService.add({ severity: 'error', summary: summary, detail: detail.toString(), life: life });
   }
 

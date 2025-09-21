@@ -15,13 +15,6 @@
     "changePhoto": "Change Photo",
     "successfullyUploaded": "Successfully uploaded"
   },
-  "configComponent": {
-    "profile": "Profile",
-    "photo": "Photo",
-    "usePhoto256x256Pixel": "Use photo 256x256 pixel",
-    "localization": "Localization",
-    "selectLanguage": "Select Language"
-  },
   "baseComponent": {
     "content": "Content",
     "settings": "Settings",
@@ -29,7 +22,6 @@
     "success": "Save successfully"
   },
   "menuComponent": {
-    "all": "All",
     "new": "New"
   },
   "menuItemEditDialogComponent": {
@@ -40,7 +32,8 @@
     "selectModule": "",
     "icon": "Icon",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "security": "Security - read"
   },
   "menuItemCreateDialogComponent": {
     "header": "Create new menu item",
@@ -52,31 +45,20 @@
     "cancel": "Cancel",
     "save": "Save"
   },
+  "menuItemComponent": {
+    "new": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteItemConfirmHeader": "Delete",
+    "deleteItemConfirmMessage": "Are you sure you want to delete the item?",
+    "deleteItemSuccessMessage": "Successfully deleted",
+    "deleteItemConfirmRejectButtonPropsLabel": "Cancel",
+    "deleteItemConfirmAcceptButtonPropsLabel": "Delete"
+  },
   "unauthorized": {
     "welcomeToOip": "Welcome to OIP!",
     "signInToContinue": "Sign in to continue",
     "signIn": "Sign In"
-  },
-  "appModulesComponent": {
-    "title": "Modules",
-    "refreshTooltip": "Refresh",
-    "table": {
-      "moduleId": "Module ID",
-      "name": "Name",
-      "currentlyLoaded": "Currently Loaded",
-      "yes": "Yes",
-      "no": "No",
-      "deleteTooltip": "Delete"
-    },
-    "confirm": {
-      "header": "Warning",
-      "message": "Are you sure you want to delete the module?",
-      "cancel": "Cancel",
-      "delete": "Delete"
-    },
-    "messages": {
-      "deleteSuccess": "Module deleted"
-    }
   },
   "primeng": ""
 }

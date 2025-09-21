@@ -11,7 +11,23 @@ public class AppSettingsOptions
     /// <summary>
     /// Program arguments for settings
     /// </summary>
-    public string[] ProgrammeArguments { get; set; } = Array.Empty<string>();
+    [Obsolete("Will be removed in further releases. Use \"ProgramArguments\" instead")]
+    public string[] ProgrammeArguments
+    {
+        get
+        {
+            return ProgramArguments;
+        }
+        set
+        {
+            ProgramArguments = value;
+        }
+    }
+
+    /// <summary>
+    /// Program arguments for settings
+    /// </summary>
+    public string[] ProgramArguments { get; set; } = Array.Empty<string>();
 
     /// <summary>
     /// JSON file name

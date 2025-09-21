@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
-using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 
 namespace Oip.Base.Controllers;
+
 /// <summary>
 /// Base controller for managing database migrations.
 /// </summary>
@@ -114,7 +114,6 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
         return Ok();
     }
 }
-
 
 /// <summary>
 /// Data transfer object representing a database migration and its status.

@@ -18,6 +18,7 @@ namespace Oip.Base.Controllers;
 /// </remarks>
 [ApiController]
 [Route("api/security")]
+[ApiExplorerSettings(GroupName = "base")]
 public class SecurityController : ControllerBase
 {
     private readonly KeycloakService _keycloakService;
@@ -49,7 +50,7 @@ public class SecurityController : ControllerBase
     public async Task<IEnumerable<string>> GetRealmRoles()
     {
         var realmRoles = await _keycloakService.GetRealmRoles();
-        return realmRoles.Select(x => x.Name);
+        return realmRoles.Select(x => x.Name).ToList();
     }
 
     /// <summary>
@@ -77,6 +78,7 @@ public class SecurityController : ControllerBase
 
         return new GetKeycloakClientSettingsResponse()
         {
+            // Use base url from settings
             Authority = securitySettings.BaseUrl.UrlAppend("realms").UrlAppend(securitySettings.Realm),
             ClientId = securitySettings.Front.ClientId,
             Scope = securitySettings.Front.Scope,
@@ -84,7 +86,7 @@ public class SecurityController : ControllerBase
             SilentRenew = securitySettings.Front.SilentRenew,
             UseRefreshToken = securitySettings.Front.UseRefreshToken,
             LogLevel = securitySettings.Front.LogLevel,
-            SecureRoutes = securityRoutes.ToList(),
+            SecureRoutes = securityRoutes.ToList()
         };
     }
 }

@@ -81,9 +81,9 @@ namespace Oip.Base.Properties {
             }
         }
         
-        internal static string FolderModuleController_GetModuleRights_Read {
+        internal static string FolderModuleController_GetModuleRights_read {
             get {
-                return ResourceManager.GetString("FolderModuleController_GetModuleRights_Read", resourceCulture);
+                return ResourceManager.GetString("FolderModuleController_GetModuleRights_read", resourceCulture);
             }
         }
         

@@ -15,8 +15,9 @@ namespace Oip.Base.Controllers;
 /// because this module does not require specific configuration.
 /// </remarks>
 [ApiController]
-[Route("api/folder")]
-public class FolderModuleController : BaseModuleController<object>
+[Route("api/folder-module")]
+[ApiExplorerSettings(GroupName = "base")]
+public class FolderModuleController : BaseModuleController<FolderModuleSettings>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FolderModuleController"/> class.
@@ -49,4 +50,15 @@ public class FolderModuleController : BaseModuleController<object>
             },
         };
     }
+}
+
+/// <summary>
+/// Module settings.
+/// </summary>
+public class FolderModuleSettings
+{
+    /// <summary>
+    /// HTML content for the module.
+    /// </summary>
+    public string Html { get; set; } = string.Empty;
 }

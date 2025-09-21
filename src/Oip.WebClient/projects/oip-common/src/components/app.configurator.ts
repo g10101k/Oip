@@ -47,13 +47,17 @@ declare type SurfacesType = {
         <div class="pt-2 flex gap-2 flex-wrap justify-start">
           @for (primaryColor of primaryColors(); track primaryColor.name) {
             <button
-              type="button"
-              [title]="primaryColor.name"
-              (click)="updateColors($event, 'primary', primaryColor)"
-              [ngClass]="{ 'outline-primary': primaryColor.name === selectedPrimaryColor() }"
               class="border-none w-5 h-5 rounded-full p-0 cursor-pointer outline-none outline-offset-1"
-              [style]="{'background-color': primaryColor?.name === 'noir' ? 'var(--text-color)' : primaryColor?.palette?.['500'] }"
-            ></button>
+              id="oip-app-configurator-primary-color-{{ primaryColor.name }}"
+              type="button"
+              [ngClass]="{
+                'outline-primary': primaryColor.name === selectedPrimaryColor()
+              }"
+              [style]="{
+                'background-color': primaryColor?.name === 'noir' ? 'var(--text-color)' : primaryColor?.palette?.['500']
+              }"
+              [title]="primaryColor.name"
+              (click)="updateColors($event, 'primary', primaryColor)"></button>
           }
         </div>
       </div>
@@ -62,27 +66,43 @@ declare type SurfacesType = {
         <div class="pt-2 flex gap-2 flex-wrap justify-start">
           @for (surface of surfaces; track surface.name) {
             <button
-              type="button"
-              [title]="surface.name"
-              (click)="updateColors($event, 'surface', surface)"
-              [ngClass]="{ 'outline-primary': selectedSurfaceColor() ? selectedSurfaceColor() === surface.name : layoutService.layoutConfig().darkTheme ? surface.name === 'zinc' : surface.name === 'slate' }"
               class="border-none w-5 h-5 rounded-full p-0 cursor-pointer outline-none outline-offset-1"
+              id="oip-app-configurator-surface-color-{{ surface.name }}"
+              type="button"
+              [ngClass]="{
+                'outline-primary': selectedSurfaceColor()
+                  ? selectedSurfaceColor() === surface.name
+                  : layoutService.layoutConfig().darkTheme
+                    ? surface.name === 'zinc'
+                    : surface.name === 'slate'
+              }"
               [style]="{
-                                'background-color': surface?.name === 'noir' ? 'var(--text-color)' : surface?.palette?.['500']
-                            }"
-            ></button>
+                'background-color': surface?.name === 'noir' ? 'var(--text-color)' : surface?.palette?.['500']
+              }"
+              [title]="surface.name"
+              (click)="updateColors($event, 'surface', surface)"></button>
           }
         </div>
       </div>
       <div class="flex flex-col gap-2">
         <span class="text-sm text-muted-color font-semibold">Presets</span>
-        <p-selectButton [options]="presets" [ngModel]="selectedPreset()" (ngModelChange)="onPresetChange($event)"
-                        [allowEmpty]="false" size="small"/>
+        <p-selectButton
+          id="oip-app-configurator-preset-select-button"
+          size="small"
+          [allowEmpty]="false"
+          [ngModel]="selectedPreset()"
+          [options]="presets"
+          (ngModelChange)="onPresetChange($event)" />
       </div>
       <div *ngIf="showMenuModeButton()" class="flex flex-col gap-2">
         <span class="text-sm text-muted-color font-semibold">Menu Mode</span>
-        <p-selectButton [ngModel]="menuMode()" (ngModelChange)="onMenuModeChange($event)" [options]="menuModeOptions"
-                        [allowEmpty]="false" size="small"/>
+        <p-selectButton
+          id="oip-app-configurator-menu-mode-select-button"
+          size="small"
+          [allowEmpty]="false"
+          [ngModel]="menuMode()"
+          [options]="menuModeOptions"
+          (ngModelChange)="onMenuModeChange($event)" />
       </div>
     </div>
   `,

@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { BaseDataService } from "./base-data.service";
 import { MenuChangeEvent } from "../events/menu-change.event";
 import { AddModuleInstanceDto } from "../dtos/add-module-instance.dto";
 import { EditModuleInstanceDto } from "../dtos/edit-module-instance.dto";
-import { ContextMenuItemDto } from "../dtos/context-menu-item.dto";
+import { Menu } from "../api/Menu";
+import { AppTitleService } from "./app-title.service";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class MenuService extends BaseDataService {
   private readonly menuSource = new Subject<MenuChangeEvent>();
   private readonly resetSource = new Subject();
-
+  private readonly titleService = inject(AppTitleService);
+  private readonly menuDataService = inject(Menu);
   menuSource$ = this.menuSource.asObservable();
   resetSource$ = this.resetSource.asObservable();
   contextMenuItem: any;
@@ -24,8 +24,14 @@ export class MenuService extends BaseDataService {
     this.menu = (this.adminMode) ? await this.getAdminMenu() : await this.getMenu();
   }
 
-  onMenuStateChange(event: MenuChangeEvent) {
+  /**
+   * Handles changes in the menu state.
+   * @param {MenuChangeEvent} event - The event containing information about the menu state change.
+   * @return {void}
+   */
+  onMenuStateChange(event: MenuChangeEvent): void {
     this.menuSource.next(event);
+    this.titleService.setTitle(event.item.label);
   }
 
   reset() {
@@ -33,11 +39,11 @@ export class MenuService extends BaseDataService {
   }
 
   getMenu() {
-    return this.sendRequest<ContextMenuItemDto[]>(this.baseUrl + 'api/menu/get');
+    return this.menuDataService.menuGet();
   }
 
   getAdminMenu() {
-    return this.sendRequest<ContextMenuItemDto[]>(this.baseUrl + 'api/menu/get-admin-menu');
+    return this.menuDataService.menuGetAdminMenu();
   }
 
   getModules() {

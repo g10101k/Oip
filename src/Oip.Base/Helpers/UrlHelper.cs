@@ -6,11 +6,11 @@
 public static class UrlHelper
 {
     /// <summary>
-    /// Append part to url with separate /
+    /// Appends a part to the end of the URL, trimming both URL and part.
     /// </summary>
-    /// <param name="url"></param>
-    /// <param name="part"></param>
-    /// <returns></returns>
+    /// <param name="url">The base URL.</param>
+    /// <param name="part">The part to append.</param>
+    /// <return>The combined URL.</return>
     public static string UrlAppend(this string url, string part)
     {
         ArgumentNullException.ThrowIfNull(part);

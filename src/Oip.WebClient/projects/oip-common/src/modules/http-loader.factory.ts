@@ -1,6 +1,6 @@
-import {HttpClient} from "@angular/common/http";
-import {map, Observable} from "rxjs";
-import { OpenIdConfiguration, StsConfigHttpLoader } from "angular-auth-oidc-client";
+import { HttpClient } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
+import { OpenIdConfiguration, StsConfigHttpLoader } from 'angular-auth-oidc-client';
 
 /**
  * Load keycloak settings from backend and save to sessionStorage
@@ -9,16 +9,16 @@ import { OpenIdConfiguration, StsConfigHttpLoader } from "angular-auth-oidc-clie
  */
 export const httpLoaderAuthFactory = (httpClient: HttpClient) => {
   const KEYCLOAK_SETTINGS_KEY = 'keycloak-client-settings';
-  let settingsStings = sessionStorage.getItem(KEYCLOAK_SETTINGS_KEY);
+  const settingsStings = sessionStorage.getItem(KEYCLOAK_SETTINGS_KEY);
   if (settingsStings) {
-    let config$ = new Observable<any>((subscribe) => {
+    const config$ = new Observable<any>((subscribe) => {
       subscribe.next(JSON.parse(settingsStings));
     });
     return new StsConfigHttpLoader(config$);
   } else {
     const config$ = httpClient.get<any>(`api/security/get-keycloak-client-settings`).pipe(
       map((config: any) => {
-        let authConfig: OpenIdConfiguration = {
+        const authConfig: OpenIdConfiguration = {
           authority: config.authority,
           redirectUrl: window.location.origin,
           postLogoutRedirectUri: window.location.origin,
@@ -28,7 +28,7 @@ export const httpLoaderAuthFactory = (httpClient: HttpClient) => {
           useRefreshToken: config.useRefreshToken,
           silentRenew: config.silentRenew,
           logLevel: config.logLevel,
-          secureRoutes: config.secureRoutes,
+          secureRoutes: config.secureRoutes
         };
         sessionStorage.setItem(KEYCLOAK_SETTINGS_KEY, JSON.stringify(authConfig));
         return authConfig;
@@ -36,4 +36,4 @@ export const httpLoaderAuthFactory = (httpClient: HttpClient) => {
     );
     return new StsConfigHttpLoader(config$);
   }
-}
+};

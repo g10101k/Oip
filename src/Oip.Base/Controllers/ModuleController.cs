@@ -17,6 +17,7 @@ namespace Oip.Base.Controllers;
 /// </remarks>
 [ApiController]
 [Route("api/module")]
+[ApiExplorerSettings(GroupName = "base")]
 public class ModuleController : ControllerBase
 {
     private readonly ModuleRepository _moduleRepository;

@@ -1,7 +1,13 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { LoginResponse, LogoutAuthOptions, OidcSecurityService } from "angular-auth-oidc-client";
-import { BehaviorSubject, lastValueFrom, Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { Injectable, OnDestroy, inject } from '@angular/core';
+import {
+  LoginResponse,
+  LogoutAuthOptions,
+  OidcSecurityService,
+  PublicEventsService,
+  EventTypes
+} from "angular-auth-oidc-client";
+import { BehaviorSubject, Observable } from "rxjs";
+import { filter, map } from "rxjs/operators";
 
 /**
  * SecurityService extends OidcSecurityService to manage authentication,
@@ -13,17 +19,47 @@ import { map } from "rxjs/operators";
 @Injectable({ providedIn: 'root' })
 export class SecurityService extends OidcSecurityService implements OnDestroy {
   /**
+   * Handles angular OIDC events.
+   */
+  private readonly publicEventsService = inject(PublicEventsService);
+
+  /**
    * Stores the latest login response from checkAuth().
    */
   loginResponse = new BehaviorSubject<LoginResponse>(null);
+
   /**
    * Stores the decoded access token payload.
    */
-  token = new BehaviorSubject<any>(null);
+  payload = new BehaviorSubject<any>(null);
+
   /**
    * Stores user-specific data from the login response.
    */
   userData: any;
+
+  /**
+   * Initializes service and subscribes to authentication events.
+   * When a 'NewAuthenticationResult' event is received, the `auth` method is called.
+   */
+  constructor() {
+    super();
+    this.publicEventsService.registerForEvents()
+      .pipe(filter(event => event.type === EventTypes.NewAuthenticationResult))
+      .subscribe(() => {
+        this.auth()
+      });
+  }
+
+  /**
+   * Returns the ID token for the sign-in.
+   * @returns A string with the id token.
+   */
+  override getAccessToken(): Observable<string> {
+    return this.loginResponse.pipe(
+      map(data => data?.accessToken)
+    );
+  }
 
   /**
    * Indicates whether the current user has the 'admin' role.
@@ -31,7 +67,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    * @returns {boolean} True if the user is an admin, false otherwise.
    */
   get isAdmin(): boolean {
-    return this.token.getValue()?.realm_access?.roles?.includes('admin');
+    return this.payload.getValue()?.realm_access?.roles?.includes('admin');
   }
 
   /**
@@ -43,7 +79,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
       this.loginResponse.next(_response);
       this.userData = _response.userData;
       this.getPayloadFromAccessToken().subscribe(_token => {
-          this.token.next(_token);
+          this.payload.next(_token);
         }
       );
     });
@@ -56,7 +92,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    * @param {LogoutAuthOptions} [logoutAuthOptions] Optional logout options.
    */
   logout(configId?: string, logoutAuthOptions?: LogoutAuthOptions) {
-    this.logoff(configId, logoutAuthOptions).subscribe(x => this.token.next(x));
+    this.logoff(configId, logoutAuthOptions).subscribe(x => this.payload.next(x));
   }
 
   /**
@@ -64,7 +100,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    */
   ngOnDestroy(): void {
     this.loginResponse.complete();
-    this.token.complete();
+    this.payload.complete();
   }
 
   /**
@@ -74,17 +110,8 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    */
   isTokenExpired(): Observable<boolean> {
     return this.getPayloadFromAccessToken().pipe(
-      map((token) => {
-        return token.exp < Math.floor(Date.now() / 1000);
+      map((payload) => {
+        return payload.exp < Math.floor(Date.now() / 1000);
       }));
-  }
-
-  gtoken() {
-    let q = this.getPayloadFromAccessToken().pipe(
-      map((token) => {
-        return token;
-      })
-    )
-    return lastValueFrom(q);
   }
 }

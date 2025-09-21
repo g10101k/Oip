@@ -14,6 +14,7 @@ namespace Oip.Base.Extensions;
 /// </summary>
 public static class WebApplicationBuilderExtension
 {
+
     /// <summary>
     /// Applies any pending migrations for the OIP module context and registers discovered modules from loaded assemblies.
     /// </summary>
@@ -45,9 +46,14 @@ public static class WebApplicationBuilderExtension
             RouteAttribute? attr = type.GetCustomAttribute<RouteAttribute>();
             if (attr == null) continue;
             var link = attr.Template.Replace("api", string.Empty);
-            if (!moduleContext.Modules.Any(x => x.Name == moduleName))
+            var module = moduleContext.Modules.FirstOrDefault(m => m.Name == moduleName);
+            if (module is null)
             {
                 moduleContext.Modules.Add(new ModuleEntity { Name = moduleName, RouterLink = link });
+            }
+            else
+            {
+                module.RouterLink = link;
             }
         }
 

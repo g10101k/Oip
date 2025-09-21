@@ -1,0 +1,14 @@
+{
+  "config": {
+    "profile": "Профиль",
+    "photo": "Фото",
+    "usePhoto256x256Pixel": "Используйте фото 256х256 пикселей",
+    "localization": "Язык",
+    "selectLanguage": "Выберите язык",
+    "all": "Показать все меню",
+    "moduleManagement": "Управление модулями",
+    "modules": "Модули",
+    "menu": "Меню",
+    "goTo": "Перейти"
+  }
+}

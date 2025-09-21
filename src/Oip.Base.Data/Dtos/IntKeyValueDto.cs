@@ -1,8 +1,6 @@
 namespace Oip.Base.Data.Dtos;
 
 /// <summary>
-/// Int Key Value DTO
+/// Represents a key-value pair where the key is an integer and the value is a string.
 /// </summary>
-/// <param name="Key"></param>
-/// <param name="Value"></param>
 public record IntKeyValueDto(int Key, string Value);

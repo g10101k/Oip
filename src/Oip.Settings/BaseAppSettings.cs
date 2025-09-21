@@ -92,7 +92,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         if (jsonFileNameDevelopment is not null)
             _appSettingsOptions.JsonFileNameDevelopment = jsonFileNameDevelopment;
         if (programArguments is not null)
-            _appSettingsOptions.ProgrammeArguments = programArguments;
+            _appSettingsOptions.ProgramArguments = programArguments;
         if (useEfCoreProvider is not null)
             _appSettingsOptions.UseEfCoreProvider = (bool)useEfCoreProvider;
         if (appSettingsTable is not null)
@@ -139,7 +139,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
             .AddSpaConfig()
             .AddModuleConfig()
             .AddEnvironmentVariables()
-            .AddCommandLine(Instance.AppSettingsOptions.ProgrammeArguments)
+            .AddCommandLine(Instance.AppSettingsOptions.ProgramArguments)
             .Build();
         return configuration;
     }

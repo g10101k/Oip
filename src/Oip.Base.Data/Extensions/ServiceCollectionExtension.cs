@@ -37,6 +37,7 @@ public static class ServiceCollectionExtension
                             option.UseNpgsql(connectionModel.NormalizeConnectionString,
                                 x =>
                                 {
+                                    x.MigrationsAssembly("Oip.Base.Data.Postgres");
                                     x.MigrationsHistoryTable(migrationHistoryTableName, migrationHistorySchemaName);
                                     x.MigrationsAssembly("Oip.Base.Data.Postgres");
                                 });
@@ -45,6 +46,7 @@ public static class ServiceCollectionExtension
                             option.UseSqlServer(connectionModel.NormalizeConnectionString,
                                 x =>
                                 {
+                                    x.MigrationsAssembly("Oip.Base.Data.SqlServer");
                                     x.MigrationsHistoryTable(migrationHistoryTableName, migrationHistorySchemaName);
                                     x.MigrationsAssembly("Oip.Base.Data.SqlServer");
                                 });

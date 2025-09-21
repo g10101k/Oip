@@ -1,0 +1,14 @@
+{
+  "config": {
+    "profile": "Profile",
+    "photo": "Photo",
+    "usePhoto256x256Pixel": "Use a 256x256 pixel photo",
+    "localization": "Language",
+    "selectLanguage": "Select language",
+    "all": "Show all menu",
+    "moduleManagement": "Module management",
+    "modules": "Modules",
+    "menu": "Menu",
+    "goTo": "Go to"
+  }
+}
