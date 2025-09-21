@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Base.Data.Constants;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Entities;
