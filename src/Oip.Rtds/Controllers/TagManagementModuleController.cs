@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Constants;
 using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
-using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Entities;
@@ -103,7 +103,7 @@ public class TagManagementModuleController : BaseModuleController<object>
         {
             new()
             {
-                Code = SecurityConstants.ReadRight,
+                Code = SecurityConstants.Read,
                 Name = Resources.TagController_GetModuleRights_Read,
                 Description = Resources.TagController_GetModuleRights_Cat_view_this_module,
                 Roles = [SecurityConstants.AdminRole]

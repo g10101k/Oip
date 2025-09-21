@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Constants;
 using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
-using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Example.Data.Contexts;
 using Oip.Properties;
@@ -32,7 +31,7 @@ public class DataContextMigrationModuleController : BaseDbMigrationController<ob
         {
             new()
             {
-                Code = SecurityConstants.ReadRight,
+                Code = SecurityConstants.Read,
                 Name = Resources.DataContextMigrationController_GetModuleRights_Read,
                 Description = Resources.DataContextMigrationController_GetModuleRights_Can_this_module,
                 Roles = [SecurityConstants.AdminRole]

@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Constants;
 using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
-using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Rtds.Data.Contexts;
+using Oip.Rts.Properties;
 
 namespace Oip.Rts.Controllers;
 
@@ -37,9 +38,9 @@ public class RtdsMetaDataContextMigrationModuleController : BaseDbMigrationContr
         {
             new()
             {
-                Code = SecurityConstants.ReadRight,
-                Name = "Read",
-                Description = "Can read this module",
+                Code = SecurityConstants.Read,
+                Name = Resources.RtdsMetaDataContextMigrationModuleController_GetModuleRights_Read,
+                Description = Resources.RtdsMetaDataContextMigrationModuleController_GetModuleRights_Can_read_this_module,
                 Roles = [SecurityConstants.AdminRole]
             },
         };

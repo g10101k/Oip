@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Constants;
 using Oip.Base.Controllers.Api;
-using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Properties;
 
@@ -43,8 +43,8 @@ public class FolderModuleController : BaseModuleController<FolderModuleSettings>
         {
             new()
             {
-                Code = SecurityConstants.ReadRight,
-                Name = Resources.FolderModuleController_GetModuleRights_Read,
+                Code = SecurityConstants.Read,
+                Name = Resources.ModuleModuleController_GetModuleRights_Read,
                 Description = Resources.FolderModuleController_GetModuleRights_Can_view_this_module,
                 Roles = [SecurityConstants.AdminRole]
             },

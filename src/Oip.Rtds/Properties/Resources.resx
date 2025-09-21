@@ -24,4 +24,10 @@
     <data name="TagController_GetModuleRights_Cat_view_this_module" xml:space="preserve">
         <value>Cat view this module</value>
     </data>
+    <data name="RtdsMetaDataContextMigrationModuleController_GetModuleRights_Read" xml:space="preserve">
+        <value>Read</value>
+    </data>
+    <data name="RtdsMetaDataContextMigrationModuleController_GetModuleRights_Can_read_this_module" xml:space="preserve">
+        <value>Can read this module</value>
+    </data>
 </root>

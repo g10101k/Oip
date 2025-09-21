@@ -26,7 +26,4 @@ public class UrlHelperTest
     {
         Assert.That(url.UrlAppend(part), Is.EqualTo(expected));
     } 
-        // Act
-        return baseUrl.UrlAppend(part);
-    }
 }
