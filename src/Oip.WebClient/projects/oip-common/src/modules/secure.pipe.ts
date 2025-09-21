@@ -1,7 +1,7 @@
-import {inject, Pipe, PipeTransform} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
-import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
-import {map, Observable} from "rxjs";
+import { inject, Pipe, PipeTransform } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { map, Observable } from 'rxjs';
 
 @Pipe({
   standalone: true,
@@ -13,6 +13,7 @@ export class SecurePipe implements PipeTransform {
 
   transform(url: any): Observable<SafeUrl> {
     return this.http
-      .get(url, {responseType: 'blob'}).pipe(map(val => this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(val))));
+      .get(url, { responseType: 'blob' })
+      .pipe(map((val) => this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(val))));
   }
 }

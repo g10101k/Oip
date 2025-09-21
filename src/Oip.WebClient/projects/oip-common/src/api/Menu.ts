@@ -10,18 +10,18 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from '@angular/core';
 import {
   AddModuleInstanceDto,
   EditModuleInstanceDto,
   IntKeyValueDto,
   MenuDeleteModuleInstanceParams,
-  ModuleInstanceDto,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+  ModuleInstanceDto
+} from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
-export class Menu<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+@Injectable()
+export class Menu<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Filters modules based on the roles of the current user and returns only those that are accessible.
    *
@@ -34,10 +34,10 @@ export class Menu<
   menuGet = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * @description Returns all administrative modules for users with the Admin role.
@@ -51,10 +51,10 @@ export class Menu<
   menuGetAdminMenu = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get-admin-menu`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * @description Useful for module management interfaces or system diagnostics.
@@ -68,10 +68,10 @@ export class Menu<
   menuGetModules = (params: RequestParams = {}) =>
     this.request<IntKeyValueDto[], any>({
       path: `/api/menu/get-modules`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -82,17 +82,14 @@ export class Menu<
    * @request POST:/api/menu/add-module-instance
    * @secure
    */
-  menuAddModuleInstance = (
-    data: AddModuleInstanceDto,
-    params: RequestParams = {},
-  ) =>
+  menuAddModuleInstance = (data: AddModuleInstanceDto, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/menu/add-module-instance`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -103,17 +100,14 @@ export class Menu<
    * @request POST:/api/menu/edit-module-instance
    * @secure
    */
-  menuEditModuleInstance = (
-    data: EditModuleInstanceDto,
-    params: RequestParams = {},
-  ) =>
+  menuEditModuleInstance = (data: EditModuleInstanceDto, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/menu/edit-module-instance`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -124,15 +118,12 @@ export class Menu<
    * @request DELETE:/api/menu/delete-module-instance
    * @secure
    */
-  menuDeleteModuleInstance = (
-    query: MenuDeleteModuleInstanceParams,
-    params: RequestParams = {},
-  ) =>
+  menuDeleteModuleInstance = (query: MenuDeleteModuleInstanceParams, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/menu/delete-module-instance`,
-      method: "DELETE",
+      method: 'DELETE',
       query: query,
       secure: true,
-      ...params,
+      ...params
     });
 }

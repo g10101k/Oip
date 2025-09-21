@@ -1,61 +1,61 @@
 {
-	"msgService": {
-		"success": "Успешно",
-		"info": "Информация",
-		"warn": "Внимание",
-		"error": "Ошибка",
-		"secondary": "Вспомогательный"
-	},
-	"securityComponent": {
-		"security": "Безопасность",
-		"save": "Сохранить",
-		"savedSecurity": "Настройки сохранены"
-	},
-	"profileComponent": {
-		"changePhoto": "Загрузить фото",
-		"successfullyUploaded": "Загружено"
-	},
-	"configComponent": {
-		"profile": "Профиль",
-		"photo": "Фото",
-		"usePhoto256x256Pixel": "Используйте фото 256х256 пикселей",
-		"localization": "Язык",
-		"selectLanguage": "Выберите язык"
-	},
-	"baseComponent": {
-		"content": "Содержимое",
-		"settings": "Настройки",
-		"security": "Безопасность",
-		"success": "Сохранено"
-	},
-	"menuComponent": {
-		"all": "Все",
-		"new": "Добавить"
-	},
-	"menuItemEditDialogComponent": {
-		"header": "Редактировать элемент меню",
-		"parentLabel": "Родительский узел",
-		"label": "Имя",
-		"module": "Модуль",
-		"selectModule": "Выбери модуль",
-		"icon": "Иконка",
-		"cancel": "Отмена",
-		"save": "Сохранить"
-	},
-	"menuItemCreateDialogComponent": {
-		"header": "Новый элемент меню",
-		"parentLabel": "Родительский узел",
-		"label": "Имя",
-		"module": "Модуль",
-		"selectModule": "Выбери модуль",
-		"icon": "Иконка",
-		"cancel": "Отмена",
-		"save": "Сохранить"
-	},
-	"unauthorized": {
-		"welcomeToOip": "Добро пожаловать в OIP!",
-		"signInToContinue": "Войдите чтобы продолжить",
-		"signIn": "Войти"
-	},
-	"primeng": ""
+  "msgService": {
+    "success": "Успешно",
+    "info": "Информация",
+    "warn": "Внимание",
+    "error": "Ошибка",
+    "secondary": "Вспомогательный"
+  },
+  "securityComponent": {
+    "security": "Безопасность",
+    "save": "Сохранить",
+    "savedSecurity": "Настройки сохранены"
+  },
+  "profileComponent": {
+    "changePhoto": "Загрузить фото",
+    "successfullyUploaded": "Загружено"
+  },
+  "configComponent": {
+    "profile": "Профиль",
+    "photo": "Фото",
+    "usePhoto256x256Pixel": "Используйте фото 256х256 пикселей",
+    "localization": "Язык",
+    "selectLanguage": "Выберите язык"
+  },
+  "baseComponent": {
+    "content": "Содержимое",
+    "settings": "Настройки",
+    "security": "Безопасность",
+    "success": "Сохранено"
+  },
+  "menuComponent": {
+    "all": "Все",
+    "new": "Добавить"
+  },
+  "menuItemEditDialogComponent": {
+    "header": "Редактировать элемент меню",
+    "parentLabel": "Родительский узел",
+    "label": "Имя",
+    "module": "Модуль",
+    "selectModule": "Выбери модуль",
+    "icon": "Иконка",
+    "cancel": "Отмена",
+    "save": "Сохранить"
+  },
+  "menuItemCreateDialogComponent": {
+    "header": "Новый элемент меню",
+    "parentLabel": "Родительский узел",
+    "label": "Имя",
+    "module": "Модуль",
+    "selectModule": "Выбери модуль",
+    "icon": "Иконка",
+    "cancel": "Отмена",
+    "save": "Сохранить"
+  },
+  "unauthorized": {
+    "welcomeToOip": "Добро пожаловать в OIP!",
+    "signInToContinue": "Войдите чтобы продолжить",
+    "signIn": "Войти"
+  },
+  "primeng": ""
 }

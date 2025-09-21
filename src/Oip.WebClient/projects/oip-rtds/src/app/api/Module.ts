@@ -10,16 +10,10 @@
  * ---------------------------------------------------------------
  */
 
-import {
-  ExistModuleDto,
-  ModuleDeleteRequest,
-  ModuleDto,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { ExistModuleDto, ModuleDeleteRequest, ModuleDto } from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
-export class Module<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Module<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Only accessible to users with the Admin role.
    *
@@ -32,10 +26,10 @@ export class Module<
   moduleGetAllList = (params: RequestParams = {}) =>
     this.request<ModuleDto[], any>({
       path: `/api/module/get-all`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -49,11 +43,11 @@ export class Module<
   moduleInsertCreate = (data: ModuleDto, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/module/insert`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -64,17 +58,14 @@ export class Module<
    * @request DELETE:/api/module/delete
    * @secure
    */
-  moduleDeleteDelete = (
-    data: ModuleDeleteRequest,
-    params: RequestParams = {},
-  ) =>
+  moduleDeleteDelete = (data: ModuleDeleteRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/module/delete`,
-      method: "DELETE",
+      method: 'DELETE',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * @description Compares all modules in the database with loaded modules in the application context. This information can be used for diagnostics and monitoring of active modules.
@@ -88,9 +79,9 @@ export class Module<
   moduleGetModulesWithLoadStatusList = (params: RequestParams = {}) =>
     this.request<ExistModuleDto[], any>({
       path: `/api/module/get-modules-with-load-status`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
 }

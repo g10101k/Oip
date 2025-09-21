@@ -47,26 +47,26 @@ interface DbMigrationSettingsDto {}
         <div class="flex flex-row gap-2">
           <p-button
             icon="pi pi-refresh"
-            severity="secondary"
             pTooltip="Refresh"
+            severity="secondary"
             tooltipPosition="bottom"
             [outlined]="true"
             (click)="refreshAction()" />
           <p-button
             icon="pi pi-filter-slash"
-            severity="secondary"
             pTooltip="Clean filter"
+            severity="secondary"
             tooltipPosition="bottom"
             [outlined]="true"
             (click)="dt.clear()" />
         </div>
         <div>
-          <p-table #dt [value]="data" dataKey="name" editMode="row" [scrollable]="true" size="small">
-            <ng-template pTemplate="header" let-columns>
+          <p-table #dt dataKey="name" editMode="row" size="small" [scrollable]="true" [value]="data">
+            <ng-template let-columns pTemplate="header">
               <tr>
                 <th pSortableColumn="name" scope="col">
                   Migration name
-                  <p-columnFilter type="text" field="name" display="menu" />
+                  <p-columnFilter display="menu" field="name" type="text" />
                 </th>
                 <th scope="col">Applied</th>
                 <th scope="col">Exist</th>
@@ -75,7 +75,7 @@ interface DbMigrationSettingsDto {}
               </tr>
             </ng-template>
 
-            <ng-template #body let-editing="editing" let-ri="rowIndex" let-rowData let-columns="columns">
+            <ng-template #body let-columns="columns" let-editing="editing" let-ri="rowIndex" let-rowData>
               <tr [pEditableRow]="rowData">
                 <td>
                   {{ rowData.name }}
@@ -85,12 +85,12 @@ interface DbMigrationSettingsDto {}
                     *ngIf="rowData.applied"
                     icon="pi pi-check"
                     severity="success"
-                    [text]="true"
-                    [rounded]="true">
+                    [rounded]="true"
+                    [text]="true">
                   </p-button>
                 </td>
                 <td>
-                  <p-button *ngIf="rowData.exist" icon="pi pi-check" severity="success" [text]="true" [rounded]="true">
+                  <p-button *ngIf="rowData.exist" icon="pi pi-check" severity="success" [rounded]="true" [text]="true">
                   </p-button>
                 </td>
                 <td>
@@ -98,19 +98,19 @@ interface DbMigrationSettingsDto {}
                     *ngIf="rowData.pending"
                     icon="pi pi-check"
                     severity="success"
-                    [text]="true"
-                    [rounded]="true">
+                    [rounded]="true"
+                    [text]="true">
                   </p-button>
                 </td>
                 <td>
                   <p-button
                     icon="pi pi-bolt"
-                    severity="secondary"
                     pCancelEditableRow
-                    [text]="true"
-                    [rounded]="true"
                     pTooltip="Apply migration"
+                    severity="secondary"
                     tooltipPosition="left"
+                    [rounded]="true"
+                    [text]="true"
                     (click)="applyMigration(rowData)">
                   </p-button>
                 </td>
@@ -120,7 +120,7 @@ interface DbMigrationSettingsDto {}
         </div>
       </div>
     </div>
-    <security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>
+    <security *ngIf="isSecurity" [controller]="controller" [id]="id"></security>
   `,
   providers: [ConfirmationService]
 })
@@ -151,7 +151,7 @@ export class DbMigrationComponent
   }
 
   async applyMigration(rowData: MigrationDto) {
-    let request = { name: rowData.name } as ApplyMigrationRequest;
+    const request = { name: rowData.name } as ApplyMigrationRequest;
     return this.baseDataService.sendRequest(`api/${this.controller}/apply-migration`, 'POST', request);
   }
 }

@@ -13,13 +13,13 @@ import {
   UserService,
   langIntercept,
   httpLoaderAuthFactory
-} from "oip-common";
-import { LocationStrategy, PathLocationStrategy } from "@angular/common";
-import { ProductService } from "./app/service/product.service";
-import { MessageService } from "primeng/api";
-import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
-import { TranslateHttpLoader } from "@ngx-translate/http-loader";
-import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from "angular-auth-oidc-client";
+} from 'oip-common';
+import { LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { ProductService } from './app/service/product.service';
+import { MessageService } from 'primeng/api';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
@@ -34,25 +34,31 @@ export const appConfig: ApplicationConfig = {
     SecurityDataService,
     BaseDataService,
     UserService,
-    importProvidersFrom([TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: httpLoaderFactory,
-        deps: [HttpClient],
-      },
-    })]),
+    importProvidersFrom([
+      TranslateModule.forRoot({
+        loader: {
+          provide: TranslateLoader,
+          useFactory: httpLoaderFactory,
+          deps: [HttpClient]
+        }
+      })
+    ]),
     provideAuth({
       loader: {
         provide: StsConfigLoader,
         useFactory: httpLoaderAuthFactory,
-        deps: [HttpClient],
-      },
+        deps: [HttpClient]
+      }
     }),
     { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
-    provideRouter(appRoutes, withInMemoryScrolling({
-      anchorScrolling: 'enabled',
-      scrollPositionRestoration: 'enabled'
-    }), withEnabledBlockingInitialNavigation()),
+    provideRouter(
+      appRoutes,
+      withInMemoryScrolling({
+        anchorScrolling: 'enabled',
+        scrollPositionRestoration: 'enabled'
+      }),
+      withEnabledBlockingInitialNavigation()
+    ),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
@@ -64,4 +70,3 @@ export const appConfig: ApplicationConfig = {
     })
   ]
 };
-

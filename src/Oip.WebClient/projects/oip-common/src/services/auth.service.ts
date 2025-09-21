@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Observable, combineLatest, of, lastValueFrom, forkJoin } from 'rxjs';
-import { SecurityService } from "./security.service";
+import { SecurityService } from './security.service';
 
 /**
  * A route guard that ensures the user is authenticated and has a valid access token.
@@ -23,11 +23,7 @@ export class AuthGuardService {
    * @returns {Observable<boolean | UrlTree>} A stream resolving to true (allow), or UrlTree (redirect).
    */
   canActivate(): Observable<boolean | UrlTree> {
-
-    return combineLatest([
-      this.oidcSecurityService.isAuthenticated(),
-      this.oidcSecurityService.isTokenExpired()
-    ]).pipe(
+    return combineLatest([this.oidcSecurityService.isAuthenticated(), this.oidcSecurityService.isTokenExpired()]).pipe(
       switchMap(([authenticated, tokenExpired]) => {
         if (!authenticated) {
           return of(this.router.parseUrl('/unauthorized'));
@@ -37,8 +33,9 @@ export class AuthGuardService {
         }
 
         // Token is expired; attempt to refresh
-        return this.tryRefreshToken()
-      }));
+        return this.tryRefreshToken();
+      })
+    );
   }
 
   /**
@@ -49,13 +46,13 @@ export class AuthGuardService {
    */
   tryRefreshToken(): Observable<boolean | UrlTree> {
     return this.oidcSecurityService.forceRefreshSession().pipe(
-      map(refreshSuccess => {
+      map((refreshSuccess) => {
         return refreshSuccess ? true : this.router.parseUrl('/unauthorized');
       }),
       catchError((err) => {
         console.warn(err);
-        return of(this.router.parseUrl('/unauthorized'))
+        return of(this.router.parseUrl('/unauthorized'));
       })
-    )
+    );
   }
 }

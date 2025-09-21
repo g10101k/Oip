@@ -1,4 +1,4 @@
-import { IsActiveMatchOptions, Params, QueryParamsHandling } from "@angular/router";
+import { IsActiveMatchOptions, Params, QueryParamsHandling } from '@angular/router';
 
 export interface ContextMenuItemDto {
   url: any;
@@ -17,7 +17,7 @@ export interface ContextMenuItemDto {
   skipLocationChange: unknown;
   queryParams: Params | null | undefined;
   target: string;
-  state: {[p: string]: any} | undefined;
+  state: { [p: string]: any } | undefined;
   replaceUrl: unknown;
   badgeClass: string;
 }

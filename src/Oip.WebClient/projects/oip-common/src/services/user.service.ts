@@ -1,6 +1,6 @@
-import {inject, Injectable} from '@angular/core';
-import {SecurityService} from './security.service';
-import {BaseDataService} from './base-data.service';
+import { inject, Injectable } from '@angular/core';
+import { SecurityService } from './security.service';
+import { BaseDataService } from './base-data.service';
 
 /**
  * UserService is responsible for retrieving and handling user-related data,
@@ -30,12 +30,12 @@ export class UserService {
    * Typically used for avatar display when a photo is unavailable.
    */
   get shortLabel(): string {
-    let data = this.securityService.userData;
+    const data = this.securityService.userData;
     return data.given_name[0] + data.family_name[0];
   }
 
   get userName(): string {
-    let data = this.securityService.userData;
+    const data = this.securityService.userData;
     return `${data.given_name} ${data.family_name}`;
   }
 
@@ -44,14 +44,16 @@ export class UserService {
    * and updates the `photo` and `photoLoaded` properties accordingly.
    */
   getUserPhoto(): void {
-    let url = `${this.baseDataService.baseUrl}api/user-profile/get-user-photo?email=${this.securityService.userData.email}`;
-    this.baseDataService.getBlob(url)
-      .then(data => {
+    const url = `${this.baseDataService.baseUrl}api/user-profile/get-user-photo?email=${this.securityService.userData.email}`;
+    this.baseDataService.getBlob(url).then(
+      (data) => {
         this.createImageFromBlob(data as Blob);
         this.photoLoaded = true;
-      }, error => {
+      },
+      (error) => {
         console.log(error);
-      });
+      }
+    );
   }
 
   /**
@@ -60,10 +62,14 @@ export class UserService {
    * @param image - The image Blob to be converted.
    */
   private createImageFromBlob(image: Blob): void {
-    let reader = new FileReader();
-    reader.addEventListener('load', () => {
-      this.photo = reader.result;
-    }, false);
+    const reader = new FileReader();
+    reader.addEventListener(
+      'load',
+      () => {
+        this.photo = reader.result;
+      },
+      false
+    );
     if (image) {
       reader.readAsDataURL(image);
     }

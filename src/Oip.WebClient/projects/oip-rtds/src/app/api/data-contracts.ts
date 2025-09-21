@@ -12,13 +12,13 @@
 
 /** Defines the data types supported for tags */
 export enum TagTypes {
-  Float32 = "Float32",
-  Float64 = "Float64",
-  Int16 = "Int16",
-  Int32 = "Int32",
-  Digital = "Digital",
-  String = "String",
-  Blob = "Blob",
+  Float32 = 'Float32',
+  Float64 = 'Float64',
+  Int16 = 'Int16',
+  Int32 = 'Int32',
+  Digital = 'Digital',
+  String = 'String',
+  Blob = 'Blob'
 }
 
 /** DTO for create module instance */

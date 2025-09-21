@@ -17,13 +17,11 @@ import {
   PutSecurityRequest,
   RtdsMetaDataContextMigrationModuleGetModuleInstanceSettingsListParams,
   RtdsMetaDataContextMigrationModuleGetSecurityListParams,
-  SecurityResponse,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+  SecurityResponse
+} from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
-export class RtdsMetaDataContextMigrationModule<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class RtdsMetaDataContextMigrationModule<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description By default, returns read permission available only for admin role
    *
@@ -33,15 +31,13 @@ export class RtdsMetaDataContextMigrationModule<
    * @request GET:/api/rtds-meta-data-context-migration-module/get-module-rights
    * @secure
    */
-  rtdsMetaDataContextMigrationModuleGetModuleRightsList = (
-    params: RequestParams = {},
-  ) =>
+  rtdsMetaDataContextMigrationModuleGetModuleRightsList = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/rtds-meta-data-context-migration-module/get-module-rights`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * @description The returned list includes: - Migrations that have been applied to the database. - Pending migrations that exist in code but are not applied. - Migrations defined in code regardless of their application status.
@@ -52,15 +48,13 @@ export class RtdsMetaDataContextMigrationModule<
    * @request GET:/api/rtds-meta-data-context-migration-module/get-migrations
    * @secure
    */
-  rtdsMetaDataContextMigrationModuleGetMigrationsList = (
-    params: RequestParams = {},
-  ) =>
+  rtdsMetaDataContextMigrationModuleGetMigrationsList = (params: RequestParams = {}) =>
     this.request<MigrationDto[], any>({
       path: `/api/rtds-meta-data-context-migration-module/get-migrations`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * @description Uses Entity Framework Core's migration mechanism to bring the database schema up to date with the current codebase. This operation is irreversible and should be performed with caution in production environments.
@@ -71,14 +65,12 @@ export class RtdsMetaDataContextMigrationModule<
    * @request POST:/api/rtds-meta-data-context-migration-module/migrate
    * @secure
    */
-  rtdsMetaDataContextMigrationModuleMigrateCreate = (
-    params: RequestParams = {},
-  ) =>
+  rtdsMetaDataContextMigrationModuleMigrateCreate = (params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/rtds-meta-data-context-migration-module/migrate`,
-      method: "POST",
+      method: 'POST',
       secure: true,
-      ...params,
+      ...params
     });
   /**
    * @description This method allows applying or reverting to a specific migration by name. Useful for targeted database updates or rolling back schema changes.
@@ -89,17 +81,14 @@ export class RtdsMetaDataContextMigrationModule<
    * @request POST:/api/rtds-meta-data-context-migration-module/apply-migration
    * @secure
    */
-  rtdsMetaDataContextMigrationModuleApplyMigrationCreate = (
-    data: ApplyMigrationRequest,
-    params: RequestParams = {},
-  ) =>
+  rtdsMetaDataContextMigrationModuleApplyMigrationCreate = (data: ApplyMigrationRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/rtds-meta-data-context-migration-module/apply-migration`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -112,15 +101,15 @@ export class RtdsMetaDataContextMigrationModule<
    */
   rtdsMetaDataContextMigrationModuleGetSecurityList = (
     query: RtdsMetaDataContextMigrationModuleGetSecurityListParams,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<SecurityResponse[], any>({
       path: `/api/rtds-meta-data-context-migration-module/get-security`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -131,17 +120,14 @@ export class RtdsMetaDataContextMigrationModule<
    * @request PUT:/api/rtds-meta-data-context-migration-module/put-security
    * @secure
    */
-  rtdsMetaDataContextMigrationModulePutSecurityUpdate = (
-    data: PutSecurityRequest,
-    params: RequestParams = {},
-  ) =>
+  rtdsMetaDataContextMigrationModulePutSecurityUpdate = (data: PutSecurityRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/rtds-meta-data-context-migration-module/put-security`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -154,14 +140,14 @@ export class RtdsMetaDataContextMigrationModule<
    */
   rtdsMetaDataContextMigrationModuleGetModuleInstanceSettingsList = (
     query: RtdsMetaDataContextMigrationModuleGetModuleInstanceSettingsListParams,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, any>({
       path: `/api/rtds-meta-data-context-migration-module/get-module-instance-settings`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -173,14 +159,14 @@ export class RtdsMetaDataContextMigrationModule<
    */
   rtdsMetaDataContextMigrationModulePutModuleInstanceSettingsUpdate = (
     data: ObjectSaveSettingsRequest,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, any>({
       path: `/api/rtds-meta-data-context-migration-module/put-module-instance-settings`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
 }

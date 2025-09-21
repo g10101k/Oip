@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { MessageService } from "primeng/api";
-import { HttpErrorResponse } from "@angular/common/http";
-import { ToastMessageOptions } from "primeng/api/toastmessage";
-import { TranslateService } from "@ngx-translate/core";
+import { MessageService } from 'primeng/api';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ToastMessageOptions } from 'primeng/api/toastmessage';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
@@ -44,4 +44,3 @@ export class MsgService {
     this.messageService.add({ severity: 'secondary', summary: summary, detail: detail, life: life });
   }
 }
-

@@ -7,9 +7,10 @@ export class ProductService {
   http: HttpClient = inject(HttpClient);
 
   getProductsSmall() {
-    return this.http.get<any>('assets/demo/data/products-small.json')
+    return this.http
+      .get<any>('assets/demo/data/products-small.json')
       .toPromise()
-      .then(res => res.data as Product[])
-      .then(data => data);
+      .then((res) => res.data as Product[])
+      .then((data) => data);
   }
 }

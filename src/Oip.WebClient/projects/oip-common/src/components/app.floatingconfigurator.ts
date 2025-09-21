@@ -15,7 +15,7 @@ import { LayoutService } from '../services/app.layout.service';
         type="button"
         [icon]="isDarkTheme() ? 'pi pi-moon' : 'pi pi-sun'"
         [rounded]="true"
-        (onClick)="toggleDarkMode()"/>
+        (onClick)="toggleDarkMode()" />
       <div class="relative">
         <p-button
           enterActiveClass="animate-scalein"
@@ -25,10 +25,10 @@ import { LayoutService } from '../services/app.layout.service';
           leaveActiveClass="animate-fadeout"
           leaveToClass="hidden"
           pStyleClass="@next"
-          [rounded]="true"
           type="button"
-          [hideOnOutsideClick]="true"/>
-        <app-configurator/>
+          [hideOnOutsideClick]="true"
+          [rounded]="true" />
+        <app-configurator />
       </div>
     </div>
   `

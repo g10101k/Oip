@@ -10,12 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-import { GetKeycloakClientSettingsResponse } from "./data-contracts";
-import { HttpClient, RequestParams } from "./http-client";
+import { Injectable } from '@angular/core';
+import { GetKeycloakClientSettingsResponse } from './data-contracts';
+import { HttpClient, RequestParams } from './http-client';
 
-export class Security<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+@Injectable()
+export class Security<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description This endpoint is restricted to administrators. Useful for role management in the application UI or backend.
    *
@@ -28,10 +28,10 @@ export class Security<
   securityGetRealmRoles = (params: RequestParams = {}) =>
     this.request<string[], any>({
       path: `/api/security/get-realm-roles`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * @description This endpoint is publicly accessible and provides client configuration such as authority URL, client ID, scopes, and secure routes for frontend OAuth2/OIDC initialization.
@@ -45,9 +45,9 @@ export class Security<
   securityGetKeycloakClientSettings = (params: RequestParams = {}) =>
     this.request<GetKeycloakClientSettingsResponse, any>({
       path: `/api/security/get-keycloak-client-settings`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
 }

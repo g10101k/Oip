@@ -29,7 +29,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
                 placeholder="Select roles"
                 [maxSelectedLabels]="10"
                 [options]="roles"
-                [(ngModel)]="item.roles"/>
+                [(ngModel)]="item.roles" />
             </div>
           }
           <div class="flex justify-content-end flex-wrap">
@@ -38,7 +38,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
               id="oip-security-save-button"
               label="{{ 'securityComponent.save' | translate }}"
               (click)="saveClick()"
-              (keydown)="saveKeyDown($event)"/>
+              (keydown)="saveKeyDown($event)" />
           </div>
         </div>
       </div>
@@ -62,25 +62,34 @@ export class SecurityComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (!this.id) {
-      this.msgService.error("Module id not passed!");
+      this.msgService.error('Module id not passed!');
     }
     if (!this.controller) {
-      this.msgService.error("Controller not passed!");
+      this.msgService.error('Controller not passed!');
     }
-    this.dataService.getSecurity(this.controller, this.id).then(result => {
-      this.securityData = result;
-    }, error => this.msgService.error(error));
+    this.dataService.getSecurity(this.controller, this.id).then(
+      (result) => {
+        this.securityData = result;
+      },
+      (error) => this.msgService.error(error)
+    );
 
-    this.dataService.getRealmRoles().then(result => {
-      this.roles = result;
-    }, error => this.msgService.error(error));
+    this.dataService.getRealmRoles().then(
+      (result) => {
+        this.roles = result;
+      },
+      (error) => this.msgService.error(error)
+    );
   }
 
   saveClick() {
-    let request: PutSecurityDto = { id: this.id, securities: this.securityData };
-    this.dataService.saveSecurity(this.controller, request).then(result => {
-      this.msgService.success(this.translateService.instant('securityComponent.savedSecurity'));
-    }, error => this.msgService.error(error));
+    const request: PutSecurityDto = { id: this.id, securities: this.securityData };
+    this.dataService.saveSecurity(this.controller, request).then(
+      (result) => {
+        this.msgService.success(this.translateService.instant('securityComponent.savedSecurity'));
+      },
+      (error) => this.msgService.error(error)
+    );
   }
 
   saveKeyDown($event: KeyboardEvent) {

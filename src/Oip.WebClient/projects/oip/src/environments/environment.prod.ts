@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  useAuthentication: true,
+  useAuthentication: true
 };

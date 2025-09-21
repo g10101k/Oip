@@ -10,16 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-import {
-  ExistModuleDto,
-  ModuleDeleteRequest,
-  ModuleDto,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { Injectable } from '@angular/core';
+import { ExistModuleDto, ModuleDeleteRequest, ModuleDto } from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
-export class Module<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+@Injectable()
+export class Module<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Only accessible to users with the Admin role.
    *
@@ -32,10 +28,10 @@ export class Module<
   moduleGetAll = (params: RequestParams = {}) =>
     this.request<ModuleDto[], any>({
       path: `/api/module/get-all`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -49,11 +45,11 @@ export class Module<
   moduleInsert = (data: ModuleDto, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/module/insert`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -67,11 +63,11 @@ export class Module<
   moduleDelete = (data: ModuleDeleteRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/module/delete`,
-      method: "DELETE",
+      method: 'DELETE',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * @description Compares all modules in the database with loaded modules in the application context. This information can be used for diagnostics and monitoring of active modules.
@@ -85,9 +81,9 @@ export class Module<
   moduleGetModulesWithLoadStatus = (params: RequestParams = {}) =>
     this.request<ExistModuleDto[], any>({
       path: `/api/module/get-modules-with-load-status`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
 }

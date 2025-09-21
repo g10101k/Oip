@@ -1,29 +1,28 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { BaseComponent, Feature, SecurityComponent } from 'oip-common'
+import { BaseComponent, Feature, SecurityComponent } from 'oip-common';
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, SelectItem, SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { DatePipe, NgIf } from '@angular/common';
-import { TagManagementModule } from "../../api/TagManagementModule";
-import { DropdownModule } from "primeng/dropdown";
-import { Checkbox } from "primeng/checkbox";
-import { Calendar } from "primeng/calendar";
-import { Button } from "primeng/button";
-import { InputText } from "primeng/inputtext";
-import { InputNumber } from "primeng/inputnumber";
-import { CreateTagDto, TagEntity, TagTypes } from "../../api/data-contracts";
-import { FormsModule } from "@angular/forms";
-import { Tooltip } from "primeng/tooltip";
-import { Textarea } from "primeng/textarea";
-import { Toolbar } from "primeng/toolbar";
-import { IconField } from "primeng/iconfield";
-import { InputIcon } from "primeng/inputicon";
-import { Dialog } from "primeng/dialog";
-import { Select } from "primeng/select";
+import { TagManagementModule } from '../../api/TagManagementModule';
+import { DropdownModule } from 'primeng/dropdown';
+import { Checkbox } from 'primeng/checkbox';
+import { Calendar } from 'primeng/calendar';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { InputNumber } from 'primeng/inputnumber';
+import { CreateTagDto, TagEntity, TagTypes } from '../../api/data-contracts';
+import { FormsModule } from '@angular/forms';
+import { Tooltip } from 'primeng/tooltip';
+import { Textarea } from 'primeng/textarea';
+import { Toolbar } from 'primeng/toolbar';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { Dialog } from 'primeng/dialog';
+import { Select } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
-export interface WeatherSettingsDto {
-}
+export interface WeatherSettingsDto {}
 
 @Component({
   selector: 'tag-management',
@@ -48,8 +47,9 @@ export interface WeatherSettingsDto {
     IconField,
     InputIcon,
     Dialog,
-    Select, ConfirmDialogModule
-  ],
+    Select,
+    ConfirmDialogModule
+  ]
 })
 export class TagManagement extends BaseComponent<WeatherSettingsDto> implements OnInit, OnDestroy, Feature {
   controller: string = 'tag-management';
@@ -58,7 +58,7 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
   tags: TagEntity[] = [];
   selectedTag: TagEntity;
   createTag: TagEntity = {} as TagEntity;
-  valueTypeOptions: SelectItem[] = Object.keys(TagTypes).map(key => ({
+  valueTypeOptions: SelectItem[] = Object.keys(TagTypes).map((key) => ({
     label: TagTypes[key as keyof typeof TagTypes],
     value: TagTypes[key as keyof typeof TagTypes]
   }));
@@ -80,7 +80,7 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
 
   async saveTag() {
     try {
-      let createTag = {
+      const createTag = {
         tagId: this.selectedTag.id,
         name: this.selectedTag.name,
         valueType: this.selectedTag.valueType,
@@ -98,17 +98,15 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
         timeCalculation: this.selectedTag.timeCalculation,
         errorCalculation: this.selectedTag.errorCalculation,
         /** User-defined calculation or formula associated with the tag's value. */
-        valueCalculation: this.selectedTag.valueCalculation,
+        valueCalculation: this.selectedTag.valueCalculation
       } as CreateTagDto;
 
       await this.tagManagementModuleDataService.tagManagementEditTagCreate(createTag);
-      this.msgService.success("Tag saved successfully.");
-    } catch
-      (error) {
+      this.msgService.success('Tag saved successfully.');
+    } catch (error) {
       this.msgService.error(error);
     }
   }
-
 
   showCreateTagDialog() {
     this.createTagDialogVisible = true;
@@ -122,8 +120,7 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
     try {
       await this.tagManagementModuleDataService.tagManagementAddTagCreate(this.createTag as CreateTagDto);
       this.createTagDialogVisible = false;
-      this.msgService.success("Tag added successfully.");
-
+      this.msgService.success('Tag added successfully.');
     } catch (error) {
       this.msgService.error(error);
     }

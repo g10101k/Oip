@@ -1,14 +1,13 @@
-import { Component, Renderer2, ViewChild } from '@angular/core';
+import { Component, Renderer2, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
-import { AppTopbar } from "./top-bar.component";
-import { FooterComponent } from "./footer.component";
-import { LayoutService } from "./../services/app.layout.service";
-import { SidebarComponent } from "./sidebar.component";
-import { Menu } from "../api/Menu";
-import { MenuService } from "../services/app.menu.service";
-
+import { AppTopbar } from './top-bar.component';
+import { FooterComponent } from './footer.component';
+import { LayoutService } from './../services/app.layout.service';
+import { SidebarComponent } from './sidebar.component';
+import { Menu } from '../api/Menu';
+import { MenuService } from '../services/app.menu.service';
 
 @Component({
   selector: 'app-layout',
@@ -25,10 +24,11 @@ import { MenuService } from "../services/app.menu.service";
         <app-footer></app-footer>
       </div>
       <div class="layout-mask animate-fadein"></div>
-    </div> `,
-  providers:[MenuService, Menu]
+    </div>
+  `,
+  providers: [MenuService, Menu]
 })
-export class AppLayout {
+export class AppLayout implements OnDestroy {
   overlayMenuOpenSubscription: Subscription;
 
   menuOutsideClickListener: any;
@@ -66,7 +66,12 @@ export class AppLayout {
     const topbarEl = document.querySelector('.layout-menu-button');
     const eventTarget = event.target as Node;
 
-    return !(sidebarEl?.isSameNode(eventTarget) || sidebarEl?.contains(eventTarget) || topbarEl?.isSameNode(eventTarget) || topbarEl?.contains(eventTarget));
+    return !(
+      sidebarEl?.isSameNode(eventTarget) ||
+      sidebarEl?.contains(eventTarget) ||
+      topbarEl?.isSameNode(eventTarget) ||
+      topbarEl?.contains(eventTarget)
+    );
   }
 
   hideMenu() {
@@ -95,7 +100,10 @@ export class AppLayout {
     if (document.body.classList) {
       document.body.classList.remove('blocked-scroll');
     } else {
-      document.body.className = document.body.className.replace(new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+      document.body.className = document.body.className.replace(
+        new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'),
+        ' '
+      );
     }
   }
 
@@ -103,7 +111,9 @@ export class AppLayout {
     return {
       'layout-overlay': this.layoutService.layoutConfig().menuMode === 'overlay',
       'layout-static': this.layoutService.layoutConfig().menuMode === 'static',
-      'layout-static-inactive': this.layoutService.layoutState().staticMenuDesktopInactive && this.layoutService.layoutConfig().menuMode === 'static',
+      'layout-static-inactive':
+        this.layoutService.layoutState().staticMenuDesktopInactive &&
+        this.layoutService.layoutConfig().menuMode === 'static',
       'layout-overlay-active': this.layoutService.layoutState().overlayMenuActive,
       'layout-mobile-active': this.layoutService.layoutState().staticMenuMobileActive
     };

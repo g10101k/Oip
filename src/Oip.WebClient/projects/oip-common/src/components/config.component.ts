@@ -1,19 +1,19 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { ProfileComponent } from "./profile.component";
-import { Fluid } from "primeng/fluid";
-import { Tooltip } from "primeng/tooltip";
-import { FormsModule } from "@angular/forms";
-import { Select, SelectChangeEvent } from "primeng/select";
-import { TableModule } from "primeng/table";
-import { LayoutService } from "../services/app.layout.service";
-import { UserService } from "../services/user.service";
-import { InputSwitch } from "primeng/inputswitch";
-import { NgIf } from "@angular/common";
-import { RouterLink } from "@angular/router";
-import { SecurityService } from "../services/security.service";
-import { MenuService } from "../services/app.menu.service";
-import { Button } from "primeng/button";
-import { L10nService } from "../services/l10n.service";
+import { ProfileComponent } from './profile.component';
+import { Fluid } from 'primeng/fluid';
+import { Tooltip } from 'primeng/tooltip';
+import { FormsModule } from '@angular/forms';
+import { Select, SelectChangeEvent } from 'primeng/select';
+import { TableModule } from 'primeng/table';
+import { LayoutService } from '../services/app.layout.service';
+import { UserService } from '../services/user.service';
+import { InputSwitch } from 'primeng/inputswitch';
+import { NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { SecurityService } from '../services/security.service';
+import { MenuService } from '../services/app.menu.service';
+import { Button } from 'primeng/button';
+import { L10nService } from '../services/l10n.service';
 
 interface L10n {
   menu: string;
@@ -34,13 +34,14 @@ interface L10n {
       <div class="flex flex-col md:flex-row gap-4">
         <div class="md:w-1/2">
           <div class="card flex flex-col gap-4">
-            <div class="font-semibold text-xl"> {{ l10n.profile }}</div>
+            <div class="font-semibold text-xl">{{ l10n.profile }}</div>
             <div class="flex justify-content-end flex-wrap">{{ userService.userName }}</div>
-            <label> {{ l10n.photo }}
+            <label>
+              {{ l10n.photo }}
               <span
+                class="pi pi-question-circle"
                 pTooltip="{{ l10n.usePhoto256x256Pixel }}"
-                tooltipPosition="right"
-                class="pi pi-question-circle"></span>
+                tooltipPosition="right"></span>
             </label>
             <div class="flex justify-content-end flex-wrap">
               <user-profile></user-profile>
@@ -49,16 +50,17 @@ interface L10n {
         </div>
         <div class="md:w-1/2">
           <div class="card flex flex-col gap-4">
-            <div class="font-semibold text-xl"> {{ l10n.localization }}</div>
+            <div class="font-semibold text-xl">{{ l10n.localization }}</div>
             <label> {{ l10n.selectLanguage }} </label>
             <div class="flex justify-content-end flex-wrap">
-              <p-select id="oip-app-config-language-select"
-                        [options]="languages"
-                        [(ngModel)]="selectedLanguage"
-                        (onChange)="changeLanguage($event)"
-                        optionLabel="label"
-                        optionValue="value"
-                        class="w-full md:w-56"/>
+              <p-select
+                class="w-full md:w-56"
+                id="oip-app-config-language-select"
+                optionLabel="label"
+                optionValue="value"
+                [options]="languages"
+                [(ngModel)]="selectedLanguage"
+                (onChange)="changeLanguage($event)" />
             </div>
           </div>
         </div>
@@ -67,13 +69,14 @@ interface L10n {
             <div class="font-semibold text-xl">{{ l10n.menu }}</div>
             <div class="flex items-center gap-2">
               <label for="oip-app-config-admin-mode">{{ l10n.all }}</label>
-              <p-inputSwitch id="oip-app-config-admin-mode" [(ngModel)]="menuService.adminMode"
-                             (onChange)="onSwitchChange()"></p-inputSwitch>
+              <p-inputSwitch
+                id="oip-app-config-admin-mode"
+                [(ngModel)]="menuService.adminMode"
+                (onChange)="onSwitchChange()"></p-inputSwitch>
             </div>
             <div class="flex items-center gap-2">
               <label for="oip-app-config-admin-mode">{{ l10n.moduleManagement }}</label>
-              <p-button routerLink="/modules" icon="pi pi-cog" label="{{ l10n.goTo }}"/>
-
+              <p-button icon="pi pi-cog" label="{{ l10n.goTo }}" routerLink="/modules" />
             </div>
           </div>
         </div>
@@ -92,8 +95,8 @@ export class ConfigComponent implements OnInit {
 
   selectedLanguage: any;
   languages: any[] = [
-    { value: "en", label: "English" },
-    { value: "ru", label: "Русский" },
+    { value: 'en', label: 'English' },
+    { value: 'ru', label: 'Русский' }
   ];
 
   constructor() {

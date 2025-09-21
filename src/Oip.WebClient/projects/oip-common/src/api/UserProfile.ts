@@ -10,15 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-import {
-  UserProfileGetUserPhotoParams,
-  UserProfilePostUserPhotoPayload,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { Injectable } from '@angular/core';
+import { UserProfileGetUserPhotoParams, UserProfilePostUserPhotoPayload } from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
-export class UserProfile<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+@Injectable()
+export class UserProfile<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -28,16 +25,13 @@ export class UserProfile<
    * @request GET:/api/user-profile/get-user-photo
    * @secure
    */
-  userProfileGetUserPhoto = (
-    query: UserProfileGetUserPhotoParams,
-    params: RequestParams = {},
-  ) =>
+  userProfileGetUserPhoto = (query: UserProfileGetUserPhotoParams, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/user-profile/get-user-photo`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -48,16 +42,13 @@ export class UserProfile<
    * @request POST:/api/user-profile/post-user-photo
    * @secure
    */
-  userProfilePostUserPhoto = (
-    data: UserProfilePostUserPhotoPayload,
-    params: RequestParams = {},
-  ) =>
+  userProfilePostUserPhoto = (data: UserProfilePostUserPhotoPayload, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/user-profile/post-user-photo`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.FormData,
-      ...params,
+      ...params
     });
 }

@@ -10,6 +10,7 @@
  * ---------------------------------------------------------------
  */
 
+import { Injectable } from '@angular/core';
 import {
   PutSecurityRequest,
   SecurityResponse,
@@ -17,13 +18,12 @@ import {
   WeatherForecastModuleGetSecurityParams,
   WeatherForecastModuleGetWeatherForecastParams,
   WeatherForecastResponse,
-  WeatherModuleSettingsSaveSettingsRequest,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+  WeatherModuleSettingsSaveSettingsRequest
+} from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
-export class WeatherForecastModule<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+@Injectable()
+export class WeatherForecastModule<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -35,15 +35,15 @@ export class WeatherForecastModule<
    */
   weatherForecastModuleGetWeatherForecast = (
     query: WeatherForecastModuleGetWeatherForecastParams,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<WeatherForecastResponse[], any>({
       path: `/api/weather-forecast-module/get-weather-forecast`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -57,10 +57,10 @@ export class WeatherForecastModule<
   weatherForecastModuleGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/weather-forecast-module/get-module-rights`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -71,17 +71,14 @@ export class WeatherForecastModule<
    * @request GET:/api/weather-forecast-module/get-security
    * @secure
    */
-  weatherForecastModuleGetSecurity = (
-    query: WeatherForecastModuleGetSecurityParams,
-    params: RequestParams = {},
-  ) =>
+  weatherForecastModuleGetSecurity = (query: WeatherForecastModuleGetSecurityParams, params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/weather-forecast-module/get-security`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -92,17 +89,14 @@ export class WeatherForecastModule<
    * @request PUT:/api/weather-forecast-module/put-security
    * @secure
    */
-  weatherForecastModulePutSecurity = (
-    data: PutSecurityRequest,
-    params: RequestParams = {},
-  ) =>
+  weatherForecastModulePutSecurity = (data: PutSecurityRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/weather-forecast-module/put-security`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -115,14 +109,14 @@ export class WeatherForecastModule<
    */
   weatherForecastModuleGetModuleInstanceSettings = (
     query: WeatherForecastModuleGetModuleInstanceSettingsParams,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, any>({
       path: `/api/weather-forecast-module/get-module-instance-settings`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -134,14 +128,14 @@ export class WeatherForecastModule<
    */
   weatherForecastModulePutModuleInstanceSettings = (
     data: WeatherModuleSettingsSaveSettingsRequest,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, any>({
       path: `/api/weather-forecast-module/put-module-instance-settings`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
 }
