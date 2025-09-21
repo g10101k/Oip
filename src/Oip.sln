@@ -41,11 +41,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds.Data.SqlServer", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds.Data.Postgres", "Oip.Rtds.Data.Postgres\Oip.Rtds.Data.Postgres.csproj", "{B714090C-E868-4CE2-ADC8-14CFA8B6855F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6CB5425C-410E-4849-AE43-84E0CD4EB703}"
-	ProjectSection(SolutionItems) = preProject
-		compose.yaml = compose.yaml
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds.Random", "Oip.Rtds.Random\Oip.Rtds.Random.csproj", "{84B5106D-A206-40F7-AF1E-5761AF7C2C5D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{20FB5A06-4C4F-4EA3-BC3B-9975A648AE31}"

@@ -23,7 +23,7 @@ dotnet run ./Oip.CodeReview \
 
 ````shell
 dotnet run ./Oip.CodeReview \
---WorkDir=/Users/igortulakov/Projects/Oip/ \
+--WorkDir=/path/to/project/ \
 --SourceBranch=code-review-change \
 --TargetBranch=main \
 --FilePath=/path/to/project/src/Oip.CodeReview/Program.cs \
