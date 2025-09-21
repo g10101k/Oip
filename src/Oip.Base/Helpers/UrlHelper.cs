@@ -1,20 +1,19 @@
-﻿namespace Oip.Base.Helpers
+﻿namespace Oip.Base.Helpers;
+
+/// <summary>
+/// Url helper
+/// </summary>
+public static class UrlHelper
 {
     /// <summary>
-    /// Url helper
+    /// Append part to url with separate /
     /// </summary>
-    public static class UrlHelper
+    /// <param name="url"></param>
+    /// <param name="part"></param>
+    /// <returns></returns>
+    public static string UrlAppend(this string url, string part)
     {
-        /// <summary>
-        /// Append part to url with separate /
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="part"></param>
-        /// <returns></returns>
-        public static string UrlAppend(this string url, string part)
-        {
-            ArgumentNullException.ThrowIfNull(part);
-            return $"{url.TrimEnd('/')}/{part.TrimStart('/')}";
-        }
+        ArgumentNullException.ThrowIfNull(part);
+        return $"{url.TrimEnd('/')}/{part.TrimStart('/')}";
     }
 }
