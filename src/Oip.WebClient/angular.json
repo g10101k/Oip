@@ -122,8 +122,7 @@
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": [
-              "projects/oip/src/**",
-              "projects/oip/src/**"
+              "projects/**"
             ]
           },
           "configurations": {
