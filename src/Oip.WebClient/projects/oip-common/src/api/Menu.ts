@@ -10,7 +10,6 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
 import {
   AddModuleInstanceDto,
   EditModuleInstanceDto,
@@ -20,16 +19,15 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
 export class Menu<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description Filters modules based on the roles of the current user and returns only those that are accessible.
    *
    * @tags Menu
-   * @name menuGet
-   * @summary Get menu for client app
+   * @name get
+   * @summary Retrieves the menu available to the current authenticated user.
    * @request GET:/api/menu/get
    * @secure
    */
@@ -42,11 +40,11 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Returns all administrative modules for users with the Admin role.
    *
    * @tags Menu
-   * @name menuGetAdminMenu
-   * @summary Get admin menu for client app
+   * @name getAdminMenu
+   * @summary Retrieves the admin-specific menu.
    * @request GET:/api/menu/get-admin-menu
    * @secure
    */
@@ -59,11 +57,11 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Useful for module management interfaces or system diagnostics.
    *
    * @tags Menu
-   * @name menuGetModules
-   * @summary Get admin menu for client app
+   * @name getModules
+   * @summary Retrieves all available modules in the system.
    * @request GET:/api/menu/get-modules
    * @secure
    */
@@ -79,8 +77,8 @@ export class Menu<
    * No description
    *
    * @tags Menu
-   * @name menuAddModuleInstance
-   * @summary Add new module
+   * @name addModuleInstance
+   * @summary Adds a new module instance to the system.
    * @request POST:/api/menu/add-module-instance
    * @secure
    */
@@ -100,8 +98,8 @@ export class Menu<
    * No description
    *
    * @tags Menu
-   * @name menuEditModuleInstance
-   * @summary Add new module
+   * @name editModuleInstance
+   * @summary Edits an existing module instance.
    * @request POST:/api/menu/edit-module-instance
    * @secure
    */
@@ -121,8 +119,8 @@ export class Menu<
    * No description
    *
    * @tags Menu
-   * @name menuDeleteModuleInstance
-   * @summary Add new module
+   * @name deleteModuleInstance
+   * @summary Deletes a module instance by its identifier.
    * @request DELETE:/api/menu/delete-module-instance
    * @secure
    */

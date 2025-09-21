@@ -13,10 +13,12 @@ import { MenuItemComponent } from './menu-item.component';
 import { MenuItemCreateDialogComponent } from "./menu-item-create-dialog.component";
 import { TranslateService } from "@ngx-translate/core";
 import { MenuItemEditDialogComponent } from "./menu-item-edit-dialog.component";
+import { Menu } from "../../api/Menu";
 
 
 @Component({
   imports: [NgFor, NgIf, MenuItemComponent, ButtonModule, ContextMenuModule, DialogModule, InputTextModule, MenuItemCreateDialogComponent, InputSwitchModule, FormsModule, MenuItemEditDialogComponent],
+  providers: [Menu],
   selector: 'app-menu',
   standalone: true,
   template: `

@@ -10,7 +10,6 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
 import {
   ApplyMigrationRequest,
   DbMigrationGetModuleInstanceSettingsParams,
@@ -22,7 +21,6 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
 export class DataContextMigrationModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -31,6 +29,7 @@ export class DataContextMigrationModule<
    *
    * @tags DataContextMigrationModule
    * @name dbMigrationGetModuleRights
+   * @summary Gets the module's access rights.
    * @request GET:/api/db-migration/get-module-rights
    * @secure
    */
@@ -43,11 +42,11 @@ export class DataContextMigrationModule<
       ...params,
     });
   /**
-   * No description
+   * @description The returned list includes: - Migrations that have been applied to the database. - Pending migrations that exist in code but are not applied. - Migrations defined in code regardless of their application status.
    *
    * @tags DataContextMigrationModule
    * @name dbMigrationGetMigrations
-   * @summary Gets the list of migrations.
+   * @summary Retrieves all database migrations and their current state.
    * @request GET:/api/db-migration/get-migrations
    * @secure
    */
@@ -60,27 +59,27 @@ export class DataContextMigrationModule<
       ...params,
     });
   /**
-   * No description
+   * @description Uses Entity Framework Core's migration mechanism to bring the database schema up to date with the current codebase. This operation is irreversible and should be performed with caution in production environments.
    *
    * @tags DataContextMigrationModule
-   * @name dbMigrationMigrateDatabase
-   * @summary Migrate database
-   * @request GET:/api/db-migration/migrate-database
+   * @name dbMigrationMigrate
+   * @summary Applies all pending migrations to the database.
+   * @request POST:/api/db-migration/migrate
    * @secure
    */
-  dbMigrationMigrateDatabase = (params: RequestParams = {}) =>
+  dbMigrationMigrate = (params: RequestParams = {}) =>
     this.request<void, any>({
-      path: `/api/db-migration/migrate-database`,
-      method: "GET",
+      path: `/api/db-migration/migrate`,
+      method: "POST",
       secure: true,
       ...params,
     });
   /**
-   * No description
+   * @description This method allows applying or reverting to a specific migration by name. Useful for targeted database updates or rolling back schema changes.
    *
    * @tags DataContextMigrationModule
    * @name dbMigrationApplyMigration
-   * @summary Applies a specific migration to the database.
+   * @summary Applies a specific database migration by name.
    * @request POST:/api/db-migration/apply-migration
    * @secure
    */
@@ -101,7 +100,7 @@ export class DataContextMigrationModule<
    *
    * @tags DataContextMigrationModule
    * @name dbMigrationGetSecurity
-   * @summary Get security for instance id
+   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/db-migration/get-security
    * @secure
    */
@@ -122,7 +121,7 @@ export class DataContextMigrationModule<
    *
    * @tags DataContextMigrationModule
    * @name dbMigrationPutSecurity
-   * @summary Update security
+   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/db-migration/put-security
    * @secure
    */
@@ -143,7 +142,7 @@ export class DataContextMigrationModule<
    *
    * @tags DataContextMigrationModule
    * @name dbMigrationGetModuleInstanceSettings
-   * @summary Get instance setting
+   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/db-migration/get-module-instance-settings
    * @secure
    */

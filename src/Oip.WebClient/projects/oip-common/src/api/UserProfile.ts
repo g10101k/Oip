@@ -10,14 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
 import {
   UserProfileGetUserPhotoParams,
   UserProfilePostUserPhotoPayload,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
 export class UserProfile<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -25,7 +23,7 @@ export class UserProfile<
    * No description
    *
    * @tags UserProfile
-   * @name userProfileGetUserPhoto
+   * @name getUserPhoto
    * @summary Get all roles
    * @request GET:/api/user-profile/get-user-photo
    * @secure
@@ -45,7 +43,7 @@ export class UserProfile<
    * No description
    *
    * @tags UserProfile
-   * @name userProfilePostUserPhoto
+   * @name postUserPhoto
    * @summary Get all roles
    * @request POST:/api/user-profile/post-user-photo
    * @secure

@@ -10,7 +10,6 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
 import {
   FolderModuleGetModuleInstanceSettingsParams,
   FolderModuleGetSecurityParams,
@@ -20,15 +19,15 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
 export class FolderModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description This method defines the security model for the folder module. It currently includes only read access, limited to users with the administrator role.
    *
    * @tags FolderModule
-   * @name folderModuleGetModuleRights
+   * @name getModuleRights
+   * @summary Returns a list of rights (permissions) required to access the folder module.
    * @request GET:/api/folder-module/get-module-rights
    * @secure
    */
@@ -44,8 +43,8 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderModuleGetSecurity
-   * @summary Get security for instance id
+   * @name getSecurity
+   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/folder-module/get-security
    * @secure
    */
@@ -65,8 +64,8 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderModulePutSecurity
-   * @summary Update security
+   * @name putSecurity
+   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/folder-module/put-security
    * @secure
    */
@@ -86,8 +85,8 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderModuleGetModuleInstanceSettings
-   * @summary Get instance setting
+   * @name getModuleInstanceSettings
+   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/folder-module/get-module-instance-settings
    * @secure
    */
@@ -106,7 +105,7 @@ export class FolderModule<
    * No description
    *
    * @tags FolderModule
-   * @name folderModulePutModuleInstanceSettings
+   * @name putModuleInstanceSettings
    * @request PUT:/api/folder-module/put-module-instance-settings
    * @secure
    */

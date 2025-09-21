@@ -10,7 +10,6 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
 import {
   DashboardGetModuleInstanceSettingsParams,
   DashboardGetSecurityParams,
@@ -20,7 +19,6 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
 export class DashboardModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
@@ -45,7 +43,7 @@ export class DashboardModule<
    *
    * @tags DashboardModule
    * @name dashboardGetSecurity
-   * @summary Get security for instance id
+   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/dashboard/get-security
    * @secure
    */
@@ -66,7 +64,7 @@ export class DashboardModule<
    *
    * @tags DashboardModule
    * @name dashboardPutSecurity
-   * @summary Update security
+   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/dashboard/put-security
    * @secure
    */
@@ -87,7 +85,7 @@ export class DashboardModule<
    *
    * @tags DashboardModule
    * @name dashboardGetModuleInstanceSettings
-   * @summary Get instance setting
+   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/dashboard/get-module-instance-settings
    * @secure
    */

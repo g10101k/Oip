@@ -7,7 +7,7 @@ import { EditModuleInstanceDto } from "../dtos/edit-module-instance.dto";
 import { Menu } from "../api/Menu";
 import { AppTitleService } from "./app-title.service";
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class MenuService extends BaseDataService {
   private readonly menuSource = new Subject<MenuChangeEvent>();
   private readonly resetSource = new Subject();

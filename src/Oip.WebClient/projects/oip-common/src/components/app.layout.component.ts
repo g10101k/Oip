@@ -6,23 +6,27 @@ import { AppTopbar } from "./top-bar.component";
 import { FooterComponent } from "./footer.component";
 import { LayoutService } from "./../services/app.layout.service";
 import { SidebarComponent } from "./sidebar.component";
+import { Menu } from "../api/Menu";
+import { MenuService } from "../services/app.menu.service";
 
 
 @Component({
   selector: 'app-layout',
   standalone: true,
   imports: [CommonModule, AppTopbar, SidebarComponent, RouterModule, FooterComponent],
-  template: `<div class="layout-wrapper" [ngClass]="containerClass">
-        <app-topbar></app-topbar>
-        <app-sidebar></app-sidebar>
-        <div class="layout-main-container">
-            <div class="layout-main">
-                <router-outlet></router-outlet>
-            </div>
-            <app-footer></app-footer>
+  template: `
+    <div class="layout-wrapper" [ngClass]="containerClass">
+      <app-topbar></app-topbar>
+      <app-sidebar></app-sidebar>
+      <div class="layout-main-container">
+        <div class="layout-main">
+          <router-outlet></router-outlet>
         </div>
-        <div class="layout-mask animate-fadein"></div>
-    </div> `
+        <app-footer></app-footer>
+      </div>
+      <div class="layout-mask animate-fadein"></div>
+    </div> `,
+  providers:[MenuService, Menu]
 })
 export class AppLayout {
   overlayMenuOpenSubscription: Subscription;
@@ -66,7 +70,12 @@ export class AppLayout {
   }
 
   hideMenu() {
-    this.layoutService.layoutState.update((prev) => ({ ...prev, overlayMenuActive: false, staticMenuMobileActive: false, menuHoverActive: false }));
+    this.layoutService.layoutState.update((prev) => ({
+      ...prev,
+      overlayMenuActive: false,
+      staticMenuMobileActive: false,
+      menuHoverActive: false
+    }));
     if (this.menuOutsideClickListener) {
       this.menuOutsideClickListener();
       this.menuOutsideClickListener = null;

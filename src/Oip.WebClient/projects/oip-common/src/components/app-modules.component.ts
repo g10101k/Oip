@@ -39,7 +39,7 @@ interface L10n {
 
 @Component({
   imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, Module],
   selector: 'app-modules',
   template: `
     <p-confirmDialog></p-confirmDialog>
