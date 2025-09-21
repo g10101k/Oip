@@ -1,17 +1,16 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { BaseComponent, Feature, SecurityComponent } from 'oip-common';
+import { BaseModuleComponent, NoSettingsDto, SecurityComponent } from 'oip-common';
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, SelectItem, SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { DatePipe, NgIf } from '@angular/common';
-import { TagManagementModule } from '../../api/TagManagementModule';
+import { TagManagementModule } from '../../../api/TagManagementModule';
 import { DropdownModule } from 'primeng/dropdown';
 import { Checkbox } from 'primeng/checkbox';
-import { Calendar } from 'primeng/calendar';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
-import { CreateTagDto, TagEntity, TagTypes } from '../../api/data-contracts';
+import { CreateTagDto, TagEntity, TagTypes } from '../../../api/data-contracts';
 import { FormsModule } from '@angular/forms';
 import { Tooltip } from 'primeng/tooltip';
 import { Textarea } from 'primeng/textarea';
@@ -21,8 +20,6 @@ import { InputIcon } from 'primeng/inputicon';
 import { Dialog } from 'primeng/dialog';
 import { Select } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-
-export interface WeatherSettingsDto {}
 
 @Component({
   selector: 'tag-management',
@@ -51,7 +48,7 @@ export interface WeatherSettingsDto {}
     ConfirmDialogModule
   ]
 })
-export class TagManagement extends BaseComponent<WeatherSettingsDto> implements OnInit, OnDestroy, Feature {
+export class TagManagement extends BaseModuleComponent<NoSettingsDto, NoSettingsDto> implements OnInit, OnDestroy {
   controller: string = 'tag-management';
   tagManagementModuleDataService = inject(TagManagementModule);
   protected readonly confirmationService: ConfirmationService = inject(ConfirmationService);
@@ -75,33 +72,12 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
   }
 
   async refresh() {
-    this.tags = await this.tagManagementModuleDataService.tagManagementGetTagsByFilterList({ filter: '%' });
+    this.tags = await this.tagManagementModuleDataService.tagManagementGetTagsByFilter({ filter: '%' });
   }
 
   async saveTag() {
     try {
-      const createTag = {
-        tagId: this.selectedTag.id,
-        name: this.selectedTag.name,
-        valueType: this.selectedTag.valueType,
-        interface: this.selectedTag.interface,
-        descriptor: this.selectedTag.descriptor,
-        uom: this.selectedTag.uom,
-        instrumentTag: this.selectedTag.instrumentTag,
-        enabled: this.selectedTag.enabled,
-        compressing: this.selectedTag.compressing,
-        compressionMinTime: this.selectedTag.compressionMinTime,
-        compressionMaxTime: this.selectedTag.compressionMaxTime,
-        digitalSet: this.selectedTag.digitalSet,
-        step: this.selectedTag.step,
-
-        timeCalculation: this.selectedTag.timeCalculation,
-        errorCalculation: this.selectedTag.errorCalculation,
-        /** User-defined calculation or formula associated with the tag's value. */
-        valueCalculation: this.selectedTag.valueCalculation
-      } as CreateTagDto;
-
-      await this.tagManagementModuleDataService.tagManagementEditTagCreate(createTag);
+      await this.tagManagementModuleDataService.tagManagementEditTag(this.selectedTag as CreateTagDto);
       this.msgService.success('Tag saved successfully.');
     } catch (error) {
       this.msgService.error(error);
@@ -118,7 +94,7 @@ export class TagManagement extends BaseComponent<WeatherSettingsDto> implements 
 
   async saveCreateTagDialogClick() {
     try {
-      await this.tagManagementModuleDataService.tagManagementAddTagCreate(this.createTag as CreateTagDto);
+      await this.tagManagementModuleDataService.tagManagementAddTag(this.createTag as CreateTagDto);
       this.createTagDialogVisible = false;
       this.msgService.success('Tag added successfully.');
     } catch (error) {

@@ -15,7 +15,7 @@
     "serve:dist": "concurrently \"serve dist/oip -l 5000 -s\" ",
     "generate-api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx swagger-typescript-api generate -p https://localhost:5002/swagger/v1/swagger.json -o ./projects/oip/src/api --clean-output --unwrap-response-data --extract-enums --extract-responses --extract-request-body --extract-request-params --modular --module-name-first-tag --t ./templates",
     "generate-base-api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx swagger-typescript-api generate -p https://localhost:5002/swagger/base/swagger.json -o ./projects/oip-common/src/api --clean-output --unwrap-response-data --extract-enums --extract-responses --extract-request-body --extract-request-params --modular --module-name-first-tag --t ./templates",
-    "generate-rtds-api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx swagger-typescript-api generate -p https://localhost:50003/swagger/v1/swagger.json -o ./projects/oip-rtds/src/app/api --clean-output --unwrap-response-data --extract-enums --extract-responses --extract-request-body --extract-request-params --modular --module-name-first-tag --t ./templates",
+    "generate-rtds-api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx swagger-typescript-api generate -p https://localhost:50003/swagger/v1/swagger.json -o ./projects/oip-rtds/src/api --clean-output --unwrap-response-data --extract-enums --extract-responses --extract-request-body --extract-request-params --modular --module-name-first-tag --t ./templates",
     "build": "ng build oip",
     "build:oip": "ng build oip",
     "build:oip-rtds": "ng build oip-rtds",

@@ -33,20 +33,19 @@ type <%~ config.Ts.CodeGenKeyword.UtilRequiredKeys %><T, K extends keyof T> = Om
 <% } %>
 
 <% for (const contract of modelTypes) {
-  if (contract.rawContent){
+  if (contract.typeIdentifier === 'interface' && contract.rawContent && Array.isArray(contract.rawContent)) {
     contract.rawContent.forEach((prop) => {
       if (prop.format ==='date-time') {
         prop.field = prop.field.replace(': string', ': Date');
       }
     })
+      let customContent = '';
+      contract.rawContent.forEach((prop) => {
+          if (prop.description) customContent += `/** ${prop.description} */ \r\n`;
+          customContent += `${prop.field};\r\n`;
+      })
+      contract.content = customContent;
   }
-
-  let customContent = '';
-  contract.rawContent.forEach((prop) => {
-  if (prop.description) customContent += `/** ${prop.description} */ \r\n`;
-    customContent += `${prop.field};\r\n`;
-  })
-  contract.content = customContent;
 %>
   <%~ includeFile('./data-contract-jsdoc.ejs', { ...it, data: { ...contract, ...contract.typeData } }) %>
   <%~ contract.internal ? '' : 'export'%> <%~ (dataContractTemplates[contract.typeIdentifier] || dataContractTemplates.type)(contract) %>
