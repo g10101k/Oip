@@ -11,10 +11,10 @@
  */
 
 import {
+  CreateTagDto,
   ObjectSaveSettingsRequest,
   PutSecurityRequest,
   SecurityResponse,
-  TagCreateDto,
   TagEntity,
   TagManagementGetModuleInstanceSettingsListParams,
   TagManagementGetSecurityListParams,
@@ -35,7 +35,7 @@ export class TagManagementModule<
    * @secure
    */
   tagManagementAddTagCreate = (
-    data: TagCreateDto,
+    data: CreateTagDto,
     params: RequestParams = {},
   ) =>
     this.request<void, any>({
@@ -65,6 +65,27 @@ export class TagManagementModule<
       query: query,
       secure: true,
       format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags TagManagementModule
+   * @name tagManagementEditTagCreate
+   * @summary Edits an existing tag.
+   * @request POST:/api/tag-management/edit-tag
+   * @secure
+   */
+  tagManagementEditTagCreate = (
+    data: CreateTagDto,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, any>({
+      path: `/api/tag-management/edit-tag`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
       ...params,
     });
   /**

@@ -46,14 +46,14 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// Accepts a tag entity from the request body and stores it in the database.  
     /// Returns HTTP 200 on success.
     /// </remarks>
-    /// <param name="tag">Tag entity to be added.</param>
+    /// <param name="createTag">Tag entity to be added.</param>
     /// <returns>HTTP 200 OK on success.</returns>
     [HttpPost("add-tag")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddTag(TagCreateDto tag)
+    public async Task<IActionResult> AddTag(CreateTagDto createTag)
     {
-        await _tagRepository.AddTag(tag);
+        await _tagRepository.AddTag(createTag);
         return Ok();
     }
 
@@ -72,6 +72,21 @@ public class TagManagementModuleController : BaseModuleController<object>
     public IActionResult GetTagsByFilter(string filter)
     {
         return Ok(_tagRepository.GetTagsByFilter(filter));
+    }
+
+
+    /// <summary>
+    /// Edits an existing tag.
+    /// </summary>
+    /// <param name="createTag">The tag object containing updated information.</param>
+    /// <returns>An IActionResult indicating success.</returns>
+    [HttpPost("edit-tag")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
+    public IActionResult EditTag(CreateTagDto createTag)
+    {
+        _tagRepository.EditTag(createTag);
+        return Ok();
     }
 
     /// <summary>

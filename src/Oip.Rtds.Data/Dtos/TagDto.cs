@@ -5,12 +5,12 @@ namespace Oip.Rtds.Data.Dtos;
 /// <summary>
 /// Represents the configuration and metadata of a tag.
 /// </summary>
-public class TagCreateDto
+public class TagDto
 {
     /// <summary>
     /// Unique identifier of the tag.
     /// </summary>
-    public uint? TagId { get; set; }
+    public uint Id { get; set; }
 
     /// <summary>
     /// Name of the tag.
@@ -25,7 +25,7 @@ public class TagCreateDto
     /// <summary>
     /// The interface associated with the tag.
     /// </summary>
-    public string? Interface { get; set; }
+    public uint? InterfaceId { get; set; }
 
     /// <summary>
     /// Description of the point (used as a comment or label).
@@ -43,9 +43,9 @@ public class TagCreateDto
     public string? InstrumentTag { get; set; }
 
     /// <summary>
-    /// Indicates whether the point is archived.
+    /// Indicates whether the tag is currently enabled.
     /// </summary>
-    public bool Active { get; set; }
+    public bool Enabled { get; set; }
 
     /// <summary>
     /// Indicates whether compression is enabled for this tag.
@@ -62,21 +62,6 @@ public class TagCreateDto
     /// Maximum time (in milliseconds) between compressed values.
     /// </summary>
     public uint? CompressionMaxTime { get; set; }
-
-    /// <summary>
-    /// The minimum expected value of the signal.
-    /// </summary>
-    public double Zero { get; set; }
-
-    /// <summary>
-    /// The range between the zero and the maximum value.
-    /// </summary>
-    public double Span { get; set; } = 100.0d;
-
-    /// <summary>
-    /// Indicates whether the point is being scanned by the interface.
-    /// </summary>
-    public bool? Scan { get; set; }
 
     /// <summary>
     /// Associated digital state set name (for digital-type points).
@@ -109,8 +94,12 @@ public class TagCreateDto
     public string? ValueCalculation { get; set; }
 
     /// <summary>
-    /// ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(time)").
-    /// Used to control how data is partitioned when creating the table.
+    /// Date and time when the tag was created.
     /// </summary>
-    public string Partition { get; set; } = "PARTITION BY toYear(Time)";
+    public DateTimeOffset CreationDate { get; set; }
+
+    /// <summary>
+    /// User or process that created the tag.
+    /// </summary>
+    public string Creator { get; set; } = string.Empty;
 }

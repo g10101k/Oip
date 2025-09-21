@@ -74,13 +74,14 @@ No raw user input is interpolated into SQL
 
 * Dotnet app start at https://localhost:5003
 * Angular client start at https://localhost:50003
+* Grcp service start at https://localhost:50004
 
 ## DbMigration
 
 For *nix system:
 
 ````shell
-migration_name=Initialization
+migration_name=RenameFieldId23
 dotnet ef migrations add "${migration_name}" --verbose --context RtdsMetaContext --project ./../Oip.Rtds.Data.Postgres --output-dir Migrations -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
 dotnet ef migrations add "${migration_name}" --verbose --context RtdsMetaContext --project ./../Oip.Rtds.Data.SqlServer --output-dir Migrations -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
 ````
@@ -93,6 +94,6 @@ dotnet ef migrations add "%migration_name%" --context RtdsMetaContext --project 
 dotnet ef migrations add "%migration_name%" --context RtdsMetaContext --project ./../Oip.Rtds.Data.SqlServer --output-dir Migrations -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
 ````
 
-## Why need RtdsMetaContext? 
+## Why need RtdsMetaContext?
 
 For modules, user and other

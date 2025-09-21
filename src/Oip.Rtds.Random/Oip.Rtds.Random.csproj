@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-Oip.Rtds.Random-a3cfaa80-09d6-43e4-a0c7-aed7862b75b5</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Protobuf Include="..\Oip.Rtds\Protos\rtds_service.proto" GrpcServices="Client">
+            <Link>Protos\rtds_service.proto</Link>
+        </Protobuf>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1"/>
+        <PackageReference Include="Grpc.Net.Client" Version="2.62.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.27.1" />
+        <PackageReference Include="Grpc.Tools" Version="2.62.0" PrivateAssets="All" />
+        <PackageReference Include="NLog" Version="5.3.4" />
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Oip.Settings\Oip.Settings.csproj" />
+    </ItemGroup>
+</Project>

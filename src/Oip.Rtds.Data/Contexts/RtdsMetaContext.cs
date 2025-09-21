@@ -32,6 +32,11 @@ public class RtdsMetaContext : DbContext
     public DbSet<TagEntity> Tags => Set<TagEntity>();
 
     /// <summary>
+    /// Represents the interfaces associated with RTDS metadata.
+    /// </summary>
+    public DbSet<InterfaceEntity> Interfaces => Set<InterfaceEntity>();
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="RtdsMetaContext"/> class
     /// </summary>
     /// <param name="options">The options to be used by this context</param>
@@ -65,6 +70,7 @@ public class RtdsMetaContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new TagEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new InterfaceEntityConfiguration(Database, _designTime));
         
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }

@@ -12,8 +12,8 @@ using Oip.Rtds.Data.Contexts;
 namespace Oip.Rtds.SqlServer.Migrations
 {
     [DbContext(typeof(RtdsMetaContext))]
-    [Migration("20250920082658_Initialization")]
-    partial class Initialization
+    [Migration("20250921125454_RenameFieldId")]
+    partial class RenameFieldId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,14 +27,11 @@ namespace Oip.Rtds.SqlServer.Migrations
 
             modelBuilder.Entity("Oip.Rtds.Data.Entities.TagEntity", b =>
                 {
-                    b.Property<long>("TagId")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TagId"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Compressing")
                         .HasColumnType("bit");
@@ -60,31 +57,23 @@ namespace Oip.Rtds.SqlServer.Migrations
                     b.Property<string>("DigitalSet")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ErrorCalculation")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InstrumentTag")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Interface")
+                    b.Property<long>("Interface")
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
-
-                    b.Property<string>("Partition")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<bool?>("Scan")
-                        .HasColumnType("bit");
-
-                    b.Property<double>("Span")
-                        .HasColumnType("float");
 
                     b.Property<bool>("Step")
                         .HasColumnType("bit");
@@ -101,10 +90,7 @@ namespace Oip.Rtds.SqlServer.Migrations
                     b.Property<int>("ValueType")
                         .HasColumnType("int");
 
-                    b.Property<double>("Zero")
-                        .HasColumnType("float");
-
-                    b.HasKey("TagId");
+                    b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();

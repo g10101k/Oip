@@ -5,12 +5,12 @@ namespace Oip.Rtds.Data.Dtos;
 /// <summary>
 /// Represents the configuration and metadata of a tag.
 /// </summary>
-public class TagGetDto
+public class CreateTagDto
 {
     /// <summary>
     /// Unique identifier of the tag.
     /// </summary>
-    public uint TagId { get; set; }
+    public uint? TagId { get; set; }
 
     /// <summary>
     /// Name of the tag.
@@ -25,7 +25,7 @@ public class TagGetDto
     /// <summary>
     /// The interface associated with the tag.
     /// </summary>
-    public string? Interface { get; set; }
+    public uint? Interface { get; set; }
 
     /// <summary>
     /// Description of the point (used as a comment or label).
@@ -45,7 +45,7 @@ public class TagGetDto
     /// <summary>
     /// Indicates whether the point is archived.
     /// </summary>
-    public bool Active { get; set; }
+    public bool Enabled { get; set; }
 
     /// <summary>
     /// Indicates whether compression is enabled for this tag.
@@ -62,21 +62,6 @@ public class TagGetDto
     /// Maximum time (in milliseconds) between compressed values.
     /// </summary>
     public uint? CompressionMaxTime { get; set; }
-
-    /// <summary>
-    /// The minimum expected value of the signal.
-    /// </summary>
-    public double Zero { get; set; }
-
-    /// <summary>
-    /// The range between the zero and the maximum value.
-    /// </summary>
-    public double Span { get; set; } = 100.0d;
-
-    /// <summary>
-    /// Indicates whether the point is being scanned by the interface.
-    /// </summary>
-    public bool? Scan { get; set; }
 
     /// <summary>
     /// Associated digital state set name (for digital-type points).
@@ -106,21 +91,5 @@ public class TagGetDto
     /// This property allows for custom calculations or transformations to be applied to the raw tag value.
     /// It can contain any valid expression or formula, depending on the RTDS configuration.
     /// </remarks>
-    public string? ValueCaclulation { get; set; }
-
-    /// <summary>
-    /// Date and time when the tag was created.
-    /// </summary>
-    public DateTimeOffset CreationDate { get; set; }
-
-    /// <summary>
-    /// User or process that created the tag.
-    /// </summary>
-    public string Creator { get; set; } = string.Empty;
-
-    /// <summary>
-    /// ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(time)").
-    /// Used to control how data is partitioned when creating the table.
-    /// </summary>
-    public string Partition { get; set; } = "PARTITION BY toYear(Time)";
+    public string? ValueCalculation { get; set; }
 }

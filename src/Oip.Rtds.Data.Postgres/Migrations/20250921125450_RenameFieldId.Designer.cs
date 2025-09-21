@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Rtds.Data.Contexts;
@@ -11,9 +12,11 @@ using Oip.Rtds.Data.Contexts;
 namespace Oip.Rtds.Data.Postgres.Migrations
 {
     [DbContext(typeof(RtdsMetaContext))]
-    partial class RtdsMetaContextModelSnapshot : ModelSnapshot
+    [Migration("20250921125450_RenameFieldId")]
+    partial class RenameFieldId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,31 +24,6 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Oip.Rtds.Data.Entities.InterfaceEntity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Interface", "rtds");
-                });
 
             modelBuilder.Entity("Oip.Rtds.Data.Entities.TagEntity", b =>
                 {
@@ -88,7 +66,7 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                     b.Property<string>("InstrumentTag")
                         .HasColumnType("text");
 
-                    b.Property<long?>("InterfaceId")
+                    b.Property<long>("Interface")
                         .HasMaxLength(128)
                         .HasColumnType("bigint");
 
@@ -114,26 +92,10 @@ namespace Oip.Rtds.Data.Postgres.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InterfaceId");
-
                     b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("Tag", "rtds");
-                });
-
-            modelBuilder.Entity("Oip.Rtds.Data.Entities.TagEntity", b =>
-                {
-                    b.HasOne("Oip.Rtds.Data.Entities.InterfaceEntity", "Interface")
-                        .WithMany("Tags")
-                        .HasForeignKey("InterfaceId");
-
-                    b.Navigation("Interface");
-                });
-
-            modelBuilder.Entity("Oip.Rtds.Data.Entities.InterfaceEntity", b =>
-                {
-                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

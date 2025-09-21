@@ -38,6 +38,58 @@ export interface ApplyMigrationRequest {
   name?: string | null;
 }
 
+/** Represents the configuration and metadata of a tag. */
+export interface CreateTagDto {
+  /**
+   * Unique identifier of the tag.
+   * @format int32
+   */
+  tagId?: number | null;
+  /** Name of the tag. */
+  name: string | null;
+  /** Defines the data types supported for tags */
+  valueType?: TagTypes;
+  /**
+   * The interface associated with the tag.
+   * @format int32
+   */
+  interface?: number | null;
+  /** Description of the point (used as a comment or label). */
+  descriptor?: string | null;
+  /** Engineering units (e.g., °C, PSI, m³/h). */
+  uom?: string | null;
+  /** Reference to the source signal or channel tag. */
+  instrumentTag?: string | null;
+  /** Indicates whether the point is archived. */
+  enabled?: boolean;
+  /** Indicates whether compression is enabled for this tag. */
+  compressing?: boolean;
+  /**
+   * Minimum time (in milliseconds) between compressed values.
+   * Values received within this period are discarded, regardless of their error margin.
+   * @format int32
+   */
+  compressionMinTime?: number | null;
+  /**
+   * Maximum time (in milliseconds) between compressed values.
+   * @format int32
+   */
+  compressionMaxTime?: number | null;
+  /** Associated digital state set name (for digital-type points). */
+  digitalSet?: string | null;
+  /** Indicates whether values are treated as step (true) or interpolated (false). */
+  step?: boolean;
+  /**
+   * Formula used to calculate the time associated with the tag's value.
+   * Default `now()`;
+   */
+  timeCalculation?: string | null;
+  /** Formula used to calculate error values for the tag. */
+  errorCalculation?: string | null;
+  /** User-defined calculation or formula associated with the tag's value. */
+  valueCalculation?: string | null;
+}
+
 /** DTO for edit module instance */
 export interface EditModuleInstanceDto {
   /** @format int32 */
@@ -96,6 +148,14 @@ export interface IntKeyValueDto {
   /** @format int32 */
   key?: number;
   value?: string | null;
+}
+
+export interface InterfaceEntity {
+  /** @format int32 */
+  id?: number;
+  name?: string | null;
+  description?: string | null;
+  tags?: TagEntity[] | null;
 }
 
 /** Data transfer object representing a database migration and its status. */
@@ -201,91 +261,22 @@ export interface SecurityResponse {
 }
 
 /** Represents the configuration and metadata of a tag. */
-export interface TagCreateDto {
-  /**
-   * Unique identifier of the tag.
-   * @format int32
-   */
-  tagId?: number | null;
-  /** Name of the tag. */
-  name: string | null;
-  /** Defines the data types supported for tags */
-  valueType?: TagTypes;
-  /** The interface associated with the tag. */
-  interface?: string | null;
-  /** Description of the point (used as a comment or label). */
-  descriptor?: string | null;
-  /** Engineering units (e.g., °C, PSI, m³/h). */
-  uom?: string | null;
-  /** Reference to the source signal or channel tag. */
-  instrumentTag?: string | null;
-  /** Indicates whether the point is archived. */
-  active?: boolean;
-  /** Indicates whether compression is enabled for this tag. */
-  compressing?: boolean;
-  /**
-   * Minimum time (in milliseconds) between compressed values.
-   * Values received within this period are discarded, regardless of their error margin.
-   * @format int32
-   */
-  compressionMinTime?: number | null;
-  /**
-   * Maximum time (in milliseconds) between compressed values.
-   * @format int32
-   */
-  compressionMaxTime?: number | null;
-  /**
-   * The minimum expected value of the signal.
-   * @format double
-   */
-  zero?: number;
-  /**
-   * The range between the zero and the maximum value.
-   * @format double
-   */
-  span?: number;
-  /** Indicates whether the point is being scanned by the interface. */
-  scan?: boolean | null;
-  /** Associated digital state set name (for digital-type points). */
-  digitalSet?: string | null;
-  /** Indicates whether values are treated as step (true) or interpolated (false). */
-  step?: boolean;
-  /**
-   * Formula used to calculate the time associated with the tag's value.
-   * Default `now()`;
-   */
-  timeCalculation?: string | null;
-  /** Formula used to calculate error values for the tag. */
-  errorCalculation?: string | null;
-  /** User-defined calculation or formula associated with the tag's value. */
-  valueCaclulation?: string | null;
-  /**
-   * Date and time when the tag was created.
-   * @format date-time
-   */
-  creationDate?: string;
-  /** User or process that created the tag. */
-  creator?: string | null;
-  /**
-   * ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(time)").
-   * Used to control how data is partitioned when creating the table.
-   */
-  partition?: string | null;
-}
-
-/** Represents the configuration and metadata of a tag. */
 export interface TagEntity {
   /**
    * Unique identifier of the tag.
    * @format int32
    */
-  tagId?: number;
+  id?: number;
   /** Name of the tag. */
   name: string | null;
   /** Defines the data types supported for tags */
   valueType?: TagTypes;
-  /** The interface associated with the tag. */
-  interface?: string | null;
+  /**
+   * The interface associated with the tag.
+   * @format int32
+   */
+  interfaceId?: number | null;
+  interface?: InterfaceEntity;
   /** Description of the point (used as a comment or label). */
   descriptor?: string | null;
   /** Engineering units (e.g., °C, PSI, m³/h). */
@@ -293,7 +284,7 @@ export interface TagEntity {
   /** Reference to the source signal or channel tag. */
   instrumentTag?: string | null;
   /** Indicates whether the point is archived. */
-  active?: boolean;
+  enabled?: boolean;
   /** Indicates whether compression is enabled for this tag. */
   compressing?: boolean;
   /**
@@ -307,18 +298,6 @@ export interface TagEntity {
    * @format int32
    */
   compressionMaxTime?: number | null;
-  /**
-   * The minimum expected value of the signal.
-   * @format double
-   */
-  zero?: number;
-  /**
-   * The range between the zero and the maximum value.
-   * @format double
-   */
-  span?: number;
-  /** Indicates whether the point is being scanned by the interface. */
-  scan?: boolean | null;
   /** Associated digital state set name (for digital-type points). */
   digitalSet?: string | null;
   /** Indicates whether values are treated as step (true) or interpolated (false). */
@@ -331,7 +310,7 @@ export interface TagEntity {
   /** Formula used to calculate error values for the tag. */
   errorCalculation?: string | null;
   /** User-defined calculation or formula associated with the tag's value. */
-  valueCaclulation?: string | null;
+  valueCalculation?: string | null;
   /**
    * Date and time when the tag was created.
    * @format date-time
@@ -339,11 +318,6 @@ export interface TagEntity {
   creationDate?: string;
   /** User or process that created the tag. */
   creator?: string | null;
-  /**
-   * ClickHouse partitioning clause for time-series storage (e.g., "PARTITION BY toYear(time)").
-   * Used to control how data is partitioned when creating the table.
-   */
-  partition?: string | null;
 }
 
 export interface FolderGetSecurityListParams {

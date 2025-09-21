@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oip.Rtds.Data.Contexts;
 
@@ -11,9 +12,11 @@ using Oip.Rtds.Data.Contexts;
 namespace Oip.Rtds.SqlServer.Migrations
 {
     [DbContext(typeof(RtdsMetaContext))]
-    partial class RtdsMetaContextModelSnapshot : ModelSnapshot
+    [Migration("20250921130900_RenameFieldId2")]
+    partial class RenameFieldId2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,15 +39,11 @@ namespace Oip.Rtds.SqlServer.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Interface", "rtds");
+                    b.ToTable("InterfaceEntity");
                 });
 
             modelBuilder.Entity("Oip.Rtds.Data.Entities.TagEntity", b =>

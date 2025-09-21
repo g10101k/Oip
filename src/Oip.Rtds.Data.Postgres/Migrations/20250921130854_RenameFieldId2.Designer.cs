@@ -12,8 +12,8 @@ using Oip.Rtds.Data.Contexts;
 namespace Oip.Rtds.Data.Postgres.Migrations
 {
     [DbContext(typeof(RtdsMetaContext))]
-    [Migration("20250920082653_Initialization")]
-    partial class Initialization
+    [Migration("20250921130854_RenameFieldId2")]
+    partial class RenameFieldId2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,16 +25,34 @@ namespace Oip.Rtds.Data.Postgres.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Oip.Rtds.Data.Entities.TagEntity", b =>
+            modelBuilder.Entity("Oip.Rtds.Data.Entities.InterfaceEntity", b =>
                 {
-                    b.Property<long>("TagId")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("TagId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<bool>("Active")
-                        .HasColumnType("boolean");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InterfaceEntity");
+                });
+
+            modelBuilder.Entity("Oip.Rtds.Data.Entities.TagEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Compressing")
                         .HasColumnType("boolean");
@@ -60,31 +78,23 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                     b.Property<string>("DigitalSet")
                         .HasColumnType("text");
 
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("ErrorCalculation")
                         .HasColumnType("text");
 
                     b.Property<string>("InstrumentTag")
                         .HasColumnType("text");
 
-                    b.Property<string>("Interface")
+                    b.Property<long?>("InterfaceId")
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
-
-                    b.Property<string>("Partition")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<bool?>("Scan")
-                        .HasColumnType("boolean");
-
-                    b.Property<double>("Span")
-                        .HasColumnType("double precision");
 
                     b.Property<bool>("Step")
                         .HasColumnType("boolean");
@@ -101,15 +111,28 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                     b.Property<int>("ValueType")
                         .HasColumnType("integer");
 
-                    b.Property<double>("Zero")
-                        .HasColumnType("double precision");
+                    b.HasKey("Id");
 
-                    b.HasKey("TagId");
+                    b.HasIndex("InterfaceId");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("Tag", "rtds");
+                });
+
+            modelBuilder.Entity("Oip.Rtds.Data.Entities.TagEntity", b =>
+                {
+                    b.HasOne("Oip.Rtds.Data.Entities.InterfaceEntity", "Interface")
+                        .WithMany("Tags")
+                        .HasForeignKey("InterfaceId");
+
+                    b.Navigation("Interface");
+                });
+
+            modelBuilder.Entity("Oip.Rtds.Data.Entities.InterfaceEntity", b =>
+                {
+                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,234 @@
+<p-confirm-dialog/>
+<div *ngIf="isContent">
+  <p-dialog header="Create tag" [modal]="true" [(visible)]="createTagDialogVisible" [style]="{ width: '25rem' }">
+    <div class="flex items-center gap-4 mb-4">
+      <label for="username" class="font-semibold w-24">Name</label>
+      <input pInputText id="username" class="flex-auto" [(ngModel)]="createTag.name" autocomplete="off"/>
+    </div>
+    <div class="flex items-center gap-4 mb-8">
+      <label for="tag-type" class="font-semibold w-24">Tag type</label>
+      <p-select id="tag-type" [options]="valueTypeOptions" [(ngModel)]="createDialogSelectedType" optionLabel="label"
+                optionValue="value"
+                placeholder="Select type" class="flex-auto"
+                appendTo="body"/>
+    </div>
+    <div class="flex justify-end gap-2">
+      <p-button label="Cancel" severity="secondary" (click)="cancelCreateDialogClick()"/>
+      <p-button label="Save" (click)="saveCreateTagDialogClick()"/>
+    </div>
+  </p-dialog>
+  <div class="grid grid-cols-12">
+    <div class="card col-span-12 xl:col-span-12">
+      <div class="font-semibold text-xl mb-2">Tags</div>
+      <div class="mb-2">
+        <p-toolbar>
+          <ng-template #start>
+            <p-button icon="pi pi-plus" class="mr-2" [text]="true" severity="secondary"
+                      (onClick)="showCreateTagDialog()"/>
+            <p-button icon="pi pi-refresh" class="mr-2" [text]="true" severity="secondary"
+                      (onClick)="refresh()"/>
+            <p-button icon="pi pi-save" class="mr-2" [text]="true" severity="secondary"
+                      (onClick)="saveTag()"/>
+          </ng-template>
+          <ng-template #center>
+
+          </ng-template>
+          <ng-template #end>
+            <p-iconfield iconPosition="left">
+              <p-inputicon class="pi pi-search"/>
+              <input type="text" pInputText placeholder="Search"/>
+            </p-iconfield>
+          </ng-template>
+        </p-toolbar>
+      </div>
+      <p-table
+        [value]="tags"
+        [paginator]="true"
+        [rows]="10"
+        [sortMode]="'multiple'"
+        [size]="'small'"
+        selectionMode="single"
+        [(selection)]="selectedTag"
+        responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="id">Id
+              <p-sortIcon field="id"/>
+            </th>
+            <th pSortableColumn="name">Name
+              <p-sortIcon field="name"/>
+            </th>
+            <th pSortableColumn="valueType">Type
+              <p-sortIcon field="valueType"/>
+            </th>
+            <th pSortableColumn="source">Source
+              <p-sortIcon field="source"/>
+            </th>
+            <th pSortableColumn="engUnits">Units
+              <p-sortIcon field="engUnits"/>
+            </th>
+            <th pSortableColumn="scan">Scan
+              <p-sortIcon field="scan"/>
+            </th>
+            <th pSortableColumn="archiving">Arch.
+              <p-sortIcon field="archiving"/>
+            </th>
+            <th pSortableColumn="compressing">Comp.
+              <p-sortIcon field="compressing"/>
+            </th>
+            <th pSortableColumn="creationDate">Created
+              <p-sortIcon field="creationDate"/>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-tag >
+          <tr [pSelectableRow]="tag">
+            <td>{{ tag.id }}</td>
+            <td>{{ tag.name }}</td>
+            <td>{{ getTagTypeName(tag.valueType) }}</td>
+            <td>{{ tag.source }}</td>
+            <td>{{ tag.uom }}</td>
+            <td>
+              <p-tag [value]="tag.scan ? 'Yes' : 'No'" [severity]="tag.scan ? 'info' : 'warn'"/>
+            </td>
+            <td>
+              <p-tag [value]="tag.archiving ? 'Yes' : 'No'" [severity]="tag.archiving ? 'info' : 'warn'"/>
+            </td>
+            <td>
+              <p-tag [value]="tag.compressing ? 'Yes' : 'No'" [severity]="tag.compressing ? 'info' : 'warn'"/>
+            </td>
+            <td>{{ tag.creationDate | date: 'yyyy-MM-dd HH:mm' }}</td>
+            <td>
+              <p-button icon="pi pi-trash" class="mr-2" [text]="true" severity="danger"
+                        (onClick)="deleteTag(tag)"/>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="10">No tags found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <div *ngIf="selectedTag" class="grid grid-cols-12 col-span-12 xl:col-span-12 gap-4">
+      <div class="card col-span-6 xl:col-span-6">
+        <div class="font-semibold text-xl">Common</div>
+        <div class="grid grid-cols-12 gap-4 mt-4">
+          <label for="name" class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Name</label>
+          <div class="col-span-12 md:col-span-10">
+            <input class="w-full" pInputText id="name" [(ngModel)]="selectedTag.name"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-4 mt-4">
+          <label for="valueType" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Value Type</label>
+          <div class="col-span-4 md:col-span-4">
+            <p-dropdown class="w-full" id="valueType" [options]="valueTypeOptions"
+                        optionLabel="label" optionValue="value"></p-dropdown>
+          </div>
+          <label for="uom" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">UOM</label>
+          <div class="col-span-4 md:col-span-4">
+            <input class="w-full" pInputText id="uom" [(ngModel)]="selectedTag.uom"/>
+          </div>
+
+        </div>
+
+        <div class="grid grid-cols-12 gap-4 mt-4">
+          <label for="descriptor"
+                 class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0">Descriptor</label>
+          <div class="col-span-12 md:col-span-10">
+            <input class="w-full" pInputText id="descriptor" [(ngModel)]="selectedTag.descriptor"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="card col-span-6 xl:col-span-6">
+        <div class="font-semibold text-xl">Configuration of Archiving</div>
+        <div class="grid grid-cols-12 gap-4 mt-4">
+          <label for="step" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Step</label>
+          <div class="col-span-10 md:col-span-10 flex-auto">
+            <p-checkbox id="step" [(ngModel)]="selectedTag.step" binary="true" title="Step"></p-checkbox>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-4">
+
+          <div class="grid col-span-1 md:col-span-1 gap-4">
+            <div class="grid grid-cols-1">
+              <label for="compressing" class="flex items-center mb-2">Compressing</label>
+              <p-checkbox id="compressing" [(ngModel)]="selectedTag.compressing" binary="true"
+                          pTooltip="Compressing"></p-checkbox>
+            </div>
+            <div class="col-span-12 md:col-span-4">
+              <label for="compMin" class="flex items-center mb-2">Compression Min (sec)</label>
+              <p-inputNumber id="compMin" [(ngModel)]="selectedTag.compressionMinTime" mode="decimal"></p-inputNumber>
+            </div>
+
+            <div class="grid grid-cols-12">
+              <div class="col-span-12 md:col-span-4">
+                <label for="compMax" class="flex items-center mb-2">Compression Max (sec)</label>
+                <p-inputNumber id="compMax" [(ngModel)]="selectedTag.compressionMaxTime" mode="decimal"></p-inputNumber>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="selectedTag" class="card col-span-6 xl:col-span-6">
+        <div class="font-semibold text-xl">Data collection</div>
+        <div class="grid grid-cols-12 gap-4 mt-4">
+          <label for="interface" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Interface</label>
+          <div class="col-span-10 md:col-span-10 flex-auto">
+            <input class="w-full" pInputText id="interface" [(ngModel)]="selectedTag.interface"/>
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-4 mt-4">
+          <label for="instrumentTag" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Instrument
+            Tag</label>
+          <div class="col-span-10 md:col-span-10 flex-auto">
+            <input class="w-full" pInputText id="instrumentTag" [(ngModel)]="selectedTag.instrumentTag"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-4 mt-4">
+          <label for="active" class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0">Enabled</label>
+          <div class="col-span-10 md:col-span-10 flex-auto">
+            <p-checkbox id="active" [(ngModel)]="selectedTag.enabled" binary="true" pTooltip="Enabled"></p-checkbox>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="selectedTag" class="card col-span-6 xl:col-span-6">
+        <div class="font-semibold text-xl">Calculations</div>
+        <div class="grid col-span-1 md:col-span-1 gap-4">
+          <div class="col-span-12 md:col-span-12">
+            <label for="errorCalculation" class="flex items-center mb-2">Error formula</label>
+            <textarea class="w-full" pTextarea [(ngModel)]="selectedTag.errorCalculation" [autoResize]="true"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="selectedTag" class="card col-span-6 xl:col-span-6">
+        <div class="font-semibold text-xl">System</div>
+        <div class="grid grid-cols-12 gap-4 mt-4">
+          <div class="col-span-12 md:col-span-6">
+            <label for="creationDate" class="flex items-center mb-2">Creation Date</label>
+            <input [disabled]="true" pInputText id="creationDate"
+                   [(ngModel)]="selectedTag.creationDate"/>
+
+          </div>
+          <div class="col-span-12 md:col-span-6">
+            <label for="creator" class="flex items-center mb-2">Creator</label>
+            <input [disabled]="true" pInputText id="creator" [(ngModel)]="selectedTag.creator"/>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div *ngIf="isSettings"></div>
+<security *ngIf="isSecurity" [id]="id" [controller]="controller"></security>

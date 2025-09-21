@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Oip.Rtds.SqlServer.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialization : Migration
+    public partial class RenameFieldId : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,33 +19,29 @@ namespace Oip.Rtds.SqlServer.Migrations
                 schema: "rtds",
                 columns: table => new
                 {
-                    TagId = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
                     ValueType = table.Column<int>(type: "int", nullable: false),
-                    Interface = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
+                    Interface = table.Column<long>(type: "bigint", maxLength: 128, nullable: false),
                     Descriptor = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true),
                     Uom = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstrumentTag = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    Enabled = table.Column<bool>(type: "bit", nullable: false),
                     Compressing = table.Column<bool>(type: "bit", nullable: false),
                     CompressionMinTime = table.Column<long>(type: "bigint", nullable: true),
                     CompressionMaxTime = table.Column<long>(type: "bigint", nullable: true),
-                    Zero = table.Column<double>(type: "float", nullable: false),
-                    Span = table.Column<double>(type: "float", nullable: false),
-                    Scan = table.Column<bool>(type: "bit", nullable: true),
                     DigitalSet = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Step = table.Column<bool>(type: "bit", nullable: false),
                     TimeCalculation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ErrorCalculation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ValueCalculation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Creator = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    Partition = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false)
+                    Creator = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tag", x => x.TagId);
+                    table.PrimaryKey("PK_Tag", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(

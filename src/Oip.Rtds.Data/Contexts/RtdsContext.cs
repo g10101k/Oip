@@ -52,15 +52,13 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// <summary>
     /// Asynchronously creates a new tag table in the RTDS using ClickHouse.
     /// </summary>
-    /// <param name="tableName">The name of the tag table to create.</param>
     /// <param name="valueType">The type of value stored in the tag table.</param>
     /// <param name="statusType">The type of status stored in the tag table.</param>
-    /// <param name="partition">The partition for the tag table.</param>
     /// <exception cref="InvalidOperationException">Thrown when a table with the same name already exists.</exception>
-    public async Task CreateTagTableAsync(string tableName, string valueType, string statusType, string partition)
+    public async Task CreateTagTableAsync(string valueType, string statusType)
     {
         await EnsureDatabaseCreatedAsync(); // Ensure database exists before creating table
-        var sql = string.Format(QueryConstants.CreateTagTableSql, tableName, valueType, statusType, partition);
+        var sql = string.Format(QueryConstants.CreateIntTagValue, valueType, statusType);
         await using var cmd = _connection.CreateCommand();
         cmd.CommandText = sql;
         await cmd.ExecuteNonQueryAsync();

@@ -35,47 +35,43 @@ public class TagRepository
     /// <summary>
     /// Creates a new tag with the specified configuration
     /// </summary>
-    /// <param name="tag">The tag creation DTO containing all configuration parameters</param>
+    /// <param name="createTag">The tag creation DTO containing all configuration parameters</param>
     /// <returns>A task representing the asynchronous operation</returns>
     /// <exception cref="NotSupportedException">
     /// Thrown when the specified tag value type is not supported
     /// </exception>
-    public async Task AddTag(TagCreateDto tag)
+    public async Task AddTag(CreateTagDto createTag)
     {
         await _rtdsMetaContext.Database.BeginTransactionAsync();
         try
         {
             var tagEntity = await _rtdsMetaContext.Tags.AddAsync(new TagEntity
             {
-                Name = tag.Name,
-                ValueType = tag.ValueType,
-                Interface = tag.Interface,
-                Descriptor = tag.Descriptor,
-                Uom = tag.Uom,
-                InstrumentTag = tag.InstrumentTag,
-                Active = tag.Active,
-                Compressing = tag.Compressing,
-                CompressionMinTime = tag.CompressionMinTime,
-                CompressionMaxTime = tag.CompressionMaxTime,
-                Zero = tag.Zero,
-                Span = tag.Span,
-                Scan = tag.Scan,
-                DigitalSet = tag.DigitalSet,
-                Step = tag.Step,
+                Name = createTag.Name,
+                ValueType = createTag.ValueType,
+                InterfaceId = createTag.Interface,
+                Descriptor = createTag.Descriptor,
+                Uom = createTag.Uom,
+                InstrumentTag = createTag.InstrumentTag,
+                Enabled = createTag.Enabled,
+                Compressing = createTag.Compressing,
+                CompressionMinTime = createTag.CompressionMinTime,
+                CompressionMaxTime = createTag.CompressionMaxTime,
+                DigitalSet = createTag.DigitalSet,
+                Step = createTag.Step,
                 CreationDate = DateTimeOffset.UtcNow,
                 Creator = _userService.GetUserEmail() ?? throw new InvalidOperationException("User not found"),
-                Partition = tag.Partition,
-                ValueCalculation = tag.ValueCalculation,
-                TimeCalculation = tag.TimeCalculation,
-                ErrorCalculation = tag.ErrorCalculation
+                ValueCalculation = createTag.ValueCalculation,
+                TimeCalculation = createTag.TimeCalculation,
+                ErrorCalculation = createTag.ErrorCalculation
             });
-            
+
             await _rtdsMetaContext.SaveChangesAsync();
-            var tableName = $"{tagEntity.Entity.TagId:D6}";
-            var valueType = GetClickHouseTypeFromTagType(tag.ValueType);
+            var tableName = $"{tagEntity.Entity.Id:D6}";
+            var valueType = GetClickHouseTypeFromTagType(createTag.ValueType);
             var statusType = GenerateClickHouseEnum8<TagValueStatus>();
 
-            await _rtdsContext.CreateTagTableAsync(tableName, valueType, statusType, tag.Partition);
+            await _rtdsContext.CreateTagTableAsync(valueType, statusType);
             await _rtdsMetaContext.Database.CommitTransactionAsync();
         }
         catch (Exception)
@@ -90,38 +86,32 @@ public class TagRepository
     /// </summary>
     /// <param name="filter">A string filter to apply to tag names (e.g., "Sensor%").</param>
     /// <returns>A list of <see cref="TagEntity"/> objects matching the filter.</returns>
-    public List<TagGetDto> GetTagsByFilter(string filter)
+    public List<TagDto> GetTagsByFilter(string filter)
     {
         return _rtdsMetaContext.Tags
             .Where(tag => EF.Functions.Like(tag.Name, filter))
-            .Select(x => new TagGetDto()
+            .Select(x => new TagDto()
             {
-                TagId = x.TagId,
+                Id = x.Id,
                 Name = x.Name,
                 ValueType = x.ValueType,
-                Interface = x.Interface,
+                InterfaceId = x.InterfaceId,
                 Descriptor = x.Descriptor,
                 Uom = x.Uom,
                 InstrumentTag = x.InstrumentTag,
-                Active = x.Active,
+                Enabled = x.Enabled,
                 Compressing = x.Compressing,
                 CompressionMinTime = x.CompressionMinTime,
                 CompressionMaxTime = x.CompressionMaxTime,
-                Zero = x.Zero,
-                Span = x.Span,
-                Scan = x.Scan,
                 DigitalSet = x.DigitalSet,
                 Step = x.Step,
                 CreationDate = x.CreationDate,
                 Creator = x.Creator,
-                Partition = x.Partition,
-                ValueCaclulation = x.ValueCalculation,
+                ValueCalculation = x.ValueCalculation,
                 TimeCalculation = x.TimeCalculation,
                 ErrorCalculation = x.ErrorCalculation,
             })
             .ToList();
-
-
     }
 
     /// <summary>
@@ -157,5 +147,44 @@ public class TagRepository
         var values = Enum.GetValues(typeof(TEnum)).Cast<TEnum>();
         var entries = values.Select(v => $"'{v}' = {(int)(object)v}");
         return "Enum8(" + string.Join(", ", entries) + ")";
+    }
+
+    /// <summary>
+    /// Edits an existing tag in the database.
+    /// </summary>
+    /// <param name="dto">The tag object containing the updated information.</param>
+    /// <exception cref="InvalidOperationException">Thrown if the tag is not found.</exception>
+    public void EditTag(CreateTagDto dto)
+    {
+        var entity = _rtdsMetaContext.Tags.FirstOrDefault(x => x.Id == dto.TagId) ??
+                     throw new InvalidOperationException("Tag not found");
+        entity.Name = dto.Name;
+        entity.ValueType = dto.ValueType;
+        entity.InterfaceId = dto.Interface;
+        entity.Descriptor = dto.Descriptor;
+        entity.Uom = dto.Uom;
+        entity.InstrumentTag = dto.InstrumentTag;
+        entity.Enabled = dto.Enabled;
+        entity.Compressing = dto.Compressing;
+        entity.CompressionMinTime = dto.CompressionMinTime;
+        entity.CompressionMaxTime = dto.CompressionMaxTime;
+        entity.DigitalSet = dto.DigitalSet;
+        entity.Step = dto.Step;
+        entity.ValueCalculation = dto.ValueCalculation;
+        entity.TimeCalculation = dto.TimeCalculation;
+        entity.ErrorCalculation = dto.ErrorCalculation;
+
+        _rtdsMetaContext.SaveChanges();
+    }
+
+    /// <summary>
+    /// Retrieves tags associated with a specific interface ID.
+    /// </summary>
+    /// <param name="requestInterfaceId">The ID of the interface to filter tags by.</param>
+    /// <returns>An enumerable collection of <see cref="TagEntity"/> objects matching the specified interface ID.</returns>
+    public IEnumerable<TagEntity> GetTagsByInterfaceId(uint requestInterfaceId)
+    {
+        return _rtdsMetaContext.Tags
+            .Where(x => x.InterfaceId == requestInterfaceId).AsNoTracking();
     }
 }
