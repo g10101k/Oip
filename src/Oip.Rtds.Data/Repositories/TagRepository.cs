@@ -156,7 +156,7 @@ public class TagRepository
     /// <exception cref="InvalidOperationException">Thrown if the tag is not found.</exception>
     public void EditTag(CreateTagDto dto)
     {
-        var entity = _rtdsMetaContext.Tags.FirstOrDefault(x => x.Id == dto.TagId) ??
+        var entity = _rtdsMetaContext.Tags.FirstOrDefault(x => x.Id == dto.Id) ??
                      throw new InvalidOperationException("Tag not found");
         entity.Name = dto.Name;
         entity.ValueType = dto.ValueType;

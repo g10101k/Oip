@@ -38,71 +38,32 @@ message GetTagsRequest {
 
 // Defines the data types supported for tags
 enum TagTypes {
-  // 32-bit floating point number (single precision)
   FLOAT32 = 0;
-  // 64-bit floating point number (double precision)
   FLOAT64 = 1;
-  // 16-bit signed integer
   INT16 = 2;
-  // 32-bit signed integer
   INT32 = 3;
-  // Digital (boolean) value (0/1)
   DIGITAL = 4;
-  // String/text data
   STRING = 5;
-  // Binary large object (blob) - for arbitrary binary data
   BLOB = 6;
 }
 
 
-// 
 message TagResponse {
-  // Unique identifier of the tag.
   optional uint32 id = 1;
-
-  // Name of the tag.
   string name = 2;
-
-  // Data type of the point.
   TagTypes value_type = 3;
-
-  // The interface associated with the tag.
-  optional string interface = 4;
-
-  // Description of the point (used as a comment or label).
+  optional uint32 interface_id = 4;
   optional string descriptor = 5;
-
-  // Engineering units (e.g., °C, PSI, m³/h).
   optional string uom = 6;
-
-  // Reference to the source signal or channel tag.
   optional string instrument_tag = 7;
-
-  // Indicates whether the point is archived.
   bool enabled = 8;
-
-  // Indicates whether compression is enabled for this tag.
   bool compressing = 9;
-
-  // Minimum time (in ms) between compressed values.
   optional uint32 compression_min_time = 10;
-
-  // Maximum time (in ms) between compressed values.
   optional uint32 compression_max_time = 11;
-
-  // Associated digital state set name.
   optional string digital_set = 12;
-
-  // Indicates whether values are treated as step (true) or interpolated (false).
   bool step = 13;
-
-  // Formula used to calculate the time associated with the tag's value.
   optional string time_calculation = 14;
-
-  // Formula used to calculate error values for the tag.
   optional string error_calculation = 15;
-
-  // User-defined calculation or formula associated with the tag's value.
   optional string value_calculation = 16;
 }
 

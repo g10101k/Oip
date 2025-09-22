@@ -28,7 +28,7 @@ export interface ApplyMigrationRequest {
 /** Represents the configuration and metadata of a tag. */
 export interface CreateTagDto {
   /** Unique identifier of the tag. */
-  tagId?: number | null;
+  id?: number | null;
   /** Name of the tag. */
   name: string | null;
   /** Defines the data types supported for tags */

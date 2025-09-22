@@ -10,7 +10,7 @@ public class CreateTagDto
     /// <summary>
     /// Unique identifier of the tag.
     /// </summary>
-    public uint? TagId { get; set; }
+    public uint? Id { get; set; }
 
     /// <summary>
     /// Name of the tag.

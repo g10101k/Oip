@@ -1,10 +1,13 @@
 using System.Collections.Concurrent;
 using Grpc.Core;
+using Oip.Base.Extensions;
 using Oip.Rtds.Grpc;
-using Oip.Rts.Extensions;
 
 namespace Oip.Rts.Services;
 
+/// <summary>
+/// Implements the Rtds service for handling real-time data streams.
+/// </summary>
 public class OipRtdsService : RtdsService.RtdsServiceBase
 {
     private readonly IServiceScopeFactory _scopeFactory;
@@ -12,23 +15,30 @@ public class OipRtdsService : RtdsService.RtdsServiceBase
     private static readonly object Lock = new();
     private static int _eventCounter;
 
+    /// <summary>
+    /// Implements the Rtds service for handling real-time data streams.
+    /// </summary>
     public OipRtdsService(IServiceScopeFactory scopeFactory)
     {
         _scopeFactory = scopeFactory;
     }
 
+    /// <summary>
+    /// Subscribes a client to real-time data streams for specified event types.
+    /// </summary>
+    /// <param name="request">The subscription request containing the client ID and event types.</param>
+    /// <param name="responseStream">The stream to send event messages to the client.</param>
+    /// <param name="context">The context for the gRPC call.</param>
     public override async Task Subscribe(SubscribeRequest request, IServerStreamWriter<EventMessage> responseStream,
         ServerCallContext context)
     {
         var clientId = request.ClientId;
 
-        // Добавляем подписчика
         Subscribers[clientId] = responseStream;
         Console.WriteLine($@"Client {clientId} subscribed to events: {string.Join(", ", request.EventTypes)}");
 
         try
         {
-            // Ждем, пока клиент не отключится
             while (!context.CancellationToken.IsCancellationRequested)
             {
                 await Task.Delay(1000, context.CancellationToken);
@@ -36,15 +46,20 @@ public class OipRtdsService : RtdsService.RtdsServiceBase
         }
         catch (TaskCanceledException)
         {
-            Console.WriteLine($"Client {clientId} disconnected");
+            Console.WriteLine($@"Client {clientId} disconnected");
         }
         finally
         {
-            // Удаляем подписчика при отключении
             Subscribers.TryRemove(clientId, out _);
         }
     }
 
+    /// <summary>
+    /// Publishes an event to the real-time data stream.
+    /// </summary>
+    /// <param name="request">The publish request containing event type and payload.</param>
+    /// <param name="context">The gRPC server call context.</param>
+    /// <returns>A publish response indicating the success of the operation.</returns>
     public override Task<PublishResponse> Publish(PublishRequest request, ServerCallContext context)
     {
         var eventMessage = new EventMessage
@@ -55,7 +70,6 @@ public class OipRtdsService : RtdsService.RtdsServiceBase
             Timestamp = DateTime.UtcNow.ToString("O")
         };
 
-        // Отправляем событие всем подписчикам
         BroadcastEvent(eventMessage);
 
         return Task.FromResult(new PublishResponse
@@ -66,6 +80,12 @@ public class OipRtdsService : RtdsService.RtdsServiceBase
     }
 
 
+    /// <summary>
+    /// Retrieves tags based on the provided request.
+    /// </summary>
+    /// <param name="request">The request containing interface ID.</param>
+    /// <param name="context">The server call context.</param>
+    /// <returns>A response containing the retrieved tags.</returns>
     public override Task<GetTagsResponse> GetTags(GetTagsRequest request, ServerCallContext context)
     {
         return _scopeFactory.ExecuteAsync<TagService, GetTagsResponse>(x => x.GetTagsByInterfaceId(request));

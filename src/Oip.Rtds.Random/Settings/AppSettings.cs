@@ -6,5 +6,5 @@ public class AppSettings : BaseAppSettings<AppSettings>
 {
     public string RtdsUrl { get; set; } = null!;
     
-    public int InterfaceId {get; set;}
+    public uint InterfaceId {get; set;}
 }

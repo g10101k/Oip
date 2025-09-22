@@ -1,7 +1,18 @@
-namespace Oip.Rts.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
+namespace Oip.Base.Extensions;
+
+/// <summary>
+/// Provides extension methods for executing scoped services.
+/// </summary>
 public static class ScopedServiceExtensions
 {
+    /// <summary>
+    /// Executes an asynchronous operation with a scoped service.
+    /// </summary>
+    /// <typeparam name="TService">The type of the scoped service.</typeparam>
+    /// <param name="factory">The service scope factory.</param>
+    /// <param name="action">The asynchronous action to execute with the service.</param>
     public static async Task ExecuteAsync<TService>(this IServiceScopeFactory factory,
         Func<TService, Task> action) where TService : notnull
     {
@@ -10,7 +21,14 @@ public static class ScopedServiceExtensions
         await action(service);
     }
 
-    public static void ExecuteScoped<TService>(this IServiceScopeFactory factory, Action<TService> action) where TService : notnull
+    /// <summary>
+    /// Executes an action with a scoped service.
+    /// </summary>
+    /// <typeparam name="TService">The type of the scoped service.</typeparam>
+    /// <param name="factory">The service scope factory.</param>
+    /// <param name="action">The action to execute with the service.</param>
+    public static void ExecuteScoped<TService>(this IServiceScopeFactory factory, Action<TService> action)
+        where TService : notnull
     {
         using var scope = factory.CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<TService>();

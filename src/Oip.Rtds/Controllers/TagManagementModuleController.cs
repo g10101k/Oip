@@ -67,9 +67,8 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// <param name="filter">Name filter to search tags by.</param>
     /// <returns>A list of matching tags.</returns>
     [HttpGet("get-tags-by-filter")]
-    [ProducesResponseType<List<TagEntity>>(StatusCodes.Status200OK)]
     [Authorize]
-    public IActionResult GetTagsByFilter(string filter)
+    public ActionResult<List<TagDto>> GetTagsByFilter(string filter)
     {
         return Ok(_tagRepository.GetTagsByFilter(filter));
     }
