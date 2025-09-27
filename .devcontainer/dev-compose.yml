@@ -107,3 +107,4 @@ volumes:
   pgadmin-data:
   pgadminhome-data:
   clickhouse_data:
+  ollama_data:
