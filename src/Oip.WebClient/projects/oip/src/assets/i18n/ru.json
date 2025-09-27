@@ -15,6 +15,13 @@
     "changePhoto": "Загрузить фото",
     "successfullyUploaded": "Загружено"
   },
+  "configComponent": {
+    "profile": "Профиль",
+    "photo": "Фото",
+    "usePhoto256x256Pixel": "Используйте фото 256х256 пикселей",
+    "localization": "Язык",
+    "selectLanguage": "Выберите язык"
+  },
   "baseComponent": {
     "content": "Содержимое",
     "settings": "Настройки",
@@ -27,11 +34,7 @@
   },
   "menuItemEditDialogComponent": {
     "header": "Редактировать элемент меню",
-    "parentLabel": "Родительский узел",
     "label": "Имя",
-    "module": "Модуль",
-    "selectModule": "Выбери модуль",
-    "security": "Безопасность - чтение",
     "icon": "Иконка",
     "cancel": "Отмена",
     "save": "Сохранить"
@@ -51,6 +54,27 @@
     "signInToContinue": "Войдите чтобы продолжить",
     "signIn": "Войти"
   },
+  "appModulesComponent": {
+    "title": "Модули",
+    "refreshTooltip": "Обновить",
+    "table": {
+      "moduleId": "ID модуля",
+      "name": "Название",
+      "currentlyLoaded": "Загружен",
+      "yes": "Да",
+      "no": "Нет",
+      "deleteTooltip": "Удалить"
+    },
+    "confirm": {
+      "header": "Внимание",
+      "message": "Вы уверены, что хотите удалить модуль?",
+      "cancel": "Отмена",
+      "delete": "Удалить"
+    },
+    "messages": {
+      "deleteSuccess": "Модуль удален"
+    }
+  },
   "menuItemComponent": {
     "new": "Добавить",
     "edit": "Редактировать",
@@ -61,6 +85,5 @@
     "deleteItemConfirmRejectButtonPropsLabel": "Отмена",
     "deleteItemConfirmAcceptButtonPropsLabel": "Удалить"
   },
-
   "primeng": ""
 }

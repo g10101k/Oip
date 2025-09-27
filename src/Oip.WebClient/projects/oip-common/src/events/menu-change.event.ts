@@ -1,4 +1,4 @@
-import { ContextMenuItemDto } from "../dtos/context-menu-item.dto";
+import { ContextMenuItemDto } from '../dtos/context-menu-item.dto';
 
 /**
  * Represents an event triggered when a menu item is clicked.

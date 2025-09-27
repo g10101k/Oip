@@ -21,7 +21,8 @@ public static class ServiceCollectionExtension
     /// <param name="migrationHistorySchemaName"></param>
     /// <returns></returns>
     public static IServiceCollection AddOipModuleContext(this IServiceCollection services, string connectionString,
-        string migrationHistoryTableName = "OipMigrationHistory", string migrationHistorySchemaName = "oip")
+        string migrationHistoryTableName = OipModuleContext.MigrationHistoryTableName,
+        string migrationHistorySchemaName = OipModuleContext.SchemaName)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(connectionString);
         return services.AddDbContext<OipModuleContext>(option =>
@@ -38,6 +39,7 @@ public static class ServiceCollectionExtension
                                 {
                                     x.MigrationsAssembly("Oip.Base.Data.Postgres");
                                     x.MigrationsHistoryTable(migrationHistoryTableName, migrationHistorySchemaName);
+                                    x.MigrationsAssembly("Oip.Base.Data.Postgres");
                                 });
                             break;
                         case XpoProvider.MSSqlServer:
@@ -46,6 +48,7 @@ public static class ServiceCollectionExtension
                                 {
                                     x.MigrationsAssembly("Oip.Base.Data.SqlServer");
                                     x.MigrationsHistoryTable(migrationHistoryTableName, migrationHistorySchemaName);
+                                    x.MigrationsAssembly("Oip.Base.Data.SqlServer");
                                 });
                             break;
                         default:

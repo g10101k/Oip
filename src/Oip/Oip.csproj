@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <SpaRoot>.\..\Oip.WebClient\</SpaRoot>
-        <SpaProxyServerUrl>https://localhost:50000</SpaProxyServerUrl>
+        <SpaProxyServerUrl>https://localhost:50002</SpaProxyServerUrl>
         <SpaProxyLaunchCommand>npm run start</SpaProxyLaunchCommand>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>

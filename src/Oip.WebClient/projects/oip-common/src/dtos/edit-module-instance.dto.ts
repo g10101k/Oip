@@ -1,5 +1,5 @@
 export interface EditModuleInstanceDto {
-  moduleInstanceId: number,
+  moduleInstanceId: number;
   moduleId: number;
   parentId: number;
   label: string;

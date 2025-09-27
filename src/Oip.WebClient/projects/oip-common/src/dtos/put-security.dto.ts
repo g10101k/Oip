@@ -1,4 +1,4 @@
-import { SecurityDto } from "./security.dto";
+import { SecurityDto } from './security.dto';
 
 export interface PutSecurityDto {
   id: number;

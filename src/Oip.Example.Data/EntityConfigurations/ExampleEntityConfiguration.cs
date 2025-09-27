@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Oip.Base.Data.Extensions;
-using Oip.Example.Data.Contexts;
 using Oip.Example.Data.Entities;
 
 namespace Oip.Example.Data.EntityConfigurations;

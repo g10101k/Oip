@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Constants;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Properties;
@@ -7,32 +7,46 @@ using Oip.Base.Properties;
 namespace Oip.Base.Controllers;
 
 /// <summary>
-/// Folder module
+/// API controller for the Folder module.
 /// </summary>
+/// <remarks>
+/// Provides metadata about the module, including access rights required to interact with it.
+/// Inherits from <see cref="BaseModuleController{TSettings}"/> with a generic parameter of <c>object</c>
+/// because this module does not require specific configuration.
+/// </remarks>
 [ApiController]
 [Route("api/folder-module")]
 [ApiExplorerSettings(GroupName = "base")]
 public class FolderModuleController : BaseModuleController<FolderModuleSettings>
 {
     /// <summary>
-    /// .ctor
+    /// Initializes a new instance of the <see cref="FolderModuleController"/> class.
     /// </summary>
-    /// <param name="moduleRepository"></param>
+    /// <param name="moduleRepository">The module repository used to retrieve and manage module data.</param>
     public FolderModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
     {
     }
-    
-    /// <inheritdoc />
+
+    /// <summary>
+    /// Returns a list of rights (permissions) required to access the folder module.
+    /// </summary>
+    /// <remarks>
+    /// This method defines the security model for the folder module. It currently includes only read access,
+    /// limited to users with the administrator role.
+    /// </remarks>
+    /// <returns>
+    /// A list of <see cref="SecurityResponse"/> representing the rights associated with the module.
+    /// </returns>
     public override List<SecurityResponse> GetModuleRights()
     {
         return new()
         {
             new()
             {
-                Code = Resources.FolderModuleController_GetModuleRights_read,
-                Name = Resources.FolderModuleController_GetModuleRights_read,
-                Description = Resources.FolderModuleController_GetModuleRights_Can_view_this_module, 
-                Roles = ["admin"]
+                Code = SecurityConstants.Read,
+                Name = Resources.ModuleModuleController_GetModuleRights_Read,
+                Description = Resources.FolderModuleController_GetModuleRights_Can_view_this_module,
+                Roles = [SecurityConstants.AdminRole]
             },
         };
     }

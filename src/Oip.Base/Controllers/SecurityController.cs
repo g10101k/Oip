@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Constants;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Helpers;
 using Oip.Base.Services;
@@ -8,8 +9,13 @@ using Oip.Base.Settings;
 namespace Oip.Base.Controllers;
 
 /// <summary>
-/// Security controller
+/// Controller responsible for managing security-related operations,
+/// including role retrieval and Keycloak client configuration.
 /// </summary>
+/// <remarks>
+/// Provides endpoints for administrators to retrieve Keycloak realm roles,
+/// as well as public access to frontend configuration for OAuth2 client setup.
+/// </remarks>
 [ApiController]
 [Route("api/security")]
 [ApiExplorerSettings(GroupName = "base")]
@@ -18,18 +24,28 @@ public class SecurityController : ControllerBase
     private readonly KeycloakService _keycloakService;
     private readonly IBaseOipModuleAppSettings _appSettings;
 
-    /// <summary>.ctor</summary>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SecurityController"/> class.
+    /// </summary>
+    /// <param name="keycloakService">Service to interact with Keycloak.</param>
+    /// <param name="appSettings">Application settings used for Keycloak configuration.</param>
     public SecurityController(KeycloakService keycloakService, IBaseOipModuleAppSettings appSettings)
     {
         _keycloakService = keycloakService;
         _appSettings = appSettings;
     }
 
-    /// <summary> 
-    /// Get all roles
+    /// <summary>
+    /// Retrieves all realm roles from Keycloak.
     /// </summary>
-    /// <returns></returns>
-    [Authorize(Roles = "admin")]
+    /// <remarks>
+    /// This endpoint is restricted to administrators.
+    /// Useful for role management in the application UI or backend.
+    /// </remarks>
+    /// <returns>
+    /// A list of role names as <see cref="string"/>.
+    /// </returns>
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     [HttpGet("get-realm-roles")]
     public async Task<IEnumerable<string>> GetRealmRoles()
     {
@@ -37,10 +53,16 @@ public class SecurityController : ControllerBase
         return realmRoles.Select(x => x.Name).ToList();
     }
 
-    /// <summary> 
-    /// Get keycloak client settings
+    /// <summary>
+    /// Retrieves Keycloak client settings needed by frontend applications.
     /// </summary>
-    /// <returns></returns>
+    /// <remarks>
+    /// This endpoint is publicly accessible and provides client configuration such as authority URL,
+    /// client ID, scopes, and secure routes for frontend OAuth2/OIDC initialization.
+    /// </remarks>
+    /// <returns>
+    /// A <see cref="GetKeycloakClientSettingsResponse"/> object containing frontend configuration.
+    /// </returns>
     [HttpGet("get-keycloak-client-settings")]
     [AllowAnonymous]
     public GetKeycloakClientSettingsResponse GetKeycloakClientSettings()

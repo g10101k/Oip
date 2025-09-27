@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using Oip.Example.Data.Entities;
 using Oip.Example.Data.EntityConfigurations;
 

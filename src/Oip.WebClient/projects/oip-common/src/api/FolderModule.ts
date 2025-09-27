@@ -10,116 +10,106 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   FolderModuleGetModuleInstanceSettingsParams,
   FolderModuleGetSecurityParams,
   FolderModuleSettingsSaveSettingsRequest,
   PutSecurityRequest,
-  SecurityResponse,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+  SecurityResponse
+} from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
-@Injectable({ providedIn: "root" })
-export class FolderModule<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+@Injectable()
+export class FolderModule<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description This method defines the security model for the folder module. It currently includes only read access, limited to users with the administrator role.
    *
    * @tags FolderModule
-   * @name folderModuleGetModuleRights
+   * @name getModuleRights
+   * @summary Returns a list of rights (permissions) required to access the folder module.
    * @request GET:/api/folder-module/get-module-rights
    * @secure
    */
   folderModuleGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/folder-module/get-module-rights`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
    *
    * @tags FolderModule
-   * @name folderModuleGetSecurity
-   * @summary Get security for instance id
+   * @name getSecurity
+   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/folder-module/get-security
    * @secure
    */
-  folderModuleGetSecurity = (
-    query: FolderModuleGetSecurityParams,
-    params: RequestParams = {},
-  ) =>
+  folderModuleGetSecurity = (query: FolderModuleGetSecurityParams, params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/folder-module/get-security`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
    *
    * @tags FolderModule
-   * @name folderModulePutSecurity
-   * @summary Update security
+   * @name putSecurity
+   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/folder-module/put-security
    * @secure
    */
-  folderModulePutSecurity = (
-    data: PutSecurityRequest,
-    params: RequestParams = {},
-  ) =>
+  folderModulePutSecurity = (data: PutSecurityRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/folder-module/put-security`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
    *
    * @tags FolderModule
-   * @name folderModuleGetModuleInstanceSettings
-   * @summary Get instance setting
+   * @name getModuleInstanceSettings
+   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/folder-module/get-module-instance-settings
    * @secure
    */
   folderModuleGetModuleInstanceSettings = (
     query: FolderModuleGetModuleInstanceSettingsParams,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, any>({
       path: `/api/folder-module/get-module-instance-settings`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      ...params,
+      ...params
     });
   /**
    * No description
    *
    * @tags FolderModule
-   * @name folderModulePutModuleInstanceSettings
+   * @name putModuleInstanceSettings
    * @request PUT:/api/folder-module/put-module-instance-settings
    * @secure
    */
-  folderModulePutModuleInstanceSettings = (
-    data: FolderModuleSettingsSaveSettingsRequest,
-    params: RequestParams = {},
-  ) =>
+  folderModulePutModuleInstanceSettings = (data: FolderModuleSettingsSaveSettingsRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/folder-module/put-module-instance-settings`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
 }

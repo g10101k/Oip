@@ -1,14 +1,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Constants;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Services;
 
 namespace Oip.Base.Controllers;
-
 /// <summary>
-/// Menu controller
+/// API controller for retrieving and managing application menus.
 /// </summary>
+/// <remarks>
+/// This controller provides endpoints for retrieving user-specific and admin-specific menus, as well as
+/// for managing module instances such as adding, editing, and deleting them.
+/// </remarks>
 [ApiController]
 [Route("api/menu")]
 [ApiExplorerSettings(GroupName = "base")]
@@ -18,8 +22,10 @@ public class MenuController : ControllerBase
     private readonly UserService _userService;
 
     /// <summary>
-    /// .ctor
+    /// Initializes a new instance of the <see cref="MenuController"/> class.
     /// </summary>
+    /// <param name="moduleRepository">The module repository instance for accessing module data.</param>
+    /// <param name="userService">The user service instance for retrieving user roles and identity.</param>
     public MenuController(ModuleRepository moduleRepository, UserService userService)
     {
         _moduleRepository = moduleRepository;
@@ -27,9 +33,12 @@ public class MenuController : ControllerBase
     }
 
     /// <summary>
-    /// Get menu for client app
+    /// Retrieves the menu available to the current authenticated user.
     /// </summary>
-    /// <returns></returns>
+    /// <remarks>
+    /// Filters modules based on the roles of the current user and returns only those that are accessible.
+    /// </remarks>
+    /// <returns>A list of <see cref="ModuleInstanceDto"/> objects available to the user.</returns>
     [HttpGet("get")]
     [Authorize]
     public async Task<IEnumerable<ModuleInstanceDto>> Get()
@@ -38,58 +47,66 @@ public class MenuController : ControllerBase
     }
 
     /// <summary>
-    /// Get admin menu for client app
-    /// </summary>  
-    /// <returns></returns>
+    /// Retrieves the admin-specific menu.
+    /// </summary>
+    /// <remarks>
+    /// Returns all administrative modules for users with the Admin role.
+    /// </remarks>
+    /// <returns>A list of <see cref="ModuleInstanceDto"/> objects representing the admin menu.</returns>
     [HttpGet("get-admin-menu")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<IEnumerable<ModuleInstanceDto>> GetAdminMenu()
     {
         return await _moduleRepository.GetAdminMenu();
     }
-    
+
     /// <summary>
-    /// Get admin menu for client app
-    /// </summary>  
-    /// <returns></returns>
+    /// Retrieves all available modules in the system.
+    /// </summary>
+    /// <remarks>
+    /// Useful for module management interfaces or system diagnostics.
+    /// </remarks>
+    /// <returns>A list of <see cref="IntKeyValueDto"/> representing available modules.</returns>
     [HttpGet("get-modules")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<IEnumerable<IntKeyValueDto>> GetModules()
     {
         return await _moduleRepository.GetModules();
     }
-    
+
     /// <summary>
-    /// Add new module
-    /// </summary>  
-    /// <returns></returns> 
+    /// Adds a new module instance to the system.
+    /// </summary>
+    /// <param name="addModuleInstanceDto">The data transfer object containing information about the new module instance.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [HttpPost("add-module-instance")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task AddModuleInstance(AddModuleInstanceDto addModuleInstanceDto)
     {
          await _moduleRepository.AddModuleInstance(addModuleInstanceDto);
     }
-    
+
     /// <summary>
-    /// Add new module
-    /// </summary>  
-    /// <returns></returns> 
+    /// Edits an existing module instance.
+    /// </summary>
+    /// <param name="editModel">The data transfer object containing the updated module instance information.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [HttpPost("edit-module-instance")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task EditModuleInstance(EditModuleInstanceDto editModel)
     {
         await _moduleRepository.EditModuleInstance(editModel);
     }
-    
+
     /// <summary>
-    /// Add new module
-    /// </summary>  
-    /// <returns></returns> 
+    /// Deletes a module instance by its identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the module instance to delete.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [HttpDelete("delete-module-instance")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task DeleteModuleInstance(int id)
     {
         await _moduleRepository.DeleteModuleInstance(id);
     }
 }
-

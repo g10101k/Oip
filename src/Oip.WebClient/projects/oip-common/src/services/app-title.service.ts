@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Title } from "@angular/platform-browser";
+import { Title } from '@angular/platform-browser';
 
 /**
  * Service to manage the application title.

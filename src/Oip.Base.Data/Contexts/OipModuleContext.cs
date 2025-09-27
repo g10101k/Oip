@@ -20,7 +20,7 @@ public class OipModuleContext : DbContext
     /// <summary>
     /// Migration history table name
     /// </summary>
-    public const string MigrationHistoryTableName = "OipModuleMigrationHistory";
+    public const string MigrationHistoryTableName = "__OipModuleMigrationHistory";
 
     /// <summary>
     /// Modules

@@ -2,7 +2,7 @@
 export * from './components/base-module.component';
 export * from './components/security.component';
 export * from './components/top-bar.component';
-export * from './components/footer.component'
+export * from './components/footer.component';
 export * from './components/menu/menu.component';
 export * from './components/app.layout.component';
 export * from './components/sidebar.component';
@@ -29,15 +29,15 @@ export * from './services/security-data.service';
 export * from './services/msg.service';
 export * from './services/auth.service';
 export * from './services/app.layout.service';
-export * from './services/app.menu.service'
+export * from './services/app.menu.service';
 export * from './services/user.service';
 export * from './services/security-storage.service';
 
 // Events
-export * from './events/menu-change.event'
+export * from './events/menu-change.event';
 
 // other
-export { langIntercept } from "./intercepts/i18n-intercept.service";
-export { SecurePipe } from "./modules/secure.pipe";
-export { httpLoaderAuthFactory } from "./modules/http-loader.factory";
-export { AddModuleInstanceDto } from "./dtos/add-module-instance.dto";
+export { langIntercept } from './intercepts/i18n-intercept.service';
+export { SecurePipe } from './modules/secure.pipe';
+export { httpLoaderAuthFactory } from './modules/http-loader.factory';
+export { AddModuleInstanceDto } from './dtos/add-module-instance.dto';

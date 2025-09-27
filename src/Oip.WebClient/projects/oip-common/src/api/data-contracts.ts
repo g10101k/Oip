@@ -28,15 +28,25 @@ export interface EditModuleInstanceDto {
   viewRoles?: string[] | null;
 }
 
+/** Data transfer object representing a module and its loaded status. */
+export interface ExistModuleDto {
+  /** Gets or sets the unique identifier of the module. */
+  moduleId?: number;
+  /** Gets or sets the name of the module. */
+  name?: string | null;
+  /** Gets or sets a value indicating whether the module is currently loaded in the application. */
+  currentlyLoaded?: boolean;
+}
+
 /** Module settings. */
 export interface FolderModuleSettings {
   /** HTML content for the module. */
   html?: string | null;
 }
 
-/** Save settings request */
+/** Represents a request to save module instance settings. */
 export interface FolderModuleSettingsSaveSettingsRequest {
-  /** Module instance id */
+  /** Gets or sets the ID of the module instance. */
   id?: number;
   /** Module settings. */
   settings?: FolderModuleSettings;
@@ -68,7 +78,7 @@ export interface GetManifestResponse {
   baseUrl?: string | null;
 }
 
-/** Int Key Value DTO */
+/** Represents a key-value pair where the key is an integer and the value is a string. */
 export interface IntKeyValueDto {
   key?: number;
   value?: string | null;
@@ -112,6 +122,8 @@ export interface ModuleInstanceDto {
   settings?: string | null;
   /** Child module instances. */
   items?: ModuleInstanceDto[] | null;
+  /** Securities */
+  securities?: string[] | null;
 }
 
 /** Module security DTO */
@@ -151,14 +163,17 @@ export interface SecurityResponse {
 }
 
 export interface FolderModuleGetSecurityParams {
+  /** The ID of the module instance. */
   id?: number;
 }
 
 export interface FolderModuleGetModuleInstanceSettingsParams {
+  /** The ID of the module instance. */
   id?: number;
 }
 
 export interface MenuDeleteModuleInstanceParams {
+  /** The unique identifier of the module instance to delete. */
   id?: number;
 }
 

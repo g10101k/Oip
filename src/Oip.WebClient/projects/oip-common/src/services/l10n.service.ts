@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
-import { TranslateService } from "@ngx-translate/core";
-import { lastValueFrom } from "rxjs";
+import { HttpClient } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
+import { lastValueFrom } from 'rxjs';
 
 /**
  * Service for managing translation loading in the application
@@ -46,9 +46,7 @@ export class L10nService {
 
     try {
       // Load translation file from assets
-      const translations = await lastValueFrom(
-        this.httpClient.get(`./assets/i18n/${component}.${lang}.json`)
-      );
+      const translations = await lastValueFrom(this.httpClient.get(`./assets/i18n/${component}.${lang}.json`));
 
       // Get existing translations for the language
       const current = this.translateService.translations[lang] || {};

@@ -36,7 +36,7 @@ public class Tests
             .GetService<IMigrationsScaffolder>();
         var migration = scaffolder?
             .ScaffoldMigration("test", "MyProject");
-        var code = migration.MigrationCode;
+        var code = migration?.MigrationCode;
         Console.WriteLine(code);
     }
 }

@@ -1,30 +1,34 @@
-import { Component, Renderer2, ViewChild } from '@angular/core';
+import { Component, Renderer2, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
-import { AppTopbar } from "./top-bar.component";
-import { FooterComponent } from "./footer.component";
-import { LayoutService } from "./../services/app.layout.service";
-import { SidebarComponent } from "./sidebar.component";
-
+import { AppTopbar } from './top-bar.component';
+import { FooterComponent } from './footer.component';
+import { LayoutService } from './../services/app.layout.service';
+import { SidebarComponent } from './sidebar.component';
+import { Menu } from '../api/Menu';
+import { MenuService } from '../services/app.menu.service';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
   imports: [CommonModule, AppTopbar, SidebarComponent, RouterModule, FooterComponent],
-  template: `<div class="layout-wrapper" [ngClass]="containerClass">
-        <app-topbar></app-topbar>
-        <app-sidebar></app-sidebar>
-        <div class="layout-main-container">
-            <div class="layout-main">
-                <router-outlet></router-outlet>
-            </div>
-            <app-footer></app-footer>
+  template: `
+    <div class="layout-wrapper" [ngClass]="containerClass">
+      <app-topbar></app-topbar>
+      <app-sidebar></app-sidebar>
+      <div class="layout-main-container">
+        <div class="layout-main">
+          <router-outlet></router-outlet>
         </div>
-        <div class="layout-mask animate-fadein"></div>
-    </div> `
+        <app-footer></app-footer>
+      </div>
+      <div class="layout-mask animate-fadein"></div>
+    </div>
+  `,
+  providers: [MenuService, Menu]
 })
-export class AppLayout {
+export class AppLayout implements OnDestroy {
   overlayMenuOpenSubscription: Subscription;
 
   menuOutsideClickListener: any;
@@ -62,11 +66,21 @@ export class AppLayout {
     const topbarEl = document.querySelector('.layout-menu-button');
     const eventTarget = event.target as Node;
 
-    return !(sidebarEl?.isSameNode(eventTarget) || sidebarEl?.contains(eventTarget) || topbarEl?.isSameNode(eventTarget) || topbarEl?.contains(eventTarget));
+    return !(
+      sidebarEl?.isSameNode(eventTarget) ||
+      sidebarEl?.contains(eventTarget) ||
+      topbarEl?.isSameNode(eventTarget) ||
+      topbarEl?.contains(eventTarget)
+    );
   }
 
   hideMenu() {
-    this.layoutService.layoutState.update((prev) => ({ ...prev, overlayMenuActive: false, staticMenuMobileActive: false, menuHoverActive: false }));
+    this.layoutService.layoutState.update((prev) => ({
+      ...prev,
+      overlayMenuActive: false,
+      staticMenuMobileActive: false,
+      menuHoverActive: false
+    }));
     if (this.menuOutsideClickListener) {
       this.menuOutsideClickListener();
       this.menuOutsideClickListener = null;
@@ -86,7 +100,10 @@ export class AppLayout {
     if (document.body.classList) {
       document.body.classList.remove('blocked-scroll');
     } else {
-      document.body.className = document.body.className.replace(new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+      document.body.className = document.body.className.replace(
+        new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'),
+        ' '
+      );
     }
   }
 
@@ -94,7 +111,9 @@ export class AppLayout {
     return {
       'layout-overlay': this.layoutService.layoutConfig().menuMode === 'overlay',
       'layout-static': this.layoutService.layoutConfig().menuMode === 'static',
-      'layout-static-inactive': this.layoutService.layoutState().staticMenuDesktopInactive && this.layoutService.layoutConfig().menuMode === 'static',
+      'layout-static-inactive':
+        this.layoutService.layoutState().staticMenuDesktopInactive &&
+        this.layoutService.layoutConfig().menuMode === 'static',
       'layout-overlay-active': this.layoutService.layoutState().overlayMenuActive,
       'layout-mobile-active': this.layoutService.layoutState().staticMenuMobileActive
     };

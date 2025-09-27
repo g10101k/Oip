@@ -63,7 +63,11 @@ public static class OipModuleApplication
         builder.Services.AddScoped<KeycloakService>();
         builder.Services.AddScoped<UserService>();
         builder.Services.AddCors();
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddControllers()
+            .AddJsonOptions(option=>
+            {
+                option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
         builder.Services.AddMvc().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.DefaultIgnoreCondition

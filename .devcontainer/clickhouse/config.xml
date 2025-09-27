@@ -1,0 +1,14 @@
+<yandex>
+    <listen_host>0.0.0.0</listen_host>
+    <http_port>8123</http_port>
+    <tcp_port>9000</tcp_port>
+    <interserver_http_port>9009</interserver_http_port>
+
+    <logger>
+        <level>information</level>
+        <console>true</console>
+    </logger>
+
+    <max_connections>100</max_connections>
+    <keep_alive_timeout>3</keep_alive_timeout>
+</yandex>

@@ -28,7 +28,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
           class="flex-auto"
           id="oip-menu-item-edit-dialog-menu-input"
           pInputText
-          [(ngModel)]="item.label"/>
+          [(ngModel)]="item.label" />
       </div>
 
       <div class="flex items-center gap-4 mb-4">
@@ -36,7 +36,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
           {{ 'menuItemEditDialogComponent.icon' | translate }}
         </label>
         <i class="{{ item.icon }}"></i>
-        <input class="flex-auto" id="oip-menu-item-edit-dialog-icon" pInputText [(ngModel)]="item.icon"/>
+        <input class="flex-auto" id="oip-menu-item-edit-dialog-icon" pInputText [(ngModel)]="item.icon" />
       </div>
 
       <div class="flex items-center gap-4 mb-4">
@@ -50,7 +50,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
           placeholder="Select roles"
           [maxSelectedLabels]="10"
           [options]="roles"
-          [(ngModel)]="item.viewRoles"/>
+          [(ngModel)]="item.viewRoles" />
       </div>
 
       <div class="flex justify-end gap-2">
@@ -59,12 +59,12 @@ import { MultiSelectModule } from 'primeng/multiselect';
           label="{{ 'menuItemEditDialogComponent.cancel' | translate }}"
           severity="secondary"
           (click)="changeVisible()"
-          (keydown)="changeVisible()"/>
+          (keydown)="changeVisible()" />
         <p-button
           id="oip-menu-item-edit-dialog-save-edit-button"
           label="{{ 'menuItemEditDialogComponent.save' | translate }}"
           (click)="save()"
-          (keydown)="save()"/>
+          (keydown)="save()" />
       </div>
     </p-dialog>
   `

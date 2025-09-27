@@ -23,7 +23,7 @@ interface MenuChangeEvent {
   routeEvent?: boolean;
 }
 
-@Injectable({  providedIn: 'root' })
+@Injectable({ providedIn: 'root' })
 export class LayoutService {
   _config: AppConfig = this.getAppConfigFromStorage();
 
@@ -98,7 +98,7 @@ export class LayoutService {
    * @returns AppConfig
    */
   private getAppConfigFromStorage(): AppConfig {
-    let appConfigUiString = localStorage.getItem('layoutConfig');
+    const appConfigUiString = localStorage.getItem('layoutConfig');
     if (appConfigUiString != null) {
       return JSON.parse(appConfigUiString) as AppConfig;
     }
@@ -109,7 +109,7 @@ export class LayoutService {
       darkTheme: false,
       menuMode: 'static',
       language: 'en'
-    } ;
+    };
   }
 
   private handleDarkModeTransition(config: AppConfig): void {
@@ -159,9 +159,15 @@ export class LayoutService {
     }
 
     if (this.isDesktop()) {
-      this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive }));
+      this.layoutState.update((prev) => ({
+        ...prev,
+        staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive
+      }));
     } else {
-      this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: !this.layoutState().staticMenuMobileActive }));
+      this.layoutState.update((prev) => ({
+        ...prev,
+        staticMenuMobileActive: !this.layoutState().staticMenuMobileActive
+      }));
 
       if (this.layoutState().staticMenuMobileActive) {
         this.overlayOpen.next(null);
@@ -180,7 +186,7 @@ export class LayoutService {
   onConfigUpdate() {
     this._config = { ...this.layoutConfig() };
     this.configUpdate.next(this.layoutConfig());
-    localStorage.setItem('layoutConfig', JSON.stringify(this.layoutConfig()))
+    localStorage.setItem('layoutConfig', JSON.stringify(this.layoutConfig()));
   }
 
   onMenuStateChange(event: MenuChangeEvent) {

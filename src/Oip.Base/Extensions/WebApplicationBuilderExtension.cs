@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Entities;
-using Oip.Settings.Enums;
 
 namespace Oip.Base.Extensions;
 

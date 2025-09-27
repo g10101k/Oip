@@ -1,10 +1,17 @@
+using Oip.Base.Settings;
+using Oip.Rtds.Data;
 using Oip.Settings;
 
-namespace Oip.Base.Settings;
+namespace Oip.Rts.Settings;
 
 /// <inheritdoc cref="IBaseOipModuleAppSettings"/>
-public class BaseOipModuleAppSettings : BaseAppSettings<BaseOipModuleAppSettings>, IBaseOipModuleAppSettings
+public class AppSettings: BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings, IRtdsAppSettings
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public string RtsConnectionString { get; set; } = null!;
+
     /// <inheritdoc />
     public string OipUrls { get; set; } = default!;
 

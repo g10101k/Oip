@@ -29,9 +29,9 @@ public class DashboardModuleController : BaseModuleController<DashboardSettings>
         {
             new()
             {
-                Code = SecurityConstants.Delete,
-                Name = Resources.DashboardModuleController_GetModuleRights_Read, 
-                Description = Resources.DashboardModuleController_GetModuleRights_Can_view_this_module, 
+                Code = SecurityConstants.Read,
+                Name = Resources.DashboardModuleController_GetModuleRights_Read,
+                Description = Resources.DashboardModuleController_GetModuleRights_Can_view_this_module,
                 Roles = [SecurityConstants.AdminRole]
             },
         };
@@ -44,7 +44,7 @@ public class DashboardModuleController : BaseModuleController<DashboardSettings>
 public class DashboardSettings
 {
     /// <summary>
-    /// Just for example
+    /// Just, for example
     /// </summary>
     public string Nothing { get; set; } = "default value";
 }

@@ -10,20 +10,18 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   DashboardGetModuleInstanceSettingsParams,
   DashboardGetSecurityParams,
   DashboardSettingsSaveSettingsRequest,
   PutSecurityRequest,
-  SecurityResponse,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+  SecurityResponse
+} from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
-@Injectable({ providedIn: "root" })
-export class DashboardModule<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+@Injectable()
+export class DashboardModule<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -35,72 +33,63 @@ export class DashboardModule<
   dashboardGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/dashboard/get-module-rights`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
    *
    * @tags DashboardModule
    * @name dashboardGetSecurity
-   * @summary Get security for instance id
+   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/dashboard/get-security
    * @secure
    */
-  dashboardGetSecurity = (
-    query: DashboardGetSecurityParams,
-    params: RequestParams = {},
-  ) =>
+  dashboardGetSecurity = (query: DashboardGetSecurityParams, params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/dashboard/get-security`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
    *
    * @tags DashboardModule
    * @name dashboardPutSecurity
-   * @summary Update security
+   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/dashboard/put-security
    * @secure
    */
-  dashboardPutSecurity = (
-    data: PutSecurityRequest,
-    params: RequestParams = {},
-  ) =>
+  dashboardPutSecurity = (data: PutSecurityRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/dashboard/put-security`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
    *
    * @tags DashboardModule
    * @name dashboardGetModuleInstanceSettings
-   * @summary Get instance setting
+   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/dashboard/get-module-instance-settings
    * @secure
    */
-  dashboardGetModuleInstanceSettings = (
-    query: DashboardGetModuleInstanceSettingsParams,
-    params: RequestParams = {},
-  ) =>
+  dashboardGetModuleInstanceSettings = (query: DashboardGetModuleInstanceSettingsParams, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/dashboard/get-module-instance-settings`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -110,16 +99,13 @@ export class DashboardModule<
    * @request PUT:/api/dashboard/put-module-instance-settings
    * @secure
    */
-  dashboardPutModuleInstanceSettings = (
-    data: DashboardSettingsSaveSettingsRequest,
-    params: RequestParams = {},
-  ) =>
+  dashboardPutModuleInstanceSettings = (data: DashboardSettingsSaveSettingsRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/dashboard/put-module-instance-settings`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
 }
