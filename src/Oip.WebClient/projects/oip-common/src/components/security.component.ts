@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { MsgService } from './../services/msg.service';
 import { SecurityDataService } from './../services/security-data.service';
 import { PutSecurityDto } from './../dtos/put-security.dto';
-import { Fluid } from 'primeng/fluid';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -44,7 +43,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
       </div>
     </div>
   `,
-  imports: [MultiSelectModule, TooltipModule, FormsModule, ButtonModule, Fluid, TranslatePipe],
+  imports: [MultiSelectModule, TooltipModule, FormsModule, ButtonModule, TranslatePipe],
   standalone: true
 })
 export class SecurityComponent implements OnInit, OnDestroy {

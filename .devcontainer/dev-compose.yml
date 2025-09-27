@@ -12,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
-    volumes:   
+    volumes:
       - postgres-data:/data/postgres
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d keycloak" ]
@@ -54,7 +54,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-      
+  
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     ports:
@@ -74,6 +74,28 @@ services:
       - CLICKHOUSE_PASSWORD=P@ssw0rd
     networks:
       - bridge-network
+      -
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    runtime: nvidia
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_GPU_DRIVER=cuda
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    restart: unless-stopped
+    privileged: true
+
 
 networks:
   backend-network: { }

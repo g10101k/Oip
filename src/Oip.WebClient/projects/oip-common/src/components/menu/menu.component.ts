@@ -1,13 +1,11 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MenuService } from '../../services/app.menu.service';
-import { NgFor, NgIf } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { SecurityService } from '../../services/security.service';
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { DialogModule } from 'primeng/dialog';
 import { MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputSwitchModule } from 'primeng/inputswitch';
 import { FormsModule } from '@angular/forms';
 import { MenuItemComponent } from './menu-item.component';
 import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.component';
@@ -17,40 +15,44 @@ import { Menu } from '../../api/Menu';
 
 @Component({
   imports: [
-    NgFor,
-    NgIf,
     MenuItemComponent,
     ButtonModule,
     ContextMenuModule,
     DialogModule,
     InputTextModule,
     MenuItemCreateDialogComponent,
-    InputSwitchModule,
     FormsModule,
     MenuItemEditDialogComponent
   ],
   providers: [Menu],
   selector: 'app-menu',
   standalone: true,
-  template: ` <div #emtpty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
+  template: `
+    <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
       <ul class="layout-menu">
-        <ng-container *ngFor="let item of menuService.menu; let i = index">
-          <li
-            *ngIf="!item.separator"
-            app-menuitem
-            [contextMenu]="contextMenu"
-            [index]="i"
-            [item]="item"
-            [menuItemCreateDialogComponent]="menuItemCreateDialogComponent"
-            [menuItemEditDialogComponent]="menuItemEditDialogComponent"
-            [root]="true"></li>
-          <li *ngIf="item.separator" class="menu-separator"></li>
-        </ng-container>
+        @for (item of menuService.menu; track item; let i = $index) {
+          <ng-container>
+            @if (item.separator) {
+              <li class="menu-separator"></li>
+            } @else {
+              <li
+                app-menuitem
+                [contextMenu]="contextMenu"
+                [index]="i"
+                [item]="item"
+                [menuItemCreateDialogComponent]="menuItemCreateDialogComponent"
+                [menuItemEditDialogComponent]="menuItemEditDialogComponent"
+                [root]="true"></li>
+            }
+          </ng-container>
+        }
       </ul>
     </div>
-    <p-contextMenu [target]="emtpty" />
-    <menu-item-create-dialog *ngIf="securityService.isAdmin" />
-    <menu-item-edit-dialog *ngIf="securityService.isAdmin" />`
+    <p-contextMenu [target]="empty"/>
+    @if (securityService.isAdmin) {
+      <menu-item-create-dialog/>
+      <menu-item-edit-dialog/>
+    }`
 })
 export class MenuComponent implements OnInit {
   readonly menuService = inject(MenuService);

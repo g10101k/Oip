@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ToastMessageOptions } from 'primeng/api/toastmessage';
+import { ToastMessageOptions } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
