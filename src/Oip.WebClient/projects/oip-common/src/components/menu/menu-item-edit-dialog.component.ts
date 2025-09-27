@@ -2,7 +2,6 @@ import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { MenuService, SecurityDataService } from 'oip-common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -10,7 +9,7 @@ import { EditModuleInstanceDto } from '../../dtos/edit-module-instance.dto';
 import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({
-  imports: [ButtonModule, DialogModule, InputTextModule, DropdownModule, FormsModule, TranslatePipe, MultiSelectModule],
+  imports: [ButtonModule, DialogModule, InputTextModule, FormsModule, TranslatePipe, MultiSelectModule],
   selector: 'menu-item-edit-dialog',
   standalone: true,
   template: `

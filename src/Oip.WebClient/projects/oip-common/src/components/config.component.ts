@@ -7,8 +7,7 @@ import { Select, SelectChangeEvent } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { LayoutService } from '../services/app.layout.service';
 import { UserService } from '../services/user.service';
-import { InputSwitch } from 'primeng/inputswitch';
-import { NgIf } from '@angular/common';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { RouterLink } from '@angular/router';
 import { SecurityService } from '../services/security.service';
 import { MenuService } from '../services/app.menu.service';
@@ -60,30 +59,32 @@ interface L10n {
                 optionValue="value"
                 [options]="languages"
                 [(ngModel)]="selectedLanguage"
-                (onChange)="changeLanguage($event)" />
+                (onChange)="changeLanguage($event)"/>
             </div>
           </div>
         </div>
-        <div *ngIf="securityService.isAdmin" class="md:w-1/2">
-          <div class="card flex flex-col gap-4">
-            <div class="font-semibold text-xl">{{ l10n.menu }}</div>
-            <div class="flex items-center gap-2">
-              <label for="oip-app-config-admin-mode">{{ l10n.all }}</label>
-              <p-inputSwitch
-                id="oip-app-config-admin-mode"
-                [(ngModel)]="menuService.adminMode"
-                (onChange)="onSwitchChange()"></p-inputSwitch>
-            </div>
-            <div class="flex items-center gap-2">
-              <label for="oip-app-config-admin-mode">{{ l10n.moduleManagement }}</label>
-              <p-button icon="pi pi-cog" label="{{ l10n.goTo }}" routerLink="/modules" />
+        @if (securityService.isAdmin) {
+          <div class="md:w-1/2">
+            <div class="card flex flex-col gap-4">
+              <div class="font-semibold text-xl">{{ l10n.menu }}</div>
+              <div class="flex items-center gap-2">
+                <label for="oip-app-config-admin-mode">{{ l10n.all }}</label>
+                <p-toggle-switch
+                  id="oip-app-config-admin-mode"
+                  [(ngModel)]="menuService.adminMode"
+                  (onChange)="onSwitchChange()"></p-toggle-switch>
+              </div>
+              <div class="flex items-center gap-2">
+                <label for="oip-app-config-admin-mode">{{ l10n.moduleManagement }}</label>
+                <p-button icon="pi pi-cog" label="{{ l10n.goTo }}" routerLink="/modules"/>
+              </div>
             </div>
           </div>
-        </div>
+        }
       </div>
     </p-fluid>
   `,
-  imports: [ProfileComponent, Fluid, Tooltip, FormsModule, Select, TableModule, InputSwitch, NgIf, RouterLink, Button]
+  imports: [ProfileComponent, Fluid, Tooltip, FormsModule, Select, TableModule, ToggleSwitchModule, RouterLink, Button]
 })
 export class ConfigComponent implements OnInit {
   private readonly layoutService = inject(LayoutService);
