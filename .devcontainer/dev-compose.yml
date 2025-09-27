@@ -74,7 +74,7 @@ services:
       - CLICKHOUSE_PASSWORD=P@ssw0rd
     networks:
       - bridge-network
-      -
+
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
