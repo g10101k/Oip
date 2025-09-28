@@ -1617,6 +1617,23 @@
           }
         },
         {
+          "id": "0ae88891-2c5e-405e-9734-57bc2e235086",
+          "name": "keycloak_user_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "id",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "user_id",
+            "jsonType.label": "String"
+          }
+        },
+        {
           "id": "1c7f1073-0057-4479-baee-65a7d6dcc605",
           "name": "username",
           "protocol": "openid-connect",
