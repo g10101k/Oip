@@ -13,8 +13,9 @@ public class UserEntity
     /// E-mail
     /// </summary>
     public string Email { get; set; }
+
     /// <summary>
-    /// 
+    /// User photo
     /// </summary>
-    public byte[]?  Photo { get; set; }
+    public byte[]? Photo { get; set; }
 }

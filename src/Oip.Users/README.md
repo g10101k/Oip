@@ -82,16 +82,16 @@ For *nix system:
 
 ````shell
 migration_name=InitialMigration
-dotnet ef migrations add "${migration_name}_Postgres" --verbose --context PostgresRtdsMetaContext --project ./../Oip.Rtds.Data --output-dir Migrations/Postgres -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
-dotnet ef migrations add "${migration_name}_SqlServer" --verbose --context SqlServerRtdsMetaContext --project ./../Oip.Rtds.Data --output-dir Migrations/SqlServer -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
+dotnet ef migrations add "${migration_name}_Postgres" --verbose --context UserContextPostgres --project ./../Oip.Users.Data --output-dir Migrations/Postgres -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
+dotnet ef migrations add "${migration_name}_SqlServer" --verbose --context UserContextSqlServer --project ./../Oip.Users.Data --output-dir Migrations/SqlServer -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
 ````
 
 For windows:
 
 ````shell
-set migration_name=MigrationName
-dotnet ef migrations add "%migration_name%" --context RtdsMetaContext --project ./../Oip.Rtds.Data.Postgres --output-dir Migrations -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
-dotnet ef migrations add "%migration_name%" --context RtdsMetaContext --project ./../Oip.Rtds.Data.SqlServer --output-dir Migrations -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
+set migration_name=InitialMigration
+dotnet ef migrations add "%migration_name%_Postgres" --context UserContextPostgres --project ./../Oip.Users.Data --output-dir Migrations/Postgres -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
+dotnet ef migrations add "%migration_name%_SqlServer" --context UserContextSqlServer --project ./../Oip.Users.Data --output-dir Migrations/SqlServer -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
 ````
 
 ## Why need RtdsMetaContext?

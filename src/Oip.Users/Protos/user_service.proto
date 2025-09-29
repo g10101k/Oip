@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+option csharp_namespace = "Oip.Users";
+
+package events;
+
+service UserService {
+  rpc Subscribe (SubscribeRequest) returns (stream EventMessage);
+  rpc Publish (PublishRequest) returns (PublishResponse);
+  rpc GetTags (GetTagsRequest) returns (GetTagsResponse);
+}
+
+message SubscribeRequest {
+  string client_id = 1;
+  repeated string event_types = 2;
+}
+
+message EventMessage {
+  string event_id = 1;
+  string event_type = 2;
+  string payload = 3;
+  string timestamp = 4;
+}
+
+message PublishRequest {
+  string event_type = 1;
+  string payload = 2;
+}
+
+message PublishResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetTagsRequest {
+  uint32 interface_id = 1;
+}
+
+// Defines the data types supported for tags
+enum TagTypes {
+  FLOAT32 = 0;
+  FLOAT64 = 1;
+  INT16 = 2;
+  INT32 = 3;
+  DIGITAL = 4;
+  STRING = 5;
+  BLOB = 6;
+}
+
+
+message TagResponse {
+  optional uint32 id = 1;
+  string name = 2;
+  TagTypes value_type = 3;
+  optional uint32 interface_id = 4;
+  optional string descriptor = 5;
+  optional string uom = 6;
+  optional string instrument_tag = 7;
+  bool enabled = 8;
+  bool compressing = 9;
+  optional uint32 compression_min_time = 10;
+  optional uint32 compression_max_time = 11;
+  optional string digital_set = 12;
+  bool step = 13;
+  optional string time_calculation = 14;
+  optional string error_calculation = 15;
+  optional string value_calculation = 16;
+}
+
+message GetTagsResponse {
+  repeated TagResponse tags = 1;
+}

@@ -24,6 +24,16 @@ public class SecurityServiceSettings
     /// Client secret
     /// </summary>
     public string ClientSecret { get; set; } = default!;
+    
+    /// <summary>
+    /// Gets or sets the Keycloak admin username.
+    /// </summary>
+    public string AdminUsername { get; set; } = default!;
+
+    /// <summary>
+    /// Gets or sets the Keycloak admin password.
+    /// </summary>
+    public string AdminPassword { get; set; } = default!;
 
     /// <summary>
     /// Realm

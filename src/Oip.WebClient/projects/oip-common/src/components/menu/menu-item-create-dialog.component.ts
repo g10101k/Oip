@@ -5,14 +5,12 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { AddModuleInstanceDto, MenuService } from 'oip-common';
-import { Select } from 'primeng/select';
 import { TranslatePipe } from '@ngx-translate/core';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'menu-item-create-dialog',
   standalone: true,
-  imports: [ButtonModule, DialogModule, InputTextModule, SelectModule, FormsModule, Select, TranslatePipe, NgIf],
+  imports: [ButtonModule, DialogModule, InputTextModule, SelectModule, FormsModule, TranslatePipe],
   template: `
     <p-dialog
       header="{{ 'menuItemCreateDialogComponent.header' | translate }}"

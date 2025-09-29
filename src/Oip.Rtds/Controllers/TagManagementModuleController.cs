@@ -5,7 +5,6 @@ using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
 using Oip.Rtds.Data.Dtos;
-using Oip.Rtds.Data.Entities;
 using Oip.Rtds.Data.Repositories;
 using Resources = Oip.Rts.Properties.Resources;
 

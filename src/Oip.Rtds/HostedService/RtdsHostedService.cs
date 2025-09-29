@@ -27,15 +27,13 @@ public class RtdsHostedService : BackgroundService
 
     private async Task DoWork(CancellationToken stoppingToken)
     {
-        _logger.LogInformation(
-            "Consume Scoped Service Hosted Service is working.");
+        _logger.LogInformation("Consume Scoped Service Hosted Service is working.");
 
         while (!stoppingToken.IsCancellationRequested)
         {
             await _scopeFactory.ExecuteAsync<OipRtdsService>(async service =>
             {
-                _logger.LogInformation(
-                    "Publishing events...");
+                _logger.LogInformation("Publishing events...");
 
                 var testRequest = new PublishRequest
                 {
