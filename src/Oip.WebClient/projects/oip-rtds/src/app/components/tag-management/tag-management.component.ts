@@ -5,7 +5,7 @@ import { ConfirmationService, SelectItem, SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { DatePipe, NgIf } from '@angular/common';
 import { TagManagementModule } from '../../../api/TagManagementModule';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { Checkbox } from 'primeng/checkbox';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
@@ -31,7 +31,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     SharedModule,
     TagModule,
     SecurityComponent,
-    DropdownModule,
+    SelectModule,
     Checkbox,
     Button,
     InputText,

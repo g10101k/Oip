@@ -1,4 +1,3 @@
-using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Entities;
 using Oip.Rtds.Grpc;
 using Riok.Mapperly.Abstractions;

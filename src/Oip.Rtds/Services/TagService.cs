@@ -1,8 +1,5 @@
-using Grpc.Core;
-using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Repositories;
 using Oip.Rtds.Grpc;
-using Oip.Rts.Mappers;
 
 namespace Oip.Rts.Services;
 

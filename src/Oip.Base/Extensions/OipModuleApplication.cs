@@ -58,9 +58,7 @@ public static class OipModuleApplication
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
         builder.Services.AddOipModuleContext(settings.ConnectionString);
-        builder.AddKeycloakClients(settings);
         builder.Services.AddSingleton(settings);
-        builder.Services.AddScoped<KeycloakService>();
         builder.Services.AddScoped<UserService>();
         builder.Services.AddCors();
         builder.Services.AddControllers()
@@ -96,29 +94,8 @@ public static class OipModuleApplication
     {
         builder.Services.AddHttpClient<OipClient>(x => { x.BaseAddress = new Uri(settings.OipUrls); })
             .AddPolicyHandler(GetRetryPolicy());
-        builder.AddKeycloakClients(settings);
     }
 
-    private static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
-        var httpClientBuilder = builder.Services.AddHttpClient<KeycloakClient>(httpClient =>
-        {
-            var url = settings.SecurityService.DockerUrl ?? settings.SecurityService.BaseUrl;
-            httpClient.BaseAddress = new Uri(url);
-        }).AddPolicyHandler(GetRetryPolicy());
-
-        if (builder.Environment.IsDevelopment() && settings.SecurityService.DockerUrl is not null)
-        {
-            httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
-            {
-                HttpClientHandler handler = new HttpClientHandler();
-
-                handler.ServerCertificateCustomValidationCallback =
-                    (message, cert, chain, errors) => true;
-                return handler;
-            });
-        }
-    }
 
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
@@ -257,7 +234,7 @@ public static class OipModuleApplication
         });
     }
 
-    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+    public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()

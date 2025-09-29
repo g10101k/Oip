@@ -1,8 +1,4 @@
-using Grpc.Core;
-using Grpc.Net.Client;
 using Oip.Base.Extensions;
-using Oip.Rtds.Grpc;
-using Oip.Rtds.Random.Settings;
 
 namespace Oip.Rtds.Random.Services;
 

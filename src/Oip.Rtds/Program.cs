@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using NLog;
 using NLog.Web;
 using Oip.Base.Extensions;
