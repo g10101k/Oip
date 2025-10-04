@@ -1,0 +1,30 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    runtime: nvidia
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_GPU_DRIVER=cuda
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    restart: unless-stopped
+    privileged: true
+
+
+networks:
+  backend-network: { }
+  bridge-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
