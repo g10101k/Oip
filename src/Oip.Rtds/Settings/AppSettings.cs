@@ -1,3 +1,4 @@
+using Oip.Base.Discovery;
 using Oip.Base.Settings;
 using Oip.Rtds.Data;
 using Oip.Settings;
@@ -5,10 +6,10 @@ using Oip.Settings;
 namespace Oip.Rts.Settings;
 
 /// <inheritdoc cref="IBaseOipModuleAppSettings"/>
-public class AppSettings: BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings, IRtdsAppSettings
+public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings, IRtdsAppSettings
 {
     /// <summary>
-    /// 
+    /// The connection string for the RTS (Real-Time Data Service) ClickHouse database.
     /// </summary>
     public string RtsConnectionString { get; set; } = null!;
 
@@ -23,7 +24,10 @@ public class AppSettings: BaseAppSettings<AppSettings>, IBaseOipModuleAppSetting
 
     /// <inheritdoc />
     public OpenTelemetrySettings Telemetry { get; set; } = new();
-    
+
     /// <inheritdoc />
     public SecurityServiceSettings SecurityService { get; set; } = new();
+
+    /// <inheritdoc />
+    public ServiceDiscoverySettings ServiceDiscovery { get; set; } = new();
 }

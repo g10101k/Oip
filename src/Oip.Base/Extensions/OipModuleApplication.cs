@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
 using Oip.Base.Clients;
+using Oip.Base.Discovery;
 using Oip.Base.Services;
 using Oip.Base.Settings;
 using Polly;
@@ -57,6 +59,7 @@ public static class OipModuleApplication
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
+        builder.Services.AddServiceDiscovery();
         builder.Services.AddOipModuleContext(settings.ConnectionString);
         builder.Services.AddSingleton(settings);
         builder.Services.AddScoped<UserService>();
@@ -240,5 +243,22 @@ public static class OipModuleApplication
             .HandleTransientHttpError()
             .OrResult(msg => msg.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.InternalServerError)
             .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+    }
+
+    /// <summary>
+    /// Adds service discovery components to the dependency injection container.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The modified service collection.</returns>
+    public static IServiceCollection AddServiceDiscovery(this IServiceCollection services)
+    {
+        services.AddSingleton<IServiceRegistry, ServiceRegistry>();
+        services.AddSingleton<IServiceBroadcaster, ServiceBroadcaster>();
+        services.AddSingleton<IServiceListener, ServiceListener>();
+        services.AddSingleton<IServiceHealthChecker, ServiceHealthChecker>();
+        
+        services.AddHostedService<ServiceDiscoveryHostedService>();
+        
+        return services;
     }
 }

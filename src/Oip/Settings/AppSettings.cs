@@ -1,3 +1,4 @@
+using Oip.Base.Discovery;
 using Oip.Base.Settings;
 
 namespace Oip.Settings;
@@ -21,4 +22,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public SecurityServiceSettings SecurityService { get; set; } = new();
-};
+
+    /// <inheritdoc />
+    public ServiceDiscoverySettings ServiceDiscovery { get; set; } = new();
+}

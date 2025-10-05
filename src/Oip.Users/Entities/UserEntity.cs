@@ -1,6 +1,3 @@
-using Oip.Base.Clients;
-using UserRepresentation = Oip.Users.Clients.UserRepresentation;
-
 namespace Oip.Users.Entities;
 
 /// <summary>
@@ -57,18 +54,4 @@ public class UserEntity
     /// User photo
     /// </summary>
     public byte[]? Photo { get; set; }
-
-    /// <summary>
-    /// Updates the user entity from Keycloak user representation
-    /// </summary>
-    /// <param name="userRep">Keycloak user representation</param>
-    public void UpdateFromKeycloak(UserRepresentation userRep)
-    {
-        Email = userRep.Email ?? Email;
-        FirstName = userRep.FirstName ?? FirstName;
-        LastName = userRep.LastName ?? LastName;
-        IsActive = userRep.Enabled ?? IsActive;
-        UpdatedAt = DateTimeOffset.UtcNow;
-        LastSyncedAt = DateTimeOffset.UtcNow;
-    }
 }

@@ -1,3 +1,4 @@
+using Oip.Base.Discovery;
 using Oip.Settings;
 
 namespace Oip.Base.Settings;
@@ -31,4 +32,9 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// Security Service Settings
     /// </summary>
     SecurityServiceSettings SecurityService { get; set; }
+
+    /// <summary>
+    /// Options for configuring service discovery.
+    /// </summary>
+    ServiceDiscoverySettings ServiceDiscovery { get; set; }
 }
