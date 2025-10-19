@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { Observable, combineLatest, of, lastValueFrom, forkJoin } from 'rxjs';
+import { Observable, combineLatest, of } from 'rxjs';
 import { SecurityService } from './security.service';
 
 /**
