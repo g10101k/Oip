@@ -10,16 +10,6 @@
  * ---------------------------------------------------------------
  */
 
-/** Represents a base response for API operations. */
-export interface BaseResponse {
-  /** Indicates whether the operation was successful. */
-  success?: boolean;
-  /** Represents an error message associated with the response. */
-  error?: string | null;
-  /** Represents the stack trace associated with an error. */
-  stackTrace?: string | null;
-}
-
 /** Settings */
 export interface DashboardSettings {
   /** Just, for example */
@@ -32,6 +22,16 @@ export interface DashboardSettingsSaveSettingsRequest {
   id?: number;
   /** Settings */
   settings?: DashboardSettings;
+}
+
+/** Represents the base exception class for Oip applications. */
+export interface OipException {
+  /** The exception message. */
+  message?: string | null;
+  /** The HTTP status code associated with the exception. */
+  statusCode?: number;
+  /** The stack trace for the exception. */
+  stackTrace?: string | null;
 }
 
 /** Put security dto */

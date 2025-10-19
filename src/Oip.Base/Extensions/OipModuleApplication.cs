@@ -2,7 +2,9 @@
 using System.Net;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -10,8 +12,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NLog.Web;
 using Oip.Base.Clients;
+using Oip.Base.Exceptions;
 using Oip.Base.Services;
 using Oip.Base.Settings;
 using Polly;
@@ -62,10 +67,7 @@ public static class OipModuleApplication
         builder.Services.AddScoped<UserService>();
         builder.Services.AddCors();
         builder.Services.AddControllers()
-            .AddJsonOptions(option=>
-            {
-                option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+            .AddJsonOptions(option => { option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
         builder.Services.AddMvc().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.DefaultIgnoreCondition
@@ -204,6 +206,9 @@ public static class OipModuleApplication
         var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
         if (localizeOptions != null) app.UseRequestLocalization(localizeOptions.Value);
 
+        app.AddExceptionHandler();
+
+
         app.MapDefaultEndpoints();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
@@ -219,6 +224,43 @@ public static class OipModuleApplication
 
         app.MigrateDatabase();
         return app;
+    }
+
+    private static readonly Lazy<JsonSerializerSettings> Settings = new(CreateSerializerSettings, true);
+
+    private static JsonSerializerSettings CreateSerializerSettings()
+    {
+        var settings = new JsonSerializerSettings();
+        UpdateJsonSerializerSettings(settings);
+        return settings;
+    }
+
+    static void UpdateJsonSerializerSettings(JsonSerializerSettings settings)
+    {
+        settings.NullValueHandling = NullValueHandling.Ignore;
+        settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+    }
+
+    private static void AddExceptionHandler(this WebApplication app)
+    {
+        app.UseExceptionHandler(errorApp =>
+        {
+            errorApp.Run(async context =>
+            {
+                context.Response.StatusCode = 500;
+                context.Response.ContentType = "application/json";
+
+                var error = context.Features.Get<IExceptionHandlerFeature>();
+                if (error != null)
+                {
+                    var ex = error.Error;
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(
+                        new OipException(ex.Message, 500, app.Environment.IsDevelopment() ? ex.StackTrace : null),
+                        Settings.Value
+                    ));
+                }
+            });
+        });
     }
 
     private static void MapOpenApi(this WebApplication app, IBaseOipModuleAppSettings settings)

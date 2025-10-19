@@ -12,7 +12,7 @@
 
 import { Injectable } from '@angular/core';
 import {
-  BaseResponse,
+  OipException,
   PutSecurityRequest,
   SecurityResponse,
   WeatherForecastModuleGetModuleInstanceSettingsParams,
@@ -38,7 +38,7 @@ export class WeatherForecastModule<SecurityDataType = unknown> extends HttpClien
     query: WeatherForecastModuleGetWeatherForecastParams,
     params: RequestParams = {}
   ) =>
-    this.request<WeatherForecastResponse[], BaseResponse>({
+    this.request<WeatherForecastResponse[], OipException>({
       path: `/api/weather-forecast-module/get-weather-forecast`,
       method: 'GET',
       query: query,

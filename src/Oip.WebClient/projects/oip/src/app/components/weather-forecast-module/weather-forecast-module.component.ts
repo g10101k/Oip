@@ -5,7 +5,6 @@ import { WeatherForecastResponse, WeatherModuleSettings } from '../../../api/dat
 import { TagModule } from 'primeng/tag';
 import { FilterMetadata, SharedModule } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
-import { NgIf } from '@angular/common';
 import { Button } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
@@ -85,7 +84,7 @@ interface WeatherModuleLocalSettings {
     }
   `,
   providers: [WeatherForecastModule],
-  imports: [NgIf, TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText]
+  imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText]
 })
 export class WeatherForecastModuleComponent
   extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
