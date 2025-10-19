@@ -2,8 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-import { TranslateService } from '@ngx-translate/core';
-import { BaseDataService } from './../services/base-data.service';
+import { BaseDataService } from '../services/base-data.service';
 import { Tag } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -133,7 +132,9 @@ export class AppModulesComponent implements OnInit {
       },
       accept: async () => {
         this.dataService
-          .sendRequest(`api/module/delete`, 'DELETE', { moduleId: module.moduleId })
+          .sendRequest(`api/module/delete`, 'DELETE', {
+            moduleId: module.moduleId
+          })
           .then(() => this.refreshAction())
           .catch((error) => console.error(error));
         this.msgService.success(this.l10n.messages.deleteSuccess);

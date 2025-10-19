@@ -58,6 +58,7 @@ export class L10nService {
       this.loadedTranslations.add(key);
     } catch (e) {
       console.warn(`No translations found for ${component}.${lang}.json`);
+      console.error(e);
     }
   }
 

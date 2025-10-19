@@ -3,12 +3,11 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { LogoComponent } from '../../logo.component';
 import { SecurityService } from '../../../services/security.service';
-import { AppFloatingConfigurator } from '../../app.floatingconfigurator';
+import { AppFloatingConfiguratorComponent } from '../../app-floating-configurator.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  selector: 'unauthorized-error',
   template: `
     <app-floating-configurator />
     <div
@@ -38,7 +37,14 @@ import { TranslatePipe } from '@ngx-translate/core';
       </div>
     </div>
   `,
-  imports: [ButtonModule, RippleModule, LogoComponent, AppFloatingConfigurator, ReactiveFormsModule, TranslatePipe]
+  imports: [
+    ButtonModule,
+    RippleModule,
+    LogoComponent,
+    AppFloatingConfiguratorComponent,
+    ReactiveFormsModule,
+    TranslatePipe
+  ]
 })
 export class UnauthorizedComponent {
   protected readonly securityService = inject(SecurityService);

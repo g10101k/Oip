@@ -1,9 +1,9 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ProfileComponent } from './profile.component';
 import { Fluid } from 'primeng/fluid';
 import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
-import { Select, SelectChangeEvent } from 'primeng/select';
+import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { LayoutService } from '../services/app.layout.service';
 import { UserService } from '../services/user.service';
@@ -13,6 +13,7 @@ import { SecurityService } from '../services/security.service';
 import { MenuService } from '../services/app.menu.service';
 import { Button } from 'primeng/button';
 import { L10nService } from '../services/l10n.service';
+import { SelectItem } from 'primeng/api';
 
 interface L10n {
   menu: string;
@@ -34,7 +35,9 @@ interface L10n {
         <div class="md:w-1/2">
           <div class="card flex flex-col gap-4">
             <div class="font-semibold text-xl">{{ l10n.profile }}</div>
-            <div class="flex justify-content-end flex-wrap">{{ userService.userName }}</div>
+            <div class="flex justify-content-end flex-wrap">
+              {{ userService.userName }}
+            </div>
             <label>
               {{ l10n.photo }}
               <span
@@ -59,7 +62,7 @@ interface L10n {
                 optionValue="value"
                 [options]="languages"
                 [(ngModel)]="selectedLanguage"
-                (onChange)="changeLanguage($event)"/>
+                (onChange)="changeLanguage()" />
             </div>
           </div>
         </div>
@@ -76,7 +79,7 @@ interface L10n {
               </div>
               <div class="flex items-center gap-2">
                 <label for="oip-app-config-admin-mode">{{ l10n.moduleManagement }}</label>
-                <p-button icon="pi pi-cog" label="{{ l10n.goTo }}" routerLink="/modules"/>
+                <p-button icon="pi pi-cog" label="{{ l10n.goTo }}" routerLink="/modules" />
               </div>
             </div>
           </div>
@@ -94,8 +97,8 @@ export class ConfigComponent implements OnInit {
   protected readonly menuService = inject(MenuService);
   protected l10n = {} as L10n;
 
-  selectedLanguage: any;
-  languages: any[] = [
+  selectedLanguage: string;
+  languages: SelectItem<string>[] = [
     { value: 'en', label: 'English' },
     { value: 'ru', label: 'Русский' }
   ];
@@ -112,11 +115,13 @@ export class ConfigComponent implements OnInit {
 
   /**
    * Changes the application's language.
-   * @param {Event} $event The event triggered by the language selection.
    * @return {void}
    */
-  changeLanguage($event: SelectChangeEvent): void {
-    this.layoutService.layoutConfig.update((config) => ({ ...config, language: this.selectedLanguage }));
+  changeLanguage(): void {
+    this.layoutService.layoutConfig.update((config) => ({
+      ...config,
+      language: this.selectedLanguage
+    }));
     this.l10nService.use(this.selectedLanguage);
   }
 

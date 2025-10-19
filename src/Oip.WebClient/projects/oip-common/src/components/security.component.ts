@@ -82,7 +82,10 @@ export class SecurityComponent implements OnInit, OnDestroy {
   }
 
   saveClick() {
-    const request: PutSecurityDto = { id: this.id, securities: this.securityData };
+    const request: PutSecurityDto = {
+      id: this.id,
+      securities: this.securityData
+    };
     this.dataService.saveSecurity(this.controller, request).then(
       (result) => {
         this.msgService.success(this.translateService.instant('securityComponent.savedSecurity'));

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LogoComponent } from './logo.component';
 import { Button } from 'primeng/button';
-import { AppFloatingConfigurator } from './app.floatingconfigurator';
+import { AppFloatingConfiguratorComponent } from './app-floating-configurator.component';
 
 @Component({
   selector: 'app-notfound',
@@ -25,7 +25,7 @@ import { AppFloatingConfigurator } from './app.floatingconfigurator';
         </div>
       </div>
     </div>`,
-  imports: [RouterLink, LogoComponent, Button, AppFloatingConfigurator],
+  imports: [RouterLink, LogoComponent, Button, AppFloatingConfiguratorComponent],
   standalone: true
 })
 export class NotfoundComponent {}

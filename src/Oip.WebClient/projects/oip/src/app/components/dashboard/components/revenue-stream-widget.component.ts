@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
 import { debounceTime, Subscription } from 'rxjs';
 import { LayoutService } from 'oip-common';
@@ -7,19 +7,21 @@ import { LayoutService } from 'oip-common';
   standalone: true,
   selector: 'app-revenue-stream-widget',
   imports: [ChartModule],
-  template: `<div class="card !mb-8">
+  template: ` <div class="card !mb-8">
     <div class="font-semibold text-xl mb-4">Revenue Stream</div>
     <p-chart class="h-80" type="bar" [data]="chartData" [options]="chartOptions" />
   </div>`
 })
 export class RevenueStreamWidgetComponent implements OnInit, OnDestroy {
+  protected layoutService = inject(LayoutService);
+
   chartData: any;
 
   chartOptions: any;
 
   subscription!: Subscription;
 
-  constructor(public layoutService: LayoutService) {
+  constructor() {
     this.subscription = this.layoutService.configUpdate$.pipe(debounceTime(25)).subscribe(() => {
       this.initChart();
     });

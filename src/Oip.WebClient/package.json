@@ -21,8 +21,7 @@
     "build:oip-rtds": "ng build oip-rtds",
     "build:common": "ng build oip-common",
     "test": "ng test",
-    "lint": "ng lint --fix",
-    "prettier": "npx prettier --write projects/",
+    "lint": "ng lint --fix || npx prettier --write projects/",
     "e2e": "ng e2e"
   },
   "private": true,

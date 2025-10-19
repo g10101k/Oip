@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { LayoutService } from '../services/app.layout.service';
-import { AppConfigurator } from './app.configurator';
+import { AppConfiguratorComponent } from './app-configurator.component';
 import { LogoComponent } from './logo.component';
 import { SecurityService } from '../services/security.service';
 import { TopBarService } from '../services/top-bar.service';
@@ -20,7 +20,7 @@ import { ButtonModule } from 'primeng/button';
     RouterModule,
     CommonModule,
     StyleClassModule,
-    AppConfigurator,
+    AppConfiguratorComponent,
     LogoComponent,
     Tabs,
     TabList,
@@ -135,7 +135,10 @@ export class AppTopbar {
   constructor(public layoutService: LayoutService) {}
 
   toggleDarkMode() {
-    this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
+    this.layoutService.layoutConfig.update((state) => ({
+      ...state,
+      darkTheme: !state.darkTheme
+    }));
   }
 
   logoutKeyDown($event: KeyboardEvent) {

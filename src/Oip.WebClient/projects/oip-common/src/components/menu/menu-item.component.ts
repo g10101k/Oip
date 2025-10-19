@@ -7,7 +7,7 @@ import { LayoutService } from '../../services/app.layout.service';
 import { MenuService } from '../../services/app.menu.service';
 import { RippleModule } from 'primeng/ripple';
 import { NgIf, NgClass, NgFor } from '@angular/common';
-import { ConfirmationService, MenuItem, MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
+import { ConfirmationService, ContextMenuService, MenuItem, MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
 import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.component';
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { MsgService } from '../../services/msg.service';
@@ -15,6 +15,8 @@ import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
 import { ContextMenuItemDto } from '../../dtos/context-menu-item.dto';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Menu } from '../../api/Menu';
+import { MenuDeleteModuleInstanceParams } from '../../api/data-contracts';
 
 interface MenuItemComponentTranslation {
   delete: string;
@@ -124,6 +126,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   private readonly translateService = inject(TranslateService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly msgService = inject(MsgService);
+  private readonly menuDataService = inject(Menu);
 
   @Input() item: ContextMenuItemDto;
   @Input() index!: number;
@@ -194,7 +197,11 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     });
 
     if (activeRoute) {
-      this.menuService.onMenuStateChange({ key: this.key, item: this.item, routeEvent: true });
+      this.menuService.onMenuStateChange({
+        key: this.key,
+        item: this.item,
+        routeEvent: true
+      });
     }
   }
 
@@ -273,7 +280,9 @@ export class MenuItemComponent implements OnInit, OnDestroy {
         severity: 'danger'
       },
       accept: async () => {
-        await this.menuService.deleteItem(this.menuService.contextMenuItem?.moduleInstanceId);
+        await this.menuDataService.menuDeleteModuleInstance({
+          id: this.menuService.contextMenuItem?.moduleInstanceId
+        } as MenuDeleteModuleInstanceParams);
         this.msgService.success(this.localization.deleteItemSuccessMessage);
         await this.menuService.loadMenu();
       }

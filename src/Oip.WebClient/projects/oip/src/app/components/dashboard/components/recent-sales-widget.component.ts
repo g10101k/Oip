@@ -31,7 +31,9 @@ import { Product } from '../../../api/product';
               width="50" />
           </td>
           <td style="width: 35%; min-width: 7rem;">{{ product.name }}</td>
-          <td style="width: 35%; min-width: 8rem;">{{ product.price | currency: 'USD' }}</td>
+          <td style="width: 35%; min-width: 8rem;">
+            {{ product.price | currency: 'USD' }}
+          </td>
           <td style="width: 15%;">
             <button
               class="p-button p-component p-button-text p-button-icon-only"

@@ -22,8 +22,6 @@ export interface ApplyMigrationRequest {
   name: string;
 }
 
-interface DbMigrationSettingsDto {}
-
 @Component({
   imports: [
     TableModule,
@@ -38,7 +36,7 @@ interface DbMigrationSettingsDto {}
     SecurityComponent,
     Tooltip
   ],
-  selector: 'crypt',
+  selector: 'db-migration',
   template: `
     <div *ngIf="isContent" class="card" style="height: 100%">
       <p-confirmDialog />
@@ -90,17 +88,14 @@ interface DbMigrationSettingsDto {}
                   </p-button>
                 </td>
                 <td>
-                  <p-button *ngIf="rowData.exist" icon="pi pi-check" severity="success" [rounded]="true" [text]="true">
-                  </p-button>
+                  @if (rowData.exist) {
+                    <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true" />
+                  }
                 </td>
                 <td>
-                  <p-button
-                    *ngIf="rowData.pending"
-                    icon="pi pi-check"
-                    severity="success"
-                    [rounded]="true"
-                    [text]="true">
-                  </p-button>
+                  @if (rowData.pending) {
+                    <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true"></p-button>
+                  }
                 </td>
                 <td>
                   <p-button
@@ -120,12 +115,14 @@ interface DbMigrationSettingsDto {}
         </div>
       </div>
     </div>
-    <security *ngIf="isSecurity" [controller]="controller" [id]="id"></security>
+    @if (isSecurity) {
+      <security [controller]="controller" [id]="id" />
+    }
   `,
   providers: [ConfirmationService]
 })
 export class DbMigrationComponent
-  extends BaseModuleComponent<DbMigrationSettingsDto, NoSettingsDto>
+  extends BaseModuleComponent<NoSettingsDto, NoSettingsDto>
   implements OnInit, OnDestroy
 {
   data: MigrationDto[];

@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { AuthGuardService, NotfoundComponent, AppLayout } from 'oip-common';
+import { AuthGuardService, NotfoundComponent, AppLayoutComponent } from 'oip-common';
 import { inject } from '@angular/core';
 
 export const appRoutes: Routes = [
   {
     path: '',
-    component: AppLayout,
+    component: AppLayoutComponent,
     canActivate: [() => inject(AuthGuardService).canActivate()],
     children: [
       {

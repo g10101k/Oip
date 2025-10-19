@@ -5,7 +5,6 @@ import { WeatherForecastResponse, WeatherModuleSettings } from '../../../api/dat
 import { TagModule } from 'primeng/tag';
 import { FilterMetadata, SharedModule } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
-import { NgIf } from '@angular/common';
 import { Button } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
@@ -19,70 +18,73 @@ interface WeatherModuleLocalSettings {
 }
 
 @Component({
-  selector: 'weather-forecast-module',
   template: `
-    <div *ngIf="isContent" class="card">
-      <div>
-        <h5>{{ this.title }}</h5>
-        <p-table #table [value]="data" (onFilter)="onFilter()">
-          >
-          <ng-template let-columns pTemplate="header">
-            <tr>
-              <th pSortableColumn="date" scope="col">
-                Date
-                <p-sortIcon field="date" />
-                <p-columnFilter display="menu" field="date" type="date" />
-              </th>
-              <th pSortableColumn="temperatureC" scope="col">
-                Temperature C
-                <p-sortIcon field="temperatureC" />
-                <p-columnFilter display="menu" field="temperatureC" type="numeric" />
-              </th>
-              <th pSortableColumn="temperatureF" scope="col">
-                Temperature F
-                <p-sortIcon field="temperatureF" />
-                <p-columnFilter display="menu" field="temperatureF" type="numeric" />
-              </th>
-              <th pSortableColumn="summary" scope="col">
-                Summary
-                <p-sortIcon field="summary" />
-                <p-columnFilter display="menu" field="summary" type="text" />
-              </th>
-            </tr>
-          </ng-template>
-          <ng-template let-columns="columns" let-forecast pTemplate="body">
-            <tr>
-              <td>{{ forecast.date }}</td>
-              <td>{{ forecast.temperatureC }}</td>
-              <td>{{ forecast.temperatureF }}</td>
-              <td>
-                <p-tag severity="success" [value]="forecast.summary"></p-tag>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+    @if (isContent) {
+      <div class="card">
+        <div>
+          <h5>{{ this.title }}</h5>
+          <p-table #table [value]="data" (onFilter)="onFilter()">
+            >
+            <ng-template let-columns pTemplate="header">
+              <tr>
+                <th pSortableColumn="date" scope="col">
+                  Date
+                  <p-sortIcon field="date" />
+                  <p-columnFilter display="menu" field="date" type="date" />
+                </th>
+                <th pSortableColumn="temperatureC" scope="col">
+                  Temperature C
+                  <p-sortIcon field="temperatureC" />
+                  <p-columnFilter display="menu" field="temperatureC" type="numeric" />
+                </th>
+                <th pSortableColumn="temperatureF" scope="col">
+                  Temperature F
+                  <p-sortIcon field="temperatureF" />
+                  <p-columnFilter display="menu" field="temperatureF" type="numeric" />
+                </th>
+                <th pSortableColumn="summary" scope="col">
+                  Summary
+                  <p-sortIcon field="summary" />
+                  <p-columnFilter display="menu" field="summary" type="text" />
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template let-columns="columns" let-forecast pTemplate="body">
+              <tr>
+                <td>{{ forecast.date }}</td>
+                <td>{{ forecast.temperatureC }}</td>
+                <td>{{ forecast.temperatureF }}</td>
+                <td>
+                  <p-tag severity="success" [value]="forecast.summary"></p-tag>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
       </div>
-    </div>
-    <div *ngIf="isSettings" class="flex flex-col md:flex-row gap-8">
-      <div class="md:w-1/2">
-        <div class="card flex flex-col gap-4">
-          <div class="font-semibold text-xl">Weather settings</div>
-          <div class="grid grid-cols-12 gap-4">
-            <label class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0" for="dayCount">Day Count</label>
-            <div class="col-span-12 md:col-span-10">
-              <input id="dayCount" pInputText type="text" [(ngModel)]="settings.dayCount" />
+    } @else if (isSettings) {
+      <div class="flex flex-col md:flex-row gap-8">
+        <div class="md:w-1/2">
+          <div class="card flex flex-col gap-4">
+            <div class="font-semibold text-xl">Weather settings</div>
+            <div class="grid grid-cols-12 gap-4">
+              <label class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0" for="dayCount">Day Count</label>
+              <div class="col-span-12 md:col-span-10">
+                <input id="dayCount" pInputText type="text" [(ngModel)]="settings.dayCount" />
+              </div>
             </div>
-          </div>
-          <div class="flex justify-end">
-            <p-button icon="pi pi-save" label="Save" (onClick)="saveSettings(settings)"></p-button>
+            <div class="flex justify-end">
+              <p-button icon="pi pi-save" label="Save" (onClick)="saveSettings(settings)"></p-button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <security *ngIf="isSecurity" [controller]="controller" [id]="id"></security>
+    } @else if (isSecurity) {
+      <security [controller]="controller" [id]="id" />
+    }
   `,
   providers: [WeatherForecastModule],
-  imports: [NgIf, TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText]
+  imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText]
 })
 export class WeatherForecastModuleComponent
   extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
@@ -98,19 +100,21 @@ export class WeatherForecastModuleComponent
 
   async ngOnInit() {
     await super.ngOnInit();
-    await this.dataService.weatherForecastModuleGetWeatherForecast({ dayCount: this.settings.dayCount }).then(
-      (result) => {
-        this.data = result;
-      },
-      (error) => {
-        console.error('Error fetching weather data:', error);
-        this.msgService.error(error);
-      }
-    );
+    try {
+      this.data = await this.dataService.weatherForecastModuleGetWeatherForecast({
+        dayCount: this.settings.dayCount
+      });
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+      this.msgService.error(error.error.message);
+    }
     if (this.localSettings().filters) this.table.filters = this.localSettings().filters;
   }
 
   onFilter() {
-    this.localSettings.update((settings) => ({ ...settings, filters: this.table.filters }));
+    this.localSettings.update((settings) => ({
+      ...settings,
+      filters: this.table.filters
+    }));
   }
 }
