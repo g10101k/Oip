@@ -51,7 +51,7 @@ public class WeatherForecastModuleController : BaseModuleController<WeatherModul
     public IActionResult Get(int dayCount)
     {
         if (new Random().Next(0, 4) == 0)
-            throw new NotImplementedException("Bring it on!");
+            throw new InvalidOperationException("Bring it on!");
 
         return Ok(Enumerable.Range(1, dayCount).Select(index => new WeatherForecastResponse
             {
