@@ -94,16 +94,18 @@ declare type SurfacesType = {
           [options]="presets"
           (ngModelChange)="onPresetChange($event)" />
       </div>
-      <div *ngIf="showMenuModeButton()" class="flex flex-col gap-2">
-        <span class="text-sm text-muted-color font-semibold">Menu Mode</span>
-        <p-selectButton
-          id="oip-app-configurator-menu-mode-select-button"
-          size="small"
-          [allowEmpty]="false"
-          [ngModel]="menuMode()"
-          [options]="menuModeOptions"
-          (ngModelChange)="onMenuModeChange($event)" />
-      </div>
+      @if (showMenuModeButton()) {
+        <div class="flex flex-col gap-2">
+          <span class="text-sm text-muted-color font-semibold">Menu Mode</span>
+          <p-selectButton
+            id="oip-app-configurator-menu-mode-select-button"
+            size="small"
+            [allowEmpty]="false"
+            [ngModel]="menuMode()"
+            [options]="menuModeOptions"
+            (ngModelChange)="onMenuModeChange($event)" />
+        </div>
+      }
     </div>
   `,
   host: {
@@ -111,7 +113,7 @@ declare type SurfacesType = {
       'hidden absolute top-[3.25rem] right-0 w-72 p-4 bg-surface-0 dark:bg-surface-900 border border-surface rounded-border origin-top shadow-[0px_3px_5px_rgba(0,0,0,0.02),0px_0px_2px_rgba(0,0,0,0.05),0px_1px_4px_rgba(0,0,0,0.08)]'
   }
 })
-export class AppConfigurator implements OnInit {
+export class AppConfiguratorComponent implements OnInit {
   router = inject(Router);
 
   config: PrimeNG = inject(PrimeNG);
@@ -445,18 +447,24 @@ export class AppConfigurator implements OnInit {
     }
   }
 
-  updateColors(event: any, type: string, color: any) {
+  updateColors(event: MouseEvent, type: string, color: SurfacesType) {
     if (type === 'primary') {
-      this.layoutService.layoutConfig.update((state) => ({ ...state, primary: color.name }));
+      this.layoutService.layoutConfig.update((state) => ({
+        ...state,
+        primary: color.name
+      }));
     } else if (type === 'surface') {
-      this.layoutService.layoutConfig.update((state) => ({ ...state, surface: color.name }));
+      this.layoutService.layoutConfig.update((state) => ({
+        ...state,
+        surface: color.name
+      }));
     }
     this.applyTheme(type, color);
 
     event.stopPropagation();
   }
 
-  applyTheme(type: string, color: any) {
+  applyTheme(type: string, color: SurfacesType) {
     if (type === 'primary') {
       updatePreset(this.getPresetExt());
     } else if (type === 'surface') {
@@ -464,14 +472,20 @@ export class AppConfigurator implements OnInit {
     }
   }
 
-  onPresetChange(event: any) {
-    this.layoutService.layoutConfig.update((state) => ({ ...state, preset: event }));
+  onPresetChange(event: string) {
+    this.layoutService.layoutConfig.update((state) => ({
+      ...state,
+      preset: event
+    }));
     const preset = presets[event as KeyOfType<typeof presets>];
     const surfacePalette = this.surfaces.find((s) => s.name === this.selectedSurfaceColor())?.palette;
     $t().preset(preset).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
   }
 
   onMenuModeChange(event: string) {
-    this.layoutService.layoutConfig.update((prev) => ({ ...prev, menuMode: event }));
+    this.layoutService.layoutConfig.update((prev) => ({
+      ...prev,
+      menuMode: event
+    }));
   }
 }

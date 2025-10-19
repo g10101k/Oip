@@ -72,7 +72,9 @@ export class TagManagement extends BaseModuleComponent<NoSettingsDto, NoSettings
   }
 
   async refresh() {
-    this.tags = await this.tagManagementModuleDataService.tagManagementGetTagsByFilter({ filter: '%' });
+    this.tags = await this.tagManagementModuleDataService.tagManagementGetTagsByFilter({
+      filter: '%'
+    });
   }
 
   async saveTag() {

@@ -11,10 +11,10 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
   imports: [FileUploadModule, ImageModule, ImageModule, FileUploadModule, ImageModule, AvatarModule, TranslatePipe],
   template: `
     <p-avatar
+      class="mr-2"
       id="oip-user-profile-photo-avatar"
       shape="circle"
       size="xlarge"
-      class="mr-2"
       [image]="userService.photoLoaded ? userService.photo : null" />
     <div class="mt-2">
       <p-fileupload

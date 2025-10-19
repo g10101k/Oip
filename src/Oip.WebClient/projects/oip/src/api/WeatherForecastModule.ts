@@ -12,6 +12,7 @@
 
 import { Injectable } from '@angular/core';
 import {
+  BaseResponse,
   PutSecurityRequest,
   SecurityResponse,
   WeatherForecastModuleGetModuleInstanceSettingsParams,
@@ -28,7 +29,7 @@ export class WeatherForecastModule<SecurityDataType = unknown> extends HttpClien
    * No description
    *
    * @tags WeatherForecastModule
-   * @name getWeatherForecast
+   * @name weatherForecastModuleGetWeatherForecast
    * @summary Retrieves example weather forecast data.
    * @request GET:/api/weather-forecast-module/get-weather-forecast
    * @secure
@@ -37,7 +38,7 @@ export class WeatherForecastModule<SecurityDataType = unknown> extends HttpClien
     query: WeatherForecastModuleGetWeatherForecastParams,
     params: RequestParams = {}
   ) =>
-    this.request<WeatherForecastResponse[], any>({
+    this.request<WeatherForecastResponse[], BaseResponse>({
       path: `/api/weather-forecast-module/get-weather-forecast`,
       method: 'GET',
       query: query,
@@ -49,7 +50,7 @@ export class WeatherForecastModule<SecurityDataType = unknown> extends HttpClien
    * No description
    *
    * @tags WeatherForecastModule
-   * @name getModuleRights
+   * @name weatherForecastModuleGetModuleRights
    * @summary <inheritdoc />
    * @request GET:/api/weather-forecast-module/get-module-rights
    * @secure
@@ -66,7 +67,7 @@ export class WeatherForecastModule<SecurityDataType = unknown> extends HttpClien
    * No description
    *
    * @tags WeatherForecastModule
-   * @name getSecurity
+   * @name weatherForecastModuleGetSecurity
    * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/weather-forecast-module/get-security
    * @secure
@@ -84,7 +85,7 @@ export class WeatherForecastModule<SecurityDataType = unknown> extends HttpClien
    * No description
    *
    * @tags WeatherForecastModule
-   * @name putSecurity
+   * @name weatherForecastModulePutSecurity
    * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/weather-forecast-module/put-security
    * @secure
@@ -102,7 +103,7 @@ export class WeatherForecastModule<SecurityDataType = unknown> extends HttpClien
    * No description
    *
    * @tags WeatherForecastModule
-   * @name getModuleInstanceSettings
+   * @name weatherForecastModuleGetModuleInstanceSettings
    * @summary Gets the settings for the specified module instance.
    * @request GET:/api/weather-forecast-module/get-module-instance-settings
    * @secure
@@ -122,7 +123,7 @@ export class WeatherForecastModule<SecurityDataType = unknown> extends HttpClien
    * No description
    *
    * @tags WeatherForecastModule
-   * @name putModuleInstanceSettings
+   * @name weatherForecastModulePutModuleInstanceSettings
    * @request PUT:/api/weather-forecast-module/put-module-instance-settings
    * @secure
    */

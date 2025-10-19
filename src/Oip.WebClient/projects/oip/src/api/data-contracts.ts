@@ -10,10 +10,14 @@
  * ---------------------------------------------------------------
  */
 
-/** Request model for applying a specific migration by name. */
-export interface ApplyMigrationRequest {
-  /** The name of the migration to apply. */
-  name?: string | null;
+/** Represents a base response for API operations. */
+export interface BaseResponse {
+  /** Indicates whether the operation was successful. */
+  success?: boolean;
+  /** Represents an error message associated with the response. */
+  error?: string | null;
+  /** Represents the stack trace associated with an error. */
+  stackTrace?: string | null;
 }
 
 /** Settings */
@@ -28,26 +32,6 @@ export interface DashboardSettingsSaveSettingsRequest {
   id?: number;
   /** Settings */
   settings?: DashboardSettings;
-}
-
-/** Data transfer object representing a database migration and its status. */
-export interface MigrationDto {
-  /** Name of the migration. */
-  name?: string | null;
-  /** Indicates whether the migration has been applied. */
-  applied?: boolean;
-  /** Indicates whether the migration is pending. */
-  pending?: boolean;
-  /** Indicates whether the migration exists in the codebase. */
-  exist?: boolean;
-}
-
-/** Represents a request to save module instance settings. */
-export interface ObjectSaveSettingsRequest {
-  /** Gets or sets the ID of the module instance. */
-  id?: number;
-  /** Gets or sets the settings object to be saved. */
-  settings?: any;
 }
 
 /** Put security dto */
@@ -102,16 +86,6 @@ export interface DashboardGetSecurityParams {
 }
 
 export interface DashboardGetModuleInstanceSettingsParams {
-  /** The ID of the module instance. */
-  id?: number;
-}
-
-export interface DbMigrationGetSecurityParams {
-  /** The ID of the module instance. */
-  id?: number;
-}
-
-export interface DbMigrationGetModuleInstanceSettingsParams {
   /** The ID of the module instance. */
   id?: number;
 }

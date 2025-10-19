@@ -10,7 +10,7 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   CreateTagDto,
   ObjectSaveSettingsRequest,
@@ -19,14 +19,12 @@ import {
   TagEntity,
   TagManagementGetModuleInstanceSettingsParams,
   TagManagementGetSecurityParams,
-  TagManagementGetTagsByFilterParams,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+  TagManagementGetTagsByFilterParams
+} from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
 @Injectable()
-export class TagManagementModule<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class TagManagementModule<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Accepts a tag entity from the request body and stores it in the database. Returns HTTP 200 on success.
    *
@@ -39,11 +37,11 @@ export class TagManagementModule<
   tagManagementAddTag = (data: CreateTagDto, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/tag-management/add-tag`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * @description Returns a list of tags whose names match the provided filter string. This is useful for searching or filtering tags by partial name.
@@ -54,17 +52,14 @@ export class TagManagementModule<
    * @request GET:/api/tag-management/get-tags-by-filter
    * @secure
    */
-  tagManagementGetTagsByFilter = (
-    query: TagManagementGetTagsByFilterParams,
-    params: RequestParams = {},
-  ) =>
+  tagManagementGetTagsByFilter = (query: TagManagementGetTagsByFilterParams, params: RequestParams = {}) =>
     this.request<TagEntity[], any>({
       path: `/api/tag-management/get-tags-by-filter`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -78,11 +73,11 @@ export class TagManagementModule<
   tagManagementEditTag = (data: CreateTagDto, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/tag-management/edit-tag`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * @description This method defines the access control rules for the Tag Management module. It lists the roles and permissions necessary to interact with the module via the UI or API.
@@ -96,10 +91,10 @@ export class TagManagementModule<
   tagManagementGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/tag-management/get-module-rights`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -110,17 +105,14 @@ export class TagManagementModule<
    * @request GET:/api/tag-management/get-security
    * @secure
    */
-  tagManagementGetSecurity = (
-    query: TagManagementGetSecurityParams,
-    params: RequestParams = {},
-  ) =>
+  tagManagementGetSecurity = (query: TagManagementGetSecurityParams, params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/tag-management/get-security`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -131,17 +123,14 @@ export class TagManagementModule<
    * @request PUT:/api/tag-management/put-security
    * @secure
    */
-  tagManagementPutSecurity = (
-    data: PutSecurityRequest,
-    params: RequestParams = {},
-  ) =>
+  tagManagementPutSecurity = (data: PutSecurityRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/tag-management/put-security`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -154,14 +143,14 @@ export class TagManagementModule<
    */
   tagManagementGetModuleInstanceSettings = (
     query: TagManagementGetModuleInstanceSettingsParams,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, any>({
       path: `/api/tag-management/get-module-instance-settings`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -171,16 +160,13 @@ export class TagManagementModule<
    * @request PUT:/api/tag-management/put-module-instance-settings
    * @secure
    */
-  tagManagementPutModuleInstanceSettings = (
-    data: ObjectSaveSettingsRequest,
-    params: RequestParams = {},
-  ) =>
+  tagManagementPutModuleInstanceSettings = (data: ObjectSaveSettingsRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/tag-management/put-module-instance-settings`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
 }

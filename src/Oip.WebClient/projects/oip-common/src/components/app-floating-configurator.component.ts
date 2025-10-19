@@ -1,12 +1,12 @@
 import { Component, computed, inject } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { StyleClassModule } from 'primeng/styleclass';
-import { AppConfigurator } from './app.configurator';
+import { AppConfiguratorComponent } from './app-configurator.component';
 import { LayoutService } from '../services/app.layout.service';
 
 @Component({
   selector: 'app-floating-configurator',
-  imports: [ButtonModule, StyleClassModule, AppConfigurator],
+  imports: [ButtonModule, StyleClassModule, AppConfiguratorComponent],
   template: `
     <div class="fixed flex gap-4 top-8 right-8">
       <p-button
@@ -33,7 +33,7 @@ import { LayoutService } from '../services/app.layout.service';
     </div>
   `
 })
-export class AppFloatingConfigurator {
+export class AppFloatingConfiguratorComponent {
   LayoutService = inject(LayoutService);
 
   isDarkTheme = computed(() => this.LayoutService.layoutConfig().darkTheme);
