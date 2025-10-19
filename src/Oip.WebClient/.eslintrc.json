@@ -1,6 +1,14 @@
 {
   "root": true,
-  "ignorePatterns": ["*.json", "*.scss"],
+  "ignorePatterns": [
+    "*.json",
+    "*.scss",
+    "*.md",
+    "*.png",
+    "*.svg",
+    "*.jpg",
+    "*.css"
+  ],
   "overrides": [
     {
       "files": ["*.ts"],
@@ -25,7 +33,6 @@
           "error",
           {
             "type": "element",
-            "prefix": "app",
             "style": "kebab-case"
           }
         ],
@@ -61,3 +68,4 @@
     }
   ]
 }
+
