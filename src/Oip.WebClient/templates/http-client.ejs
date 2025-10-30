@@ -59,6 +59,7 @@ export class HttpClient<SecurityDataType = unknown> {
     private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"]  =
       (securityData) => ({
         headers: {
+          "Accept-language":  this.layoutService.language() ? this.layoutService.language() : 'en',
           Authorization: `Bearer ${securityData}`,
         },
       });
