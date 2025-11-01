@@ -16,6 +16,7 @@ namespace Oip.Settings;
 public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : class, IAppSettings
 {
     private static TAppSettings? _instance;
+    private static TAppSettings? _tmpInstance;
 
     // ReSharper disable once StaticMemberInGenericType
 #pragma warning disable S2743
@@ -34,8 +35,11 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
                 return _instance;
             _instance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
                                        throw new InvalidOperationException());
-            BindTemporaryConfiguration(_instance);
-            BindMainConfiguration(_instance);
+            _tmpInstance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
+                                          throw new InvalidOperationException());
+            BindTemporaryConfiguration(_tmpInstance);
+            BindMainConfiguration(_instance, _tmpInstance);
+
             return _instance;
         }
     }
@@ -107,23 +111,25 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     }
 #pragma warning restore S107
 
-    private static void BindTemporaryConfiguration(TAppSettings instance)
+    private static void BindTemporaryConfiguration(TAppSettings tmpInstance)
     {
         var configuration = BuildBaseConfiguration(new ConfigurationBuilder());
-        BindConfig(configuration, instance);
+        BindConfig(configuration, tmpInstance);
     }
 
-    private static void BindMainConfiguration(TAppSettings instance)
+    private static void BindMainConfiguration(TAppSettings instance, TAppSettings tmp)
     {
-        if (Instance.AppSettingsOptions is null)
+        if (tmp.AppSettingsOptions is null)
             throw new InvalidOperationException(
                 $"{nameof(_appSettingsOptions)} is null, call {nameof(Initialize)} before use {nameof(Instance)}");
-
-        var efConfigurationSource = new EfConfigurationSource<TAppSettings>(Instance.AppSettingsOptions, instance);
-
+        
         var configurationBuilder = new ConfigurationBuilder();
         if (instance.AppSettingsOptions.UseEfCoreProvider)
+        {
+            var efConfigurationSource = new EfConfigurationSource<TAppSettings>(Instance.AppSettingsOptions, instance);
             configurationBuilder.Add(efConfigurationSource);
+        }
+
         var configuration = BuildBaseConfiguration(configurationBuilder);
 
         BindConfig(configuration, instance);
