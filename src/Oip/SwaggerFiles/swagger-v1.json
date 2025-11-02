@@ -1,0 +1,604 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Oip service web-api",
+    "description": "Oip service web-api",
+    "version": "v1.0.0"
+  },
+  "paths": {
+    "/api/dashboard/get-module-rights": {
+      "get": {
+        "tags": [
+          "DashboardModule"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/get-security": {
+      "get": {
+        "tags": [
+          "DashboardModule"
+        ],
+        "summary": "Gets the security configuration for the specified module instance ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/put-security": {
+      "put": {
+        "tags": [
+          "DashboardModule"
+        ],
+        "summary": "Updates the security configuration for the specified module instance.",
+        "requestBody": {
+          "description": "The request containing the new security configuration.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/dashboard/get-module-instance-settings": {
+      "get": {
+        "tags": [
+          "DashboardModule"
+        ],
+        "summary": "Gets the settings for the specified module instance.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/dashboard/put-module-instance-settings": {
+      "put": {
+        "tags": [
+          "DashboardModule"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DashboardSettingsSaveSettingsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DashboardSettingsSaveSettingsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DashboardSettingsSaveSettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/weather-forecast-module/get-weather-forecast": {
+      "get": {
+        "tags": [
+          "WeatherForecastModule"
+        ],
+        "summary": "Retrieves example weather forecast data.",
+        "parameters": [
+          {
+            "name": "dayCount",
+            "in": "query",
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherForecastResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherForecastResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeatherForecastResponse"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/OipException"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OipException"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OipException"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/weather-forecast-module/get-module-rights": {
+      "get": {
+        "tags": [
+          "WeatherForecastModule"
+        ],
+        "summary": "<inheritdoc />",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/weather-forecast-module/get-security": {
+      "get": {
+        "tags": [
+          "WeatherForecastModule"
+        ],
+        "summary": "Gets the security configuration for the specified module instance ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/weather-forecast-module/put-security": {
+      "put": {
+        "tags": [
+          "WeatherForecastModule"
+        ],
+        "summary": "Updates the security configuration for the specified module instance.",
+        "requestBody": {
+          "description": "The request containing the new security configuration.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/weather-forecast-module/get-module-instance-settings": {
+      "get": {
+        "tags": [
+          "WeatherForecastModule"
+        ],
+        "summary": "Gets the settings for the specified module instance.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/weather-forecast-module/put-module-instance-settings": {
+      "put": {
+        "tags": [
+          "WeatherForecastModule"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeatherModuleSettingsSaveSettingsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeatherModuleSettingsSaveSettingsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeatherModuleSettingsSaveSettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DashboardSettings": {
+        "type": "object",
+        "properties": {
+          "nothing": {
+            "type": "string",
+            "description": "Just, for example",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Settings"
+      },
+      "DashboardSettingsSaveSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the module instance.",
+            "format": "int32"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/DashboardSettings"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a request to save module instance settings."
+      },
+      "OipException": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The exception message.",
+            "nullable": true
+          },
+          "statusCode": {
+            "type": "integer",
+            "description": "The HTTP status code associated with the exception.",
+            "format": "int32"
+          },
+          "stackTrace": {
+            "type": "string",
+            "description": "The stack trace for the exception.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents the base exception class for Oip applications."
+      },
+      "PutSecurityRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Instance id",
+            "format": "int32"
+          },
+          "securities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SecurityResponse"
+            },
+            "description": "Securities",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Put security dto"
+      },
+      "SecurityResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Code",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Description",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Roles",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Security dto"
+      },
+      "WeatherForecastResponse": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Date",
+            "format": "date-time"
+          },
+          "temperatureC": {
+            "type": "integer",
+            "description": "Temp in ºC",
+            "format": "int32"
+          },
+          "temperatureF": {
+            "type": "integer",
+            "description": "Temp in ºF",
+            "format": "int32",
+            "readOnly": true
+          },
+          "summary": {
+            "type": "string",
+            "description": "Summary",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response"
+      },
+      "WeatherModuleSettings": {
+        "type": "object",
+        "properties": {
+          "dayCount": {
+            "type": "integer",
+            "description": "Day count",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Module settings"
+      },
+      "WeatherModuleSettingsSaveSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the module instance.",
+            "format": "int32"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/WeatherModuleSettings"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a request to save module instance settings."
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "JWT Authorization header using the Bearer scheme. \\r\\n\\r\\n \n                      Enter 'Bearer' [space] and then your token in the text input below.\n                      \\r\\n\\r\\nExample: 'Bearer 12345abcdef'",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
