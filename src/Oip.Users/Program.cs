@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using NLog;
 using NLog.Web;
 using Oip.Base.Extensions;
@@ -28,8 +27,8 @@ internal static class Program
             builder.Services.AddScoped<UserSyncService>();
 
             // Background service
-            builder.Services.AddHostedService<BackgroundSyncService>();
-
+            builder.Services.AddHostedService<KeycloakSyncBackgroundService>();
+            
             // HTTP Client
             builder.Services.AddHttpClient();
             var app = builder.BuildApp(settings);

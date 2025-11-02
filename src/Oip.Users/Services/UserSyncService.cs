@@ -1,4 +1,3 @@
-using Oip.Base.Clients;
 using Oip.Users.Entities;
 using Oip.Users.Repositories;
 using Oip.Users.Settings;

@@ -17,8 +17,10 @@ using Newtonsoft.Json.Serialization;
 using NLog.Web;
 using Oip.Base.Clients;
 using Oip.Base.Exceptions;
+using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
+using Oip.Base.StartupTasks;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -63,6 +65,8 @@ public static class OipModuleApplication
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
         builder.Services.AddOipModuleContext(settings.ConnectionString);
+        builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+        builder.Services.AddStartupRunner();
         builder.Services.AddSingleton(settings);
         builder.Services.AddScoped<UserService>();
         builder.Services.AddCors();
@@ -74,6 +78,7 @@ public static class OipModuleApplication
                 = JsonIgnoreCondition.WhenWritingNull;
         });
         builder.AddLocalization();
+
         return builder;
     }
 

@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Options;
 using Oip.Base.Extensions;
 using Oip.Users.Settings;
 
@@ -7,8 +6,9 @@ namespace Oip.Users.Services;
 /// <summary>
 /// Background service for synchronizing users periodically.
 /// </summary>
-public class BackgroundSyncService(ILogger<BackgroundSyncService> logger, IServiceScopeFactory scopeFactory)
-    : BackgroundService
+public class KeycloakSyncBackgroundService(
+    ILogger<KeycloakSyncBackgroundService> logger,
+    IServiceScopeFactory scopeFactory) : BackgroundService
 {
     private readonly SyncOptions _syncOptions = AppSettings.Instance.SyncOptions;
 

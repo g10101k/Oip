@@ -31,4 +31,9 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// Security Service Settings
     /// </summary>
     SecurityServiceSettings SecurityService { get; set; }
+    
+    /// <summary>
+    /// Api generation settings
+    /// </summary>
+    List<ApiGenerationSettings> ApiGenerationSettings { get; set; }
 }

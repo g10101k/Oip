@@ -10,17 +10,19 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from '@angular/core';
-import { GetManifestResponse, RegisterModuleDto } from './data-contracts';
-import { ContentType, HttpClient, RequestParams } from './http-client';
+import { Injectable } from "@angular/core";
+import { GetManifestResponse, RegisterModuleDto } from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class Service<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Service<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
    * @tags Service
-   * @name get
+   * @name serviceGet
    * @summary Get manifest for client app
    * @request GET:/api/service/get
    * @secure
@@ -28,27 +30,30 @@ export class Service<SecurityDataType = unknown> extends HttpClient<SecurityData
   serviceGet = (params: RequestParams = {}) =>
     this.request<Record<string, GetManifestResponse>, any>({
       path: `/api/service/get`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
-      ...params
+      format: "json",
+      ...params,
     });
   /**
    * No description
    *
    * @tags Service
-   * @name registerModule
+   * @name serviceRegisterModule
    * @summary Registry module
    * @request POST:/api/service/register-module
    * @secure
    */
-  serviceRegisterModule = (data: RegisterModuleDto, params: RequestParams = {}) =>
+  serviceRegisterModule = (
+    data: RegisterModuleDto,
+    params: RequestParams = {},
+  ) =>
     this.request<void, any>({
       path: `/api/service/register-module`,
-      method: 'POST',
+      method: "POST",
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params
+      ...params,
     });
 }

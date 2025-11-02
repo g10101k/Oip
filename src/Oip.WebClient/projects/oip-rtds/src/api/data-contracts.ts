@@ -12,13 +12,13 @@
 
 /** Defines the data types supported for tags */
 export enum TagTypes {
-  Float32 = 'Float32',
-  Float64 = 'Float64',
-  Int16 = 'Int16',
-  Int32 = 'Int32',
-  Digital = 'Digital',
-  String = 'String',
-  Blob = 'Blob'
+  Float32 = "Float32",
+  Float64 = "Float64",
+  Int16 = "Int16",
+  Int32 = "Int32",
+  Digital = "Digital",
+  String = "String",
+  Blob = "Blob",
 } /** Request model for applying a specific migration by name. */
 export interface ApplyMigrationRequest {
   /** The name of the migration to apply. */
@@ -63,13 +63,6 @@ Default `now()`; */
   valueCalculation?: string | null;
 }
 
-export interface InterfaceEntity {
-  id?: number;
-  name?: string | null;
-  description?: string | null;
-  tags?: TagEntity[] | null;
-}
-
 /** Data transfer object representing a database migration and its status. */
 export interface MigrationDto {
   /** Name of the migration. */
@@ -111,7 +104,7 @@ export interface SecurityResponse {
 }
 
 /** Represents the configuration and metadata of a tag. */
-export interface TagEntity {
+export interface TagDto {
   /** Unique identifier of the tag. */
   id?: number;
   /** Name of the tag. */
@@ -120,14 +113,13 @@ export interface TagEntity {
   valueType?: TagTypes;
   /** The interface associated with the tag. */
   interfaceId?: number | null;
-  interface?: InterfaceEntity;
   /** Description of the point (used as a comment or label). */
   descriptor?: string | null;
   /** Engineering units (e.g., °C, PSI, m³/h). */
   uom?: string | null;
   /** Reference to the source signal or channel tag. */
   instrumentTag?: string | null;
-  /** Indicates whether the point is archived. */
+  /** Indicates whether the tag is currently enabled. */
   enabled?: boolean;
   /** Indicates whether compression is enabled for this tag. */
   compressing?: boolean;

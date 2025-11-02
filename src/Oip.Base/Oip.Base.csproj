@@ -19,6 +19,12 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
+        <PackageReference Include="NSwag.CodeGeneration" Version="14.6.1" />
+        <PackageReference Include="NSwag.CodeGeneration.TypeScript" Version="14.6.1" />
+        <PackageReference Include="NSwag.Core" Version="14.6.1" />
+        <PackageReference Include="NJsonSchema" Version="11.5.1" />
+        <PackageReference Include="NJsonSchema.CodeGeneration" Version="11.5.1" />
+        <PackageReference Include="NJsonSchema.CodeGeneration.TypeScript" Version="11.5.1" />
         <PackageReference Include="Polly" Version="8.5.0" />
         <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
         <PackageReference Include="Riok.Mapperly" Version="4.1.1" />

@@ -1,10 +1,7 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Oip.Base.Settings;
 using Oip.Users.Clients;
 using Oip.Users.Contexts;
-using Oip.Users.Services;
 using Oip.Base.Extensions;
 
 namespace Oip.Users.Extensions;

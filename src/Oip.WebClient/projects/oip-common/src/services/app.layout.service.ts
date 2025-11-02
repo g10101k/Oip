@@ -1,5 +1,6 @@
 import { Injectable, effect, signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
+import { convertToPrimeNgDateFormat } from '../helpers/date.helper';
 
 export interface AppConfig {
   preset?: string;
@@ -8,6 +9,10 @@ export interface AppConfig {
   darkTheme?: boolean;
   menuMode?: string;
   language?: string;
+  dateFormat: string;
+  timeFormat: string;
+  dateTimeFormat: string;
+  timeZone: string;
 }
 
 interface LayoutState {
@@ -69,6 +74,32 @@ export class LayoutService {
 
   language = computed(() => this.layoutConfig().language);
 
+  dateFormat = computed(() => this.layoutConfig().dateFormat);
+
+  primeNgDateFormat = computed(() => convertToPrimeNgDateFormat(this.layoutConfig().dateFormat));
+
+  timeFormat = computed(() => this.layoutConfig().timeFormat);
+
+  dateTimeFormat = computed(() => `${this.layoutConfig().dateFormat} ${this.layoutConfig().timeFormat}`);
+
+  monthFormat = computed(() => {
+    const reDay = /d+/i;
+    const reDelimeter = /^[^\w]|[^\w]$|([^\w])\1+/;
+    const ngDateFormat = convertToPrimeNgDateFormat(this.layoutConfig().dateFormat);
+    const ngDate = ngDateFormat.replace(reDay, '');
+    const dateGroups = ngDate.match(reDelimeter);
+    if (Array.isArray(dateGroups) && dateGroups.length > 1) {
+      return dateGroups[1] !== undefined
+        ? ngDate.replace(dateGroups[0], '')
+        : ngDate.startsWith(dateGroups[0])
+          ? ngDate.substring(1)
+          : ngDate.substring(0, ngDate.length - 1);
+    }
+    return ngDateFormat;
+  });
+
+  timeZone = computed(() => this.layoutConfig().timeZone);
+
   transitionComplete = signal<boolean>(false);
 
   private initialized = false;
@@ -100,7 +131,9 @@ export class LayoutService {
   private getAppConfigFromStorage(): AppConfig {
     const appConfigUiString = localStorage.getItem('layoutConfig');
     if (appConfigUiString != null) {
-      return JSON.parse(appConfigUiString) as AppConfig;
+      const config = JSON.parse(appConfigUiString) as AppConfig;
+      config.timeZone ??= Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return config;
     }
     return {
       preset: 'Aura',
@@ -108,7 +141,11 @@ export class LayoutService {
       surface: null,
       darkTheme: false,
       menuMode: 'static',
-      language: 'en'
+      language: 'ru',
+      dateFormat: 'yyyy-MM-dd',
+      timeFormat: 'HH:mm:ss',
+      dateTimeFormat: 'yyyy-MM-dd HH:mm:ss',
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
   }
 
@@ -151,10 +188,7 @@ export class LayoutService {
 
   onMenuToggle() {
     if (this.isOverlay()) {
-      this.layoutState.update((prev) => ({
-        ...prev,
-        overlayMenuActive: !this.layoutState().overlayMenuActive
-      }));
+      this.layoutState.update((prev) => ({ ...prev, overlayMenuActive: !this.layoutState().overlayMenuActive }));
 
       if (this.layoutState().overlayMenuActive) {
         this.overlayOpen.next(null);
