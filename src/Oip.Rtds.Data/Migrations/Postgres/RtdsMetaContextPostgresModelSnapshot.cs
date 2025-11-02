@@ -10,8 +10,8 @@ using Oip.Rtds.Data.Contexts;
 
 namespace Oip.Rtds.Data.Postgres.Migrations
 {
-    [DbContext(typeof(RtdsMetaContext))]
-    partial class RtdsMetaContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(RtdsMetaContextPostgres))]
+    partial class RtdsMetaContextPostgresModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

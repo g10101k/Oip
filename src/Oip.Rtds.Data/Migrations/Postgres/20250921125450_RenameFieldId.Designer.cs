@@ -9,7 +9,7 @@ using Oip.Rtds.Data.Contexts;
 
 namespace Oip.Rtds.Data.Migrations.Postgres
 {
-    [DbContext(typeof(RtdsMetaContext))]
+    [DbContext(typeof(RtdsMetaContextPostgres))]
     [Migration("20250921125450_RenameFieldId")]
     partial class RenameFieldId
     {
