@@ -99,11 +99,11 @@ public class UserContext : DbContext
 /// <summary>
 /// Represents the SQL Server database context for user-related entities.
 /// </summary>
-public class UserContextSqlServer(DbContextOptions<UserContext> options, bool designTime = false)
+public class UserContextSqlServer(DbContextOptions<UserContext> options, bool designTime = true)
     : UserContext(options, designTime);
 
 /// <summary>
 /// Represents the PostgreSQL database context for user-related entities.
 /// </summary>
-public class UserContextPostgres(DbContextOptions<UserContext> options, bool designTime = false)
+public class UserContextPostgres(DbContextOptions<UserContext> options, bool designTime = true)
     : UserContext(options, designTime);

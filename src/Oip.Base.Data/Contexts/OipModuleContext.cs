@@ -85,11 +85,11 @@ public class OipModuleContext : DbContext
 /// <summary>
 /// Represents the SQL Server database context for user-related entities.
 /// </summary>
-public class OipModuleContextSqlServer(DbContextOptions<OipModuleContext> options, bool designTime = false)
+public class OipModuleContextSqlServer(DbContextOptions<OipModuleContext> options, bool designTime = true)
     : OipModuleContext(options, designTime);
 
 /// <summary>
 /// Represents the PostgreSQL database context for user-related entities.
 /// </summary>
-public class OipModuleContextPostgres(DbContextOptions<OipModuleContext> options, bool designTime = false)
+public class OipModuleContextPostgres(DbContextOptions<OipModuleContext> options, bool designTime = true)
     : OipModuleContext(options, designTime);

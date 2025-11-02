@@ -173,7 +173,7 @@ namespace Oip.Base.Data.Postgres.Migrations
 
                     b.Property<byte[]>("Photo")
                         .HasColumnType("bytea")
-                        .HasComment("");
+                        .HasComment("User photo");
 
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()

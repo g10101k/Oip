@@ -9,6 +9,7 @@ public class UserEntity
     /// User id
     /// </summary>
     public int UserId { get; set; }
+
     /// <summary>
     /// E-mail
     /// </summary>
