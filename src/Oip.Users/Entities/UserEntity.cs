@@ -1,4 +1,3 @@
-using Oip.Base.Clients;
 using UserRepresentation = Oip.Users.Clients.UserRepresentation;
 
 namespace Oip.Users.Entities;
