@@ -3,27 +3,28 @@ using Microsoft.Extensions.Logging;
 
 namespace Oip.Base.Runtime;
 
-public class StartupRunner : IStartupRunner
+/// <summary>
+/// Runner for startup tasks.
+/// </summary>
+public class StartupRunner(
+    IEnumerable<IStartupTask> startupTasks,
+    IServiceScopeFactory scopeFactory,
+    ILogger<StartupRunner> logger) : IStartupRunner
 {
-    private readonly ILogger<StartupRunner> _logger;
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ICollection<Type> _startupTaskTypes;
-
-    public StartupRunner(IEnumerable<IStartupTask> startupTasks, IServiceScopeFactory scopeFactory,
-        ILogger<StartupRunner> logger)
-    {
-        _scopeFactory = scopeFactory;
-        _logger = logger;
-        _startupTaskTypes = startupTasks.OrderBy(x => x.Order).Select(x => x.GetType()).ToList();
-    }
-
+    /// <summary>
+    /// Executes startup tasks in order.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task StartupAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var startupTaskType in _startupTaskTypes)
+        var startupTaskTypes = startupTasks.OrderBy(x => x.Order).Select(x => x.GetType()).ToList();
+
+        foreach (var startupTaskType in startupTaskTypes)
         {
-            using var scope = _scopeFactory.CreateScope();
+            using var scope = scopeFactory.CreateScope();
             var startupTask = (IStartupTask)scope.ServiceProvider.GetRequiredService(startupTaskType);
-            _logger.LogInformation("Running startup task {StartupTaskName}", startupTaskType.Name);
+            logger.LogInformation("Running startup task {StartupTaskName}", startupTaskType.Name);
             await startupTask.ExecuteAsync(cancellationToken);
         }
     }
