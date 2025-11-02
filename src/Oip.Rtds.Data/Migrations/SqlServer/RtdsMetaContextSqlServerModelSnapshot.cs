@@ -24,22 +24,20 @@ namespace Oip.Rtds.SqlServer.Migrations
 
             modelBuilder.Entity("Oip.Rtds.Data.Entities.InterfaceEntity", b =>
                 {
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
-
-                    b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -51,89 +49,94 @@ namespace Oip.Rtds.SqlServer.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasComment("Unique identifier of the tag.");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Compressing")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasComment("Indicates whether compression is enabled for this tag.");
 
                     b.Property<long?>("CompressionMaxTime")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasComment("Maximum time (in milliseconds) between compressed values.");
 
                     b.Property<long?>("CompressionMinTime")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasComment("Minimum time (in milliseconds) between compressed values.\n            Values received within this period are discarded, regardless of their error margin.");
 
                     b.Property<DateTimeOffset>("CreationDate")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetimeoffset")
+                        .HasComment("Date and time when the tag was created.");
 
                     b.Property<string>("Creator")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(256)")
+                        .HasComment("User or process that created the tag.");
 
                     b.Property<string>("Descriptor")
                         .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasColumnType("nvarchar(1024)")
+                        .HasComment("Description of the point (used as a comment or label).");
 
                     b.Property<string>("DigitalSet")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Associated digital state set name (for digital-type points).");
 
                     b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasComment("Indicates whether the point is archived.");
 
                     b.Property<string>("ErrorCalculation")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Formula used to calculate error values for the tag.");
 
                     b.Property<string>("InstrumentTag")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Reference to the source signal or channel tag.");
 
                     b.Property<long?>("InterfaceId")
                         .HasMaxLength(128)
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasComment("The interface associated with the tag.");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)");
+                        .HasColumnType("nvarchar(512)")
+                        .HasComment("Name of the tag.");
 
                     b.Property<bool>("Step")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasComment("Indicates whether values are treated as step (true) or interpolated (false).");
 
                     b.Property<string>("TimeCalculation")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Formula used to calculate the time associated with the tag's value.\n            Default `now()`;");
 
                     b.Property<string>("Uom")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Engineering units (e.g., °C, PSI, m³/h).");
 
                     b.Property<string>("ValueCalculation")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("User-defined calculation or formula associated with the tag's value.");
 
                     b.Property<int>("ValueType")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasComment("Data type of the point (e.g., Float32, Int32, Digital, String, Blob).");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InterfaceId");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Tag", "rtds");
-                });
-
-            modelBuilder.Entity("Oip.Rtds.Data.Entities.TagEntity", b =>
-                {
-                    b.HasOne("Oip.Rtds.Data.Entities.InterfaceEntity", "Interface")
-                        .WithMany("Tags")
-                        .HasForeignKey("InterfaceId");
-
-                    b.Navigation("Interface");
-                });
-
-            modelBuilder.Entity("Oip.Rtds.Data.Entities.InterfaceEntity", b =>
-                {
-                    b.Navigation("Tags");
+                    b.ToTable("Tag", "rtds", t =>
+                        {
+                            t.HasComment("Represents the configuration and metadata of a tag.");
+                        });
                 });
 #pragma warning restore 612, 618
         }

@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Rtds.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Rtds.Data.Postgres.Migrations
+namespace Oip.Rtds.Data.Migrations.Postgres
 {
     [DbContext(typeof(RtdsMetaContextPostgres))]
-    partial class RtdsMetaContextPostgresModelSnapshot : ModelSnapshot
+    [Migration("20251102175541_AddComment_Postgres")]
+    partial class AddComment_Postgres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

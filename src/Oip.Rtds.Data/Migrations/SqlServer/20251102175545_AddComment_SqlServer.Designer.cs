@@ -2,42 +2,45 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Rtds.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Rtds.Data.Postgres.Migrations
+namespace Oip.Rtds.Data.Migrations.SqlServer
 {
-    [DbContext(typeof(RtdsMetaContextPostgres))]
-    partial class RtdsMetaContextPostgresModelSnapshot : ModelSnapshot
+    [DbContext(typeof(RtdsMetaContextSqlServer))]
+    [Migration("20251102175545_AddComment_SqlServer")]
+    partial class AddComment_SqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.11")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Oip.Rtds.Data.Entities.InterfaceEntity", b =>
                 {
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
+                        .HasColumnType("nvarchar(512)");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -52,10 +55,10 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                         .HasColumnType("bigint")
                         .HasComment("Unique identifier of the tag.");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Compressing")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Indicates whether compression is enabled for this tag.");
 
                     b.Property<long?>("CompressionMaxTime")
@@ -67,34 +70,34 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                         .HasComment("Minimum time (in milliseconds) between compressed values.\n            Values received within this period are discarded, regardless of their error margin.");
 
                     b.Property<DateTimeOffset>("CreationDate")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetimeoffset")
                         .HasComment("Date and time when the tag was created.");
 
                     b.Property<string>("Creator")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("nvarchar(256)")
                         .HasComment("User or process that created the tag.");
 
                     b.Property<string>("Descriptor")
                         .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
+                        .HasColumnType("nvarchar(1024)")
                         .HasComment("Description of the point (used as a comment or label).");
 
                     b.Property<string>("DigitalSet")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Associated digital state set name (for digital-type points).");
 
                     b.Property<bool>("Enabled")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Indicates whether the point is archived.");
 
                     b.Property<string>("ErrorCalculation")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Formula used to calculate error values for the tag.");
 
                     b.Property<string>("InstrumentTag")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Reference to the source signal or channel tag.");
 
                     b.Property<long?>("InterfaceId")
@@ -105,27 +108,27 @@ namespace Oip.Rtds.Data.Postgres.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("Name of the tag.");
 
                     b.Property<bool>("Step")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Indicates whether values are treated as step (true) or interpolated (false).");
 
                     b.Property<string>("TimeCalculation")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Formula used to calculate the time associated with the tag's value.\n            Default `now()`;");
 
                     b.Property<string>("Uom")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Engineering units (e.g., °C, PSI, m³/h).");
 
                     b.Property<string>("ValueCalculation")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("User-defined calculation or formula associated with the tag's value.");
 
                     b.Property<int>("ValueType")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Data type of the point (e.g., Float32, Int32, Digital, String, Blob).");
 
                     b.HasKey("Id");

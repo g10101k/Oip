@@ -81,7 +81,7 @@ No raw user input is interpolated into SQL
 For *nix system:
 
 ````shell
-migration_name=InitialMigration
+migration_name=MigrationName
 dotnet ef migrations add "${migration_name}_Postgres" --context RtdsMetaContextPostgres --project ./../Oip.Rtds.Data --output-dir Migrations/Postgres -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
 dotnet ef migrations add "${migration_name}_SqlServer" --context RtdsMetaContextSqlServer --project ./../Oip.Rtds.Data --output-dir Migrations/SqlServer -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
 ````
