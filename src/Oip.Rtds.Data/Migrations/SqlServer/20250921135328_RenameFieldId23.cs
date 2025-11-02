@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Rtds.SqlServer.Migrations
+namespace Oip.Rtds.Data.Migrations.SqlServer
 {
     /// <inheritdoc />
     public partial class RenameFieldId23 : Migration

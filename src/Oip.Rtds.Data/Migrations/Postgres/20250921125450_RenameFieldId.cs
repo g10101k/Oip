@@ -1,10 +1,9 @@
-﻿using System;
+﻿#nullable disable
+
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-#nullable disable
-
-namespace Oip.Rtds.Data.Postgres.Migrations
+namespace Oip.Rtds.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class RenameFieldId : Migration
