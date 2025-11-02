@@ -5,27 +5,27 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
 
-namespace Oip.Users.Contexts;
+namespace Oip.Base.Data.Contexts;
 #pragma warning disable EF1001
 
 /// <summary>
 /// Represents a migration assembly for the user context that handles database migrations for both SQL Server and PostgreSQL.
 /// </summary>
-public class UserContextMigrationAssembly : MigrationsAssembly
+public class BaseContextMigrationAssembly<TContextSqlServer, TContextPostgres> : MigrationsAssembly
 {
     private readonly IDiagnosticsLogger<DbLoggerCategory.Migrations> _logger;
     private readonly ICurrentDbContext _currentContext;
     private IReadOnlyDictionary<string, TypeInfo>? _migration;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="UserContextMigrationAssembly"/> class.
+    /// Initializes a new instance of the <see cref="BaseContextMigrationAssembly{TContextSqlServer,TContextPostgres}"/> class.
     /// </summary>
     /// <param name="currentContext">The current database context.</param>
     /// <param name="options">The database context options.</param>
     /// <param name="idGenerator">The migration ID generator.</param>
     /// <param name="logger">The diagnostics logger for migrations.</param>
     /// <inheritdoc />
-    public UserContextMigrationAssembly(ICurrentDbContext currentContext, IDbContextOptions options,
+    public BaseContextMigrationAssembly(ICurrentDbContext currentContext, IDbContextOptions options,
         IMigrationsIdGenerator idGenerator, IDiagnosticsLogger<DbLoggerCategory.Migrations> logger)
         : base(currentContext, options, idGenerator, logger)
     {
@@ -51,7 +51,7 @@ public class UserContextMigrationAssembly : MigrationsAssembly
     {
         var result = new SortedList<string, TypeInfo>();
         var isSqlServer = _currentContext.Context.Database.IsSqlServer();
-        var contextType = isSqlServer ? typeof(UserContextSqlServer) : typeof(UserContextPostgres);
+        var contextType = isSqlServer ? typeof(TContextSqlServer) : typeof(TContextPostgres);
 
         var items = from t in Assembly.GetTypes()
             where t.IsSubclassOf(typeof(Migration))
