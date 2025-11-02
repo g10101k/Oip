@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Settings.Enums;
+using Oip.Settings.Models;
 
 namespace Oip.Settings;
 
@@ -14,20 +15,14 @@ public class AppSettingsOptions
     [Obsolete("Will be removed in further releases. Use \"ProgramArguments\" instead")]
     public string[] ProgrammeArguments
     {
-        get
-        {
-            return ProgramArguments;
-        }
-        set
-        {
-            ProgramArguments = value;
-        }
+        get => ProgramArguments;
+        set => ProgramArguments = value;
     }
 
     /// <summary>
     /// Program arguments for settings
     /// </summary>
-    public string[] ProgramArguments { get; set; } = Array.Empty<string>();
+    public string[] ProgramArguments { get; set; } = [];
 
     /// <summary>
     /// JSON file name
@@ -38,11 +33,11 @@ public class AppSettingsOptions
     /// JSON file name (development)
     /// </summary>
     public string JsonFileNameDevelopment { get; set; } = "appsettings.Development.json";
-    
+
     /// <summary>
     /// Exclude migration (table create from root app)
     /// </summary>
-    public bool ExcludeMigration { get; set; } 
+    public bool ExcludeMigration { get; set; }
 
     private string _appSettingsSchema = "settings";
 
