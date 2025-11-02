@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Extensions;
 using Oip.Rtds.Data.Entities;
 using Oip.Rtds.Data.EntityConfigurations;
@@ -57,6 +59,9 @@ public class RtdsMetaContext : DbContext
     /// </exception>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder
+            .ReplaceService<IMigrationsAssembly,
+                BaseContextMigrationAssembly<RtdsMetaContextSqlServer, RtdsMetaContextPostgres>>();
         if (!optionsBuilder.IsConfigured)
             throw new InvalidOperationException("OnConfiguring error");
     }
@@ -71,7 +76,18 @@ public class RtdsMetaContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new TagEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new InterfaceEntityConfiguration(Database, _designTime));
-        
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }
 }
+
+/// <summary>
+/// Represents the SQL Server database context for user-related entities.
+/// </summary>
+public class RtdsMetaContextSqlServer(DbContextOptions<RtdsMetaContext> options, bool designTime = true)
+    : RtdsMetaContext(options, designTime);
+
+/// <summary>
+/// Represents the PostgreSQL database context for user-related entities.
+/// </summary>
+public class RtdsMetaContextPostgres(DbContextOptions<RtdsMetaContext> options, bool designTime = true)
+    : RtdsMetaContext(options, designTime);
