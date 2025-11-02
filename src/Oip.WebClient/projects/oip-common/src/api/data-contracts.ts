@@ -129,9 +129,9 @@ export interface ModuleInstanceDto {
 /** Module security DTO */
 export interface ModuleSecurityDto {
   /** Right */
-  right?: string | null;
+  right: string | null;
   /** Role */
-  role?: string | null;
+  role: string | null;
 }
 
 /** Put security dto */
@@ -175,12 +175,4 @@ export interface FolderModuleGetModuleInstanceSettingsParams {
 export interface MenuDeleteModuleInstanceParams {
   /** The unique identifier of the module instance to delete. */
   id?: number;
-}
-
-export interface UserProfileGetUserPhotoParams {
-  email?: string;
-}
-
-export interface UserProfilePostUserPhotoPayload {
-  files?: File;
 }
