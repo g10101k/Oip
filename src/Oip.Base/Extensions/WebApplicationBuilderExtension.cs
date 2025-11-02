@@ -14,7 +14,6 @@ namespace Oip.Base.Extensions;
 /// </summary>
 public static class WebApplicationBuilderExtension
 {
-
     /// <summary>
     /// Applies any pending migrations for the OIP module context and registers discovered modules from loaded assemblies.
     /// </summary>
@@ -95,7 +94,7 @@ public static class WebApplicationBuilderExtension
 
         return result;
     }
-    
+
     /// <summary>
     /// Asynchronously retrieves a list of all loaded module types from the currently loaded assemblies.
     /// </summary>
