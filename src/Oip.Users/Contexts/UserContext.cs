@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Extensions;
 using Oip.Users.Entities;
 using Oip.Users.EntityConfigurations;
@@ -49,7 +50,9 @@ public class UserContext : DbContext
     /// </exception>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.ReplaceService<IMigrationsAssembly, UserContextMigrationAssembly>();
+        optionsBuilder
+            .ReplaceService<IMigrationsAssembly,
+                BaseContextMigrationAssembly<UserContextSqlServer, UserContextPostgres>>();
 
         if (!optionsBuilder.IsConfigured)
             throw new InvalidOperationException("OnConfiguring error");
