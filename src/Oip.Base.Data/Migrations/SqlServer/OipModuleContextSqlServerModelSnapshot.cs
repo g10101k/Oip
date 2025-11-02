@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oip.Base.Data.Contexts;
 
@@ -11,12 +10,10 @@ using Oip.Base.Data.Contexts;
 
 namespace Oip.Base.Data.SqlServer.Migrations
 {
-    [DbContext(typeof(OipModuleContext))]
-    [Migration("20250518130749_AddComment")]
-    partial class AddComment
+    [DbContext(typeof(OipModuleContextSqlServer))]
+    partial class OipModuleContextSqlServerModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

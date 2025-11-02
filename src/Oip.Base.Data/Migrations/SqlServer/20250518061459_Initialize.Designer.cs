@@ -9,9 +9,9 @@ using Oip.Base.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Base.Data.SqlServer.Migrations
+namespace Oip.Base.Data.Migrations.SqlServer
 {
-    [DbContext(typeof(OipModuleContext))]
+    [DbContext(typeof(OipModuleContextSqlServer))]
     [Migration("20250518061459_Initialize")]
     partial class Initialize
     {

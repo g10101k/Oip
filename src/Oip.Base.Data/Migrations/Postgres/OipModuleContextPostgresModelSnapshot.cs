@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Base.Data.Contexts;
@@ -11,12 +10,10 @@ using Oip.Base.Data.Contexts;
 
 namespace Oip.Base.Data.Postgres.Migrations
 {
-    [DbContext(typeof(OipModuleContext))]
-    [Migration("20250518130745_AddComment")]
-    partial class AddComment
+    [DbContext(typeof(OipModuleContextPostgres))]
+    partial class OipModuleContextPostgresModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

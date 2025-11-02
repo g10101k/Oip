@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Oip.Base.Data.SqlServer.Migrations
+namespace Oip.Base.Data.Migrations.SqlServer
 {
     /// <inheritdoc />
     public partial class Initialize : Migration

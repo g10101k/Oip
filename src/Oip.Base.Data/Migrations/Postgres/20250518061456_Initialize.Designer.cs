@@ -11,7 +11,7 @@ using Oip.Base.Data.Contexts;
 
 namespace Oip.Base.Data.Postgres.Migrations
 {
-    [DbContext(typeof(OipModuleContext))]
+    [DbContext(typeof(OipModuleContextPostgres))]
     [Migration("20250518061456_Initialize")]
     partial class Initialize
     {
