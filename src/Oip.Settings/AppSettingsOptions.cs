@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Settings.Enums;
-using Oip.Settings.Models;
 
 namespace Oip.Settings;
 

@@ -21,4 +21,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public SecurityServiceSettings SecurityService { get; set; } = new();
-};
+
+    /// <inheritdoc />
+    public List<ApiGenerationSettings> ApiGenerationSettings { get; set; } = new();
+}
