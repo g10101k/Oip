@@ -40,5 +40,14 @@ public class TagEntityConfiguration : IEntityTypeConfiguration<TagEntity>
         entity.Property(e => e.InterfaceId).HasMaxLength(128);
         entity.Property(e => e.Creator).HasMaxLength(256);
         entity.Property(e => e.Descriptor).HasMaxLength(1024);
+
+        if (_designTime)
+        {
+            entity.Ignore(e => e.Interface);
+        }
+        else
+        {
+            entity.HasOne(e => e.Interface).WithMany(e => e.Tags).HasForeignKey(e => e.InterfaceId);
+        }
     }
 }
