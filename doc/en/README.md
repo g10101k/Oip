@@ -26,6 +26,8 @@ Subsequent runs can be performed using:
 # Concepts
 
 * [Modules](./Modules.md)
+* [Swagger WebClient Generator](./SwaggerWebClientGenerator.md)
+
 
 # Known Issues
 

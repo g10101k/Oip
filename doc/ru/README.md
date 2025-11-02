@@ -27,7 +27,7 @@
 
 * [Модули](./Modules.md)
 * [Локализация](./L10n.md)
-
+* [Генерация клиентов web api](./SwaggerWebClientGenerator.md)
 
 # Известные проблемы
 
