@@ -31,7 +31,7 @@ public class TagService
             ErrorCalculation = x.ErrorCalculation ?? string.Empty,
             TimeCalculation = x.TimeCalculation ?? string.Empty,
             ValueCalculation = x.ValueCalculation ?? string.Empty,
-            ValueType = (Oip.Rtds.Grpc.TagTypes)x.ValueType,
+            ValueType = (TagTypes)x.ValueType,
         });
         var response = new GetTagsResponse();
         response.Tags.AddRange(tags);
