@@ -3,14 +3,14 @@ import { BaseModuleComponent, NoSettingsDto, SecurityComponent } from 'oip-commo
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, SelectItem, SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
-import { DatePipe, NgIf } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { TagManagementModule } from '../../../api/TagManagementModule';
 import { SelectModule } from 'primeng/select';
 import { Checkbox } from 'primeng/checkbox';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
-import { CreateTagDto, TagEntity, TagTypes } from '../../../api/data-contracts';
+import { CreateTagDto, TagDto, TagTypes } from '../../../api/data-contracts';
 import { FormsModule } from '@angular/forms';
 import { Tooltip } from 'primeng/tooltip';
 import { Textarea } from 'primeng/textarea';
@@ -26,7 +26,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
   templateUrl: './tag-management.component.html',
   providers: [TagManagementModule, ConfirmationService],
   imports: [
-    NgIf,
     TableModule,
     SharedModule,
     TagModule,
@@ -52,9 +51,9 @@ export class TagManagement extends BaseModuleComponent<NoSettingsDto, NoSettings
   controller: string = 'tag-management';
   tagManagementModuleDataService = inject(TagManagementModule);
   protected readonly confirmationService: ConfirmationService = inject(ConfirmationService);
-  tags: TagEntity[] = [];
-  selectedTag: TagEntity;
-  createTag: TagEntity = {} as TagEntity;
+  tags: TagDto[] = [];
+  selectedTag: TagDto;
+  createTag: TagDto = {} as TagDto;
   valueTypeOptions: SelectItem[] = Object.keys(TagTypes).map((key) => ({
     label: TagTypes[key as keyof typeof TagTypes],
     value: TagTypes[key as keyof typeof TagTypes]
@@ -104,7 +103,7 @@ export class TagManagement extends BaseModuleComponent<NoSettingsDto, NoSettings
     }
   }
 
-  deleteTag(tag: TagEntity) {
+  deleteTag(tag: any) {
     this.confirmationService.confirm({
       header: 'Warning',
       icon: 'pi pi-trash',
