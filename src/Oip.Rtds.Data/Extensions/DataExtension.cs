@@ -22,7 +22,6 @@ public static class DataExtension
     public static IServiceCollection AddRtdsData(this IServiceCollection services, IBaseOipModuleAppSettings settings)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
-        services.AddScoped<RtdsContext>();
         switch (connectionModel.Provider)
         {
             case XpoProvider.Postgres:
@@ -33,7 +32,6 @@ public static class DataExtension
                         {
                             x.MigrationsHistoryTable(RtdsMetaContext.MigrationHistoryTableName,
                                 RtdsMetaContext.SchemaName);
-                            x.MigrationsAssembly("Oip.Rtds.Data.Postgres");
                         });
                 });
                 break;
@@ -45,7 +43,6 @@ public static class DataExtension
                         {
                             x.MigrationsHistoryTable(RtdsMetaContext.MigrationHistoryTableName,
                                 RtdsMetaContext.SchemaName);
-                            x.MigrationsAssembly("Oip.Rtds.Data.SqlServer");
                         });
                 });
                 break;
