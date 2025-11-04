@@ -29,30 +29,19 @@ public static class ServiceCollectionExtension
                 {
                     switch (connectionModel.Provider)
                     {
-                        case XpoProvider.SQLite:
-                            option.UseSqlite(connectionModel.NormalizeConnectionString,
-                                x => { x.MigrationsHistoryTable(migrationHistoryTableName); });
-                            break;
                         case XpoProvider.Postgres:
                             option.UseNpgsql(connectionModel.NormalizeConnectionString,
                                 x =>
                                 {
-                                    x.MigrationsAssembly("Oip.Base.Data.Postgres");
                                     x.MigrationsHistoryTable(migrationHistoryTableName, migrationHistorySchemaName);
-                                    x.MigrationsAssembly("Oip.Base.Data.Postgres");
                                 });
                             break;
                         case XpoProvider.MSSqlServer:
                             option.UseSqlServer(connectionModel.NormalizeConnectionString,
                                 x =>
                                 {
-                                    x.MigrationsAssembly("Oip.Base.Data.SqlServer");
                                     x.MigrationsHistoryTable(migrationHistoryTableName, migrationHistorySchemaName);
-                                    x.MigrationsAssembly("Oip.Base.Data.SqlServer");
                                 });
-                            break;
-                        default:
-                            option.UseInMemoryDatabase(connectionModel.NormalizeConnectionString);
                             break;
                     }
                 }

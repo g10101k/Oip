@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oip.Users.Contexts;
 
 #nullable disable
 
-namespace Oip.Users.Data.Migrations.SqlServer
+namespace Oip.Users.Migrations.SqlServer
 {
     [DbContext(typeof(UserContextSqlServer))]
-    partial class UserContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20251102171617_AddCommentAndPrimaryKeyHook_SqlServer")]
+    partial class AddCommentAndPrimaryKeyHook_SqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

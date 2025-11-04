@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Extensions;
 using Oip.Users.Entities;
 using Oip.Users.EntityConfigurations;
@@ -49,7 +50,9 @@ public class UserContext : DbContext
     /// </exception>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.ReplaceService<IMigrationsAssembly, UserContextMigrationAssembly>();
+        optionsBuilder
+            .ReplaceService<IMigrationsAssembly,
+                BaseContextMigrationAssembly<UserContextSqlServer, UserContextPostgres>>();
 
         if (!optionsBuilder.IsConfigured)
             throw new InvalidOperationException("OnConfiguring error");
@@ -96,11 +99,11 @@ public class UserContext : DbContext
 /// <summary>
 /// Represents the SQL Server database context for user-related entities.
 /// </summary>
-public class UserContextSqlServer(DbContextOptions<UserContext> options, bool designTime = false)
+public class UserContextSqlServer(DbContextOptions<UserContext> options, bool designTime = true)
     : UserContext(options, designTime);
 
 /// <summary>
 /// Represents the PostgreSQL database context for user-related entities.
 /// </summary>
-public class UserContextPostgres(DbContextOptions<UserContext> options, bool designTime = false)
+public class UserContextPostgres(DbContextOptions<UserContext> options, bool designTime = true)
     : UserContext(options, designTime);

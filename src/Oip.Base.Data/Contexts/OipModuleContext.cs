@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Oip.Base.Data.Entities;
 using Oip.Base.Data.EntityConfigurations;
 using Oip.Base.Data.Extensions;
@@ -60,6 +61,9 @@ public class OipModuleContext : DbContext
     /// </summary>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder
+            .ReplaceService<IMigrationsAssembly,
+                BaseContextMigrationAssembly<OipModuleContextSqlServer, OipModuleContextPostgres>>();
         if (!optionsBuilder.IsConfigured)
             throw new InvalidOperationException("OnConfiguring error");
     }
@@ -77,3 +81,15 @@ public class OipModuleContext : DbContext
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }
 }
+
+/// <summary>
+/// Represents the SQL Server database context for user-related entities.
+/// </summary>
+public class OipModuleContextSqlServer(DbContextOptions<OipModuleContext> options, bool designTime = true)
+    : OipModuleContext(options, designTime);
+
+/// <summary>
+/// Represents the PostgreSQL database context for user-related entities.
+/// </summary>
+public class OipModuleContextPostgres(DbContextOptions<OipModuleContext> options, bool designTime = true)
+    : OipModuleContext(options, designTime);

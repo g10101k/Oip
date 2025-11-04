@@ -24,8 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Oip.Base.Data.Postgres\Oip.Base.Data.Postgres.csproj" />
-        <ProjectReference Include="..\Oip.Base.Data.SqlServer\Oip.Base.Data.SqlServer.csproj" />
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
         <ProjectReference Include="..\Oip.Base.Data\Oip.Base.Data.csproj" />
     </ItemGroup>
