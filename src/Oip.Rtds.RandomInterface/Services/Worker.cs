@@ -2,13 +2,12 @@ using System.Text;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Oip.Rtds.Grpc;
-using Oip.Rtds.Random.Settings;
+using Oip.Rtds.RandomInterface.Settings;
 
-namespace Oip.Rtds.Random.Services;
+namespace Oip.Rtds.RandomInterface.Services;
 
 public class Worker(ILogger<Worker> logger, IServiceScopeFactory scopeFactory) : BackgroundService
 {
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -30,7 +29,7 @@ public class Worker(ILogger<Worker> logger, IServiceScopeFactory scopeFactory) :
 
                 using var call = client.Subscribe(request);
                 var responseStream = call.ResponseStream;
-                
+
                 await foreach (var eventMessage in responseStream.ReadAllAsync(cancellationToken: stoppingToken))
                 {
                     DisplayEvent(eventMessage);

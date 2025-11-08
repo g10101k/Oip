@@ -1,0 +1,117 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Oip.Rtds.Grpc";
+
+package events;
+
+service RtdsService {
+  rpc Subscribe (SubscribeRequest) returns (stream EventMessage);
+  rpc Publish (PublishRequest) returns (PublishResponse);
+  rpc GetTags (GetTagsRequest) returns (GetTagsResponse);
+  rpc WriteData (WriteDataRequest) returns (WriteDataResponse);
+}
+
+message SubscribeRequest {
+  string client_id = 1;
+  repeated string event_types = 2;
+}
+
+message EventMessage {
+  string event_id = 1;
+  string event_type = 2;
+  string payload = 3;
+  string timestamp = 4;
+}
+
+message PublishRequest {
+  string event_type = 1;
+  string payload = 2;
+}
+
+message PublishResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetTagsRequest {
+  uint32 interface_id = 1;
+}
+
+// Defines the data types supported for tags
+enum TagTypes {
+  FLOAT32 = 0;
+  FLOAT64 = 1;
+  INT16 = 2;
+  INT32 = 3;
+  DIGITAL = 4;
+  STRING = 5;
+  BLOB = 6;
+}
+
+// Represents the status of a tag value.
+enum TagValueStatus {
+  // The value is valid and good.
+  GOOD = 0;
+  // The value is questionable; may be from a backup source or have quality issues.
+  QUESTIONABLE = -1;
+  // The value was substituted (e.g., manually or by a system process).
+  SUBSTITUTED = -2;
+  // The value was interpolated between two known data points.
+  INTERPOLATED = -3;
+  // No data is available for the requested time or range.
+  NO_DATA = -4;
+  // The data source or interface returned a bad or corrupt value.
+  BAD = -5;
+  // The PI Server or interface was shut down.
+  SHUTDOWN = -6;
+  // A calculation failed, e.g., in a formula tag.
+  CALC_FAILED = -7;
+  // Data was expected but did not arrive in time.
+  TIMEOUT = -8;
+  // The value is outside of the configured low or high range.
+  OUT_OF_RANGE = -9;
+}
+
+message TagResponse {
+  optional uint32 id = 1;
+  string name = 2;
+  TagTypes value_type = 3;
+  optional uint32 interface_id = 4;
+  optional string instrument_tag = 7;
+  bool compressing = 9;
+  optional uint32 compression_min_time = 10;
+  optional uint32 compression_max_time = 11;
+  optional string digital_set = 12;
+  optional string time_calculation = 14;
+  optional string error_calculation = 15;
+  optional string value_calculation = 16;
+  google.protobuf.Timestamp valueTime = 17;
+  oneof value {
+    double double_value = 18;
+    int32 int32_value = 19;
+  };
+}
+
+message GetTagsResponse {
+  repeated TagResponse tags = 1;
+}
+
+message WriteDataTag {
+  uint32 id = 1;
+  google.protobuf.Timestamp time = 2;
+  TagValueStatus status = 3;
+  oneof value {
+    double double_value = 4;
+    int32 int32_value = 5;
+  };
+}
+
+message WriteDataRequest {
+  repeated WriteDataTag tags = 1;
+}
+
+message WriteDataResponse {
+  bool success = 1;
+  optional string error = 2;
+}

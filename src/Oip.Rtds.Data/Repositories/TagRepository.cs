@@ -3,7 +3,7 @@ using Oip.Base.Services;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Entities;
-using Oip.Rtds.Data.Enums;
+using Oip.Rtds.Grpc;
 
 namespace Oip.Rtds.Data.Repositories;
 
@@ -49,7 +49,7 @@ public class TagRepository
             {
                 Name = createTag.Name,
                 ValueType = createTag.ValueType,
-                InterfaceId = createTag.Interface,
+                InterfaceId = createTag.InterfaceId,
                 Descriptor = createTag.Descriptor,
                 Uom = createTag.Uom,
                 InstrumentTag = createTag.InstrumentTag,
@@ -160,7 +160,7 @@ public class TagRepository
                      throw new InvalidOperationException("Tag not found");
         entity.Name = dto.Name;
         entity.ValueType = dto.ValueType;
-        entity.InterfaceId = dto.Interface;
+        entity.InterfaceId = dto.InterfaceId;
         entity.Descriptor = dto.Descriptor;
         entity.Uom = dto.Uom;
         entity.InstrumentTag = dto.InstrumentTag;
@@ -185,6 +185,6 @@ public class TagRepository
     public IEnumerable<TagEntity> GetTagsByInterfaceId(uint requestInterfaceId)
     {
         return _rtdsMetaContext.Tags
-            .Where(x => x.InterfaceId == requestInterfaceId).AsNoTracking();
+            .Where(x => x.InterfaceId == requestInterfaceId && x.Enabled).AsNoTracking();
     }
 }

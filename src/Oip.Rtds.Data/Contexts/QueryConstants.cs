@@ -14,4 +14,7 @@ ENGINE = MergeTree
 PARTITION BY toYYYYMM(Time)
 ORDER BY (Id, Time);
 ";
+
+    public const string InsertIntoQuery = @"
+INSERT INTO data.{0}TagValue (Id, Time, Value, Status) VALUES {1}";
 }

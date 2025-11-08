@@ -48,7 +48,6 @@
           </p-toolbar>
         </div>
         <p-table
-          responsiveLayout="scroll"
           selectionMode="single"
           [paginator]="true"
           [rows]="10"
@@ -147,7 +146,9 @@
                   id="valueType"
                   optionLabel="label"
                   optionValue="value"
-                  [options]="valueTypeOptions"></p-select>
+                  [options]="valueTypeOptions"
+                  [(ngModel)]="selectedTag.valueType"
+                ></p-select>
               </div>
               <label class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0" for="uom">UOM</label>
               <div class="col-span-4 md:col-span-4">
@@ -228,13 +229,33 @@
             <div class="font-semibold text-xl">Calculations</div>
             <div class="grid col-span-1 md:col-span-1 gap-4">
               <div class="col-span-12 md:col-span-12">
-                <label class="flex items-center mb-2" for="errorCalculation">Error formula</label>
+                <label class="flex items-center mb-2" for="value-calculation">Value formula</label>
                 <textarea
+                  id="value-calculation"
+                  class="w-full"
+                  pTextarea
+                  [autoResize]="true"
+                  [(ngModel)]="selectedTag.valueCalculation"></textarea>
+              </div>
+              <div class="col-span-12 md:col-span-12">
+                <label class="flex items-center mb-2" for="time-calculation">Time formula</label>
+                <textarea
+                  id="time-calculation"
+                  class="w-full"
+                  pTextarea
+                  [autoResize]="true"
+                  [(ngModel)]="selectedTag.timeCalculation"></textarea>
+              </div>
+              <div class="col-span-12 md:col-span-12">
+                <label class="flex items-center mb-2" for="error-calculation">Error formula</label>
+                <textarea
+                  id="error-calculation"
                   class="w-full"
                   pTextarea
                   [autoResize]="true"
                   [(ngModel)]="selectedTag.errorCalculation"></textarea>
               </div>
+
             </div>
           </div>
 

@@ -49,6 +49,7 @@ public static class DataExtension
         }
         services.AddScoped<RtdsContext>();
         services.AddScoped<TagRepository>();
+        services.AddScoped<RtdsRepository>();
         return services;
     }
 }
