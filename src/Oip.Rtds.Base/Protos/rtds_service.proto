@@ -49,6 +49,30 @@ enum TagTypes {
   BLOB = 6;
 }
 
+// Represents the status of a tag value.
+enum TagValueStatus {
+  // The value is valid and good.
+  GOOD = 0;
+  // The value is questionable; may be from a backup source or have quality issues.
+  QUESTIONABLE = -1;
+  // The value was substituted (e.g., manually or by a system process).
+  SUBSTITUTED = -2;
+  // The value was interpolated between two known data points.
+  INTERPOLATED = -3;
+  // No data is available for the requested time or range.
+  NO_DATA = -4;
+  // The data source or interface returned a bad or corrupt value.
+  BAD = -5;
+  // The PI Server or interface was shut down.
+  SHUTDOWN = -6;
+  // A calculation failed, e.g., in a formula tag.
+  CALC_FAILED = -7;
+  // Data was expected but did not arrive in time.
+  TIMEOUT = -8;
+  // The value is outside of the configured low or high range.
+  OUT_OF_RANGE = -9;
+}
+
 message TagResponse {
   optional uint32 id = 1;
   string name = 2;
@@ -62,8 +86,11 @@ message TagResponse {
   optional string time_calculation = 14;
   optional string error_calculation = 15;
   optional string value_calculation = 16;
-  string value = 17;
-  google.protobuf.Timestamp valueTime = 18;
+  google.protobuf.Timestamp valueTime = 17;
+  oneof value {
+    double double_value = 18;
+    int32 int32_value = 19;
+  };
 }
 
 message GetTagsResponse {
@@ -72,8 +99,12 @@ message GetTagsResponse {
 
 message WriteDataTag {
   uint32 id = 1;
-  string value = 2;
-  google.protobuf.Timestamp time = 3;
+  google.protobuf.Timestamp time = 2;
+  TagValueStatus status = 3;
+  oneof value {
+    double double_value = 4;
+    int32 int32_value = 5;
+  };
 }
 
 message WriteDataRequest {

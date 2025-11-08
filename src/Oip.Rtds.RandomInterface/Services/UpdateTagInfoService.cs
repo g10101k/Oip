@@ -1,9 +1,10 @@
+using Grpc.Core;
 using Oip.Rtds.Base;
 using Oip.Rtds.Base.Services;
 using Oip.Rtds.Grpc;
-using Oip.Rtds.Random.Settings;
+using Oip.Rtds.RandomInterface.Settings;
 
-namespace Oip.Rtds.Random.Services;
+namespace Oip.Rtds.RandomInterface.Services;
 
 /// <summary>
 /// Service for updating tag information and formulas from RTDS data source
@@ -30,10 +31,11 @@ public class UpdateTagInfoService(
             InterfaceId = AppSettings.Instance.InterfaceId
         });
         tagCacheService.UpdateTags(tags.Tags);
-        foreach (TagResponse tag in tags.Tags)
+        foreach (var tag in tags.Tags)
         {
             logger.LogInformation("Tag: {Name}", tag.Name);
-            formulaManager.UpdateFormulas(tag.Id, tag.ValueCalculation, tag.TimeCalculation, tag.ErrorCalculation);
+            formulaManager.UpdateFormulas(tag.Id, tag.ValueType, tag.ValueCalculation, tag.TimeCalculation,
+                tag.ErrorCalculation);
         }
     }
 }

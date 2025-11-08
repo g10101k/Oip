@@ -8,7 +8,7 @@ namespace Oip.Rts.Services;
 /// <summary>
 /// Implements the Rtds service for handling real-time data streams.
 /// </summary>
-public class OipRtdsService : RtdsService.RtdsServiceBase
+public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private static readonly ConcurrentDictionary<string, IServerStreamWriter<EventMessage>> Subscribers = new();
@@ -18,7 +18,7 @@ public class OipRtdsService : RtdsService.RtdsServiceBase
     /// <summary>
     /// Implements the Rtds service for handling real-time data streams.
     /// </summary>
-    public OipRtdsService(IServiceScopeFactory scopeFactory)
+    public RtdsService(IServiceScopeFactory scopeFactory)
     {
         _scopeFactory = scopeFactory;
     }
@@ -106,6 +106,17 @@ public class OipRtdsService : RtdsService.RtdsServiceBase
                 Subscribers.TryRemove(subscriber.Key, out _);
             }
         }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public override Task<WriteDataResponse> WriteData(WriteDataRequest request, ServerCallContext context)
+    {
+        return _scopeFactory.ExecuteAsync<TagService, WriteDataResponse>(x => x.WriteData(request));
     }
 
     private string GenerateEventId()

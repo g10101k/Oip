@@ -1,4 +1,3 @@
-using System.Globalization;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -79,7 +78,7 @@ public class CompressServiceTests
         {
             Id = 1,
             Compressing = false,
-            Value = "50.0",
+            DoubleValue = 50.0,
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMinutes(-1))
         };
 
@@ -87,7 +86,7 @@ public class CompressServiceTests
         {
             Id = 2,
             Compressing = false,
-            Value = "150.0",
+            DoubleValue = 150.0,
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMinutes(-1))
         };
 
@@ -100,8 +99,8 @@ public class CompressServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(2, result.Tags.Count);
-        Assert.Contains(result.Tags, t => t.Id == 1 && t.Value == "100");
-        Assert.Contains(result.Tags, t => t.Id == 2 && t.Value == "200");
+        Assert.Contains(result.Tags, t => t.Id == 1 && t.DoubleValue == 100);
+        Assert.Contains(result.Tags, t => t.Id == 2 && t.DoubleValue == 200);
     }
 
     [Fact]
@@ -123,7 +122,7 @@ public class CompressServiceTests
             Compressing = true,
             CompressionMinTime = 1000, // 1 second
             CompressionMaxTime = 5000, // 5 seconds
-            Value = "99.9", // Small change
+            DoubleValue = 99.9, // Small change
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMilliseconds(-500)) // Less than min time
         };
 
@@ -156,7 +155,7 @@ public class CompressServiceTests
             Compressing = true,
             CompressionMinTime = 1000,
             CompressionMaxTime = 5000,
-            Value = "99.9", // Small change
+            DoubleValue = 99.9, // Small change
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMilliseconds(-6000)) // More than max time
         };
 
@@ -169,7 +168,7 @@ public class CompressServiceTests
         Assert.NotNull(result);
         Assert.Single(result.Tags);
         Assert.Equal(1, (int)result.Tags[0].Id);
-        Assert.Equal("100", result.Tags[0].Value);
+        Assert.Equal(100, result.Tags[0].DoubleValue);
     }
 
     [Fact]
@@ -191,7 +190,7 @@ public class CompressServiceTests
             Compressing = true,
             CompressionMinTime = 1000,
             CompressionMaxTime = 5000,
-            Value = "100.0",
+            DoubleValue = 100.0,
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMilliseconds(-2000)) // Within time range
         };
 
@@ -204,7 +203,7 @@ public class CompressServiceTests
         Assert.NotNull(result);
         Assert.Single(result.Tags);
         Assert.Equal(1, (int)result.Tags[0].Id);
-        Assert.Equal("110", result.Tags[0].Value);
+        Assert.Equal(110, result.Tags[0].DoubleValue);
     }
 
     [Fact]
@@ -226,7 +225,7 @@ public class CompressServiceTests
             Compressing = true,
             CompressionMinTime = 1000,
             CompressionMaxTime = 5000,
-            Value = "100.0",
+            DoubleValue = 100.0,
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMilliseconds(-2000)) // Within time range
         };
 
@@ -260,7 +259,7 @@ public class CompressServiceTests
         {
             Id = 2,
             Compressing = false,
-            Value = "150.0",
+            DoubleValue = 150.0,
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMinutes(-1))
         };
         SetupTagCache(2, tag2);
@@ -284,7 +283,7 @@ public class CompressServiceTests
     }
 
     [Theory]
-    [InlineData(false, 500, 1000, 99.9, 100.0, 1.0, 1, true)] 
+    [InlineData(false, 500, 1000, 99.9, 100.0, 1.0, 1, true)]
     [InlineData(true, 500, 1000, 99.9, 100.0, 1.0, 200, false)] // Time diff < min time
     [InlineData(true, 1000, 5000, 99.9, 100.0, 1.0, 2000, false)] // Value change < error
     [InlineData(true, 1000, 5000, 90.0, 100.0, 1.0, 2000, true)] // Value change > error
@@ -316,7 +315,7 @@ public class CompressServiceTests
             Compressing = compressing,
             CompressionMinTime = compressionMinTime,
             CompressionMaxTime = compressionMaxTime,
-            Value = lastValue.ToString(CultureInfo.InvariantCulture),
+            DoubleValue = lastValue,
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMilliseconds(-valueTimeOffset))
         };
 
@@ -333,18 +332,5 @@ public class CompressServiceTests
             .Setup(x => x.TryGetTag(tagId, out It.Ref<TagResponse?>.IsAny))
             .Callback((uint id, out TagResponse? tag) => { tag = tagResponse; })
             .Returns(true);
-    }
-
-    // Helper class to test private method
-    private static class CompressServiceTestsAccessor
-    {
-        public static WriteDataTag PrepareDataSend(CalculateResult calculateResult, TagResponse tagResponse)
-        {
-            var compressService = new CompressService(Mock.Of<TagCacheService>(), Mock.Of<ILogger<CompressService>>());
-            var method = typeof(CompressService).GetMethod("PrepareDataSend",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-            return (WriteDataTag)method!.Invoke(compressService, new object[] { calculateResult, tagResponse })!;
-        }
     }
 }

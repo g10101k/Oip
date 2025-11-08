@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rtds", "Rtds", "{5019271F-8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds", "Oip.Rtds\Oip.Rtds.csproj", "{181D9C29-D6FF-484F-B10D-41FC25B139BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds.Random", "Oip.Rtds.Random\Oip.Rtds.Random.csproj", "{84B5106D-A206-40F7-AF1E-5761AF7C2C5D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds.RandomInterface", "Oip.Rtds.RandomInterface\Oip.Rtds.RandomInterface.csproj", "{84B5106D-A206-40F7-AF1E-5761AF7C2C5D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{20FB5A06-4C4F-4EA3-BC3B-9975A648AE31}"
 EndProject

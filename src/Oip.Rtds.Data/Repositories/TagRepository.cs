@@ -3,7 +3,7 @@ using Oip.Base.Services;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Entities;
-using Oip.Rtds.Data.Enums;
+using Oip.Rtds.Grpc;
 
 namespace Oip.Rtds.Data.Repositories;
 

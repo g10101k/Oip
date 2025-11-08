@@ -10,7 +10,6 @@
  * ---------------------------------------------------------------
  */
 
-/** Defines the data types supported for tags */
 export enum TagTypes {
   Float32 = "Float32",
   Float64 = "Float64",
@@ -31,7 +30,6 @@ export interface CreateTagDto {
   id?: number | null;
   /** Name of the tag. */
   name: string | null;
-  /** Defines the data types supported for tags */
   valueType?: TagTypes;
   /** The interface associated with the tag. */
   interfaceId?: number | null;
@@ -109,7 +107,6 @@ export interface TagDto {
   id?: number;
   /** Name of the tag. */
   name: string | null;
-  /** Defines the data types supported for tags */
   valueType?: TagTypes;
   /** The interface associated with the tag. */
   interfaceId?: number | null;

@@ -1,13 +1,13 @@
 using NLog;
-using NLog.Web;
-using Oip.Rtds.Random.Settings;
 using NLog.Extensions.Logging;
+using NLog.Web;
 using Oip.Rtds.Base;
 using Oip.Rtds.Base.Services;
 using Oip.Rtds.Grpc;
-using Oip.Rtds.Random.Services;
+using Oip.Rtds.RandomInterface.Services;
+using Oip.Rtds.RandomInterface.Settings;
 
-namespace Oip.Rtds.Random;
+namespace Oip.Rtds.RandomInterface;
 
 public class Program
 {

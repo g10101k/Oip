@@ -869,8 +869,7 @@
           "String",
           "Blob"
         ],
-        "type": "string",
-        "description": "Defines the data types supported for tags"
+        "type": "string"
       }
     },
     "securitySchemes": {

@@ -1,13 +1,11 @@
 using Oip.Base.Extensions;
-using Oip.Rtds.Base.Services;
 
-namespace Oip.Rtds.Random.Services;
+namespace Oip.Rtds.RandomInterface.Services;
 
 /// <summary>
 /// A hosted service that periodically collects and evaluates tags using a specified interval
 /// </summary>
 public class TagWorkerHostedService(
-    TagCacheService tagCache,
     IServiceScopeFactory scopeFactory,
     ILogger<TagWorkerHostedService> logger,
     TimeSpan? interval = null)

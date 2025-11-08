@@ -1,6 +1,6 @@
 using Oip.Base.Extensions;
 
-namespace Oip.Rtds.Random.Services;
+namespace Oip.Rtds.RandomInterface.Services;
 
 /// <summary>
 /// This namespace contains services related to generating random data for RTDS.
@@ -24,7 +24,12 @@ public class UpdateTagInfoHostedService(ILogger<UpdateTagInfoHostedService> logg
             try
             {
                 await scopeFactory.ExecuteAsync<UpdateTagInfoService>(x => x.DoWork(stoppingToken));
-                await Task.Delay(1000, stoppingToken); // Example delay
+                await Task.Delay(60000, stoppingToken);
+            }
+            catch (OperationCanceledException)
+            {
+                logger.LogInformation("Stoping updating tag information.");
+                break;
             }
             catch (Exception ex)
             {

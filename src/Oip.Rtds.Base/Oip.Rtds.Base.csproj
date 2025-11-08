@@ -7,8 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Protobuf Include="..\Oip.Rtds\Protos\rtds_service.proto" GrpcServices="Client">
-            <Link>Protos\rtds_service.proto</Link>
+        <Protobuf Include="Protos\rtds_service.proto" GrpcServices="Client">
+            <Generator>MSBuild:Compile</Generator>
+
+        </Protobuf>
+        <Protobuf Include="Protos\rtds_service.proto" GrpcServices="GrpcServices">
+            <Generator>MSBuild:Compile</Generator>
         </Protobuf>
     </ItemGroup>
 
@@ -18,6 +22,9 @@
         <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0"/>
         <PackageReference Include="Google.Protobuf" Version="3.27.1"/>
         <PackageReference Include="Grpc.Tools" Version="2.62.0" PrivateAssets="All"/>
+    </ItemGroup>
+    <ItemGroup>
+
     </ItemGroup>
 
 </Project>

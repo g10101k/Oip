@@ -1,17 +1,17 @@
+using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Repositories;
 using Oip.Rtds.Grpc;
+using TagTypes = Oip.Rtds.Grpc.TagTypes;
 
 namespace Oip.Rts.Services;
 
-public class TagService
+/// <summary>
+/// 
+/// </summary>
+/// <param name="tagRepository"></param>
+/// <param name="rtdsRepository"></param>
+public class TagService(TagRepository tagRepository, RtdsRepository rtdsRepository)
 {
-    private readonly TagRepository _tagRepository;
-
-    public TagService(TagRepository tagRepository)
-    {
-        _tagRepository = tagRepository;
-    }
-
     /// <summary>
     /// Retrieves tags by interface ID.
     /// </summary>
@@ -19,7 +19,7 @@ public class TagService
     /// <return>A response containing the list of tags.</return>
     public async Task<GetTagsResponse> GetTagsByInterfaceId(GetTagsRequest request)
     {
-        var tags = _tagRepository.GetTagsByInterfaceId(request.InterfaceId).Select(x => new TagResponse()
+        var tags = tagRepository.GetTagsByInterfaceId(request.InterfaceId).Select(x => new TagResponse()
         {
             Id = x.Id,
             Name = x.Name,
@@ -37,5 +37,25 @@ public class TagService
         var response = new GetTagsResponse();
         response.Tags.AddRange(tags);
         return response;
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public async Task<WriteDataResponse> WriteData(WriteDataRequest request)
+    {
+        var t = request.Tags.Where(x => x.ValueCase is WriteDataTag.ValueOneofCase.DoubleValue)
+            .Select(x => new InsertValueDto<double>(x.Id, TagTypes.Float32, x.Time.ToDateTimeOffset(),
+                x.DoubleValue, TagValueStatus.Good)).ToList();
+
+        await rtdsRepository.InsertValues(t);
+        return new WriteDataResponse()
+        {
+            Success = true
+        };
     }
 }

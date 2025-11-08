@@ -1,4 +1,8 @@
+using System.Globalization;
+using System.Text;
+using Microsoft.Extensions.Logging;
 using Octonica.ClickHouseClient;
+using Oip.Rtds.Grpc;
 
 namespace Oip.Rtds.Data.Contexts;
 
@@ -11,6 +15,7 @@ namespace Oip.Rtds.Data.Contexts;
 /// </remarks>
 public sealed class RtdsContext : IDisposable, IAsyncDisposable
 {
+    private readonly ILogger<RtdsContext> _logger;
     private readonly ClickHouseConnection _connection;
     private bool _disposed;
 
@@ -18,12 +23,9 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// Initializes a new instance of the <see cref="RtdsContext"/> class using the provided application settings.
     /// Opens the ClickHouse connection immediately.
     /// </summary>
-    /// <param name="appSettings">Application configuration containing connection string.</param>
-    /// <remarks>
-    /// Immediately opens a connection to the ClickHouse database.
-    /// </remarks>
-    public RtdsContext(IRtdsAppSettings appSettings)
+    public RtdsContext(IRtdsAppSettings appSettings, ILogger<RtdsContext> logger)
     {
+        _logger = logger;
         _connection = new ClickHouseConnection(appSettings.RtsConnectionString);
         _connection.Open();
     }
@@ -62,6 +64,27 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
         await using var cmd = _connection.CreateCommand();
         cmd.CommandText = sql;
         await cmd.ExecuteNonQueryAsync();
+    }
+
+    public async Task InsertValues(List<InsertValueDto<double>> values)
+    {
+        try
+        {
+            var valuesForQuery = values.Aggregate("",
+                (current, value) =>
+                    current + string.Format(
+                        $",({value.Id}, '{value.Time.UtcDateTime:yyyy-MM-dd HH:mm:ss.fff}', {value.Value}, '{value.Status}')"));
+            valuesForQuery = valuesForQuery.Remove(0, 1);
+
+            var commandText = string.Format(QueryConstants.InsertIntoQuery, values[0].ValueType, valuesForQuery);
+            await using var cmd = _connection.CreateCommand();
+            cmd.CommandText = commandText;
+            await cmd.ExecuteNonQueryAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "An error occured while inserting values");
+        }
     }
 
     #region IDisposable Support
@@ -121,3 +144,5 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
 
     #endregion
 }
+
+public record InsertValueDto<T>(uint Id, TagTypes ValueType, DateTimeOffset Time, T Value, TagValueStatus Status);

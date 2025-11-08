@@ -44,6 +44,29 @@ public class TagCacheService
         }
     }
 
+    public void UpdateValues(WriteDataRequest request)
+    {
+        foreach (var t in request.Tags)
+        {
+            if (TryGetTag(t.Id, out var tag))
+            {
+                switch (t.ValueCase)
+                {
+                    case WriteDataTag.ValueOneofCase.None:
+                        break;
+                    case WriteDataTag.ValueOneofCase.DoubleValue:
+                        tag!.DoubleValue = t.DoubleValue;
+                        break;
+                    case WriteDataTag.ValueOneofCase.Int32Value:
+                        tag!.Int32Value = t.Int32Value;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Attempts to retrieve a tag by its ID from the cache.
     /// </summary>

@@ -1,7 +1,7 @@
 using Oip.Rtds.Base;
 using Oip.Rtds.Base.Services;
 
-namespace Oip.Rtds.Random.Services;
+namespace Oip.Rtds.RandomInterface.Services;
 
 /// <summary>
 /// Service that handles tag data collection, evaluation of formulas, and writing results to a buffer service.
@@ -21,7 +21,7 @@ public class TagWorkerService(
             return;
 
         var tasks = tags
-            .Select(tag => formulaManager.Evaluate(tag.Id, double.MaxValue, tag.Value, DateTimeOffset.Now))
+            .Select(tag => formulaManager.Evaluate(tag.Id, double.MaxValue, tag.DoubleValue, DateTimeOffset.Now))
             .ToArray();
 
         var result = await Task.WhenAll(tasks);

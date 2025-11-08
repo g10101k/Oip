@@ -49,12 +49,12 @@ public class CompressService(TagCacheService tagCacheService, ILogger<CompressSe
     /// <returns><c>true</c> if the value should be written, <c>false</c> otherwise</returns>
     public static bool ShouldWriteValue(CalculateResult calculateResult, TagResponse tag)
     {
-        if (!tag.Compressing)
+        if (!tag.Compressing || tag.ValueTime is null)
             return true;
 
         var lastTime = tag.ValueTime.ToDateTimeOffset();
         var deltaTime = calculateResult.Time - lastTime;
-        var deltaValue = Math.Abs(Convert.ToDouble(tag.Value, CultureInfo.InvariantCulture) -
+        var deltaValue = Math.Abs(Convert.ToDouble(tag.DoubleValue, CultureInfo.InvariantCulture) -
                                   Convert.ToDouble(calculateResult.Value));
 
         // Skip if the time difference is too small
@@ -76,7 +76,7 @@ public class CompressService(TagCacheService tagCacheService, ILogger<CompressSe
         return new WriteDataTag
         {
             Id = tagResponse.Id,
-            Value = calculateResult.Value.ToString(),
+            DoubleValue = (double)calculateResult.Value,
             Time = Timestamp.FromDateTimeOffset(calculateResult.Time)
         };
     }

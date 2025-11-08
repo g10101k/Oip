@@ -10,18 +10,19 @@ public class BufferWriterService
     private readonly RtdsService.RtdsServiceClient _client;
     private readonly ILogger<BufferWriterService> _logger;
     private readonly CompressService _compressService;
-
+    private readonly TagCacheService _cacheService;
     private readonly ConcurrentQueue<WriteDataRequest> _bufferQueue = new();
     private readonly SemaphoreSlim _sendLock = new(1, 1);
     private readonly TimeSpan _retryInterval = TimeSpan.FromSeconds(10);
     private readonly Timer _retryTimer;
 
     public BufferWriterService(RtdsService.RtdsServiceClient client, ILogger<BufferWriterService> logger,
-        CompressService compressService)
+        CompressService compressService, TagCacheService cacheService)
     {
         _client = client;
         _logger = logger;
         _compressService = compressService;
+        _cacheService = cacheService;
         _retryTimer = new Timer(async void (_) => await TryFlushBufferAsync(), null, _retryInterval, _retryInterval);
     }
 
@@ -49,6 +50,7 @@ public class BufferWriterService
         try
         {
             await _client.WriteDataAsync(request);
+            _cacheService.UpdateValues(request);
         }
         catch (RpcException ex)
         {

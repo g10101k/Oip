@@ -1,38 +1,23 @@
 using Oip.Base.Extensions;
 using Oip.Rtds.Grpc;
-using Oip.Rts.Services;
+using RtdsService = Oip.Rts.Services.RtdsService;
 
 namespace Oip.Rts.HostedService;
 
-public class RtdsHostedService : BackgroundService
+public class RtdsHostedService(IServiceScopeFactory scopeFactory, ILogger<RtdsHostedService> logger) : BackgroundService
 {
-    private readonly ILogger<RtdsHostedService> _logger;
-    private readonly IServiceScopeFactory _scopeFactory;
-
-    public RtdsHostedService(IServiceScopeFactory scopeFactory, ILogger<RtdsHostedService> logger)
-    {
-        _scopeFactory = scopeFactory;
-        _logger = logger;
-    }
-
-
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Consume Scoped Service Hosted Service running.");
+        logger.LogInformation("Consume Scoped Service Hosted Service running.");
 
-        await DoWork(stoppingToken);
-    }
-
-    private async Task DoWork(CancellationToken stoppingToken)
-    {
-        _logger.LogInformation("Consume Scoped Service Hosted Service is working.");
+        logger.LogInformation("Consume Scoped Service Hosted Service is working.");
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            await _scopeFactory.ExecuteAsync<OipRtdsService>(async service =>
+            await scopeFactory.ExecuteAsync<RtdsService>(async service =>
             {
-                _logger.LogInformation("Publishing events...");
+                logger.LogInformation("Publishing events...");
 
                 var testRequest = new PublishRequest
                 {
@@ -45,12 +30,11 @@ public class RtdsHostedService : BackgroundService
             await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
         }
     }
-
+    
     /// <inheritdoc />
     public override async Task StopAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation(
-            "Consume Scoped Service Hosted Service is stopping.");
+        logger.LogInformation("Consume Scoped Service Hosted Service is stopping.");
 
         await base.StopAsync(stoppingToken);
     }

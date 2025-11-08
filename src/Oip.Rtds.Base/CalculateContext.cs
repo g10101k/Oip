@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Oip.Rtds.Grpc;
 
 namespace Oip.Rtds.Base;
 
@@ -113,9 +114,10 @@ public class FormulaManager : IDisposable
         _defaultReferences = refs.ToArray();
     }
 
-    public void UpdateFormulas(uint tagId, string valueFormula, string timeFormula, string errorFormula)
+    public void UpdateFormulas(uint tagId, TagTypes tagTypes, string valueFormula, string timeFormula,
+        string errorFormula)
     {
-        var compiled = CompileSingleFormula(tagId, valueFormula, timeFormula, errorFormula);
+        var compiled = CompileSingleFormula(tagId, tagTypes, valueFormula, timeFormula, errorFormula);
 
         _lock.EnterWriteLock();
         try
@@ -136,7 +138,8 @@ public class FormulaManager : IDisposable
         return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
     }
 
-    private CompiledFormula CompileSingleFormula(uint id, string valueFormula, string timeFormula, string errorFormula)
+    private CompiledFormula CompileSingleFormula(uint id, TagTypes tagTypes, string valueFormula, string timeFormula,
+        string errorFormula)
     {
         var hash = ComputeSha256($"{valueFormula}{timeFormula}{errorFormula}");
 
@@ -167,6 +170,8 @@ public class FormulaManager : IDisposable
         // Если нет — компилируем
         var formulasNamespace = "Oip.Rtds.Base.DynamicFormulas";
         var className = $"Formula_{id}";
+        var typ = GetCsharpType(tagTypes);
+
 
         string source = $@"
 using System;
@@ -178,7 +183,7 @@ namespace {formulasNamespace}
 {{
     public static class {className}
     {{
-        public static object ValueFormula(object value, DateTimeOffset time)
+        public static {typ} ValueFormula({typ} value, DateTimeOffset time)
         {{
             try
             {{
@@ -190,7 +195,7 @@ namespace {formulasNamespace}
             }}
         }}
 
-        public static DateTimeOffset TimeFormula(object value, DateTimeOffset time)
+        public static DateTimeOffset TimeFormula({typ} value, DateTimeOffset time)
         {{
             try
             {{
@@ -202,7 +207,7 @@ namespace {formulasNamespace}
             }}
         }}
 
-        public static double ErrorFormula(object value, DateTimeOffset time)
+        public static {typ} ErrorFormula({typ} value, DateTimeOffset time)
         {{
             try
             {{
@@ -338,6 +343,30 @@ namespace {formulasNamespace}
         }
 
         _lock.Dispose();
+    }
+
+
+    private string GetCsharpType(TagTypes tagTypes)
+    {
+        switch (tagTypes)
+        {
+            case TagTypes.Float32:
+                return "double"; 
+            case TagTypes.Float64:
+                return "double";
+            case TagTypes.Int16:
+                return "short";
+            case TagTypes.Int32:
+                return "int";
+            case TagTypes.Digital:
+                return "bool"; // для бинарных/булевых значений
+            case TagTypes.String:
+                return "string";
+            case TagTypes.Blob:
+                return "byte[]"; // или "string" если данные в base64
+            default:
+                throw new ArgumentOutOfRangeException(nameof(tagTypes), tagTypes, null);
+        }
     }
 }
 

@@ -2,9 +2,9 @@ using System.Text;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Oip.Rtds.Grpc;
-using Oip.Rtds.Random.Settings;
+using Oip.Rtds.RandomInterface.Settings;
 
-namespace Oip.Rtds.Random.Services;
+namespace Oip.Rtds.RandomInterface.Services;
 
 public class Worker(ILogger<Worker> logger, IServiceScopeFactory scopeFactory) : BackgroundService
 {

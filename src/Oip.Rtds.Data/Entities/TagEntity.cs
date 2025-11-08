@@ -1,4 +1,5 @@
-using Oip.Rtds.Data.Enums;
+
+using Oip.Rtds.Grpc;
 
 namespace Oip.Rtds.Data.Entities;
 
