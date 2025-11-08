@@ -8,7 +8,6 @@ namespace Oip.Rtds.Random.Services;
 
 public class Worker(ILogger<Worker> logger, IServiceScopeFactory scopeFactory) : BackgroundService
 {
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -30,7 +29,7 @@ public class Worker(ILogger<Worker> logger, IServiceScopeFactory scopeFactory) :
 
                 using var call = client.Subscribe(request);
                 var responseStream = call.ResponseStream;
-                
+
                 await foreach (var eventMessage in responseStream.ReadAllAsync(cancellationToken: stoppingToken))
                 {
                     DisplayEvent(eventMessage);

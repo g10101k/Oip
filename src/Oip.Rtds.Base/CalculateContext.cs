@@ -4,26 +4,24 @@ using System.Runtime.Loader;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Oip.Rtds.Base;
 
-public record CalculateResult(object Value, DateTimeOffset Time, double Error);
+public record CalculateResult(uint TagId, object Value, DateTimeOffset Time, double Error);
 
 /// <summary>
 /// Результат компиляции формулы с загруженной сборкой и методами.
 /// </summary>
 public class CompiledFormula : IDisposable
 {
-    // Идентификатор и контрольная сумма формулы
     public uint Id { get; init; }
     public string Hash { get; init; }
 
-    // Загрузка сборки
     public AssemblyLoadContext LoadContext { get; init; }
     public Assembly Assembly { get; init; }
     public Type FormulaType { get; init; }
 
-    // Методы выполнения формул
     private MethodInfo ValueMethod { get; init; }
     private MethodInfo TimeMethod { get; init; }
     private MethodInfo ErrorMethod { get; init; }
@@ -68,21 +66,14 @@ class CollectibleAssemblyLoadContext : AssemblyLoadContext
 public class FormulaManager : IDisposable
 {
     private readonly ConcurrentDictionary<uint, CompiledFormula> _compiled = new();
-    private readonly ReaderWriterLockSlim _readerWriterLockSlim = new();
-
-    private readonly HashSet<string> _forbiddenIdentifiers = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "System.IO", "File", "Directory", "Process", "System.Net", "Dns", "Socket", "HttpClient", "WebClient",
-        "Thread.Sleep", "Environment.Exit", "Console.Read", "Console.ReadLine", "new Process"
-    };
-
+    private readonly ConcurrentDictionary<string, CompiledFormula> _compiledByHash = new();
+    private readonly ReaderWriterLockSlim _lock = new();
     private readonly MetadataReference[] _defaultReferences;
 
     public FormulaManager()
     {
         var refs = new List<MetadataReference>();
-
-        var assemblies = new[]
+        var assembles = new List<Assembly>()
         {
             typeof(object).Assembly,
             typeof(Console).Assembly,
@@ -91,7 +82,14 @@ public class FormulaManager : IDisposable
             Assembly.GetExecutingAssembly()
         };
 
-        foreach (var a in assemblies.Distinct())
+        assembles.AddRange(AppDomain.CurrentDomain
+            .GetAssemblies()
+            .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location)));
+
+        var toAddAssembles =
+            assembles.Distinct();
+
+        foreach (var a in toAddAssembles.Distinct())
             refs.Add(MetadataReference.CreateFromFile(a.Location));
 
         _defaultReferences = refs.ToArray();
@@ -100,14 +98,15 @@ public class FormulaManager : IDisposable
     public void UpdateFormulas(uint tagId, string valueFormula, string timeFormula, string errorFormula)
     {
         var compiled = CompileSingleFormula(tagId, valueFormula, timeFormula, errorFormula);
-        _readerWriterLockSlim.EnterWriteLock();
+
+        _lock.EnterWriteLock();
         try
         {
             _compiled[tagId] = compiled;
         }
         finally
         {
-            _readerWriterLockSlim.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
@@ -121,19 +120,41 @@ public class FormulaManager : IDisposable
 
     private CompiledFormula CompileSingleFormula(uint id, string valueFormula, string timeFormula, string errorFormula)
     {
-        foreach (var forbid in _forbiddenIdentifiers)
+        var hash = ComputeSha256($"{valueFormula}{timeFormula}{errorFormula}");
+
+        if (string.IsNullOrWhiteSpace(valueFormula.Trim()))
+            valueFormula = "return value;";
+
+        if (string.IsNullOrWhiteSpace(timeFormula.Trim()))
+            timeFormula = "return time;";
+
+        if (string.IsNullOrWhiteSpace(errorFormula.Trim()))
+            errorFormula = "return 0.0;";
+
+        _lock.EnterReadLock();
+        try
         {
-            if (valueFormula.IndexOf(forbid, StringComparison.OrdinalIgnoreCase) >= 0)
-                throw new InvalidOperationException($"Forbidden identifier detected: '{forbid}'");
+            if (_compiledByHash.TryGetValue(hash, out var cached))
+            {
+                return new CompiledFormula(id, cached.Hash, cached.LoadContext, cached.Assembly,
+                    cached.FormulaType, GetMethod(cached, "ValueFormula"), GetMethod(cached, "TimeFormula"),
+                    GetMethod(cached, "ErrorFormula"));
+            }
+        }
+        finally
+        {
+            _lock.ExitReadLock();
         }
 
-        var hash = ComputeSha256($"{valueFormula}{timeFormula}{errorFormula}");
+        // Если нет — компилируем
         var formulasNamespace = "Oip.Rtds.Base.DynamicFormulas";
         var className = $"Formula_{id}";
 
         string source = $@"
 using System;
+using System.Runtime;
 using System.Collections.Generic;
+using Oip.Rtds.Base;
 
 namespace {formulasNamespace}
 {{
@@ -178,6 +199,9 @@ namespace {formulasNamespace}
 }}";
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
+
+        ForbiddenIdentifierWalker.Validate(syntaxTree);
+
         var compilation = CSharpCompilation.Create(
             assemblyName: $"FormulaAssembly_{Guid.NewGuid():N}",
             syntaxTrees: [syntaxTree],
@@ -212,14 +236,24 @@ namespace {formulasNamespace}
                        ?? throw new InvalidOperationException(
                            $"Compiled assembly doesn't contain expected type '{formulasNamespace}.{className}'.");
 
-            var methodValue = type.GetMethod("ValueFormula", BindingFlags.Public | BindingFlags.Static)
-                              ?? throw new InvalidOperationException("ValueFormula method not found.");
-            var methodTime = type.GetMethod("TimeFormula", BindingFlags.Public | BindingFlags.Static)
-                             ?? throw new InvalidOperationException("TimeFormula method not found.");
-            var methodError = type.GetMethod("ErrorFormula", BindingFlags.Public | BindingFlags.Static)
-                              ?? throw new InvalidOperationException("ErrorFormula method not found.");
+            var cf = new CompiledFormula(
+                id, hash, alc, assembly, type,
+                GetMethod(type, "ValueFormula"),
+                GetMethod(type, "TimeFormula"),
+                GetMethod(type, "ErrorFormula")
+            );
 
-            return new CompiledFormula(id, hash, alc, assembly, type, methodValue, methodTime, methodError);
+            _lock.EnterWriteLock();
+            try
+            {
+                _compiledByHash.TryAdd(hash, cf);
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
+
+            return cf;
         }
         catch
         {
@@ -228,20 +262,30 @@ namespace {formulasNamespace}
         }
     }
 
-    public CalculateResult Evaluate(uint id, object value, DateTimeOffset time)
+    private static MethodInfo GetMethod(Type type, string name) =>
+        type.GetMethod(name, BindingFlags.Public | BindingFlags.Static)
+        ?? throw new InvalidOperationException($"{name} method not found.");
+
+    private static MethodInfo GetMethod(CompiledFormula cf, string name) =>
+        cf.FormulaType.GetMethod(name, BindingFlags.Public | BindingFlags.Static)
+        ?? throw new InvalidOperationException($"{name} method not found in cached formula.");
+
+    public async Task<CalculateResult> Evaluate(uint id, object value, object prevValue, DateTimeOffset time)
     {
-        _readerWriterLockSlim.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             if (!_compiled.TryGetValue(id, out var cf))
                 throw new KeyNotFoundException($"Formula '{id}' not found.");
-            return new CalculateResult(cf.EvaluateValue(value, time),
+
+            return new CalculateResult(id,
+                cf.EvaluateValue(value, time),
                 cf.EvaluateTimeValue(value, time),
                 cf.EvaluateErrorValue(value, time));
         }
         finally
         {
-            _readerWriterLockSlim.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
@@ -261,19 +305,84 @@ namespace {formulasNamespace}
 
     public void Dispose()
     {
-        _readerWriterLockSlim.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             foreach (var kv in _compiled)
                 kv.Value.Dispose();
 
             _compiled.Clear();
+            _compiledByHash.Clear();
         }
         finally
         {
-            _readerWriterLockSlim.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
 
-        _readerWriterLockSlim.Dispose();
+        _lock.Dispose();
+    }
+}
+
+public class ForbiddenIdentifierWalker : CSharpSyntaxWalker
+{
+    private readonly HashSet<string> _forbidden = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "System.IO", "File", "Directory", "Process", "System.Net", "Dns", "Socket", "HttpClient", "WebClient",
+        "Thread.Sleep", "Environment.Exit", "Console.Read", "Console.ReadLine", "new Process"
+    };
+
+    private readonly List<string> _found = new();
+
+    private IReadOnlyList<string> Found => _found;
+
+    public override void VisitIdentifierName(IdentifierNameSyntax node)
+    {
+        var name = node.Identifier.Text;
+        if (_forbidden.Contains(name))
+            _found.Add(name);
+
+        base.VisitIdentifierName(node);
+    }
+
+    public override void VisitQualifiedName(QualifiedNameSyntax node)
+    {
+        var fullName = node.ToString();
+        foreach (var forbid in _forbidden)
+        {
+            if (fullName.Contains(forbid, StringComparison.OrdinalIgnoreCase))
+            {
+                _found.Add(fullName);
+                break;
+            }
+        }
+
+        base.VisitQualifiedName(node);
+    }
+
+    public override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
+    {
+        var expr = node.ToString();
+        foreach (var forbid in _forbidden)
+        {
+            if (expr.Contains(forbid, StringComparison.OrdinalIgnoreCase))
+            {
+                _found.Add(expr);
+                break;
+            }
+        }
+
+        base.VisitMemberAccessExpression(node);
+    }
+
+    public static void Validate(SyntaxTree syntaxTree)
+    {
+        var walker = new ForbiddenIdentifierWalker();
+        walker.Visit(syntaxTree.GetRoot());
+
+        if (walker.Found.Count > 0)
+        {
+            var list = string.Join(", ", walker.Found.Distinct(StringComparer.OrdinalIgnoreCase));
+            throw new InvalidOperationException($"Class contains forbidden identifiers: {list}");
+        }
     }
 }

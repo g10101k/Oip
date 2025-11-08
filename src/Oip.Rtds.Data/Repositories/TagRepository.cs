@@ -185,6 +185,6 @@ public class TagRepository
     public IEnumerable<TagEntity> GetTagsByInterfaceId(uint requestInterfaceId)
     {
         return _rtdsMetaContext.Tags
-            .Where(x => x.InterfaceId == requestInterfaceId).AsNoTracking();
+            .Where(x => x.InterfaceId == requestInterfaceId && x.Enabled).AsNoTracking();
     }
 }

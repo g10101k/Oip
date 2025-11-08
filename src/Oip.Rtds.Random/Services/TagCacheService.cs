@@ -13,14 +13,19 @@ public class TagCacheService
     /// <summary>
     /// Gets the collection of all cached tags.
     /// </summary>
+    /// <value>The collection of all cached tags.</value>
     public ICollection<TagResponse> Tags => _tags.Values;
 
     /// <summary>
     /// Fully updates the tag list: adds new tags, updates existing ones, and removes missing tags.
     /// </summary>
     /// <param name="newTags">The new set of tags to update the cache with.</param>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="newTags"/> is null.</exception>
     public void UpdateTags(IEnumerable<TagResponse> newTags)
     {
+        if (newTags == null)
+            throw new ArgumentNullException(nameof(newTags));
+
         var newTagIds = new HashSet<uint>();
 
         // Update existing and add new tags
@@ -52,5 +57,6 @@ public class TagCacheService
     /// <summary>
     /// Clears all cached tags.
     /// </summary>
+    /// <remarks>This method clears the entire cache of tags.</remarks>
     public void Clear() => _tags.Clear();
 }

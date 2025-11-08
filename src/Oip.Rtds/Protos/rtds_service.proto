@@ -1,4 +1,5 @@
 syntax = "proto3";
+import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Oip.Rtds.Grpc";
 
@@ -8,6 +9,7 @@ service RtdsService {
   rpc Subscribe (SubscribeRequest) returns (stream EventMessage);
   rpc Publish (PublishRequest) returns (PublishResponse);
   rpc GetTags (GetTagsRequest) returns (GetTagsResponse);
+  rpc WriteData (WriteDataRequest) returns (WriteDataResponse);
 }
 
 message SubscribeRequest {
@@ -47,26 +49,38 @@ enum TagTypes {
   BLOB = 6;
 }
 
-
 message TagResponse {
   optional uint32 id = 1;
   string name = 2;
   TagTypes value_type = 3;
   optional uint32 interface_id = 4;
-  optional string descriptor = 5;
-  optional string uom = 6;
   optional string instrument_tag = 7;
-  bool enabled = 8;
   bool compressing = 9;
   optional uint32 compression_min_time = 10;
   optional uint32 compression_max_time = 11;
   optional string digital_set = 12;
-  bool step = 13;
   optional string time_calculation = 14;
   optional string error_calculation = 15;
   optional string value_calculation = 16;
+  string value = 17;
+  google.protobuf.Timestamp valueTime = 18;
 }
 
 message GetTagsResponse {
   repeated TagResponse tags = 1;
+}
+
+message WriteDataTag {
+  uint32 id = 1;
+  string value = 2;
+  google.protobuf.Timestamp time = 3;
+}
+
+message WriteDataRequest {
+  repeated WriteDataTag tags = 1;
+}
+
+message WriteDataResponse {
+  bool success = 1;
+  optional string error = 2;
 }

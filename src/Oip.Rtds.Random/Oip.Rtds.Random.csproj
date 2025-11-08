@@ -32,6 +32,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
+      <ProjectReference Include="..\Oip.Rtds.Base\Oip.Rtds.Base.csproj" />
       <ProjectReference Include="..\Oip.Settings\Oip.Settings.csproj" />
     </ItemGroup>
 </Project>

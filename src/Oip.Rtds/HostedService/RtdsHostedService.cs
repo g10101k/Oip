@@ -19,8 +19,7 @@ public class RtdsHostedService : BackgroundService
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation(
-            "Consume Scoped Service Hosted Service running.");
+        _logger.LogInformation("Consume Scoped Service Hosted Service running.");
 
         await DoWork(stoppingToken);
     }

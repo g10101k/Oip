@@ -2,6 +2,7 @@ using NLog;
 using NLog.Web;
 using Oip.Rtds.Random.Settings;
 using NLog.Extensions.Logging;
+using Oip.Rtds.Base;
 using Oip.Rtds.Grpc;
 using Oip.Rtds.Random.Services;
 
@@ -22,9 +23,14 @@ public class Program
             {
                 options.Address = new Uri(settings.RtdsUrl);
             });
-            builder.Services.AddScoped<RandomInterfaceScoped>();
+            builder.Services.AddScoped<UpdateTagInfoService>();
+            builder.Services.AddScoped<TagWorkerService>();
+            builder.Services.AddSingleton<FormulaManager>();
+            builder.Services.AddSingleton<TagCacheService>();
+            builder.Services.AddSingleton<BufferWriterService>();
             builder.Services.AddHostedService<Worker>();
-            builder.Services.AddHostedService<RandomInterfaceServices>();
+            builder.Services.AddHostedService<UpdateTagInfoHostedService>();
+            builder.Services.AddHostedService<TagWorkerHostedService>();
             var host = builder.Build();
             await host.RunAsync();
         }
