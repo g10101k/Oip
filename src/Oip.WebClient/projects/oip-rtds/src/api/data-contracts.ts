@@ -34,7 +34,7 @@ export interface CreateTagDto {
   /** Defines the data types supported for tags */
   valueType?: TagTypes;
   /** The interface associated with the tag. */
-  interface?: number | null;
+  interfaceId?: number | null;
   /** Description of the point (used as a comment or label). */
   descriptor?: string | null;
   /** Engineering units (e.g., °C, PSI, m³/h). */
