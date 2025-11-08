@@ -28,6 +28,7 @@ public class Program
             builder.Services.AddSingleton<FormulaManager>();
             builder.Services.AddSingleton<TagCacheService>();
             builder.Services.AddSingleton<BufferWriterService>();
+            builder.Services.AddSingleton<CompressService>();
             builder.Services.AddHostedService<Worker>();
             builder.Services.AddHostedService<UpdateTagInfoHostedService>();
             builder.Services.AddHostedService<TagWorkerHostedService>();

@@ -4,8 +4,16 @@ using Oip.Rtds.Grpc;
 
 namespace Oip.Rtds.Random.Services;
 
+/// <summary>
+/// Service for compressing and filtering data before writing to RTDS
+/// </summary>
 public class CompressService(TagCacheService tagCacheService, ILogger<CompressService> logger)
 {
+    /// <summary>
+    /// Compresses and filters calculation results based on compression settings
+    /// </summary>
+    /// <param name="calculateResults">Collection of calculation results to process</param>
+    /// <returns>WriteDataRequest containing filtered tags for writing to RTDS</returns>
     public async Task<WriteDataRequest> CompressFilterData(IEnumerable<CalculateResult> calculateResults)
     {
         var enumerable = calculateResults as CalculateResult[] ?? calculateResults.ToArray();
@@ -33,11 +41,11 @@ public class CompressService(TagCacheService tagCacheService, ILogger<CompressSe
     }
 
     /// <summary>
-    /// Determines whether a value should be written to RTDS based on the compression settings.
+    /// Determines whether a value should be written to RTDS based on the compression settings
     /// </summary>
-    /// <param name="calculateResult">The calculated result to check.</param>
-    /// <param name="tag">The tag associated with the result.</param>
-    /// <returns><c>true</c> if the value should be written, <c>false</c> otherwise.</returns>
+    /// <param name="calculateResult">The calculated result to check</param>
+    /// <param name="tag">The tag associated with the result</param>
+    /// <returns><c>true</c> if the value should be written, <c>false</c> otherwise</returns>
     public static bool ShouldWriteValue(CalculateResult calculateResult, TagResponse tag)
     {
         if (!tag.Compressing)
@@ -55,13 +63,12 @@ public class CompressService(TagCacheService tagCacheService, ILogger<CompressSe
         return deltaTime.TotalMilliseconds > tag.CompressionMaxTime || deltaValue > calculateResult.Error;
     }
 
-
     /// <summary>
-    /// Prepares data for sending to the server.
+    /// Prepares data for sending to the server
     /// </summary>
-    /// <param name="calculateResult">The calculated result to send.</param>
-    /// <param name="tagResponse">The tag associated with the result.</param>
-    /// <returns>A <see cref="WriteDataTag"/> containing the prepared data.</returns>
+    /// <param name="calculateResult">The calculated result to send</param>
+    /// <param name="tagResponse">The tag associated with the result</param>
+    /// <returns>A <see cref="WriteDataTag"/> containing the prepared data</returns>
     private static WriteDataTag PrepareDataSend(CalculateResult calculateResult, TagResponse tagResponse)
     {
         return new WriteDataTag

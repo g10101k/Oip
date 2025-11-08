@@ -23,8 +23,7 @@ public class TagCacheService
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="newTags"/> is null.</exception>
     public void UpdateTags(IEnumerable<TagResponse> newTags)
     {
-        if (newTags == null)
-            throw new ArgumentNullException(nameof(newTags));
+        ArgumentNullException.ThrowIfNull(newTags);
 
         var newTagIds = new HashSet<uint>();
 
