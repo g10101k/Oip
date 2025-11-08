@@ -147,7 +147,9 @@
                   id="valueType"
                   optionLabel="label"
                   optionValue="value"
-                  [options]="valueTypeOptions"></p-select>
+                  [options]="valueTypeOptions"
+                  [(ngModel)]="selectedTag.valueType"
+                ></p-select>
               </div>
               <label class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0" for="uom">UOM</label>
               <div class="col-span-4 md:col-span-4">
