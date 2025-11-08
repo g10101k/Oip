@@ -1,0 +1,890 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Oip service web-api",
+    "description": "Oip service web-api",
+    "version": "v1.0.0"
+  },
+  "paths": {
+    "/api/rtds-meta-data-context-migration-module/get-module-rights": {
+      "get": {
+        "tags": [
+          "RtdsMetaDataContextMigrationModule"
+        ],
+        "summary": "Gets the list of access rights for the migration module",
+        "description": "By default, returns read permission available only for admin role",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rtds-meta-data-context-migration-module/get-migrations": {
+      "get": {
+        "tags": [
+          "RtdsMetaDataContextMigrationModule"
+        ],
+        "summary": "Retrieves all database migrations and their current state.",
+        "description": "The returned list includes:\r\n- Migrations that have been applied to the database.\r\n- Pending migrations that exist in code but are not applied.\r\n- Migrations defined in code regardless of their application status.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MigrationDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MigrationDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MigrationDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rtds-meta-data-context-migration-module/migrate": {
+      "post": {
+        "tags": [
+          "RtdsMetaDataContextMigrationModule"
+        ],
+        "summary": "Applies all pending migrations to the database.",
+        "description": "Uses Entity Framework Core's migration mechanism to bring the database schema\r\nup to date with the current codebase. This operation is irreversible and should be\r\nperformed with caution in production environments.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rtds-meta-data-context-migration-module/apply-migration": {
+      "post": {
+        "tags": [
+          "RtdsMetaDataContextMigrationModule"
+        ],
+        "summary": "Applies a specific database migration by name.",
+        "description": "This method allows applying or reverting to a specific migration by name.\r\nUseful for targeted database updates or rolling back schema changes.",
+        "requestBody": {
+          "description": "A request containing the name of the migration to apply.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyMigrationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyMigrationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyMigrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rtds-meta-data-context-migration-module/get-security": {
+      "get": {
+        "tags": [
+          "RtdsMetaDataContextMigrationModule"
+        ],
+        "summary": "Gets the security configuration for the specified module instance ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rtds-meta-data-context-migration-module/put-security": {
+      "put": {
+        "tags": [
+          "RtdsMetaDataContextMigrationModule"
+        ],
+        "summary": "Updates the security configuration for the specified module instance.",
+        "requestBody": {
+          "description": "The request containing the new security configuration.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rtds-meta-data-context-migration-module/get-module-instance-settings": {
+      "get": {
+        "tags": [
+          "RtdsMetaDataContextMigrationModule"
+        ],
+        "summary": "Gets the settings for the specified module instance.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rtds-meta-data-context-migration-module/put-module-instance-settings": {
+      "put": {
+        "tags": [
+          "RtdsMetaDataContextMigrationModule"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectSaveSettingsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectSaveSettingsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectSaveSettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/tag-management/add-tag": {
+      "post": {
+        "tags": [
+          "TagManagementModule"
+        ],
+        "summary": "Adds a new tag.",
+        "description": "Accepts a tag entity from the request body and stores it in the database.  \r\nReturns HTTP 200 on success.",
+        "requestBody": {
+          "description": "Tag entity to be added.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/tag-management/get-tags-by-filter": {
+      "get": {
+        "tags": [
+          "TagManagementModule"
+        ],
+        "summary": "Retrieves tags that match a given name filter.",
+        "description": "Returns a list of tags whose names match the provided filter string.  \r\nThis is useful for searching or filtering tags by partial name.",
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Name filter to search tags by.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tag-management/edit-tag": {
+      "post": {
+        "tags": [
+          "TagManagementModule"
+        ],
+        "summary": "Edits an existing tag.",
+        "requestBody": {
+          "description": "The tag object containing updated information.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/tag-management/get-module-rights": {
+      "get": {
+        "tags": [
+          "TagManagementModule"
+        ],
+        "summary": "Returns the security rights required for accessing this module.",
+        "description": "This method defines the access control rules for the Tag Management module.  \r\nIt lists the roles and permissions necessary to interact with the module via the UI or API.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tag-management/get-security": {
+      "get": {
+        "tags": [
+          "TagManagementModule"
+        ],
+        "summary": "Gets the security configuration for the specified module instance ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tag-management/put-security": {
+      "put": {
+        "tags": [
+          "TagManagementModule"
+        ],
+        "summary": "Updates the security configuration for the specified module instance.",
+        "requestBody": {
+          "description": "The request containing the new security configuration.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/tag-management/get-module-instance-settings": {
+      "get": {
+        "tags": [
+          "TagManagementModule"
+        ],
+        "summary": "Gets the settings for the specified module instance.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/tag-management/put-module-instance-settings": {
+      "put": {
+        "tags": [
+          "TagManagementModule"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectSaveSettingsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectSaveSettingsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectSaveSettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApplyMigrationRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the migration to apply.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request model for applying a specific migration by name."
+      },
+      "CreateTagDto": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the tag.",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the tag.",
+            "nullable": true
+          },
+          "valueType": {
+            "$ref": "#/components/schemas/TagTypes"
+          },
+          "interface": {
+            "type": "integer",
+            "description": "The interface associated with the tag.",
+            "format": "int32",
+            "nullable": true
+          },
+          "descriptor": {
+            "type": "string",
+            "description": "Description of the point (used as a comment or label).",
+            "nullable": true
+          },
+          "uom": {
+            "type": "string",
+            "description": "Engineering units (e.g., °C, PSI, m³/h).",
+            "nullable": true
+          },
+          "instrumentTag": {
+            "type": "string",
+            "description": "Reference to the source signal or channel tag.",
+            "nullable": true
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Indicates whether the point is archived."
+          },
+          "compressing": {
+            "type": "boolean",
+            "description": "Indicates whether compression is enabled for this tag."
+          },
+          "compressionMinTime": {
+            "type": "integer",
+            "description": "Minimum time (in milliseconds) between compressed values.\r\nValues received within this period are discarded, regardless of their error margin.",
+            "format": "int32",
+            "nullable": true
+          },
+          "compressionMaxTime": {
+            "type": "integer",
+            "description": "Maximum time (in milliseconds) between compressed values.",
+            "format": "int32",
+            "nullable": true
+          },
+          "digitalSet": {
+            "type": "string",
+            "description": "Associated digital state set name (for digital-type points).",
+            "nullable": true
+          },
+          "step": {
+            "type": "boolean",
+            "description": "Indicates whether values are treated as step (true) or interpolated (false)."
+          },
+          "timeCalculation": {
+            "type": "string",
+            "description": "Formula used to calculate the time associated with the tag's value.\r\nDefault `now()`;",
+            "nullable": true
+          },
+          "errorCalculation": {
+            "type": "string",
+            "description": "Formula used to calculate error values for the tag.",
+            "nullable": true
+          },
+          "valueCalculation": {
+            "type": "string",
+            "description": "User-defined calculation or formula associated with the tag's value.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents the configuration and metadata of a tag."
+      },
+      "MigrationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the migration.",
+            "nullable": true
+          },
+          "applied": {
+            "type": "boolean",
+            "description": "Indicates whether the migration has been applied."
+          },
+          "pending": {
+            "type": "boolean",
+            "description": "Indicates whether the migration is pending."
+          },
+          "exist": {
+            "type": "boolean",
+            "description": "Indicates whether the migration exists in the codebase."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Data transfer object representing a database migration and its status."
+      },
+      "ObjectSaveSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the module instance.",
+            "format": "int32"
+          },
+          "settings": {
+            "description": "Gets or sets the settings object to be saved.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a request to save module instance settings."
+      },
+      "PutSecurityRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Instance id",
+            "format": "int32"
+          },
+          "securities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SecurityResponse"
+            },
+            "description": "Securities",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Put security dto"
+      },
+      "SecurityResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Code",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Description",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Roles",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Security dto"
+      },
+      "TagDto": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the tag.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the tag.",
+            "nullable": true
+          },
+          "valueType": {
+            "$ref": "#/components/schemas/TagTypes"
+          },
+          "interfaceId": {
+            "type": "integer",
+            "description": "The interface associated with the tag.",
+            "format": "int32",
+            "nullable": true
+          },
+          "descriptor": {
+            "type": "string",
+            "description": "Description of the point (used as a comment or label).",
+            "nullable": true
+          },
+          "uom": {
+            "type": "string",
+            "description": "Engineering units (e.g., °C, PSI, m³/h).",
+            "nullable": true
+          },
+          "instrumentTag": {
+            "type": "string",
+            "description": "Reference to the source signal or channel tag.",
+            "nullable": true
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Indicates whether the tag is currently enabled."
+          },
+          "compressing": {
+            "type": "boolean",
+            "description": "Indicates whether compression is enabled for this tag."
+          },
+          "compressionMinTime": {
+            "type": "integer",
+            "description": "Minimum time (in milliseconds) between compressed values.\r\nValues received within this period are discarded, regardless of their error margin.",
+            "format": "int32",
+            "nullable": true
+          },
+          "compressionMaxTime": {
+            "type": "integer",
+            "description": "Maximum time (in milliseconds) between compressed values.",
+            "format": "int32",
+            "nullable": true
+          },
+          "digitalSet": {
+            "type": "string",
+            "description": "Associated digital state set name (for digital-type points).",
+            "nullable": true
+          },
+          "step": {
+            "type": "boolean",
+            "description": "Indicates whether values are treated as step (true) or interpolated (false)."
+          },
+          "timeCalculation": {
+            "type": "string",
+            "description": "Formula used to calculate the time associated with the tag's value.\r\nDefault `now()`;",
+            "nullable": true
+          },
+          "errorCalculation": {
+            "type": "string",
+            "description": "Formula used to calculate error values for the tag.",
+            "nullable": true
+          },
+          "valueCalculation": {
+            "type": "string",
+            "description": "User-defined calculation or formula associated with the tag's value.",
+            "nullable": true
+          },
+          "creationDate": {
+            "type": "string",
+            "description": "Date and time when the tag was created.",
+            "format": "date-time"
+          },
+          "creator": {
+            "type": "string",
+            "description": "User or process that created the tag.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents the configuration and metadata of a tag."
+      },
+      "TagTypes": {
+        "enum": [
+          "Float32",
+          "Float64",
+          "Int16",
+          "Int32",
+          "Digital",
+          "String",
+          "Blob"
+        ],
+        "type": "string",
+        "description": "Defines the data types supported for tags"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "JWT Authorization header using the Bearer scheme. \\r\\n\\r\\n \n                      Enter 'Bearer' [space] and then your token in the text input below.\n                      \\r\\n\\r\\nExample: 'Bearer 12345abcdef'",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
