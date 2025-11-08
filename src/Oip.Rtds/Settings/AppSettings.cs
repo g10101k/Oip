@@ -5,7 +5,7 @@ using Oip.Settings;
 namespace Oip.Rts.Settings;
 
 /// <inheritdoc cref="IBaseOipModuleAppSettings"/>
-public class AppSettings: BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings, IRtdsAppSettings
+public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings, IRtdsAppSettings
 {
     /// <summary>
     /// 
@@ -16,17 +16,14 @@ public class AppSettings: BaseAppSettings<AppSettings>, IBaseOipModuleAppSetting
     public string OipUrls { get; set; } = default!;
 
     /// <inheritdoc />
-    public OpenApiSettings OpenApi { get; set; } = new();
+    public List<OpenApiSettings> OpenApi { get; set; } = new();
 
     /// <inheritdoc />
     public SpaDevelopmentServerSettings SpaProxyServer { get; set; } = new();
 
     /// <inheritdoc />
     public OpenTelemetrySettings Telemetry { get; set; } = new();
-    
-    /// <inheritdoc />
-    public SecurityServiceSettings SecurityService { get; set; } = new();
 
     /// <inheritdoc />
-    public List<ApiGenerationSettings> ApiGenerationSettings { get; set; } = new();
+    public SecurityServiceSettings SecurityService { get; set; } = new();
 }

@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Octonica.ClickHouseClient;
 using Oip.Rtds.Grpc;
@@ -9,10 +7,6 @@ namespace Oip.Rtds.Data.Contexts;
 /// <summary>
 /// ClickHouse database context for real-time data storage operations.
 /// </summary>
-/// <remarks>
-/// Manages database connections and provides methods for tag table creation.
-/// Handles both synchronous and asynchronous resource cleanup.
-/// </remarks>
 public sealed class RtdsContext : IDisposable, IAsyncDisposable
 {
     private readonly ILogger<RtdsContext> _logger;
@@ -23,6 +17,8 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// Initializes a new instance of the <see cref="RtdsContext"/> class using the provided application settings.
     /// Opens the ClickHouse connection immediately.
     /// </summary>
+    /// <param name="appSettings">Application settings containing connection string</param>
+    /// <param name="logger">Logger instance for logging operations</param>
     public RtdsContext(IRtdsAppSettings appSettings, ILogger<RtdsContext> logger)
     {
         _logger = logger;
@@ -66,6 +62,11 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
         await cmd.ExecuteNonQueryAsync();
     }
 
+    /// <summary>
+    /// Inserts a collection of numeric values into the tag table
+    /// </summary>
+    /// <param name="values">List of value DTOs containing data to insert</param>
+    /// <returns>Task representing the asynchronous insert operation</returns>
     public async Task InsertValues(List<InsertValueDto<double>> values)
     {
         try
@@ -83,7 +84,7 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error occured while inserting values");
+            _logger.LogError(e, "An error occurred while inserting values");
         }
     }
 
@@ -145,4 +146,13 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     #endregion
 }
 
+/// <summary>
+/// Represents a data transfer object for inserting tag values
+/// </summary>
+/// <typeparam name="T">Type of the value data</typeparam>
+/// <param name="Id">Tag identifier</param>
+/// <param name="ValueType">Type of the tag value</param>
+/// <param name="Time">Timestamp of the value</param>
+/// <param name="Value">The actual value data</param>
+/// <param name="Status">Status of the tag value</param>
 public record InsertValueDto<T>(uint Id, TagTypes ValueType, DateTimeOffset Time, T Value, TagValueStatus Status);

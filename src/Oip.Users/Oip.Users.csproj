@@ -10,6 +10,7 @@
         <SpaProxyLaunchCommand>npm run start:rtds</SpaProxyLaunchCommand>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <UserSecretsId>240c1695-547e-4873-b43c-0a540c7e9a07</UserSecretsId>
     </PropertyGroup>
     
     <ItemGroup>
@@ -59,6 +60,10 @@
       <None Include="appsettings.Development.json">
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="SwaggerFiles\" />
     </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

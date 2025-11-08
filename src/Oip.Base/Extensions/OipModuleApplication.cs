@@ -107,7 +107,7 @@ public static class OipModuleApplication
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var openApiSettings = settings.OpenApi;
-        if (!openApiSettings.Publish)
+        if (openApiSettings.All(x => !x.Publish))
             return;
         builder.Services.AddSwaggerGen(options =>
         {
@@ -147,20 +147,20 @@ public static class OipModuleApplication
                     new List<string>()
                 }
             });
-            options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
-            {
-                Version = openApiSettings.Version,
-                Title = openApiSettings.Title,
-                Description = openApiSettings.Description,
-            });
 
-            options.SwaggerDoc("base", new OpenApiInfo
+            openApiSettings.ForEach(openApiSettings =>
             {
-                Version = "v1",
-                Title = "Base services",
-                Description = "Base services",
+                if (openApiSettings.Publish)
+                {
+                    options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
+                    {
+                        Version = openApiSettings.Version,
+                        Title = openApiSettings.Title,
+                        Description = openApiSettings.Description,
+                    });
+                }
             });
-
+            
             options.DocInclusionPredicate((docName, apiDesc) =>
             {
                 if (docName == "v1")
@@ -270,14 +270,19 @@ public static class OipModuleApplication
 
     private static void MapOpenApi(this WebApplication app, IBaseOipModuleAppSettings settings)
     {
-        if (!settings.OpenApi.Publish)
+        if (settings.OpenApi.All(x => !x.Publish))
             return;
         app.UseSwagger();
-        app.UseSwaggerUI(x =>
+        app.UseSwaggerUI(swaggerUiOptions =>
         {
-            x.EnableTryItOutByDefault();
-            x.SwaggerEndpoint("/swagger/v1/swagger.json", "Module OIP service");
-            x.SwaggerEndpoint("/swagger/base/swagger.json", "Base OIP service");
+            swaggerUiOptions.EnableTryItOutByDefault();
+            settings.OpenApi.ForEach(api =>
+            {
+                if (api.Publish)
+                {
+                    swaggerUiOptions.SwaggerEndpoint(api.Url, api.Name);
+                }
+            });
         });
     }
 

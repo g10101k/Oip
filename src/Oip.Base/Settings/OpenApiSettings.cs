@@ -16,9 +16,14 @@ public class OpenApiSettings
     public string Name { get; set; } = "v1";
 
     /// <summary>
+    /// Url
+    /// </summary>
+    public string Url { get; set; } = "/swagger/v1/swagger.json";
+
+    /// <summary>
     /// Version api
     /// </summary>
-    public string Version { get; set; } = "v1";
+    public string Version { get; set; } = "v1.0.0";
 
     /// <summary>
     /// Title
@@ -29,4 +34,9 @@ public class OpenApiSettings
     /// Description
     /// </summary>
     public string Description { get; set; } = "Add block \"OpenApiSettings\" in appsettings.json";
+    
+    /// <summary>
+    /// Output path for
+    /// </summary>
+    public string? WebClientOutputPath { get; set; }
 }

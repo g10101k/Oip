@@ -12,7 +12,7 @@ namespace Oip.Users.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/users")]
-[Authorize]
+[ApiExplorerSettings(GroupName = "users")]
 public class UsersController(
     UserRepository userRepository,
     UserSyncService userSyncService,
