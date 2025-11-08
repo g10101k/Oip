@@ -602,7 +602,7 @@
           "valueType": {
             "$ref": "#/components/schemas/TagTypes"
           },
-          "interface": {
+          "interfaceId": {
             "type": "integer",
             "description": "The interface associated with the tag.",
             "format": "int32",

@@ -8,18 +8,9 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
-    <ItemGroup>
-        <Protobuf Include="..\Oip.Rtds\Protos\rtds_service.proto" GrpcServices="Client">
-            <Link>Protos\rtds_service.proto</Link>
-        </Protobuf>
-    </ItemGroup>
     
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1"/>
-        <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
-        <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
-        <PackageReference Include="Google.Protobuf" Version="3.27.1" />
-        <PackageReference Include="Grpc.Tools" Version="2.62.0" PrivateAssets="All" />
         <PackageReference Include="NLog" Version="5.3.4" />
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
     </ItemGroup>

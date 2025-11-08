@@ -1,8 +1,9 @@
+using System.Globalization;
 using Google.Protobuf.WellKnownTypes;
-using Oip.Rtds.Base;
+using Microsoft.Extensions.Logging;
 using Oip.Rtds.Grpc;
 
-namespace Oip.Rtds.Random.Services;
+namespace Oip.Rtds.Base.Services;
 
 /// <summary>
 /// Service for compressing and filtering data before writing to RTDS
@@ -53,7 +54,8 @@ public class CompressService(TagCacheService tagCacheService, ILogger<CompressSe
 
         var lastTime = tag.ValueTime.ToDateTimeOffset();
         var deltaTime = calculateResult.Time - lastTime;
-        var deltaValue = Math.Abs(Convert.ToDouble(tag.Value) - Convert.ToDouble(calculateResult.Value));
+        var deltaValue = Math.Abs(Convert.ToDouble(tag.Value, CultureInfo.InvariantCulture) -
+                                  Convert.ToDouble(calculateResult.Value));
 
         // Skip if the time difference is too small
         if (deltaTime.TotalMilliseconds < tag.CompressionMinTime)

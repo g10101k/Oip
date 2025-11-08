@@ -25,7 +25,7 @@ public class CreateTagDto
     /// <summary>
     /// The interface associated with the tag.
     /// </summary>
-    public uint? Interface { get; set; }
+    public uint? InterfaceId { get; set; }
 
     /// <summary>
     /// Description of the point (used as a comment or label).

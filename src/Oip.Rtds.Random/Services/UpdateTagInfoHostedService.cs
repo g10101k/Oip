@@ -23,7 +23,7 @@ public class UpdateTagInfoHostedService(ILogger<UpdateTagInfoHostedService> logg
         {
             try
             {
-                // Your update logic here
+                await scopeFactory.ExecuteAsync<UpdateTagInfoService>(x => x.DoWork(stoppingToken));
                 await Task.Delay(1000, stoppingToken); // Example delay
             }
             catch (Exception ex)
@@ -33,4 +33,3 @@ public class UpdateTagInfoHostedService(ILogger<UpdateTagInfoHostedService> logg
         }
     }
 }
-    

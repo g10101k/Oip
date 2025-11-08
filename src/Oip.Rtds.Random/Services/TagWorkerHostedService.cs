@@ -1,4 +1,5 @@
 using Oip.Base.Extensions;
+using Oip.Rtds.Base.Services;
 
 namespace Oip.Rtds.Random.Services;
 

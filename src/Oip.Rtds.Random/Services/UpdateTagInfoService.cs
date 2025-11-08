@@ -1,4 +1,5 @@
 using Oip.Rtds.Base;
+using Oip.Rtds.Base.Services;
 using Oip.Rtds.Grpc;
 using Oip.Rtds.Random.Settings;
 

@@ -49,7 +49,7 @@ public class TagRepository
             {
                 Name = createTag.Name,
                 ValueType = createTag.ValueType,
-                InterfaceId = createTag.Interface,
+                InterfaceId = createTag.InterfaceId,
                 Descriptor = createTag.Descriptor,
                 Uom = createTag.Uom,
                 InstrumentTag = createTag.InstrumentTag,
@@ -160,7 +160,7 @@ public class TagRepository
                      throw new InvalidOperationException("Tag not found");
         entity.Name = dto.Name;
         entity.ValueType = dto.ValueType;
-        entity.InterfaceId = dto.Interface;
+        entity.InterfaceId = dto.InterfaceId;
         entity.Descriptor = dto.Descriptor;
         entity.Uom = dto.Uom;
         entity.InstrumentTag = dto.InstrumentTag;

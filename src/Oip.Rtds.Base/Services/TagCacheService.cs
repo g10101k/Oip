@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Oip.Rtds.Grpc;
 
-namespace Oip.Rtds.Random.Services;
+namespace Oip.Rtds.Base.Services;
 
 /// <summary>
 /// Service for managing a cache of tags. Provides methods to update, retrieve, and clear the cache of tags.
@@ -50,8 +50,10 @@ public class TagCacheService
     /// <param name="id">The ID of the tag to retrieve.</param>
     /// <param name="tag">The tag corresponding to the given ID, if found.</param>
     /// <returns>True if the tag was found, otherwise false.</returns>
-    public bool TryGetTag(uint id, out TagResponse? tag)
-        => _tags.TryGetValue(id, out tag);
+    public virtual bool TryGetTag(uint id, out TagResponse? tag)
+    {
+        return _tags.TryGetValue(id, out tag);
+    }
 
     /// <summary>
     /// Clears all cached tags.

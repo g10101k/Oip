@@ -8,7 +8,25 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Oip.Rtds.Base;
 
-public record CalculateResult(uint TagId, object Value, DateTimeOffset Time, double Error);
+public class CalculateResult
+{
+    public uint TagId { get; set; }
+    public object Value { get; set; }
+    public DateTimeOffset Time { get; set; }
+    public double Error { get; set; }
+
+    public CalculateResult()
+    {
+    }
+
+    public CalculateResult(uint tagId, object value, DateTimeOffset time, double error)
+    {
+        TagId = tagId;
+        Value = value;
+        Time = time;
+        Error = error;
+    }
+}
 
 /// <summary>
 /// Результат компиляции формулы с загруженной сборкой и методами.

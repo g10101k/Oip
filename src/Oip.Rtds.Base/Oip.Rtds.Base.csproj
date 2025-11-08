@@ -7,7 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+        <Protobuf Include="..\Oip.Rtds\Protos\rtds_service.proto" GrpcServices="Client">
+            <Link>Protos\rtds_service.proto</Link>
+        </Protobuf>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0"/>
+        <PackageReference Include="Grpc.Net.Client" Version="2.71.0"/>
+        <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0"/>
+        <PackageReference Include="Google.Protobuf" Version="3.27.1"/>
+        <PackageReference Include="Grpc.Tools" Version="2.62.0" PrivateAssets="All"/>
     </ItemGroup>
 
 </Project>
