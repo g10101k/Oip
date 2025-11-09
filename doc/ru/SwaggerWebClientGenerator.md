@@ -8,6 +8,9 @@ Swagger-документации и при необходимости **пере
 Он активируется **только в режиме разработки** (`ASPNETCORE_ENVIRONMENT=Development`) и использует [
 `swagger-typescript-api`](https://github.com/acacode/swagger-typescript-api) для генерации.
 
+Для правильной того, чтобы отнести тот или иной контроллер к определенному api нужно использовать
+атрибут `[ApiExplorerSettings(GroupName = "users")]`
+
 ---
 
 ## ⚙️ Как работает
@@ -27,45 +30,29 @@ Swagger-документации и при необходимости **пере
 
 ```json
 {
-  "ApiGenerationSettings": [
+  "OpenApi": [
     {
-      "DocumentName": "base",
-      "OutputPath": "./projects/oip-common/src/api"
+      "Publish": true,
+      "Name": "base",
+      "Url": "/swagger/base/swagger.json",
+      "Version": "v1.0.0",
+      "Title": "Base service web-api",
+      "Description": "Base service web-api",
+      "WebClientOutputPath": "./projects/oip/src/api"
+      // <- при наличии генерирует веб-клиента
     },
     {
-      "DocumentName": "v1",
-      "OutputPath": "./projects/oip/src/api"
+      "Publish": true,
+      "Name": "users",
+      "Url": "/swagger/users/swagger.json",
+      "Version": "v1.0.0",
+      "Title": "User service web-api",
+      "Description": "User service web-api",
+      "WebClientOutputPath": "./projects/oip-common/src/user-api"
+      // <- при наличии генерирует веб-клиента
     }
   ]
 }
-```
-
----
-
-## 📦 Установка зависимостей
-
-### Backend (C#)
-
-Добавьте необходимые NuGet-пакеты:
-
-```bash
-dotnet add package Swashbuckle.AspNetCore.Swagger
-dotnet add package Microsoft.OpenApi
-```
-
-### Frontend (Node.js)
-
-Перейдите в каталог фронтенда:
-
-```bash
-cd ../Oip.WebClient
-npm install swagger-typescript-api --save-dev
-```
-
-При желании можно установить глобально:
-
-```bash
-npm install -g swagger-typescript-api
 ```
 
 ---
