@@ -6,8 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <SpaRoot>.\..\Oip.WebClient\</SpaRoot>
-        <SpaProxyServerUrl>https://localhost:50003</SpaProxyServerUrl>
-        <SpaProxyLaunchCommand>npm run start:rtds</SpaProxyLaunchCommand>
+        <SpaProxyServerUrl>https://localhost:50005</SpaProxyServerUrl>
+        <SpaProxyLaunchCommand>npm run start:users</SpaProxyLaunchCommand>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <UserSecretsId>240c1695-547e-4873-b43c-0a540c7e9a07</UserSecretsId>
@@ -17,6 +17,7 @@
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.11"/>
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.14"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
         <PackageReference Include="NLog" Version="5.3.4"/>
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
@@ -60,10 +61,6 @@
       <None Include="appsettings.Development.json">
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="SwaggerFiles\" />
     </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
