@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Users.Contexts;
 
 #nullable disable
 
-namespace Oip.Users.Data.Migrations.Postgres
+namespace Oip.Users.Migrations.Postgres
 {
     [DbContext(typeof(UserContextPostgres))]
-    partial class UserContextPostgresModelSnapshot : ModelSnapshot
+    [Migration("20251109072313_AddUserSettingsColumn_Postgres")]
+    partial class AddUserSettingsColumn_Postgres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

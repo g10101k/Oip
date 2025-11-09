@@ -64,6 +64,11 @@ namespace Oip.Users.Data.Migrations.SqlServer
                         .HasColumnType("varbinary(max)")
                         .HasComment("User photo");
 
+                    b.Property<string>("Settings")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("User settings");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("datetimeoffset")
                         .HasComment("Last update date and time");

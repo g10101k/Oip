@@ -2,83 +2,86 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Users.Contexts;
 
 #nullable disable
 
-namespace Oip.Users.Data.Migrations.Postgres
+namespace Oip.Users.Migrations.SqlServer
 {
-    [DbContext(typeof(UserContextPostgres))]
-    partial class UserContextPostgresModelSnapshot : ModelSnapshot
+    [DbContext(typeof(UserContextSqlServer))]
+    [Migration("20251109072319_AddUserSettingsColumn_SqlServer")]
+    partial class AddUserSettingsColumn_SqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.11")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Oip.Users.Entities.UserEntity", b =>
                 {
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetimeoffset")
                         .HasComment("Creation date and time");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("E-mail");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("First name");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Indicates whether the user is active");
 
                     b.Property<string>("KeycloakId")
                         .IsRequired()
                         .HasMaxLength(36)
-                        .HasColumnType("character varying(36)")
+                        .HasColumnType("nvarchar(36)")
                         .HasComment("Gets or sets the Keycloak identifier for the user.");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Last name");
 
                     b.Property<DateTimeOffset>("LastSyncedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetimeoffset")
                         .HasComment("Last synchronization date and time");
 
                     b.Property<byte[]>("Photo")
-                        .HasColumnType("bytea")
+                        .HasColumnType("varbinary(max)")
                         .HasComment("User photo");
 
                     b.Property<string>("Settings")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("User settings");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetimeoffset")
                         .HasComment("Last update date and time");
 
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("User id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
                     b.ToTable("User", "usr", t =>
                         {
