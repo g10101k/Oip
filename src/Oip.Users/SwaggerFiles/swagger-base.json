@@ -1,0 +1,1094 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Base service web-api",
+    "description": "Base service web-api",
+    "version": "v1.0.0"
+  },
+  "paths": {
+    "/api/folder-module/get-module-rights": {
+      "get": {
+        "tags": [
+          "FolderModule"
+        ],
+        "summary": "Returns a list of rights (permissions) required to access the folder module.",
+        "description": "This method defines the security model for the folder module. It currently includes only read access,\r\nlimited to users with the administrator role.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/folder-module/get-security": {
+      "get": {
+        "tags": [
+          "FolderModule"
+        ],
+        "summary": "Gets the security configuration for the specified module instance ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SecurityResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/folder-module/put-security": {
+      "put": {
+        "tags": [
+          "FolderModule"
+        ],
+        "summary": "Updates the security configuration for the specified module instance.",
+        "requestBody": {
+          "description": "The request containing the new security configuration.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutSecurityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/folder-module/get-module-instance-settings": {
+      "get": {
+        "tags": [
+          "FolderModule"
+        ],
+        "summary": "Gets the settings for the specified module instance.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The ID of the module instance.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/folder-module/put-module-instance-settings": {
+      "put": {
+        "tags": [
+          "FolderModule"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FolderModuleSettingsSaveSettingsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FolderModuleSettingsSaveSettingsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FolderModuleSettingsSaveSettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menu/get": {
+      "get": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Retrieves the menu available to the current authenticated user.",
+        "description": "Filters modules based on the roles of the current user and returns only those that are accessible.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleInstanceDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleInstanceDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleInstanceDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/menu/get-admin-menu": {
+      "get": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Retrieves the admin-specific menu.",
+        "description": "Returns all administrative modules for users with the Admin role.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleInstanceDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleInstanceDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleInstanceDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/menu/get-modules": {
+      "get": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Retrieves all available modules in the system.",
+        "description": "Useful for module management interfaces or system diagnostics.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IntKeyValueDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IntKeyValueDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IntKeyValueDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/menu/add-module-instance": {
+      "post": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Adds a new module instance to the system.",
+        "requestBody": {
+          "description": "The data transfer object containing information about the new module instance.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddModuleInstanceDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddModuleInstanceDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddModuleInstanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menu/edit-module-instance": {
+      "post": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Edits an existing module instance.",
+        "requestBody": {
+          "description": "The data transfer object containing the updated module instance information.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditModuleInstanceDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditModuleInstanceDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditModuleInstanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/menu/delete-module-instance": {
+      "delete": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Deletes a module instance by its identifier.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The unique identifier of the module instance to delete.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/module/get-all": {
+      "get": {
+        "tags": [
+          "Module"
+        ],
+        "summary": "Retrieves all modules stored in the system.",
+        "description": "Only accessible to users with the Admin role.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/module/insert": {
+      "post": {
+        "tags": [
+          "Module"
+        ],
+        "summary": "Inserts a new module into the system.",
+        "requestBody": {
+          "description": "The module data to insert.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/module/delete": {
+      "delete": {
+        "tags": [
+          "Module"
+        ],
+        "summary": "Deletes a module by its identifier.",
+        "requestBody": {
+          "description": "The request object containing the module ID to delete.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleDeleteRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleDeleteRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleDeleteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/module/get-modules-with-load-status": {
+      "get": {
+        "tags": [
+          "Module"
+        ],
+        "summary": "Returns all registered modules and indicates whether each one is currently loaded into the application.",
+        "description": "Compares all modules in the database with loaded modules in the application context.\r\nThis information can be used for diagnostics and monitoring of active modules.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExistModuleDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExistModuleDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExistModuleDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/security/get-realm-roles": {
+      "get": {
+        "tags": [
+          "Security"
+        ],
+        "summary": "Retrieves all realm roles from Keycloak.",
+        "description": "This endpoint is restricted to administrators.\r\nUseful for role management in the application UI or backend.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/security/get-keycloak-client-settings": {
+      "get": {
+        "tags": [
+          "Security"
+        ],
+        "summary": "Retrieves Keycloak client settings needed by frontend applications.",
+        "description": "This endpoint is publicly accessible and provides client configuration such as authority URL,\r\nclient ID, scopes, and secure routes for frontend OAuth2/OIDC initialization.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetKeycloakClientSettingsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetKeycloakClientSettingsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetKeycloakClientSettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/service/get": {
+      "get": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Get manifest for client app",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/GetManifestResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/GetManifestResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/GetManifestResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/service/register-module": {
+      "post": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Registry module",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterModuleDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterModuleDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterModuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddModuleInstanceDto": {
+        "type": "object",
+        "properties": {
+          "moduleId": {
+            "type": "integer",
+            "description": "",
+            "format": "int32"
+          },
+          "label": {
+            "type": "string",
+            "description": "",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "description": "",
+            "nullable": true
+          },
+          "parentId": {
+            "type": "integer",
+            "description": "",
+            "format": "int32",
+            "nullable": true
+          },
+          "viewRoles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO for create module instance"
+      },
+      "EditModuleInstanceDto": {
+        "type": "object",
+        "properties": {
+          "moduleInstanceId": {
+            "type": "integer",
+            "description": "",
+            "format": "int32"
+          },
+          "label": {
+            "type": "string",
+            "description": "",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "description": "",
+            "nullable": true
+          },
+          "parentId": {
+            "type": "integer",
+            "description": "",
+            "format": "int32",
+            "nullable": true
+          },
+          "viewRoles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "DTO for edit module instance"
+      },
+      "ExistModuleDto": {
+        "type": "object",
+        "properties": {
+          "moduleId": {
+            "type": "integer",
+            "description": "Gets or sets the unique identifier of the module.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Gets or sets the name of the module.",
+            "nullable": true
+          },
+          "currentlyLoaded": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether the module is currently loaded in the application."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Data transfer object representing a module and its loaded status."
+      },
+      "FolderModuleSettings": {
+        "type": "object",
+        "properties": {
+          "html": {
+            "type": "string",
+            "description": "HTML content for the module.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Module settings."
+      },
+      "FolderModuleSettingsSaveSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Gets or sets the ID of the module instance.",
+            "format": "int32"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/FolderModuleSettings"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a request to save module instance settings."
+      },
+      "GetKeycloakClientSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "authority": {
+            "type": "string",
+            "description": "Authority",
+            "nullable": true
+          },
+          "clientId": {
+            "type": "string",
+            "description": "Client id",
+            "nullable": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Scope",
+            "nullable": true
+          },
+          "responseType": {
+            "type": "string",
+            "description": "Response Type",
+            "nullable": true
+          },
+          "useRefreshToken": {
+            "type": "boolean",
+            "description": "Use Refresh Token"
+          },
+          "silentRenew": {
+            "type": "boolean",
+            "description": "Silent Renew"
+          },
+          "logLevel": {
+            "type": "integer",
+            "description": "Log level None = 0, Debug = 1, Warn = 2, Error = 3",
+            "format": "int32"
+          },
+          "secureRoutes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Urls with auth",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response front security settings"
+      },
+      "GetManifestResponse": {
+        "type": "object",
+        "properties": {
+          "baseUrl": {
+            "type": "string",
+            "description": "Base Url",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response for module federation"
+      },
+      "IntKeyValueDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a key-value pair where the key is an integer and the value is a string."
+      },
+      "ModuleDeleteRequest": {
+        "type": "object",
+        "properties": {
+          "moduleId": {
+            "type": "integer",
+            "description": "Gets or sets the unique identifier of the module to be deleted.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents a request to delete a module by its identifier."
+      },
+      "ModuleDto": {
+        "type": "object",
+        "properties": {
+          "moduleId": {
+            "type": "integer",
+            "description": "Id",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name",
+            "nullable": true
+          },
+          "settings": {
+            "type": "string",
+            "description": "Settings",
+            "nullable": true
+          },
+          "moduleSecurities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModuleSecurityDto"
+            },
+            "description": "Securities",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "It module in app"
+      },
+      "ModuleInstanceDto": {
+        "type": "object",
+        "properties": {
+          "moduleInstanceId": {
+            "type": "integer",
+            "description": "Unique identifier for the module instance.",
+            "format": "int32"
+          },
+          "moduleId": {
+            "type": "integer",
+            "description": "Identifier for the module.",
+            "format": "int32"
+          },
+          "label": {
+            "type": "string",
+            "description": "The label for the module instance.",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "description": "Icon associated with the module instance. see https://primeng.org/icons",
+            "nullable": true
+          },
+          "routerLink": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Route link.",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "description": "URL for the module instance.",
+            "nullable": true
+          },
+          "target": {
+            "type": "string",
+            "description": "The target.",
+            "nullable": true
+          },
+          "settings": {
+            "type": "string",
+            "description": "Configuration settings for the module instance.",
+            "nullable": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModuleInstanceDto"
+            },
+            "description": "Child module instances.",
+            "nullable": true
+          },
+          "securities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Securities",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Module Instance Dto"
+      },
+      "ModuleSecurityDto": {
+        "required": [
+          "right",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "right": {
+            "type": "string",
+            "description": "Right",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "description": "Role",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Module security DTO"
+      },
+      "PutSecurityRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Instance id",
+            "format": "int32"
+          },
+          "securities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SecurityResponse"
+            },
+            "description": "Securities",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Put security dto"
+      },
+      "RegisterModuleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "See 'name' in webpack.config.js",
+            "nullable": true
+          },
+          "baseUrl": {
+            "type": "string",
+            "description": "Base Url",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Dto module"
+      },
+      "SecurityResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Code",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Description",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Roles",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Security dto"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "JWT Authorization header using the Bearer scheme. \\r\\n\\r\\n \n                      Enter 'Bearer' [space] and then your token in the text input below.\n                      \\r\\n\\r\\nExample: 'Bearer 12345abcdef'",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}

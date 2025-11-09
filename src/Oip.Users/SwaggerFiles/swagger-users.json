@@ -1,0 +1,197 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "User service web-api",
+    "description": "User service web-api",
+    "version": "v1.0.0"
+  },
+  "paths": {
+    "/api/user-profile/get-user-photo": {
+      "get": {
+        "tags": [
+          "UserProfile"
+        ],
+        "summary": "Gets user photo by email address",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "description": "User's email address",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/user-profile/post-user-photo": {
+      "post": {
+        "tags": [
+          "UserProfile"
+        ],
+        "summary": "Uploads user photo",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "files": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/user-profile/get-settings": {
+      "get": {
+        "tags": [
+          "UserProfile"
+        ],
+        "summary": "Get user setting by e-mail",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user-profile/set-settings": {
+      "put": {
+        "tags": [
+          "UserProfile"
+        ],
+        "summary": "Update User settings",
+        "requestBody": {
+          "description": "Settings",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSettingsDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSettingsDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserSettingsDto": {
+        "type": "object",
+        "properties": {
+          "preset": {
+            "type": "string",
+            "description": "Gets or sets the selected visual preset name.",
+            "nullable": true
+          },
+          "primary": {
+            "type": "string",
+            "description": "Gets or sets the primary color theme.",
+            "nullable": true
+          },
+          "surface": {
+            "type": "string",
+            "description": "Gets or sets the surface color. Can be null.",
+            "nullable": true
+          },
+          "darkTheme": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether the dark theme is enabled."
+          },
+          "menuMode": {
+            "type": "string",
+            "description": "Gets or sets the layout mode for the menu (e.g., static, overlay).",
+            "nullable": true
+          },
+          "language": {
+            "type": "string",
+            "description": "Gets or sets the selected language code.",
+            "nullable": true
+          },
+          "dateFormat": {
+            "type": "string",
+            "description": "Gets or sets the date format pattern.",
+            "nullable": true
+          },
+          "timeFormat": {
+            "type": "string",
+            "description": "Gets or sets the time format pattern.",
+            "nullable": true
+          },
+          "timeZone": {
+            "type": "string",
+            "description": "Gets or sets the user's time zone.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Represents user interface and localization settings."
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "JWT Authorization header using the Bearer scheme. \\r\\n\\r\\n \n                      Enter 'Bearer' [space] and then your token in the text input below.\n                      \\r\\n\\r\\nExample: 'Bearer 12345abcdef'",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
