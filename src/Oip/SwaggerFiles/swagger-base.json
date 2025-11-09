@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Base services",
-    "description": "Base services",
-    "version": "v1"
+    "title": "Base service web-api",
+    "description": "Base service web-api",
+    "version": "v1.0.0"
   },
   "paths": {
     "/api/folder-module/get-module-rights": {
