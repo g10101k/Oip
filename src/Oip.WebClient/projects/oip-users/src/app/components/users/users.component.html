@@ -1,0 +1,9 @@
+@if (isContent) {
+  <div>
+    Users module
+  </div>
+} @else if (isSettings) {
+  <div></div>
+} @else if (isSecurity) {
+  <security [controller]="controller" [id]="id"></security>
+}
