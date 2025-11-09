@@ -10,21 +10,19 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   SyncUserRequest,
   UserEntity,
   UsersGetAllUsersParams,
   UsersGetUserByKeycloakIdParams,
   UsersGetUserParams,
-  UsersSearchUserParams,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+  UsersSearchUserParams
+} from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
 @Injectable()
-export class Users<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Users<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -34,17 +32,14 @@ export class Users<
    * @request GET:/api/users/get-all-users
    * @secure
    */
-  usersGetAllUsers = (
-    query: UsersGetAllUsersParams,
-    params: RequestParams = {},
-  ) =>
+  usersGetAllUsers = (query: UsersGetAllUsersParams, params: RequestParams = {}) =>
     this.request<UserEntity[], any>({
       path: `/api/users/get-all-users`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -58,11 +53,11 @@ export class Users<
   usersGetUser = (query: UsersGetUserParams, params: RequestParams = {}) =>
     this.request<UserEntity, any>({
       path: `/api/users/get-user`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -73,17 +68,14 @@ export class Users<
    * @request GET:/api/users/get-user-by-keycloak-id
    * @secure
    */
-  usersGetUserByKeycloakId = (
-    query: UsersGetUserByKeycloakIdParams,
-    params: RequestParams = {},
-  ) =>
+  usersGetUserByKeycloakId = (query: UsersGetUserByKeycloakIdParams, params: RequestParams = {}) =>
     this.request<UserEntity, any>({
       path: `/api/users/get-user-by-keycloak-id`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -94,17 +86,14 @@ export class Users<
    * @request GET:/api/users/search-user
    * @secure
    */
-  usersSearchUser = (
-    query: UsersSearchUserParams,
-    params: RequestParams = {},
-  ) =>
+  usersSearchUser = (query: UsersSearchUserParams, params: RequestParams = {}) =>
     this.request<UserEntity[], any>({
       path: `/api/users/search-user`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * No description
@@ -118,11 +107,11 @@ export class Users<
   usersSyncUser = (data: SyncUserRequest, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/users/sync-user`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
   /**
    * No description
@@ -136,8 +125,8 @@ export class Users<
   usersSyncAllUsers = (params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/users/sync-all-users`,
-      method: "POST",
+      method: 'POST',
       secure: true,
-      ...params,
+      ...params
     });
 }

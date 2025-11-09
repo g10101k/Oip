@@ -10,18 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
-import {
-  UserProfileGetUserPhotoParams,
-  UserProfilePostUserPhotoPayload,
-  UserSettingsDto,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { Injectable } from '@angular/core';
+import { UserProfileGetUserPhotoParams, UserProfilePostUserPhotoPayload, UserSettingsDto } from './data-contracts';
+import { ContentType, HttpClient, RequestParams } from './http-client';
 
 @Injectable()
-export class UserProfile<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class UserProfile<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Gets user photo by email address
    *
@@ -30,16 +24,13 @@ export class UserProfile<
    * @request GET:/api/user-profile/get-user-photo
    * @secure
    */
-  userProfileGetUserPhoto = (
-    query: UserProfileGetUserPhotoParams,
-    params: RequestParams = {},
-  ) =>
+  userProfileGetUserPhoto = (query: UserProfileGetUserPhotoParams, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/user-profile/get-user-photo`,
-      method: "GET",
+      method: 'GET',
       query: query,
       secure: true,
-      ...params,
+      ...params
     });
   /**
    * @description Uploads user photo
@@ -49,17 +40,14 @@ export class UserProfile<
    * @request POST:/api/user-profile/post-user-photo
    * @secure
    */
-  userProfilePostUserPhoto = (
-    data: UserProfilePostUserPhotoPayload,
-    params: RequestParams = {},
-  ) =>
+  userProfilePostUserPhoto = (data: UserProfilePostUserPhotoPayload, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/user-profile/post-user-photo`,
-      method: "POST",
+      method: 'POST',
       body: data,
       secure: true,
       type: ContentType.FormData,
-      ...params,
+      ...params
     });
   /**
    * @description Get user setting by e-mail
@@ -72,10 +60,10 @@ export class UserProfile<
   userProfileGetSettings = (params: RequestParams = {}) =>
     this.request<UserSettingsDto, any>({
       path: `/api/user-profile/get-settings`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
   /**
    * @description Update User settings
@@ -85,16 +73,13 @@ export class UserProfile<
    * @request PUT:/api/user-profile/set-settings
    * @secure
    */
-  userProfileSetSettings = (
-    data: UserSettingsDto,
-    params: RequestParams = {},
-  ) =>
+  userProfileSetSettings = (data: UserSettingsDto, params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/user-profile/set-settings`,
-      method: "PUT",
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
+      ...params
     });
 }

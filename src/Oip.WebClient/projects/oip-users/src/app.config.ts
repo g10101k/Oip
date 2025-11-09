@@ -11,7 +11,8 @@ import {
   SecurityDataService,
   UserService,
   langIntercept,
-  httpLoaderAuthFactory, SecurityService
+  httpLoaderAuthFactory,
+  SecurityService
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { MessageService } from 'primeng/api';
@@ -19,7 +20,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 import { SecurityStorageService } from '../../oip-common/src/services/security-storage.service';
-import { UserProfile } from "../../oip-common/src/user-api/UserProfile";
+import { UserProfile } from '../../oip-common/src/user-api/UserProfile';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);

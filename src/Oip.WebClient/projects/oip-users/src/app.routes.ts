@@ -10,8 +10,7 @@ export const appRoutes: Routes = [
     children: [
       {
         path: 'user/:id',
-        loadComponent: () =>
-          import('./app/components/users/users.component').then((m) => m.UserComponent),
+        loadComponent: () => import('./app/components/users/users.component').then((m) => m.UserComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
       },
       {

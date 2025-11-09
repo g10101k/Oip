@@ -10,14 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from "@angular/core";
-import { GetKeycloakClientSettingsResponse } from "./data-contracts";
-import { HttpClient, RequestParams } from "./http-client";
+import { Injectable } from '@angular/core';
+import { GetKeycloakClientSettingsResponse } from './data-contracts';
+import { HttpClient, RequestParams } from './http-client';
 
 @Injectable()
-export class Security<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Security<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Retrieves Keycloak client settings needed by frontend applications.
    *
@@ -29,9 +27,9 @@ export class Security<
   securityGetKeycloakClientSettings = (params: RequestParams = {}) =>
     this.request<GetKeycloakClientSettingsResponse, any>({
       path: `/api/security/get-keycloak-client-settings`,
-      method: "GET",
+      method: 'GET',
       secure: true,
-      format: "json",
-      ...params,
+      format: 'json',
+      ...params
     });
 }

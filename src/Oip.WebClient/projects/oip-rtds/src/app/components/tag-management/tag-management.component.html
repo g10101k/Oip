@@ -1,10 +1,10 @@
-<p-confirm-dialog/>
+<p-confirm-dialog />
 @if (isContent) {
   <div>
     <p-dialog header="Create tag" [modal]="true" [style]="{ width: '25rem' }" [(visible)]="createTagDialogVisible">
       <div class="flex items-center gap-4 mb-4">
         <label class="font-semibold w-24" for="username">Name</label>
-        <input autocomplete="off" class="flex-auto" id="username" pInputText [(ngModel)]="createTag.name"/>
+        <input autocomplete="off" class="flex-auto" id="username" pInputText [(ngModel)]="createTag.name" />
       </div>
       <div class="flex items-center gap-4 mb-8">
         <label class="font-semibold w-24" for="tag-type">Tag type</label>
@@ -16,11 +16,11 @@
           optionValue="value"
           placeholder="Select type"
           [options]="valueTypeOptions"
-          [(ngModel)]="createDialogSelectedType"/>
+          [(ngModel)]="createDialogSelectedType" />
       </div>
       <div class="flex justify-end gap-2">
-        <p-button label="Cancel" severity="secondary" (click)="cancelCreateDialogClick()"/>
-        <p-button label="Save" (click)="saveCreateTagDialogClick()"/>
+        <p-button label="Cancel" severity="secondary" (click)="cancelCreateDialogClick()" />
+        <p-button label="Save" (click)="saveCreateTagDialogClick()" />
       </div>
     </p-dialog>
     <div class="grid grid-cols-12">
@@ -34,15 +34,15 @@
                 icon="pi pi-plus"
                 severity="secondary"
                 [text]="true"
-                (onClick)="showCreateTagDialog()"/>
-              <p-button class="mr-2" icon="pi pi-refresh" severity="secondary" [text]="true" (onClick)="refresh()"/>
-              <p-button class="mr-2" icon="pi pi-save" severity="secondary" [text]="true" (onClick)="saveTag()"/>
+                (onClick)="showCreateTagDialog()" />
+              <p-button class="mr-2" icon="pi pi-refresh" severity="secondary" [text]="true" (onClick)="refresh()" />
+              <p-button class="mr-2" icon="pi pi-save" severity="secondary" [text]="true" (onClick)="saveTag()" />
             </ng-template>
             <ng-template #center></ng-template>
             <ng-template #end>
               <p-iconfield iconPosition="left">
-                <p-inputicon class="pi pi-search"/>
-                <input pInputText placeholder="Search" type="text"/>
+                <p-inputicon class="pi pi-search" />
+                <input pInputText placeholder="Search" type="text" />
               </p-iconfield>
             </ng-template>
           </p-toolbar>
@@ -59,39 +59,39 @@
             <tr>
               <th pSortableColumn="id">
                 Id
-                <p-sortIcon field="id"/>
+                <p-sortIcon field="id" />
               </th>
               <th pSortableColumn="name">
                 Name
-                <p-sortIcon field="name"/>
+                <p-sortIcon field="name" />
               </th>
               <th pSortableColumn="valueType">
                 Type
-                <p-sortIcon field="valueType"/>
+                <p-sortIcon field="valueType" />
               </th>
               <th pSortableColumn="source">
                 Source
-                <p-sortIcon field="source"/>
+                <p-sortIcon field="source" />
               </th>
               <th pSortableColumn="engUnits">
                 Units
-                <p-sortIcon field="engUnits"/>
+                <p-sortIcon field="engUnits" />
               </th>
               <th pSortableColumn="scan">
                 Scan
-                <p-sortIcon field="scan"/>
+                <p-sortIcon field="scan" />
               </th>
               <th pSortableColumn="archiving">
                 Arch.
-                <p-sortIcon field="archiving"/>
+                <p-sortIcon field="archiving" />
               </th>
               <th pSortableColumn="compressing">
                 Comp.
-                <p-sortIcon field="compressing"/>
+                <p-sortIcon field="compressing" />
               </th>
               <th pSortableColumn="creationDate">
                 Created
-                <p-sortIcon field="creationDate"/>
+                <p-sortIcon field="creationDate" />
               </th>
               <th>Actions</th>
             </tr>
@@ -105,17 +105,17 @@
               <td>{{ tag.source }}</td>
               <td>{{ tag.uom }}</td>
               <td>
-                <p-tag [severity]="tag.scan ? 'info' : 'warn'" [value]="tag.scan ? 'Yes' : 'No'"/>
+                <p-tag [severity]="tag.scan ? 'info' : 'warn'" [value]="tag.scan ? 'Yes' : 'No'" />
               </td>
               <td>
-                <p-tag [severity]="tag.archiving ? 'info' : 'warn'" [value]="tag.archiving ? 'Yes' : 'No'"/>
+                <p-tag [severity]="tag.archiving ? 'info' : 'warn'" [value]="tag.archiving ? 'Yes' : 'No'" />
               </td>
               <td>
-                <p-tag [severity]="tag.compressing ? 'info' : 'warn'" [value]="tag.compressing ? 'Yes' : 'No'"/>
+                <p-tag [severity]="tag.compressing ? 'info' : 'warn'" [value]="tag.compressing ? 'Yes' : 'No'" />
               </td>
               <td>{{ tag.creationDate | date: "yyyy-MM-dd HH:mm" }}</td>
               <td>
-                <p-button class="mr-2" icon="pi pi-trash" severity="danger" [text]="true" (onClick)="deleteTag(tag)"/>
+                <p-button class="mr-2" icon="pi pi-trash" severity="danger" [text]="true" (onClick)="deleteTag(tag)" />
               </td>
             </tr>
           </ng-template>
@@ -134,7 +134,7 @@
             <div class="grid grid-cols-12 gap-4 mt-4">
               <label class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0" for="name">Name</label>
               <div class="col-span-12 md:col-span-10">
-                <input class="w-full" id="name" pInputText [(ngModel)]="selectedTag.name"/>
+                <input class="w-full" id="name" pInputText [(ngModel)]="selectedTag.name" />
               </div>
             </div>
 
@@ -147,20 +147,20 @@
                   optionLabel="label"
                   optionValue="value"
                   [options]="valueTypeOptions"
-                  [(ngModel)]="selectedTag.valueType"
-                ></p-select>
+                  [(ngModel)]="selectedTag.valueType"></p-select>
               </div>
               <label class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0" for="uom">UOM</label>
               <div class="col-span-4 md:col-span-4">
-                <input class="w-full" id="uom" pInputText [(ngModel)]="selectedTag.uom"/>
+                <input class="w-full" id="uom" pInputText [(ngModel)]="selectedTag.uom" />
               </div>
             </div>
 
             <div class="grid grid-cols-12 gap-4 mt-4">
-              <label class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0"
-                     for="descriptor">Descriptor</label>
+              <label class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0" for="descriptor"
+                >Descriptor</label
+              >
               <div class="col-span-12 md:col-span-10">
-                <input class="w-full" id="descriptor" pInputText [(ngModel)]="selectedTag.descriptor"/>
+                <input class="w-full" id="descriptor" pInputText [(ngModel)]="selectedTag.descriptor" />
               </div>
             </div>
           </div>
@@ -185,35 +185,39 @@
                 </div>
                 <div class="col-span-12 md:col-span-4">
                   <label class="flex items-center mb-2" for="compMin">Compression Min (sec)</label>
-                  <p-inputNumber id="compMin" mode="decimal"
-                                 [(ngModel)]="selectedTag.compressionMinTime"></p-inputNumber>
+                  <p-inputNumber
+                    id="compMin"
+                    mode="decimal"
+                    [(ngModel)]="selectedTag.compressionMinTime"></p-inputNumber>
                 </div>
 
                 <div class="grid grid-cols-12">
                   <div class="col-span-12 md:col-span-4">
                     <label class="flex items-center mb-2" for="compMax">Compression Max (sec)</label>
-                    <p-inputNumber id="compMax" mode="decimal"
-                                   [(ngModel)]="selectedTag.compressionMaxTime"></p-inputNumber>
+                    <p-inputNumber
+                      id="compMax"
+                      mode="decimal"
+                      [(ngModel)]="selectedTag.compressionMaxTime"></p-inputNumber>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div  class="card col-span-6 xl:col-span-6">
+          <div class="card col-span-6 xl:col-span-6">
             <div class="font-semibold text-xl">Data collection</div>
             <div class="grid grid-cols-12 gap-4 mt-4">
               <label class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0" for="interface">Interface</label>
               <div class="col-span-10 md:col-span-10 flex-auto">
-                <input class="w-full" id="interface" pInputText [(ngModel)]="selectedTag.interfaceId"/>
+                <input class="w-full" id="interface" pInputText [(ngModel)]="selectedTag.interfaceId" />
               </div>
             </div>
             <div class="grid grid-cols-12 gap-4 mt-4">
               <label class="flex items-center col-span-2 mb-2 md:col-span-2 md:mb-0" for="instrumentTag"
-              >Instrument Tag</label
+                >Instrument Tag</label
               >
               <div class="col-span-10 md:col-span-10 flex-auto">
-                <input class="w-full" id="instrumentTag" pInputText [(ngModel)]="selectedTag.instrumentTag"/>
+                <input class="w-full" id="instrumentTag" pInputText [(ngModel)]="selectedTag.instrumentTag" />
               </div>
             </div>
 
@@ -231,8 +235,8 @@
               <div class="col-span-12 md:col-span-12">
                 <label class="flex items-center mb-2" for="value-calculation">Value formula</label>
                 <textarea
-                  id="value-calculation"
                   class="w-full"
+                  id="value-calculation"
                   pTextarea
                   [autoResize]="true"
                   [(ngModel)]="selectedTag.valueCalculation"></textarea>
@@ -240,8 +244,8 @@
               <div class="col-span-12 md:col-span-12">
                 <label class="flex items-center mb-2" for="time-calculation">Time formula</label>
                 <textarea
-                  id="time-calculation"
                   class="w-full"
+                  id="time-calculation"
                   pTextarea
                   [autoResize]="true"
                   [(ngModel)]="selectedTag.timeCalculation"></textarea>
@@ -249,13 +253,12 @@
               <div class="col-span-12 md:col-span-12">
                 <label class="flex items-center mb-2" for="error-calculation">Error formula</label>
                 <textarea
-                  id="error-calculation"
                   class="w-full"
+                  id="error-calculation"
                   pTextarea
                   [autoResize]="true"
                   [(ngModel)]="selectedTag.errorCalculation"></textarea>
               </div>
-
             </div>
           </div>
 
@@ -264,11 +267,11 @@
             <div class="grid grid-cols-12 gap-4 mt-4">
               <div class="col-span-12 md:col-span-6">
                 <label class="flex items-center mb-2" for="creationDate">Creation Date</label>
-                <input id="creationDate" pInputText [disabled]="true" [(ngModel)]="selectedTag.creationDate"/>
+                <input id="creationDate" pInputText [disabled]="true" [(ngModel)]="selectedTag.creationDate" />
               </div>
               <div class="col-span-12 md:col-span-6">
                 <label class="flex items-center mb-2" for="creator">Creator</label>
-                <input id="creator" pInputText [disabled]="true" [(ngModel)]="selectedTag.creator"/>
+                <input id="creator" pInputText [disabled]="true" [(ngModel)]="selectedTag.creator" />
               </div>
             </div>
           </div>

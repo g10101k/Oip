@@ -6,9 +6,7 @@ import { ConfirmationService } from 'primeng/api';
   selector: 'users',
   templateUrl: './users.component.html',
   providers: [ConfirmationService],
-  imports: [
-    SecurityComponent
-  ]
+  imports: [SecurityComponent]
 })
 export class UserComponent extends BaseModuleComponent<NoSettingsDto, NoSettingsDto> implements OnInit, OnDestroy {
   async ngOnInit() {
