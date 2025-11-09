@@ -4,7 +4,7 @@ option csharp_namespace = "Oip.Users";
 
 package events;
 
-service UserService {
+service GrpcUserService {
   rpc Subscribe (SubscribeRequest) returns (stream EventMessage);
   rpc Publish (PublishRequest) returns (PublishResponse);
   rpc GetTags (GetTagsRequest) returns (GetTagsResponse);
