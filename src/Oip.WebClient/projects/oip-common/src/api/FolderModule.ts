@@ -25,11 +25,10 @@ export class FolderModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * @description This method defines the security model for the folder module. It currently includes only read access, limited to users with the administrator role.
+   * @description Returns a list of rights (permissions) required to access the folder module.
    *
    * @tags FolderModule
    * @name folderModuleGetModuleRights
-   * @summary Returns a list of rights (permissions) required to access the folder module.
    * @request GET:/api/folder-module/get-module-rights
    * @secure
    */
@@ -42,11 +41,10 @@ export class FolderModule<
       ...params,
     });
   /**
-   * No description
+   * @description Gets the security configuration for the specified module instance ID.
    *
    * @tags FolderModule
    * @name folderModuleGetSecurity
-   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/folder-module/get-security
    * @secure
    */
@@ -63,11 +61,10 @@ export class FolderModule<
       ...params,
     });
   /**
-   * No description
+   * @description Updates the security configuration for the specified module instance.
    *
    * @tags FolderModule
    * @name folderModulePutSecurity
-   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/folder-module/put-security
    * @secure
    */
@@ -84,11 +81,10 @@ export class FolderModule<
       ...params,
     });
   /**
-   * No description
+   * @description Gets the settings for the specified module instance.
    *
    * @tags FolderModule
    * @name folderModuleGetModuleInstanceSettings
-   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/folder-module/get-module-instance-settings
    * @secure
    */

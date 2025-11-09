@@ -129,9 +129,9 @@ export interface ModuleInstanceDto {
 /** Module security DTO */
 export interface ModuleSecurityDto {
   /** Right */
-  right: string | null;
+  right?: string | null;
   /** Role */
-  role: string | null;
+  role?: string | null;
 }
 
 /** Put security dto */

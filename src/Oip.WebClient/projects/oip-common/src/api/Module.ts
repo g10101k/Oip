@@ -23,11 +23,10 @@ export class Module<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * @description Only accessible to users with the Admin role.
+   * @description Retrieves all modules stored in the system.
    *
    * @tags Module
    * @name moduleGetAll
-   * @summary Retrieves all modules stored in the system.
    * @request GET:/api/module/get-all
    * @secure
    */
@@ -40,11 +39,10 @@ export class Module<
       ...params,
     });
   /**
-   * No description
+   * @description Inserts a new module into the system.
    *
    * @tags Module
    * @name moduleInsert
-   * @summary Inserts a new module into the system.
    * @request POST:/api/module/insert
    * @secure
    */
@@ -58,11 +56,10 @@ export class Module<
       ...params,
     });
   /**
-   * No description
+   * @description Deletes a module by its identifier.
    *
    * @tags Module
    * @name moduleDelete
-   * @summary Deletes a module by its identifier.
    * @request DELETE:/api/module/delete
    * @secure
    */
@@ -76,11 +73,10 @@ export class Module<
       ...params,
     });
   /**
-   * @description Compares all modules in the database with loaded modules in the application context. This information can be used for diagnostics and monitoring of active modules.
+   * @description Returns all registered modules and indicates whether each one is currently loaded into the application.
    *
    * @tags Module
    * @name moduleGetModulesWithLoadStatus
-   * @summary Returns all registered modules and indicates whether each one is currently loaded into the application.
    * @request GET:/api/module/get-modules-with-load-status
    * @secure
    */
