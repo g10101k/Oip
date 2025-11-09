@@ -2,17 +2,20 @@
 
 ## 📖 Description
 
-`SwaggerGenerateWebClientStartupTask` is a **startup task** for ASP.NET Core that automatically checks for changes
-in Swagger documentation and, if necessary, **regenerates TypeScript clients** based on the current APIs.
+`SwaggerGenerateWebClientStartupTask` is a **startup task** for ASP.NET Core that automatically checks for changes in
+Swagger documentation and, if necessary, **regenerates TypeScript clients** based on the current APIs.
 
 It activates **only in development mode** (`ASPNETCORE_ENVIRONMENT=Development`) and uses
 [`swagger-typescript-api`](https://github.com/acacode/swagger-typescript-api) for generation.
+
+To correctly associate a controller with a specific API, you need to use
+the attribute `[ApiExplorerSettings(GroupName = "users")]`.
 
 ---
 
 ## ⚙️ How it works
 
-1. When the application starts, the task loads a list of API configurations from
+1. When the application starts, the task loads the list of API configurations from
    `appsettings.Development.json`.
 2. For each API:
     - Retrieves the current Swagger document.
@@ -27,45 +30,27 @@ It activates **only in development mode** (`ASPNETCORE_ENVIRONMENT=Development`)
 
 ```json
 {
-  "ApiGenerationSettings": [
+  "OpenApi": [
     {
-      "DocumentName": "base",
-      "OutputPath": "./projects/oip-common/src/api"
+      "Publish": true,
+      "Name": "base",
+      "Url": "/swagger/base/swagger.json",
+      "Version": "v1.0.0",
+      "Title": "Base service web-api",
+      "Description": "Base service web-api",
+      "WebClientOutputPath": "./projects/oip/src/api" // <- generates web client if present
     },
     {
-      "DocumentName": "v1",
-      "OutputPath": "./projects/oip/src/api"
+      "Publish": true,
+      "Name": "users",
+      "Url": "/swagger/users/swagger.json",
+      "Version": "v1.0.0",
+      "Title": "User service web-api",
+      "Description": "User service web-api",
+      "WebClientOutputPath": "./projects/oip-common/src/user-api" // <- generates web client if present
     }
   ]
 }
-```
-
----
-
-## 📦 Dependency installation
-
-### Backend (C#)
-
-Add the necessary NuGet packages:
-
-```bash
-dotnet add package Swashbuckle.AspNetCore.Swagger
-dotnet add package Microsoft.OpenApi
-```
-
-### Frontend (Node.js)
-
-Navigate to the frontend directory:
-
-```bash
-cd ../Oip.WebClient
-npm install swagger-typescript-api --save-dev
-```
-
-Optionally, install globally:
-
-```bash
-npm install -g swagger-typescript-api
 ```
 
 ---
