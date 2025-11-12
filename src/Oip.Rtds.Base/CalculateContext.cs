@@ -9,11 +9,29 @@ using Oip.Rtds.Grpc;
 
 namespace Oip.Rtds.Base;
 
+/// <summary>
+/// Represents a calculation result containing tag identifier, value, timestamp and error metric
+/// </summary>
 public class CalculateResult
 {
+    /// <summary>
+    /// Gets or sets the numeric identifier of the tag for the calculation result
+    /// </summary>
     public uint TagId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the calculated value of the tag result
+    /// </summary>
     public object Value { get; set; }
+
+    /// <summary>
+    /// Gets or sets the timestamp of the calculation result
+    /// </summary>
     public DateTimeOffset Time { get; set; }
+
+    /// <summary>
+    /// Gets or sets the error threshold used to determine whether a value change exceeds the allowed deviation
+    /// </summary>
     public double Error { get; set; }
 
     public CalculateResult()
@@ -30,35 +48,85 @@ public class CalculateResult
 }
 
 /// <summary>
-/// Результат компиляции формулы с загруженной сборкой и методами.
+/// Result of formula compilation with loaded assembly and methods.
 /// </summary>
 public class CompiledFormula : IDisposable
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the compiled formula.
+    /// </summary>
     public uint Id { get; init; }
+
+    /// <summary>
+    /// Gets or sets the hash of the compiled formula.
+    /// </summary>
     public string Hash { get; init; }
 
+    /// <summary>
+    /// Gets or sets the assembly load context for the compiled formula.
+    /// </summary>
     public AssemblyLoadContext LoadContext { get; init; }
+
+    /// <summary>
+    /// Gets or sets the compiled assembly.
+    /// </summary>
     public Assembly Assembly { get; init; }
+
+    /// <summary>
+    /// Gets or sets the formula type in the assembly.
+    /// </summary>
     public Type FormulaType { get; init; }
 
     private MethodInfo ValueMethod { get; init; }
     private MethodInfo TimeMethod { get; init; }
     private MethodInfo ErrorMethod { get; init; }
 
+    /// <summary>
+    /// Evaluates the value formula with the provided parameters.
+    /// </summary>
+    /// <param name="value">The input value for the formula.</param>
+    /// <param name="time">The timestamp for the calculation.</param>
+    /// <returns>The calculated result.</returns>
     public object EvaluateValue(object value, DateTimeOffset time) =>
         ValueMethod.Invoke(null, [value, time])!;
 
+    /// <summary>
+    /// Evaluates the time formula with the provided parameters.
+    /// </summary>
+    /// <param name="value">The input value for the formula.</param>
+    /// <param name="time">The timestamp for the calculation.</param>
+    /// <returns>The calculated time result.</returns>
     public DateTimeOffset EvaluateTimeValue(object value, DateTimeOffset time) =>
         (DateTimeOffset)TimeMethod.Invoke(null, [value, time])!;
 
+    /// <summary>
+    /// Evaluates the error formula with the provided parameters.
+    /// </summary>
+    /// <param name="value">The input value for the formula.</param>
+    /// <param name="time">The timestamp for the calculation.</param>
+    /// <returns>The calculated error value.</returns>
     public double EvaluateErrorValue(object value, DateTimeOffset time) =>
         Convert.ToDouble(ErrorMethod.Invoke(null, [value, time])!);
 
+    /// <summary>
+    /// Disposes of the compiled formula resources.
+    /// </summary>
     public void Dispose()
     {
-        // Можно расширить выгрузку сборки при необходимости
+        // Can be extended to unload the assembly if needed
     }
 
+    /// <summary>
+    /// Initializes a new instance of the CompiledFormula class.
+    /// </summary>
+    /// <param name="id">The unique identifier for the formula.</param>
+    /// <param name="hash">The hash of the compiled formula.</param>
+    /// <param name="alc">The assembly load context.</param>
+    /// <param name="assembly">The compiled assembly.</param>
+    /// <param name="formulaType">The formula type in the assembly.</param>
+    /// <param name="valueMethod">The value calculation method.</param>
+    /// <param name="timeMethod">The time calculation method.</param>
+    /// <param name="errorMethod">The error calculation method.</param>
     public CompiledFormula(uint id, string hash, AssemblyLoadContext alc, Assembly assembly,
         Type formulaType, MethodInfo valueMethod, MethodInfo timeMethod, MethodInfo errorMethod)
     {
@@ -71,15 +139,6 @@ public class CompiledFormula : IDisposable
         TimeMethod = timeMethod;
         ErrorMethod = errorMethod;
     }
-}
-
-class CollectibleAssemblyLoadContext : AssemblyLoadContext
-{
-    public CollectibleAssemblyLoadContext() : base(isCollectible: true)
-    {
-    }
-
-    protected override Assembly Load(AssemblyName assemblyName) => null;
 }
 
 public class FormulaManager : IDisposable
