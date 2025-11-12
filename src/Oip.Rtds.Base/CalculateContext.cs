@@ -293,7 +293,7 @@ namespace {formulasNamespace}
         cf.FormulaType.GetMethod(name, BindingFlags.Public | BindingFlags.Static)
         ?? throw new InvalidOperationException($"{name} method not found in cached formula.");
 
-    public async Task<CalculateResult> Evaluate(uint id, object value, object prevValue, DateTimeOffset time)
+    public CalculateResult Evaluate(uint id, object value, object prevValue, DateTimeOffset time)
     {
         _lock.EnterReadLock();
         try
@@ -304,7 +304,7 @@ namespace {formulasNamespace}
             return new CalculateResult(id,
                 cf.EvaluateValue(value, time),
                 cf.EvaluateTimeValue(value, time),
-                cf.EvaluateErrorValue(value, time));
+                cf.EvaluateErrorValue(prevValue, time));
         }
         finally
         {
@@ -351,7 +351,7 @@ namespace {formulasNamespace}
         switch (tagTypes)
         {
             case TagTypes.Float32:
-                return "double"; 
+                return "double";
             case TagTypes.Float64:
                 return "double";
             case TagTypes.Int16:

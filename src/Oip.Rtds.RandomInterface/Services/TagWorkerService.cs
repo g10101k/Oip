@@ -20,12 +20,10 @@ public class TagWorkerService(
         if (tags.Count == 0)
             return;
 
-        var tasks = tags
+        var result = tags
             .Select(tag => formulaManager.Evaluate(tag.Id, double.MaxValue, tag.DoubleValue, DateTimeOffset.Now))
             .ToArray();
-
-        var result = await Task.WhenAll(tasks);
-
+        
         await bufferWriterService.WriteToService(result);
     }
 }
