@@ -281,6 +281,12 @@ public static class OipModuleApplication
         });
     }
 
+    /// <summary>
+    /// Creates an asynchronous Polly retry policy for HTTP requests that handles transient errors and
+    /// retries on <see cref="HttpStatusCode.NotFound"/> and <see cref="HttpStatusCode.InternalServerError"/>.
+    /// The policy performs up to five retries with exponential back‑off (2ⁿ seconds).
+    /// </summary>
+    /// <returns>An <see cref="IAsyncPolicy{HttpResponseMessage}"/> that can be attached to an <see cref="HttpClient"/>.</returns>
     public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
     {
         return HttpPolicyExtensions
