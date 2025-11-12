@@ -3,10 +3,10 @@ using Grpc.Core;
 using Oip.Base.Extensions;
 using Oip.Rtds.Grpc;
 
-namespace Oip.Rts.Services;
+namespace Oip.Rtds.Services;
 
 /// <summary>
-/// Implements the Rtds service for handling real-time data streams.
+/// Implements the Rtds service for handling real-time data streams. Нахуйя козе баянд
 /// </summary>
 public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
 {
@@ -60,7 +60,7 @@ public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
     /// <param name="request">The publish request containing event type and payload.</param>
     /// <param name="context">The gRPC server call context.</param>
     /// <returns>A publish response indicating the success of the operation.</returns>
-    public override Task<PublishResponse> Publish(PublishRequest request, ServerCallContext context)
+    public override async Task<PublishResponse> Publish(PublishRequest request, ServerCallContext context)
     {
         var eventMessage = new EventMessage
         {
@@ -70,13 +70,13 @@ public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
             Timestamp = DateTime.UtcNow.ToString("O")
         };
 
-        BroadcastEvent(eventMessage);
+        await BroadcastEvent(eventMessage);
 
-        return Task.FromResult(new PublishResponse
+        return new PublishResponse
         {
             Success = true,
             Message = $"Event {eventMessage.EventId} published"
-        });
+        };
     }
 
 
@@ -91,13 +91,15 @@ public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
         return _scopeFactory.ExecuteAsync<TagService, GetTagsResponse>(x => x.GetTagsByInterfaceId(request));
     }
 
-    private void BroadcastEvent(EventMessage eventMessage)
+    private async Task BroadcastEvent(EventMessage eventMessage)
     {
-        foreach (var subscriber in Subscribers)
+        var subscribersSnapshot = Subscribers.ToArray();
+
+        foreach (var subscriber in subscribersSnapshot)
         {
             try
             {
-                subscriber.Value.WriteAsync(eventMessage).Wait();
+                await subscriber.Value.WriteAsync(eventMessage);
                 Console.WriteLine($@"Event {eventMessage.EventId} sent to client {subscriber.Key}");
             }
             catch (Exception ex)
@@ -107,16 +109,16 @@ public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
             }
         }
     }
-
+    
     /// <summary>
-    /// 
+    /// Writes data to tags
     /// </summary>
-    /// <param name="request"></param>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    public override Task<WriteDataResponse> WriteData(WriteDataRequest request, ServerCallContext context)
+    /// <param name="request">The request containing tag data to write</param>
+    /// <param name="context">The server call context.</param>
+    /// <returns>Response indicating success or failure</returns>
+    public override async Task<WriteDataResponse> WriteData(WriteDataRequest request, ServerCallContext context)
     {
-        return _scopeFactory.ExecuteAsync<TagService, WriteDataResponse>(x => x.WriteData(request));
+        return await _scopeFactory.ExecuteAsync<TagService, WriteDataResponse>(x => x.WriteData(request));
     }
 
     private string GenerateEventId()
