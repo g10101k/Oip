@@ -1,18 +1,19 @@
 using Oip.Base.Extensions;
 using Oip.Rtds.Grpc;
-using RtdsService = Oip.Rts.Services.RtdsService;
+using RtdsService = Oip.Rtds.Services.RtdsService;
 
-namespace Oip.Rts.HostedService;
+namespace Oip.Rtds.HostedService;
 
+/// <summary>
+/// Background service that periodically publishes test events using <see cref="RtdsService"/>.
+/// </summary>
 public class RtdsHostedService(IServiceScopeFactory scopeFactory, ILogger<RtdsHostedService> logger) : BackgroundService
 {
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Consume Scoped Service Hosted Service running.");
-
-        logger.LogInformation("Consume Scoped Service Hosted Service is working.");
-
+        
         while (!stoppingToken.IsCancellationRequested)
         {
             await scopeFactory.ExecuteAsync<RtdsService>(async service =>

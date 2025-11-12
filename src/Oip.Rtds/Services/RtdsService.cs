@@ -6,7 +6,7 @@ using Oip.Rtds.Grpc;
 namespace Oip.Rtds.Services;
 
 /// <summary>
-/// Implements the Rtds service for handling real-time data streams. Нахуйя козе баянд
+/// Implements the Rtds service for handling real-time data streams.
 /// </summary>
 public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
 {
