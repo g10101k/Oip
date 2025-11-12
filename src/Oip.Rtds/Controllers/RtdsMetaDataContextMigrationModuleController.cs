@@ -4,9 +4,9 @@ using Oip.Base.Controllers;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
 using Oip.Rtds.Data.Contexts;
-using Oip.Rts.Properties;
+using Oip.Rtds.Properties;
 
-namespace Oip.Rts.Controllers;
+namespace Oip.Rtds.Controllers;
 
 /// <summary>
 /// Controller for managing database migrations of the RTDS metadata context
