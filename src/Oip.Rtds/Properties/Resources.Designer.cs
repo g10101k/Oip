@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Oip.Rts.Properties {
+namespace Oip.Rtds.Properties {
     using System;
     
     

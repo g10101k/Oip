@@ -3,12 +3,11 @@ using NLog.Web;
 using Oip.Base.Extensions;
 using Oip.Rtds.Data;
 using Oip.Rtds.Data.Extensions;
-using Oip.Rtds.Data.Repositories;
-using Oip.Rts.HostedService;
-using Oip.Rts.Services;
-using Oip.Rts.Settings;
+using Oip.Rtds.HostedService;
+using Oip.Rtds.Services;
+using Oip.Rtds.Settings;
 
-namespace Oip.Rts;
+namespace Oip.Rtds;
 
 internal static class Program
 {

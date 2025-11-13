@@ -3,15 +3,16 @@ namespace Oip.Base.Exceptions;
 /// <summary>
 /// Represents the base exception class for Oip applications.
 /// </summary>
-/// <param name="message">The exception message.</param>
-/// <param name="statusCode">The HTTP status code associated with the exception.</param>
+/// <param name="message">Exception message.</param>
+/// <param name="statusCode">HTTP status code associated with the exception.</param>
+/// <param name="stackTrace">Stacktrace.</param>
 public class OipException(
     string message,
     int statusCode = 500,
     string? stackTrace = null)
 {
     /// <summary>
-    /// The exception message.
+    /// Exception message.
     /// </summary>
     public string Message { get; } = message;
 
