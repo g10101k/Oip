@@ -1,3 +1,4 @@
+using Oip.Base.Services;
 using Oip.Users.Entities;
 using Oip.Users.Repositories;
 using Oip.Users.Settings;
@@ -8,26 +9,22 @@ namespace Oip.Users.Services;
 /// <summary>
 /// Service responsible for synchronizing user data between Keycloak and the local database.
 /// </summary>
-public class UserSyncService
+public class UserSyncService(
+    KeycloakService keycloakService,
+    UserRepository userRepository,
+    ILogger<UserSyncService> logger) : IPeriodicalService
 {
-    private readonly KeycloakService _keycloakService;
-    private readonly UserRepository _userRepository;
-    private readonly ILogger<UserSyncService> _logger;
+    /// <inheritdoc />
+    public int Interval => AppSettings.Instance.SyncOptions.IntervalSeconds;
+
+    /// <inheritdoc />
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    {
+        await SyncAllUsersAsync();
+    }
+
     private readonly SyncOptions _syncOptions = AppSettings.Instance.SyncOptions;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UserSyncService"/> class.
-    /// </summary>
-    /// <param name="keycloakService">The Keycloak service used to retrieve user data.</param>
-    /// <param name="userRepository">The repository for managing user entities in the database.</param>
-    /// <param name="logger">The logger for recording service operations and errors.</param>
-    public UserSyncService(KeycloakService keycloakService, UserRepository userRepository,
-        ILogger<UserSyncService> logger)
-    {
-        _keycloakService = keycloakService;
-        _userRepository = userRepository;
-        _logger = logger;
-    }
 
     /// <summary>
     /// Synchronizes a user from Keycloak to the local database.
@@ -38,14 +35,14 @@ public class UserSyncService
     {
         try
         {
-            _logger.LogInformation("Starting sync for user {KeycloakUserId}", keycloakUserId);
+            logger.LogInformation("Starting sync for user {KeycloakUserId}", keycloakUserId);
 
-            var keycloakUser = await _keycloakService.GetUserAsync(keycloakUserId);
+            var keycloakUser = await keycloakService.GetUserAsync(keycloakUserId);
             await SyncUserFromKeycloak(keycloakUser);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error syncing user {KeycloakUserId}", keycloakUserId);
+            logger.LogError(ex, "Error syncing user {KeycloakUserId}", keycloakUserId);
             throw;
         }
     }
@@ -55,11 +52,11 @@ public class UserSyncService
     /// </summary>
     /// <param name="user">The user representation retrieved from Keycloak.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task SyncUserFromKeycloak(UserRepresentation? user)
+    private async Task SyncUserFromKeycloak(UserRepresentation? user)
     {
         ArgumentNullException.ThrowIfNull(user);
         ArgumentNullException.ThrowIfNull(user.Id);
-        var existingUser = await _userRepository.GetByKeycloakIdAsync(user.Id);
+        var existingUser = await userRepository.GetByKeycloakIdAsync(user.Id);
 
         if (existingUser == null)
         {
@@ -73,8 +70,8 @@ public class UserSyncService
                 IsActive = user.Enabled ?? true
             };
 
-            await _userRepository.AddAsync(newUser);
-            _logger.LogInformation("Created new user for Keycloak ID {KeycloakUserId}", user.Id);
+            await userRepository.AddAsync(newUser);
+            logger.LogInformation("Created new user for Keycloak ID {KeycloakUserId}", user.Id);
         }
         else
         {
@@ -85,8 +82,8 @@ public class UserSyncService
             existingUser.IsActive = user.Enabled ?? false;
             existingUser.UpdatedAt = DateTimeOffset.UtcNow;
             existingUser.LastSyncedAt = DateTimeOffset.UtcNow;
-            await _userRepository.UpdateAsync(existingUser);
-            _logger.LogInformation("Updated user for Keycloak ID {KeycloakUserId}", user.Id);
+            await userRepository.UpdateAsync(existingUser);
+            logger.LogInformation("Updated user for Keycloak ID {KeycloakUserId}", user.Id);
         }
     }
 
@@ -97,24 +94,24 @@ public class UserSyncService
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task SyncAllUsersAsync()
     {
-        _logger.LogInformation("Starting full user synchronization");
+        logger.LogInformation("Starting full user synchronization");
 
-        var totalUsers = await _keycloakService.GetUsersCountAsync();
+        var totalUsers = await keycloakService.GetUsersCountAsync();
         var batches = (int)Math.Ceiling((double)totalUsers / AppSettings.Instance.SyncOptions.BatchSize);
 
-        _logger.LogInformation("Synchronizing {TotalUsers} users in {Batches} batches", totalUsers, batches);
+        logger.LogInformation("Synchronizing {TotalUsers} users in {Batches} batches", totalUsers, batches);
 
         for (int i = 0; i < batches; i++)
         {
             var offset = i * _syncOptions.BatchSize;
             var syncedCount = await SyncUsersBatchAsync(offset, _syncOptions.BatchSize);
-            _logger.LogInformation("Batch {BatchNumber}: Synced {SyncedCount} users", i + 1, syncedCount);
+            logger.LogInformation("Batch {BatchNumber}: Synced {SyncedCount} users", i + 1, syncedCount);
 
             // Small delay to avoid overwhelming Keycloak
             await Task.Delay(1000);
         }
 
-        _logger.LogInformation("Full user synchronization completed");
+        logger.LogInformation("Full user synchronization completed");
     }
 
     /// <summary>
@@ -123,9 +120,9 @@ public class UserSyncService
     /// <param name="offset">The offset for retrieving users from Keycloak.</param>
     /// <param name="limit">The maximum number of users to retrieve in this batch.</param>
     /// <returns>The number of users successfully synchronized in this batch.</returns>
-    public async Task<int> SyncUsersBatchAsync(int offset = 0, int limit = 100)
+    private async Task<int> SyncUsersBatchAsync(int offset = 0, int limit = 100)
     {
-        var keycloakUsers = await _keycloakService.GetUsersAsync(offset, limit);
+        var keycloakUsers = await keycloakService.GetUsersAsync(offset, limit);
         var syncedCount = 0;
 
         foreach (var keycloakUser in keycloakUsers)
@@ -139,7 +136,7 @@ public class UserSyncService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error syncing user {KeycloakUserId}", keycloakUser.Id);
+                logger.LogError(ex, "Error syncing user {KeycloakUserId}", keycloakUser.Id);
             }
         }
 
