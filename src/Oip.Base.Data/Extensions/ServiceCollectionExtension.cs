@@ -46,7 +46,6 @@ public static class ServiceCollectionExtension
                     }
                 }
             )
-            .AddScoped<ModuleRepository>()
-            .AddScoped<UserRepository>();
+            .AddScoped<ModuleRepository>();
     }
 }

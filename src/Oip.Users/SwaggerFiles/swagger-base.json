@@ -691,22 +691,22 @@
         "properties": {
           "moduleId": {
             "type": "integer",
-            "description": "",
+            "description": "The identifier of the module to create an instance of",
             "format": "int32"
           },
           "label": {
             "type": "string",
-            "description": "",
+            "description": "The display label for the module instance",
             "nullable": true
           },
           "icon": {
             "type": "string",
-            "description": "",
+            "description": "The icon identifier for the module instance (optional)",
             "nullable": true
           },
           "parentId": {
             "type": "integer",
-            "description": "",
+            "description": "The parent module instance identifier (optional)",
             "format": "int32",
             "nullable": true
           },
@@ -715,33 +715,34 @@
             "items": {
               "type": "string"
             },
+            "description": "Array of role identifiers that can view this module instance (optional)",
             "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "DTO for create module instance"
+        "description": "Data Transfer Object for creating a new module instance"
       },
       "EditModuleInstanceDto": {
         "type": "object",
         "properties": {
           "moduleInstanceId": {
             "type": "integer",
-            "description": "",
+            "description": "The identifier of the module instance to edit",
             "format": "int32"
           },
           "label": {
             "type": "string",
-            "description": "",
+            "description": "The updated display label for the module instance",
             "nullable": true
           },
           "icon": {
             "type": "string",
-            "description": "",
+            "description": "The updated icon identifier for the module instance (optional)",
             "nullable": true
           },
           "parentId": {
             "type": "integer",
-            "description": "",
+            "description": "The updated parent module instance identifier (optional)",
             "format": "int32",
             "nullable": true
           },
@@ -750,12 +751,12 @@
             "items": {
               "type": "string"
             },
-            "description": "",
+            "description": "Updated array of role identifiers that can view this module instance (optional)",
             "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "DTO for edit module instance"
+        "description": "Data Transfer Object for editing an existing module instance"
       },
       "ExistModuleDto": {
         "type": "object",

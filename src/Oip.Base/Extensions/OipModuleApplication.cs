@@ -15,7 +15,6 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NLog.Web;
-using Oip.Base.Clients;
 using Oip.Base.Exceptions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
@@ -41,7 +40,6 @@ public static class OipModuleApplication
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
-        builder.AddHttpClients(settings);
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
@@ -96,13 +94,6 @@ public static class OipModuleApplication
             options.SupportedUICultures = supportedCultures;
         });
     }
-
-    private static void AddHttpClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
-        builder.Services.AddHttpClient<OipClient>(x => { x.BaseAddress = new Uri(settings.OipUrls); })
-            .AddPolicyHandler(GetRetryPolicy());
-    }
-
 
     private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {

@@ -10,67 +10,53 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.11" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.0.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
-        <PackageReference Include="NSwag.CodeGeneration" Version="14.6.1" />
-        <PackageReference Include="NSwag.CodeGeneration.TypeScript" Version="14.6.1" />
-        <PackageReference Include="NSwag.Core" Version="14.6.1" />
-        <PackageReference Include="NJsonSchema" Version="11.5.1" />
-        <PackageReference Include="NJsonSchema.CodeGeneration" Version="11.5.1" />
-        <PackageReference Include="NJsonSchema.CodeGeneration.TypeScript" Version="11.5.1" />
-        <PackageReference Include="Polly" Version="8.5.0" />
-        <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
-        <PackageReference Include="Riok.Mapperly" Version="4.1.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />        
-        <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1" />
-        <PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="8.0.11">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="NSwag.ApiDescription.Client" Version="14.2.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11"/>
+        <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.11"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.0.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
+        <PackageReference Include="NSwag.CodeGeneration" Version="14.6.1"/>
+        <PackageReference Include="NSwag.CodeGeneration.TypeScript" Version="14.6.1"/>
+        <PackageReference Include="NSwag.Core" Version="14.6.1"/>
+        <PackageReference Include="NJsonSchema" Version="11.5.1"/>
+        <PackageReference Include="NJsonSchema.CodeGeneration" Version="11.5.1"/>
+        <PackageReference Include="NJsonSchema.CodeGeneration.TypeScript" Version="11.5.1"/>
+        <PackageReference Include="Polly" Version="8.5.0"/>
+        <PackageReference Include="Polly.Extensions.Http" Version="3.0.0"/>
+        <PackageReference Include="Riok.Mapperly" Version="4.1.1"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
+        <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Oip.Base.Data\Oip.Base.Data.csproj" />
-        <ProjectReference Include="..\Oip.Settings\Oip.Settings.csproj" />
+        <ProjectReference Include="..\Oip.Base.Data\Oip.Base.Data.csproj"/>
+        <ProjectReference Include="..\Oip.Settings\Oip.Settings.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <OpenApiReference Include=".\OipOpenApi.json" CodeGenerator="NSwagCSharp" ClassName="OipClient" Namespace="Oip.Base.Clients" Link="Clients\OipOpenApi.json">
-            <Options>/UseBaseUrl:false</Options>
-        </OpenApiReference>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Properties\Resources.ru.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.ru.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Properties\Resources.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Properties\Resources.ru.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.ru.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Properties\Resources.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Properties\Resources.ru.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.ru.resx</DependentUpon>
-      </Compile>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Properties\Resources.ru.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.ru.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 </Project>
