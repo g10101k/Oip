@@ -1,24 +1,19 @@
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
+using Xunit;
 
 namespace Oip.Settings.Test;
 
 public class Tests
 {
-    [SetUp]
-    public void Setup()
-    {
-        // do nothing
-    }
-
-    [Test]
-    [TestCase("XpoProvider=InMemoryDataStore;", XpoProvider.InMemoryDataStore)]
-    [TestCase("XpoProvider=MSSqlServer;", XpoProvider.MSSqlServer)]
-    [TestCase("XpoProvider=Postgres;", XpoProvider.Postgres)]
-    [TestCase("XpoProvider=SQLite;", XpoProvider.SQLite)]
+    [Theory]
+    [InlineData("XpoProvider=InMemoryDataStore;", XpoProvider.InMemoryDataStore)]
+    [InlineData("XpoProvider=MSSqlServer;", XpoProvider.MSSqlServer)]
+    [InlineData("XpoProvider=Postgres;", XpoProvider.Postgres)]
+    [InlineData("XpoProvider=SQLite;", XpoProvider.SQLite)]
     public void NormalizeConnectionStringTest(string connectionString, XpoProvider provider)
     {
         var model = ConnectionStringHelper.NormalizeConnectionString(connectionString);
-        Assert.That(model.Provider, Is.EqualTo(provider));
+        Assert.Equal(provider, model.Provider);
     }
 }
