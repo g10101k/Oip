@@ -46,11 +46,11 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     /// <inheritdoc />
     [NotSaveToDb]
-    public string ConnectionString { get; set; } = default!;
+    public string ConnectionString { get; set; } = null!;
 
     /// <inheritdoc />
     [NotSaveToDb]
-    public string NormalizedConnectionString { get; set; } = default!;
+    public string NormalizedConnectionString { get; set; } = null!;
 
     /// <inheritdoc />
     [NotSaveToDb]
