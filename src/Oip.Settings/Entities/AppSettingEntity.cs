@@ -8,10 +8,10 @@ public class AppSettingEntity
     /// <summary>
     /// Key
     /// </summary>
-    public string Key { get; set; } = default!;
+    public string Key { get; set; } = null!;
 
     /// <summary>
     /// Value
     /// </summary>
-    public string Value { get; set; } = default!;
+    public string Value { get; set; } = null!;
 }
