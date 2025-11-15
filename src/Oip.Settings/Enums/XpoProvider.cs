@@ -8,6 +8,7 @@ public enum XpoProvider
     /// <summary>
     /// SQLite
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     SQLite,
 
     /// <summary>
@@ -18,6 +19,7 @@ public enum XpoProvider
     /// <summary>
     /// MS SQL
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     MSSqlServer,
 
     /// <summary>
