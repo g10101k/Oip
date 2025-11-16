@@ -38,41 +38,14 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
         var builder = new DbContextOptionsBuilder<AppSettingsContext>();
 
         _appSettingsOptions.Builder(builder, _settings.Provider, _settings.NormalizedConnectionString);
-
-        switch (_settings.Provider)
-        {
-            case XpoProvider.Postgres:
-                using (var context = new PostgresMigrationContext(builder.Options, _appSettingsOptions))
-                {
-                    MigrateAndFillData(context);
-                }
-
-                break;
-            case XpoProvider.SQLite:
-                using (var context = new SqliteMigrationContext(builder.Options, _appSettingsOptions))
-                {
-                    MigrateAndFillData(context);
-                }
-
-                break;
-            case XpoProvider.MSSqlServer:
-                using (var context = new MsSqlServerMigrationContext(builder.Options, _appSettingsOptions))
-                {
-                    MigrateAndFillData(context);
-                }
-
-                break;
-            case XpoProvider.InMemoryDataStore:
-                break;
-            default:
-                throw new InvalidOperationException("Unknown provider");
-        }
+        using var context = new AppSettingsContext(builder.Options, _appSettingsOptions);
+        MigrateAndFillData(context);
     }
 
     private void MigrateAndFillData(AppSettingsContext context)
     {
         if (!_appSettingsOptions.ExcludeMigration)
-            context.Database.Migrate();
+            context.Migrate();
         CreateAndSaveDefaultValues(context);
         Data = context.AppSettings.ToDictionary(c => c.Key, c => c.Value)!;
     }
