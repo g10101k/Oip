@@ -20,7 +20,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     // ReSharper disable once StaticMemberInGenericType
 #pragma warning disable S2743
-    private static AppSettingsOptions? _appSettingsOptions;
+    internal static AppSettingsOptions? _appSettingsOptions;
 #pragma warning restore S2743
 
     /// <summary>
@@ -117,7 +117,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         BindConfig(configuration, tmpInstance);
     }
 
-    private static void BindMainConfiguration(TAppSettings instance, TAppSettings tmp)
+    internal static void BindMainConfiguration(TAppSettings instance, TAppSettings tmp)
     {
         if (tmp.AppSettingsOptions is null)
             throw new InvalidOperationException(
@@ -126,7 +126,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         var configurationBuilder = new ConfigurationBuilder();
         if (instance.AppSettingsOptions.UseEfCoreProvider)
         {
-            var efConfigurationSource = new EfConfigurationSource<TAppSettings>(Instance.AppSettingsOptions, instance);
+            var efConfigurationSource = new EfConfigurationSource<TAppSettings>(Instance.AppSettingsOptions, tmp);
             configurationBuilder.Add(efConfigurationSource);
         }
 
@@ -136,9 +136,10 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         ChangeToken.OnChange(() => configuration.GetReloadToken(), () => { BindConfig(configuration, instance); });
     }
 
-    private static IConfigurationRoot BuildBaseConfiguration(ConfigurationBuilder configurationBuilder)
+    internal static IConfigurationRoot BuildBaseConfiguration(ConfigurationBuilder configurationBuilder)
     {
         var configuration = configurationBuilder
+            .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileName, true, true)
             .AddJsonFile(Instance.AppSettingsOptions.JsonFileNameDevelopment, true, true)
             .AddUserSecrets<TAppSettings>()
@@ -150,13 +151,13 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         return configuration;
     }
 
-    private static void BindConfig(IConfiguration config, TAppSettings instance)
+    internal static void BindConfig(IConfiguration config, TAppSettings instance)
     {
         config.Bind(instance);
         NormalizeConnectionString(instance);
     }
 
-    private static void NormalizeConnectionString(TAppSettings instance)
+    internal static void NormalizeConnectionString(TAppSettings instance)
     {
         if (!instance.AppSettingsOptions.NormalizeConnectionString)
             return;
