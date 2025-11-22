@@ -13,14 +13,12 @@ public static class Flatter
     /// <summary>
     /// Converts an application settings instance to a flat dictionary
     /// </summary>
-    /// <param name="dictionary">Target dictionary to populate with flattened data</param>
     /// <param name="obj">Object instance to flatten</param>
-    /// <param name="prefix">Key prefix for nested properties</param>
-    public static Dictionary<string, string> ToDictionary(object obj, string prefix)
+    public static Dictionary<string, string> ToDictionary(object obj)
     {
         var visitedObjects = new HashSet<object>();
-        var dictionary = new Dictionary<string, string>();
-        ToDictionaryInternal(dictionary, obj, prefix, visitedObjects);
+        var dictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        ToDictionaryInternal(dictionary, obj, string.Empty, visitedObjects);
         return dictionary;
     }
 
