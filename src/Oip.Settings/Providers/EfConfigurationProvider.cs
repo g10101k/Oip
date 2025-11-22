@@ -1,11 +1,8 @@
-using System.Collections;
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Oip.Settings.Attributes;
 using Oip.Settings.Contexts;
 using Oip.Settings.Entities;
-using Oip.Settings.Enums;
+using Oip.Settings.Helpers;
 
 namespace Oip.Settings.Providers;
 
@@ -59,7 +56,7 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
         var configValues =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        ToDictionary(configValues, _settings, string.Empty);
+        Flatter.ToDictionary(configValues, _settings, string.Empty);
         var list = dbContext.AppSettings.ToList();
 
         foreach (var keyValue in configValues)
@@ -76,71 +73,5 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
         dbContext.SaveChanges();
     }
 
-    /// <summary>
-    /// Convert application settings instance to dictionary
-    /// </summary>
-    /// <param name="dictionary"></param>
-    /// <param name="obj"></param>
-    /// <param name="prefix"></param>
-    private static void ToDictionary(Dictionary<string, string> dictionary, object obj, string prefix)
-    {
-        var fields = obj.GetType().GetProperties();
-        foreach (var field in fields)
-        {
-            if (field.GetCustomAttribute(typeof(NotSaveToDbAttribute)) != null)
-                continue;
-
-            var value = field.GetValue(obj);
-            if (value != null)
-            {
-                var key = string.IsNullOrEmpty(prefix)
-                    ? field.Name
-                    : string.Join(':', prefix, field.Name);
-                if (value is string or int or double or bool)
-                {
-                    dictionary.Add(key, value.ToString()!);
-                }
-                else if (value.GetType().IsGenericType)
-                {
-                    GenericToDictionary(dictionary, prefix, value, key);
-                }
-                else
-                {
-                    ToDictionary(dictionary, value, key);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Generic type to dictionary
-    /// </summary>
-    /// <param name="dictionary"></param>
-    /// <param name="prefix"></param>
-    /// <param name="value"></param>
-    /// <param name="key"></param>
-    private static void GenericToDictionary(Dictionary<string, string> dictionary, string prefix, object value,
-        string key)
-    {
-        if (value.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>))
-        {
-            if (value is IDictionary dictionary1)
-            {
-                foreach (DictionaryEntry keyValue in dictionary1)
-                {
-                    var key2 = prefix + ":" + keyValue.Key;
-                    dictionary.Add(key2, keyValue.Value?.ToString()!);
-                }
-            }
-        }
-        else if (value.GetType().GetGenericTypeDefinition() == typeof(List<>))
-        {
-            int i = 0;
-            foreach (var item in (IEnumerable)value)
-            {
-                ToDictionary(dictionary, item, $"{key}:{i}");
-                i++;
-            }
-        }
-    }
+    
 }
