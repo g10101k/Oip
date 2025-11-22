@@ -18,8 +18,7 @@ public class FatterTests
             TestString = "Hello World",
             TestBool = true
         };
-        var dictionary = new Dictionary<string, string>();
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Act
         Assert.Multiple(() =>
@@ -39,10 +38,9 @@ public class FatterTests
         {
             TestStringList = ["apple", "banana", "cherry"]
         };
-        var dictionary = new Dictionary<string, string>();
 
         // Act
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Assert
         Assert.Multiple(() =>
@@ -65,10 +63,9 @@ public class FatterTests
                 new() { TestInt = 2, TestString = "Second" }
             ]
         };
-        var dictionary = new Dictionary<string, string>();
 
         // Act
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Assert
         Assert.Multiple(() =>
@@ -93,10 +90,9 @@ public class FatterTests
                 ["language"] = "C#"
             }
         };
-        var dictionary = new Dictionary<string, string>();
 
         // Act
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Assert
         Assert.Multiple(() =>
@@ -104,24 +100,6 @@ public class FatterTests
             Assert.That(dictionary["TestDictionary:key1"], Is.EqualTo("value1"));
             Assert.That(dictionary["TestDictionary:key2"], Is.EqualTo("value2"));
             Assert.That(dictionary["TestDictionary:language"], Is.EqualTo("C#"));
-        });
-    }
-
-    [Test]
-    public void ToDictionary_WithPrefix_ShouldIncludePrefixInKeys()
-    {
-        // Arrange
-        var instance = new SimpleTypesExample { TestInt = 100, TestString = "Prefixed" };
-        var dictionary = new Dictionary<string, string>();
-
-        // Act
-        Flatter.ToDictionary(dictionary, instance, "MyPrefix");
-
-        // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(dictionary["MyPrefix:TestInt"], Is.EqualTo("100"));
-            Assert.That(dictionary["MyPrefix:TestString"], Is.EqualTo("Prefixed"));
         });
     }
 
@@ -134,10 +112,9 @@ public class FatterTests
             SaveProperty = "ShouldSave",
             DontSaveProperty = "ShouldNotSave"
         };
-        var dictionary = new Dictionary<string, string>();
 
         // Act
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Assert
         Assert.Multiple(() =>
@@ -157,10 +134,9 @@ public class FatterTests
             NotNullProperty = "HasValue",
             NullProperty = null
         };
-        var dictionary = new Dictionary<string, string>();
 
         // Act
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Assert
         Assert.Multiple(() =>
@@ -180,10 +156,9 @@ public class FatterTests
             EmptyDictionary = new Dictionary<string, string>(),
             ValidProperty = "Valid"
         };
-        var dictionary = new Dictionary<string, string>();
 
         // Act
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Assert
         Assert.That(dictionary.ContainsKey("ValidProperty"), Is.True);
@@ -200,10 +175,9 @@ public class FatterTests
             Simple = new SimpleTypesExample { TestInt = 999, TestString = "Nested" },
             List = new ListExample { TestStringList = new List<string> { "nested1", "nested2" } }
         };
-        var dictionary = new Dictionary<string, string>();
 
         // Act
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Assert
         Assert.Multiple(() =>
@@ -223,10 +197,9 @@ public class FatterTests
         {
             MixedList = new List<object> { "string", 42, 3.14, true }
         };
-        var dictionary = new Dictionary<string, string>();
 
         // Act
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         Assert.That(dictionary["MixedList:0"], Is.EqualTo("string"));
         Assert.That(dictionary["MixedList:1"], Is.EqualTo("42"));
@@ -245,10 +218,9 @@ public class FatterTests
             TestGuid = Guid.Parse("12345678-1234-1234-1234-123456789012"),
             TestDecimal = 123.45m
         };
-        var dictionary = new Dictionary<string, string>();
 
         // Act
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Assert
         Assert.Multiple(() =>
@@ -263,9 +235,8 @@ public class FatterTests
     public void ToDictionary_WithEnum_ShouldFlattenCorrectly()
     {
         var instance = new { Status = Status.Active };
-        var dictionary = new Dictionary<string, string>();
 
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         Assert.That(dictionary["Status"], Is.EqualTo("Active"));
     }
@@ -280,9 +251,8 @@ public class FatterTests
                 ["inner"] = new { Value = "test" }
             }
         };
-        var dictionary = new Dictionary<string, string>();
 
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Проверка вложенной структуры
 
@@ -304,9 +274,7 @@ public class FatterTests
                 [2] = "two"
             }
         };
-        var dictionary = new Dictionary<string, string>();
-
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         Assert.That(dictionary["IntKeyDict:1"], Is.EqualTo("one"));
     }
@@ -317,12 +285,9 @@ public class FatterTests
         var obj1 = new CircularExample();
         var obj2 = new CircularExample();
         obj1.Reference = obj2;
-        obj2.Reference = obj1; // циклическая ссылка
+        obj2.Reference = obj1;
 
-        var dictionary = new Dictionary<string, string>();
-
-        // Должен обработать без stack overflow
-        Flatter.ToDictionary(dictionary, obj1, "");
+        Assert.Throws<InvalidOperationException>(() => { _ = Flatter.ToDictionary(obj1); });
     }
 
     [Test]
@@ -337,9 +302,7 @@ public class FatterTests
             FalseBool = false,
             EmptyString = ""
         };
-        var dictionary = new Dictionary<string, string>();
-
-        Flatter.ToDictionary(dictionary, instance, "");
+        var dictionary = Flatter.ToDictionary(instance);
 
         // Проверка всех граничных значений
 
@@ -364,9 +327,9 @@ public class FatterTests
             DateTimeOffset = new DateTimeOffset(2023, 12, 31, 23, 59, 59, TimeSpan.Zero),
             TimeSpan = TimeSpan.FromHours(2.5)
         };
-        var dictionary = new Dictionary<string, string>();
+        
+        var dictionary = Flatter.ToDictionary(instance);
 
-        Flatter.ToDictionary(dictionary, instance, "");
 
         // Проверка что все форматы используют инвариантную культуру
         Assert.Multiple(() =>
