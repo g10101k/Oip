@@ -74,21 +74,18 @@ public class AppSettingsOptions
     public Action<DbContextOptionsBuilder, XpoProvider, string> Builder { get; set; } =
         (option, provider, connection) =>
         {
-            var defaultSchema = "settings";
-            var migrationTableName = "AppSettingsMigrationsHistory";
             switch (provider)
             {
                 case XpoProvider.SQLite:
-                    option.UseSqlite(connection, builder => { builder.MigrationsHistoryTable(migrationTableName); });
+                    option.UseSqlite(connection);
                     break;
                 case XpoProvider.Postgres:
-                    option.UseNpgsql(connection,
-                        builder => { builder.MigrationsHistoryTable(migrationTableName, defaultSchema); });
+                    option.UseNpgsql(connection);
                     break;
                 case XpoProvider.MSSqlServer:
-                    option.UseSqlServer(connection,
-                        builder => { builder.MigrationsHistoryTable(migrationTableName, defaultSchema); });
+                    option.UseSqlServer(connection);
                     break;
+                case XpoProvider.InMemoryDataStore:
                 default:
                     option.UseInMemoryDatabase(connection);
                     break;
