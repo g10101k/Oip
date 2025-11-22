@@ -18,32 +18,56 @@ public static class Flatter
     /// <param name="prefix"></param>
     public static void ToDictionary(Dictionary<string, string> dictionary, object obj, string prefix)
     {
-        var fields = obj.GetType().GetProperties();
-        foreach (var field in fields)
-        {
-            if (field.GetCustomAttribute(typeof(NotSaveToDbAttribute)) != null)
-                continue;
-
-            var value = field.GetValue(obj);
-            if (value == null) continue;
-
-            var key = string.IsNullOrEmpty(prefix) ? field.Name : string.Join(':', prefix, field.Name);
-
-            if (IsSimpleOrNull(value))
-            {
-                dictionary.Add(key, ToStringInvariant(value));
-            }
-            else if (value.GetType().IsGenericType)
-            {
-                GenericToDictionary(dictionary, prefix, value, key);
-            }
-            else
-            {
-                ToDictionary(dictionary, value, key);
-            }
-        }
+        var visitedObjects = new HashSet<object>();
+        ToDictionaryInternal(dictionary, obj, prefix, visitedObjects);
     }
 
+    /// <summary>
+    /// Internal recursive method with cycle detection
+    /// </summary>
+    private static void ToDictionaryInternal(Dictionary<string, string> dictionary, object? obj, string prefix, HashSet<object> visitedObjects)
+    {
+        if (obj == null) return;
+
+        // Проверка на циклическую ссылку
+        if (!visitedObjects.Add(obj))
+        {
+            throw new InvalidOperationException($"Обнаружена циклическая ссылка при сериализации объекта типа {obj.GetType().Name}");
+        }
+        
+        try
+        {
+            var fields = obj.GetType().GetProperties();
+            foreach (var field in fields)
+            {
+                if (field.GetCustomAttribute(typeof(NotSaveToDbAttribute)) != null)
+                    continue;
+
+                var value = field.GetValue(obj);
+                if (value == null) continue;
+
+                var key = string.IsNullOrEmpty(prefix) ? field.Name : string.Join(':', prefix, field.Name);
+
+                if (IsSimpleOrNull(value))
+                {
+                    dictionary.Add(key, ToStringInvariant(value));
+                }
+                else if (value.GetType().IsGenericType)
+                {
+                    GenericToDictionary(dictionary, prefix, value, key, visitedObjects);
+                }
+                else
+                {
+                    ToDictionaryInternal(dictionary, value, key, visitedObjects);
+                }
+            }
+        }
+        finally
+        {
+            // Удаляем объект из списка посещенных при выходе из рекурсии
+            visitedObjects.Remove(obj);
+        }
+    }
 
     /// <summary>
     /// Generic type to dictionary
@@ -52,8 +76,9 @@ public static class Flatter
     /// <param name="prefix"></param>
     /// <param name="value"></param>
     /// <param name="key"></param>
+    /// <param name="visitedObjects"></param>
     private static void GenericToDictionary(Dictionary<string, string> dictionary, string prefix, object value,
-        string key)
+        string key, HashSet<object> visitedObjects)
     {
         if (value.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
@@ -68,7 +93,7 @@ public static class Flatter
                     }
                     else
                     {
-                        ToDictionary(dictionary, keyValue.Value!, key2);
+                        ToDictionaryInternal(dictionary, keyValue.Value!, key2, visitedObjects);
                     }
                 }
             }
@@ -84,7 +109,7 @@ public static class Flatter
                 }
                 else
                 {
-                    ToDictionary(dictionary, item, $"{key}:{i}");
+                    ToDictionaryInternal(dictionary, item, $"{key}:{i}", visitedObjects);
                 }
 
                 i++;
