@@ -71,6 +71,15 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         return Instance;
     }
 
+    /// <summary>
+    /// Rebind main configuration
+    /// </summary>
+    public static void Rebind()
+    {
+        if (_instance is not null && _tmpInstance is not null)
+            BindMainConfiguration(_instance, _tmpInstance);
+    }
+
 #pragma warning disable S107
     /// <summary>
     /// Initialize app settings
@@ -122,7 +131,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         if (tmp.AppSettingsOptions is null)
             throw new InvalidOperationException(
                 $"{nameof(_appSettingsOptions)} is null, call {nameof(Initialize)} before use {nameof(Instance)}");
-        
+
         var configurationBuilder = new ConfigurationBuilder();
         if (instance.AppSettingsOptions.UseEfCoreProvider)
         {

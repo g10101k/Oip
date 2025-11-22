@@ -88,7 +88,7 @@ public class AppSettingsContext : DbContext
                 _appSettingsOptions.AppSettingsTable);
             Database.ExecuteSqlRaw(sql);
         }
-        else if (Database.IsInMemory())
+        else if (Database.IsNpgsql())
         {
             sqlFormat = """
                         CREATE SCHEMA IF NOT EXISTS "{0}";

@@ -53,10 +53,7 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
     /// <param name="dbContext"></param>
     private void CreateAndSaveDefaultValues(AppSettingsContext dbContext)
     {
-        var configValues =
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-        Flatter.ToDictionary(configValues, _settings, string.Empty);
+        var configValues = Flatter.ToDictionary(_settings);
         var list = dbContext.AppSettings.ToList();
 
         foreach (var keyValue in configValues)
@@ -72,6 +69,4 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
 
         dbContext.SaveChanges();
     }
-
-    
 }
