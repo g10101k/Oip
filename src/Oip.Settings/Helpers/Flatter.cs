@@ -11,30 +11,38 @@ namespace Oip.Settings.Helpers;
 public static class Flatter
 {
     /// <summary>
-    /// Convert application settings instance to dictionary
+    /// Converts an application settings instance to a flat dictionary
     /// </summary>
-    /// <param name="dictionary"></param>
-    /// <param name="obj"></param>
-    /// <param name="prefix"></param>
-    public static void ToDictionary(Dictionary<string, string> dictionary, object obj, string prefix)
+    /// <param name="dictionary">Target dictionary to populate with flattened data</param>
+    /// <param name="obj">Object instance to flatten</param>
+    /// <param name="prefix">Key prefix for nested properties</param>
+    public static Dictionary<string, string> ToDictionary(object obj, string prefix)
     {
         var visitedObjects = new HashSet<object>();
+        var dictionary = new Dictionary<string, string>();
         ToDictionaryInternal(dictionary, obj, prefix, visitedObjects);
+        return dictionary;
     }
 
     /// <summary>
-    /// Internal recursive method with cycle detection
+    /// Internal recursive method with cycle detection for flattening objects
     /// </summary>
-    private static void ToDictionaryInternal(Dictionary<string, string> dictionary, object? obj, string prefix, HashSet<object> visitedObjects)
+    /// <param name="dictionary">Target dictionary to populate</param>
+    /// <param name="obj">Current object being processed</param>
+    /// <param name="prefix">Current key prefix</param>
+    /// <param name="visitedObjects">Set of visited objects for cycle detection</param>
+    private static void ToDictionaryInternal(Dictionary<string, string> dictionary, object? obj, string prefix,
+        HashSet<object> visitedObjects)
     {
         if (obj == null) return;
 
-        // Проверка на циклическую ссылку
+        // Check for circular reference
         if (!visitedObjects.Add(obj))
         {
-            throw new InvalidOperationException($"Обнаружена циклическая ссылка при сериализации объекта типа {obj.GetType().Name}");
+            throw new InvalidOperationException(
+                $"Circular reference detected while serializing object of type {obj.GetType().Name}");
         }
-        
+
         try
         {
             var fields = obj.GetType().GetProperties();
@@ -64,19 +72,19 @@ public static class Flatter
         }
         finally
         {
-            // Удаляем объект из списка посещенных при выходе из рекурсии
+            // Remove object from visited set when exiting recursion
             visitedObjects.Remove(obj);
         }
     }
 
     /// <summary>
-    /// Generic type to dictionary
+    /// Handles conversion of generic types (Dictionary and List) to dictionary entries
     /// </summary>
-    /// <param name="dictionary"></param>
-    /// <param name="prefix"></param>
-    /// <param name="value"></param>
-    /// <param name="key"></param>
-    /// <param name="visitedObjects"></param>
+    /// <param name="dictionary">Target dictionary to populate</param>
+    /// <param name="prefix">Current key prefix</param>
+    /// <param name="value">Generic object value to process</param>
+    /// <param name="key">Current key for the value</param>
+    /// <param name="visitedObjects">Set of visited objects for cycle detection</param>
     private static void GenericToDictionary(Dictionary<string, string> dictionary, string prefix, object value,
         string key, HashSet<object> visitedObjects)
     {
@@ -117,6 +125,11 @@ public static class Flatter
         }
     }
 
+    /// <summary>
+    /// Converts object to string using invariant culture for formattable types
+    /// </summary>
+    /// <param name="obj">Object to convert to string</param>
+    /// <returns>String representation of the object</returns>
     private static string ToStringInvariant(object? obj)
     {
         return obj switch
@@ -127,6 +140,11 @@ public static class Flatter
         };
     }
 
+    /// <summary>
+    /// Determines if the object is a simple type or null
+    /// </summary>
+    /// <param name="obj">Object to check</param>
+    /// <returns>True if object is simple type or null, otherwise false</returns>
     private static bool IsSimpleOrNull(object? obj)
     {
         if (obj is null) return true;
