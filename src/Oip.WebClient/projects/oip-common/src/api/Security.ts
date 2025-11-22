@@ -36,7 +36,7 @@ export class Security<
       ...params,
     });
   /**
-   * @description This endpoint is publicly accessible and provides client configuration such as authority URL, client ID, scopes, and secure routes for frontend OAuth2/OIDC initialization.
+   * No description
    *
    * @tags Security
    * @name securityGetKeycloakClientSettings

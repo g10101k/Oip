@@ -6,13 +6,10 @@ using Oip.Base.Data.Repositories;
 using Oip.Base.Services;
 
 namespace Oip.Base.Controllers;
+
 /// <summary>
 /// API controller for retrieving and managing application menus.
 /// </summary>
-/// <remarks>
-/// This controller provides endpoints for retrieving user-specific and admin-specific menus, as well as
-/// for managing module instances such as adding, editing, and deleting them.
-/// </remarks>
 [ApiController]
 [Route("api/menu")]
 [ApiExplorerSettings(GroupName = "base")]
@@ -83,7 +80,7 @@ public class MenuController : ControllerBase
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task AddModuleInstance(AddModuleInstanceDto addModuleInstanceDto)
     {
-         await _moduleRepository.AddModuleInstance(addModuleInstanceDto);
+        await _moduleRepository.AddModuleInstance(addModuleInstanceDto);
     }
 
     /// <summary>

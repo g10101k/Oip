@@ -10,10 +10,6 @@ namespace Oip.Base.Controllers;
 /// Controller responsible for managing security-related operations,
 /// including role retrieval and Keycloak client configuration.
 /// </summary>
-/// <remarks>
-/// Provides endpoints for administrators to retrieve Keycloak realm roles,
-/// as well as public access to frontend configuration for OAuth2 client setup.
-/// </remarks>
 [ApiController]
 [Route("api/security")]
 [ApiExplorerSettings(GroupName = "base")]
@@ -33,10 +29,6 @@ public class SecurityController : ControllerBase
     /// <summary>
     /// Retrieves Keycloak client settings needed by frontend applications.
     /// </summary>
-    /// <remarks>
-    /// This endpoint is publicly accessible and provides client configuration such as authority URL,
-    /// client ID, scopes, and secure routes for frontend OAuth2/OIDC initialization.
-    /// </remarks>
     /// <returns>
     /// A <see cref="GetKeycloakClientSettingsResponse"/> object containing frontend configuration.
     /// </returns>

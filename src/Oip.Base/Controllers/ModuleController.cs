@@ -8,29 +8,15 @@ using Oip.Base.Data.Repositories;
 using Oip.Base.Extensions;
 
 namespace Oip.Base.Controllers;
+
 /// <summary>
 /// API controller for managing modules in the system.
 /// </summary>
-/// <remarks>
-/// Provides endpoints for retrieving, inserting, deleting modules, and checking their runtime load status.
-/// All actions require administrative privileges.
-/// </remarks>
 [ApiController]
 [Route("api/module")]
 [ApiExplorerSettings(GroupName = "base")]
-public class ModuleController : ControllerBase
+public class ModuleController(ModuleRepository moduleRepository) : ControllerBase
 {
-    private readonly ModuleRepository _moduleRepository;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ModuleController"/> class.
-    /// </summary>
-    /// <param name="moduleRepository">The repository used for module data access.</param>
-    public ModuleController(ModuleRepository moduleRepository)
-    {
-        _moduleRepository = moduleRepository;
-    }
-
     /// <summary>
     /// Retrieves all modules stored in the system.
     /// </summary>
@@ -42,7 +28,7 @@ public class ModuleController : ControllerBase
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<IEnumerable<ModuleDto>> GetAll()
     {
-        return await _moduleRepository.GetAll();
+        return await moduleRepository.GetAll();
     }
 
     /// <summary>
@@ -54,7 +40,7 @@ public class ModuleController : ControllerBase
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task Insert(ModuleDto item)
     {
-        await _moduleRepository.Insert([item]);
+        await moduleRepository.Insert([item]);
     }
 
     /// <summary>
@@ -66,16 +52,12 @@ public class ModuleController : ControllerBase
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task Delete(ModuleDeleteRequest request)
     {
-        await _moduleRepository.DeleteModule(request.ModuleId);
+        await moduleRepository.DeleteModule(request.ModuleId);
     }
 
     /// <summary>
     /// Returns all registered modules and indicates whether each one is currently loaded into the application.
     /// </summary>
-    /// <remarks>
-    /// Compares all modules in the database with loaded modules in the application context.
-    /// This information can be used for diagnostics and monitoring of active modules.
-    /// </remarks>
     /// <returns>
     /// An <see cref="IActionResult"/> containing a list of <see cref="ExistModuleDto"/> objects,
     /// each representing a module with its load status.
@@ -85,7 +67,7 @@ public class ModuleController : ControllerBase
     [ProducesResponseType<IEnumerable<ExistModuleDto>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetModulesWithLoadStatus()
     {
-        var resultTask = _moduleRepository.GetAll();
+        var resultTask = moduleRepository.GetAll();
         var loadedModulesTask = WebApplicationBuilderExtension.GetAllLoadedModulesAsync();
         await Task.WhenAll(resultTask, loadedModulesTask);
 

@@ -25,10 +25,7 @@ public class UserService
     /// <returns></returns>
     public string? GetUserEmail()
     {
-        if (_httpContextAccessor.HttpContext == null)
-            return null;
-
-        var searchResult = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+        var searchResult = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
         if (searchResult is { } claim)
         {
             return claim.Value;
