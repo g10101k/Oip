@@ -2,23 +2,24 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Oip.Base.Services;
-using Xunit;
 
 namespace Oip.Test;
 
+[TestFixture]
 public class PeriodicBackgroundServiceTests
 {
-    private readonly Mock<IServiceScopeFactory> _scopeFactoryMock;
-    private readonly Mock<IServiceProvider> _serviceProviderMock;
-    private readonly Mock<ILogger<PeriodicBackgroundService<TestWorker>>> _loggerMock;
-    private readonly CancellationTokenSource _cancellationTokenSource;
+    private Mock<IServiceScopeFactory> _scopeFactoryMock;
+    private Mock<IServiceProvider> _serviceProviderMock;
+    private Mock<ILogger<TestWorker>> _loggerMock;
+    private CancellationTokenSource _cancellationTokenSource;
 
-    public PeriodicBackgroundServiceTests()
+    [SetUp]
+    public void SetUp()
     {
         _scopeFactoryMock = new Mock<IServiceScopeFactory>();
         var scopeMock = new Mock<IServiceScope>();
         _serviceProviderMock = new Mock<IServiceProvider>();
-        _loggerMock = new Mock<ILogger<PeriodicBackgroundService<TestWorker>>>();
+        _loggerMock = new Mock<ILogger<TestWorker>>();
         _cancellationTokenSource = new CancellationTokenSource();
 
         _scopeFactoryMock.Setup(x => x.CreateScope())
@@ -27,7 +28,7 @@ public class PeriodicBackgroundServiceTests
             .Returns(_serviceProviderMock.Object);
     }
 
-    [Fact]
+    [Test]
     public async Task ExecuteAsync_WorkerCreatedSuccessfully_ExecutesWorker()
     {
         // Arrange
@@ -44,12 +45,12 @@ public class PeriodicBackgroundServiceTests
         await service.StopAsync(_cancellationTokenSource.Token);
 
         // Assert
-        Assert.True(worker.Executed);
+        Assert.That(worker.Executed, Is.True);
         VerifyLogInformation("Service started.");
-        VerifyLogInformation("Work started at:");
+        VerifyLogDebug("Work started at:");
     }
 
-    [Fact]
+    [Test]
     public async Task ExecuteAsync_WorkerIsNull_Waits60Seconds()
     {
         // Arrange
@@ -59,7 +60,7 @@ public class PeriodicBackgroundServiceTests
         var service = new PeriodicBackgroundService<TestWorker>(_scopeFactoryMock.Object, _loggerMock.Object);
 
         // Act
-        var task = service.StartAsync(_cancellationTokenSource.Token);
+        _ = service.StartAsync(_cancellationTokenSource.Token);
         await Task.Delay(100);
         await service.StopAsync(_cancellationTokenSource.Token);
 
@@ -67,7 +68,7 @@ public class PeriodicBackgroundServiceTests
         VerifyLogWarning("Worker is null. Waiting 60 seconds.");
     }
 
-    [Fact]
+    [Test]
     public async Task ExecuteAsync_IntervalNegative_Waits60Seconds()
     {
         // Arrange
@@ -85,10 +86,10 @@ public class PeriodicBackgroundServiceTests
 
         // Assert
         VerifyLogInformation("Interval <= 0, worker not accepted. Waiting 60 seconds.");
-        Assert.False(worker.Executed);
+        Assert.That(worker.Executed, Is.False);
     }
 
-    [Fact]
+    [Test]
     public async Task ExecuteAsync_WorkerThrowsOperationCanceled_LogsErrorAndContinues()
     {
         // Arrange
@@ -108,7 +109,7 @@ public class PeriodicBackgroundServiceTests
         VerifyLogInformation("Service worker canceled.");
     }
 
-    [Fact]
+    [Test]
     public async Task ExecuteAsync_WorkerThrowsException_LogsErrorAndContinues()
     {
         // Arrange
@@ -128,7 +129,7 @@ public class PeriodicBackgroundServiceTests
         VerifyLogError("PeriodicService failed.");
     }
 
-    [Fact]
+    [Test]
     public async Task ExecuteAsync_CancellationRequested_StopsService()
     {
         // Arrange
@@ -166,6 +167,18 @@ public class PeriodicBackgroundServiceTests
         _loggerMock.Verify(
             x => x.Log(
                 LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains(expectedMessage)),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+            Times.AtLeastOnce);
+    }
+
+    private void VerifyLogDebug(string expectedMessage)
+    {
+        _loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Debug,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => v.ToString().Contains(expectedMessage)),
                 It.IsAny<Exception>(),

@@ -76,7 +76,7 @@ export class Module<
       ...params,
     });
   /**
-   * @description Compares all modules in the database with loaded modules in the application context. This information can be used for diagnostics and monitoring of active modules.
+   * No description
    *
    * @tags Module
    * @name moduleGetModulesWithLoadStatus

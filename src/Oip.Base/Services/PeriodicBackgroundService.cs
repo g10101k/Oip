@@ -10,7 +10,7 @@ namespace Oip.Base.Services;
 /// </summary>
 public class PeriodicBackgroundService<TScopeServiceWorker>(
     IServiceScopeFactory scopeFactory,
-    ILogger<PeriodicBackgroundService<TScopeServiceWorker>> logger)
+    ILogger<TScopeServiceWorker> logger)
     : BackgroundService where TScopeServiceWorker : class, IPeriodicalService
 {
     /// <summary>

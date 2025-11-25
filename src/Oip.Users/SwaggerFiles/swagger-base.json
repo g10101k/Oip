@@ -506,7 +506,6 @@
           "Module"
         ],
         "summary": "Returns all registered modules and indicates whether each one is currently loaded into the application.",
-        "description": "Compares all modules in the database with loaded modules in the application context.\r\nThis information can be used for diagnostics and monitoring of active modules.",
         "responses": {
           "200": {
             "description": "OK",
@@ -586,7 +585,6 @@
           "Security"
         ],
         "summary": "Retrieves Keycloak client settings needed by frontend applications.",
-        "description": "This endpoint is publicly accessible and provides client configuration such as authority URL,\r\nclient ID, scopes, and secure routes for frontend OAuth2/OIDC initialization.",
         "responses": {
           "200": {
             "description": "OK",

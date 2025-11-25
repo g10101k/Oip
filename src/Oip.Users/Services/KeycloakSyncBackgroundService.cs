@@ -6,6 +6,6 @@ namespace Oip.Users.Services;
 /// Background service for synchronizing users periodically.
 /// </summary>
 public class KeycloakSyncBackgroundService(
-    ILogger<PeriodicBackgroundService<UserSyncService>> logger,
+    ILogger<UserSyncService> logger,
     IServiceScopeFactory scopeFactory)
     : PeriodicBackgroundService<UserSyncService>(scopeFactory, logger);
