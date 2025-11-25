@@ -10,7 +10,7 @@ public class PeriodicBackgroundServiceTests
 {
     private Mock<IServiceScopeFactory> _scopeFactoryMock;
     private Mock<IServiceProvider> _serviceProviderMock;
-    private Mock<ILogger<PeriodicBackgroundService<TestWorker>>> _loggerMock;
+    private Mock<ILogger<TestWorker>> _loggerMock;
     private CancellationTokenSource _cancellationTokenSource;
 
     [SetUp]
@@ -19,7 +19,7 @@ public class PeriodicBackgroundServiceTests
         _scopeFactoryMock = new Mock<IServiceScopeFactory>();
         var scopeMock = new Mock<IServiceScope>();
         _serviceProviderMock = new Mock<IServiceProvider>();
-        _loggerMock = new Mock<ILogger<PeriodicBackgroundService<TestWorker>>>();
+        _loggerMock = new Mock<ILogger<TestWorker>>();
         _cancellationTokenSource = new CancellationTokenSource();
 
         _scopeFactoryMock.Setup(x => x.CreateScope())
@@ -60,7 +60,7 @@ public class PeriodicBackgroundServiceTests
         var service = new PeriodicBackgroundService<TestWorker>(_scopeFactoryMock.Object, _loggerMock.Object);
 
         // Act
-        var task = service.StartAsync(_cancellationTokenSource.Token);
+        _ = service.StartAsync(_cancellationTokenSource.Token);
         await Task.Delay(100);
         await service.StopAsync(_cancellationTokenSource.Token);
 
@@ -200,17 +200,12 @@ public class PeriodicBackgroundServiceTests
 }
 
 // Test implementation for testing
-public class TestWorker : IPeriodicalService
+public class TestWorker(int interval) : IPeriodicalService
 {
-    public int Interval { get; }
+    public int Interval { get; } = interval;
     public bool Executed { get; private set; }
     public bool ThrowOperationCanceled { get; set; }
     public bool ThrowException { get; set; }
-
-    public TestWorker(int interval)
-    {
-        Interval = interval;
-    }
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
