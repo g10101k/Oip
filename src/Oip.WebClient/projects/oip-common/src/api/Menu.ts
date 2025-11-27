@@ -10,18 +10,20 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   AddModuleInstanceDto,
   EditModuleInstanceDto,
   IntKeyValueDto,
   MenuDeleteModuleInstanceParams,
-  ModuleInstanceDto
-} from './data-contracts';
-import { ContentType, HttpClient, RequestParams } from './http-client';
+  ModuleInstanceDto,
+} from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class Menu<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Menu<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * @description Retrieves the menu available to the current authenticated user.
    *
@@ -33,10 +35,10 @@ export class Menu<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
   menuGet = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
-      ...params
+      format: "json",
+      ...params,
     });
   /**
    * @description Retrieves the admin-specific menu.
@@ -49,10 +51,10 @@ export class Menu<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
   menuGetAdminMenu = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get-admin-menu`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
-      ...params
+      format: "json",
+      ...params,
     });
   /**
    * @description Retrieves all available modules in the system.
@@ -65,10 +67,10 @@ export class Menu<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
   menuGetModules = (params: RequestParams = {}) =>
     this.request<IntKeyValueDto[], any>({
       path: `/api/menu/get-modules`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
-      ...params
+      format: "json",
+      ...params,
     });
   /**
    * @description Adds a new module instance to the system.
@@ -78,14 +80,17 @@ export class Menu<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
    * @request POST:/api/menu/add-module-instance
    * @secure
    */
-  menuAddModuleInstance = (data: AddModuleInstanceDto, params: RequestParams = {}) =>
+  menuAddModuleInstance = (
+    data: AddModuleInstanceDto,
+    params: RequestParams = {},
+  ) =>
     this.request<void, any>({
       path: `/api/menu/add-module-instance`,
-      method: 'POST',
+      method: "POST",
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params
+      ...params,
     });
   /**
    * @description Edits an existing module instance.
@@ -95,14 +100,17 @@ export class Menu<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
    * @request POST:/api/menu/edit-module-instance
    * @secure
    */
-  menuEditModuleInstance = (data: EditModuleInstanceDto, params: RequestParams = {}) =>
+  menuEditModuleInstance = (
+    data: EditModuleInstanceDto,
+    params: RequestParams = {},
+  ) =>
     this.request<void, any>({
       path: `/api/menu/edit-module-instance`,
-      method: 'POST',
+      method: "POST",
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params
+      ...params,
     });
   /**
    * @description Deletes a module instance by its identifier.
@@ -112,12 +120,15 @@ export class Menu<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
    * @request DELETE:/api/menu/delete-module-instance
    * @secure
    */
-  menuDeleteModuleInstance = (query: MenuDeleteModuleInstanceParams, params: RequestParams = {}) =>
+  menuDeleteModuleInstance = (
+    query: MenuDeleteModuleInstanceParams,
+    params: RequestParams = {},
+  ) =>
     this.request<void, any>({
       path: `/api/menu/delete-module-instance`,
-      method: 'DELETE',
+      method: "DELETE",
       query: query,
       secure: true,
-      ...params
+      ...params,
     });
 }

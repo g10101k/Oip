@@ -10,18 +10,20 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   FolderModuleGetModuleInstanceSettingsParams,
   FolderModuleGetSecurityParams,
   FolderModuleSettingsSaveSettingsRequest,
   PutSecurityRequest,
-  SecurityResponse
-} from './data-contracts';
-import { ContentType, HttpClient, RequestParams } from './http-client';
+  SecurityResponse,
+} from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class FolderModule<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class FolderModule<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * @description Returns a list of rights (permissions) required to access the folder module.
    *
@@ -33,10 +35,10 @@ export class FolderModule<SecurityDataType = unknown> extends HttpClient<Securit
   folderModuleGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/folder-module/get-module-rights`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
-      ...params
+      format: "json",
+      ...params,
     });
   /**
    * @description Gets the security configuration for the specified module instance ID.
@@ -46,14 +48,17 @@ export class FolderModule<SecurityDataType = unknown> extends HttpClient<Securit
    * @request GET:/api/folder-module/get-security
    * @secure
    */
-  folderModuleGetSecurity = (query: FolderModuleGetSecurityParams, params: RequestParams = {}) =>
+  folderModuleGetSecurity = (
+    query: FolderModuleGetSecurityParams,
+    params: RequestParams = {},
+  ) =>
     this.request<SecurityResponse[], any>({
       path: `/api/folder-module/get-security`,
-      method: 'GET',
+      method: "GET",
       query: query,
       secure: true,
-      format: 'json',
-      ...params
+      format: "json",
+      ...params,
     });
   /**
    * @description Updates the security configuration for the specified module instance.
@@ -63,14 +68,17 @@ export class FolderModule<SecurityDataType = unknown> extends HttpClient<Securit
    * @request PUT:/api/folder-module/put-security
    * @secure
    */
-  folderModulePutSecurity = (data: PutSecurityRequest, params: RequestParams = {}) =>
+  folderModulePutSecurity = (
+    data: PutSecurityRequest,
+    params: RequestParams = {},
+  ) =>
     this.request<void, any>({
       path: `/api/folder-module/put-security`,
-      method: 'PUT',
+      method: "PUT",
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params
+      ...params,
     });
   /**
    * @description Gets the settings for the specified module instance.
@@ -82,14 +90,14 @@ export class FolderModule<SecurityDataType = unknown> extends HttpClient<Securit
    */
   folderModuleGetModuleInstanceSettings = (
     query: FolderModuleGetModuleInstanceSettingsParams,
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<void, any>({
       path: `/api/folder-module/get-module-instance-settings`,
-      method: 'GET',
+      method: "GET",
       query: query,
       secure: true,
-      ...params
+      ...params,
     });
   /**
    * No description
@@ -99,13 +107,16 @@ export class FolderModule<SecurityDataType = unknown> extends HttpClient<Securit
    * @request PUT:/api/folder-module/put-module-instance-settings
    * @secure
    */
-  folderModulePutModuleInstanceSettings = (data: FolderModuleSettingsSaveSettingsRequest, params: RequestParams = {}) =>
+  folderModulePutModuleInstanceSettings = (
+    data: FolderModuleSettingsSaveSettingsRequest,
+    params: RequestParams = {},
+  ) =>
     this.request<void, any>({
       path: `/api/folder-module/put-module-instance-settings`,
-      method: 'PUT',
+      method: "PUT",
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params
+      ...params,
     });
 }
