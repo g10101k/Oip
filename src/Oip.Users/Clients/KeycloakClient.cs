@@ -218,7 +218,8 @@ public sealed class KeycloakClient : HttpClient
                 }
             }
 
-            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            await using var responseStream =
+                await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var streamReader = new StreamReader(responseStream);
             await using var jsonTextReader = new JsonTextReader(streamReader);
             {
@@ -527,17 +528,17 @@ public class Role
     /// <summary>
     /// Role identifier.
     /// </summary>
-    public string Id { get; set; }
+    public string Id { get; set; } = null!;
 
     /// <summary>
     /// Name
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// Description
     /// </summary>
-    public string Description { get; set; }
+    public string Description { get; set; } = null!;
 
     /// <summary>
     /// Indicates whether the role is composite.
@@ -552,7 +553,7 @@ public class Role
     /// <summary>
     /// The container ID associated with the role.
     /// </summary>
-    public string ContainerId { get; set; }
+    public string ContainerId { get; set; } = null!;
 }
 
 /// <summary>

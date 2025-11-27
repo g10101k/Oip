@@ -27,7 +27,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(withInterceptors([authInterceptor(), langIntercept]), withFetch()),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
-    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     AuthGuardService,
     MessageService,
     SecurityDataService,
@@ -49,6 +48,7 @@ export const appConfig: ApplicationConfig = {
         deps: [HttpClient]
       }
     }),
+    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     provideRouter(
       appRoutes,
       withInMemoryScrolling({

@@ -6,7 +6,7 @@ using Oip.Rtds.RandomInterface.Settings;
 
 namespace Oip.Rtds.RandomInterface.Services;
 
-public class Worker(ILogger<Worker> logger, IServiceScopeFactory scopeFactory) : BackgroundService
+public class Worker(ILogger<Worker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

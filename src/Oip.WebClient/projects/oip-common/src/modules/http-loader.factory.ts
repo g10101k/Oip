@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { OpenIdConfiguration, StsConfigHttpLoader } from 'angular-auth-oidc-client';
-import { GetKeycloakClientSettingsResponse } from "../api/data-contracts";
+import { GetKeycloakClientSettingsResponse } from '../api/data-contracts';
 
 /**
  * Load keycloak settings from backend and save to sessionStorage

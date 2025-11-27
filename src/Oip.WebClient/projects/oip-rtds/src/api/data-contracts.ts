@@ -11,13 +11,13 @@
  */
 
 export enum TagTypes {
-  Float32 = "Float32",
-  Float64 = "Float64",
-  Int16 = "Int16",
-  Int32 = "Int32",
-  Digital = "Digital",
-  String = "String",
-  Blob = "Blob",
+  Float32 = 'Float32',
+  Float64 = 'Float64',
+  Int16 = 'Int16',
+  Int32 = 'Int32',
+  Digital = 'Digital',
+  String = 'String',
+  Blob = 'Blob'
 } /** Request model for applying a specific migration by name. */
 export interface ApplyMigrationRequest {
   /** The name of the migration to apply. */

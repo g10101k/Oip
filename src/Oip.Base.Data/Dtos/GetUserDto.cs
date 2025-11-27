@@ -1,9 +1,4 @@
 namespace Oip.Base.Data.Dtos;
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="UserId"></param>
-/// <param name="Email"></param>
-/// <param name="Photo"></param>
+/// Represents a Data Transfer Object for retrieving user information
 public record GetUserDto(int UserId, string Email, byte[]? Photo);

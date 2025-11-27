@@ -12,7 +12,6 @@ namespace Oip.Users.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/users")]
-[Authorize]
 public class UsersController(
     UserRepository userRepository,
     UserSyncService userSyncService,

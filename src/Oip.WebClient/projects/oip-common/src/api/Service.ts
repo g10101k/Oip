@@ -19,11 +19,10 @@ export class Service<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description Get manifest for client app
    *
    * @tags Service
    * @name serviceGet
-   * @summary Get manifest for client app
    * @request GET:/api/service/get
    * @secure
    */
@@ -36,11 +35,10 @@ export class Service<
       ...params,
     });
   /**
-   * No description
+   * @description Registry module
    *
    * @tags Service
    * @name serviceRegisterModule
-   * @summary Registry module
    * @request POST:/api/service/register-module
    * @secure
    */

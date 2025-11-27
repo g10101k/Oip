@@ -35,23 +35,22 @@ public class SwaggerGenerateWebClientStartupTask(
         {
             logger.LogDebug("Checking for Swagger changes...");
 
-            foreach (var config in settings.ApiGenerationSettings)
+            foreach (var config in settings.OpenApi.Where(x => x.WebClientOutputPath is not null))
             {
                 try
                 {
-                    logger.LogDebug("Checking Swagger for {Name}", config.DocumentName);
+                    logger.LogDebug("Checking Swagger for {Name}", config.Name);
                     var swaggerJson = GetSwaggerJson(config);
                     if (!await HasSwaggerChanged(config, swaggerJson)) continue;
-                    logger.LogInformation("Swagger changed detected for {Name}. Generating client...",
-                        config.DocumentName);
+                    logger.LogInformation("Swagger changed detected for {Name}. Generating client...", config.Name);
                     var path = await SaveSwaggerHash(config, swaggerJson);
                     await GenerateTypeScriptClient(config, path);
 
-                    logger.LogInformation("Client generated successfully for {Name}", config.DocumentName);
+                    logger.LogInformation("Client generated successfully for {Name}", config.Name);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error processing Swagger config {Name}", config.DocumentName);
+                    logger.LogError(ex, "Error processing Swagger config {Name}", config.Name);
                 }
             }
         }
@@ -61,13 +60,13 @@ public class SwaggerGenerateWebClientStartupTask(
         }
     }
 
-    private string GetSwaggerJson(ApiGenerationSettings config)
+    private string GetSwaggerJson(OpenApiSettings config)
     {
-        var swaggerDoc = swaggerProvider.GetSwagger(config.DocumentName);
+        var swaggerDoc = swaggerProvider.GetSwagger(config.Name);
         return swaggerDoc.SerializeAsJson(OpenApiSpecVersion.OpenApi3_0);
     }
 
-    private async Task<bool> HasSwaggerChanged(ApiGenerationSettings config, string currentSwaggerJson)
+    private async Task<bool> HasSwaggerChanged(OpenApiSettings config, string currentSwaggerJson)
     {
         var hashFilePath = GetHashFilePath(config);
         if (!File.Exists(hashFilePath))
@@ -77,7 +76,7 @@ public class SwaggerGenerateWebClientStartupTask(
         return storedSwaggerJson != currentSwaggerJson;
     }
 
-    private async Task<string> SaveSwaggerHash(ApiGenerationSettings config, string content)
+    private async Task<string> SaveSwaggerHash(OpenApiSettings config, string content)
     {
         var hashFilePath = GetHashFilePath(config);
 
@@ -89,18 +88,18 @@ public class SwaggerGenerateWebClientStartupTask(
         return hashFilePath;
     }
 
-    private async Task GenerateTypeScriptClient(ApiGenerationSettings config, string swaggerJsonPath)
+    private async Task GenerateTypeScriptClient(OpenApiSettings config, string swaggerJsonPath)
     {
         var processStartInfo = new ProcessStartInfo
         {
             FileName = "npx",
             Arguments =
-                $"swagger-typescript-api generate -p {swaggerJsonPath} -o {config.OutputPath} --unwrap-response-data --extract-enums --extract-responses --extract-request-body --extract-request-params --modular --module-name-first-tag --t ./templates",
+                $"swagger-typescript-api generate -p {swaggerJsonPath} -o {config.WebClientOutputPath} --unwrap-response-data --extract-enums --extract-responses --extract-request-body --extract-request-params --modular --module-name-first-tag --t ./templates",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-            WorkingDirectory = "../Oip.WebClient",
+            WorkingDirectory = settings.SpaProxyServer.WorkingDirectory,
             StandardOutputEncoding = System.Text.Encoding.UTF8,
             StandardErrorEncoding = System.Text.Encoding.UTF8
         };
@@ -127,9 +126,9 @@ public class SwaggerGenerateWebClientStartupTask(
         await process.WaitForExitAsync();
     }
 
-    private string GetHashFilePath(ApiGenerationSettings config)
+    private string GetHashFilePath(OpenApiSettings config)
     {
         return Path.Combine(environment.ContentRootPath, "SwaggerFiles",
-            $"swagger-{config.DocumentName.ToLower()}.json");
+            $"swagger-{config.Name.ToLower()}.json");
     }
 }

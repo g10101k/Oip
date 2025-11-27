@@ -28,11 +28,10 @@ export class WeatherForecastModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description Retrieves example weather forecast data.
    *
    * @tags WeatherForecastModule
    * @name weatherForecastModuleGetWeatherForecast
-   * @summary Retrieves example weather forecast data.
    * @request GET:/api/weather-forecast-module/get-weather-forecast
    * @secure
    */
@@ -49,11 +48,10 @@ export class WeatherForecastModule<
       ...params,
     });
   /**
-   * No description
+   * @description <inheritdoc />
    *
    * @tags WeatherForecastModule
    * @name weatherForecastModuleGetModuleRights
-   * @summary <inheritdoc />
    * @request GET:/api/weather-forecast-module/get-module-rights
    * @secure
    */
@@ -66,11 +64,10 @@ export class WeatherForecastModule<
       ...params,
     });
   /**
-   * No description
+   * @description Gets the security configuration for the specified module instance ID.
    *
    * @tags WeatherForecastModule
    * @name weatherForecastModuleGetSecurity
-   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/weather-forecast-module/get-security
    * @secure
    */
@@ -87,11 +84,10 @@ export class WeatherForecastModule<
       ...params,
     });
   /**
-   * No description
+   * @description Updates the security configuration for the specified module instance.
    *
    * @tags WeatherForecastModule
    * @name weatherForecastModulePutSecurity
-   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/weather-forecast-module/put-security
    * @secure
    */
@@ -108,11 +104,10 @@ export class WeatherForecastModule<
       ...params,
     });
   /**
-   * No description
+   * @description Gets the settings for the specified module instance.
    *
    * @tags WeatherForecastModule
    * @name weatherForecastModuleGetModuleInstanceSettings
-   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/weather-forecast-module/get-module-instance-settings
    * @secure
    */

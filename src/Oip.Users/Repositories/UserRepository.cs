@@ -129,7 +129,7 @@ public class UserRepository
     {
         return await _context.Users.CountAsync();
     }
-    
+
     /// <summary>
     /// Get user by email
     /// </summary>
@@ -142,6 +142,16 @@ public class UserRepository
             return null;
         else
             return new GetUserDto(user.UserId, user.Email, user.Photo);
+    }
+
+    /// <summary>
+    /// Get user settings
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
+    public string GetUserSettings(string email)
+    {
+        return _context.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefault()?.Settings ?? string.Empty;
     }
 
     /// <summary>
@@ -167,5 +177,19 @@ public class UserRepository
         }
 
         _context.SaveChanges();
+    }
+
+    /// <summary>
+    /// Update User settings
+    /// </summary>
+    /// <param name="email">email</param>
+    /// <param name="json">settings</param>
+    /// <exception cref="InvalidOperationException">User not found</exception>
+    public async Task UpdateUserSettings(string email, string json)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email) ??
+                   throw new InvalidOperationException($"User with email: {email} - not found");
+        user.Settings = json;
+        await _context.SaveChangesAsync();
     }
 }

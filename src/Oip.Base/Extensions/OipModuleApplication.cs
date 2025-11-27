@@ -57,8 +57,7 @@ public static class OipModuleApplication
     public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
-        builder.Logging.ClearProviders();
-        builder.Host.UseNLog();
+        builder.AddNlog();
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
@@ -72,15 +71,28 @@ public static class OipModuleApplication
             .AddJsonOptions(option => { option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
         builder.Services.AddMvc().AddJsonOptions(options =>
         {
-            options.JsonSerializerOptions.DefaultIgnoreCondition
-                = JsonIgnoreCondition.WhenWritingNull;
+            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         });
         builder.AddLocalization();
 
         return builder;
     }
 
-    private static void AddLocalization(this WebApplicationBuilder builder)
+    /// <summary>
+    /// Adds NLog logging to the application
+    /// </summary>
+    /// <param name="builder">The application builder</param>
+    public static void AddNlog(this WebApplicationBuilder builder)
+    {
+        builder.Logging.ClearProviders();
+        builder.Host.UseNLog();
+    }
+
+    /// <summary>
+    /// Configures localization options for the application
+    /// </summary>
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    public static void AddLocalization(this WebApplicationBuilder builder)
     {
         builder.Services.Configure<RequestLocalizationOptions>(options =>
         {
@@ -95,10 +107,15 @@ public static class OipModuleApplication
         });
     }
 
-    private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    /// <summary>
+    /// Adds OpenAPI/Swagger support to the application builder
+    /// </summary>
+    /// <param name="builder">The application builder</param>
+    /// <param name="settings">The application settings</param>
+    public static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var openApiSettings = settings.OpenApi;
-        if (!openApiSettings.Publish)
+        if (openApiSettings.All(x => !x.Publish))
             return;
         builder.Services.AddSwaggerGen(options =>
         {
@@ -138,18 +155,18 @@ public static class OipModuleApplication
                     new List<string>()
                 }
             });
-            options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
-            {
-                Version = openApiSettings.Version,
-                Title = openApiSettings.Title,
-                Description = openApiSettings.Description,
-            });
 
-            options.SwaggerDoc("base", new OpenApiInfo
+            openApiSettings.ForEach(apiSettings =>
             {
-                Version = "v1",
-                Title = "Base services",
-                Description = "Base services",
+                if (apiSettings.Publish)
+                {
+                    options.SwaggerDoc(apiSettings.Name, new OpenApiInfo
+                    {
+                        Version = apiSettings.Version,
+                        Title = apiSettings.Title,
+                        Description = apiSettings.Description,
+                    });
+                }
             });
 
             options.DocInclusionPredicate((docName, apiDesc) =>
@@ -166,13 +183,17 @@ public static class OipModuleApplication
     /// Add a default liveness check to ensure app is responsive
     /// </summary>
     /// <param name="builder"></param>
-    private static void AddDefaultHealthChecks(this WebApplicationBuilder builder)
+    public static void AddDefaultHealthChecks(this WebApplicationBuilder builder)
     {
         builder.Services.AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
     }
 
-    private static void MapDefaultEndpoints(this WebApplication app)
+    /// <summary>
+    /// Maps default health check endpoints for application monitoring
+    /// </summary>
+    /// <param name="app">The application builder</param>
+    public static void MapDefaultEndpoints(this WebApplication app)
     {
         // All health checks must pass for app to be considered ready to accept traffic after starting
         app.MapHealthChecks("/health");
@@ -199,12 +220,8 @@ public static class OipModuleApplication
             app.UseHsts();
         }
 
-        var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
-        if (localizeOptions != null) app.UseRequestLocalization(localizeOptions.Value);
-
+        app.AddRequestLocalization();
         app.AddExceptionHandler();
-
-
         app.MapDefaultEndpoints();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
@@ -212,9 +229,7 @@ public static class OipModuleApplication
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseCors(options => options.AllowAnyOrigin());
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller}/{action=Index}/{id?}");
+        app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
         app.MapOpenApi(settings);
         app.MapFallbackToFile("index.html");
 
@@ -222,22 +237,30 @@ public static class OipModuleApplication
         return app;
     }
 
-    private static readonly Lazy<JsonSerializerSettings> Settings = new(CreateSerializerSettings, true);
-
-    private static JsonSerializerSettings CreateSerializerSettings()
+    /// <summary>
+    /// Configures request localization for the application
+    /// </summary>
+    /// <param name="app">The application builder</param>
+    /// <returns></returns>
+    public static WebApplication AddRequestLocalization(this WebApplication app)
     {
-        var settings = new JsonSerializerSettings();
-        UpdateJsonSerializerSettings(settings);
-        return settings;
+        var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+        if (localizeOptions != null) app.UseRequestLocalization(localizeOptions.Value);
+        return app;
     }
 
-    static void UpdateJsonSerializerSettings(JsonSerializerSettings settings)
+    private static readonly Lazy<JsonSerializerSettings> Settings = new(() => new JsonSerializerSettings
     {
-        settings.NullValueHandling = NullValueHandling.Ignore;
-        settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-    }
+        NullValueHandling = NullValueHandling.Ignore,
+        ContractResolver = new CamelCasePropertyNamesContractResolver()
+    }, true);
 
-    private static void AddExceptionHandler(this WebApplication app)
+
+    /// <summary>
+    /// Configures the application to handle exceptions and return a JSON response
+    /// </summary>
+    /// <param name="app">The application builder</param>
+    public static WebApplication AddExceptionHandler(this WebApplication app)
     {
         app.UseExceptionHandler(errorApp =>
         {
@@ -257,18 +280,29 @@ public static class OipModuleApplication
                 }
             });
         });
+        return app;
     }
 
-    private static void MapOpenApi(this WebApplication app, IBaseOipModuleAppSettings settings)
+    /// <summary>
+    /// Configures and maps Open API endpoints for the application
+    /// </summary>
+    /// <param name="app">The application builder</param>
+    /// <param name="settings">The application settings</param>
+    public static void MapOpenApi(this WebApplication app, IBaseOipModuleAppSettings settings)
     {
-        if (!settings.OpenApi.Publish)
+        if (settings.OpenApi.All(x => !x.Publish))
             return;
         app.UseSwagger();
-        app.UseSwaggerUI(x =>
+        app.UseSwaggerUI(swaggerUiOptions =>
         {
-            x.EnableTryItOutByDefault();
-            x.SwaggerEndpoint("/swagger/v1/swagger.json", "Module OIP service");
-            x.SwaggerEndpoint("/swagger/base/swagger.json", "Base OIP service");
+            swaggerUiOptions.EnableTryItOutByDefault();
+            settings.OpenApi.ForEach(api =>
+            {
+                if (api.Publish)
+                {
+                    swaggerUiOptions.SwaggerEndpoint(api.Url, api.Name);
+                }
+            });
         });
     }
 

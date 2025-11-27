@@ -42,4 +42,10 @@
     <data name="FolderModuleController_GetModuleRights_Can_view_this_module" xml:space="preserve">
         <value>Can view this module</value>
     </data>
+    <data name="BaseModuleController_GetModuleRights_Read" xml:space="preserve">
+        <value>Read</value>
+    </data>
+    <data name="BaseModuleController_GetModuleRights_Can_view_this_module" xml:space="preserve">
+        <value>Can view this module</value>
+    </data>
 </root>

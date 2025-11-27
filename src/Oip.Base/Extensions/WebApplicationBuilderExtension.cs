@@ -23,8 +23,8 @@ public static class WebApplicationBuilderExtension
     public static IApplicationBuilder MigrateDatabase(this IApplicationBuilder app)
     {
         using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        var context = serviceScope.ServiceProvider.GetService<OipModuleContext>()
-                      ?? throw new InvalidOperationException();
+        var context = serviceScope.ServiceProvider.GetService<OipModuleContext>() ??
+                      throw new InvalidOperationException("Could not find OipModuleContext.");
         context.Database.Migrate();
         AddModulesFromAssemblies(context);
         return app;

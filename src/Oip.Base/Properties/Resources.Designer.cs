@@ -92,5 +92,17 @@ namespace Oip.Base.Properties {
                 return ResourceManager.GetString("FolderModuleController_GetModuleRights_Can_view_this_module", resourceCulture);
             }
         }
+        
+        internal static string BaseModuleController_GetModuleRights_Read {
+            get {
+                return ResourceManager.GetString("BaseModuleController_GetModuleRights_Read", resourceCulture);
+            }
+        }
+        
+        internal static string BaseModuleController_GetModuleRights_Can_view_this_module {
+            get {
+                return ResourceManager.GetString("BaseModuleController_GetModuleRights_Can_view_this_module", resourceCulture);
+            }
+        }
     }
 }

@@ -64,6 +64,11 @@ namespace Oip.Users.Data.Migrations.Postgres
                         .HasColumnType("bytea")
                         .HasComment("User photo");
 
+                    b.Property<string>("Settings")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasComment("User settings");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasComment("Last update date and time");

@@ -25,11 +25,10 @@ export class Menu<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * @description Filters modules based on the roles of the current user and returns only those that are accessible.
+   * @description Retrieves the menu available to the current authenticated user.
    *
    * @tags Menu
    * @name menuGet
-   * @summary Retrieves the menu available to the current authenticated user.
    * @request GET:/api/menu/get
    * @secure
    */
@@ -42,11 +41,10 @@ export class Menu<
       ...params,
     });
   /**
-   * @description Returns all administrative modules for users with the Admin role.
+   * @description Retrieves the admin-specific menu.
    *
    * @tags Menu
    * @name menuGetAdminMenu
-   * @summary Retrieves the admin-specific menu.
    * @request GET:/api/menu/get-admin-menu
    * @secure
    */
@@ -59,11 +57,10 @@ export class Menu<
       ...params,
     });
   /**
-   * @description Useful for module management interfaces or system diagnostics.
+   * @description Retrieves all available modules in the system.
    *
    * @tags Menu
    * @name menuGetModules
-   * @summary Retrieves all available modules in the system.
    * @request GET:/api/menu/get-modules
    * @secure
    */
@@ -76,11 +73,10 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Adds a new module instance to the system.
    *
    * @tags Menu
    * @name menuAddModuleInstance
-   * @summary Adds a new module instance to the system.
    * @request POST:/api/menu/add-module-instance
    * @secure
    */
@@ -97,11 +93,10 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Edits an existing module instance.
    *
    * @tags Menu
    * @name menuEditModuleInstance
-   * @summary Edits an existing module instance.
    * @request POST:/api/menu/edit-module-instance
    * @secure
    */
@@ -118,11 +113,10 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Deletes a module instance by its identifier.
    *
    * @tags Menu
    * @name menuDeleteModuleInstance
-   * @summary Deletes a module instance by its identifier.
    * @request DELETE:/api/menu/delete-module-instance
    * @secure
    */

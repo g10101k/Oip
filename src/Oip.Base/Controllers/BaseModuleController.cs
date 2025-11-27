@@ -5,6 +5,7 @@ using Oip.Base.Constants;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Repositories;
+using Oip.Base.Properties;
 
 namespace Oip.Base.Controllers;
 
@@ -13,25 +14,9 @@ namespace Oip.Base.Controllers;
 /// Provides functionality to manage module settings and security.
 /// </summary>
 /// <typeparam name="TSettings">The type representing module settings.</typeparam>
-/// <remarks>
-/// Inherit from this controller to implement module-specific logic and security configuration.
-/// </remarks>
-public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleControllerSecurity where TSettings : class
+public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRepository)
+    : ControllerBase, IModuleControllerSecurity where TSettings : class
 {
-    /// <summary>
-    /// The repository used for module-related data access.
-    /// </summary>
-    private readonly ModuleRepository _moduleRepository;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BaseModuleController{TSettings}"/> class.
-    /// </summary>
-    /// <param name="moduleRepository">The module repository instance.</param>
-    protected BaseModuleController(ModuleRepository moduleRepository)
-    {
-        _moduleRepository = moduleRepository;
-    }
-
     /// <summary>
     /// Gets the security configuration for the specified module instance ID.
     /// </summary>
@@ -41,7 +26,7 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<List<SecurityResponse>> GetSecurity(int id)
     {
-        var roleRightPair = await _moduleRepository.GetSecurityByInstanceId(id);
+        var roleRightPair = await moduleRepository.GetSecurityByInstanceId(id);
         var result = new List<SecurityResponse>();
         foreach (var security in GetModuleRights())
         {
@@ -75,7 +60,7 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
             }
         }
 
-        await _moduleRepository.UpdateInstanceSecurity(request.Id, securityDtos);
+        await moduleRepository.UpdateInstanceSecurity(request.Id, securityDtos);
         return Ok();
     }
 
@@ -88,7 +73,7 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
     [Authorize]
     public IActionResult GetModuleInstanceSettings(int id)
     {
-        var settingString = _moduleRepository.GetModuleInstanceSettings(id);
+        var settingString = moduleRepository.GetModuleInstanceSettings(id);
         var result = JsonConvert.DeserializeObject<TSettings>(settingString) ??
                      Activator.CreateInstance(typeof(TSettings)) as TSettings;
         return Ok(result);
@@ -103,7 +88,7 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
     public void SaveSettings(SaveSettingsRequest request)
     {
         var settingString = JsonConvert.SerializeObject(request.Settings);
-        _moduleRepository.UpdateModuleInstanceSettings(request.Id, settingString);
+        moduleRepository.UpdateModuleInstanceSettings(request.Id, settingString);
     }
 
     /// <summary>
@@ -112,7 +97,19 @@ public abstract class BaseModuleController<TSettings> : ControllerBase, IModuleC
     /// <returns>A list of <see cref="SecurityResponse"/> representing available rights.</returns>
     [HttpGet("get-module-rights")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
-    public abstract List<SecurityResponse> GetModuleRights();
+    public virtual List<SecurityResponse> GetModuleRights()
+    {
+        return new()
+        {
+            new()
+            {
+                Code = SecurityConstants.Read,
+                Name = Resources.BaseModuleController_GetModuleRights_Read,
+                Description = Resources.BaseModuleController_GetModuleRights_Can_view_this_module,
+                Roles = [SecurityConstants.AdminRole]
+            }
+        };
+    }
 
     /// <summary>
     /// Represents a request to save module instance settings.

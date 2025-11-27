@@ -15,7 +15,7 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// <summary>
     /// OpenAPI settings
     /// </summary>
-    OpenApiSettings OpenApi { get; set; }
+    List<OpenApiSettings> OpenApi { get; set; }
 
     /// <summary>
     /// Spa proxy server settings
@@ -23,17 +23,7 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     SpaDevelopmentServerSettings SpaProxyServer { get; set; }
 
     /// <summary>
-    /// Open telemetry settings
-    /// </summary>
-    OpenTelemetrySettings Telemetry { get; set; }
-
-    /// <summary>
     /// Security Service Settings
     /// </summary>
     SecurityServiceSettings SecurityService { get; set; }
-    
-    /// <summary>
-    /// Api generation settings
-    /// </summary>
-    List<ApiGenerationSettings> ApiGenerationSettings { get; set; }
 }

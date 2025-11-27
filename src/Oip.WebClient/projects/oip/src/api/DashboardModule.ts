@@ -41,11 +41,10 @@ export class DashboardModule<
       ...params,
     });
   /**
-   * No description
+   * @description Gets the security configuration for the specified module instance ID.
    *
    * @tags DashboardModule
    * @name dashboardGetSecurity
-   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/dashboard/get-security
    * @secure
    */
@@ -62,11 +61,10 @@ export class DashboardModule<
       ...params,
     });
   /**
-   * No description
+   * @description Updates the security configuration for the specified module instance.
    *
    * @tags DashboardModule
    * @name dashboardPutSecurity
-   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/dashboard/put-security
    * @secure
    */
@@ -83,11 +81,10 @@ export class DashboardModule<
       ...params,
     });
   /**
-   * No description
+   * @description Gets the settings for the specified module instance.
    *
    * @tags DashboardModule
    * @name dashboardGetModuleInstanceSettings
-   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/dashboard/get-module-instance-settings
    * @secure
    */

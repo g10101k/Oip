@@ -66,12 +66,11 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// <param name="filter">Name filter to search tags by.</param>
     /// <returns>A list of matching tags.</returns>
     [HttpGet("get-tags-by-filter")]
-    [Authorize]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     public ActionResult<List<TagDto>> GetTagsByFilter(string filter)
     {
         return Ok(_tagRepository.GetTagsByFilter(filter));
     }
-
 
     /// <summary>
     /// Edits an existing tag.
@@ -85,27 +84,5 @@ public class TagManagementModuleController : BaseModuleController<object>
     {
         _tagRepository.EditTag(createTag);
         return Ok();
-    }
-
-    /// <summary>
-    /// Returns the security rights required for accessing this module.
-    /// </summary>
-    /// <remarks>
-    /// This method defines the access control rules for the Tag Management module.  
-    /// It lists the roles and permissions necessary to interact with the module via the UI or API.
-    /// </remarks>
-    /// <returns>A list of security rights.</returns>
-    public override List<SecurityResponse> GetModuleRights()
-    {
-        return new()
-        {
-            new()
-            {
-                Code = SecurityConstants.Read,
-                Name = Resources.TagController_GetModuleRights_Read,
-                Description = Resources.TagController_GetModuleRights_Cat_view_this_module,
-                Roles = [SecurityConstants.AdminRole]
-            }
-        };
     }
 }
