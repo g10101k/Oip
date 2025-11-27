@@ -99,7 +99,7 @@ public class SwaggerGenerateWebClientStartupTask(
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-            WorkingDirectory = "../Oip.WebClient",
+            WorkingDirectory = settings.SpaProxyServer.WorkingDirectory,
             StandardOutputEncoding = System.Text.Encoding.UTF8,
             StandardErrorEncoding = System.Text.Encoding.UTF8
         };
