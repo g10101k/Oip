@@ -1,3 +1,4 @@
+using Oip.Base.Services;
 using Oip.Rtds.Base;
 using Oip.Rtds.Base.Services;
 
@@ -9,22 +10,22 @@ namespace Oip.Rtds.RandomInterface.Services;
 public class TagWorkerService(
     TagCacheService tagCacheService,
     FormulaManager formulaManager,
-    BufferWriterService bufferWriterService)
+    BufferWriterService bufferWriterService) : IPeriodicalService
 {
+    public int Interval { get; } = 5;
+
     /// <summary>
     /// Collects tag data, evaluates formulas for each tag, and writes the results to a buffer.
     /// </summary>
-    public async Task CollectAndEvaluate()
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         var tags = tagCacheService.Tags;
         if (tags.Count == 0)
             return;
 
-        var tasks = tags
+        var result = tags
             .Select(tag => formulaManager.Evaluate(tag.Id, double.MaxValue, tag.DoubleValue, DateTimeOffset.Now))
             .ToArray();
-
-        var result = await Task.WhenAll(tasks);
 
         await bufferWriterService.WriteToService(result);
     }

@@ -4,24 +4,25 @@ using Moq;
 using Oip.Rtds.Base;
 using Oip.Rtds.Base.Services;
 using Oip.Rtds.Grpc;
-using Xunit;
 
 namespace Oip.Rtds.Test;
 
+[TestFixture]
 public class CompressServiceTests
 {
-    private readonly Mock<TagCacheService> _tagCacheServiceMock;
-    private readonly Mock<ILogger<CompressService>> _loggerMock;
-    private readonly CompressService _compressService;
+    private Mock<TagCacheService> _tagCacheServiceMock;
+    private Mock<ILogger<CompressService>> _loggerMock;
+    private CompressService _compressService;
 
-    public CompressServiceTests()
+    [SetUp]
+    public void SetUp()
     {
         _tagCacheServiceMock = new Mock<TagCacheService>();
         _loggerMock = new Mock<ILogger<CompressService>>();
         _compressService = new CompressService(_tagCacheServiceMock.Object, _loggerMock.Object);
     }
 
-    [Fact]
+    [Test]
     public async Task CompressFilterData_WhenNoCalculateResults_ReturnsEmptyRequest()
     {
         // Arrange
@@ -31,11 +32,11 @@ public class CompressServiceTests
         var result = await _compressService.CompressFilterData(calculateResults);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result.Tags);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Tags, Is.Empty);
     }
 
-    [Fact]
+    [Test]
     public async Task CompressFilterData_WhenTagNotFound_LogsErrorAndContinues()
     {
         // Arrange
@@ -51,8 +52,8 @@ public class CompressServiceTests
         var result = await _compressService.CompressFilterData(calculateResults);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result.Tags);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Tags, Is.Empty);
         _loggerMock.Verify(
             x => x.Log(
                 LogLevel.Error,
@@ -63,7 +64,7 @@ public class CompressServiceTests
             Times.Once);
     }
 
-    [Fact]
+    [Test]
     public async Task CompressFilterData_WhenCompressionDisabled_WritesAllValues()
     {
         // Arrange
@@ -97,13 +98,13 @@ public class CompressServiceTests
         var result = await _compressService.CompressFilterData(calculateResults);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(2, result.Tags.Count);
-        Assert.Contains(result.Tags, t => t.Id == 1 && t.DoubleValue == 100);
-        Assert.Contains(result.Tags, t => t.Id == 2 && t.DoubleValue == 200);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Tags, Has.Count.EqualTo(2));
+        Assert.That(result.Tags, Has.Some.Matches<TagResponse>(t => t.Id == 1 && t.DoubleValue == 100));
+        Assert.That(result.Tags, Has.Some.Matches<TagResponse>(t => t.Id == 2 && t.DoubleValue == 200));
     }
 
-    [Fact]
+    [Test]
     public async Task CompressFilterData_WhenTimeDifferenceBelowMinTime_DoesNotWriteValue()
     {
         // Arrange
@@ -132,11 +133,11 @@ public class CompressServiceTests
         var result = await _compressService.CompressFilterData(new[] { calculateResult });
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result.Tags);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Tags, Is.Empty);
     }
 
-    [Fact]
+    [Test]
     public async Task CompressFilterData_WhenTimeDifferenceExceedsMaxTime_WritesValue()
     {
         // Arrange
@@ -165,13 +166,13 @@ public class CompressServiceTests
         var result = await _compressService.CompressFilterData(new[] { calculateResult });
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Single(result.Tags);
-        Assert.Equal(1, (int)result.Tags[0].Id);
-        Assert.Equal(100, result.Tags[0].DoubleValue);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Tags, Has.Count.EqualTo(1));
+        Assert.That(result.Tags[0].Id, Is.EqualTo(1));
+        Assert.That(result.Tags[0].DoubleValue, Is.EqualTo(100));
     }
 
-    [Fact]
+    [Test]
     public async Task CompressFilterData_WhenValueChangeExceedsError_WritesValue()
     {
         // Arrange
@@ -200,13 +201,13 @@ public class CompressServiceTests
         var result = await _compressService.CompressFilterData(new[] { calculateResult });
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Single(result.Tags);
-        Assert.Equal(1, (int)result.Tags[0].Id);
-        Assert.Equal(110, result.Tags[0].DoubleValue);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Tags, Has.Count.EqualTo(1));
+        Assert.That(result.Tags[0].Id, Is.EqualTo(1));
+        Assert.That(result.Tags[0].DoubleValue, Is.EqualTo(110));
     }
 
-    [Fact]
+    [Test]
     public async Task CompressFilterData_WhenValueChangeBelowError_DoesNotWriteValue()
     {
         // Arrange
@@ -235,11 +236,11 @@ public class CompressServiceTests
         var result = await _compressService.CompressFilterData(new[] { calculateResult });
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result.Tags);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Tags, Is.Empty);
     }
 
-    [Fact]
+    [Test]
     public async Task CompressFilterData_WhenExceptionOccurs_LogsErrorAndContinuesProcessing()
     {
         // Arrange
@@ -268,9 +269,9 @@ public class CompressServiceTests
         var result = await _compressService.CompressFilterData(calculateResults);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Single(result.Tags); // Only second tag should be processed
-        Assert.Equal(2, (int)result.Tags[0].Id);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Tags, Has.Count.EqualTo(1)); // Only second tag should be processed
+        Assert.That(result.Tags[0].Id, Is.EqualTo(2));
 
         _loggerMock.Verify(
             x => x.Log(
@@ -282,13 +283,12 @@ public class CompressServiceTests
             Times.Once);
     }
 
-    [Theory]
-    [InlineData(false, 500, 1000, 99.9, 100.0, 1.0, 1, true)]
-    [InlineData(true, 500, 1000, 99.9, 100.0, 1.0, 200, false)] // Time diff < min time
-    [InlineData(true, 1000, 5000, 99.9, 100.0, 1.0, 2000, false)] // Value change < error
-    [InlineData(true, 1000, 5000, 90.0, 100.0, 1.0, 2000, true)] // Value change > error
-    [InlineData(true, 1000, 5000, 99.9, 100.0, 0.05, 2000, true)] // Value change > error (small error)
-    [InlineData(true, 1000, 5000, 99.9, 100.0, 1.0, 6000, true)] // Time diff > max time
+    [TestCase(false, 500, 1000, 99.9, 100.0, 1.0, 1, true)]
+    [TestCase(true, 500, 1000, 99.9, 100.0, 1.0, 200, false)] // Time diff < min time
+    [TestCase(true, 1000, 5000, 99.9, 100.0, 1.0, 2000, false)] // Value change < error
+    [TestCase(true, 1000, 5000, 90.0, 100.0, 1.0, 2000, true)] // Value change > error
+    [TestCase(true, 1000, 5000, 99.9, 100.0, 0.05, 2000, true)] // Value change > error (small error)
+    [TestCase(true, 1000, 5000, 99.9, 100.0, 1.0, 6000, true)] // Time diff > max time
     public void ShouldWriteValue_WithVariousScenarios_ReturnsExpectedResult(
         bool compressing,
         uint compressionMinTime,
@@ -323,7 +323,7 @@ public class CompressServiceTests
         var result = CompressService.ShouldWriteValue(calculateResult, tag);
 
         // Assert
-        Assert.Equal(expectedResult, result);
+        Assert.That(result, Is.EqualTo(expectedResult));
     }
 
     private void SetupTagCache(uint tagId, TagResponse tagResponse)

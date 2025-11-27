@@ -464,7 +464,7 @@
         "properties": {
           "message": {
             "type": "string",
-            "description": "The exception message.",
+            "description": "Exception message.",
             "nullable": true
           },
           "statusCode": {

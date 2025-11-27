@@ -26,7 +26,7 @@ export interface DashboardSettingsSaveSettingsRequest {
 
 /** Represents the base exception class for Oip applications. */
 export interface OipException {
-  /** The exception message. */
+  /** Exception message. */
   message?: string | null;
   /** The HTTP status code associated with the exception. */
   statusCode?: number;
@@ -66,40 +66,48 @@ export interface WeatherForecastResponse {
   summary?: string | null;
 }
 
-/** Module settings */
-export interface WeatherModuleSettings {
-  /** Day count */
-  dayCount?: number;
+/** User entity */
+export interface UserEntity {
+  /** User id */
+  userId?: number;
+  /** Gets or sets the Keycloak identifier for the user. */
+  keycloakId?: string | null;
+  /** E-mail */
+  email: string | null;
+  /** First name */
+  firstName?: string | null;
+  /** Last name */
+  lastName?: string | null;
+  /** Indicates whether the user is active */
+  isActive?: boolean;
+  /** Creation date and time */
+  createdAt?: Date;
+  /** Last update date and time */
+  updatedAt?: Date;
+  /** Last synchronization date and time */
+  lastSyncedAt?: Date;
+  /** User photo */
+  photo?: string | null;
 }
 
-/** Represents a request to save module instance settings. */
-export interface WeatherModuleSettingsSaveSettingsRequest {
-  /** Gets or sets the ID of the module instance. */
+export interface UsersGetAllUsersParams {
+  /** Number of records to skip */
+  skip?: number;
+  /** Number of records to take */
+  take?: number;
+}
+
+export interface UsersGetUserParams {
+  /** User ID */
   id?: number;
-  /** Module settings */
-  settings?: WeatherModuleSettings;
 }
 
-export interface DashboardGetSecurityParams {
-  /** The ID of the module instance. */
-  id?: number;
+export interface UsersGetUserByKeycloakIdParams {
+  /** Keycloak user ID */
+  keycloakId?: string;
 }
 
-export interface DashboardGetModuleInstanceSettingsParams {
-  /** The ID of the module instance. */
-  id?: number;
-}
-
-export interface WeatherForecastModuleGetWeatherForecastParams {
-  dayCount?: number;
-}
-
-export interface WeatherForecastModuleGetSecurityParams {
-  /** The ID of the module instance. */
-  id?: number;
-}
-
-export interface WeatherForecastModuleGetModuleInstanceSettingsParams {
-  /** The ID of the module instance. */
-  id?: number;
+export interface UsersSearchUserParams {
+  /** Search term */
+  term?: string;
 }

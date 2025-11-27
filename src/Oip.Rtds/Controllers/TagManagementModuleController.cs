@@ -6,9 +6,9 @@ using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Repositories;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Repositories;
-using Resources = Oip.Rts.Properties.Resources;
+using Resources = Oip.Rtds.Properties.Resources;
 
-namespace Oip.Rts.Controllers;
+namespace Oip.Rtds.Controllers;
 
 /// <summary>
 /// Controller for managing tags in the Tag Management module.

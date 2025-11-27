@@ -506,7 +506,6 @@
           "Module"
         ],
         "summary": "Returns all registered modules and indicates whether each one is currently loaded into the application.",
-        "description": "Compares all modules in the database with loaded modules in the application context.\r\nThis information can be used for diagnostics and monitoring of active modules.",
         "responses": {
           "200": {
             "description": "Success",
@@ -546,7 +545,6 @@
           "Security"
         ],
         "summary": "Retrieves Keycloak client settings needed by frontend applications.",
-        "description": "This endpoint is publicly accessible and provides client configuration such as authority URL,\r\nclient ID, scopes, and secure routes for frontend OAuth2/OIDC initialization.",
         "responses": {
           "200": {
             "description": "Success",
@@ -651,22 +649,22 @@
         "properties": {
           "moduleId": {
             "type": "integer",
-            "description": "",
+            "description": "The identifier of the module to create an instance of",
             "format": "int32"
           },
           "label": {
             "type": "string",
-            "description": "",
+            "description": "The display label for the module instance",
             "nullable": true
           },
           "icon": {
             "type": "string",
-            "description": "",
+            "description": "The icon identifier for the module instance (optional)",
             "nullable": true
           },
           "parentId": {
             "type": "integer",
-            "description": "",
+            "description": "The parent module instance identifier (optional)",
             "format": "int32",
             "nullable": true
           },
@@ -675,33 +673,34 @@
             "items": {
               "type": "string"
             },
+            "description": "Array of role identifiers that can view this module instance (optional)",
             "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "DTO for create module instance"
+        "description": "Data Transfer Object for creating a new module instance"
       },
       "EditModuleInstanceDto": {
         "type": "object",
         "properties": {
           "moduleInstanceId": {
             "type": "integer",
-            "description": "",
+            "description": "The identifier of the module instance to edit",
             "format": "int32"
           },
           "label": {
             "type": "string",
-            "description": "",
+            "description": "The updated display label for the module instance",
             "nullable": true
           },
           "icon": {
             "type": "string",
-            "description": "",
+            "description": "The updated icon identifier for the module instance (optional)",
             "nullable": true
           },
           "parentId": {
             "type": "integer",
-            "description": "",
+            "description": "The updated parent module instance identifier (optional)",
             "format": "int32",
             "nullable": true
           },
@@ -710,12 +709,12 @@
             "items": {
               "type": "string"
             },
-            "description": "",
+            "description": "Updated array of role identifiers that can view this module instance (optional)",
             "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "DTO for edit module instance"
+        "description": "Data Transfer Object for editing an existing module instance"
       },
       "ExistModuleDto": {
         "type": "object",

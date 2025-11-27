@@ -8,9 +8,7 @@
         <SpaRoot>.\..\Oip.WebClient\</SpaRoot>
         <SpaProxyServerUrl>https://localhost:50003</SpaProxyServerUrl>
         <SpaProxyLaunchCommand>npm run start:rtds</SpaProxyLaunchCommand>
-        <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <RootNamespace>Oip.Rts</RootNamespace>
     </PropertyGroup>
     
     <ItemGroup>

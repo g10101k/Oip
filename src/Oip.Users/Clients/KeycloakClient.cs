@@ -450,6 +450,9 @@ public partial class ApiException : Exception
         Headers = headers;
     }
 
+    /// <summary>
+    /// Collection of HTTP response headers returned by the failed API request.
+    /// </summary>
     public IReadOnlyDictionary<string, IEnumerable<string>> Headers { get; set; }
 
     public int StatusCode { get; set; }

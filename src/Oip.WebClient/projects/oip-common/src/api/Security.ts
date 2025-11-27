@@ -10,26 +10,46 @@
  * ---------------------------------------------------------------
  */
 
-import { Injectable } from '@angular/core';
-import { GetKeycloakClientSettingsResponse } from './data-contracts';
-import { HttpClient, RequestParams } from './http-client';
+import { Injectable } from "@angular/core";
+import { GetKeycloakClientSettingsResponse } from "./data-contracts";
+import { HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class Security<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Security<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
-   * @description Retrieves Keycloak client settings needed by frontend applications.
+   * @description This endpoint is restricted to administrators. Useful for role management in the application UI or backend.
+   *
+   * @tags Security
+   * @name securityGetRealmRoles
+   * @summary Retrieves all realm roles from Keycloak.
+   * @request GET:/api/security/get-realm-roles
+   * @secure
+   */
+  securityGetRealmRoles = (params: RequestParams = {}) =>
+    this.request<string[], any>({
+      path: `/api/security/get-realm-roles`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
    *
    * @tags Security
    * @name securityGetKeycloakClientSettings
+   * @summary Retrieves Keycloak client settings needed by frontend applications.
    * @request GET:/api/security/get-keycloak-client-settings
    * @secure
    */
   securityGetKeycloakClientSettings = (params: RequestParams = {}) =>
     this.request<GetKeycloakClientSettingsResponse, any>({
       path: `/api/security/get-keycloak-client-settings`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
-      ...params
+      format: "json",
+      ...params,
     });
 }

@@ -10,21 +10,31 @@
  * ---------------------------------------------------------------
  */
 
-/** DTO for create module instance */
+/** Data Transfer Object for creating a new module instance */
 export interface AddModuleInstanceDto {
+  /** The identifier of the module to create an instance of */
   moduleId?: number;
+  /** The display label for the module instance */
   label?: string | null;
+  /** The icon identifier for the module instance (optional) */
   icon?: string | null;
+  /** The parent module instance identifier (optional) */
   parentId?: number | null;
+  /** Array of role identifiers that can view this module instance (optional) */
   viewRoles?: string[] | null;
 }
 
-/** DTO for edit module instance */
+/** Data Transfer Object for editing an existing module instance */
 export interface EditModuleInstanceDto {
+  /** The identifier of the module instance to edit */
   moduleInstanceId?: number;
+  /** The updated display label for the module instance */
   label?: string | null;
+  /** The updated icon identifier for the module instance (optional) */
   icon?: string | null;
+  /** The updated parent module instance identifier (optional) */
   parentId?: number | null;
+  /** Updated array of role identifiers that can view this module instance (optional) */
   viewRoles?: string[] | null;
 }
 

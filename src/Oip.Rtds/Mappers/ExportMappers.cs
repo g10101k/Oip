@@ -1,6 +1,6 @@
 using Riok.Mapperly.Abstractions;
 
-namespace Oip.Rts.Mappers;
+namespace Oip.Rtds.Mappers;
 
 /// <summary>
 /// Mapper for ExportModule
