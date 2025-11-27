@@ -23,11 +23,6 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     SpaDevelopmentServerSettings SpaProxyServer { get; set; }
 
     /// <summary>
-    /// Open telemetry settings
-    /// </summary>
-    OpenTelemetrySettings Telemetry { get; set; }
-
-    /// <summary>
     /// Security Service Settings
     /// </summary>
     SecurityServiceSettings SecurityService { get; set; }
