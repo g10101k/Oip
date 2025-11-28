@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds.Base", "Oip.Rtds.B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds.Test", "Oip.Rtds.Test\Oip.Rtds.Test.csproj", "{D5B77332-0964-43A7-9BCC-A05CB2E54286}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Api", "Oip.Api\Oip.Api.csproj", "{2B2D44E7-233C-4741-89FA-24A6DD8CBD1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +98,10 @@ Global
 		{D5B77332-0964-43A7-9BCC-A05CB2E54286}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5B77332-0964-43A7-9BCC-A05CB2E54286}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5B77332-0964-43A7-9BCC-A05CB2E54286}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B2D44E7-233C-4741-89FA-24A6DD8CBD1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B2D44E7-233C-4741-89FA-24A6DD8CBD1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B2D44E7-233C-4741-89FA-24A6DD8CBD1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B2D44E7-233C-4741-89FA-24A6DD8CBD1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4A0A6CC5-AB1B-4950-A18A-2373FEBED8A9} = {20FB5A06-4C4F-4EA3-BC3B-9975A648AE31}

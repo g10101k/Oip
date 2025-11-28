@@ -21,21 +21,6 @@ public class DashboardModuleController : BaseModuleController<DashboardSettings>
     public DashboardModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
     {
     }
-
-    /// <inheritdoc />
-    public override List<SecurityResponse> GetModuleRights()
-    {
-        return new()
-        {
-            new()
-            {
-                Code = SecurityConstants.Read,
-                Name = Resources.DashboardModuleController_GetModuleRights_Read,
-                Description = Resources.DashboardModuleController_GetModuleRights_Can_view_this_module,
-                Roles = [SecurityConstants.AdminRole]
-            },
-        };
-    }
 }
 
 /// <summary>

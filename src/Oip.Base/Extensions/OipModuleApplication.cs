@@ -37,6 +37,7 @@ public static class OipModuleApplication
     /// </summary>
     /// <param name="settings">App settings</param>
     /// <returns></returns>
+    [Obsolete("Use particle call ")]
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
@@ -48,12 +49,12 @@ public static class OipModuleApplication
         return builder;
     }
 
-
     /// <summary>
     /// Initializes a new instance of the WebApplicationBuilder class with preconfigured defaults
     /// </summary>
     /// <param name="settings">App settings</param>
     /// <returns></returns>
+    [Obsolete]
     public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
@@ -61,20 +62,32 @@ public static class OipModuleApplication
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
-        builder.Services.AddOipModuleContext(settings.ConnectionString);
         builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
         builder.Services.AddStartupRunner();
         builder.Services.AddSingleton(settings);
         builder.Services.AddScoped<UserService>();
         builder.Services.AddCors();
-        builder.Services.AddControllers()
-            .AddJsonOptions(option => { option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+        builder.AddControllersAndView();
+        builder.AddLocalization();
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds controllers and configures JSON options for the application builder
+    /// </summary>
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    /// <returns>The modified WebApplicationBuilder instance</returns>
+    public static WebApplicationBuilder AddControllersAndView(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddControllers().AddJsonOptions(option =>
+        {
+            option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
         builder.Services.AddMvc().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         });
-        builder.AddLocalization();
-
         return builder;
     }
 
@@ -211,15 +224,10 @@ public static class OipModuleApplication
     /// <param name="builder"></param>
     /// <param name="settings"></param>
     /// <returns></returns>
+    [Obsolete]
     public static WebApplication BuildApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var app = builder.Build();
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Home/Error");
-            app.UseHsts();
-        }
-
         app.AddRequestLocalization();
         app.AddExceptionHandler();
         app.MapDefaultEndpoints();
@@ -233,7 +241,22 @@ public static class OipModuleApplication
         app.MapOpenApi(settings);
         app.MapFallbackToFile("index.html");
 
-        app.MigrateDatabase();
+        return app;
+    }
+
+    /// <summary>
+    /// Configures HTTP Strict Transport Security to help protect against man-in-the-middle attacks
+    /// </summary>
+    /// <param name="app">The application builder</param>
+    /// <returns></returns>
+    public static WebApplication AddHsts(this WebApplication app)
+    {
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Home/Error");
+            app.UseHsts();
+        }
+
         return app;
     }
 

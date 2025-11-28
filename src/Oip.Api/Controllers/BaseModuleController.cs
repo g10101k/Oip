@@ -15,7 +15,7 @@ namespace Oip.Base.Controllers;
 /// </summary>
 /// <typeparam name="TSettings">The type representing module settings.</typeparam>
 public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRepository)
-    : ControllerBase, IModuleControllerSecurity where TSettings : class
+    : ControllerBase where TSettings : class
 {
     /// <summary>
     /// Gets the security configuration for the specified module instance ID.

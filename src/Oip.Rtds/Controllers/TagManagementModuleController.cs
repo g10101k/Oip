@@ -26,10 +26,6 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// <summary>
     /// Initializes a new instance of the <see cref="TagManagementModuleController"/> class.
     /// </summary>
-    /// <remarks>
-    /// The controller depends on an application context and a module repository 
-    /// for database access and modular behavior, respectively.
-    /// </remarks>
     /// <param name="tagRepository">Application database context for tag operations.</param>
     /// <param name="moduleRepository">Base module repository for module-level operations.</param>
     public TagManagementModuleController(TagRepository tagRepository, ModuleRepository moduleRepository)
@@ -41,10 +37,6 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// <summary>
     /// Adds a new tag.
     /// </summary>
-    /// <remarks>
-    /// Accepts a tag entity from the request body and stores it in the database.  
-    /// Returns HTTP 200 on success.
-    /// </remarks>
     /// <param name="createTag">Tag entity to be added.</param>
     /// <returns>HTTP 200 OK on success.</returns>
     [HttpPost("add-tag")]
@@ -59,10 +51,6 @@ public class TagManagementModuleController : BaseModuleController<object>
     /// <summary>
     /// Retrieves tags that match a given name filter.
     /// </summary>
-    /// <remarks>
-    /// Returns a list of tags whose names match the provided filter string.  
-    /// This is useful for searching or filtering tags by partial name.
-    /// </remarks>
     /// <param name="filter">Name filter to search tags by.</param>
     /// <returns>A list of matching tags.</returns>
     [HttpGet("get-tags-by-filter")]

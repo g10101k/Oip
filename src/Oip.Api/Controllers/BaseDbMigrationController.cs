@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -6,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 using Oip.Base.Constants;
 using Oip.Base.Data.Repositories;
+using Oip.Base.Exceptions;
 
 namespace Oip.Base.Controllers;
 
@@ -44,6 +46,9 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     /// <returns>A list of <see cref="MigrationDto"/> objects containing migration metadata.</returns>
     [HttpGet("get-migrations")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType<IEnumerable<MigrationDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public virtual async Task<IEnumerable<MigrationDto>> GetMigrations()
     {
         var result = new List<MigrationDto>();
@@ -92,6 +97,9 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     /// <returns>HTTP 200 OK on success.</returns>
     [HttpPost("migrate")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAppliedMigrations()
     {
         await _dbContext.Database.MigrateAsync();
@@ -109,6 +117,9 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     /// <returns>HTTP 200 OK on success.</returns>
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [HttpPost("apply-migration")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ApplyMigration(ApplyMigrationRequest request)
     {
         await _dbContext.Database.GetInfrastructure().GetService<IMigrator>()?.MigrateAsync(request.Name)!;
