@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Entities;
 
-namespace Oip.Base.Extensions;
+namespace Oip.Base.Data.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring and initializing the OIP module context

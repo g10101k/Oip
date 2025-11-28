@@ -1,6 +1,6 @@
-using Oip.Base.Controllers.Api;
+using Oip.Api.Controllers.Api;
 
-namespace Oip.Base.Controllers;
+namespace Oip.Api.Controllers;
 
 #pragma warning disable CS1591
 public interface IModuleControllerSecurity

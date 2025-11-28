@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Constants;
+using Oip.Base.Data.Constants;
 using Oip.Users.Services;
 
 namespace Oip.Users.Controllers;

@@ -1,4 +1,4 @@
-namespace Oip.Base.Constants;
+namespace Oip.Base.Data.Constants;
 
 /// <summary>
 /// Defines a set of standard security-related constants 

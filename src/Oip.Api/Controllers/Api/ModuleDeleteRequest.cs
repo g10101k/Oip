@@ -1,4 +1,4 @@
-namespace Oip.Base.Controllers.Api;
+namespace Oip.Api.Controllers.Api;
 
 /// <summary>
 /// Represents a request to delete a module by its identifier.

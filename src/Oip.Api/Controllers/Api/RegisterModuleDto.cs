@@ -1,4 +1,4 @@
-namespace Oip.Base.Controllers.Api;
+namespace Oip.Api.Controllers.Api;
 
 /// <summary>
 /// Dto module

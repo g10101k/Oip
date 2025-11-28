@@ -2,9 +2,9 @@ using System.Collections.Concurrent;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Oip.Base.Controllers.Api;
+using Oip.Api.Controllers.Api;
 
-namespace Oip.Base.Controllers;
+namespace Oip.Api.Controllers;
 
 /// <summary>
 /// Module federation controller

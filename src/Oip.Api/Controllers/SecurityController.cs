@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Controllers.Api;
+using Oip.Api.Controllers.Api;
 using Oip.Base.Helpers;
 using Oip.Base.Settings;
 
-namespace Oip.Base.Controllers;
+namespace Oip.Api.Controllers;
 
 /// <summary>
 /// Controller responsible for managing security-related operations,

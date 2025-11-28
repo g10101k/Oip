@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Constants;
-using Oip.Base.Controllers.Api;
+using Oip.Api.Controllers.Api;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Extensions;
 using Oip.Base.Data.Repositories;
-using Oip.Base.Extensions;
 
-namespace Oip.Base.Controllers;
+namespace Oip.Api.Controllers;
 
 /// <summary>
 /// API controller for managing modules in the system.
