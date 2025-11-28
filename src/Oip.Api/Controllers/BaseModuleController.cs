@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Oip.Api.Controllers.Api;
@@ -6,6 +7,7 @@ using Oip.Api.Properties;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Repositories;
+using Oip.Base.Exceptions;
 
 namespace Oip.Api.Controllers;
 
@@ -24,6 +26,9 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// <returns>A list of <see cref="SecurityResponse"/> objects representing the security rights and associated roles.</returns>
     [HttpGet("get-security")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType<List<SecurityResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status403Forbidden)]
     public async Task<List<SecurityResponse>> GetSecurity(int id)
     {
         var roleRightPair = await moduleRepository.GetSecurityByInstanceId(id);
@@ -44,6 +49,10 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// <returns>An <see cref="IActionResult"/> indicating the outcome of the operation.</returns>
     [HttpPut("put-security")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> PutSecurity(PutSecurityRequest request)
     {
         List<ModuleSecurityDto> securityDtos = new();
@@ -71,6 +80,9 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// <returns>An <see cref="IActionResult"/> containing the deserialized settings object.</returns>
     [HttpGet("get-module-instance-settings")]
     [Authorize]
+    [ProducesResponseType<object>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status403Forbidden)]
     public IActionResult GetModuleInstanceSettings(int id)
     {
         var settingString = moduleRepository.GetModuleInstanceSettings(id);
@@ -85,6 +97,10 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// <param name="request">The request containing the new settings and instance ID.</param>
     [HttpPut("put-module-instance-settings")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status403Forbidden)]
     public void SaveSettings(SaveSettingsRequest request)
     {
         var settingString = JsonConvert.SerializeObject(request.Settings);
@@ -97,6 +113,9 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// <returns>A list of <see cref="SecurityResponse"/> representing available rights.</returns>
     [HttpGet("get-module-rights")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType<List<SecurityResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status403Forbidden)]
     public virtual List<SecurityResponse> GetModuleRights()
     {
         return new()

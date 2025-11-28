@@ -6,6 +6,7 @@ using Oip.Base.Data.Constants;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Extensions;
 using Oip.Base.Data.Repositories;
+using Oip.Base.Exceptions;
 
 namespace Oip.Api.Controllers;
 
@@ -26,6 +27,9 @@ public class ModuleController(ModuleRepository moduleRepository) : ControllerBas
     /// <returns>A list of <see cref="ModuleDto"/> objects representing all modules.</returns>
     [HttpGet("get-all")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType<IEnumerable<ModuleDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status403Forbidden)]
     public async Task<IEnumerable<ModuleDto>> GetAll()
     {
         return await moduleRepository.GetAll();
@@ -38,6 +42,9 @@ public class ModuleController(ModuleRepository moduleRepository) : ControllerBas
     /// <returns>A task representing the asynchronous operation.</returns>
     [HttpPost("insert")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status403Forbidden)]
     public async Task Insert(ModuleDto item)
     {
         await moduleRepository.Insert([item]);
@@ -50,6 +57,9 @@ public class ModuleController(ModuleRepository moduleRepository) : ControllerBas
     /// <returns>A task representing the asynchronous operation.</returns>
     [HttpDelete("delete")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status403Forbidden)]
     public async Task Delete(ModuleDeleteRequest request)
     {
         await moduleRepository.DeleteModule(request.ModuleId);
@@ -65,6 +75,8 @@ public class ModuleController(ModuleRepository moduleRepository) : ControllerBas
     [HttpGet("get-modules-with-load-status")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType<IEnumerable<ExistModuleDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetModulesWithLoadStatus()
     {
         var resultTask = moduleRepository.GetAll();

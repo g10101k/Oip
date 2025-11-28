@@ -8,17 +8,17 @@ public class SecurityResponse
     /// <summary>
     /// Code
     /// </summary>
-    public string Code { get; set; } = default!;
+    public string Code { get; set; } = null!;
 
     /// <summary>
     /// Name
     /// </summary>
-    public string Name { get; set; } = default!;
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// Description
     /// </summary>
-    public string Description { get; set; } = default!;
+    public string Description { get; set; } = null!;
 
     /// <summary>
     /// Roles

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Oip.Api.Controllers.Api;
+using Oip.Base.Exceptions;
 using Oip.Base.Helpers;
 using Oip.Base.Settings;
 
@@ -13,19 +15,8 @@ namespace Oip.Api.Controllers;
 [ApiController]
 [Route("api/security")]
 [ApiExplorerSettings(GroupName = "base")]
-public class SecurityController : ControllerBase
+public class SecurityController(IBaseOipModuleAppSettings appSettings) : ControllerBase
 {
-    private readonly IBaseOipModuleAppSettings _appSettings;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SecurityController"/> class.
-    /// </summary>
-    /// <param name="appSettings">Application settings used for Keycloak configuration.</param>
-    public SecurityController(IBaseOipModuleAppSettings appSettings)
-    {
-        _appSettings = appSettings;
-    }
-
     /// <summary>
     /// Retrieves Keycloak client settings needed by frontend applications.
     /// </summary>
@@ -34,13 +25,15 @@ public class SecurityController : ControllerBase
     /// </returns>
     [HttpGet("get-keycloak-client-settings")]
     [AllowAnonymous]
+    [ProducesResponseType<GetKeycloakClientSettingsResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
     public GetKeycloakClientSettingsResponse GetKeycloakClientSettings()
     {
-        var securitySettings = _appSettings.SecurityService;
+        var securitySettings = appSettings.SecurityService;
 
         HashSet<string> securityRoutes =
         [
-            _appSettings.OipUrls
+            appSettings.OipUrls
         ];
         foreach (var q in securitySettings.Front.SecureRoutes)
         {

@@ -32,9 +32,6 @@ public class MenuController : ControllerBase
     /// <summary>
     /// Retrieves the menu available to the current authenticated user.
     /// </summary>
-    /// <remarks>
-    /// Filters modules based on the roles of the current user and returns only those that are accessible.
-    /// </remarks>
     /// <returns>A list of <see cref="ModuleInstanceDto"/> objects available to the user.</returns>
     [HttpGet("get")]
     [Authorize]
@@ -46,9 +43,6 @@ public class MenuController : ControllerBase
     /// <summary>
     /// Retrieves the admin-specific menu.
     /// </summary>
-    /// <remarks>
-    /// Returns all administrative modules for users with the Admin role.
-    /// </remarks>
     /// <returns>A list of <see cref="ModuleInstanceDto"/> objects representing the admin menu.</returns>
     [HttpGet("get-admin-menu")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
@@ -60,9 +54,6 @@ public class MenuController : ControllerBase
     /// <summary>
     /// Retrieves all available modules in the system.
     /// </summary>
-    /// <remarks>
-    /// Useful for module management interfaces or system diagnostics.
-    /// </remarks>
     /// <returns>A list of <see cref="IntKeyValueDto"/> representing available modules.</returns>
     [HttpGet("get-modules")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
