@@ -18,20 +18,9 @@ namespace Oip.Rtds.Controllers;
 /// </remarks>
 [ApiController]
 [Route("api/tag-management")]
-public class TagManagementModuleController : BaseModuleController<object>
+public class TagManagementModuleController(TagRepository tagRepository, ModuleRepository moduleRepository)
+    : BaseModuleController<object>(moduleRepository)
 {
-    private readonly TagRepository _tagRepository;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TagManagementModuleController"/> class.
-    /// </summary>
-    /// <param name="tagRepository">Application database context for tag operations.</param>
-    /// <param name="moduleRepository">Base module repository for module-level operations.</param>
-    public TagManagementModuleController(TagRepository tagRepository, ModuleRepository moduleRepository)
-        : base(moduleRepository)
-    {
-        _tagRepository = tagRepository;
-    }
 
     /// <summary>
     /// Adds a new tag.
@@ -43,7 +32,7 @@ public class TagManagementModuleController : BaseModuleController<object>
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> AddTag(CreateTagDto createTag)
     {
-        await _tagRepository.AddTag(createTag);
+        await tagRepository.AddTag(createTag);
         return Ok();
     }
 
@@ -56,7 +45,7 @@ public class TagManagementModuleController : BaseModuleController<object>
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public ActionResult<List<TagDto>> GetTagsByFilter(string filter)
     {
-        return Ok(_tagRepository.GetTagsByFilter(filter));
+        return Ok(tagRepository.GetTagsByFilter(filter));
     }
 
     /// <summary>
@@ -69,7 +58,7 @@ public class TagManagementModuleController : BaseModuleController<object>
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public IActionResult EditTag(CreateTagDto createTag)
     {
-        _tagRepository.EditTag(createTag);
+        tagRepository.EditTag(createTag);
         return Ok();
     }
 }

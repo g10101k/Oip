@@ -10,16 +10,8 @@ namespace Oip.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/dashboard")]
-public class DashboardModuleController : BaseModuleController<DashboardSettings>
-{
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="moduleRepository"></param>
-    public DashboardModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
-    {
-    }
-}
+public class DashboardModuleController(ModuleRepository moduleRepository)
+    : BaseModuleController<DashboardSettings>(moduleRepository);
 
 /// <summary>
 /// Settings
