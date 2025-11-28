@@ -8,7 +8,7 @@ public class RegisterModuleDto
     /// <summary>
     /// See 'name' in webpack.config.js
     /// </summary>
-    public string Name { get; set; } = default!;
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// Base Url
