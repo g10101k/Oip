@@ -16,7 +16,7 @@ public class ClaimsTransformation : IClaimsTransformation
     /// <returns></returns>
     public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {
-        ClaimsIdentity identity = new ClaimsIdentity();
+        var identity = new ClaimsIdentity();
         AddRolesFromRealmAccess(principal, identity);
         principal.AddIdentity(identity);
         return Task.FromResult(principal);
