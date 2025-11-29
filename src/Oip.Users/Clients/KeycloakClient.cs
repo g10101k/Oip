@@ -13,21 +13,12 @@ public sealed class KeycloakClient : HttpClient
     private readonly HttpClient _httpClient;
     private AuthResponse? _authResponse;
 
-
-    private static readonly Lazy<JsonSerializerSettings> Settings = new(CreateSerializerSettings, true);
-
-    private static JsonSerializerSettings CreateSerializerSettings()
+    private static readonly Lazy<JsonSerializerSettings> Settings = new(() => new JsonSerializerSettings
     {
-        var settings = new JsonSerializerSettings();
-        UpdateJsonSerializerSettings(settings);
-        return settings;
-    }
+        NullValueHandling = NullValueHandling.Ignore,
+        ContractResolver = new CamelCasePropertyNamesContractResolver()
+    }, true);
 
-    static void UpdateJsonSerializerSettings(JsonSerializerSettings settings)
-    {
-        settings.NullValueHandling = NullValueHandling.Ignore;
-        settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-    }
 
     /// <summary>
     /// Json settings
@@ -455,6 +446,9 @@ public partial class ApiException : Exception
     /// </summary>
     public IReadOnlyDictionary<string, IEnumerable<string>> Headers { get; set; }
 
+    /// <summary>
+    /// The HTTP status code returned by the API call
+    /// </summary>
     public int StatusCode { get; set; }
 
     /// <summary>
@@ -470,6 +464,9 @@ public partial class ApiException : Exception
         Response = response;
     }
 
+    /// <summary>
+    /// Represents the response from an API call
+    /// </summary>
     public string? Response { get; set; }
 }
 

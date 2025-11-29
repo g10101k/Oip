@@ -48,5 +48,5 @@ public class SecurityServiceSettings
     /// <summary>
     /// Front settings
     /// </summary>
-    public FrontSecuritySettings Front { get; set; }
+    public FrontSecuritySettings Front { get; set; } = null!;
 }

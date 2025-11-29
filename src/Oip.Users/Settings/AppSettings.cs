@@ -7,10 +7,10 @@ namespace Oip.Users.Settings;
 public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
 {
     /// <inheritdoc />
-    public string OipUrls { get; set; } = default!;
+    public string OipUrls { get; set; } = null!;
 
     /// <inheritdoc />
-    public List<OpenApiSettings> OpenApi { get; set; } = new();
+    public OpenApiSettings OpenApi { get; set; } = new();
 
     /// <inheritdoc />
     public SpaDevelopmentServerSettings SpaProxyServer { get; set; } = new();

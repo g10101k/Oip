@@ -28,6 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
     </ItemGroup>
 

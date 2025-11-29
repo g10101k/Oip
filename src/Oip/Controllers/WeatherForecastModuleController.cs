@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Constants;
-using Oip.Base.Controllers;
-using Oip.Base.Controllers.Api;
+using Oip.Api.Controllers;
+using Oip.Api.Controllers.Api;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
 using Oip.Controllers.Api;
@@ -15,7 +15,8 @@ namespace Oip.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/weather-forecast-module")]
-public class WeatherForecastModuleController : BaseModuleController<WeatherModuleSettings>
+public class WeatherForecastModuleController(ModuleRepository moduleRepository)
+    : BaseModuleController<WeatherModuleSettings>(moduleRepository)
 {
     private readonly string[] _summaries =
     [
@@ -31,13 +32,6 @@ public class WeatherForecastModuleController : BaseModuleController<WeatherModul
         Resources.WeatherForecastController_Summaries_Scorching
     ];
 
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="moduleRepository"></param>
-    public WeatherForecastModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
-    {
-    }
 
     /// <summary>
     /// Retrieves example weather forecast data.

@@ -6,10 +6,7 @@ namespace Oip.Base.Exceptions;
 /// <param name="message">Exception message.</param>
 /// <param name="statusCode">HTTP status code associated with the exception.</param>
 /// <param name="stackTrace">Stacktrace.</param>
-public class OipException(
-    string message,
-    int statusCode = 500,
-    string? stackTrace = null)
+public class OipException(string message, int statusCode = 500, string? stackTrace = null)
 {
     /// <summary>
     /// Exception message.

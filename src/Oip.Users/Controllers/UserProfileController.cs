@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Oip.Base.Exceptions;
 using Oip.Base.Services;
 using Oip.Users.Repositories;
 
@@ -12,22 +13,8 @@ namespace Oip.Users.Controllers;
 [ApiController]
 [Route("api/user-profile")]
 [ApiExplorerSettings(GroupName = "users")]
-public class UserProfileController : ControllerBase
+public class UserProfileController(UserService userService, UserRepository userRepository) : ControllerBase
 {
-    private readonly UserService _userService;
-    private readonly UserRepository _userRepository;
-
-    /// <summary>
-    /// Initializes a new instance of UserProfileController
-    /// </summary>
-    /// <param name="userService">User service for user operations</param>
-    /// <param name="userRepository">User repository for data access</param>
-    public UserProfileController(UserService userService, UserRepository userRepository)
-    {
-        _userService = userService;
-        _userRepository = userRepository;
-    }
-
     /// <summary>
     /// Gets user photo by email address
     /// </summary>
@@ -35,9 +22,13 @@ public class UserProfileController : ControllerBase
     /// <returns>User photo as JPEG image or NotFound result</returns>
     [HttpGet("get-user-photo")]
     [Authorize]
+    [ProducesResponseType<FileContentResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public IActionResult GetUserPhoto(string email)
     {
-        var userDto = _userRepository.GetUserByEmail(email);
+        var userDto = userRepository.GetUserByEmail(email);
         if (userDto?.Photo != null)
             return new FileContentResult(userDto.Photo, "image/jpeg");
         return new NotFoundResult();
@@ -50,6 +41,10 @@ public class UserProfileController : ControllerBase
     /// <returns>OK result</returns>
     [HttpPost("post-user-photo")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> OnPostUploadAsync(IFormFile files)
     {
         await using var stream = files.OpenReadStream();
@@ -61,7 +56,7 @@ public class UserProfileController : ControllerBase
             await ms.WriteAsync(buffer.AsMemory(0, read), CancellationToken.None);
         }
 
-        _userRepository.UpsertUserPhoto(_userService.GetUserEmail()!, ms.ToArray());
+        userRepository.UpsertUserPhoto(userService.GetUserEmail()!, ms.ToArray());
 
         return Ok();
     }
@@ -72,9 +67,12 @@ public class UserProfileController : ControllerBase
     /// <returns></returns>
     [HttpGet("get-settings")]
     [Authorize]
+    [ProducesResponseType<UserSettingsDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public async Task<UserSettingsDto> GetSettings()
     {
-        var json = _userRepository.GetUserSettings(_userService.GetUserEmail()!);
+        var json = userRepository.GetUserSettings(userService.GetUserEmail()!);
 
         return JsonConvert.DeserializeObject<UserSettingsDto>(json) ?? new();
     }
@@ -85,10 +83,14 @@ public class UserProfileController : ControllerBase
     /// <param name="settings">Settings</param>
     [HttpPut("set-settings")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public async Task UpdateSettings(UserSettingsDto settings)
     {
         var json = JsonConvert.SerializeObject(settings);
-        await _userRepository.UpdateUserSettings(_userService.GetUserEmail()!, json);
+        await userRepository.UpdateUserSettings(userService.GetUserEmail()!, json);
     }
 }
 

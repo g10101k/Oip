@@ -58,5 +58,5 @@ public class UserEntity
     /// <summary>
     /// User settings
     /// </summary>
-    public string Settings { get; set; }
+    public string Settings { get; set; } = null!;
 }

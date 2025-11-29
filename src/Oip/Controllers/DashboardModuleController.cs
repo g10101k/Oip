@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Constants;
-using Oip.Base.Controllers;
-using Oip.Base.Controllers.Api;
+using Oip.Api.Controllers;
 using Oip.Base.Data.Repositories;
 using Oip.Properties;
 
@@ -12,31 +10,8 @@ namespace Oip.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/dashboard")]
-public class DashboardModuleController : BaseModuleController<DashboardSettings>
-{
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="moduleRepository"></param>
-    public DashboardModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
-    {
-    }
-
-    /// <inheritdoc />
-    public override List<SecurityResponse> GetModuleRights()
-    {
-        return new()
-        {
-            new()
-            {
-                Code = SecurityConstants.Read,
-                Name = Resources.DashboardModuleController_GetModuleRights_Read,
-                Description = Resources.DashboardModuleController_GetModuleRights_Can_view_this_module,
-                Roles = [SecurityConstants.AdminRole]
-            },
-        };
-    }
-}
+public class DashboardModuleController(ModuleRepository moduleRepository)
+    : BaseModuleController<DashboardSettings>(moduleRepository);
 
 /// <summary>
 /// Settings
