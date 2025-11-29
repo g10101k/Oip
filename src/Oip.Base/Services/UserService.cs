@@ -6,26 +6,16 @@ namespace Oip.Base.Services;
 /// <summary>
 /// User service
 /// </summary>
-public class UserService
+public class UserService(IHttpContextAccessor httpContextAccessor)
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="httpContextAccessor"></param>
-    public UserService(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
     /// <summary>
     /// Get user e-mail
     /// </summary>
     /// <returns></returns>
     public string? GetUserEmail()
     {
-        var searchResult = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+        var searchResult =
+            httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
         if (searchResult is { } claim)
         {
             return claim.Value;
@@ -40,10 +30,10 @@ public class UserService
     /// <returns></returns>
     public List<string> GetUserRoles()
     {
-        if (_httpContextAccessor.HttpContext == null)
+        if (httpContextAccessor.HttpContext == null)
             return [];
 
-        return _httpContextAccessor.HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role)
+        return httpContextAccessor.HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role)
             .Select(c => c.Value)
             .ToList();
     }
