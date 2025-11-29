@@ -51,13 +51,9 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public virtual async Task<IEnumerable<MigrationDto>> GetMigrations()
     {
-        var result = new List<MigrationDto>();
         var allMigrations = _dbContext.Database.GetMigrations();
 
-        foreach (var migration in allMigrations)
-        {
-            result.Add(new MigrationDto(migration, false, false, true));
-        }
+        var result = allMigrations.Select(migration => new MigrationDto(migration, false, false, true)).ToList();
 
         var appliedMigrations = await _dbContext.Database.GetAppliedMigrationsAsync();
         foreach (var migration in appliedMigrations)
