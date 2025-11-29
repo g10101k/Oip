@@ -18,13 +18,13 @@ internal class OipModuleContextDesignTimeDbContextFactory : IDesignTimeDbContext
             case XpoProvider.Postgres:
                 optionsBuilder.UseNpgsql(settings.NormalizedConnectionString, x =>
                 {
-                    x.MigrationsAssembly("Oip.Base.Data.Postgres");
+                    x.MigrationsAssembly("Oip.Data.Postgres");
                 });
                 break;
             case XpoProvider.MSSqlServer:
                 optionsBuilder.UseSqlServer(settings.NormalizedConnectionString, x =>
                 {
-                    x.MigrationsAssembly("Oip.Base.Data.SqlServer");
+                    x.MigrationsAssembly("Oip.Data.SqlServer");
                 });
                 break;
             default:

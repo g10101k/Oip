@@ -23,7 +23,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Oip.Api\Oip.Api.csproj" />
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
-        <ProjectReference Include="..\Oip.Base.Data\Oip.Base.Data.csproj"/>
+        <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
     </ItemGroup>
 
     <ItemGroup>

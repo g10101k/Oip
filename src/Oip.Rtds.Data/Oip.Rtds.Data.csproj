@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Oip.Base.Data\Oip.Base.Data.csproj" />
+      <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
       <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
       <ProjectReference Include="..\Oip.Rtds.Base\Oip.Rtds.Base.csproj" />
     </ItemGroup>

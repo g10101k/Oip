@@ -25,7 +25,7 @@ namespace Oip.Base.Data.Migrations.Postgres
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleEntity", b =>
                 {
                     b.Property<int>("ModuleId")
                         .ValueGeneratedOnAdd()
@@ -55,7 +55,7 @@ namespace Oip.Base.Data.Migrations.Postgres
                         });
                 });
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleInstanceEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceEntity", b =>
                 {
                     b.Property<string>("Icon")
                         .HasMaxLength(64)
@@ -104,7 +104,7 @@ namespace Oip.Base.Data.Migrations.Postgres
                         });
                 });
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleInstanceSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleInstanceId")
                         .HasColumnType("integer")
@@ -135,7 +135,7 @@ namespace Oip.Base.Data.Migrations.Postgres
                         });
                 });
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleId")
                         .HasColumnType("integer")
@@ -166,7 +166,7 @@ namespace Oip.Base.Data.Migrations.Postgres
                         });
                 });
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.UserEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.UserEntity", b =>
                 {
                     b.Property<string>("Email")
                         .IsRequired()

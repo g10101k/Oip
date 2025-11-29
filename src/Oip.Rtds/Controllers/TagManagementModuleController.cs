@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Oip.Api.Controllers;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
+using Oip.Base.Exceptions;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Repositories;
 using Resources = Oip.Rtds.Properties.Resources;
@@ -21,7 +22,6 @@ namespace Oip.Rtds.Controllers;
 public class TagManagementModuleController(TagRepository tagRepository, ModuleRepository moduleRepository)
     : BaseModuleController<object>(moduleRepository)
 {
-
     /// <summary>
     /// Adds a new tag.
     /// </summary>
@@ -30,6 +30,8 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     [HttpPost("add-tag")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> AddTag(CreateTagDto createTag)
     {
         await tagRepository.AddTag(createTag);
@@ -43,6 +45,9 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     /// <returns>A list of matching tags.</returns>
     [HttpGet("get-tags-by-filter")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType<List<TagDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public ActionResult<List<TagDto>> GetTagsByFilter(string filter)
     {
         return Ok(tagRepository.GetTagsByFilter(filter));
@@ -54,8 +59,10 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     /// <param name="createTag">The tag object containing updated information.</param>
     /// <returns>An IActionResult indicating success.</returns>
     [HttpPost("edit-tag")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
     public IActionResult EditTag(CreateTagDto createTag)
     {
         tagRepository.EditTag(createTag);

@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oip.Base.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Base.Data.Migrations.SqlServer
+namespace Oip.Base.Data.SqlServer.Migrations
 {
     [DbContext(typeof(OipModuleContextSqlServer))]
-    [Migration("20251102170455_AlignmentMigration_SqlServer")]
-    partial class AlignmentMigration_SqlServer
+    partial class OipModuleContextSqlServerModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +22,7 @@ namespace Oip.Base.Data.Migrations.SqlServer
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleEntity", b =>
                 {
                     b.Property<int>("ModuleId")
                         .ValueGeneratedOnAdd()
@@ -55,7 +52,7 @@ namespace Oip.Base.Data.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleInstanceEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceEntity", b =>
                 {
                     b.Property<string>("Icon")
                         .HasMaxLength(64)
@@ -104,7 +101,7 @@ namespace Oip.Base.Data.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleInstanceSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleInstanceId")
                         .HasColumnType("int")
@@ -135,7 +132,7 @@ namespace Oip.Base.Data.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.ModuleSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleId")
                         .HasColumnType("int")
@@ -166,7 +163,7 @@ namespace Oip.Base.Data.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Base.Data.Entities.UserEntity", b =>
+            modelBuilder.Entity("Oip.Data.Entities.UserEntity", b =>
                 {
                     b.Property<string>("Email")
                         .IsRequired()

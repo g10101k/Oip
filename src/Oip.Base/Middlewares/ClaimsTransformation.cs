@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Authentication;
+using Newtonsoft.Json.Linq;
 
 namespace Oip.Base.Middlewares;
 

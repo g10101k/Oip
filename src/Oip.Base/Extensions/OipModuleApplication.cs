@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using System.Net;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -11,11 +13,14 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NLog.Web;
 using Oip.Base.Exceptions;
+using Oip.Base.Helpers;
+using Oip.Base.Middlewares;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
@@ -216,6 +221,65 @@ public static class OipModuleApplication
         {
             Predicate = r => r.Tags.Contains("live")
         });
+    }
+
+    /// <summary>
+    /// Configures default authentication using JWT Bearer scheme.
+    /// </summary>
+    /// <param name="builder">The web application builder.</param>
+    /// <param name="settings">The base Oip module application settings.</param>
+    /// <returns>The configured web application builder.</returns>
+    public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder,
+        IBaseOipModuleAppSettings settings)
+    {
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                var list = new List<string>();
+
+                var urlWithRealm = settings.SecurityService.BaseUrl
+                    .UrlAppend("realms")
+                    .UrlAppend(settings.SecurityService.Realm);
+                list.Add(urlWithRealm);
+
+                var dockerInternalUrl = settings.SecurityService.DockerUrl?
+                    .UrlAppend("realms")
+                    .UrlAppend(settings.SecurityService.Realm);
+
+                if (dockerInternalUrl is not null)
+                    list.Add(dockerInternalUrl);
+
+                options.MetadataAddress = (dockerInternalUrl ?? urlWithRealm)
+                    .UrlAppend(".well-known/openid-configuration");
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuers = list,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.FromSeconds(settings.SecurityService.ClockSkewSeconds)
+                };
+
+                if (builder.Environment.IsDevelopment() && dockerInternalUrl is not null)
+                {
+                    options.TokenValidationParameters.IssuerSigningKeyResolver =
+                        (token, securityToken, kid, parameters) =>
+                        {
+                            var handler = new HttpClientHandler
+                            {
+                                ServerCertificateCustomValidationCallback =
+                                    (message, cert, chain, errors) => true
+                            };
+                            var client = new HttpClient(handler);
+                            var jwksUri = dockerInternalUrl.UrlAppend("/protocol/openid-connect/certs");
+                            var jwksJson = client.GetStringAsync(jwksUri).Result;
+                            var keys = JsonWebKeySet.Create(jwksJson).GetSigningKeys();
+                            return keys;
+                        };
+                }
+            });
+        builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
+        builder.Services.AddAuthorization();
+        return builder;
     }
 
     /// <summary>
