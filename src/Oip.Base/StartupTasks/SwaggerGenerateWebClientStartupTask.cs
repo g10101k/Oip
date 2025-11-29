@@ -35,7 +35,7 @@ public class SwaggerGenerateWebClientStartupTask(
         {
             logger.LogDebug("Checking for Swagger changes...");
 
-            foreach (var config in settings.OpenApi.Where(x => x.WebClientOutputPath is not null))
+            foreach (var config in settings.OpenApiSettings.Apis.Where(x => x.WebClientOutputPath is not null))
             {
                 try
                 {
@@ -60,13 +60,13 @@ public class SwaggerGenerateWebClientStartupTask(
         }
     }
 
-    private string GetSwaggerJson(OpenApiSettings config)
+    private string GetSwaggerJson(OpenApiItem config)
     {
         var swaggerDoc = swaggerProvider.GetSwagger(config.Name);
         return swaggerDoc.SerializeAsJson(OpenApiSpecVersion.OpenApi3_0);
     }
 
-    private async Task<bool> HasSwaggerChanged(OpenApiSettings config, string currentSwaggerJson)
+    private async Task<bool> HasSwaggerChanged(OpenApiItem config, string currentSwaggerJson)
     {
         var hashFilePath = GetHashFilePath(config);
         if (!File.Exists(hashFilePath))
@@ -76,7 +76,7 @@ public class SwaggerGenerateWebClientStartupTask(
         return storedSwaggerJson != currentSwaggerJson;
     }
 
-    private async Task<string> SaveSwaggerHash(OpenApiSettings config, string content)
+    private async Task<string> SaveSwaggerHash(OpenApiItem config, string content)
     {
         var hashFilePath = GetHashFilePath(config);
 
@@ -88,7 +88,7 @@ public class SwaggerGenerateWebClientStartupTask(
         return hashFilePath;
     }
 
-    private async Task GenerateTypeScriptClient(OpenApiSettings config, string swaggerJsonPath)
+    private async Task GenerateTypeScriptClient(OpenApiItem config, string swaggerJsonPath)
     {
         var processStartInfo = new ProcessStartInfo
         {
@@ -126,7 +126,7 @@ public class SwaggerGenerateWebClientStartupTask(
         await process.WaitForExitAsync();
     }
 
-    private string GetHashFilePath(OpenApiSettings config)
+    private string GetHashFilePath(OpenApiItem config)
     {
         return Path.Combine(environment.ContentRootPath, "SwaggerFiles",
             $"swagger-{config.Name.ToLower()}.json");
