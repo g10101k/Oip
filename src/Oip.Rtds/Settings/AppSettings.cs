@@ -8,7 +8,7 @@ namespace Oip.Rtds.Settings;
 public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings, IRtdsAppSettings
 {
     /// <summary>
-    /// 
+    /// Gets or sets the connection string for the RTD service
     /// </summary>
     public string RtsConnectionString { get; set; } = null!;
 
@@ -16,7 +16,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public string OipUrls { get; set; } = null!;
 
     /// <inheritdoc />
-    public List<OpenApiSettings> OpenApi { get; set; } = new();
+    public OpenApiSettings OpenApi { get; set; } = new();
 
     /// <inheritdoc />
     public SpaDevelopmentServerSettings SpaProxyServer { get; set; } = new();

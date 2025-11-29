@@ -35,7 +35,7 @@ public class SwaggerGenerateWebClientStartupTask(
         {
             logger.LogDebug("Checking for Swagger changes...");
 
-            foreach (var config in settings.OpenApiSettings.Apis.Where(x => x.WebClientOutputPath is not null))
+            foreach (var config in settings.OpenApi.Where(x => x.WebClientOutputPath is not null))
             {
                 try
                 {

@@ -3,7 +3,7 @@ namespace Oip.Base.Settings;
 /// <summary>
 /// Open api/swagger config
 /// </summary>
-public class OpenApiSettings
+public class OpenApiItem
 {
     /// <summary>
     /// Publish swagger
@@ -33,7 +33,7 @@ public class OpenApiSettings
     /// <summary>
     /// Description
     /// </summary>
-    public string Description { get; set; } = "Add block \"OpenApiSettings\" in appsettings.json";
+    public string Description { get; set; } = "Add block \"OpenApi\" in appsettings.json";
     
     /// <summary>
     /// Output path for

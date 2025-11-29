@@ -12,10 +12,7 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     string OipUrls { get; set; }
 
-    /// <summary>
-    /// OpenAPI settings
-    /// </summary>
-    List<OpenApiSettings> OpenApi { get; set; }
+    OpenApiSettings OpenApi { get; set; }
 
     /// <summary>
     /// Spa proxy server settings
@@ -27,3 +24,5 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     SecurityServiceSettings SecurityService { get; set; }
 }
+
+public class OpenApiSettings : List<OpenApiItem>;
