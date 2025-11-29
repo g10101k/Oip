@@ -23,4 +23,4 @@ jobs:
       #    - name: Test
       #      run: dotnet test --no-build --verbosity normal
       - name: Publish nuget
-        run: dotnet nuget push ./src/Oip.Settings/bin/Debug/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push ./src/Oip.Base/bin/Debug/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
