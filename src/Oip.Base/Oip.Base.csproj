@@ -11,7 +11,7 @@
 
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.0.1</Version>
+        <Version>0.0.2</Version>
         <Authors>Igor Tyulyakov aka g101k</Authors>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Title>Base library for OIP template</Title>

@@ -30,8 +30,8 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     [HttpPost("add-tag")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> AddTag(CreateTagDto createTag)
     {
         await tagRepository.AddTag(createTag);
@@ -46,8 +46,8 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     [HttpGet("get-tags-by-filter")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType<List<TagDto>>(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public ActionResult<List<TagDto>> GetTagsByFilter(string filter)
     {
         return Ok(tagRepository.GetTagsByFilter(filter));
@@ -61,8 +61,8 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     [HttpPost("edit-tag")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult EditTag(CreateTagDto createTag)
     {
         tagRepository.EditTag(createTag);

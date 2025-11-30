@@ -41,11 +41,11 @@ public class WeatherForecastModuleController(ModuleRepository moduleRepository)
     [HttpGet("get-weather-forecast")]
     [Authorize]
     [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult Get(int dayCount)
     {
         if (new Random().Next(0, 4) == 0)
-            throw new InvalidOperationException("Bring it on!");
+            throw new ApiException("Error!", "Random exception", 3535);
 
         return Ok(Enumerable.Range(1, dayCount).Select(index => new WeatherForecastResponse
             {

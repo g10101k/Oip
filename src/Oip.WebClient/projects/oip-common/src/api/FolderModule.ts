@@ -12,6 +12,7 @@
 
 import { Injectable } from "@angular/core";
 import {
+  ApiExceptionResponse,
   FolderModuleGetModuleInstanceSettingsParams,
   FolderModuleGetSecurityParams,
   FolderModuleSettingsSaveSettingsRequest,
@@ -33,7 +34,7 @@ export class FolderModule<
    * @secure
    */
   folderModuleGetModuleRights = (params: RequestParams = {}) =>
-    this.request<SecurityResponse[], any>({
+    this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/folder-module/get-module-rights`,
       method: "GET",
       secure: true,
@@ -52,7 +53,7 @@ export class FolderModule<
     query: FolderModuleGetSecurityParams,
     params: RequestParams = {},
   ) =>
-    this.request<SecurityResponse[], any>({
+    this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/folder-module/get-security`,
       method: "GET",
       query: query,
@@ -72,7 +73,7 @@ export class FolderModule<
     data: PutSecurityRequest,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/folder-module/put-security`,
       method: "PUT",
       body: data,
@@ -92,11 +93,12 @@ export class FolderModule<
     query: FolderModuleGetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<any, ApiExceptionResponse>({
       path: `/api/folder-module/get-module-instance-settings`,
       method: "GET",
       query: query,
       secure: true,
+      format: "json",
       ...params,
     });
   /**
@@ -111,7 +113,7 @@ export class FolderModule<
     data: FolderModuleSettingsSaveSettingsRequest,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/folder-module/put-module-instance-settings`,
       method: "PUT",
       body: data,

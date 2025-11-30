@@ -23,9 +23,9 @@ public class UserProfileController(UserService userService, UserRepository userR
     [HttpGet("get-user-photo")]
     [Authorize]
     [ProducesResponseType<FileContentResult>(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType<OipException>(StatusCodes.Status404NotFound)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult GetUserPhoto(string email)
     {
         var userDto = userRepository.GetUserByEmail(email);
@@ -42,9 +42,9 @@ public class UserProfileController(UserService userService, UserRepository userR
     [HttpPost("post-user-photo")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> OnPostUploadAsync(IFormFile files)
     {
         await using var stream = files.OpenReadStream();
@@ -68,8 +68,8 @@ public class UserProfileController(UserService userService, UserRepository userR
     [HttpGet("get-settings")]
     [Authorize]
     [ProducesResponseType<UserSettingsDto>(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<UserSettingsDto> GetSettings()
     {
         var json = userRepository.GetUserSettings(userService.GetUserEmail()!);
@@ -84,9 +84,9 @@ public class UserProfileController(UserService userService, UserRepository userR
     [HttpPut("set-settings")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task UpdateSettings(UserSettingsDto settings)
     {
         var json = JsonConvert.SerializeObject(settings);

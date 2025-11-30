@@ -24,6 +24,18 @@ export interface AddModuleInstanceDto {
   viewRoles?: string[] | null;
 }
 
+/** Standardized response format for API exceptions */
+export interface ApiExceptionResponse {
+  /** User-friendly title of the exception */
+  title?: string | null;
+  /** Detailed description of the error */
+  message?: string | null;
+  /** HTTP status code associated with the exception */
+  statusCode?: number;
+  /** Stack trace information (optional, typically omitted in production) */
+  stackTrace?: string | null;
+}
+
 /** Data Transfer Object for editing an existing module instance */
 export interface EditModuleInstanceDto {
   /** The identifier of the module instance to edit */
@@ -80,12 +92,6 @@ export interface GetKeycloakClientSettingsResponse {
   logLevel?: number;
   /** Urls with auth */
   secureRoutes?: string[] | null;
-}
-
-/** Response for module federation */
-export interface GetManifestResponse {
-  /** Base Url */
-  baseUrl?: string | null;
 }
 
 /** Represents a key-value pair where the key is an integer and the value is a string. */
@@ -150,14 +156,6 @@ export interface PutSecurityRequest {
   id?: number;
   /** Securities */
   securities?: SecurityResponse[] | null;
-}
-
-/** Dto module */
-export interface RegisterModuleDto {
-  /** See 'name' in webpack.config.js */
-  name?: string | null;
-  /** Base Url */
-  baseUrl?: string | null;
 }
 
 /** Security dto */

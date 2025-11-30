@@ -12,6 +12,9 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     string OipUrls { get; set; }
 
+    /// <summary>
+    /// Collection of OpenAPI specification configurations for the application
+    /// </summary>
     OpenApiSettings OpenApi { get; set; }
 
     /// <summary>
@@ -25,4 +28,7 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     SecurityServiceSettings SecurityService { get; set; }
 }
 
+/// <summary>
+/// Contains OpenAPI/Swagger configuration items for the application
+/// </summary>
 public class OpenApiSettings : List<OpenApiItem>;
