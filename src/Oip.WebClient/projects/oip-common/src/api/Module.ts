@@ -12,6 +12,7 @@
 
 import { Injectable } from "@angular/core";
 import {
+  ApiExceptionResponse,
   ExistModuleDto,
   ModuleDeleteRequest,
   ModuleDto,
@@ -31,7 +32,7 @@ export class Module<
    * @secure
    */
   moduleGetAll = (params: RequestParams = {}) =>
-    this.request<ModuleDto[], any>({
+    this.request<ModuleDto[], ApiExceptionResponse>({
       path: `/api/module/get-all`,
       method: "GET",
       secure: true,
@@ -47,7 +48,7 @@ export class Module<
    * @secure
    */
   moduleInsert = (data: ModuleDto, params: RequestParams = {}) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/module/insert`,
       method: "POST",
       body: data,
@@ -64,7 +65,7 @@ export class Module<
    * @secure
    */
   moduleDelete = (data: ModuleDeleteRequest, params: RequestParams = {}) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/module/delete`,
       method: "DELETE",
       body: data,
@@ -81,7 +82,7 @@ export class Module<
    * @secure
    */
   moduleGetModulesWithLoadStatus = (params: RequestParams = {}) =>
-    this.request<ExistModuleDto[], any>({
+    this.request<ExistModuleDto[], ApiExceptionResponse>({
       path: `/api/module/get-modules-with-load-status`,
       method: "GET",
       secure: true,

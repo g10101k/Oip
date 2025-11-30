@@ -11,7 +11,10 @@
  */
 
 import { Injectable } from "@angular/core";
-import { GetKeycloakClientSettingsResponse } from "./data-contracts";
+import {
+  ApiExceptionResponse,
+  GetKeycloakClientSettingsResponse,
+} from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
@@ -27,7 +30,7 @@ export class Security<
    * @secure
    */
   securityGetKeycloakClientSettings = (params: RequestParams = {}) =>
-    this.request<GetKeycloakClientSettingsResponse, any>({
+    this.request<GetKeycloakClientSettingsResponse, ApiExceptionResponse>({
       path: `/api/security/get-keycloak-client-settings`,
       method: "GET",
       secure: true,

@@ -26,8 +26,8 @@ public class SecurityController(IBaseOipModuleAppSettings appSettings) : Control
     [HttpGet("get-keycloak-client-settings")]
     [AllowAnonymous]
     [ProducesResponseType<GetKeycloakClientSettingsResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public GetKeycloakClientSettingsResponse GetKeycloakClientSettings()
     {
         var securitySettings = appSettings.SecurityService;

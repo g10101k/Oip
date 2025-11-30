@@ -12,7 +12,7 @@
 
 import { Injectable } from "@angular/core";
 import {
-  OipException,
+  ApiExceptionResponse,
   PutSecurityRequest,
   SecurityResponse,
   WeatherForecastModuleGetModuleInstanceSettingsParams,
@@ -39,7 +39,7 @@ export class WeatherForecastModule<
     query: WeatherForecastModuleGetWeatherForecastParams,
     params: RequestParams = {},
   ) =>
-    this.request<WeatherForecastResponse[], OipException>({
+    this.request<WeatherForecastResponse[], ApiExceptionResponse>({
       path: `/api/weather-forecast-module/get-weather-forecast`,
       method: "GET",
       query: query,
@@ -56,7 +56,7 @@ export class WeatherForecastModule<
    * @secure
    */
   weatherForecastModuleGetModuleRights = (params: RequestParams = {}) =>
-    this.request<SecurityResponse[], any>({
+    this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/weather-forecast-module/get-module-rights`,
       method: "GET",
       secure: true,
@@ -75,7 +75,7 @@ export class WeatherForecastModule<
     query: WeatherForecastModuleGetSecurityParams,
     params: RequestParams = {},
   ) =>
-    this.request<SecurityResponse[], any>({
+    this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/weather-forecast-module/get-security`,
       method: "GET",
       query: query,
@@ -95,7 +95,7 @@ export class WeatherForecastModule<
     data: PutSecurityRequest,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/weather-forecast-module/put-security`,
       method: "PUT",
       body: data,
@@ -115,11 +115,12 @@ export class WeatherForecastModule<
     query: WeatherForecastModuleGetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<any, ApiExceptionResponse>({
       path: `/api/weather-forecast-module/get-module-instance-settings`,
       method: "GET",
       query: query,
       secure: true,
+      format: "json",
       ...params,
     });
   /**
@@ -134,7 +135,7 @@ export class WeatherForecastModule<
     data: WeatherModuleSettingsSaveSettingsRequest,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/weather-forecast-module/put-module-instance-settings`,
       method: "PUT",
       body: data,

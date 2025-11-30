@@ -47,8 +47,8 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     [HttpGet("get-migrations")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType<IEnumerable<MigrationDto>>(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public virtual async Task<IEnumerable<MigrationDto>> GetMigrations()
     {
         var allMigrations = _dbContext.Database.GetMigrations();
@@ -94,8 +94,8 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     [HttpPost("migrate")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAppliedMigrations()
     {
         await _dbContext.Database.MigrateAsync();
@@ -114,8 +114,8 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [HttpPost("apply-migration")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType<OipException>(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType<OipException>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ApplyMigration(ApplyMigrationRequest request)
     {
         await _dbContext.Database.GetInfrastructure().GetService<IMigrator>()?.MigrateAsync(request.Name)!;

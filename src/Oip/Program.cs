@@ -22,7 +22,7 @@ internal static class Program
             builder.AddNlog();
             builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
-            builder.Services.AddOipModuleContext(settings.NormalizedConnectionString);
+            builder.Services.AddOipModuleContext(settings.ConnectionString);
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);

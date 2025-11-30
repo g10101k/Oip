@@ -347,11 +347,20 @@ public static class OipModuleApplication
                     var error = context.Features.Get<IExceptionHandlerFeature>();
                     if (error != null)
                     {
-                        var ex = error.Error;
-                        await context.Response.WriteAsync(JsonConvert.SerializeObject(
-                            new OipException(ex.Message, 500, app.Environment.IsDevelopment() ? ex.StackTrace : null),
-                            Settings.Value
-                        ));
+                        ApiExceptionResponse response;
+                        if (error.Error is ApiException oipException)
+                        {
+                            response = new ApiExceptionResponse(oipException.Title, oipException.Message, oipException.StatusCode,
+                                app.Environment.IsDevelopment() ? oipException.StackTrace : null);
+                        }
+                        else
+                        {
+                            var ex = error.Error;
+                            response = new ApiExceptionResponse("Unexpected error", ex.Message, 500,
+                                app.Environment.IsDevelopment() ? ex.StackTrace : null);
+                        }
+
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(response, JsonSettings.Value));
                     }
                 });
             });
@@ -381,13 +390,13 @@ public static class OipModuleApplication
         }
     }
 
-    private static readonly Lazy<JsonSerializerSettings> Settings = new(() => new JsonSerializerSettings
+    private static readonly Lazy<JsonSerializerSettings> JsonSettings = new(() => new JsonSerializerSettings
     {
         NullValueHandling = NullValueHandling.Ignore,
         ContractResolver = new CamelCasePropertyNamesContractResolver()
     }, true);
 
-    
+
     /// <summary>
     /// Creates an asynchronous Polly retry policy for HTTP requests that handles transient errors and
     /// retries on <see cref="HttpStatusCode.NotFound"/> and <see cref="HttpStatusCode.InternalServerError"/>.

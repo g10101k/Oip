@@ -10,6 +10,18 @@
  * ---------------------------------------------------------------
  */
 
+/** Standardized response format for API exceptions */
+export interface ApiExceptionResponse {
+  /** User-friendly title of the exception */
+  title?: string | null;
+  /** Detailed description of the error */
+  message?: string | null;
+  /** HTTP status code associated with the exception */
+  statusCode?: number;
+  /** Stack trace information (optional, typically omitted in production) */
+  stackTrace?: string | null;
+}
+
 /** Settings */
 export interface DashboardSettings {
   /** Just, for example */
@@ -22,16 +34,6 @@ export interface DashboardSettingsSaveSettingsRequest {
   id?: number;
   /** Settings */
   settings?: DashboardSettings;
-}
-
-/** Represents the base exception class for Oip applications. */
-export interface OipException {
-  /** Exception message. */
-  message?: string | null;
-  /** The HTTP status code associated with the exception. */
-  statusCode?: number;
-  /** The stack trace for the exception. */
-  stackTrace?: string | null;
 }
 
 /** Put security dto */
