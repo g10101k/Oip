@@ -5,6 +5,7 @@ using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
+using Oip.Data.Extensions;
 using Oip.Settings;
 
 namespace Oip;
@@ -46,6 +47,7 @@ internal static class Program
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
+            app.MigrateOipModuleDatabase();
             app.Run();
         }
         catch (Exception e)

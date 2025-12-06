@@ -20,7 +20,7 @@ public static class WebApplicationBuilderExtension
     /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
     /// <returns>The same <see cref="IApplicationBuilder"/> instance, to support method chaining.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the <see cref="OipModuleContext"/> cannot be resolved.</exception>
-    public static IApplicationBuilder MigrateDatabase(this IApplicationBuilder app)
+    public static IApplicationBuilder MigrateOipModuleDatabase(this IApplicationBuilder app)
     {
         using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
         var context = serviceScope.ServiceProvider.GetService<OipModuleContext>() ??
