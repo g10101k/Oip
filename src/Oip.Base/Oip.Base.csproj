@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\Common.props"/>
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -11,14 +12,7 @@
 
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.0.2</Version>
-        <Authors>Igor Tyulyakov aka g101k</Authors>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Title>Base library for OIP template</Title>
-        <PackageProjectUrl>https://github.com/g10101k/Oip</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/g10101k/Oip</RepositoryUrl>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -34,7 +28,7 @@
         <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.0.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
-        <PackageReference Include="Oip.Settings" Version="1.2.0"/>
+        <PackageReference Include="Oip.Settings" Version="1.2.3"/>
         <PackageReference Include="Polly" Version="8.5.0"/>
         <PackageReference Include="Polly.Extensions.Http" Version="3.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>

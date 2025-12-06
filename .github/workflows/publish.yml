@@ -18,9 +18,10 @@ jobs:
           dotnet-version: 8.0.x
       - name: Restore dependencies
         run: dotnet restore ./src/Oip.sln
-      - name: Build
-        run: dotnet build ./src/Oip.sln --no-restore
-      #    - name: Test
-      #      run: dotnet test --no-build --verbosity normal
+      - name: Build and pack
+        run: dotnet pack ./src/Oip.sln --configuration Release --output ./publish
       - name: Publish nuget
-        run: dotnet nuget push ./src/Oip.Base/bin/Debug/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: |
+          for f in ./publish/*.nupkg; do
+          dotnet nuget push "$f" --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          done

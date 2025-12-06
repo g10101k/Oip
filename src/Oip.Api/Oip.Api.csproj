@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
+    <Import Project="..\Common.props"/>
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -8,6 +8,16 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <UserSecretsId>b978822d-6d6b-40a7-93aa-1c8f8686ab85</UserSecretsId>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Base API library for OIP template</Title>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include=".\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11"/>
         <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.11"/>
@@ -17,36 +27,36 @@
         <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.0.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
-        <PackageReference Include="Oip.Settings" Version="1.2.0"/>
+        <PackageReference Include="Oip.Settings" Version="1.2.3"/>
         <PackageReference Include="Polly" Version="8.5.0"/>
         <PackageReference Include="Polly.Extensions.Http" Version="3.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
         <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1"/>
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
-      <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
+        <ProjectReference Include="..\Oip.Data\Oip.Data.csproj"/>
+        <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
     </ItemGroup>
     <ItemGroup>
-      <EmbeddedResource Update="Properties\Resources.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Properties\Resources.ru.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.ru.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Properties\Resources.ru.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.ru.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>
-      <Compile Update="Properties\Resources.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Properties\Resources.ru.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.ru.resx</DependentUpon>
-      </Compile>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Properties\Resources.ru.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.ru.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 </Project>
