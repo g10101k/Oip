@@ -19,7 +19,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ./src/Oip.sln
       - name: Build
-        run: dotnet publish ./src/Oip.sln --configuration Release --output ./publish
+        run: dotnet build ./src/Oip.sln --no-restore
       - name: Publish nuget
         run: |
           dotnet nuget push ./src/Oip.Base/bin/Debug/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
