@@ -22,6 +22,6 @@ jobs:
         run: dotnet publish ./src/Oip.sln --configuration Release --output ./publish
       - name: Publish nuget
         run: |
-          for f in ./publish/*.nupkg; do
-          dotnet nuget push "$f" --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-          done
+          dotnet nuget push ./src/Oip.Base/bin/Debug/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push ./src/Oip.Data/bin/Debug/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push ./src/Oip.Api/bin/Debug/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
