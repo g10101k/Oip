@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
 
-namespace Oip.Base.Data.Contexts;
+namespace Oip.Data.Contexts;
 #pragma warning disable EF1001
 
 /// <summary>

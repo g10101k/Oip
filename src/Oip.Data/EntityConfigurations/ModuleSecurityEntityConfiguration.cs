@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Oip.Base.Data.Entities;
-using Oip.Base.Data.Extensions;
+using Oip.Data.Entities;
+using Oip.Data.Extensions;
 
-namespace Oip.Base.Data.EntityConfigurations;
+namespace Oip.Data.EntityConfigurations;
 
 /// <summary>
 /// <inheritdoc cref="IEntityTypeConfiguration{TEntity}"/>

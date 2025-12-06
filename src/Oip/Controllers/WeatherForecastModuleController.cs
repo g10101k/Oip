@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Oip.Api.Controllers;
 using Oip.Api.Controllers.Api;
-using Oip.Base.Data.Constants;
-using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
 using Oip.Controllers.Api;
+using Oip.Data.Constants;
+using Oip.Data.Repositories;
 using Oip.Properties;
 
 namespace Oip.Controllers;

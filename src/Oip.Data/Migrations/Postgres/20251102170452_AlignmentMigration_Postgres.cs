@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Base.Data.Migrations.Postgres
+namespace Oip.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class AlignmentMigration_Postgres : Migration

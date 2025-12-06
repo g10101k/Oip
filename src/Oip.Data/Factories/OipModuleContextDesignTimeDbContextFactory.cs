@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Oip.Base.Data.Contexts;
-using Oip.Base.Data.Settings;
+using Oip.Data.Contexts;
+using Oip.Data.Settings;
 using Oip.Settings.Enums;
 
-namespace Oip.Base.Data.Factories;
+namespace Oip.Data.Factories;
 
 // ReSharper disable once UnusedType.Global
 internal class OipModuleContextDesignTimeDbContextFactory : IDesignTimeDbContextFactory<OipModuleContext>

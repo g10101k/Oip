@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Oip.Api.Controllers.Api;
 using Oip.Api.Properties;
-using Oip.Base.Data.Constants;
-using Oip.Base.Data.Dtos;
-using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
+using Oip.Data.Constants;
+using Oip.Data.Dtos;
+using Oip.Data.Repositories;
 
 namespace Oip.Api.Controllers;
 

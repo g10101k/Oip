@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Base.Data.Dtos;
+using Oip.Data.Dtos;
 using Oip.Users.Contexts;
 using Oip.Users.Entities;
 

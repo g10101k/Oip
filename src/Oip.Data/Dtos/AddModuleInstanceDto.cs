@@ -1,4 +1,4 @@
-namespace Oip.Base.Data.Dtos;
+namespace Oip.Data.Dtos;
 
 /// <summary>
 /// Data Transfer Object for creating a new module instance

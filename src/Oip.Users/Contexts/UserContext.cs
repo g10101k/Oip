@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Oip.Base.Data.Contexts;
-using Oip.Base.Data.Extensions;
+using Oip.Data.Contexts;
+using Oip.Data.Extensions;
 using Oip.Users.Entities;
 using Oip.Users.EntityConfigurations;
 

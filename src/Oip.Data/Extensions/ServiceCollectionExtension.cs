@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Base.Data.Contexts;
-using Oip.Base.Data.Repositories;
+using Oip.Data.Contexts;
+using Oip.Data.Repositories;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 

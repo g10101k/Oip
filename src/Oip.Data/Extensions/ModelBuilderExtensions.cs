@@ -1,7 +1,7 @@
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 
-namespace Oip.Base.Data.Extensions;
+namespace Oip.Data.Extensions;
 
 /// <summary>
 /// ModelBuilder extensions

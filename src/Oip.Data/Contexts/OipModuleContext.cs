@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Oip.Base.Data.Entities;
-using Oip.Base.Data.EntityConfigurations;
-using Oip.Base.Data.Extensions;
+using Oip.Data.Entities;
+using Oip.Data.EntityConfigurations;
+using Oip.Data.Extensions;
 
-namespace Oip.Base.Data.Contexts;
+namespace Oip.Data.Contexts;
 
 /// <summary>
 /// OIP module context

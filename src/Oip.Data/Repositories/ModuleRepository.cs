@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Base.Data.Contexts;
-using Oip.Base.Data.Dtos;
-using Oip.Base.Data.Entities;
+using Oip.Data.Contexts;
+using Oip.Data.Dtos;
+using Oip.Data.Entities;
 
-namespace Oip.Base.Data.Repositories;
+namespace Oip.Data.Repositories;
 
 /// <summary>
 /// Provides methods to manage modules and their instances, including CRUD operations and security settings.

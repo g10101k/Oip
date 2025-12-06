@@ -5,9 +5,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Oip.Base.Data.Contexts;
+using Oip.Data.Contexts;
 
-namespace Oip.Base.Data.Migrations.Postgres
+namespace Oip.Data.Migrations.Postgres
 {
     [DbContext(typeof(OipModuleContextPostgres))]
     [Migration("20250518130745_AddComment")]

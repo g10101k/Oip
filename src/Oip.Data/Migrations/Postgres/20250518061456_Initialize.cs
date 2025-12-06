@@ -3,7 +3,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Oip.Base.Data.Migrations.Postgres
+namespace Oip.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class Initialize : Migration

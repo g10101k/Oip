@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Oip.Base.Data.Extensions;
+using Oip.Data.Extensions;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Entities;
 

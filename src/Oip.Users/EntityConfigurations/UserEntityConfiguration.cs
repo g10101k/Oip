@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Oip.Base.Data.Extensions;
+using Oip.Data.Extensions;
 using Oip.Users.Contexts;
 using Entities_UserEntity = Oip.Users.Entities.UserEntity;
 using UserEntity = Oip.Users.Entities.UserEntity;
