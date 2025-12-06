@@ -18,8 +18,8 @@ jobs:
           dotnet-version: 8.0.x
       - name: Restore dependencies
         run: dotnet restore ./src/Oip.sln
-      - name: Build and pack
-        run: dotnet pack ./src/Oip.sln --configuration Release --output ./publish
+      - name: Build
+        run: dotnet publish ./src/Oip.sln --configuration Release --output ./publish
       - name: Publish nuget
         run: |
           for f in ./publish/*.nupkg; do
