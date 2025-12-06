@@ -35,7 +35,7 @@ public class SwaggerGenerateWebClientStartupTask(
         {
             logger.LogDebug("Checking for Swagger changes...");
 
-            foreach (var config in settings.OpenApi.Where(x => x.WebClientOutputPath is not null))
+            foreach (var config in settings.OpenApi.Where(x => x.GenerateCommand is not null))
             {
                 try
                 {
@@ -57,6 +57,10 @@ public class SwaggerGenerateWebClientStartupTask(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error in Swagger client generator");
+        }
+        finally
+        {
+            logger.LogInformation("Swagger generation complete");
         }
     }
 
@@ -90,11 +94,12 @@ public class SwaggerGenerateWebClientStartupTask(
 
     private async Task GenerateTypeScriptClient(OpenApiItem config, string swaggerJsonPath)
     {
+        string[] parts = config.GenerateCommand!.Replace("{SwaggerJsonPath}", swaggerJsonPath).Split(' ', 2);
+        
         var processStartInfo = new ProcessStartInfo
         {
-            FileName = "npx",
-            Arguments =
-                $"swagger-typescript-api generate -p {swaggerJsonPath} -o {config.WebClientOutputPath} --unwrap-response-data --extract-enums --extract-responses --extract-request-body --extract-request-params --modular --module-name-first-tag --t ./templates",
+            FileName = parts[0],
+            Arguments = parts[1],
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,

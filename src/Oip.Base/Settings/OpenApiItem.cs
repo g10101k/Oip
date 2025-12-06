@@ -38,5 +38,5 @@ public class OpenApiItem
     /// <summary>
     /// Output path for
     /// </summary>
-    public string? WebClientOutputPath { get; set; }
+    public string? GenerateCommand { get; set; }
 }

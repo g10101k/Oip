@@ -4,5 +4,16 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
-  "assets": [{ "input": "src/assets", "glob": "**/*", "output": "assets" }]
+  "assets": [
+    {
+      "input": "./src/assets",
+      "glob": "**/*",
+      "output": "assets"
+    },
+    {
+      "input": "./templates",
+      "glob": "**/*",
+      "output": "templates"
+    }
+  ]
 }
