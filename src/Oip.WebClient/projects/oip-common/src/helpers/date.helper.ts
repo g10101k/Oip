@@ -60,7 +60,7 @@ export function convertToPrimeNgDateFormat(dateformat: string): string {
 }
 
 /**
- * Преобразовать все свойства объекта со строковыми датами в даты
+ * Convert all properties of an object with string dates to Date objects
  * @param obj
  */
 export function restoreDates(obj: any) {
@@ -86,7 +86,7 @@ export function restoreDates(obj: any) {
 }
 
 /**
- * Проверить, является ли строка датой в ISO формате
+ * Check if a string is a date in ISO format
  * @param str
  */
 export function isIsoDate(str: string) {
