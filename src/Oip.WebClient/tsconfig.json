@@ -15,11 +15,6 @@
       "es2018",
       "dom"
     ],
-    "paths": {
-      "oip-common": [
-        "projects/oip-common/src/public-api.ts"
-      ]
-    },
     "useDefineForClassFields": false
   }
 }

@@ -4,10 +4,10 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
-import { MenuService } from 'oip-common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AddModuleInstanceDto, IntKeyValueDto } from '../../api/data-contracts';
 import { Menu } from '../../api/Menu';
+import { MenuService } from '../../services/app.menu.service';
 
 @Component({
   selector: 'menu-item-create-dialog',

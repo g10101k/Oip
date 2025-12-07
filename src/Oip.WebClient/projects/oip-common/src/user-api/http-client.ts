@@ -11,7 +11,8 @@
  */
 
 import { inject, Injectable } from '@angular/core';
-import { LayoutService, SecurityService } from 'oip-common';
+import { LayoutService } from '../services/app.layout.service';
+import { SecurityService } from '../services/security.service';
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>;
@@ -58,7 +59,7 @@ export enum ContentType {
   Text = 'text/plain'
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class HttpClient<SecurityDataType = unknown> {
   protected securityService = inject(SecurityService);
   public baseUrl: string = '';
@@ -75,6 +76,7 @@ export class HttpClient<SecurityDataType = unknown> {
     const storageData = localStorage.getItem('0-oip-client');
     return JSON.parse(storageData)?.authnResult?.access_token;
   }
+
   private getLanguage(): string {
     // Получаем язык из localStorage или используем значение по умолчанию
     return localStorage.getItem('user-language') || 'en';
@@ -189,16 +191,16 @@ export class HttpClient<SecurityDataType = unknown> {
   };
 
   public request = async <T = any, E = any>({
-    body,
-    secure,
-    path,
-    type,
-    query,
-    format,
-    baseUrl,
-    cancelToken,
-    ...params
-  }: FullRequestParams): Promise<T> => {
+                                              body,
+                                              secure,
+                                              path,
+                                              type,
+                                              query,
+                                              format,
+                                              baseUrl,
+                                              cancelToken,
+                                              ...params
+                                            }: FullRequestParams): Promise<T> => {
     const secureParams =
       ((typeof secure === 'boolean' ? secure : this.baseApiParams.secure) &&
         this.securityWorker &&
@@ -213,7 +215,7 @@ export class HttpClient<SecurityDataType = unknown> {
       ...requestParams,
       headers: {
         ...(requestParams.headers || {}),
-        ...(type && type !== ContentType.FormData ? { 'Content-Type': type } : {})
+        ...(type && type !== ContentType.FormData ? {'Content-Type': type} : {})
       },
       signal: (cancelToken ? this.createAbortSignal(cancelToken) : requestParams.signal) || null,
       body: typeof body === 'undefined' || body === null ? null : payloadFormatter(body)
@@ -227,18 +229,18 @@ export class HttpClient<SecurityDataType = unknown> {
       const data = !responseFormat
         ? r
         : await response[responseFormat]()
-            .then((data) => {
-              if (r.ok) {
-                r.data = data;
-              } else {
-                r.error = data;
-              }
-              return r;
-            })
-            .catch((e) => {
-              r.error = e;
-              return r;
-            });
+          .then((data) => {
+            if (r.ok) {
+              r.data = data;
+            } else {
+              r.error = data;
+            }
+            return r;
+          })
+          .catch((e) => {
+            r.error = e;
+            return r;
+          });
 
       if (cancelToken) {
         this.abortControllers.delete(cancelToken);

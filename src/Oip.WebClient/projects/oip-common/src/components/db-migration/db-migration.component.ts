@@ -1,5 +1,4 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { BaseModuleComponent, NoSettingsDto, SecurityComponent } from 'oip-common';
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
@@ -11,6 +10,9 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { NgIf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
 import { ActivatedRoute } from '@angular/router';
+import { BaseModuleComponent } from '../base-module.component';
+import { NoSettingsDto } from '../../dtos/no-settings.dto';
+import { SecurityComponent } from '../security.component';
 
 export interface MigrationDto {
   name: string;

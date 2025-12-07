@@ -32,10 +32,7 @@ public class SecurityController(IBaseOipModuleAppSettings appSettings) : Control
     {
         var securitySettings = appSettings.SecurityService;
 
-        HashSet<string> securityRoutes =
-        [
-            appSettings.OipUrls
-        ];
+        HashSet<string> securityRoutes = new();
         foreach (var q in securitySettings.Front.SecureRoutes)
         {
             securityRoutes.Add(q);
