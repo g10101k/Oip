@@ -122,7 +122,10 @@ import { ButtonModule } from 'primeng/button';
         </div>
       </div>
     </div>
-  </div>`
+  </div>`,
+  styles: [`
+
+  `]
 })
 export class AppTopbar {
   items!: MenuItem[];
