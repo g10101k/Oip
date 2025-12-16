@@ -16,7 +16,7 @@ import { filter, map } from 'rxjs/operators';
  * It provides helper methods for checking authentication, managing tokens,
  * determining user roles, and performing logout and refresh operations.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class SecurityService extends OidcSecurityService implements OnDestroy {
   /**
    * Handles angular OIDC events.
