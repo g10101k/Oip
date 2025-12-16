@@ -29,8 +29,8 @@
               "projects/oip/src/assets",
               {
                 "glob": "**/*",
-                "input": "./projects/oip-common/src/assets",
-                "output": "/assets/"
+                "input": "node_modules/oip-common/assets",
+                "output": "/assets"
               }
             ],
             "styles": [
@@ -110,7 +110,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/oip/src/favicon.ico",
-              "projects/oip/src/assets"
+              "projects/oip/src/assets",
+
             ],
             "styles": [
               "projects/oip/src/styles.scss"

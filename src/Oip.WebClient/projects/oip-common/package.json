@@ -1,6 +1,6 @@
 {
   "name": "oip-common",
-  "version": "0.0.5",
+  "version": "0.0.9",
   "description": "A template for cross-platform web applications based on sakai-ng and primeNG",
   "main": "index.js",
   "keywords": [
