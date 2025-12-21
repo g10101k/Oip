@@ -14,9 +14,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class Security<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Security<SecurityDataType = unknown, > extends HttpClient<SecurityDataType> {
   /**
    * @description Retrieves all realm roles from Keycloak.
    *

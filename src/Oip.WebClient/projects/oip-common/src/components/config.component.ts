@@ -14,6 +14,7 @@ import { MenuService } from '../services/app.menu.service';
 import { Button } from 'primeng/button';
 import { L10nService } from '../services/l10n.service';
 import { SelectItem } from 'primeng/api';
+import { TranslatePipe } from "@ngx-translate/core";
 
 interface L10n {
   menu: string;
@@ -34,15 +35,15 @@ interface L10n {
       <div class="flex flex-col md:flex-row gap-4">
         <div class="md:w-1/2">
           <div class="card flex flex-col gap-4">
-            <div class="font-semibold text-xl">{{ l10n.profile }}</div>
+            <div class="font-semibold text-xl">{{ 'config.profile' | translate }}</div>
             <div class="flex justify-content-end flex-wrap">
               {{ userService.userName }}
             </div>
             <label>
-              {{ l10n.photo }}
+              {{ 'config.photo' | translate }}
               <span
                 class="pi pi-question-circle"
-                pTooltip="{{ l10n.usePhoto256x256Pixel }}"
+                pTooltip="{{ 'config.usePhoto256x256Pixel' | translate }}"
                 tooltipPosition="right"></span>
             </label>
             <div class="flex justify-content-end flex-wrap">
@@ -52,8 +53,8 @@ interface L10n {
         </div>
         <div class="md:w-1/2">
           <div class="card flex flex-col gap-4">
-            <div class="font-semibold text-xl">{{ l10n.localization }}</div>
-            <label> {{ l10n.selectLanguage }} </label>
+            <div class="font-semibold text-xl">{{ 'config.localization' | translate }}</div>
+            <label> {{ 'config.selectLanguage' | translate }} </label>
             <div class="flex justify-content-end flex-wrap">
               <p-select
                 class="w-full md:w-56"
@@ -62,24 +63,24 @@ interface L10n {
                 optionValue="value"
                 [options]="languages"
                 [(ngModel)]="selectedLanguage"
-                (onChange)="changeLanguage()" />
+                (onChange)="changeLanguage()"/>
             </div>
           </div>
         </div>
-        @if (securityService.isAdmin) {
+        @if (securityService.isAdmin()) {
           <div class="md:w-1/2">
             <div class="card flex flex-col gap-4">
-              <div class="font-semibold text-xl">{{ l10n.menu }}</div>
+              <div class="font-semibold text-xl">{{ 'config.menu' | translate }}</div>
               <div class="flex items-center gap-2">
-                <label for="oip-app-config-admin-mode">{{ l10n.all }}</label>
+                <label for="oip-app-config-admin-mode">{{ 'config.all' | translate }}</label>
                 <p-toggle-switch
                   id="oip-app-config-admin-mode"
                   [(ngModel)]="menuService.adminMode"
                   (onChange)="onSwitchChange()"></p-toggle-switch>
               </div>
               <div class="flex items-center gap-2">
-                <label for="oip-app-config-admin-mode">{{ l10n.moduleManagement }}</label>
-                <p-button icon="pi pi-cog" label="{{ l10n.goTo }}" routerLink="/modules" />
+                <label for="oip-app-config-admin-mode">{{ 'config.moduleManagement' | translate }}</label>
+                <p-button icon="pi pi-cog" label="{{ 'config.goTo' | translate  }}" routerLink="/modules"/>
               </div>
             </div>
           </div>
@@ -87,7 +88,7 @@ interface L10n {
       </div>
     </p-fluid>
   `,
-  imports: [ProfileComponent, Fluid, Tooltip, FormsModule, Select, TableModule, ToggleSwitchModule, RouterLink, Button]
+  imports: [ProfileComponent, Fluid, Tooltip, FormsModule, Select, TableModule, ToggleSwitchModule, RouterLink, Button, TranslatePipe]
 })
 export class ConfigComponent implements OnInit {
   private readonly layoutService = inject(LayoutService);
@@ -104,13 +105,12 @@ export class ConfigComponent implements OnInit {
   ];
 
   constructor() {
+    this.l10nService.loadComponentTranslations('config');
     this.selectedLanguage = this.layoutService.language();
   }
 
   async ngOnInit() {
-    (await this.l10nService.get('config')).subscribe((l10n) => {
-      this.l10n = l10n;
-    });
+
   }
 
   /**
@@ -122,7 +122,7 @@ export class ConfigComponent implements OnInit {
       ...config,
       language: this.selectedLanguage
     }));
-    this.l10nService.use(this.selectedLanguage);
+    this.l10nService.use(this.selectedLanguage, 'config');
   }
 
   async onSwitchChange(): Promise<void> {

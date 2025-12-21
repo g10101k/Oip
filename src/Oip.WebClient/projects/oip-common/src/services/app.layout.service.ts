@@ -84,10 +84,10 @@ export class LayoutService {
 
   monthFormat = computed(() => {
     const reDay = /d+/i;
-    const reDelimeter = /^[^\w]|[^\w]$|([^\w])\1+/;
+    const reDelimiter = /^[^\w]|[^\w]$|([^\w])\1+/;
     const ngDateFormat = convertToPrimeNgDateFormat(this.layoutConfig().dateFormat);
     const ngDate = ngDateFormat.replace(reDay, '');
-    const dateGroups = ngDate.match(reDelimeter);
+    const dateGroups = ngDate.match(reDelimiter);
     if (Array.isArray(dateGroups) && dateGroups.length > 1) {
       return dateGroups[1] !== undefined
         ? ngDate.replace(dateGroups[0], '')

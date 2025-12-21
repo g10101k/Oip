@@ -110,8 +110,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/oip/src/favicon.ico",
-              "projects/oip/src/assets",
-
+              "projects/oip/src/assets"
             ],
             "styles": [
               "projects/oip/src/styles.scss"

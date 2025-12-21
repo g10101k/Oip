@@ -12,12 +12,12 @@ import {
   SecurityStorageService,
   UserService,
   langIntercept,
-  httpLoaderAuthFactory
+  httpLoaderAuthFactory, SecurityService, KeycloakSecurityService
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ProductService } from './app/service/product.service';
 import { MessageService } from 'primeng/api';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule, TranslatePipe } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 
@@ -36,6 +36,7 @@ export const appConfig: ApplicationConfig = {
     }),
     { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     { provide: LocationStrategy, useClass: PathLocationStrategy },
+    { provide: SecurityService, useClass: KeycloakSecurityService },
     ProductService,
     AuthGuardService,
     MessageService,

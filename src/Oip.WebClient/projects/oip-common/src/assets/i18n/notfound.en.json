@@ -1,0 +1,8 @@
+{
+  "notfound": {
+    "title": "Not Found",
+    "errorCode": "404",
+    "description": "Requested resource is not available.",
+    "button": "Go to home"
+  }
+}

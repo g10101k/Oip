@@ -30,12 +30,12 @@ export class UserService {
    * Typically used for avatar display when a photo is unavailable.
    */
   get shortLabel(): string {
-    const data = this.securityService.userData;
-    return data.given_name[0] + data.family_name[0];
+    const data = this.securityService.getCurrentUser();
+    return (data) ? data.given_name[0] + data.family_name[0] : "";
   }
 
   get userName(): string {
-    const data = this.securityService.userData;
+    const data = this.securityService.getCurrentUser();
     return `${data.given_name} ${data.family_name}`;
   }
 
@@ -44,7 +44,7 @@ export class UserService {
    * and updates the `photo` and `photoLoaded` properties accordingly.
    */
   getUserPhoto(): void {
-    const url = `${this.baseDataService.baseUrl}api/user-profile/get-user-photo?email=${this.securityService.userData.email}`;
+    const url = `${this.baseDataService.baseUrl}api/user-profile/get-user-photo?email=${this.securityService.getCurrentUser().email}`;
     this.baseDataService.getBlob(url).then(
       (data) => {
         this.createImageFromBlob(data as Blob);

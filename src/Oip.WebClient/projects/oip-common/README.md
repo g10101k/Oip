@@ -1,28 +1,26 @@
 # OipCommon
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 19.0.0.
+Add assets in angular.json
+```json
+{
+  "glob": "**/*",
+  "input": "node_modules/oip-common/assets",
+  "output": "/assets"
+}
+```
 
-## Code scaffolding
+Add tailwind config
 
-Run `ng generate component component-name --project oip-common` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project oip-common`.
+```js
+const primeui = require('tailwindcss-primeui');
+module.exports = {
+  /* Your config */
+  content: [/* Your config */, './node_modules/oip-common/**/*.{html,ts,scss,css,js,mjs}'],
+  /* Your config */
+};
+```
 
-> Note: Don't forget to add `--project oip-common` or else it will be added to the default project in your `angular.json` file.
-
-## Build
-
-Run `ng build oip-common` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Publishing
-
-After building your library with `ng build oip-common`, go to the dist folder `cd dist/oip-common` and run `npm publish`.
-
-## Running unit tests
-
-Run `ng test oip-common` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
-
-
-з
+Add scss
+```sass
+@use "../../../node_modules/oip-common/assets/oip-common";
+```

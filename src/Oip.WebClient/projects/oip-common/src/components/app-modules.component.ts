@@ -13,6 +13,7 @@ import { L10nService } from '../services/l10n.service';
 import { Module } from '../api/Module';
 import { ModuleDto } from '../api/data-contracts';
 import { AppTitleService } from '../services/app-title.service';
+import { TranslatePipe } from "@ngx-translate/core";
 
 interface L10n {
   confirm: {
@@ -37,7 +38,7 @@ interface L10n {
 }
 
 @Component({
-  imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog],
+  imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog, TranslatePipe],
   providers: [ConfirmationService, Module],
   selector: 'app-modules',
   template: `
@@ -55,16 +56,16 @@ interface L10n {
               severity="secondary"
               text="true"
               tooltipPosition="bottom"
-              [pTooltip]="l10n.refreshTooltip"
+              [pTooltip]="'app-modules.refreshTooltip' | translate"
               (onClick)="refreshAction()"></p-button>
           </p-toolbar>
         </div>
         <p-table class="mt-4" [paginator]="true" [rows]="100" [value]="modules">
           <ng-template pTemplate="header">
             <tr>
-              <th>{{ l10n.table.moduleId }}</th>
-              <th>{{ l10n.table.name }}</th>
-              <th>{{ l10n.table.currentlyLoaded }}</th>
+              <th>{{ 'app-modules.table.moduleId' | translate }}</th>
+              <th>{{ 'app-modules.table.name' | translate }}</th>
+              <th>{{ 'app-modules.table.currentlyLoaded'  | translate }}</th>
               <th style="width: 4rem"></th>
             </tr>
           </ng-template>
@@ -75,7 +76,7 @@ interface L10n {
               <td>
                 <p-tag
                   [severity]="module.currentlyLoaded ? 'success' : 'danger'"
-                  [value]="module.currentlyLoaded ? l10n.table.yes : l10n.table.no"></p-tag>
+                  [value]="(module.currentlyLoaded ? 'app-modules.table.yes' : 'app-modules.table.no') | translate"></p-tag>
               </td>
               <td>
                 <p-button
@@ -84,7 +85,7 @@ interface L10n {
                   severity="danger"
                   text="true"
                   tooltipPosition="bottom"
-                  [pTooltip]="l10n.table.deleteTooltip"
+                  [pTooltip]="'app-modules.table.deleteTooltip' | translate"
                   (onClick)="deleteModule(module)"></p-button>
               </td>
             </tr>
@@ -105,8 +106,8 @@ export class AppModulesComponent implements OnInit {
   private moduleService = inject(Module);
 
   async ngOnInit() {
-    (await this.l10nService.get('app-modules')).subscribe((l) => {
-      this.l10n = l;
+    this.l10nService.get('app-modules').subscribe((l10n) => {
+      this.l10n = l10n;
     });
     this.titleService.setTitle(this.l10n.title);
     await this.refreshAction();

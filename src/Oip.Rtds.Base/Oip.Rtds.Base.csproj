@@ -10,7 +10,6 @@
     <ItemGroup>
         <Protobuf Include="Protos\rtds_service.proto" GrpcServices="Client">
             <Generator>MSBuild:Compile</Generator>
-
         </Protobuf>
         <Protobuf Include="Protos\rtds_service.proto" GrpcServices="GrpcServices">
             <Generator>MSBuild:Compile</Generator>
