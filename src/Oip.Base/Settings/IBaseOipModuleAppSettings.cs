@@ -1,4 +1,5 @@
 using Oip.Settings;
+using Oip.Settings.Attributes;
 
 namespace Oip.Base.Settings;
 
@@ -15,16 +16,19 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// <summary>
     /// Collection of OpenAPI specification configurations for the application
     /// </summary>
+    [NotSaveToDb]
     OpenApiSettings OpenApi { get; set; }
 
     /// <summary>
     /// Spa proxy server settings
     /// </summary>
+    [NotSaveToDb]
     SpaDevelopmentServerSettings SpaProxyServer { get; set; }
 
     /// <summary>
     /// Security Service Settings
     /// </summary>
+    [NotSaveToDb]
     SecurityServiceSettings SecurityService { get; set; }
 }
 
