@@ -34,7 +34,7 @@ interface MenuItemComponentTranslation {
   selector: '[app-menuitem]',
   template: `
     <ng-container>
-      <p-confirm-dialog />
+      <p-confirm-dialog/>
       <div
         *ngIf="root && item.visible !== false"
         class="layout-menuitem-root-text"
@@ -290,6 +290,6 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   }
 
   private editClick(event: MenuItemCommandEvent) {
-    this.menuItemEditDialogComponent.showDialog();
+    this.menuItemEditDialogComponent.showDialog().then();
   }
 }

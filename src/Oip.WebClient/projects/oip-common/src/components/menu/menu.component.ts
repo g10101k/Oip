@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { SecurityService } from '../../services/security.service';
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { DialogModule } from 'primeng/dialog';
-import { MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
+import { ContextMenuService, MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { MenuItemComponent } from './menu-item.component';
@@ -12,6 +12,7 @@ import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.compone
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
 import { Menu } from '../../api/Menu';
+import { L10nService } from "../../services/l10n.service";
 
 @Component({
   imports: [
@@ -27,7 +28,8 @@ import { Menu } from '../../api/Menu';
   providers: [Menu],
   selector: 'app-menu',
   standalone: true,
-  template: ` <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
+  template: `
+    <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
       <ul class="layout-menu">
         @for (item of menuService.menu; track item; let i = $index) {
           <ng-container>
@@ -47,25 +49,23 @@ import { Menu } from '../../api/Menu';
         }
       </ul>
     </div>
-    <p-contextMenu [target]="empty" />
+    <p-contextMenu [target]="empty"/>
     @if (securityService.isAdmin) {
-      <menu-item-create-dialog />
-      <menu-item-edit-dialog />
+      <menu-item-create-dialog/>
+      <menu-item-edit-dialog/>
     }`
 })
 export class MenuComponent implements OnInit {
   readonly menuService = inject(MenuService);
   readonly securityService = inject(SecurityService);
   readonly translateService = inject(TranslateService);
-
-  @ViewChild(MenuItemCreateDialogComponent)
-  menuItemCreateDialogComponent: MenuItemCreateDialogComponent;
-  @ViewChild(MenuItemEditDialogComponent)
-  menuItemEditDialogComponent: MenuItemEditDialogComponent;
+  @ViewChild(MenuItemCreateDialogComponent) menuItemCreateDialogComponent: MenuItemCreateDialogComponent;
+  @ViewChild(MenuItemEditDialogComponent) menuItemEditDialogComponent: MenuItemEditDialogComponent;
   @ViewChild(ContextMenu) contextMenu: ContextMenu;
 
   ngOnInit() {
     this.menuService.loadMenu().then();
+
   }
 
   private newClick(e: MenuItemCommandEvent) {

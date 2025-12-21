@@ -17,7 +17,7 @@ export { AppModulesComponent } from './components/app-modules.component';
 export { AppConfiguratorComponent } from './components/app-configurator.component'
 export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator.component';
 
-// Dtos
+// DTOs
 export { TopBarDto } from './dtos/top-bar.dto';
 export { SecurityDto } from './dtos/security.dto';
 export { PutSecurityDto } from './dtos/put-security.dto';
@@ -26,7 +26,7 @@ export { NoSettingsDto } from './dtos/no-settings.dto';
 // Services
 export { BaseDataService } from './services/base-data.service';
 export { TopBarService } from './services/top-bar.service';
-export { SecurityService } from './services/security.service';
+export { SecurityService, KeycloakSecurityService } from './services/security.service';
 export { SecurityDataService } from './services/security-data.service';
 export { MsgService } from './services/msg.service';
 export { AuthGuardService } from './services/auth.service';
