@@ -109,7 +109,7 @@ import { TranslatePipe } from "@ngx-translate/core";
               (click)="securityService.logout()"
               (keydown)="logoutKeyDown($event)">
               <i class="pi pi-sign-out"></i>
-              <span>Logout</span>
+              <span>{{ 'topbar.logout' | translate }}</span>
             </button>
             <button class="layout-topbar-action" routerLink="config">
               <p-avatar
@@ -120,24 +120,19 @@ import { TranslatePipe } from "@ngx-translate/core";
                 [image]="userService.photoLoaded ? userService.photo : null"
               >{{ !userService.photoLoaded ? userService.shortLabel : null }}
               </p-avatar>
-              <span class="ml-2">Profile</span>
+              <span class="ml-2">{{ 'topbar.profile' | translate }}</span>
             </button>
           </div>
         </div>
       </div>
-    </div>`,
-  styles: [`
-
-  `]
+    </div>`
 })
 export class AppTopbar {
   items!: MenuItem[];
   securityService = inject(SecurityService);
   topBarService = inject(TopBarService);
   userService = inject(UserService);
-
-  constructor(public layoutService: LayoutService) {
-  }
+  layoutService = inject(LayoutService);
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({

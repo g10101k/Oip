@@ -1,0 +1,19 @@
+{
+  "db-migration": {
+    "migrationManager": "Менеджер миграций",
+    "actions": {
+      "refresh": "Обновить",
+      "cleanFilter": "Очистить фильтр",
+      "applyMigration": "Применить миграцию"
+    },
+    "columns": {
+      "name": "Название миграции",
+      "applied": "Применена",
+      "exist": "Существует",
+      "pending": "Ожидает"
+    },
+    "messages": {
+      "errorRefreshing": "Ошибка обновления базы данных"
+    }
+  }
+}

@@ -20,8 +20,7 @@ public class UserProfileController(UserService userService, UserRepository userR
     /// </summary>
     /// <param name="email">User's email address</param>
     /// <returns>User photo as JPEG image or NotFound result</returns>
-    [HttpGet("get-user-photo")]
-    [Authorize]
+    [Authorize, HttpGet("get-user-photo")]
     [ProducesResponseType<FileContentResult>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
@@ -39,8 +38,7 @@ public class UserProfileController(UserService userService, UserRepository userR
     /// </summary>
     /// <param name="files">Photo file to upload</param>
     /// <returns>OK result</returns>
-    [HttpPost("post-user-photo")]
-    [Authorize]
+    [Authorize, HttpPost("post-user-photo")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
@@ -65,8 +63,7 @@ public class UserProfileController(UserService userService, UserRepository userR
     /// Get user setting by e-mail
     /// </summary>
     /// <returns></returns>
-    [HttpGet("get-settings")]
-    [Authorize]
+    [Authorize, HttpGet("get-settings")]
     [ProducesResponseType<UserSettingsDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
@@ -81,8 +78,7 @@ public class UserProfileController(UserService userService, UserRepository userR
     /// Update User settings
     /// </summary>
     /// <param name="settings">Settings</param>
-    [HttpPut("set-settings")]
-    [Authorize]
+    [Authorize, HttpPut("set-settings")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]

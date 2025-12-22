@@ -37,4 +37,20 @@ export class Security<
       format: "json",
       ...params,
     });
+  /**
+   * @description Retrieves all realm roles from Keycloak.
+   *
+   * @tags Security
+   * @name securityGetRealmRoles
+   * @request GET:/api/security/get-realm-roles
+   * @secure
+   */
+  securityGetRealmRoles = (params: RequestParams = {}) =>
+    this.request<string[], any>({
+      path: `/api/security/get-realm-roles`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
 }

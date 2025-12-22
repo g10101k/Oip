@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Oip.Users.Clients;
+namespace Oip.Base.Clients;
 
 /// <summary>
 /// Keycloak client for authentication and user management with Keycloak server

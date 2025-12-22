@@ -18,6 +18,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NLog.Web;
+using Oip.Base.Clients;
 using Oip.Base.Exceptions;
 using Oip.Base.Helpers;
 using Oip.Base.Middlewares;
@@ -27,6 +28,7 @@ using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
 using Polly;
 using Polly.Extensions.Http;
+using ApiException = Oip.Base.Exceptions.ApiException;
 
 namespace Oip.Base.Extensions;
 
@@ -259,6 +261,9 @@ public static class OipModuleApplication
                 });
             builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
             builder.Services.AddAuthorization();
+            builder.Services.AddHttpClient<KeycloakClient>(x=>x.BaseAddress = new Uri(settings.SecurityService.BaseUrl));
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<KeycloakService>();
             return builder;
         }
 
@@ -350,7 +355,8 @@ public static class OipModuleApplication
                         ApiExceptionResponse response;
                         if (error.Error is ApiException oipException)
                         {
-                            response = new ApiExceptionResponse(oipException.Title, oipException.Message, oipException.StatusCode,
+                            response = new ApiExceptionResponse(oipException.Title, oipException.Message,
+                                oipException.StatusCode,
                                 app.Environment.IsDevelopment() ? oipException.StackTrace : null);
                         }
                         else

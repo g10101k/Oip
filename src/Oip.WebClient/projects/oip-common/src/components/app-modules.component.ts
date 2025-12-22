@@ -65,7 +65,7 @@ interface L10n {
             <tr>
               <th>{{ 'app-modules.table.moduleId' | translate }}</th>
               <th>{{ 'app-modules.table.name' | translate }}</th>
-              <th>{{ 'app-modules.table.currentlyLoaded'  | translate }}</th>
+              <th>{{ 'app-modules.table.currentlyLoaded' | translate }}</th>
               <th style="width: 4rem"></th>
             </tr>
           </ng-template>
@@ -138,6 +138,7 @@ export class AppModulesComponent implements OnInit {
           })
           .then(() => this.refreshAction())
           .catch((error) => console.error(error));
+
         this.msgService.success(this.l10n.messages.deleteSuccess);
       }
     });
