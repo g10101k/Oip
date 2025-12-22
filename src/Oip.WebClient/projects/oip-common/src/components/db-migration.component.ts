@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, SharedModule } from 'primeng/api';
 import { TableModule } from 'primeng/table';
@@ -7,11 +7,12 @@ import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { NgIf } from '@angular/common';
 import { Tooltip } from 'primeng/tooltip';
 import { BaseModuleComponent } from './base-module.component';
 import { NoSettingsDto } from '../dtos/no-settings.dto';
 import { SecurityComponent } from './security.component';
+import { L10nService } from "../services/l10n.service";
+import { TranslatePipe } from "@ngx-translate/core";
 
 export interface MigrationDto {
   name: string;
@@ -35,27 +36,27 @@ export interface ApplyMigrationRequest {
     FormsModule,
     ConfirmDialog,
     SecurityComponent,
-    Tooltip
+    Tooltip,
+    TranslatePipe
   ],
   selector: 'db-migration',
   template: `
     @if (isContent) {
-
       <div class="card" style="height: 100%">
         <p-confirmDialog/>
         <div>
-          <h5>Migration manager</h5>
+          <h5>{{ 'db-migration.migrationManager' | translate }}</h5>
           <div class="flex flex-row gap-2">
             <p-button
               icon="pi pi-refresh"
-              pTooltip="Refresh"
+              [pTooltip]="'db-migration.actions.refresh' | translate"
               severity="secondary"
               tooltipPosition="bottom"
               [outlined]="true"
               (click)="refreshAction()"/>
             <p-button
               icon="pi pi-filter-slash"
-              pTooltip="Clean filter"
+              [pTooltip]="'db-migration.actions.cleanFilter' | translate"
               severity="secondary"
               tooltipPosition="bottom"
               [outlined]="true"
@@ -66,12 +67,12 @@ export interface ApplyMigrationRequest {
               <ng-template let-columns pTemplate="header">
                 <tr>
                   <th pSortableColumn="name" scope="col">
-                    Migration name
+                    {{ 'db-migration.columns.name' | translate }}
                     <p-columnFilter display="menu" field="name" type="text"/>
                   </th>
-                  <th scope="col">Applied</th>
-                  <th scope="col">Exist</th>
-                  <th>Pending</th>
+                  <th scope="col">{{ 'db-migration.columns.applied' | translate }}</th>
+                  <th scope="col">{{ 'db-migration.columns.exist' | translate }}</th>
+                  <th scope="col">{{ 'db-migration.columns.pending' | translate }}</th>
                   <th scope="col"></th>
                 </tr>
               </ng-template>
@@ -82,13 +83,14 @@ export interface ApplyMigrationRequest {
                     {{ rowData.name }}
                   </td>
                   <td>
-                    <p-button
-                      *ngIf="rowData.applied"
-                      icon="pi pi-check"
-                      severity="success"
-                      [rounded]="true"
-                      [text]="true">
-                    </p-button>
+                    @if (rowData.applied) {
+                      <p-button
+                        icon="pi pi-check"
+                        severity="success"
+                        [rounded]="true"
+                        [text]="true">
+                      </p-button>
+                    }
                   </td>
                   <td>
                     @if (rowData.exist) {
@@ -104,7 +106,7 @@ export interface ApplyMigrationRequest {
                     <p-button
                       icon="pi pi-bolt"
                       pCancelEditableRow
-                      pTooltip="Apply migration"
+                      pTooltip="{{'db-migration.actions.applyMigration' | translate}}"
                       severity="secondary"
                       tooltipPosition="left"
                       [rounded]="true"
@@ -128,6 +130,12 @@ export class DbMigrationComponent
   extends BaseModuleComponent<NoSettingsDto, NoSettingsDto>
   implements OnInit, OnDestroy {
   data: MigrationDto[];
+  l10nService = inject(L10nService);
+
+  constructor() {
+    super();
+    this.l10nService.loadComponentTranslations('db-migration');
+  }
 
   async ngOnInit() {
     await super.ngOnInit();
@@ -141,7 +149,7 @@ export class DbMigrationComponent
       })
       .catch((error) => {
         console.log(error);
-        this.msgService.error('Error refreshing database');
+        this.msgService.error(this.l10nService.instant('db-migration.messages.errorRefreshing'));
       });
   }
 

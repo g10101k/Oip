@@ -1,27 +1,16 @@
+using Microsoft.Extensions.Logging;
+using Oip.Base.Clients;
 using Oip.Base.Settings;
-using Oip.Users.Clients;
-using Oip.Users.Settings;
 
-namespace Oip.Users.Services;
+namespace Oip.Base.Services;
 
 /// <summary>
 /// Provides services for interacting with Keycloak identity management system.
 /// </summary>
-public class KeycloakService
+public class KeycloakService(KeycloakClient client, ILogger<KeycloakService> logger, SecurityServiceSettings _options)
 {
-    private readonly KeycloakClient _client;
-    private readonly ILogger<KeycloakService> _logger;
-    private readonly SecurityServiceSettings _options = AppSettings.Instance.SecurityService;
     private bool _isAuthenticated;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="KeycloakService"/> class.
-    /// </summary>
-    public KeycloakService(KeycloakClient client, ILogger<KeycloakService> logger)
-    {
-        _client = client;
-        _logger = logger;
-    }
 
     /// <summary>
     /// Asynchronously retrieves a user by their ID.
@@ -31,7 +20,7 @@ public class KeycloakService
     public async Task<UserRepresentation?> GetUserAsync(string userId)
     {
         await EnsureAuthenticatedAsync();
-        return await _client.GetUserAsync(_options.Realm, userId);
+        return await client.GetUserAsync(_options.Realm, userId);
     }
 
     /// <summary>
@@ -43,7 +32,7 @@ public class KeycloakService
     public async Task<IEnumerable<UserRepresentation>> GetUsersAsync(int offset = 0, int limit = 100)
     {
         await EnsureAuthenticatedAsync();
-        var users = await _client.GetUsersAsync(_options.Realm, first: offset, max: limit);
+        var users = await client.GetUsersAsync(_options.Realm, first: offset, max: limit);
         return users ?? [];
     }
 
@@ -57,13 +46,13 @@ public class KeycloakService
         {
             try
             {
-                await _client.AuthenticateAsync(_options.ClientId, _options.ClientSecret, _options.Realm);
+                await client.AuthenticateAsync(_options.ClientId, _options.ClientSecret, _options.Realm);
                 _isAuthenticated = true;
-                _logger.LogInformation("Successfully authenticated with Keycloak");
+                logger.LogInformation("Successfully authenticated with Keycloak");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to authenticate with Keycloak");
+                logger.LogError(ex, "Failed to authenticate with Keycloak");
                 throw;
             }
         }
@@ -78,11 +67,11 @@ public class KeycloakService
         try
         {
             await EnsureAuthenticatedAsync();
-            return await _client.GetUsersCountAsync(_options.Realm);
+            return await client.GetUsersCountAsync(_options.Realm);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting users count from Keycloak");
+            logger.LogError(ex, "Error getting users count from Keycloak");
             throw;
         }
     }
@@ -93,8 +82,9 @@ public class KeycloakService
     /// <returns></returns>
     public async Task<List<Role>> GetRealmRoles()
     {
-        _ = await _client.Authentication(_options.ClientId, _options.ClientSecret, _options.Realm, CancellationToken.None);
+        _ = await client.Authentication(_options.ClientId, _options.ClientSecret, _options.Realm,
+            CancellationToken.None);
 
-        return await _client.GetRoles(_options.Realm, CancellationToken.None);
+        return await client.GetRoles(_options.Realm, CancellationToken.None);
     }
 }

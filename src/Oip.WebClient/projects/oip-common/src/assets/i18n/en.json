@@ -60,5 +60,15 @@
     "signInToContinue": "Sign in to continue",
     "signIn": "Sign In"
   },
+  "app-configurator": {
+    "primary": "Primary",
+    "surface": "Surface",
+    "presets": "Presets",
+    "menuMode": "Menu Mode"
+  },
+  "topbar": {
+    "logout": "Logout",
+    "profile": "Profile"
+  },
   "primeng": ""
 }

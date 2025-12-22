@@ -2,11 +2,6 @@ import { Component } from '@angular/core';
 import { LogoComponent } from './logo.component';
 import { TranslatePipe } from "@ngx-translate/core";
 
-interface L10n {
-  title: string;
-  version: string;
-}
-
 @Component({
   selector: 'app-footer',
   template: `
@@ -22,7 +17,4 @@ interface L10n {
   imports: [LogoComponent, TranslatePipe]
 })
 export class FooterComponent {
-
-  constructor() {
-  }
 }

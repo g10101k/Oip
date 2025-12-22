@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { TranslateService } from '@ngx-translate/core';
+import { InterpolationParameters, TranslateService, Translation, TranslationObject } from '@ngx-translate/core';
 import { LayoutService } from "./app.layout.service";
 import { PrimeNG } from "primeng/config";
 
@@ -29,7 +29,7 @@ export class L10nService {
    * @returns the translated key, or an object of translated keys
    */
   public get(key: string) {
-    this.loadComponentTranslations(key)
+    this.loadComponentTranslations(key.split('.')[0]);
     return this.translateService.get(key);
   }
 
@@ -86,5 +86,9 @@ export class L10nService {
     this.translateService.use(lang);
     this.loadComponentTranslations('app-info');
     this.translateService.get('primeng').subscribe((res) => this.primeNg.setTranslation(res));
+  }
+
+  instant(key: string | string[], interpolateParams?: InterpolationParameters): Translation | TranslationObject {
+    return this.translateService.instant(key, interpolateParams);
   }
 }

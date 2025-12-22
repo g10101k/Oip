@@ -1,6 +1,7 @@
 using NLog;
 using NLog.Web;
 using Oip.Base.Extensions;
+using Oip.Base.Services;
 using Oip.Users.Extensions;
 using Oip.Users.Repositories;
 using Oip.Users.Services;
@@ -17,13 +18,12 @@ internal static class Program
         {
             var settings = AppSettings.Initialize(args, false, true);
             var builder = OipModuleApplication.CreateShellBuilder(settings);
-            builder.AddKeycloakClients(settings);
+            builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddUsersData(settings);
             // Repositories
             builder.Services.AddScoped<UserRepository>();
 
             // Services
-            builder.Services.AddScoped<KeycloakService>();
             builder.Services.AddScoped<UserSyncService>();
 
             // Background service

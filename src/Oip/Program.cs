@@ -1,5 +1,6 @@
 using NLog;
 using NLog.Web;
+using Oip.Base.Clients;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
@@ -29,7 +30,6 @@ internal static class Program
             builder.AddOpenApi(settings);
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
-            builder.Services.AddScoped<UserService>();
             builder.Services.AddCors();
             builder.AddControllersAndView();
             builder.AddLocalization();

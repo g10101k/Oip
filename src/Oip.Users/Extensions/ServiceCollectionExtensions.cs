@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Oip.Base.Clients;
 using Oip.Base.Extensions;
 using Oip.Base.Settings;
-using Oip.Users.Clients;
 using Oip.Users.Contexts;
 
 namespace Oip.Users.Extensions;

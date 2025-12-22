@@ -2,7 +2,7 @@ using Oip.Base.Services;
 using Oip.Users.Entities;
 using Oip.Users.Repositories;
 using Oip.Users.Settings;
-using UserRepresentation = Oip.Users.Clients.UserRepresentation;
+using UserRepresentation = Oip.Base.Clients.UserRepresentation;
 
 namespace Oip.Users.Services;
 

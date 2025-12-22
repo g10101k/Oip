@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Oip.Api.Controllers.Api;
 using Oip.Base.Exceptions;
 using Oip.Base.Helpers;
+using Oip.Base.Services;
 using Oip.Base.Settings;
+using Oip.Data.Constants;
 
 namespace Oip.Api.Controllers;
 
@@ -15,7 +17,7 @@ namespace Oip.Api.Controllers;
 [ApiController]
 [Route("api/security")]
 [ApiExplorerSettings(GroupName = "base")]
-public class SecurityController(IBaseOipModuleAppSettings appSettings) : ControllerBase
+public class SecurityController(IBaseOipModuleAppSettings appSettings, KeycloakService keycloakService) : ControllerBase
 {
     /// <summary>
     /// Retrieves Keycloak client settings needed by frontend applications.
@@ -50,5 +52,19 @@ public class SecurityController(IBaseOipModuleAppSettings appSettings) : Control
             LogLevel = securitySettings.Front.LogLevel,
             SecureRoutes = securityRoutes.ToList()
         };
+    }
+
+    /// <summary>
+    /// Retrieves all realm roles from Keycloak.
+    /// </summary>
+    /// <returns>
+    /// A list of role names as <see cref="string"/>.
+    /// </returns>
+    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [HttpGet("get-realm-roles")]
+    public async Task<IEnumerable<string>> GetRealmRoles()
+    {
+        var realmRoles = await keycloakService.GetRealmRoles();
+        return realmRoles.Select(x => x.Name).ToList();
     }
 }
