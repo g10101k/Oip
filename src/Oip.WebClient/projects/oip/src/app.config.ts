@@ -19,7 +19,7 @@ import {
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ProductService } from './app/service/product.service';
 import { MessageService } from 'primeng/api';
-import { TranslateLoader, TranslateModule, TranslatePipe } from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 

@@ -7,7 +7,7 @@ import { BaseDataService } from '../services/base-data.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject, Subscription } from 'rxjs';
 import { AppTitleService } from '../services/app-title.service';
-import { LayoutService } from 'oip-common';
+import { LayoutService } from'../services/app.layout.service';
 
 interface BaseComponentLocalization {
   security: string;
