@@ -1,21 +1,34 @@
 ﻿using System.Globalization;
 using System.Net;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NLog.Web;
 using Oip.Base.Clients;
+using Oip.Base.Exceptions;
+using Oip.Base.Helpers;
+using Oip.Base.Middlewares;
+using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
+using Oip.Base.StartupTasks;
 using Polly;
 using Polly.Extensions.Http;
+using ApiException = Oip.Base.Exceptions.ApiException;
 
 namespace Oip.Base.Extensions;
 
@@ -31,10 +44,10 @@ public static class OipModuleApplication
     /// </summary>
     /// <param name="settings">App settings</param>
     /// <returns></returns>
+    [Obsolete("Use particle call ")]
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
-        builder.AddHttpClients(settings);
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
@@ -42,218 +55,361 @@ public static class OipModuleApplication
         builder.Services.AddSingleton(settings);
         return builder;
     }
-
 
     /// <summary>
     /// Initializes a new instance of the WebApplicationBuilder class with preconfigured defaults
     /// </summary>
     /// <param name="settings">App settings</param>
     /// <returns></returns>
+    [Obsolete]
     public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
-        builder.Logging.ClearProviders();
-        builder.Host.UseNLog();
+        builder.AddNlog();
         builder.AddDefaultHealthChecks();
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
-        builder.Services.AddOipModuleContext(settings.ConnectionString);
-        builder.AddKeycloakClients(settings);
+        builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+        builder.Services.AddStartupRunner();
         builder.Services.AddSingleton(settings);
-        builder.Services.AddScoped<KeycloakService>();
         builder.Services.AddScoped<UserService>();
         builder.Services.AddCors();
-        builder.Services.AddControllersWithViews();
-        builder.Services.AddMvc().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.DefaultIgnoreCondition
-                = JsonIgnoreCondition.WhenWritingNull;
-        });
+        builder.AddControllersAndView();
         builder.AddLocalization();
+
         return builder;
     }
 
-    private static void AddLocalization(this WebApplicationBuilder builder)
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    extension(WebApplicationBuilder builder)
     {
-        builder.Services.Configure<RequestLocalizationOptions>(options =>
+        /// <summary>
+        /// Adds controllers and configures JSON options for the application builder
+        /// </summary>
+        /// <returns>The modified WebApplicationBuilder instance</returns>
+        public WebApplicationBuilder AddControllersAndView()
         {
-            var supportedCultures = new List<CultureInfo>
+            builder.Services.AddControllers().AddJsonOptions(option =>
             {
-                new("en"),
-                new("ru")
-            };
-            options.DefaultRequestCulture = new RequestCulture(culture: "en", uiCulture: "en");
-            options.SupportedCultures = supportedCultures;
-            options.SupportedUICultures = supportedCultures;
-        });
-    }
-
-    private static void AddHttpClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
-        builder.Services.AddHttpClient<OipClient>(x => { x.BaseAddress = new Uri(settings.OipUrls); })
-            .AddPolicyHandler(GetRetryPolicy());
-        builder.AddKeycloakClients(settings);
-    }
-
-    private static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
-        var httpClientBuilder = builder.Services.AddHttpClient<KeycloakClient>(httpClient =>
-        {
-            var url = settings.SecurityService.DockerUrl ?? settings.SecurityService.BaseUrl;
-            httpClient.BaseAddress = new Uri(url);
-        }).AddPolicyHandler(GetRetryPolicy());
-
-        if (builder.Environment.IsDevelopment() && settings.SecurityService.DockerUrl is not null)
-        {
-            httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
+                option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+            builder.Services.AddMvc().AddJsonOptions(options =>
             {
-                HttpClientHandler handler = new HttpClientHandler();
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            });
+            return builder;
+        }
 
-                handler.ServerCertificateCustomValidationCallback =
-                    (message, cert, chain, errors) => true;
-                return handler;
+        /// <summary>
+        /// Adds NLog logging to the application
+        /// </summary>
+        public void AddNlog()
+        {
+            builder.Logging.ClearProviders();
+            builder.Host.UseNLog();
+        }
+
+        /// <summary>
+        /// Configures localization options for the application
+        /// </summary>
+        public void AddLocalization()
+        {
+            builder.Services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new List<CultureInfo>
+                {
+                    new("en"),
+                    new("ru")
+                };
+                options.DefaultRequestCulture = new RequestCulture(culture: "en", uiCulture: "en");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
             });
         }
-    }
 
-    private static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
-        var openApiSettings = settings.OpenApi;
-        if (!openApiSettings.Publish)
-            return;
-        builder.Services.AddSwaggerGen(options =>
+        /// <summary>
+        /// Adds OpenAPI/Swagger support to the application builder
+        /// </summary>
+        /// <param name="settings">The application settings</param>
+        public void AddOpenApi(IBaseOipModuleAppSettings settings)
         {
-            var path = Path.GetDirectoryName(typeof(OipModuleApplication).Assembly.Location);
-            if (path == null) return;
-
-            var filesPaths = Directory.GetFiles(path, "*.xml");
-            foreach (var filePath in filesPaths)
+            var openApiSettings = settings.OpenApi;
+            if (openApiSettings.All(x => !x.Publish))
+                return;
+            builder.Services.AddSwaggerGen(options =>
             {
-                options.IncludeXmlComments(filePath);
-            }
+                var path = Path.GetDirectoryName(typeof(OipModuleApplication).Assembly.Location);
+                if (path == null) return;
 
-            options.AddSecurityDefinition(Bearer, new OpenApiSecurityScheme
-            {
-                Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                var filesPaths = Directory.GetFiles(path, "*.xml");
+                foreach (var filePath in filesPaths)
+                {
+                    options.IncludeXmlComments(filePath);
+                }
+
+                options.AddSecurityDefinition(Bearer, new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
                       Enter 'Bearer' [space] and then your token in the text input below.
                       \r\n\r\nExample: 'Bearer 12345abcdef'",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-                Scheme = Bearer
-            });
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement()
-            {
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = Bearer
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
-                    new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference
+                        new OpenApiSecurityScheme
                         {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = Bearer
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = Bearer
+                            },
+                            Scheme = "oauth2",
+                            Name = Bearer,
+                            In = ParameterLocation.Header,
                         },
-                        Scheme = "oauth2",
-                        Name = Bearer,
-                        In = ParameterLocation.Header,
-                    },
-                    new List<string>()
-                }
+                        new List<string>()
+                    }
+                });
+
+                openApiSettings.ForEach(apiSettings =>
+                {
+                    if (apiSettings.Publish)
+                    {
+                        options.SwaggerDoc(apiSettings.Name, new OpenApiInfo
+                        {
+                            Version = apiSettings.Version,
+                            Title = apiSettings.Title,
+                            Description = apiSettings.Description,
+                        });
+                    }
+                });
+
+                options.DocInclusionPredicate((docName, apiDesc) =>
+                {
+                    if (docName == "v1")
+                        return apiDesc.GroupName is null || apiDesc.GroupName == docName;
+
+                    return apiDesc.GroupName == docName;
+                });
             });
-            options.SwaggerDoc(openApiSettings.Name, new OpenApiInfo
-            {
-                Version = openApiSettings.Version,
-                Title = openApiSettings.Title,
-                Description = openApiSettings.Description,
-            });
-
-            options.SwaggerDoc("base", new OpenApiInfo
-            {
-                Version = "v1",
-                Title = "Base services",
-                Description = "Base services",
-            });
-
-            options.DocInclusionPredicate((docName, apiDesc) =>
-            {
-                if (docName == "v1")
-                    return apiDesc.GroupName is null || apiDesc.GroupName == docName;
-
-                return apiDesc.GroupName == docName;
-            });
-        });
-    }
-
-    /// <summary>
-    /// Add a default liveness check to ensure app is responsive
-    /// </summary>
-    /// <param name="builder"></param>
-    private static void AddDefaultHealthChecks(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
-    }
-
-    private static void MapDefaultEndpoints(this WebApplication app)
-    {
-        // All health checks must pass for app to be considered ready to accept traffic after starting
-        app.MapHealthChecks("/health");
-
-        // Only health checks tagged with the "live" tag must pass for app to be considered alive
-        app.MapHealthChecks("/liveness", new HealthCheckOptions
-        {
-            Predicate = r => r.Tags.Contains("live")
-        });
-    }
-
-    /// <summary>
-    /// Build Oip Module application
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="settings"></param>
-    /// <returns></returns>
-    public static WebApplication BuildApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
-        var app = builder.Build();
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Home/Error");
-            app.UseHsts();
         }
 
-        var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
-        if (localizeOptions != null) app.UseRequestLocalization(localizeOptions.Value);
-
-        app.MapDefaultEndpoints();
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
-        app.UseRouting();
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.UseCors(options => options.AllowAnyOrigin());
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller}/{action=Index}/{id?}");
-        app.MapOpenApi(settings);
-        app.MapFallbackToFile("index.html");
-
-        app.MigrateDatabase();
-        return app;
-    }
-
-    private static void MapOpenApi(this WebApplication app, IBaseOipModuleAppSettings settings)
-    {
-        if (!settings.OpenApi.Publish)
-            return;
-        app.UseSwagger();
-        app.UseSwaggerUI(x =>
+        /// <summary>
+        /// Add a default liveness check to ensure app is responsive
+        /// </summary>
+        public void AddDefaultHealthChecks()
         {
-            x.EnableTryItOutByDefault();
-            x.SwaggerEndpoint("/swagger/v1/swagger.json", "Module OIP service");
-            x.SwaggerEndpoint("/swagger/base/swagger.json", "Base OIP service");
-        });
+            builder.Services.AddHealthChecks()
+                .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+        }
+
+        /// <summary>
+        /// Configures default authentication using JWT Bearer scheme.
+        /// </summary>
+        /// <param name="settings">The base Oip module application settings.</param>
+        /// <returns>The configured web application builder.</returns>
+        public WebApplicationBuilder AddDefaultAuthentication(IBaseOipModuleAppSettings settings)
+        {
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    var list = new List<string>();
+
+                    var urlWithRealm = settings.SecurityService.BaseUrl
+                        .UrlAppend("realms")
+                        .UrlAppend(settings.SecurityService.Realm);
+                    list.Add(urlWithRealm);
+
+                    var dockerInternalUrl = settings.SecurityService.DockerUrl?
+                        .UrlAppend("realms")
+                        .UrlAppend(settings.SecurityService.Realm);
+
+                    if (dockerInternalUrl is not null)
+                        list.Add(dockerInternalUrl);
+
+                    options.MetadataAddress = (dockerInternalUrl ?? urlWithRealm)
+                        .UrlAppend(".well-known/openid-configuration");
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuers = list,
+                        ValidateAudience = false,
+                        ClockSkew = TimeSpan.FromSeconds(settings.SecurityService.ClockSkewSeconds)
+                    };
+
+                    if (builder.Environment.IsDevelopment() && dockerInternalUrl is not null)
+                    {
+                        options.TokenValidationParameters.IssuerSigningKeyResolver =
+                            (token, securityToken, kid, parameters) =>
+                            {
+                                var handler = new HttpClientHandler
+                                {
+                                    ServerCertificateCustomValidationCallback =
+                                        (message, cert, chain, errors) => true
+                                };
+                                var client = new HttpClient(handler);
+                                var jwksUri = dockerInternalUrl.UrlAppend("/protocol/openid-connect/certs");
+                                var jwksJson = client.GetStringAsync(jwksUri).Result;
+                                var keys = JsonWebKeySet.Create(jwksJson).GetSigningKeys();
+                                return keys;
+                            };
+                    }
+                });
+            builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
+            builder.Services.AddAuthorization();
+            builder.Services.AddHttpClient<KeycloakClient>(x=>x.BaseAddress = new Uri(settings.SecurityService.BaseUrl));
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<KeycloakService>();
+            return builder;
+        }
+
+        /// <summary>
+        /// Build Oip Module application
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        [Obsolete]
+        public WebApplication BuildApp(IBaseOipModuleAppSettings settings)
+        {
+            var app = builder.Build();
+            app.AddRequestLocalization();
+            app.AddExceptionHandler();
+            app.MapDefaultEndpoints();
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseCors(options => options.AllowAnyOrigin());
+            app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
+            app.MapOpenApi(settings);
+            app.MapFallbackToFile("index.html");
+
+            return app;
+        }
     }
 
-    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+    /// <param name="app">The application builder</param>
+    extension(WebApplication app)
+    {
+        /// <summary>
+        /// Maps default health check endpoints for application monitoring
+        /// </summary>
+        public void MapDefaultEndpoints()
+        {
+            // All health checks must pass for app to be considered ready to accept traffic after starting
+            app.MapHealthChecks("/health");
+
+            // Only health checks tagged with the "live" tag must pass for app to be considered alive
+            app.MapHealthChecks("/liveness", new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("live")
+            });
+        }
+
+        /// <summary>
+        /// Configures HTTP Strict Transport Security to help protect against man-in-the-middle attacks
+        /// </summary>
+        /// <returns></returns>
+        public WebApplication AddHsts()
+        {
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
+
+            return app;
+        }
+
+        /// <summary>
+        /// Configures request localization for the application
+        /// </summary>
+        /// <returns></returns>
+        public WebApplication AddRequestLocalization()
+        {
+            var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+            if (localizeOptions != null) app.UseRequestLocalization(localizeOptions.Value);
+            return app;
+        }
+
+        /// <summary>
+        /// Configures the application to handle exceptions and return a JSON response
+        /// </summary>
+        public WebApplication AddExceptionHandler()
+        {
+            app.UseExceptionHandler(errorApp =>
+            {
+                errorApp.Run(async context =>
+                {
+                    context.Response.StatusCode = 500;
+                    context.Response.ContentType = "application/json";
+
+                    var error = context.Features.Get<IExceptionHandlerFeature>();
+                    if (error != null)
+                    {
+                        ApiExceptionResponse response;
+                        if (error.Error is ApiException oipException)
+                        {
+                            response = new ApiExceptionResponse(oipException.Title, oipException.Message,
+                                oipException.StatusCode,
+                                app.Environment.IsDevelopment() ? oipException.StackTrace : null);
+                        }
+                        else
+                        {
+                            var ex = error.Error;
+                            response = new ApiExceptionResponse("Unexpected error", ex.Message, 500,
+                                app.Environment.IsDevelopment() ? ex.StackTrace : null);
+                        }
+
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(response, JsonSettings.Value));
+                    }
+                });
+            });
+            return app;
+        }
+
+        /// <summary>
+        /// Configures and maps Open API endpoints for the application
+        /// </summary>
+        /// <param name="settings">The application settings</param>
+        public void MapOpenApi(IBaseOipModuleAppSettings settings)
+        {
+            if (settings.OpenApi.All(x => !x.Publish))
+                return;
+            app.UseSwagger();
+            app.UseSwaggerUI(swaggerUiOptions =>
+            {
+                swaggerUiOptions.EnableTryItOutByDefault();
+                settings.OpenApi.ForEach(api =>
+                {
+                    if (api.Publish)
+                    {
+                        swaggerUiOptions.SwaggerEndpoint(api.Url, api.Name);
+                    }
+                });
+            });
+        }
+    }
+
+    private static readonly Lazy<JsonSerializerSettings> JsonSettings = new(() => new JsonSerializerSettings
+    {
+        NullValueHandling = NullValueHandling.Ignore,
+        ContractResolver = new CamelCasePropertyNamesContractResolver()
+    }, true);
+
+
+    /// <summary>
+    /// Creates an asynchronous Polly retry policy for HTTP requests that handles transient errors and
+    /// retries on <see cref="HttpStatusCode.NotFound"/> and <see cref="HttpStatusCode.InternalServerError"/>.
+    /// The policy performs up to five retries with exponential back‑off (2ⁿ seconds).
+    /// </summary>
+    /// <returns>An <see cref="IAsyncPolicy{HttpResponseMessage}"/> that can be attached to an <see cref="HttpClient"/>.</returns>
+    public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()

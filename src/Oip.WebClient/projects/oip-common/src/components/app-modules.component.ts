@@ -1,19 +1,19 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Tooltip } from "primeng/tooltip";
-import { FormsModule } from "@angular/forms";
-import { TableModule } from "primeng/table";
-import { TranslateService } from "@ngx-translate/core";
-import { BaseDataService } from "./../services/base-data.service";
-import { Tag } from "primeng/tag";
+import { Tooltip } from 'primeng/tooltip';
+import { FormsModule } from '@angular/forms';
+import { TableModule } from 'primeng/table';
+import { BaseDataService } from '../services/base-data.service';
+import { Tag } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
-import { MsgService } from "../services/msg.service";
-import { ConfirmationService } from "primeng/api";
-import { ConfirmDialog } from "primeng/confirmdialog";
-import { L10nService } from "../services/l10n.service";
-import { Module } from "../api/Module";
-import { ModuleDto } from "../api/data-contracts";
-import { AppTitleService } from "../services/app-title.service";
+import { MsgService } from '../services/msg.service';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { L10nService } from '../services/l10n.service';
+import { Module } from '../api/Module';
+import { ModuleDto } from '../api/data-contracts';
+import { AppTitleService } from '../services/app-title.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 interface L10n {
   confirm: {
@@ -21,11 +21,11 @@ interface L10n {
     message: string;
     cancel: string;
     delete: string;
-  },
+  };
   title: string;
   messages: {
     deleteSuccess: string;
-  },
+  };
   table: {
     deleteTooltip: string;
     currentlyLoaded: string;
@@ -33,13 +33,13 @@ interface L10n {
     no: string;
     name: string;
     moduleId: string;
-  },
+  };
   refreshTooltip: string;
 }
 
 @Component({
-  imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog],
-  providers: [ConfirmationService],
+  imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog, TranslatePipe],
+  providers: [ConfirmationService, Module],
   selector: 'app-modules',
   template: `
     <p-confirmDialog></p-confirmDialog>
@@ -52,44 +52,43 @@ interface L10n {
           <p-toolbar>
             <p-button
               icon="pi pi-refresh"
-              severity="secondary"
-              (onClick)="refreshAction()"
-              [pTooltip]="l10n.refreshTooltip"
-              tooltipPosition="bottom"
               rounded="true"
+              severity="secondary"
               text="true"
-            ></p-button>
+              tooltipPosition="bottom"
+              [pTooltip]="'app-modules.refreshTooltip' | translate"
+              (onClick)="refreshAction()"></p-button>
           </p-toolbar>
         </div>
-        <p-table class="mt-4" [value]="modules" [paginator]="true" [rows]="100">
+        <p-table class="mt-4" [paginator]="true" [rows]="100" [value]="modules">
           <ng-template pTemplate="header">
             <tr>
-              <th>{{ l10n.table.moduleId }}</th>
-              <th>{{ l10n.table.name }}</th>
-              <th>{{ l10n.table.currentlyLoaded }}</th>
+              <th>{{ 'app-modules.table.moduleId' | translate }}</th>
+              <th>{{ 'app-modules.table.name' | translate }}</th>
+              <th>{{ 'app-modules.table.currentlyLoaded' | translate }}</th>
               <th style="width: 4rem"></th>
             </tr>
           </ng-template>
-          <ng-template pTemplate="body" let-module>
+          <ng-template let-module pTemplate="body">
             <tr>
               <td>{{ module.moduleId }}</td>
               <td>{{ module.name }}</td>
               <td>
                 <p-tag
-                  [value]="module.currentlyLoaded ? l10n.table.yes : l10n.table.no"
                   [severity]="module.currentlyLoaded ? 'success' : 'danger'"
-                ></p-tag>
+                  [value]="
+                    (module.currentlyLoaded ? 'app-modules.table.yes' : 'app-modules.table.no') | translate
+                  "></p-tag>
               </td>
               <td>
                 <p-button
                   icon="pi pi-trash"
-                  (onClick)="deleteModule(module)"
-                  [pTooltip]="l10n.table.deleteTooltip"
-                  tooltipPosition="bottom"
-                  severity="danger"
                   rounded="true"
+                  severity="danger"
                   text="true"
-                ></p-button>
+                  tooltipPosition="bottom"
+                  [pTooltip]="'app-modules.table.deleteTooltip' | translate"
+                  (onClick)="deleteModule(module)"></p-button>
               </td>
             </tr>
           </ng-template>
@@ -109,16 +108,15 @@ export class AppModulesComponent implements OnInit {
   private moduleService = inject(Module);
 
   async ngOnInit() {
-    (await this.l10nService.get('app-modules')).subscribe((l) => {
-        this.l10n = l;
-      }
-    );
+    this.l10nService.get('app-modules').subscribe((l10n) => {
+      this.l10n = l10n;
+    });
     this.titleService.setTitle(this.l10n.title);
     await this.refreshAction();
   }
 
   async refreshAction() {
-    this.modules = await this.moduleService.moduleGetModulesWithLoadStatus()
+    this.modules = await this.moduleService.moduleGetModulesWithLoadStatus();
   }
 
   deleteModule(module: ModuleDto) {
@@ -129,19 +127,22 @@ export class AppModulesComponent implements OnInit {
       rejectButtonProps: {
         label: this.l10n.confirm.cancel,
         severity: 'secondary',
-        outlined: true,
+        outlined: true
       },
       acceptButtonProps: {
         label: this.l10n.confirm.delete,
-        severity: 'danger',
+        severity: 'danger'
       },
       accept: async () => {
         this.dataService
-          .sendRequest(`api/module/delete`, 'DELETE', { moduleId: module.moduleId })
+          .sendRequest(`api/module/delete`, 'DELETE', {
+            moduleId: module.moduleId
+          })
           .then(() => this.refreshAction())
-          .catch(error => console.error(error));
+          .catch((error) => console.error(error));
+
         this.msgService.success(this.l10n.messages.deleteSuccess);
-      },
+      }
     });
   }
 }

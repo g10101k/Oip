@@ -11,8 +11,8 @@
  */
 
 import { inject, Injectable } from "@angular/core";
-import { SecurityService } from "oip-common";
-
+import { LayoutService, } from "../services/app.layout.service";
+import { SecurityService } from "../services/security.service";
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -67,12 +67,17 @@ export enum ContentType {
 @Injectable({ providedIn: "root" })
 export class HttpClient<SecurityDataType = unknown> {
   protected securityService = inject(SecurityService);
+  protected layoutService = inject(LayoutService);
   public baseUrl: string = "";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] = (
     securityData,
   ) => ({
     headers: {
+      "Accept-language": this.layoutService.language()
+        ? this.layoutService.language()
+        : "en",
+      "X-Timezone": this.layoutService.timeZone(),
       Authorization: `Bearer ${securityData}`,
     },
   });
@@ -215,7 +220,7 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const queryString = query && this.toQueryString(query);
     const payloadFormatter = this.contentFormatters[type || ContentType.Json];
-    const responseFormat = format || requestParams.format;
+    let responseFormat = format || requestParams.format;
 
     return this.customFetch(
       `${baseUrl || this.baseUrl || ""}${path}${queryString ? `?${queryString}` : ""}`,
@@ -240,6 +245,9 @@ export class HttpClient<SecurityDataType = unknown> {
       const r = response.clone() as HttpResponse<T, E>;
       r.data = null as unknown as T;
       r.error = null as unknown as E;
+
+      if (typeof E !== undefined && responseFormat === undefined)
+        responseFormat = "json";
 
       const data = !responseFormat
         ? r

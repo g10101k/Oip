@@ -1,4 +1,5 @@
 services:
+  
   postgres:
     image: postgres:16.3
     environment:
@@ -53,6 +54,26 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+  
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    ports:
+      - "8123:8123"  # HTTP interface
+      - "9001:9000"  # Native protocol
+      - "9009:9009"  # Interserver communication
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    environment:
+      - TZ=UTC
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=admin
+      - CLICKHOUSE_PASSWORD=P@ssw0rd
+    networks:
+      - bridge-network
 
 networks:
   backend-network: { }
@@ -62,4 +83,5 @@ networks:
 volumes:
   postgres-data:
   pgadmin-data:
-  pgadminhome-data:    
+  pgadminhome-data:
+  clickhouse_data:

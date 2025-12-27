@@ -4,10 +4,31 @@ import {
   LogoutAuthOptions,
   OidcSecurityService,
   PublicEventsService,
-  EventTypes
-} from "angular-auth-oidc-client";
-import { BehaviorSubject, Observable } from "rxjs";
-import { filter, map } from "rxjs/operators";
+  EventTypes,
+  AuthOptions
+} from 'angular-auth-oidc-client';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+
+export abstract class SecurityService {
+  abstract auth(): void;
+
+  abstract logout(): void;
+
+  abstract isAuthenticated(): Observable<boolean>;
+
+  abstract getAccessToken(): Observable<string>;
+
+  abstract isTokenExpired(): Observable<boolean>;
+
+  abstract getCurrentUser(): any;
+
+  abstract forceRefreshSession(): Observable<LoginResponse>;
+
+  abstract isAdmin(): boolean;
+
+  abstract authorize(configId?: string, authOptions?: AuthOptions): void;
+}
 
 /**
  * SecurityService extends OidcSecurityService to manage authentication,
@@ -16,8 +37,8 @@ import { filter, map } from "rxjs/operators";
  * It provides helper methods for checking authentication, managing tokens,
  * determining user roles, and performing logout and refresh operations.
  */
-@Injectable({ providedIn: 'root' })
-export class SecurityService extends OidcSecurityService implements OnDestroy {
+@Injectable()
+export class KeycloakSecurityService extends OidcSecurityService implements OnDestroy, SecurityService {
   /**
    * Handles angular OIDC events.
    */
@@ -26,12 +47,12 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
   /**
    * Stores the latest login response from checkAuth().
    */
-  loginResponse = new BehaviorSubject<LoginResponse>(null);
+  private loginResponse = new BehaviorSubject<LoginResponse>(null);
 
   /**
    * Stores the decoded access token payload.
    */
-  payload = new BehaviorSubject<any>(null);
+  private payload = new BehaviorSubject<any>(null);
 
   /**
    * Stores user-specific data from the login response.
@@ -44,11 +65,16 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    */
   constructor() {
     super();
-    this.publicEventsService.registerForEvents()
-      .pipe(filter(event => event.type === EventTypes.NewAuthenticationResult))
+    this.publicEventsService
+      .registerForEvents()
+      .pipe(filter((event) => event.type === EventTypes.NewAuthenticationResult))
       .subscribe(() => {
-        this.auth()
+        this.auth();
       });
+  }
+
+  getCurrentUser() {
+    return this.userData;
   }
 
   /**
@@ -56,9 +82,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    * @returns A string with the id token.
    */
   override getAccessToken(): Observable<string> {
-    return this.loginResponse.pipe(
-      map(data => data?.accessToken)
-    );
+    return this.loginResponse.pipe(map((data) => data?.accessToken));
   }
 
   /**
@@ -66,7 +90,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    *
    * @returns {boolean} True if the user is an admin, false otherwise.
    */
-  get isAdmin(): boolean {
+  isAdmin(): boolean {
     return this.payload.getValue()?.realm_access?.roles?.includes('admin');
   }
 
@@ -78,10 +102,9 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
     super.checkAuth().subscribe((_response: LoginResponse) => {
       this.loginResponse.next(_response);
       this.userData = _response.userData;
-      this.getPayloadFromAccessToken().subscribe(_token => {
-          this.payload.next(_token);
-        }
-      );
+      this.getPayloadFromAccessToken().subscribe((_token) => {
+        this.payload.next(_token);
+      });
     });
   }
 
@@ -92,7 +115,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
    * @param {LogoutAuthOptions} [logoutAuthOptions] Optional logout options.
    */
   logout(configId?: string, logoutAuthOptions?: LogoutAuthOptions) {
-    this.logoff(configId, logoutAuthOptions).subscribe(x => this.payload.next(x));
+    this.logoff(configId, logoutAuthOptions).subscribe((x) => this.payload.next(x));
   }
 
   /**
@@ -112,6 +135,7 @@ export class SecurityService extends OidcSecurityService implements OnDestroy {
     return this.getPayloadFromAccessToken().pipe(
       map((payload) => {
         return payload.exp < Math.floor(Date.now() / 1000);
-      }));
+      })
+    );
   }
 }

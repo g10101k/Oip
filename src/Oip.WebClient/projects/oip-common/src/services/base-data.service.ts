@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { lastValueFrom, Observable } from 'rxjs';
-
 
 /**
  * BaseDataService provides a unified interface for sending HTTP requests
@@ -33,7 +32,7 @@ export class BaseDataService {
     method: 'GET' | 'PUT' | 'POST' | 'DELETE' = 'GET',
     data: any = {}
   ): Promise<TResponse> {
-    const httpOptions = { withCredentials: true};
+    const httpOptions = { withCredentials: true };
     let result: Observable<TResponse>;
 
     switch (method) {
@@ -47,12 +46,11 @@ export class BaseDataService {
         result = this.http.post<TResponse>(url, data, httpOptions);
         break;
       case 'DELETE':
-        result = this.http.request<TResponse>('DELETE', url,
-          {
-            body: data,
-            headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-            withCredentials: true
-          });
+        result = this.http.request<TResponse>('DELETE', url, {
+          body: data,
+          headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+          withCredentials: true
+        });
         break;
     }
 
@@ -65,12 +63,12 @@ export class BaseDataService {
    * @param url - The target URL for the GET request.
    * @returns A promise that resolves to a Object response.
    */
-  getBlob(url: string): Promise<Object> {
+  getBlob(url: string): Promise<object> {
     const httpOptions = {
       responseType: 'blob' as 'json',
-      withCredentials: true,
+      withCredentials: true
     };
-    let result = this.http.get(url, httpOptions);
+    const result = this.http.get(url, httpOptions);
     return lastValueFrom(result);
   }
 }

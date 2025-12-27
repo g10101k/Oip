@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BaseDataService } from "./base-data.service";
-import { SecurityDto } from "../dtos/security.dto";
-import { PutSecurityDto } from "../dtos/put-security.dto";
+import { BaseDataService } from './base-data.service';
+import { SecurityDto } from '../dtos/security.dto';
+import { PutSecurityDto } from '../dtos/put-security.dto';
 
 @Injectable()
 export class SecurityDataService extends BaseDataService {

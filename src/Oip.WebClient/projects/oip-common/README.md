@@ -1,24 +1,66 @@
 # OipCommon
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 19.0.0.
+Add assets in angular.json
 
-## Code scaffolding
+```json
+{
+  "glob": "**/*",
+  "input": "node_modules/oip-common/assets",
+  "output": "/assets"
+}
+```
 
-Run `ng generate component component-name --project oip-common` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project oip-common`.
-> Note: Don't forget to add `--project oip-common` or else it will be added to the default project in your `angular.json` file. 
+Add tailwind config
 
-## Build
+```js
+const primeui = require("tailwindcss-primeui");
+module.exports = {
+  /* Your config */
+  content: [, /* Your config */ "./node_modules/oip-common/**/*.{html,ts,scss,css,js,mjs}"]
+  /* Your config */
+};
+```
 
-Run `ng build oip-common` to build the project. The build artifacts will be stored in the `dist/` directory.
+Add scss
 
-## Publishing
+```sass
+@use "../../../node_modules/oip-common/assets/oip-common";
+```
 
-After building your library with `ng build oip-common`, go to the dist folder `cd dist/oip-common` and run `npm publish`.
+Init L10nService to AppComponent
 
-## Running unit tests
+```ts
+import { Component, inject, OnInit } from '@angular/core';
+import { SecurityService } from 'oip-common';
+import { RouterOutlet } from '@angular/router';
+import { ToastModule } from 'primeng/toast';
+import { L10nService } from '../../../oip-common/src/services/l10n.service';
 
-Run `ng test oip-common` to execute the unit tests via [Karma](https://karma-runner.github.io).
+@Component({
+  selector: 'app-root',
+  template: `
+    <p-toast/>
+    <router-outlet></router-outlet>
+  `,
+  standalone: true,
+  imports: [ToastModule, RouterOutlet]
+})
+export class AppComponent implements OnInit {
+  private readonly securityService = inject(SecurityService);
+  private readonly translateService = inject(L10nService);
 
-## Further help
+  ngOnInit() {
+    this.securityService.auth();
+    this.translateService.init([{
+      code: 'en',
+      name: "English",
+      icon: "flag flag-gb"
+    }, {
+      code: 'ru',
+      name: "Русский",
+      icon: "flag flag-ru"
+    }]);
+  }
+}
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```

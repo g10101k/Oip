@@ -5,6 +5,7 @@
   "semi": true,
   "printWidth": 120,
   "bracketSameLine": true,
+  "endOfLine": "crlf",
   "overrides": [
     {
       "files": [

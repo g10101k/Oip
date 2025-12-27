@@ -3,3 +3,6 @@ package-lock.json
 dist/
 build/
 .coverage
+projects/oip/src/api/
+projects/oip-common/src/api/
+projects/oip-common/src/user-api/

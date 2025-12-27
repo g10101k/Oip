@@ -1,5 +1,5 @@
 import { AbstractSecurityStorage } from 'angular-auth-oidc-client';
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 
 @Injectable()
 export class SecurityStorageService implements AbstractSecurityStorage {

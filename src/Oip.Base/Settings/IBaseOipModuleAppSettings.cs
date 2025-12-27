@@ -1,4 +1,5 @@
 using Oip.Settings;
+using Oip.Settings.Attributes;
 
 namespace Oip.Base.Settings;
 
@@ -13,17 +14,25 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     string OipUrls { get; set; }
 
     /// <summary>
-    /// OpenAPI settings
+    /// Collection of OpenAPI specification configurations for the application
     /// </summary>
+    [NotSaveToDb]
     OpenApiSettings OpenApi { get; set; }
 
     /// <summary>
-    /// Open telemetry settings
+    /// Spa proxy server settings
     /// </summary>
-    OpenTelemetrySettings Telemetry { get; set; }
+    [NotSaveToDb]
+    SpaDevelopmentServerSettings SpaProxyServer { get; set; }
 
     /// <summary>
     /// Security Service Settings
     /// </summary>
+    [NotSaveToDb]
     SecurityServiceSettings SecurityService { get; set; }
 }
+
+/// <summary>
+/// Contains OpenAPI/Swagger configuration items for the application
+/// </summary>
+public class OpenApiSettings : List<OpenApiItem>;

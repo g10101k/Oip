@@ -1,21 +1,13 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  effect,
-  inject,
-  OnDestroy,
-  OnInit,
-  signal,
-  WritableSignal,
-} from '@angular/core';
-import { TopBarDto } from '../dtos/top-bar.dto'
-import { TopBarService } from '../services/top-bar.service'
-import { MsgService } from "../services/msg.service";
-import { ActivatedRoute } from "@angular/router";
-import { BaseDataService } from "../services/base-data.service";
-import { TranslateService } from "@ngx-translate/core";
-import { Subject, Subscription } from "rxjs";
-import { AppTitleService } from "../services/app-title.service";
+import { ChangeDetectorRef, Component, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { TopBarDto } from '../dtos/top-bar.dto';
+import { TopBarService } from '../services/top-bar.service';
+import { MsgService } from '../services/msg.service';
+import { ActivatedRoute } from '@angular/router';
+import { BaseDataService } from '../services/base-data.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Subject, Subscription } from 'rxjs';
+import { AppTitleService } from '../services/app-title.service';
+import { LayoutService } from'../services/app.layout.service';
 
 interface BaseComponentLocalization {
   security: string;
@@ -25,6 +17,11 @@ interface BaseComponentLocalization {
 
 @Component({ standalone: true, template: '' })
 export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSettings> implements OnInit, OnDestroy {
+
+  /**
+   * Provide access to app settings
+   */
+  public readonly layoutService = inject(LayoutService);
   /**
    * Provides access to topbar related functionality, such as managing visibility and content.
    * @type {TopBarService}
@@ -108,7 +105,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     if (Object.keys(this.localSettings()).length > 0) {
       this._localSettings = { ...this.localSettings() };
       this.localSettingsUpdate.next(this._localSettings);
-      localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this._localSettings))
+      localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this._localSettings));
     }
   }
 
@@ -119,7 +116,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
         this.localSettings.set(JSON.parse(localStorageSettingsString) as TLocalStoreSettings);
       }
     } catch (error) {
-      this.msgService.error(error, "Error parsing layoutConfig:");
+      this.msgService.error(error, 'Error parsing layoutConfig:');
       this.localSettings.set({} as TLocalStoreSettings);
     }
   }
@@ -163,10 +160,10 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   /**
    * Defines the top bar items.
    */
-  public topBarItems: TopBarDto [] = [
+  public topBarItems: TopBarDto[] = [
     { id: 'content', icon: 'pi-box', caption: '' },
     { id: 'settings', icon: 'pi-cog', caption: '' },
-    { id: 'security', icon: 'pi-lock', caption: '' },
+    { id: 'security', icon: 'pi-lock', caption: '' }
   ];
 
   /**
@@ -179,15 +176,18 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
         this.onConfigUpdate();
       }
     });
-    this.subscriptions.push(this.route.url.subscribe(url => {
-      this.controller = url[0].path;
-    }));
-    this.subscriptions.push(this.route.paramMap.subscribe(params => {
-      this.id = +params.get('id');
-      this.getLocalStorageSettings();
-    }));
+    this.subscriptions.push(
+      this.route.url.subscribe((url) => {
+        this.controller = url[0].path;
+      })
+    );
+    this.subscriptions.push(
+      this.route.paramMap.subscribe((params) => {
+        this.id = +params.get('id');
+        this.getLocalStorageSettings();
+      })
+    );
   }
-
 
   /**
    * Lifecycle hook that is called when a component is destroyed.
@@ -198,7 +198,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   ngOnDestroy() {
     this.topBarService.setTopBarItems([]);
     this.topBarService.activeId = this.topBarItems[0].id;
-    this.subscriptions.forEach(s => s.unsubscribe());
+    this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
   /**
@@ -221,10 +221,12 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
 
     await this.getSettings();
 
-    this.subscriptions.push(this.appTitleService.title$.subscribe(title => {
-      this.title = title;
-      this.changeDetectorRef.detectChanges();
-    }));
+    this.subscriptions.push(
+      this.appTitleService.title$.subscribe((title) => {
+        this.title = title;
+        this.changeDetectorRef.detectChanges();
+      })
+    );
   }
 
   /**
@@ -233,7 +235,9 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    */
   async getSettings(): Promise<void> {
     try {
-      this.settings = await this.baseDataService.sendRequest<TBackendStoreSettings>(`${this.baseDataService.baseUrl}api/${this.controller}/get-module-instance-settings?id=${this.id}`);
+      this.settings = await this.baseDataService.sendRequest<TBackendStoreSettings>(
+        `${this.baseDataService.baseUrl}api/${this.controller}/get-module-instance-settings?id=${this.id}`
+      );
     } catch (error) {
       this.msgService.error(error);
     }
@@ -245,13 +249,16 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @return {Promise<void>} A promise that resolves when the settings are saved. Reject if an error occurs.
    */
   async saveSettings(settings: TBackendStoreSettings): Promise<void> {
-    await this.baseDataService.sendRequest(`api/${this.controller}/put-module-instance-settings`, 'PUT', {
-      id: this.id,
-      settings: settings
-    }).then(() => {
-      this.msgService.success(this.translateService.instant('baseComponent.success'));
-    }).catch(error => {
-      this.msgService.error(error);
-    });
+    await this.baseDataService
+      .sendRequest(`api/${this.controller}/put-module-instance-settings`, 'PUT', {
+        id: this.id,
+        settings: settings
+      })
+      .then(() => {
+        this.msgService.success(this.translateService.instant('baseComponent.success'));
+      })
+      .catch((error) => {
+        this.msgService.error(error);
+      });
   }
 }

@@ -10,22 +10,54 @@
  * ---------------------------------------------------------------
  */
 
-/** DTO for create module instance */
+/** Data Transfer Object for creating a new module instance */
 export interface AddModuleInstanceDto {
+  /** The identifier of the module to create an instance of */
   moduleId?: number;
+  /** The display label for the module instance */
   label?: string | null;
+  /** The icon identifier for the module instance (optional) */
   icon?: string | null;
+  /** The parent module instance identifier (optional) */
   parentId?: number | null;
+  /** Array of role identifiers that can view this module instance (optional) */
   viewRoles?: string[] | null;
 }
 
-/** DTO for edit module instance */
+/** Standardized response format for API exceptions */
+export interface ApiExceptionResponse {
+  /** User-friendly title of the exception */
+  title?: string | null;
+  /** Detailed description of the error */
+  message?: string | null;
+  /** HTTP status code associated with the exception */
+  statusCode?: number;
+  /** Stack trace information (optional, typically omitted in production) */
+  stackTrace?: string | null;
+}
+
+/** Data Transfer Object for editing an existing module instance */
 export interface EditModuleInstanceDto {
+  /** The identifier of the module instance to edit */
   moduleInstanceId?: number;
+  /** The updated display label for the module instance */
   label?: string | null;
+  /** The updated icon identifier for the module instance (optional) */
   icon?: string | null;
+  /** The updated parent module instance identifier (optional) */
   parentId?: number | null;
+  /** Updated array of role identifiers that can view this module instance (optional) */
   viewRoles?: string[] | null;
+}
+
+/** Data transfer object representing a module and its loaded status. */
+export interface ExistModuleDto {
+  /** Gets or sets the unique identifier of the module. */
+  moduleId?: number;
+  /** Gets or sets the name of the module. */
+  name?: string | null;
+  /** Gets or sets a value indicating whether the module is currently loaded in the application. */
+  currentlyLoaded?: boolean;
 }
 
 /** Module settings. */
@@ -34,9 +66,9 @@ export interface FolderModuleSettings {
   html?: string | null;
 }
 
-/** Save settings request */
+/** Represents a request to save module instance settings. */
 export interface FolderModuleSettingsSaveSettingsRequest {
-  /** Module instance id */
+  /** Gets or sets the ID of the module instance. */
   id?: number;
   /** Module settings. */
   settings?: FolderModuleSettings;
@@ -62,13 +94,7 @@ export interface GetKeycloakClientSettingsResponse {
   secureRoutes?: string[] | null;
 }
 
-/** Response for module federation */
-export interface GetManifestResponse {
-  /** Base Url */
-  baseUrl?: string | null;
-}
-
-/** Int Key Value DTO */
+/** Represents a key-value pair where the key is an integer and the value is a string. */
 export interface IntKeyValueDto {
   key?: number;
   value?: string | null;
@@ -112,6 +138,8 @@ export interface ModuleInstanceDto {
   settings?: string | null;
   /** Child module instances. */
   items?: ModuleInstanceDto[] | null;
+  /** Securities */
+  securities?: string[] | null;
 }
 
 /** Module security DTO */
@@ -130,14 +158,6 @@ export interface PutSecurityRequest {
   securities?: SecurityResponse[] | null;
 }
 
-/** Dto module */
-export interface RegisterModuleDto {
-  /** See 'name' in webpack.config.js */
-  name?: string | null;
-  /** Base Url */
-  baseUrl?: string | null;
-}
-
 /** Security dto */
 export interface SecurityResponse {
   /** Code */
@@ -151,21 +171,16 @@ export interface SecurityResponse {
 }
 
 export interface FolderModuleGetSecurityParams {
+  /** The ID of the module instance. */
   id?: number;
 }
 
 export interface FolderModuleGetModuleInstanceSettingsParams {
+  /** The ID of the module instance. */
   id?: number;
 }
 
 export interface MenuDeleteModuleInstanceParams {
+  /** The unique identifier of the module instance to delete. */
   id?: number;
-}
-
-export interface UserProfileGetUserPhotoParams {
-  email?: string;
-}
-
-export interface UserProfilePostUserPhotoPayload {
-  files?: File;
 }

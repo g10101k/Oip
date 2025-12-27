@@ -12,6 +12,7 @@
 
 import { Injectable } from "@angular/core";
 import {
+  ApiExceptionResponse,
   DashboardGetModuleInstanceSettingsParams,
   DashboardGetSecurityParams,
   DashboardSettingsSaveSettingsRequest,
@@ -20,32 +21,15 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
+@Injectable()
 export class DashboardModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
-   *
-   * @tags DashboardModule
-   * @name dashboardGetModuleRights
-   * @request GET:/api/dashboard/get-module-rights
-   * @secure
-   */
-  dashboardGetModuleRights = (params: RequestParams = {}) =>
-    this.request<SecurityResponse[], any>({
-      path: `/api/dashboard/get-module-rights`,
-      method: "GET",
-      secure: true,
-      format: "json",
-      ...params,
-    });
-  /**
-   * No description
+   * @description Gets the security configuration for the specified module instance ID.
    *
    * @tags DashboardModule
    * @name dashboardGetSecurity
-   * @summary Get security for instance id
    * @request GET:/api/dashboard/get-security
    * @secure
    */
@@ -53,7 +37,7 @@ export class DashboardModule<
     query: DashboardGetSecurityParams,
     params: RequestParams = {},
   ) =>
-    this.request<SecurityResponse[], any>({
+    this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/dashboard/get-security`,
       method: "GET",
       query: query,
@@ -62,11 +46,10 @@ export class DashboardModule<
       ...params,
     });
   /**
-   * No description
+   * @description Updates the security configuration for the specified module instance.
    *
    * @tags DashboardModule
    * @name dashboardPutSecurity
-   * @summary Update security
    * @request PUT:/api/dashboard/put-security
    * @secure
    */
@@ -74,7 +57,7 @@ export class DashboardModule<
     data: PutSecurityRequest,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/dashboard/put-security`,
       method: "PUT",
       body: data,
@@ -83,11 +66,10 @@ export class DashboardModule<
       ...params,
     });
   /**
-   * No description
+   * @description Gets the settings for the specified module instance.
    *
    * @tags DashboardModule
    * @name dashboardGetModuleInstanceSettings
-   * @summary Get instance setting
    * @request GET:/api/dashboard/get-module-instance-settings
    * @secure
    */
@@ -95,11 +77,12 @@ export class DashboardModule<
     query: DashboardGetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<any, ApiExceptionResponse>({
       path: `/api/dashboard/get-module-instance-settings`,
       method: "GET",
       query: query,
       secure: true,
+      format: "json",
       ...params,
     });
   /**
@@ -114,12 +97,28 @@ export class DashboardModule<
     data: DashboardSettingsSaveSettingsRequest,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/dashboard/put-module-instance-settings`,
       method: "PUT",
       body: data,
       secure: true,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Gets the list of security rights supported by the module.
+   *
+   * @tags DashboardModule
+   * @name dashboardGetModuleRights
+   * @request GET:/api/dashboard/get-module-rights
+   * @secure
+   */
+  dashboardGetModuleRights = (params: RequestParams = {}) =>
+    this.request<SecurityResponse[], ApiExceptionResponse>({
+      path: `/api/dashboard/get-module-rights`,
+      method: "GET",
+      secure: true,
+      format: "json",
       ...params,
     });
 }

@@ -8,14 +8,14 @@ namespace Oip.Settings;
 public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
 {
     /// <inheritdoc />
-    public string OipUrls { get; set; } = default!;
+    public string OipUrls { get; set; } = null!;
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();
 
     /// <inheritdoc />
-    public OpenTelemetrySettings Telemetry { get; set; } = new();
+    public SpaDevelopmentServerSettings SpaProxyServer { get; set; } = new();
 
     /// <inheritdoc />
     public SecurityServiceSettings SecurityService { get; set; } = new();
-};
+}

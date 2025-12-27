@@ -11,24 +11,28 @@
  */
 
 import { Injectable } from "@angular/core";
-import { ModuleDeleteRequest, ModuleDto } from "./data-contracts";
+import {
+  ApiExceptionResponse,
+  ExistModuleDto,
+  ModuleDeleteRequest,
+  ModuleDto,
+} from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
+@Injectable()
 export class Module<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description Retrieves all modules stored in the system.
    *
    * @tags Module
    * @name moduleGetAll
-   * @summary Get all modules
    * @request GET:/api/module/get-all
    * @secure
    */
   moduleGetAll = (params: RequestParams = {}) =>
-    this.request<ModuleDto[], any>({
+    this.request<ModuleDto[], ApiExceptionResponse>({
       path: `/api/module/get-all`,
       method: "GET",
       secure: true,
@@ -36,16 +40,15 @@ export class Module<
       ...params,
     });
   /**
-   * No description
+   * @description Inserts a new module into the system.
    *
    * @tags Module
    * @name moduleInsert
-   * @summary Insert
    * @request POST:/api/module/insert
    * @secure
    */
   moduleInsert = (data: ModuleDto, params: RequestParams = {}) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/module/insert`,
       method: "POST",
       body: data,
@@ -54,16 +57,15 @@ export class Module<
       ...params,
     });
   /**
-   * No description
+   * @description Deletes a module by its identifier.
    *
    * @tags Module
    * @name moduleDelete
-   * @summary delete
    * @request DELETE:/api/module/delete
    * @secure
    */
   moduleDelete = (data: ModuleDeleteRequest, params: RequestParams = {}) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/module/delete`,
       method: "DELETE",
       body: data,
@@ -72,16 +74,15 @@ export class Module<
       ...params,
     });
   /**
-   * @description This endpoint is restricted to users with administrative privileges. It aggregates module data from the database and compares it against the currently loaded modules in the application context, returning a combined view with load status flags.
+   * @description Returns all registered modules and indicates whether each one is currently loaded into the application.
    *
    * @tags Module
    * @name moduleGetModulesWithLoadStatus
-   * @summary Returns a list of all registered modules and indicates whether each one is currently loaded into the application.
    * @request GET:/api/module/get-modules-with-load-status
    * @secure
    */
   moduleGetModulesWithLoadStatus = (params: RequestParams = {}) =>
-    this.request<ModuleDto[], any>({
+    this.request<ExistModuleDto[], ApiExceptionResponse>({
       path: `/api/module/get-modules-with-load-status`,
       method: "GET",
       secure: true,

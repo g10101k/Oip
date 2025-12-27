@@ -1,20 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Base.Constants;
-using Oip.Base.Controllers;
-using Oip.Base.Controllers.Api;
-using Oip.Base.Data.Repositories;
+using Oip.Api.Controllers;
+using Oip.Api.Controllers.Api;
+using Oip.Base.Exceptions;
 using Oip.Controllers.Api;
+using Oip.Data.Constants;
+using Oip.Data.Repositories;
 using Oip.Properties;
 
 namespace Oip.Controllers;
 
 /// <summary>
-/// Module controller example
+/// Controller for managing weather forecast data.
 /// </summary>
 [ApiController]
 [Route("api/weather-forecast-module")]
-public class WeatherForecastModuleController : BaseModuleController<WeatherModuleSettings>
+public class WeatherForecastModuleController(ModuleRepository moduleRepository)
+    : BaseModuleController<WeatherModuleSettings>(moduleRepository)
 {
     private readonly string[] _summaries =
     [
@@ -30,24 +32,21 @@ public class WeatherForecastModuleController : BaseModuleController<WeatherModul
         Resources.WeatherForecastController_Summaries_Scorching
     ];
 
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="moduleRepository"></param>
-    public WeatherForecastModuleController(ModuleRepository moduleRepository) : base(moduleRepository)
-    {
-    }
 
     /// <summary>
-    /// Get example data
+    /// Retrieves example weather forecast data.
     /// </summary>
     /// <param name="dayCount"></param>
     /// <returns></returns>
     [HttpGet("get-weather-forecast")]
     [Authorize]
     [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult Get(int dayCount)
     {
+        if (new Random().Next(0, 4) == 0)
+            throw new ApiException("Error!", "Random exception", 3535);
+
         return Ok(Enumerable.Range(1, dayCount).Select(index => new WeatherForecastResponse
             {
                 Date = DateTime.Now.AddDays(index),
@@ -74,9 +73,9 @@ public class WeatherForecastModuleController : BaseModuleController<WeatherModul
             },
             new()
             {
-                Code = SecurityConstants.Edit, 
+                Code = SecurityConstants.Edit,
                 Name = Resources.WeatherForecastController_GetModuleRights_Edit,
-                Description = Resources.WeatherForecastController_GetModuleRights_Can_edit_data, 
+                Description = Resources.WeatherForecastController_GetModuleRights_Can_edit_data,
                 Roles = [SecurityConstants.AdminRole]
             },
             new()

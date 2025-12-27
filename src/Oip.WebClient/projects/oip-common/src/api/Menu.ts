@@ -20,16 +20,15 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
+@Injectable()
 export class Menu<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description Retrieves the menu available to the current authenticated user.
    *
    * @tags Menu
    * @name menuGet
-   * @summary Get menu for client app
    * @request GET:/api/menu/get
    * @secure
    */
@@ -42,11 +41,10 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Retrieves the admin-specific menu.
    *
    * @tags Menu
    * @name menuGetAdminMenu
-   * @summary Get admin menu for client app
    * @request GET:/api/menu/get-admin-menu
    * @secure
    */
@@ -59,11 +57,10 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Retrieves all available modules in the system.
    *
    * @tags Menu
    * @name menuGetModules
-   * @summary Get admin menu for client app
    * @request GET:/api/menu/get-modules
    * @secure
    */
@@ -76,11 +73,10 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Adds a new module instance to the system.
    *
    * @tags Menu
    * @name menuAddModuleInstance
-   * @summary Add new module
    * @request POST:/api/menu/add-module-instance
    * @secure
    */
@@ -97,11 +93,10 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Edits an existing module instance.
    *
    * @tags Menu
    * @name menuEditModuleInstance
-   * @summary Add new module
    * @request POST:/api/menu/edit-module-instance
    * @secure
    */
@@ -118,11 +113,10 @@ export class Menu<
       ...params,
     });
   /**
-   * No description
+   * @description Deletes a module instance by its identifier.
    *
    * @tags Menu
    * @name menuDeleteModuleInstance
-   * @summary Add new module
    * @request DELETE:/api/menu/delete-module-instance
    * @secure
    */

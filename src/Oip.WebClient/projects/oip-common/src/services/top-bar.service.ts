@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TopBarDto } from "../dtos/top-bar.dto";
+import { TopBarDto } from '../dtos/top-bar.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -26,12 +26,10 @@ export class TopBarService {
 
   set activeId(value: string | undefined) {
     this._activeId = value;
-    if (this.activeTopBarItem?.click)
-      this.activeTopBarItem.click();
+    if (this.activeTopBarItem?.click) this.activeTopBarItem.click();
   }
 
-  constructor() {
-  }
+  constructor() {}
 
   // Set tob bar items
   setTopBarItems(items: TopBarDto[]) {
@@ -39,11 +37,8 @@ export class TopBarService {
   }
 
   checkId(id: string): boolean {
-    if (this.activeTopBarItem === undefined && id === 'content')
-      return true;
-    if (this.activeTopBarItem === undefined)
-      return false;
+    if (this.activeTopBarItem === undefined && id === 'content') return true;
+    if (this.activeTopBarItem === undefined) return false;
     return this.activeTopBarItem.id == id;
   }
 }
-

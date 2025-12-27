@@ -1,12 +1,16 @@
 {
   "name": "oip-common",
-  "version": "0.0.1",
-  "peerDependencies": {
-    "@angular/common": "^17.0.0",
-    "@angular/core": "^17.0.0"
-  },
-  "dependencies": {
-    "tslib": "^2.3.0"
-  },
-  "sideEffects": false
+  "version": "0.0.18",
+  "description": "A template for cross-platform web applications based on sakai-ng and primeNG",
+  "main": "index.js",
+  "keywords": [
+    "oip",
+    "template"
+  ],
+  "author": "Igor Tyulyakov aka g101k",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/g10101k/Oip.git"
+  }
 }

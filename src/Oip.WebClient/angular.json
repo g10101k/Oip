@@ -29,8 +29,8 @@
               "projects/oip/src/assets",
               {
                 "glob": "**/*",
-                "input": "./projects/oip-common/src/assets",
-                "output": "/assets/"
+                "input": "node_modules/oip-common/assets",
+                "output": "/assets"
               }
             ],
             "styles": [
@@ -82,8 +82,8 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "publicHost": "https://localhost:50000",
-            "port": 50000,
+            "publicHost": "https://localhost:50002",
+            "port": 50002,
             "headers": {
               "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50001;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
               "Access-Control-Allow-Origin": "*",
@@ -122,14 +122,246 @@
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": [
-              "projects/oip/src/**",
-              "projects/oip/src/**"
+              "projects/**"
             ]
           },
           "configurations": {
             "strict": {
               "strict": true
             }
+          }
+        }
+      }
+    },
+    "oip-rtds": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/oip-rtds",
+      "sourceRoot": "projects/oip-rtds/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/oip-rtds",
+            "index": "projects/oip-rtds/src/index.html",
+            "main": "projects/oip-rtds/src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "projects/oip-rtds/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/oip-rtds/src/assets",
+              {
+                "glob": "**/*",
+                "input": "./projects/oip-common/src/assets",
+                "output": "/assets/"
+              }
+            ],
+            "styles": [
+              "projects/oip-rtds/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/oip-rtds/src/environments/environment.ts",
+                  "with": "projects/oip-rtds/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "oip-rtds:build:production"
+            },
+            "development": {
+              "buildTarget": "oip-rtds:build:development",
+              "proxyConfig": "proxy.conf.js"
+            }
+          },
+          "defaultConfiguration": "development",
+          "options": {
+            "publicHost": "https://localhost:50003",
+            "port": 50003,
+            "headers": {
+              "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50001;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "oip-rtds:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/oip-rtds/src/test.ts",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "projects/oip-rtds/tsconfig.spec.json",
+            "karmaConfig": "projects/oip-rtds/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/oip-rtds/src/favicon.ico",
+              "projects/oip-rtds/src/assets"
+            ],
+            "styles": [
+              "projects/oip-rtds/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    },
+    "oip-users": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/oip-users",
+      "sourceRoot": "projects/oip-users/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/oip-users",
+            "index": "projects/oip-users/src/index.html",
+            "main": "projects/oip-users/src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "projects/oip-users/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/oip-users/src/assets",
+              {
+                "glob": "**/*",
+                "input": "./projects/oip-common/src/assets",
+                "output": "/assets/"
+              }
+            ],
+            "styles": [
+              "projects/oip-users/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/oip-users/src/environments/environment.ts",
+                  "with": "projects/oip-users/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "oip-users:build:production"
+            },
+            "development": {
+              "buildTarget": "oip-users:build:development",
+              "proxyConfig": "proxy.conf.js"
+            }
+          },
+          "defaultConfiguration": "development",
+          "options": {
+            "publicHost": "https://localhost:50005",
+            "port": 50005,
+            "headers": {
+              "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50001;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "oip-users:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/oip-users/src/test.ts",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "projects/oip-users/tsconfig.spec.json",
+            "karmaConfig": "projects/oip-users/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/oip-users/src/assets"
+            ],
+            "styles": [
+              "projects/oip-users/src/styles.scss"
+            ],
+            "scripts": []
           }
         }
       }

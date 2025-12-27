@@ -16,8 +16,9 @@
   left: calc(50vw - 75px);
 }
 
-.preloader-content:before, .preloader-content:after {
-  content: '';
+.preloader-content:before,
+.preloader-content:after {
+  content: "";
   border: 1em solid var(--primary-color);
   border-radius: 50%;
   width: inherit;

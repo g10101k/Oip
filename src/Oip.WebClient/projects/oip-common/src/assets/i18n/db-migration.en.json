@@ -1,0 +1,19 @@
+{
+  "db-migration": {
+    "migrationManager": "Migration manager",
+    "actions": {
+      "refresh": "Refresh",
+      "cleanFilter": "Clean filter",
+      "applyMigration": "Apply migration"
+    },
+    "columns": {
+      "name": "Migration name",
+      "applied": "Applied",
+      "exist": "Exist",
+      "pending": "Pending"
+    },
+    "messages": {
+      "errorRefreshing": "Error refreshing database"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { OpenIdConfiguration, StsConfigHttpLoader } from 'angular-auth-oidc-client';
+import { GetKeycloakClientSettingsResponse } from '../api/data-contracts';
 
 /**
  * Load keycloak settings from backend and save to sessionStorage
@@ -11,13 +12,13 @@ export const httpLoaderAuthFactory = (httpClient: HttpClient) => {
   const KEYCLOAK_SETTINGS_KEY = 'keycloak-client-settings';
   const settingsStings = sessionStorage.getItem(KEYCLOAK_SETTINGS_KEY);
   if (settingsStings) {
-    const config$ = new Observable<any>((subscribe) => {
+    const config$ = new Observable<GetKeycloakClientSettingsResponse>((subscribe) => {
       subscribe.next(JSON.parse(settingsStings));
     });
     return new StsConfigHttpLoader(config$);
   } else {
-    const config$ = httpClient.get<any>(`api/security/get-keycloak-client-settings`).pipe(
-      map((config: any) => {
+    const config$ = httpClient.get<GetKeycloakClientSettingsResponse>(`api/security/get-keycloak-client-settings`).pipe(
+      map((config: GetKeycloakClientSettingsResponse) => {
         const authConfig: OpenIdConfiguration = {
           authority: config.authority,
           redirectUrl: window.location.origin,

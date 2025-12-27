@@ -1,4 +1,4 @@
-@use './mixins' as *;
+@use "./mixins" as *;
 
 .layout-sidebar {
   position: fixed;
@@ -8,8 +8,9 @@
   overflow-y: auto;
   user-select: none;
 
-  transition: transform var(--layout-section-transition-duration),
-  left var(--layout-section-transition-duration);
+  transition:
+    transform var(--layout-section-transition-duration),
+    left var(--layout-section-transition-duration);
   background-color: var(--surface-overlay);
   border-radius: var(--content-border-radius);
   padding: 4.5rem 1.5rem;
@@ -66,8 +67,9 @@
       cursor: pointer;
       padding: 0.75rem 1rem;
       border-radius: var(--content-border-radius);
-      transition: background-color var(--element-transition-duration),
-      box-shadow var(--element-transition-duration);
+      transition:
+        background-color var(--element-transition-duration),
+        box-shadow var(--element-transition-duration);
 
       .layout-menuitem-icon {
         margin-right: 0.5rem;

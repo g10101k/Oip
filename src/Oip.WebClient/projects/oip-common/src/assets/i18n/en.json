@@ -1,0 +1,74 @@
+{
+  "msgService": {
+    "success": "Success",
+    "info": "Info",
+    "warn": "Warm",
+    "error": "Error",
+    "secondary": "Secondary"
+  },
+  "securityComponent": {
+    "security": "Security",
+    "save": "Save",
+    "savedSecurity": "Saved security"
+  },
+  "profileComponent": {
+    "changePhoto": "Change Photo",
+    "successfullyUploaded": "Successfully uploaded"
+  },
+  "baseComponent": {
+    "content": "Content",
+    "settings": "Settings",
+    "security": "Security",
+    "success": "Save successfully"
+  },
+  "menuComponent": {
+    "new": "New"
+  },
+  "menuItemEditDialogComponent": {
+    "header": "Edit menu item",
+    "parentLabel": "Parent",
+    "label": "Label",
+    "module": "Module",
+    "selectModule": "",
+    "icon": "Icon",
+    "cancel": "Cancel",
+    "save": "Save",
+    "security": "Security - read"
+  },
+  "menuItemCreateDialogComponent": {
+    "header": "Create new menu item",
+    "parentLabel": "Parent",
+    "label": "Label",
+    "module": "Module",
+    "selectModule": "Select module",
+    "icon": "Icon",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "menuItemComponent": {
+    "new": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteItemConfirmHeader": "Delete",
+    "deleteItemConfirmMessage": "Are you sure you want to delete the item?",
+    "deleteItemSuccessMessage": "Successfully deleted",
+    "deleteItemConfirmRejectButtonPropsLabel": "Cancel",
+    "deleteItemConfirmAcceptButtonPropsLabel": "Delete"
+  },
+  "unauthorized": {
+    "welcomeToOip": "Welcome to OIP!",
+    "signInToContinue": "Sign in to continue",
+    "signIn": "Sign In"
+  },
+  "app-configurator": {
+    "primary": "Primary",
+    "surface": "Surface",
+    "presets": "Presets",
+    "menuMode": "Menu Mode"
+  },
+  "topbar": {
+    "logout": "Logout",
+    "profile": "Profile"
+  },
+  "primeng": ""
+}

@@ -1,5 +1,6 @@
 import { Injectable, effect, signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
+import { convertToPrimeNgDateFormat } from '../helpers/date.helper';
 
 export interface AppConfig {
   preset?: string;
@@ -8,6 +9,10 @@ export interface AppConfig {
   darkTheme?: boolean;
   menuMode?: string;
   language?: string;
+  dateFormat: string;
+  timeFormat: string;
+  dateTimeFormat: string;
+  timeZone: string;
 }
 
 interface LayoutState {
@@ -23,7 +28,7 @@ interface MenuChangeEvent {
   routeEvent?: boolean;
 }
 
-@Injectable({  providedIn: 'root' })
+@Injectable({ providedIn: 'root' })
 export class LayoutService {
   _config: AppConfig = this.getAppConfigFromStorage();
 
@@ -69,6 +74,32 @@ export class LayoutService {
 
   language = computed(() => this.layoutConfig().language);
 
+  dateFormat = computed(() => this.layoutConfig().dateFormat);
+
+  primeNgDateFormat = computed(() => convertToPrimeNgDateFormat(this.layoutConfig().dateFormat));
+
+  timeFormat = computed(() => this.layoutConfig().timeFormat);
+
+  dateTimeFormat = computed(() => `${this.layoutConfig().dateFormat} ${this.layoutConfig().timeFormat}`);
+
+  monthFormat = computed(() => {
+    const reDay = /d+/i;
+    const reDelimiter = /^[^\w]|[^\w]$|([^\w])\1+/;
+    const ngDateFormat = convertToPrimeNgDateFormat(this.layoutConfig().dateFormat);
+    const ngDate = ngDateFormat.replace(reDay, '');
+    const dateGroups = ngDate.match(reDelimiter);
+    if (Array.isArray(dateGroups) && dateGroups.length > 1) {
+      return dateGroups[1] !== undefined
+        ? ngDate.replace(dateGroups[0], '')
+        : ngDate.startsWith(dateGroups[0])
+          ? ngDate.substring(1)
+          : ngDate.substring(0, ngDate.length - 1);
+    }
+    return ngDateFormat;
+  });
+
+  timeZone = computed(() => this.layoutConfig().timeZone);
+
   transitionComplete = signal<boolean>(false);
 
   private initialized = false;
@@ -98,9 +129,11 @@ export class LayoutService {
    * @returns AppConfig
    */
   private getAppConfigFromStorage(): AppConfig {
-    let appConfigUiString = localStorage.getItem('layoutConfig');
+    const appConfigUiString = localStorage.getItem('layoutConfig');
     if (appConfigUiString != null) {
-      return JSON.parse(appConfigUiString) as AppConfig;
+      const config = JSON.parse(appConfigUiString) as AppConfig;
+      config.timeZone ??= Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return config;
     }
     return {
       preset: 'Aura',
@@ -108,8 +141,12 @@ export class LayoutService {
       surface: null,
       darkTheme: false,
       menuMode: 'static',
-      language: 'en'
-    } ;
+      language: 'ru',
+      dateFormat: 'yyyy-MM-dd',
+      timeFormat: 'HH:mm:ss',
+      dateTimeFormat: 'yyyy-MM-dd HH:mm:ss',
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+    };
   }
 
   private handleDarkModeTransition(config: AppConfig): void {
@@ -159,9 +196,15 @@ export class LayoutService {
     }
 
     if (this.isDesktop()) {
-      this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive }));
+      this.layoutState.update((prev) => ({
+        ...prev,
+        staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive
+      }));
     } else {
-      this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: !this.layoutState().staticMenuMobileActive }));
+      this.layoutState.update((prev) => ({
+        ...prev,
+        staticMenuMobileActive: !this.layoutState().staticMenuMobileActive
+      }));
 
       if (this.layoutState().staticMenuMobileActive) {
         this.overlayOpen.next(null);
@@ -180,7 +223,7 @@ export class LayoutService {
   onConfigUpdate() {
     this._config = { ...this.layoutConfig() };
     this.configUpdate.next(this.layoutConfig());
-    localStorage.setItem('layoutConfig', JSON.stringify(this.layoutConfig()))
+    localStorage.setItem('layoutConfig', JSON.stringify(this.layoutConfig()));
   }
 
   onMenuStateChange(event: MenuChangeEvent) {

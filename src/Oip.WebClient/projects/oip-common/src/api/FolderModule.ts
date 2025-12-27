@@ -12,6 +12,7 @@
 
 import { Injectable } from "@angular/core";
 import {
+  ApiExceptionResponse,
   FolderModuleGetModuleInstanceSettingsParams,
   FolderModuleGetSecurityParams,
   FolderModuleSettingsSaveSettingsRequest,
@@ -20,12 +21,12 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-@Injectable({ providedIn: "root" })
+@Injectable()
 export class FolderModule<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description Returns a list of rights (permissions) required to access the folder module.
    *
    * @tags FolderModule
    * @name folderModuleGetModuleRights
@@ -33,7 +34,7 @@ export class FolderModule<
    * @secure
    */
   folderModuleGetModuleRights = (params: RequestParams = {}) =>
-    this.request<SecurityResponse[], any>({
+    this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/folder-module/get-module-rights`,
       method: "GET",
       secure: true,
@@ -41,11 +42,10 @@ export class FolderModule<
       ...params,
     });
   /**
-   * No description
+   * @description Gets the security configuration for the specified module instance ID.
    *
    * @tags FolderModule
    * @name folderModuleGetSecurity
-   * @summary Get security for instance id
    * @request GET:/api/folder-module/get-security
    * @secure
    */
@@ -53,7 +53,7 @@ export class FolderModule<
     query: FolderModuleGetSecurityParams,
     params: RequestParams = {},
   ) =>
-    this.request<SecurityResponse[], any>({
+    this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/folder-module/get-security`,
       method: "GET",
       query: query,
@@ -62,11 +62,10 @@ export class FolderModule<
       ...params,
     });
   /**
-   * No description
+   * @description Updates the security configuration for the specified module instance.
    *
    * @tags FolderModule
    * @name folderModulePutSecurity
-   * @summary Update security
    * @request PUT:/api/folder-module/put-security
    * @secure
    */
@@ -74,7 +73,7 @@ export class FolderModule<
     data: PutSecurityRequest,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/folder-module/put-security`,
       method: "PUT",
       body: data,
@@ -83,11 +82,10 @@ export class FolderModule<
       ...params,
     });
   /**
-   * No description
+   * @description Gets the settings for the specified module instance.
    *
    * @tags FolderModule
    * @name folderModuleGetModuleInstanceSettings
-   * @summary Get instance setting
    * @request GET:/api/folder-module/get-module-instance-settings
    * @secure
    */
@@ -95,11 +93,12 @@ export class FolderModule<
     query: FolderModuleGetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<any, ApiExceptionResponse>({
       path: `/api/folder-module/get-module-instance-settings`,
       method: "GET",
       query: query,
       secure: true,
+      format: "json",
       ...params,
     });
   /**
@@ -114,7 +113,7 @@ export class FolderModule<
     data: FolderModuleSettingsSaveSettingsRequest,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/folder-module/put-module-instance-settings`,
       method: "PUT",
       body: data,

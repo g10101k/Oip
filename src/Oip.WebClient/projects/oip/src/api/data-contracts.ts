@@ -10,44 +10,30 @@
  * ---------------------------------------------------------------
  */
 
-/** Represents a request to apply a specific migration. */
-export interface ApplyMigrationRequest {
-  /** The name of the migration to apply. */
-  name?: string | null;
+/** Standardized response format for API exceptions */
+export interface ApiExceptionResponse {
+  /** User-friendly title of the exception */
+  title?: string | null;
+  /** Detailed description of the error */
+  message?: string | null;
+  /** HTTP status code associated with the exception */
+  statusCode?: number;
+  /** Stack trace information (optional, typically omitted in production) */
+  stackTrace?: string | null;
 }
 
 /** Settings */
 export interface DashboardSettings {
-  /** Just for example */
+  /** Just, for example */
   nothing?: string | null;
 }
 
-/** Save settings request */
+/** Represents a request to save module instance settings. */
 export interface DashboardSettingsSaveSettingsRequest {
-  /** Module instance id */
+  /** Gets or sets the ID of the module instance. */
   id?: number;
   /** Settings */
   settings?: DashboardSettings;
-}
-
-/** DTO represents a migration status. */
-export interface MigrationDto {
-  /** Name of the migration. */
-  name?: string | null;
-  /** Indicates whether the migration has been applied to the database. */
-  applied?: boolean;
-  /** Indicates whether the migration is pending application. */
-  pending?: boolean;
-  /** Indicates whether the migration exists. */
-  exist?: boolean;
-}
-
-/** Save settings request */
-export interface ObjectSaveSettingsRequest {
-  /** Module instance id */
-  id?: number;
-  /** Settings */
-  settings?: any;
 }
 
 /** Put security dto */
@@ -88,27 +74,21 @@ export interface WeatherModuleSettings {
   dayCount?: number;
 }
 
-/** Save settings request */
+/** Represents a request to save module instance settings. */
 export interface WeatherModuleSettingsSaveSettingsRequest {
-  /** Module instance id */
+  /** Gets or sets the ID of the module instance. */
   id?: number;
   /** Module settings */
   settings?: WeatherModuleSettings;
 }
 
 export interface DashboardGetSecurityParams {
+  /** The ID of the module instance. */
   id?: number;
 }
 
 export interface DashboardGetModuleInstanceSettingsParams {
-  id?: number;
-}
-
-export interface DbMigrationGetSecurityParams {
-  id?: number;
-}
-
-export interface DbMigrationGetModuleInstanceSettingsParams {
+  /** The ID of the module instance. */
   id?: number;
 }
 
@@ -117,9 +97,11 @@ export interface WeatherForecastModuleGetWeatherForecastParams {
 }
 
 export interface WeatherForecastModuleGetSecurityParams {
+  /** The ID of the module instance. */
   id?: number;
 }
 
 export interface WeatherForecastModuleGetModuleInstanceSettingsParams {
+  /** The ID of the module instance. */
   id?: number;
 }

@@ -6,7 +6,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
-import { AppFloatingConfigurator } from '../../app.floatingconfigurator';
+import { AppFloatingConfiguratorComponent } from '../../app-floating-configurator.component';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +19,7 @@ import { AppFloatingConfigurator } from '../../app.floatingconfigurator';
     FormsModule,
     RouterModule,
     RippleModule,
-    AppFloatingConfigurator
+    AppFloatingConfiguratorComponent
   ],
   template: `
     <app-floating-configurator />
@@ -111,7 +111,7 @@ import { AppFloatingConfigurator } from '../../app.floatingconfigurator';
     </div>
   `
 })
-export class Login {
+export class LoginComponent {
   email: string = '';
 
   password: string = '';

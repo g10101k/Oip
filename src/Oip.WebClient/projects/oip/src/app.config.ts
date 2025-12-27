@@ -12,14 +12,16 @@ import {
   SecurityStorageService,
   UserService,
   langIntercept,
-  httpLoaderAuthFactory
-} from "oip-common";
-import { LocationStrategy, PathLocationStrategy } from "@angular/common";
-import { ProductService } from "./app/service/product.service";
-import { MessageService } from "primeng/api";
-import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
-import { TranslateHttpLoader } from "@ngx-translate/http-loader";
-import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from "angular-auth-oidc-client";
+  httpLoaderAuthFactory,
+  SecurityService,
+  KeycloakSecurityService
+} from 'oip-common';
+import { LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { ProductService } from './app/service/product.service';
+import { MessageService } from 'primeng/api';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
@@ -27,32 +29,39 @@ const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: Http
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(withInterceptors([authInterceptor(), langIntercept]), withFetch()),
+    provideAuth({
+      loader: {
+        provide: StsConfigLoader,
+        useFactory: httpLoaderAuthFactory,
+        deps: [HttpClient]
+      }
+    }),
+    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     { provide: LocationStrategy, useClass: PathLocationStrategy },
+    { provide: SecurityService, useClass: KeycloakSecurityService },
     ProductService,
     AuthGuardService,
     MessageService,
     SecurityDataService,
     BaseDataService,
     UserService,
-    importProvidersFrom([TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: httpLoaderFactory,
-        deps: [HttpClient],
-      },
-    })]),
-    provideAuth({
-      loader: {
-        provide: StsConfigLoader,
-        useFactory: httpLoaderAuthFactory,
-        deps: [HttpClient],
-      },
-    }),
-    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
-    provideRouter(appRoutes, withInMemoryScrolling({
-      anchorScrolling: 'enabled',
-      scrollPositionRestoration: 'enabled'
-    }), withEnabledBlockingInitialNavigation()),
+    importProvidersFrom([
+      TranslateModule.forRoot({
+        loader: {
+          provide: TranslateLoader,
+          useFactory: httpLoaderFactory,
+          deps: [HttpClient]
+        }
+      })
+    ]),
+    provideRouter(
+      appRoutes,
+      withInMemoryScrolling({
+        anchorScrolling: 'enabled',
+        scrollPositionRestoration: 'enabled'
+      }),
+      withEnabledBlockingInitialNavigation()
+    ),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
@@ -64,4 +73,3 @@ export const appConfig: ApplicationConfig = {
     })
   ]
 };
-

@@ -1,28 +1,21 @@
 import { Component, inject } from '@angular/core';
-import { FileUploadModule } from "primeng/fileupload";
-import { ImageModule } from "primeng/image";
-import { AvatarModule } from "primeng/avatar";
-import { MsgService, UserService } from "oip-common";
-import { TranslatePipe, TranslateService } from "@ngx-translate/core";
+import { FileUploadModule } from 'primeng/fileupload';
+import { ImageModule } from 'primeng/image';
+import { AvatarModule } from 'primeng/avatar';
+import { MsgService } from '../services/msg.service';
+import { UserService } from '../services/user.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'user-profile',
   standalone: true,
-  imports: [
-    FileUploadModule,
-    ImageModule,
-    ImageModule,
-    FileUploadModule,
-    ImageModule,
-    AvatarModule,
-    TranslatePipe
-  ],
+  imports: [FileUploadModule, ImageModule, ImageModule, FileUploadModule, ImageModule, AvatarModule, TranslatePipe],
   template: `
     <p-avatar
+      class="mr-2"
       id="oip-user-profile-photo-avatar"
       shape="circle"
       size="xlarge"
-      styleClass="mr-2"
       [image]="userService.photoLoaded ? userService.photo : null" />
     <div class="mt-2">
       <p-fileupload
