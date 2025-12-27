@@ -20,6 +20,7 @@ export class L10nService {
   private translateService = inject(TranslateService);
   private readonly primeNg = inject(PrimeNG);
   private readonly layoutService = inject(LayoutService);
+  public availableLanguages: LanguageDto[];
 
   /**
    * Loads translations for a specific component
@@ -81,9 +82,10 @@ export class L10nService {
     this.translateService.use(selectedLanguage);
   }
 
-  init(langs: string[]) {
-    this.translateService.addLangs(langs);
-    const lang = /en|ru/.exec(this.layoutService.language()) ? this.layoutService.language() : 'en';
+  init(languages: LanguageDto[]) {
+    this.availableLanguages = languages;
+    this.translateService.addLangs(languages.map(x=>x.code));
+    const lang = this.layoutService.language() ? this.layoutService.language() : 'en';
     this.translateService.setDefaultLang(lang);
     this.translateService.use(lang);
     this.loadComponentTranslations('app-info');
