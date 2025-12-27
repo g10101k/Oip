@@ -1,8 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { SecurityService } from 'oip-common';
+import { SecurityService, L10nService } from 'oip-common';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
-import { L10nService } from '../../../oip-common/src/services/l10n.service';
 
 @Component({
   selector: 'app-root',

@@ -1,14 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { LayoutService, SecurityService } from 'oip-common';
+import { SecurityService, L10nService } from 'oip-common';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
-import { TranslateService } from '@ngx-translate/core';
-import { PrimeNG } from 'primeng/config';
 
 @Component({
   selector: 'app-root',
   template: `
-    <p-toast />
+    <p-toast/>
     <router-outlet></router-outlet>
   `,
   standalone: true,
@@ -16,20 +14,18 @@ import { PrimeNG } from 'primeng/config';
 })
 export class AppComponent implements OnInit {
   private readonly securityService = inject(SecurityService);
-  private readonly translateService = inject(TranslateService);
-  private readonly primeNg = inject(PrimeNG);
-  private readonly layoutService = inject(LayoutService);
+  private readonly translateService = inject(L10nService);
 
   ngOnInit() {
-    this.translateService.addLangs(['en', 'ru']);
-    const lang = /en|ru/.exec(this.layoutService.language()) ? this.layoutService.language() : 'en';
-    this.translateService.setDefaultLang(lang);
-    this.translate(lang);
     this.securityService.auth();
-  }
-
-  translate(lang: string) {
-    this.translateService.use(lang);
-    this.translateService.get('primeng').subscribe((res) => this.primeNg.setTranslation(res));
+    this.translateService.init([{
+      code: 'en',
+      name: "English",
+      icon: "flag flag-gb"
+    }, {
+      code: 'ru',
+      name: "Русский",
+      icon: "flag flag-ru"
+    }]);
   }
 }
