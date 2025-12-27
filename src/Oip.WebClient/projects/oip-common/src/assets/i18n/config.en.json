@@ -1,14 +1,17 @@
 {
   "config": {
-    "profile": "Profile",
-    "photo": "Photo",
-    "usePhoto256x256Pixel": "Use a 256x256 pixel photo",
-    "localization": "Language",
-    "selectLanguage": "Select language",
-    "all": "Show all menu",
-    "moduleManagement": "Module management",
-    "modules": "Modules",
+    "all": "All",
+    "dateFormat": "Date format",
+    "dateTimeFormat": "Date and time format:",
+    "goTo": "Go to",
+    "localization": "Localization",
     "menu": "Menu",
-    "goTo": "Go to"
+    "moduleManagement": "Module management",
+    "photo": "Photo",
+    "profile": "Profile",
+    "selectLanguage": "Select language",
+    "timeFormat": "Time format",
+    "timeZone": "Time zone",
+    "usePhoto256x256Pixel": "Use photo 256x256 pixel"
   }
 }
