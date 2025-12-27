@@ -35,7 +35,7 @@ export { MenuService } from './services/app.menu.service';
 export { UserService } from './services/user.service';
 export { SecurityStorageService } from './services/security-storage.service';
 export { L10nService, LanguageDto } from './services/l10n.service';
-
+export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './services/logo.service';
 // Events
 export { MenuChangeEvent } from './events/menu-change.event';
 
