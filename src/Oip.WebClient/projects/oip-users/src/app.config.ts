@@ -12,7 +12,9 @@ import {
   UserService,
   langIntercept,
   httpLoaderAuthFactory,
-  SecurityService, KeycloakSecurityService, SecurityStorageService
+  SecurityService,
+  KeycloakSecurityService,
+  SecurityStorageService
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { MessageService } from 'primeng/api';

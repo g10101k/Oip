@@ -1,8 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { InterpolationParameters, TranslateService, Translation, TranslationObject } from '@ngx-translate/core';
-import { LayoutService } from "./app.layout.service";
-import { PrimeNG } from "primeng/config";
+import { LayoutService } from './app.layout.service';
+import { PrimeNG } from 'primeng/config';
+
+export interface LanguageDto {
+  code: string;
+  name: string;
+  icon: string;
+}
 
 /**
  * Service for managing translation loading in the application
@@ -49,20 +55,16 @@ export class L10nService {
 
     try {
       // Load translation file from assets
-      this.httpClient.get(`./assets/i18n/${component}.${lang}.json`).subscribe(
-        (translations) => {
-          // Get existing translations for the language
-          const current = this.translateService.translations[lang] || {};
+      this.httpClient.get(`./assets/i18n/${component}.${lang}.json`).subscribe((translations) => {
+        // Get existing translations for the language
+        const current = this.translateService.translations[lang] || {};
 
-          // Merge new translations with existing ones
-          this.translateService.setTranslation(lang, { ...current, ...translations }, true);
+        // Merge new translations with existing ones
+        this.translateService.setTranslation(lang, { ...current, ...translations }, true);
 
-          // Mark these translations as loaded
-          this.loadedTranslations.add(key);
-        }
-      );
-
-
+        // Mark these translations as loaded
+        this.loadedTranslations.add(key);
+      });
     } catch (e) {
       console.warn(`No translations found for ${component}.${lang}.json`);
       console.error(e);
@@ -76,7 +78,7 @@ export class L10nService {
     if (key) {
       this.get(key);
     }
-    this.translateService.use(selectedLanguage)
+    this.translateService.use(selectedLanguage);
   }
 
   init(langs: string[]) {

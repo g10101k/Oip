@@ -1,15 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { LayoutService, SecurityService } from 'oip-common';
+import { SecurityService } from 'oip-common';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
-import { TranslateService } from '@ngx-translate/core';
-import { PrimeNG } from 'primeng/config';
-import { L10nService } from "../../../oip-common/src/services/l10n.service";
+import { L10nService } from '../../../oip-common/src/services/l10n.service';
 
 @Component({
   selector: 'app-root',
   template: `
-    <p-toast/>
+    <p-toast />
     <router-outlet></router-outlet>
   `,
   standalone: true,

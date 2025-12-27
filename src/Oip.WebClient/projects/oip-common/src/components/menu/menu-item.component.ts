@@ -34,7 +34,7 @@ interface MenuItemComponentTranslation {
   selector: '[app-menuitem]',
   template: `
     <ng-container>
-      <p-confirm-dialog/>
+      <p-confirm-dialog />
       <div
         *ngIf="root && item.visible !== false"
         class="layout-menuitem-root-text"

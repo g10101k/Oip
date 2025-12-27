@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { LogoComponent } from './logo.component';
-import { TranslatePipe } from "@ngx-translate/core";
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-footer',
@@ -16,5 +16,4 @@ import { TranslatePipe } from "@ngx-translate/core";
   standalone: true,
   imports: [LogoComponent, TranslatePipe]
 })
-export class FooterComponent {
-}
+export class FooterComponent {}

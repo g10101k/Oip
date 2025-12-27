@@ -11,8 +11,8 @@ import { Tooltip } from 'primeng/tooltip';
 import { BaseModuleComponent } from './base-module.component';
 import { NoSettingsDto } from '../dtos/no-settings.dto';
 import { SecurityComponent } from './security.component';
-import { L10nService } from "../services/l10n.service";
-import { TranslatePipe } from "@ngx-translate/core";
+import { L10nService } from '../services/l10n.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export interface MigrationDto {
   name: string;
@@ -43,24 +43,24 @@ export interface ApplyMigrationRequest {
   template: `
     @if (isContent) {
       <div class="card" style="height: 100%">
-        <p-confirmDialog/>
+        <p-confirmDialog />
         <div>
           <h5>{{ 'db-migration.migrationManager' | translate }}</h5>
           <div class="flex flex-row gap-2">
             <p-button
               icon="pi pi-refresh"
-              [pTooltip]="'db-migration.actions.refresh' | translate"
               severity="secondary"
               tooltipPosition="bottom"
               [outlined]="true"
-              (click)="refreshAction()"/>
+              [pTooltip]="'db-migration.actions.refresh' | translate"
+              (click)="refreshAction()" />
             <p-button
               icon="pi pi-filter-slash"
-              [pTooltip]="'db-migration.actions.cleanFilter' | translate"
               severity="secondary"
               tooltipPosition="bottom"
               [outlined]="true"
-              (click)="dt.clear()"/>
+              [pTooltip]="'db-migration.actions.cleanFilter' | translate"
+              (click)="dt.clear()" />
           </div>
           <div>
             <p-table #dt dataKey="name" editMode="row" size="small" [scrollable]="true" [value]="data">
@@ -68,7 +68,7 @@ export interface ApplyMigrationRequest {
                 <tr>
                   <th pSortableColumn="name" scope="col">
                     {{ 'db-migration.columns.name' | translate }}
-                    <p-columnFilter display="menu" field="name" type="text"/>
+                    <p-columnFilter display="menu" field="name" type="text" />
                   </th>
                   <th scope="col">{{ 'db-migration.columns.applied' | translate }}</th>
                   <th scope="col">{{ 'db-migration.columns.exist' | translate }}</th>
@@ -84,17 +84,12 @@ export interface ApplyMigrationRequest {
                   </td>
                   <td>
                     @if (rowData.applied) {
-                      <p-button
-                        icon="pi pi-check"
-                        severity="success"
-                        [rounded]="true"
-                        [text]="true">
-                      </p-button>
+                      <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true"> </p-button>
                     }
                   </td>
                   <td>
                     @if (rowData.exist) {
-                      <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true"/>
+                      <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true" />
                     }
                   </td>
                   <td>
@@ -106,7 +101,7 @@ export interface ApplyMigrationRequest {
                     <p-button
                       icon="pi pi-bolt"
                       pCancelEditableRow
-                      pTooltip="{{'db-migration.actions.applyMigration' | translate}}"
+                      pTooltip="{{ 'db-migration.actions.applyMigration' | translate }}"
                       severity="secondary"
                       tooltipPosition="left"
                       [rounded]="true"
@@ -121,14 +116,15 @@ export interface ApplyMigrationRequest {
         </div>
       </div>
     } @else if (isSecurity) {
-      <security [controller]="controller" [id]="id"/>
+      <security [controller]="controller" [id]="id" />
     }
   `,
   providers: [ConfirmationService]
 })
 export class DbMigrationComponent
   extends BaseModuleComponent<NoSettingsDto, NoSettingsDto>
-  implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy
+{
   data: MigrationDto[];
   l10nService = inject(L10nService);
 

@@ -12,7 +12,7 @@ import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.compone
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
 import { Menu } from '../../api/Menu';
-import { L10nService } from "../../services/l10n.service";
+import { L10nService } from '../../services/l10n.service';
 
 @Component({
   imports: [
@@ -28,8 +28,7 @@ import { L10nService } from "../../services/l10n.service";
   providers: [Menu],
   selector: 'app-menu',
   standalone: true,
-  template: `
-    <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
+  template: ` <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
       <ul class="layout-menu">
         @for (item of menuService.menu; track item; let i = $index) {
           <ng-container>
@@ -49,10 +48,10 @@ import { L10nService } from "../../services/l10n.service";
         }
       </ul>
     </div>
-    <p-contextMenu [target]="empty"/>
+    <p-contextMenu [target]="empty" />
     @if (securityService.isAdmin) {
-      <menu-item-create-dialog/>
-      <menu-item-edit-dialog/>
+      <menu-item-create-dialog />
+      <menu-item-edit-dialog />
     }`
 })
 export class MenuComponent implements OnInit {
@@ -65,7 +64,6 @@ export class MenuComponent implements OnInit {
 
   ngOnInit() {
     this.menuService.loadMenu().then();
-
   }
 
   private newClick(e: MenuItemCommandEvent) {

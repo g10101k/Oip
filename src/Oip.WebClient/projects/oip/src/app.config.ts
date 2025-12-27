@@ -12,7 +12,9 @@ import {
   SecurityStorageService,
   UserService,
   langIntercept,
-  httpLoaderAuthFactory, SecurityService, KeycloakSecurityService
+  httpLoaderAuthFactory,
+  SecurityService,
+  KeycloakSecurityService
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ProductService } from './app/service/product.service';
