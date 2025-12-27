@@ -4,12 +4,11 @@ import { LogoComponent } from './logo.component';
 import { Button } from 'primeng/button';
 import { AppFloatingConfiguratorComponent } from './app-floating-configurator.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { L10nService } from "../services/l10n.service";
+import { L10nService } from '../services/l10n.service';
 
 @Component({
   selector: 'app-notfound',
-  template: `
-    <app-floating-configurator/>
+  template: ` <app-floating-configurator />
     <div class="flex items-center justify-center min-h-screen overflow-hidden">
       <div class="flex flex-col items-center justify-center">
         <div
@@ -21,9 +20,11 @@ import { L10nService } from "../services/l10n.service";
               <logo [height]="96" [width]="96"></logo>
             </div>
             <span class="text-primary font-bold text-3xl">{{ 'notfound.errorCode' | translate }}</span>
-            <h1 class="text-surface-900 dark:text-surface-0 font-bold text-3xl lg:text-5xl mb-2">{{ 'notfound.title' | translate }}</h1>
+            <h1 class="text-surface-900 dark:text-surface-0 font-bold text-3xl lg:text-5xl mb-2">
+              {{ 'notfound.title' | translate }}
+            </h1>
             <div class="text-surface-600 dark:text-surface-200 mb-8">{{ 'notfound.description' | translate }}</div>
-            <p-button id="oip-app-notfound-go-to-home-button" [label]="'notfound.button' | translate" routerLink="/"/>
+            <p-button id="oip-app-notfound-go-to-home-button" routerLink="/" [label]="'notfound.button' | translate" />
           </div>
         </div>
       </div>
@@ -32,7 +33,6 @@ import { L10nService } from "../services/l10n.service";
   standalone: true
 })
 export class NotfoundComponent {
-
   constructor(l10nService: L10nService) {
     l10nService.get('notfound');
   }

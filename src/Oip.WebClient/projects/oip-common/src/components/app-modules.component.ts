@@ -13,7 +13,7 @@ import { L10nService } from '../services/l10n.service';
 import { Module } from '../api/Module';
 import { ModuleDto } from '../api/data-contracts';
 import { AppTitleService } from '../services/app-title.service';
-import { TranslatePipe } from "@ngx-translate/core";
+import { TranslatePipe } from '@ngx-translate/core';
 
 interface L10n {
   confirm: {
@@ -76,7 +76,9 @@ interface L10n {
               <td>
                 <p-tag
                   [severity]="module.currentlyLoaded ? 'success' : 'danger'"
-                  [value]="(module.currentlyLoaded ? 'app-modules.table.yes' : 'app-modules.table.no') | translate"></p-tag>
+                  [value]="
+                    (module.currentlyLoaded ? 'app-modules.table.yes' : 'app-modules.table.no') | translate
+                  "></p-tag>
               </td>
               <td>
                 <p-button

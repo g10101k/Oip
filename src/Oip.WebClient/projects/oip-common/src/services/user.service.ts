@@ -31,7 +31,7 @@ export class UserService {
    */
   get shortLabel(): string {
     const data = this.securityService.getCurrentUser();
-    return (data) ? data.given_name[0] + data.family_name[0] : "";
+    return data ? data.given_name[0] + data.family_name[0] : '';
   }
 
   get userName(): string {

@@ -4,11 +4,11 @@ import {
   LogoutAuthOptions,
   OidcSecurityService,
   PublicEventsService,
-  EventTypes, AuthOptions
+  EventTypes,
+  AuthOptions
 } from 'angular-auth-oidc-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-
 
 export abstract class SecurityService {
   abstract auth(): void;
@@ -17,7 +17,7 @@ export abstract class SecurityService {
 
   abstract isAuthenticated(): Observable<boolean>;
 
-  abstract getAccessToken(): Observable<string>
+  abstract getAccessToken(): Observable<string>;
 
   abstract isTokenExpired(): Observable<boolean>;
 
@@ -25,11 +25,10 @@ export abstract class SecurityService {
 
   abstract forceRefreshSession(): Observable<LoginResponse>;
 
-  abstract isAdmin(): boolean
+  abstract isAdmin(): boolean;
 
   abstract authorize(configId?: string, authOptions?: AuthOptions): void;
 }
-
 
 /**
  * SecurityService extends OidcSecurityService to manage authentication,
@@ -140,5 +139,3 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
     );
   }
 }
-
-
