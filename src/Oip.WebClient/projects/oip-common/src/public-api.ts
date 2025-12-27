@@ -34,7 +34,7 @@ export { AppConfig, LayoutService } from './services/app.layout.service';
 export { MenuService } from './services/app.menu.service';
 export { UserService } from './services/user.service';
 export { SecurityStorageService } from './services/security-storage.service';
-export { L10nService } from './services/l10n.service';
+export { L10nService, LanguageDto } from './services/l10n.service';
 
 // Events
 export { MenuChangeEvent } from './events/menu-change.event';
