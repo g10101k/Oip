@@ -1,6 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ProfileComponent } from './profile.component';
-import { Fluid } from 'primeng/fluid';
 import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -14,7 +13,7 @@ import { MenuService } from '../services/app.menu.service';
 import { Button } from 'primeng/button';
 import { L10nService } from '../services/l10n.service';
 import { SelectItem } from 'primeng/api';
-import { TranslatePipe } from "@ngx-translate/core";
+import { TranslatePipe } from '@ngx-translate/core';
 
 interface L10n {
   menu: string;
@@ -31,74 +30,118 @@ interface L10n {
 @Component({
   selector: 'app-config',
   template: `
-    <p-fluid>
-      <div class="flex flex-col md:flex-row gap-4">
-        <div class="md:w-1/2">
-          <div class="card flex flex-col gap-4">
-            <div class="font-semibold text-xl">{{ 'config.profile' | translate }}</div>
-            <div class="flex justify-content-end flex-wrap">
-              {{ userService.userName }}
-            </div>
-            <label>
-              {{ 'config.photo' | translate }}
-              <span
-                class="pi pi-question-circle"
-                pTooltip="{{ 'config.usePhoto256x256Pixel' | translate }}"
-                tooltipPosition="right"></span>
-            </label>
-            <div class="flex justify-content-end flex-wrap">
-              <user-profile></user-profile>
-            </div>
+    <div class="flex flex-col md:flex-row gap-4">
+      <div class="md:w-1/2">
+        <div class="card flex flex-col gap-4">
+          <div class="font-semibold text-xl">{{ 'config.profile' | translate }}</div>
+          <div class="flex justify-content-end flex-wrap">
+            {{ userService.userName }}
+          </div>
+          <label>
+            {{ 'config.photo' | translate }}
+            <span
+              class="pi pi-question-circle"
+              pTooltip="{{ 'config.usePhoto256x256Pixel' | translate }}"
+              tooltipPosition="right"></span>
+          </label>
+          <div class="flex justify-content-end flex-wrap">
+            <user-profile></user-profile>
           </div>
         </div>
-        <div class="md:w-1/2">
-          <div class="card flex flex-col gap-4">
-            <div class="font-semibold text-xl">{{ 'config.localization' | translate }}</div>
-            <label> {{ 'config.selectLanguage' | translate }} </label>
-            <div class="flex justify-content-end flex-wrap">
-              <p-select
-                class="w-full md:w-56"
-                id="oip-app-config-language-select"
-                optionLabel="label"
-                optionValue="value"
-                [options]="languages"
-                [(ngModel)]="selectedLanguage"
-                (onChange)="changeLanguage()"/>
-            </div>
-          </div>
-        </div>
-        @if (securityService.isAdmin()) {
-          <div class="md:w-1/2">
-            <div class="card flex flex-col gap-4">
-              <div class="font-semibold text-xl">{{ 'config.menu' | translate }}</div>
-              <div class="flex items-center gap-2">
-                <label for="oip-app-config-admin-mode">{{ 'config.all' | translate }}</label>
-                <p-toggle-switch
-                  id="oip-app-config-admin-mode"
-                  [(ngModel)]="menuService.adminMode"
-                  (onChange)="onSwitchChange()"></p-toggle-switch>
-              </div>
-              <div class="flex items-center gap-2">
-                <label for="oip-app-config-admin-mode">{{ 'config.moduleManagement' | translate }}</label>
-                <p-button icon="pi pi-cog" label="{{ 'config.goTo' | translate  }}" routerLink="/modules"/>
-              </div>
-            </div>
-          </div>
-        }
       </div>
-    </p-fluid>
+      <div class="md:w-1/2">
+        <div class="card flex flex-col gap-4">
+          <div class="font-semibold text-xl">{{ 'config.localization' | translate }}</div>
+          <label> {{ 'config.selectLanguage' | translate }} </label>
+          <div class="flex justify-content-end flex-wrap">
+            <p-select
+              class="w-full md:w-56"
+              optionLabel="label"
+              optionValue="value"
+              qa-id="oip-app-config-language-select"
+              [options]="languages"
+              [(ngModel)]="selectedLanguage"
+              (onChange)="changeLanguage()" />
+          </div>
+          <div class="flex flex-col gap-5">
+            <div class="mt-5">Формат даты и времени:</div>
+            <p-select
+              class="w-full md:w-56"
+              placeholder="Шаблон даты"
+              qa-id="oip-app-config-date-format-select"
+              [options]="dateFormats"
+              [(ngModel)]="selectedDateFormat"
+              (onChange)="changeDateFormat()" />
+            <p-select
+              class="w-full md:w-56"
+              placeholder="Формат времени"
+              qa-id="oip-app-config-time-format-select"
+              [options]="timeFormats"
+              [(ngModel)]="selectedTimeFormat"
+              (onChange)="changeTimeFormat()" />
+            <div class="mt-5">Часовой пояс:</div>
+            <p-select
+              class="w-full md:w-56"
+              placeholder="Часовой пояс"
+              qa-id="oip-app-config-timezone-select"
+              [filter]="true"
+              [options]="allTimeZones"
+              [virtualScroll]="true"
+              [virtualScrollItemSize]="34"
+              [(ngModel)]="selectedTimeZone"
+              (onChange)="changeTimeZone()" />
+          </div>
+        </div>
+      </div>
+      @if (securityService.isAdmin()) {
+        <div class="md:w-1/2">
+          <div class="card flex flex-col gap-4">
+            <div class="font-semibold text-xl">{{ 'config.menu' | translate }}</div>
+            <div class="flex items-center gap-2">
+              <label for="oip-app-config-admin-mode">{{ 'config.all' | translate }}</label>
+              <p-toggle-switch
+                id="oip-app-config-admin-mode"
+                [(ngModel)]="menuService.adminMode"
+                (onChange)="onSwitchChange()"></p-toggle-switch>
+            </div>
+            <div class="flex items-center gap-2">
+              <label for="oip-app-config-admin-mode">{{ 'config.moduleManagement' | translate }}</label>
+              <p-button icon="pi pi-cog" label="{{ 'config.goTo' | translate }}" routerLink="/modules" />
+            </div>
+          </div>
+        </div>
+      }
+    </div>
   `,
-  imports: [ProfileComponent, Fluid, Tooltip, FormsModule, Select, TableModule, ToggleSwitchModule, RouterLink, Button, TranslatePipe]
+  imports: [
+    ProfileComponent,
+    Tooltip,
+    FormsModule,
+    Select,
+    TableModule,
+    TranslatePipe,
+    ToggleSwitchModule,
+    Button,
+    RouterLink
+  ]
 })
-export class ConfigComponent implements OnInit {
+export class ConfigComponent {
   private readonly layoutService = inject(LayoutService);
   private readonly l10nService = inject(L10nService);
   protected readonly userService = inject(UserService);
   protected readonly securityService = inject(SecurityService);
   protected readonly menuService = inject(MenuService);
   protected l10n = {} as L10n;
+  protected readonly dateFormats: string[] = ['dd.MM.yyyy', 'dd.MM.yy', 'yyyy-MM-dd', 'dd.MMM.yyyy'];
+  protected readonly timeFormats: string[] = ['HH:mm:ss', 'HH:mm'];
+  // @ts-ignore
+  protected readonly allTimeZones: any[] = Intl.supportedValuesOf('timeZone');
 
-  selectedLanguage: string;
+  protected selectedLanguage: any;
+  protected selectedDateFormat: string;
+  protected selectedTimeFormat: string;
+  protected selectedTimeZone: string;
+
   languages: SelectItem<string>[] = [
     { value: 'en', label: 'English' },
     { value: 'ru', label: 'Русский' }
@@ -107,22 +150,29 @@ export class ConfigComponent implements OnInit {
   constructor() {
     this.l10nService.loadComponentTranslations('config');
     this.selectedLanguage = this.layoutService.language();
+    this.selectedDateFormat = this.layoutService.dateFormat();
+    this.selectedTimeFormat = this.layoutService.timeFormat();
+    this.selectedTimeZone = this.layoutService.timeZone();
   }
 
-  async ngOnInit() {
-
-  }
-
-  /**
-   * Changes the application's language.
-   * @return {void}
-   */
-  changeLanguage(): void {
+  changeLanguage() {
     this.layoutService.layoutConfig.update((config) => ({
       ...config,
       language: this.selectedLanguage
     }));
     this.l10nService.use(this.selectedLanguage, 'config');
+  }
+
+  changeDateFormat() {
+    this.layoutService.layoutConfig.update((config) => ({ ...config, dateFormat: this.selectedDateFormat }));
+  }
+
+  changeTimeFormat() {
+    this.layoutService.layoutConfig.update((config) => ({ ...config, timeFormat: this.selectedTimeFormat }));
+  }
+
+  changeTimeZone() {
+    this.layoutService.layoutConfig.update((config) => ({ ...config, timeZone: this.selectedTimeZone }));
   }
 
   async onSwitchChange(): Promise<void> {

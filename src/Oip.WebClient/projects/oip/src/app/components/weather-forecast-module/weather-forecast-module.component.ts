@@ -8,6 +8,7 @@ import { Table, TableModule } from 'primeng/table';
 import { Button } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
+import { DatePipe } from '@angular/common';
 
 interface WeatherModuleLocalSettings {
   first: number;
@@ -24,7 +25,6 @@ interface WeatherModuleLocalSettings {
         <div>
           <h5>{{ this.title }}</h5>
           <p-table #table [value]="data" (onFilter)="onFilter()">
-            >
             <ng-template let-columns pTemplate="header">
               <tr>
                 <th pSortableColumn="date" scope="col">
@@ -51,7 +51,7 @@ interface WeatherModuleLocalSettings {
             </ng-template>
             <ng-template let-columns="columns" let-forecast pTemplate="body">
               <tr>
-                <td>{{ forecast.date }}</td>
+                <td>{{ forecast.date | date: layoutService.dateTimeFormat() }}</td>
                 <td>{{ forecast.temperatureC }}</td>
                 <td>{{ forecast.temperatureF }}</td>
                 <td>
@@ -84,7 +84,7 @@ interface WeatherModuleLocalSettings {
     }
   `,
   providers: [WeatherForecastModule],
-  imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText]
+  imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText, DatePipe]
 })
 export class WeatherForecastModuleComponent
   extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
