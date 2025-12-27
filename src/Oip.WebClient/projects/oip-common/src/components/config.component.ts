@@ -12,7 +12,6 @@ import { SecurityService } from '../services/security.service';
 import { MenuService } from '../services/app.menu.service';
 import { Button } from 'primeng/button';
 import { L10nService } from '../services/l10n.service';
-import { SelectItem } from 'primeng/api';
 import { TranslatePipe } from '@ngx-translate/core';
 
 interface L10n {
@@ -56,40 +55,53 @@ interface L10n {
           <div class="flex justify-content-end flex-wrap">
             <p-select
               class="w-full md:w-56"
-              optionLabel="label"
-              optionValue="value"
+              optionLabel="name"
+              optionValue="code"
               qa-id="oip-app-config-language-select"
-              [options]="languages"
+              [options]="l10nService.availableLanguages"
               [(ngModel)]="selectedLanguage"
-              (onChange)="changeLanguage()" />
+              (onChange)="changeLanguage()">
+              <ng-template #selectedItem let-selectedOption>
+                <div class="flex items-center gap-2">
+                  <span [class]="selectedOption.icon"></span>
+                  <div>{{ selectedOption.name }}</div>
+                </div>
+              </ng-template>
+              <ng-template let-languages #item>
+                <div class="flex items-center gap-2">
+                  <span [class]="languages.icon"></span>
+                  <div>{{ languages.name }}</div>
+                </div>
+              </ng-template>
+            </p-select>
           </div>
           <div class="flex flex-col gap-5">
-            <div class="mt-5">Формат даты и времени:</div>
+            <div class="mt-5">{{ 'config.dateTimeFormat' | translate }}</div>
             <p-select
               class="w-full md:w-56"
-              placeholder="Шаблон даты"
+              [placeholder]="'config.dateFormat' | translate"
               qa-id="oip-app-config-date-format-select"
               [options]="dateFormats"
               [(ngModel)]="selectedDateFormat"
-              (onChange)="changeDateFormat()" />
+              (onChange)="changeDateFormat()"/>
             <p-select
               class="w-full md:w-56"
-              placeholder="Формат времени"
+              [placeholder]="'config.timeFormat' | translate"
               qa-id="oip-app-config-time-format-select"
               [options]="timeFormats"
               [(ngModel)]="selectedTimeFormat"
-              (onChange)="changeTimeFormat()" />
-            <div class="mt-5">Часовой пояс:</div>
+              (onChange)="changeTimeFormat()"/>
+            <div class="mt-5">{{ 'config.timeZone' | translate }}</div>
             <p-select
               class="w-full md:w-56"
-              placeholder="Часовой пояс"
+              [placeholder]="'config.timeZone' | translate"
               qa-id="oip-app-config-timezone-select"
               [filter]="true"
               [options]="allTimeZones"
               [virtualScroll]="true"
               [virtualScrollItemSize]="34"
               [(ngModel)]="selectedTimeZone"
-              (onChange)="changeTimeZone()" />
+              (onChange)="changeTimeZone()"/>
           </div>
         </div>
       </div>
@@ -106,7 +118,7 @@ interface L10n {
             </div>
             <div class="flex items-center gap-2">
               <label for="oip-app-config-admin-mode">{{ 'config.moduleManagement' | translate }}</label>
-              <p-button icon="pi pi-cog" label="{{ 'config.goTo' | translate }}" routerLink="/modules" />
+              <p-button icon="pi pi-cog" label="{{ 'config.goTo' | translate }}" routerLink="/modules"/>
             </div>
           </div>
         </div>
@@ -127,7 +139,7 @@ interface L10n {
 })
 export class ConfigComponent {
   private readonly layoutService = inject(LayoutService);
-  private readonly l10nService = inject(L10nService);
+  protected readonly l10nService = inject(L10nService);
   protected readonly userService = inject(UserService);
   protected readonly securityService = inject(SecurityService);
   protected readonly menuService = inject(MenuService);
@@ -142,10 +154,6 @@ export class ConfigComponent {
   protected selectedTimeFormat: string;
   protected selectedTimeZone: string;
 
-  languages: SelectItem<string>[] = [
-    { value: 'en', label: 'English' },
-    { value: 'ru', label: 'Русский' }
-  ];
 
   constructor() {
     this.l10nService.loadComponentTranslations('config');

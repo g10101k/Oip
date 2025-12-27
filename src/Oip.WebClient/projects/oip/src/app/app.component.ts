@@ -7,7 +7,7 @@ import { L10nService } from '../../../oip-common/src/services/l10n.service';
 @Component({
   selector: 'app-root',
   template: `
-    <p-toast />
+    <p-toast/>
     <router-outlet></router-outlet>
   `,
   standalone: true,
@@ -19,6 +19,14 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.securityService.auth();
-    this.translateService.init(['en', 'ru']);
+    this.translateService.init([{
+      code: 'en',
+      name: "English",
+      icon: "flag flag-gb"
+    }, {
+      code: 'ru',
+      name: "Русский",
+      icon: "flag flag-ru"
+    }]);
   }
 }

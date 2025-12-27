@@ -1,14 +1,17 @@
 {
   "config": {
-    "profile": "Профиль",
-    "photo": "Фото",
-    "usePhoto256x256Pixel": "Используйте фото 256х256 пикселей",
-    "localization": "Язык",
-    "selectLanguage": "Выберите язык",
-    "all": "Показать все меню",
-    "moduleManagement": "Управление модулями",
-    "modules": "Модули",
+    "all": "Все",
+    "dateFormat": "Формат даты",
+    "dateTimeFormat": "Формат даты и времени:",
+    "goTo": "Перейти",
+    "localization": "Локализация",
     "menu": "Меню",
-    "goTo": "Перейти"
+    "moduleManagement": "Управление модулями",
+    "photo": "Фото",
+    "profile": "Профиль",
+    "selectLanguage": "Выберите язык",
+    "timeFormat": "Формат времени",
+    "timeZone": "Часовой пояс",
+    "usePhoto256x256Pixel": "Используйте фото 256x256 пикселей"
   }
 }
