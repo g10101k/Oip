@@ -2,6 +2,8 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Oip.Data.Contexts;
 using Oip.Data.Extensions;
 
 namespace Oip.Notifications.Contexts;
@@ -340,9 +342,24 @@ public class NotificationDeliveryRepository(NotificationsDbContext context)
 }
 
 /// <summary>
+/// Represents the SQL Server database context for user-related entities.
+/// </summary>
+public class NotificationsDbContextSqlServer(DbContextOptions<NotificationsDbContext> options, bool designTime = true)
+    : NotificationsDbContext(options, designTime);
+
+/// <summary>
+/// Represents the PostgreSQL database context for user-related entities.
+/// </summary>
+public class NotificationsDbContextPostgres(
+    DbContextOptions<NotificationsDbContext> options,
+    bool designTime = true)
+    : NotificationsDbContext(options, designTime);
+
+/// <summary>
 /// Database context for notification entities
 /// </summary>
-public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> options) : DbContext(options)
+public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> options, bool designTime = false)
+    : DbContext(options)
 {
     /// <summary>
     /// Schema name for notification entities
@@ -404,7 +421,7 @@ public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> opt
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new NotificationTypeEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new NotificationTypeEntityConfiguration(Database, designTime));
         modelBuilder.ApplyConfiguration(new NotificationChannelEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new NotificationTemplateEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new NotificationTemplateChannelEntityConfiguration(Database));
@@ -413,6 +430,25 @@ public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> opt
         modelBuilder.ApplyConfiguration(new NotificationEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new NotificationUserEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new NotificationDeliveryEntityConfiguration(Database));
+
+        modelBuilder.ApplyXmlDocumentation(designTime);
+    }
+
+    /// <summary>
+    /// Configures the context options by replacing the migration assembly service
+    /// </summary>
+    /// <param name="optionsBuilder">The builder being used to configure the context</param>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the options builder is not properly configured
+    /// </exception>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder
+            .ReplaceService<IMigrationsAssembly,
+                BaseContextMigrationAssembly<NotificationsDbContextSqlServer, NotificationsDbContextPostgres>>();
+
+        if (!optionsBuilder.IsConfigured)
+            throw new InvalidOperationException("OnConfiguring error");
     }
 }
 
@@ -915,12 +951,12 @@ public class NotificationTemplateEntity
     /// <summary>
     /// Subject template for the notification
     /// </summary>
-    public required string SubjectTemplate { get; set; }
+    public string SubjectTemplate { get; set; } = null!;
 
     /// <summary>
     /// Message template for the notification
     /// </summary>
-    public required string MessageTemplate { get; set; }
+    public string MessageTemplate { get; set; } = null!;
 
     /// <summary>
     /// Whether the notification template is currently active
