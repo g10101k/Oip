@@ -3,33 +3,69 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Oip.Data.Extensions;
 
-namespace Oip.Notifications.Entities;
+namespace Oip.Notifications.Contexts;
 
 /// <summary>
 /// Represents the database context for notification entities
 /// </summary>
-public class NotificationsDbContext : DbContext
+public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> options) : DbContext(options)
 {
     /// <summary>
     /// Defines the schema name for the notification entities
     /// </summary>
     public const string SchemaName = "notifications";
 
-    public NotificationsDbContext(DbContextOptions<NotificationsDbContext> options)
-        : base(options)
-    {
-    }
+    /// <summary>
+    /// Defines the name of the table used to track Entity Framework Core migrations
+    /// </summary>
+    public const string MigrationHistoryTableName = "__EFMigrationHistory";
 
+    /// <summary>
+    /// Represents the collection of notification types within the system
+    /// </summary>
     public DbSet<NotificationTypeEntity> NotificationTypes { get; set; }
+
+    /// <summary>
+    /// Represents the available notification delivery channels
+    /// </summary>
     public DbSet<NotificationChannelEntity> NotificationChannels { get; set; }
+
+    /// <summary>
+    /// Represents the collection of notification templates available in the system
+    /// </summary>
     public DbSet<NotificationTemplateEntity> NotificationTemplates { get; set; }
+
+    /// <summary>
+    /// Represents the set of associations between notification templates and notification channels
+    /// </summary>
     public DbSet<NotificationTemplateChannelEntity> NotificationTemplateChannels { get; set; }
+
+    /// <summary>
+    /// Represents the entity set for notification template users
+    /// </summary>
     public DbSet<NotificationTemplateUserEntity> NotificationTemplateUsers { get; set; }
+
+    /// <summary>
+    /// Represents user preferences for receiving notifications
+    /// </summary>
     public DbSet<UserNotificationPreferenceEntity> UserNotificationPreferences { get; set; }
+
+    /// <summary>
+    /// Represents a collection of notifications
+    /// </summary>
     public DbSet<NotificationEntity> Notifications { get; set; }
+
+    /// <summary>
+    /// Represents the entity mapping for users associated with notifications
+    /// </summary>
     public DbSet<NotificationUserEntity> NotificationUsers { get; set; }
+
+    /// <summary>
+    /// Represents the delivery history of notifications to users through various channels
+    /// </summary>
     public DbSet<NotificationDeliveryEntity> NotificationDeliveries { get; set; }
 
+    /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -47,27 +83,14 @@ public class NotificationsDbContext : DbContext
 }
 
 /// <inheritdoc />
-public class NotificationTypeEntityConfiguration : IEntityTypeConfiguration<NotificationTypeEntity>
+public class NotificationTypeEntityConfiguration(DatabaseFacade database, bool designTime = false)
+    : IEntityTypeConfiguration<NotificationTypeEntity>
 {
-    private readonly DatabaseFacade _database;
-    private readonly bool _designTime;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="database"></param>
-    /// <param name="designTime"></param>
-    public NotificationTypeEntityConfiguration(DatabaseFacade database, bool designTime = false)
-    {
-        _database = database;
-        _designTime = designTime;
-    }
-
     /// <inheritdoc />
     public void Configure(EntityTypeBuilder<NotificationTypeEntity> builder)
     {
         // Set table with schema for notifications
-        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationTypeId);
 
@@ -103,23 +126,15 @@ public class NotificationTypeEntityConfiguration : IEntityTypeConfiguration<Noti
     }
 }
 
-public class NotificationChannelEntityConfiguration : IEntityTypeConfiguration<NotificationChannelEntity>
+/// <inheritdoc />
+public class NotificationChannelEntityConfiguration(DatabaseFacade database)
+    : IEntityTypeConfiguration<NotificationChannelEntity>
 {
-    private readonly DatabaseFacade _database;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="database"></param>
-    public NotificationChannelEntityConfiguration(DatabaseFacade database)
-    {
-        _database = database;
-    }
-
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<NotificationChannelEntity> builder)
     {
         // Set table with schema for notifications
-        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationChannelId);
 
@@ -155,23 +170,15 @@ public class NotificationChannelEntityConfiguration : IEntityTypeConfiguration<N
     }
 }
 
-public class NotificationTemplateEntityConfiguration : IEntityTypeConfiguration<NotificationTemplateEntity>
+/// <inheritdoc />
+public class NotificationTemplateEntityConfiguration(DatabaseFacade database)
+    : IEntityTypeConfiguration<NotificationTemplateEntity>
 {
-    private readonly DatabaseFacade _database;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="database"></param>
-    public NotificationTemplateEntityConfiguration(DatabaseFacade database)
-    {
-        _database = database;
-    }
-
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<NotificationTemplateEntity> builder)
     {
         // Set table with schema for notifications
-        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationTemplateId);
 
@@ -210,24 +217,15 @@ public class NotificationTemplateEntityConfiguration : IEntityTypeConfiguration<
     }
 }
 
-public class NotificationTemplateChannelEntityConfiguration :
-    IEntityTypeConfiguration<NotificationTemplateChannelEntity>
+/// <inheritdoc />
+public class NotificationTemplateChannelEntityConfiguration(DatabaseFacade database)
+    : IEntityTypeConfiguration<NotificationTemplateChannelEntity>
 {
-    private readonly DatabaseFacade _database;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="database"></param>
-    public NotificationTemplateChannelEntityConfiguration(DatabaseFacade database)
-    {
-        _database = database;
-    }
-
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<NotificationTemplateChannelEntity> builder)
     {
         // Set table with schema for notifications
-        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationTemplateChannelId);
 
@@ -237,37 +235,18 @@ public class NotificationTemplateChannelEntityConfiguration :
         // Composite unique index to prevent duplicate relationships
         builder.HasIndex(e => new { e.NotificationTemplateId, e.NotificationChannelId })
             .IsUnique();
-
-        // Relationships
-        builder.HasOne(e => e.NotificationTemplate)
-            .WithMany(t => t.NotificationTemplateChannels)
-            .HasForeignKey(e => e.NotificationTemplateId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(e => e.NotificationChannel)
-            .WithMany(c => c.Templates)
-            .HasForeignKey(e => e.NotificationChannelId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
-public class NotificationTemplateUserEntityConfiguration : IEntityTypeConfiguration<NotificationTemplateUserEntity>
+/// <inheritdoc />
+public class NotificationTemplateUserEntityConfiguration(DatabaseFacade database)
+    : IEntityTypeConfiguration<NotificationTemplateUserEntity>
 {
-    private readonly DatabaseFacade _database;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="database"></param>
-    public NotificationTemplateUserEntityConfiguration(DatabaseFacade database)
-    {
-        _database = database;
-    }
-
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<NotificationTemplateUserEntity> builder)
     {
         // Set table with schema for notifications
-        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationTemplateUserId);
 
@@ -282,23 +261,15 @@ public class NotificationTemplateUserEntityConfiguration : IEntityTypeConfigurat
     }
 }
 
-public class UserNotificationPreferenceEntityConfiguration : IEntityTypeConfiguration<UserNotificationPreferenceEntity>
+/// <inheritdoc />
+public class UserNotificationPreferenceEntityConfiguration(DatabaseFacade database)
+    : IEntityTypeConfiguration<UserNotificationPreferenceEntity>
 {
-    private readonly DatabaseFacade _database;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="database"></param>
-    public UserNotificationPreferenceEntityConfiguration(DatabaseFacade database)
-    {
-        _database = database;
-    }
-
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<UserNotificationPreferenceEntity> builder)
     {
         // Set table with schema for notifications
-        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.UserNotificationPreferenceId);
 
@@ -331,23 +302,15 @@ public class UserNotificationPreferenceEntityConfiguration : IEntityTypeConfigur
     }
 }
 
-public class NotificationEntityConfiguration : IEntityTypeConfiguration<NotificationEntity>
+/// <inheritdoc />
+public class NotificationEntityConfiguration(DatabaseFacade database)
+    : IEntityTypeConfiguration<NotificationEntity>
 {
-    private readonly DatabaseFacade _database;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="database"></param>
-    public NotificationEntityConfiguration(DatabaseFacade database)
-    {
-        _database = database;
-    }
-
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<NotificationEntity> builder)
     {
         // Set table with schema for notifications
-        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationId);
 
@@ -359,8 +322,7 @@ public class NotificationEntityConfiguration : IEntityTypeConfiguration<Notifica
             .HasConversion<int>();
 
         builder.Property(e => e.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .IsRequired();
 
         builder.Property(e => e.DataJson);
 
@@ -382,23 +344,15 @@ public class NotificationEntityConfiguration : IEntityTypeConfiguration<Notifica
     }
 }
 
-public class NotificationUserEntityConfiguration : IEntityTypeConfiguration<NotificationUserEntity>
+/// <inheritdoc />
+public class NotificationUserEntityConfiguration(DatabaseFacade database)
+    : IEntityTypeConfiguration<NotificationUserEntity>
 {
-    private readonly DatabaseFacade _database;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="database"></param>
-    public NotificationUserEntityConfiguration(DatabaseFacade database)
-    {
-        _database = database;
-    }
-
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<NotificationUserEntity> builder)
     {
         // Set table with schema for notifications
-        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationUserId);
 
@@ -410,8 +364,7 @@ public class NotificationUserEntityConfiguration : IEntityTypeConfiguration<Noti
             .HasMaxLength(200);
 
         builder.Property(e => e.Message)
-            .IsRequired()
-            .HasColumnType("nvarchar(max)");
+            .IsRequired();
 
         // Indexes
         builder.HasIndex(e => e.NotificationId);
@@ -432,9 +385,11 @@ public class NotificationUserEntityConfiguration : IEntityTypeConfiguration<Noti
     }
 }
 
+/// <inheritdoc />
 public class NotificationDeliveryEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<NotificationDeliveryEntity>
 {
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<NotificationDeliveryEntity> builder)
     {
         // Set table with schema for notifications
@@ -503,27 +458,27 @@ public class NotificationTypeEntity
     /// <summary>
     /// Name of the notification type
     /// </summary>
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     /// <summary>
     /// Provides a detailed explanation of the notification type
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// Scope of notification type (global, appName, feature)
     /// </summary>
-    public string Scope { get; set; }
+    public required string Scope { get; set; }
 
     /// <summary>
     /// Represents the collection of notification templates associated with a specific notification type
     /// </summary>
-    public ICollection<NotificationTemplateEntity> Templates { get; set; }
+    public List<NotificationTemplateEntity> Templates { get; set; } = new();
 
     /// <summary>
     /// Represents user preferences for notifications
     /// </summary>
-    public ICollection<UserNotificationPreferenceEntity> UserPreferences { get; set; }
+    public List<UserNotificationPreferenceEntity> UserPreferences { get; set; } = new();
 }
 
 /// <summary>
@@ -555,10 +510,20 @@ public class NotificationChannelEntity
     public bool RequiresVerification { get; set; } = false;
     public int? MaxRetryCount { get; set; }
 
-    // Navigation properties
-    public ICollection<NotificationTemplateEntity> Templates { get; set; }
-    public ICollection<UserNotificationPreferenceEntity> UserPreferences { get; set; }
-    public ICollection<NotificationDeliveryEntity> Deliveries { get; set; }
+    /// <summary>
+    /// Represents the collection of notification templates associated with a notification channel
+    /// </summary>
+    public List<NotificationTemplateEntity> Templates { get; set; } = new();
+
+    /// <summary>
+    /// Represents user-specific preferences for receiving notifications
+    /// </summary>
+    public List<UserNotificationPreferenceEntity> UserPreferences { get; set; } = new();
+
+    /// <summary>
+    /// Represents the list of deliveries associated with a notification channel
+    /// </summary>
+    public List<NotificationDeliveryEntity> Deliveries { get; set; } = new();
 }
 
 /// <summary>
@@ -579,12 +544,12 @@ public class NotificationTemplateEntity
     /// <summary>
     /// Defines the subject template for the notification
     /// </summary>
-    public string SubjectTemplate { get; set; }
+    public string SubjectTemplate { get; set; } = null!;
 
     /// <summary>
     /// Contains the message text for the notification
     /// </summary>
-    public string MessageTemplate { get; set; }
+    public string MessageTemplate { get; set; } = null!;
 
     /// <summary>
     /// Indicates whether the notification template is currently active
@@ -593,10 +558,13 @@ public class NotificationTemplateEntity
 
     // Navigation properties
     public NotificationTypeEntity NotificationType { get; set; }
-    public ICollection<NotificationTemplateChannelEntity> NotificationTemplateChannels { get; set; }
-    public ICollection<NotificationTemplateUserEntity> NotificationTemplateUsers { get; set; }
+    public List<NotificationTemplateChannelEntity> NotificationTemplateChannels { get; set; } = new();
+    public List<NotificationTemplateUserEntity> NotificationTemplateUsers { get; set; } = new();
 }
 
+/// <summary>
+/// Represents the association between a notification template and a notification channel
+/// </summary>
 public class NotificationTemplateChannelEntity
 {
     public int NotificationTemplateChannelId { get; set; }
@@ -659,7 +627,7 @@ public class NotificationUserEntity
     public string Subject { get; set; }
     public string Message { get; set; }
     public NotificationEntity Notification { get; set; }
-    public ICollection<NotificationDeliveryEntity> Deliveries { get; set; }
+    public List<NotificationDeliveryEntity> Deliveries { get; set; }
 }
 
 /// <summary>
