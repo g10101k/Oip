@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -6,62 +7,395 @@ using Oip.Data.Extensions;
 namespace Oip.Notifications.Contexts;
 
 /// <summary>
-/// Represents the database context for notification entities
+/// Базовый репозиторий с общими методами CRUD
+/// </summary>
+public abstract class BaseRepository<TEntity, TKey>(NotificationsDbContext context)
+    where TEntity : class
+{
+    /// <summary>
+    /// Represents the set of entities in the database for a given type
+    /// </summary>
+    protected DbSet<TEntity> DbSet => context.Set<TEntity>();
+
+    public virtual async Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
+    {
+        return await DbSet.FindAsync([id!], cancellationToken);
+    }
+
+    public virtual async Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet.ToListAsync(cancellationToken);
+    }
+
+    public virtual async Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet.Where(predicate).ToListAsync(cancellationToken);
+    }
+
+    public virtual async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+    {
+        await DbSet.AddAsync(entity, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public virtual async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+    {
+        DbSet.Update(entity);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public virtual async Task DeleteAsync(TKey id, CancellationToken cancellationToken = default)
+    {
+        var entity = await GetByIdAsync(id, cancellationToken);
+        if (entity != null)
+        {
+            DbSet.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet.AnyAsync(predicate, cancellationToken);
+    }
+
+    public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (predicate == null)
+            return await DbSet.CountAsync(cancellationToken);
+
+        return await DbSet.CountAsync(predicate, cancellationToken);
+    }
+}
+
+public class NotificationTypeRepository(NotificationsDbContext context)
+    : BaseRepository<NotificationTypeEntity, int>(context)
+{
+    public async Task<NotificationTypeEntity?> GetByNameAsync(string name,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet.FirstOrDefaultAsync(e => e.Name == name, cancellationToken);
+    }
+
+    public async Task<List<NotificationTypeEntity>> GetByScopeAsync(string scope,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet.Where(e => e.Scope == scope).ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<NotificationTypeEntity>> GetWithTemplatesAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(e => e.Templates)
+            .ToListAsync(cancellationToken);
+    }
+}
+
+public class NotificationChannelRepository(NotificationsDbContext context)
+    : BaseRepository<NotificationChannelEntity, int>(context)
+{
+    public async Task<NotificationChannelEntity?> GetByNameAsync(string name,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet.FirstOrDefaultAsync(e => e.Name == name, cancellationToken);
+    }
+
+    public async Task<List<NotificationChannelEntity>> GetActiveChannelsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet.Where(e => e.IsActive).ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<NotificationChannelEntity>> GetChannelsRequiringVerificationAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet.Where(e => e.RequiresVerification).ToListAsync(cancellationToken);
+    }
+}
+
+public class NotificationTemplateRepository(NotificationsDbContext context)
+    : BaseRepository<NotificationTemplateEntity, int>(context)
+{
+    public async Task<List<NotificationTemplateEntity>> GetActiveTemplatesByTypeAsync(
+        int notificationTypeId, CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Where(e => e.NotificationTypeId == notificationTypeId && e.IsActive)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<NotificationTemplateEntity?> GetWithChannelsAsync(int id,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(e => e.NotificationTemplateChannels)
+            .ThenInclude(tc => tc.NotificationChannel)
+            .Include(e => e.NotificationType)
+            .FirstOrDefaultAsync(e => e.NotificationTemplateId == id, cancellationToken);
+    }
+
+    public async Task<List<NotificationTemplateEntity>> GetByTypeWithChannelsAsync(
+        int notificationTypeId, CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(e => e.NotificationTemplateChannels)
+            .ThenInclude(tc => tc.NotificationChannel)
+            .Where(e => e.NotificationTypeId == notificationTypeId && e.IsActive)
+            .ToListAsync(cancellationToken);
+    }
+}
+
+public class UserNotificationPreferenceRepository(NotificationsDbContext context)
+    : BaseRepository<UserNotificationPreferenceEntity, int>(context)
+{
+    private readonly NotificationsDbContext _context = context;
+
+    public async Task<List<UserNotificationPreferenceEntity>> GetByUserIdAsync(int userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(p => p.NotificationType)
+            .Include(p => p.NotificationChannel)
+            .Where(p => p.UserId == userId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<UserNotificationPreferenceEntity>> GetByUserAndTypeAsync(
+        int userId, int notificationTypeId, CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(p => p.NotificationChannel)
+            .Where(p => p.UserId == userId && p.NotificationTypeId == notificationTypeId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<UserNotificationPreferenceEntity?> GetPreferenceAsync(
+        int userId, int notificationTypeId, int notificationChannelId, CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(p => p.NotificationType)
+            .Include(p => p.NotificationChannel)
+            .FirstOrDefaultAsync(p => p.UserId == userId &&
+                                      p.NotificationTypeId == notificationTypeId &&
+                                      p.NotificationChannelId == notificationChannelId,
+                cancellationToken);
+    }
+
+    public async Task<UserNotificationPreferenceEntity> UpsertPreferenceAsync(
+        UserNotificationPreferenceEntity preference, CancellationToken cancellationToken = default)
+    {
+        var existing = await GetPreferenceAsync(
+            preference.UserId,
+            preference.NotificationTypeId,
+            preference.NotificationChannelId,
+            cancellationToken);
+
+        if (existing != null)
+        {
+            existing.IsEnabled = preference.IsEnabled;
+            await UpdateAsync(existing, cancellationToken);
+            return existing;
+        }
+        else
+        {
+            await AddAsync(preference, cancellationToken);
+            return preference;
+        }
+    }
+
+    public async Task DeleteByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var preferences = await GetByUserIdAsync(userId, cancellationToken);
+        DbSet.RemoveRange(preferences);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+}
+
+public class NotificationRepository(NotificationsDbContext context)
+    : BaseRepository<NotificationEntity, long>(context)
+{
+    public async Task<List<NotificationEntity>> GetByTypeAsync(int notificationTypeId,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Where(n => n.NotificationTypeId == notificationTypeId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<NotificationEntity>> GetByImportanceAsync(ImportanceLevel importance,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Where(n => n.Importance == importance)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<NotificationEntity>> GetCreatedAfterAsync(DateTimeOffset date,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Where(n => n.CreatedAt >= date)
+            .OrderByDescending(n => n.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<NotificationEntity?> GetWithUsersAsync(long id, CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(n => n.NotificationUsers)
+            .Include(n => n.NotificationType)
+            .FirstOrDefaultAsync(n => n.NotificationId == id, cancellationToken);
+    }
+
+    public async Task<List<NotificationEntity>> GetByUserIdAsync(int userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(n => n.NotificationType)
+            .Include(n => n.NotificationUsers)
+            .Where(n => n.NotificationUsers.Any(u => u.UserId == userId))
+            .OrderByDescending(n => n.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+}
+
+public class NotificationDeliveryRepository(NotificationsDbContext context)
+    : BaseRepository<NotificationDeliveryEntity, long>(context)
+{
+    public async Task<List<NotificationDeliveryEntity>> GetByStatusAsync(DeliveryStatus status,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(d => d.NotificationUser)
+            .Include(d => d.NotificationChannel)
+            .Where(d => d.Status == status)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<NotificationDeliveryEntity>> GetByUserIdAsync(int userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(d => d.NotificationUser)
+            .Include(d => d.NotificationChannel)
+            .Where(d => d.UserId == userId)
+            .OrderByDescending(d => d.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<NotificationDeliveryEntity>> GetByChannelIdAsync(int channelId,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(d => d.NotificationUser)
+            .Where(d => d.NotificationChannelId == channelId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<NotificationDeliveryEntity>> GetForRetryAsync(int maxRetryCount,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(d => d.NotificationUser)
+            .Include(d => d.NotificationChannel)
+            .Where(d => d.Status == DeliveryStatus.Failed &&
+                        d.RetryCount < maxRetryCount &&
+                        d.NotificationChannel.IsActive)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<NotificationDeliveryEntity?> GetByExternalIdAsync(string externalId,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbSet
+            .Include(d => d.NotificationUser)
+            .Include(d => d.NotificationChannel)
+            .FirstOrDefaultAsync(d => d.ExternalId == externalId, cancellationToken);
+    }
+
+    public async Task UpdateStatusAsync(long deliveryId, DeliveryStatus status, string? externalId = null,
+        string? errorMessage = null, CancellationToken cancellationToken = default)
+    {
+        var delivery = await GetByIdAsync(deliveryId, cancellationToken);
+        if (delivery == null)
+            throw new ArgumentException($"Delivery with id {deliveryId} not found");
+
+        delivery.Status = status;
+        delivery.ExternalId = externalId ?? delivery.ExternalId;
+        delivery.ErrorMessage = errorMessage ?? delivery.ErrorMessage;
+
+        if (status == DeliveryStatus.Sent)
+            delivery.SentAt = DateTimeOffset.UtcNow;
+        else if (status == DeliveryStatus.Delivered)
+            delivery.DeliveredAt = DateTimeOffset.UtcNow;
+
+        if (status == DeliveryStatus.Failed)
+            delivery.RetryCount++;
+
+        await UpdateAsync(delivery, cancellationToken);
+    }
+}
+
+/// <summary>
+/// Database context for notification entities
 /// </summary>
 public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> options) : DbContext(options)
 {
     /// <summary>
-    /// Defines the schema name for the notification entities
+    /// Schema name for notification entities
     /// </summary>
     public const string SchemaName = "notifications";
 
     /// <summary>
-    /// Defines the name of the table used to track Entity Framework Core migrations
+    /// Table name for tracking Entity Framework Core migrations
     /// </summary>
     public const string MigrationHistoryTableName = "__EFMigrationHistory";
 
     /// <summary>
-    /// Represents the collection of notification types within the system
+    /// Collection of notification types
     /// </summary>
     public DbSet<NotificationTypeEntity> NotificationTypes { get; set; }
 
     /// <summary>
-    /// Represents the available notification delivery channels
+    /// Available notification delivery channels
     /// </summary>
     public DbSet<NotificationChannelEntity> NotificationChannels { get; set; }
 
     /// <summary>
-    /// Represents the collection of notification templates available in the system
+    /// Collection of notification templates
     /// </summary>
     public DbSet<NotificationTemplateEntity> NotificationTemplates { get; set; }
 
     /// <summary>
-    /// Represents the set of associations between notification templates and notification channels
+    /// Associations between notification templates and notification channels
     /// </summary>
     public DbSet<NotificationTemplateChannelEntity> NotificationTemplateChannels { get; set; }
 
     /// <summary>
-    /// Represents the entity set for notification template users
+    /// Entity set for notification template users
     /// </summary>
     public DbSet<NotificationTemplateUserEntity> NotificationTemplateUsers { get; set; }
 
     /// <summary>
-    /// Represents user preferences for receiving notifications
+    /// User preferences for receiving notifications
     /// </summary>
     public DbSet<UserNotificationPreferenceEntity> UserNotificationPreferences { get; set; }
 
     /// <summary>
-    /// Represents a collection of notifications
+    /// Collection of notifications
     /// </summary>
     public DbSet<NotificationEntity> Notifications { get; set; }
 
     /// <summary>
-    /// Represents the entity mapping for users associated with notifications
+    /// Users associated with notifications
     /// </summary>
     public DbSet<NotificationUserEntity> NotificationUsers { get; set; }
 
     /// <summary>
-    /// Represents the delivery history of notifications to users through various channels
+    /// Delivery history of notifications to users through various channels
     /// </summary>
     public DbSet<NotificationDeliveryEntity> NotificationDeliveries { get; set; }
 
@@ -82,7 +416,9 @@ public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> opt
     }
 }
 
-/// <inheritdoc />
+/// <summary>
+/// Configures database mapping for NotificationTypeEntity
+/// </summary>
 public class NotificationTypeEntityConfiguration(DatabaseFacade database, bool designTime = false)
     : IEntityTypeConfiguration<NotificationTypeEntity>
 {
@@ -126,7 +462,9 @@ public class NotificationTypeEntityConfiguration(DatabaseFacade database, bool d
     }
 }
 
-/// <inheritdoc />
+/// <summary>
+/// Configures database mapping for NotificationChannelEntity
+/// </summary>
 public class NotificationChannelEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<NotificationChannelEntity>
 {
@@ -170,7 +508,9 @@ public class NotificationChannelEntityConfiguration(DatabaseFacade database)
     }
 }
 
-/// <inheritdoc />
+/// <summary>
+/// Configures database mapping for NotificationTemplateEntity
+/// </summary>
 public class NotificationTemplateEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<NotificationTemplateEntity>
 {
@@ -217,7 +557,9 @@ public class NotificationTemplateEntityConfiguration(DatabaseFacade database)
     }
 }
 
-/// <inheritdoc />
+/// <summary>
+/// Configures database mapping for NotificationTemplateChannelEntity
+/// </summary>
 public class NotificationTemplateChannelEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<NotificationTemplateChannelEntity>
 {
@@ -238,7 +580,9 @@ public class NotificationTemplateChannelEntityConfiguration(DatabaseFacade datab
     }
 }
 
-/// <inheritdoc />
+/// <summary>
+/// Configures database mapping for NotificationTemplateUserEntity
+/// </summary>
 public class NotificationTemplateUserEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<NotificationTemplateUserEntity>
 {
@@ -261,7 +605,9 @@ public class NotificationTemplateUserEntityConfiguration(DatabaseFacade database
     }
 }
 
-/// <inheritdoc />
+/// <summary>
+/// Configures database mapping for UserNotificationPreferenceEntity
+/// </summary>
 public class UserNotificationPreferenceEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<UserNotificationPreferenceEntity>
 {
@@ -302,7 +648,9 @@ public class UserNotificationPreferenceEntityConfiguration(DatabaseFacade databa
     }
 }
 
-/// <inheritdoc />
+/// <summary>
+/// Configures database mapping for NotificationEntity
+/// </summary>
 public class NotificationEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<NotificationEntity>
 {
@@ -344,7 +692,9 @@ public class NotificationEntityConfiguration(DatabaseFacade database)
     }
 }
 
-/// <inheritdoc />
+/// <summary>
+/// Configures database mapping for NotificationUserEntity
+/// </summary>
 public class NotificationUserEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<NotificationUserEntity>
 {
@@ -385,7 +735,9 @@ public class NotificationUserEntityConfiguration(DatabaseFacade database)
     }
 }
 
-/// <inheritdoc />
+/// <summary>
+/// Configures database mapping for NotificationDeliveryEntity
+/// </summary>
 public class NotificationDeliveryEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<NotificationDeliveryEntity>
 {
@@ -446,12 +798,12 @@ public class NotificationDeliveryEntityConfiguration(DatabaseFacade database)
 }
 
 /// <summary>
-/// Represents a type of notification within the system
+/// Type of notification within the system
 /// </summary>
 public class NotificationTypeEntity
 {
     /// <summary>
-    /// Defines the unique identifier for the notification type
+    /// Unique identifier for the notification type
     /// </summary>
     public int NotificationTypeId { get; set; }
 
@@ -461,7 +813,7 @@ public class NotificationTypeEntity
     public required string Name { get; set; }
 
     /// <summary>
-    /// Provides a detailed explanation of the notification type
+    /// Detailed explanation of the notification type
     /// </summary>
     public string? Description { get; set; }
 
@@ -471,196 +823,392 @@ public class NotificationTypeEntity
     public required string Scope { get; set; }
 
     /// <summary>
-    /// Represents the collection of notification templates associated with a specific notification type
+    /// Collection of notification templates associated with this notification type
     /// </summary>
     public List<NotificationTemplateEntity> Templates { get; set; } = new();
 
     /// <summary>
-    /// Represents user preferences for notifications
+    /// User preferences for notifications of this type
     /// </summary>
     public List<UserNotificationPreferenceEntity> UserPreferences { get; set; } = new();
 }
 
 /// <summary>
-/// Event importance level (FR-1.2)
+/// Event importance levels
 /// </summary>
 public enum ImportanceLevel
 {
-    /// <summary>Represents a low level of importance</summary>
+    /// <summary>Low level of importance</summary>
     Low = 0,
 
-    /// <summary>Indicates a notification with medium importance</summary>
+    /// <summary>Notification with medium importance</summary>
     Medium = 1,
 
-    /// <summary>Represents a high level of importance</summary>
+    /// <summary>High level of importance</summary>
     High = 2,
 
-    /// <summary>Represents a notification with the highest level of importance requiring immediate attention</summary>
+    /// <summary>Highest level of importance requiring immediate attention</summary>
     Critical = 3
 }
 
 /// <summary>
-/// Notification delivery channels (FR-1)
+/// Notification delivery channels
 /// </summary>
 public class NotificationChannelEntity
 {
+    /// <summary>
+    /// Unique identifier for the notification channel
+    /// </summary>
     public int NotificationChannelId { get; set; }
-    public string Name { get; set; }
+
+    /// <summary>
+    /// Name of the notification channel
+    /// </summary>
+    public required string Name { get; set; } = null!;
+
+    /// <summary>
+    /// Whether the channel is active
+    /// </summary>
     public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// Whether the channel requires user verification
+    /// </summary>
     public bool RequiresVerification { get; set; } = false;
+
+    /// <summary>
+    /// Maximum number of delivery retry attempts
+    /// </summary>
     public int? MaxRetryCount { get; set; }
 
     /// <summary>
-    /// Represents the collection of notification templates associated with a notification channel
+    /// Collection of notification templates associated with this channel
     /// </summary>
     public List<NotificationTemplateEntity> Templates { get; set; } = new();
 
     /// <summary>
-    /// Represents user-specific preferences for receiving notifications
+    /// User-specific preferences for this channel
     /// </summary>
     public List<UserNotificationPreferenceEntity> UserPreferences { get; set; } = new();
 
     /// <summary>
-    /// Represents the list of deliveries associated with a notification channel
+    /// List of deliveries associated with this channel
     /// </summary>
     public List<NotificationDeliveryEntity> Deliveries { get; set; } = new();
 }
 
 /// <summary>
-/// Notification template for different channels (FR-2.2.1)
+/// Notification template for different channels
 /// </summary>
 public class NotificationTemplateEntity
 {
     /// <summary>
-    /// Represents the unique identifier for the notification template
+    /// Unique identifier for the notification template
     /// </summary>
     public int NotificationTemplateId { get; set; }
 
     /// <summary>
-    /// Represents the unique identifier for the notification type
+    /// Unique identifier for the notification type
     /// </summary>
     public int NotificationTypeId { get; set; }
 
     /// <summary>
-    /// Defines the subject template for the notification
+    /// Subject template for the notification
     /// </summary>
-    public string SubjectTemplate { get; set; } = null!;
+    public required string SubjectTemplate { get; set; }
 
     /// <summary>
-    /// Contains the message text for the notification
+    /// Message template for the notification
     /// </summary>
-    public string MessageTemplate { get; set; } = null!;
+    public required string MessageTemplate { get; set; }
 
     /// <summary>
-    /// Indicates whether the notification template is currently active
+    /// Whether the notification template is currently active
     /// </summary>
     public bool IsActive { get; set; } = true;
 
-    // Navigation properties
-    public NotificationTypeEntity NotificationType { get; set; }
+    /// <summary>
+    /// Associated notification type
+    /// </summary>
+    public NotificationTypeEntity NotificationType { get; set; } = null!;
+
+    /// <summary>
+    /// Channels associated with this template
+    /// </summary>
     public List<NotificationTemplateChannelEntity> NotificationTemplateChannels { get; set; } = new();
+
+    /// <summary>
+    /// Users associated with this template
+    /// </summary>
     public List<NotificationTemplateUserEntity> NotificationTemplateUsers { get; set; } = new();
 }
 
 /// <summary>
-/// Represents the association between a notification template and a notification channel
+/// Association between a notification template and a notification channel
 /// </summary>
 public class NotificationTemplateChannelEntity
 {
+    /// <summary>
+    /// Unique identifier for the template-channel association
+    /// </summary>
     public int NotificationTemplateChannelId { get; set; }
+
+    /// <summary>
+    /// Notification template identifier
+    /// </summary>
     public int NotificationTemplateId { get; set; }
+
+    /// <summary>
+    /// Notification channel identifier
+    /// </summary>
     public int NotificationChannelId { get; set; }
-    public NotificationTemplateEntity NotificationTemplate { get; set; }
-    public NotificationChannelEntity NotificationChannel { get; set; }
+
+    /// <summary>
+    /// Associated notification template
+    /// </summary>
+    public NotificationTemplateEntity NotificationTemplate { get; set; } = null!;
+
+    /// <summary>
+    /// Associated notification channel
+    /// </summary>
+    public NotificationChannelEntity NotificationChannel { get; set; } = null!;
 }
 
 /// <summary>
-/// Represents a mapping between a notification template and a user
+/// Mapping between a notification template and a user
 /// </summary>
 public class NotificationTemplateUserEntity
 {
+    /// <summary>
+    /// Unique identifier for the template-user mapping
+    /// </summary>
     public int NotificationTemplateUserId { get; set; }
+
+    /// <summary>
+    /// Notification template identifier
+    /// </summary>
     public int NotificationTemplateId { get; set; }
+
+    /// <summary>
+    /// User identifier
+    /// </summary>
     public int UserId { get; set; }
 }
 
 /// <summary>
-/// User notification settings (FR-2)
+/// User notification preferences
 /// </summary>
 public class UserNotificationPreferenceEntity
 {
+    /// <summary>
+    /// Unique identifier for the user notification preference
+    /// </summary>
     public int UserNotificationPreferenceId { get; set; }
+
+    /// <summary>
+    /// User identifier
+    /// </summary>
     public int UserId { get; set; }
+
+    /// <summary>
+    /// Notification type identifier
+    /// </summary>
     public int NotificationTypeId { get; set; }
+
+    /// <summary>
+    /// Notification channel identifier
+    /// </summary>
     public int NotificationChannelId { get; set; }
+
+    /// <summary>
+    /// Whether notifications are enabled for this preference
+    /// </summary>
     public bool IsEnabled { get; set; } = true;
 
-    // Navigation properties
-    public NotificationTypeEntity NotificationType { get; set; }
-    public NotificationChannelEntity NotificationChannel { get; set; }
+    /// <summary>
+    /// Associated notification type
+    /// </summary>
+    public NotificationTypeEntity NotificationType { get; set; } = null!;
+
+    /// <summary>
+    /// Associated notification channel
+    /// </summary>
+    public NotificationChannelEntity NotificationChannel { get; set; } = null!;
 }
 
 /// <summary>
-/// Notification/event (FR-2.1.1, FR-3)
+/// Notification/event
 /// </summary>
 public class NotificationEntity
 {
+    /// <summary>
+    /// Unique identifier for the notification
+    /// </summary>
     public long NotificationId { get; set; }
-    public int NotificationTypeId { get; set; }
-    public ImportanceLevel Importance { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
-    public string DataJson { get; set; }
 
-    // Navigation properties
-    public NotificationTypeEntity NotificationType { get; set; }
-    public List<NotificationUserEntity> NotificationUsers { get; set; }
+    /// <summary>
+    /// Notification type identifier
+    /// </summary>
+    public int NotificationTypeId { get; set; }
+
+    /// <summary>
+    /// Importance level of the notification
+    /// </summary>
+    public ImportanceLevel Importance { get; set; }
+
+    /// <summary>
+    /// Creation timestamp of the notification
+    /// </summary>
+    public DateTimeOffset CreatedAt { get; set; }
+
+    /// <summary>
+    /// JSON data associated with the notification
+    /// </summary>
+    public string? DataJson { get; set; }
+
+    /// <summary>
+    /// Associated notification type
+    /// </summary>
+    public NotificationTypeEntity NotificationType { get; set; } = null!;
+
+    /// <summary>
+    /// Users associated with this notification
+    /// </summary>
+    public List<NotificationUserEntity> NotificationUsers { get; set; } = new();
 }
 
 /// <summary>
-/// Entity describing which users should be notified about an event from Notification
+/// Users who should be notified about an event
 /// </summary>
 public class NotificationUserEntity
 {
+    /// <summary>
+    /// Unique identifier for the notification user
+    /// </summary>
     public long NotificationUserId { get; set; }
+
+    /// <summary>
+    /// Notification identifier
+    /// </summary>
     public long NotificationId { get; set; }
+
+    /// <summary>
+    /// User identifier
+    /// </summary>
     public int UserId { get; set; }
-    public string Subject { get; set; }
-    public string Message { get; set; }
-    public NotificationEntity Notification { get; set; }
-    public List<NotificationDeliveryEntity> Deliveries { get; set; }
+
+    /// <summary>
+    /// Subject of the notification for this user
+    /// </summary>
+    public string Subject { get; set; } = null!;
+
+    /// <summary>
+    /// Message of the notification for this user
+    /// </summary>
+    public string Message { get; set; } = null!;
+
+    /// <summary>
+    /// Associated notification
+    /// </summary>
+    public NotificationEntity Notification { get; set; } = null!;
+
+    /// <summary>
+    /// Delivery attempts for this notification user
+    /// </summary>
+    public List<NotificationDeliveryEntity> Deliveries { get; set; } = new();
 }
 
 /// <summary>
-/// Notification delivery history by channels (FR-3)
+/// Notification delivery history by channels
 /// </summary>
 public class NotificationDeliveryEntity
 {
+    /// <summary>
+    /// Unique identifier for the notification delivery
+    /// </summary>
     public long NotificationDeliveryId { get; set; }
+
+    /// <summary>
+    /// Notification user identifier
+    /// </summary>
     public long NotificationUserId { get; set; }
+
+    /// <summary>
+    /// User identifier
+    /// </summary>
     public int UserId { get; set; }
+
+    /// <summary>
+    /// Notification channel identifier
+    /// </summary>
     public int NotificationChannelId { get; set; }
+
+    /// <summary>
+    /// Delivery status
+    /// </summary>
     public DeliveryStatus Status { get; set; }
+
+    /// <summary>
+    /// External identifier from the delivery service
+    /// </summary>
     public string? ExternalId { get; set; }
+
+    /// <summary>
+    /// Error message if delivery failed
+    /// </summary>
     public string? ErrorMessage { get; set; }
+
+    /// <summary>
+    /// Number of delivery retry attempts
+    /// </summary>
     public int RetryCount { get; set; }
+
+    /// <summary>
+    /// Creation timestamp of the delivery record
+    /// </summary>
     public DateTimeOffset CreatedAt { get; set; }
+
+    /// <summary>
+    /// Timestamp when the notification was sent
+    /// </summary>
     public DateTimeOffset? SentAt { get; set; }
+
+    /// <summary>
+    /// Timestamp when the notification was delivered
+    /// </summary>
     public DateTimeOffset? DeliveredAt { get; set; }
 
-    // Navigation properties
-    public NotificationUserEntity NotificationUser { get; set; }
-    public NotificationChannelEntity NotificationChannel { get; set; }
+    /// <summary>
+    /// Associated notification user
+    /// </summary>
+    public NotificationUserEntity NotificationUser { get; set; } = null!;
+
+    /// <summary>
+    /// Associated notification channel
+    /// </summary>
+    public NotificationChannelEntity NotificationChannel { get; set; } = null!;
 }
 
 /// <summary>
-/// Delivery status
+/// Delivery status values
 /// </summary>
 public enum DeliveryStatus
 {
+    /// <summary>Delivery is pending</summary>
     Pending = 0,
+
+    /// <summary>Delivery is being processed</summary>
     Processing = 1,
+
+    /// <summary>Notification has been sent</summary>
     Sent = 2,
+
+    /// <summary>Notification has been delivered</summary>
     Delivered = 3,
+
+    /// <summary>Delivery failed</summary>
     Failed = 4,
+
+    /// <summary>Delivery was cancelled</summary>
     Cancelled = 5
 }
