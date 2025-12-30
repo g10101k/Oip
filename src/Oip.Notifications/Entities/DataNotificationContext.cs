@@ -66,6 +66,7 @@ public class NotificationTypeEntityConfiguration : IEntityTypeConfiguration<Noti
     /// <inheritdoc />
     public void Configure(EntityTypeBuilder<NotificationTypeEntity> builder)
     {
+        // Set table with schema for notifications
         builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationTypeId);
@@ -89,7 +90,7 @@ public class NotificationTypeEntityConfiguration : IEntityTypeConfiguration<Noti
 
         builder.HasIndex(e => e.Scope);
 
-        // Связи
+        // Relationships
         builder.HasMany(e => e.Templates)
             .WithOne(t => t.NotificationType)
             .HasForeignKey(t => t.NotificationTypeId)
@@ -162,7 +163,7 @@ public class NotificationTemplateEntityConfiguration : IEntityTypeConfiguration<
             .IsRequired()
             .HasDefaultValue(true);
 
-        // Связи
+        // Relationships
         builder.HasOne(e => e.NotificationType)
             .WithMany(t => t.Templates)
             .HasForeignKey(e => e.NotificationTypeId)
@@ -178,7 +179,7 @@ public class NotificationTemplateEntityConfiguration : IEntityTypeConfiguration<
             .HasForeignKey(tu => tu.NotificationTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Индексы
+        // Indexes
         builder.HasIndex(e => new { e.NotificationTypeId, e.IsActive });
     }
 }
@@ -195,18 +196,20 @@ public class NotificationTemplateChannelEntityConfiguration :
         builder.Property(e => e.NotificationTemplateChannelId)
             .ValueGeneratedOnAdd();
 
-        // Составной уникальный индекс для предотвращения дублирования связей
+        // Composite unique index to prevent duplicate relationships
         builder.HasIndex(e => new { e.NotificationTemplateId, e.NotificationChannelId })
             .IsUnique();
 
-        // Связи
+        // Relationships
         builder.HasOne(e => e.NotificationTemplate)
             .WithMany(t => t.NotificationTemplateChannels)
             .HasForeignKey(e => e.NotificationTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // NOTE: The collection name seems to be missing. 
+        // Based on the NotificationChannelEntity class, it should be "Templates"
         builder.HasOne(e => e.NotificationChannel)
-            .WithMany(c => c.)
+            .WithMany(c => c.Templates)
             .HasForeignKey(e => e.NotificationChannelId)
             .OnDelete(DeleteBehavior.Cascade);
     }
@@ -223,7 +226,7 @@ public class NotificationTemplateUserEntityConfiguration : IEntityTypeConfigurat
         builder.Property(e => e.NotificationTemplateUserId)
             .ValueGeneratedOnAdd();
 
-        // Составной уникальный индекс
+        // Composite unique index
         builder.HasIndex(e => new { e.NotificationTemplateId, e.UserId })
             .IsUnique();
 
@@ -246,16 +249,16 @@ public class UserNotificationPreferenceEntityConfiguration : IEntityTypeConfigur
             .IsRequired()
             .HasDefaultValue(true);
 
-        // Составной уникальный индекс для предотвращения дублирования настроек
+        // Composite unique index to prevent duplicate settings
         builder.HasIndex(e => new { e.UserId, e.NotificationTypeId, e.NotificationChannelId })
             .IsUnique();
 
-        // Индексы для быстрого поиска
+        // Indexes for fast search
         builder.HasIndex(e => e.UserId);
         builder.HasIndex(e => e.NotificationTypeId);
         builder.HasIndex(e => new { e.UserId, e.IsEnabled });
 
-        // Связи
+        // Relationships
         builder.HasOne(e => e.NotificationType)
             .WithMany(t => t.UserPreferences)
             .HasForeignKey(e => e.NotificationTypeId)
@@ -288,12 +291,12 @@ public class NotificationEntityConfiguration : IEntityTypeConfiguration<Notifica
             .HasDefaultValueSql("GETUTCDATE()");
 
         builder.Property(e => e.DataJson);
-        // Индексы
+        // Indexes
         builder.HasIndex(e => e.NotificationTypeId);
         builder.HasIndex(e => e.CreatedAt);
         builder.HasIndex(e => e.Importance);
 
-        // Связи
+        // Relationships
         builder.HasOne(e => e.NotificationType)
             .WithMany()
             .HasForeignKey(e => e.NotificationTypeId)
@@ -326,13 +329,13 @@ public class NotificationUserEntityConfiguration : IEntityTypeConfiguration<Noti
             .HasColumnType("nvarchar(max)");
 
 
-        // Индексы
+        // Indexes
         builder.HasIndex(e => e.NotificationId);
         builder.HasIndex(e => e.UserId);
         builder.HasIndex(e => new { e.NotificationId, e.UserId })
             .IsUnique();
 
-        // Связи
+        // Relationships
         builder.HasOne(e => e.Notification)
             .WithMany(n => n.NotificationUsers)
             .HasForeignKey(e => e.NotificationId)
@@ -372,10 +375,9 @@ public class NotificationDeliveryEntityConfiguration : IEntityTypeConfiguration<
             .HasDefaultValue(0);
 
         builder.Property(e => e.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .IsRequired();
 
-        // Индексы
+        // Indexes
         builder.HasIndex(e => e.NotificationUserId);
         builder.HasIndex(e => e.UserId);
         builder.HasIndex(e => e.NotificationChannelId);
@@ -383,10 +385,9 @@ public class NotificationDeliveryEntityConfiguration : IEntityTypeConfiguration<
         builder.HasIndex(e => e.CreatedAt);
         builder.HasIndex(e => e.SentAt);
         builder.HasIndex(e => new { e.Status, e.RetryCount });
-        builder.HasIndex(e => e.ExternalId)
-            .HasFilter("[ExternalId] IS NOT NULL");
+        builder.HasIndex(e => e.ExternalId);
 
-        // Связи
+        // Relationships
         builder.HasOne(e => e.NotificationUser)
             .WithMany(u => u.Deliveries)
             .HasForeignKey(e => e.NotificationUserId)
@@ -436,7 +437,7 @@ public class NotificationTypeEntity
 }
 
 /// <summary>
-/// Уровень важности события (FR-1.2)
+/// Event importance level (FR-1.2)
 /// </summary>
 public enum ImportanceLevel
 {
@@ -454,7 +455,7 @@ public enum ImportanceLevel
 }
 
 /// <summary>
-/// Каналы доставки уведомлений (FR-1)
+/// Notification delivery channels (FR-1)
 /// </summary>
 public class NotificationChannelEntity
 {
@@ -464,14 +465,14 @@ public class NotificationChannelEntity
     public bool RequiresVerification { get; set; } = false;
     public int? MaxRetryCount { get; set; }
 
-    // Навигационные свойства
+    // Navigation properties
     public ICollection<NotificationTemplateEntity> Templates { get; set; }
     public ICollection<UserNotificationPreferenceEntity> UserPreferences { get; set; }
     public ICollection<NotificationDeliveryEntity> Deliveries { get; set; }
 }
 
 /// <summary>
-/// Шаблон уведомления для разных каналов (FR-2.2.1)
+/// Notification template for different channels (FR-2.2.1)
 /// </summary>
 public class NotificationTemplateEntity
 {
@@ -491,7 +492,7 @@ public class NotificationTemplateEntity
     public string SubjectTemplate { get; set; }
 
     /// <summary>
-    /// Содержит текст сообщения для уведомления
+    /// Contains the message text for the notification
     /// </summary>
     public string MessageTemplate { get; set; }
 
@@ -500,7 +501,7 @@ public class NotificationTemplateEntity
     /// </summary>
     public bool IsActive { get; set; } = true;
 
-    // Навигационные свойства
+    // Navigation properties
     public NotificationTypeEntity NotificationType { get; set; }
     public ICollection<NotificationTemplateChannelEntity> NotificationTemplateChannels { get; set; }
     public ICollection<NotificationTemplateUserEntity> NotificationTemplateUsers { get; set; }
@@ -526,7 +527,7 @@ public class NotificationTemplateUserEntity
 }
 
 /// <summary>
-/// Настройки пользователя для уведомлений (FR-2)
+/// User notification settings (FR-2)
 /// </summary>
 public class UserNotificationPreferenceEntity
 {
@@ -536,13 +537,13 @@ public class UserNotificationPreferenceEntity
     public int NotificationChannelId { get; set; }
     public bool IsEnabled { get; set; } = true;
 
-    // Навигационные свойства
+    // Navigation properties
     public NotificationTypeEntity NotificationType { get; set; }
     public NotificationChannelEntity NotificationChannel { get; set; }
 }
 
 /// <summary>
-/// Уведомление/событие (FR-2.1.1, FR-3)
+/// Notification/event (FR-2.1.1, FR-3)
 /// </summary>
 public class NotificationEntity
 {
@@ -552,13 +553,13 @@ public class NotificationEntity
     public DateTimeOffset CreatedAt { get; set; }
     public string DataJson { get; set; }
 
-    // Навигационные свойства
+    // Navigation properties
     public NotificationTypeEntity NotificationType { get; set; }
     public List<NotificationUserEntity> NotificationUsers { get; set; }
 }
 
 /// <summary>
-/// Сущность описывающая, что пользователя должны оповестить о событии из Notification
+/// Entity describing which users should be notified about an event from Notification
 /// </summary>
 public class NotificationUserEntity
 {
@@ -572,7 +573,7 @@ public class NotificationUserEntity
 }
 
 /// <summary>
-/// История доставки уведомлений по каналам (FR-3)
+/// Notification delivery history by channels (FR-3)
 /// </summary>
 public class NotificationDeliveryEntity
 {
@@ -588,13 +589,13 @@ public class NotificationDeliveryEntity
     public DateTimeOffset? SentAt { get; set; }
     public DateTimeOffset? DeliveredAt { get; set; }
 
-    // Навигационные свойства
+    // Navigation properties
     public NotificationUserEntity NotificationUser { get; set; }
     public NotificationChannelEntity NotificationChannel { get; set; }
 }
 
 /// <summary>
-/// Статус доставки
+/// Delivery status
 /// </summary>
 public enum DeliveryStatus
 {
