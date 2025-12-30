@@ -35,14 +35,14 @@ public class NotificationsDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new NotificationTypeEntityConfiguration(Database));
-        modelBuilder.ApplyConfiguration(new NotificationChannelEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new NotificationTemplateEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new NotificationTemplateChannelEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new NotificationTemplateUserEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new UserNotificationPreferenceEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new NotificationEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new NotificationUserEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new NotificationDeliveryEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new NotificationChannelEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new NotificationTemplateEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new NotificationTemplateChannelEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new NotificationTemplateUserEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new UserNotificationPreferenceEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new NotificationEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new NotificationUserEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new NotificationDeliveryEntityConfiguration(Database));
     }
 }
 
@@ -105,8 +105,21 @@ public class NotificationTypeEntityConfiguration : IEntityTypeConfiguration<Noti
 
 public class NotificationChannelEntityConfiguration : IEntityTypeConfiguration<NotificationChannelEntity>
 {
+    private readonly DatabaseFacade _database;
+
+    /// <summary>
+    /// .ctor
+    /// </summary>
+    /// <param name="database"></param>
+    public NotificationChannelEntityConfiguration(DatabaseFacade database)
+    {
+        _database = database;
+    }
+
     public void Configure(EntityTypeBuilder<NotificationChannelEntity> builder)
     {
+        // Set table with schema for notifications
+        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationChannelId);
 
@@ -125,9 +138,10 @@ public class NotificationChannelEntityConfiguration : IEntityTypeConfiguration<N
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(e => e.MaxRetryCount);
+
         builder.HasIndex(e => e.Name)
             .IsUnique();
-
 
         builder.HasMany(e => e.UserPreferences)
             .WithOne(p => p.NotificationChannel)
@@ -143,9 +157,21 @@ public class NotificationChannelEntityConfiguration : IEntityTypeConfiguration<N
 
 public class NotificationTemplateEntityConfiguration : IEntityTypeConfiguration<NotificationTemplateEntity>
 {
+    private readonly DatabaseFacade _database;
+
+    /// <summary>
+    /// .ctor
+    /// </summary>
+    /// <param name="database"></param>
+    public NotificationTemplateEntityConfiguration(DatabaseFacade database)
+    {
+        _database = database;
+    }
+
     public void Configure(EntityTypeBuilder<NotificationTemplateEntity> builder)
     {
-        builder.ToTable("NotificationTemplates");
+        // Set table with schema for notifications
+        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationTemplateId);
 
@@ -158,7 +184,7 @@ public class NotificationTemplateEntityConfiguration : IEntityTypeConfiguration<
 
         builder.Property(e => e.MessageTemplate)
             .IsRequired();
-        
+
         builder.Property(e => e.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
@@ -187,9 +213,21 @@ public class NotificationTemplateEntityConfiguration : IEntityTypeConfiguration<
 public class NotificationTemplateChannelEntityConfiguration :
     IEntityTypeConfiguration<NotificationTemplateChannelEntity>
 {
+    private readonly DatabaseFacade _database;
+
+    /// <summary>
+    /// .ctor
+    /// </summary>
+    /// <param name="database"></param>
+    public NotificationTemplateChannelEntityConfiguration(DatabaseFacade database)
+    {
+        _database = database;
+    }
+
     public void Configure(EntityTypeBuilder<NotificationTemplateChannelEntity> builder)
     {
-        builder.ToTable("NotificationTemplateChannels");
+        // Set table with schema for notifications
+        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationTemplateChannelId);
 
@@ -206,8 +244,6 @@ public class NotificationTemplateChannelEntityConfiguration :
             .HasForeignKey(e => e.NotificationTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // NOTE: The collection name seems to be missing. 
-        // Based on the NotificationChannelEntity class, it should be "Templates"
         builder.HasOne(e => e.NotificationChannel)
             .WithMany(c => c.Templates)
             .HasForeignKey(e => e.NotificationChannelId)
@@ -217,9 +253,21 @@ public class NotificationTemplateChannelEntityConfiguration :
 
 public class NotificationTemplateUserEntityConfiguration : IEntityTypeConfiguration<NotificationTemplateUserEntity>
 {
+    private readonly DatabaseFacade _database;
+
+    /// <summary>
+    /// .ctor
+    /// </summary>
+    /// <param name="database"></param>
+    public NotificationTemplateUserEntityConfiguration(DatabaseFacade database)
+    {
+        _database = database;
+    }
+
     public void Configure(EntityTypeBuilder<NotificationTemplateUserEntity> builder)
     {
-        builder.ToTable("NotificationTemplateUsers");
+        // Set table with schema for notifications
+        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationTemplateUserId);
 
@@ -236,9 +284,21 @@ public class NotificationTemplateUserEntityConfiguration : IEntityTypeConfigurat
 
 public class UserNotificationPreferenceEntityConfiguration : IEntityTypeConfiguration<UserNotificationPreferenceEntity>
 {
+    private readonly DatabaseFacade _database;
+
+    /// <summary>
+    /// .ctor
+    /// </summary>
+    /// <param name="database"></param>
+    public UserNotificationPreferenceEntityConfiguration(DatabaseFacade database)
+    {
+        _database = database;
+    }
+
     public void Configure(EntityTypeBuilder<UserNotificationPreferenceEntity> builder)
     {
-        builder.ToTable("UserNotificationPreferences");
+        // Set table with schema for notifications
+        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.UserNotificationPreferenceId);
 
@@ -273,9 +333,21 @@ public class UserNotificationPreferenceEntityConfiguration : IEntityTypeConfigur
 
 public class NotificationEntityConfiguration : IEntityTypeConfiguration<NotificationEntity>
 {
+    private readonly DatabaseFacade _database;
+
+    /// <summary>
+    /// .ctor
+    /// </summary>
+    /// <param name="database"></param>
+    public NotificationEntityConfiguration(DatabaseFacade database)
+    {
+        _database = database;
+    }
+
     public void Configure(EntityTypeBuilder<NotificationEntity> builder)
     {
-        builder.ToTable("Notifications");
+        // Set table with schema for notifications
+        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationId);
 
@@ -291,6 +363,7 @@ public class NotificationEntityConfiguration : IEntityTypeConfiguration<Notifica
             .HasDefaultValueSql("GETUTCDATE()");
 
         builder.Property(e => e.DataJson);
+
         // Indexes
         builder.HasIndex(e => e.NotificationTypeId);
         builder.HasIndex(e => e.CreatedAt);
@@ -311,9 +384,21 @@ public class NotificationEntityConfiguration : IEntityTypeConfiguration<Notifica
 
 public class NotificationUserEntityConfiguration : IEntityTypeConfiguration<NotificationUserEntity>
 {
+    private readonly DatabaseFacade _database;
+
+    /// <summary>
+    /// .ctor
+    /// </summary>
+    /// <param name="database"></param>
+    public NotificationUserEntityConfiguration(DatabaseFacade database)
+    {
+        _database = database;
+    }
+
     public void Configure(EntityTypeBuilder<NotificationUserEntity> builder)
     {
-        builder.ToTable("NotificationUsers");
+        // Set table with schema for notifications
+        builder.SetTableWithSchema(_database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationUserId);
 
@@ -327,7 +412,6 @@ public class NotificationUserEntityConfiguration : IEntityTypeConfiguration<Noti
         builder.Property(e => e.Message)
             .IsRequired()
             .HasColumnType("nvarchar(max)");
-
 
         // Indexes
         builder.HasIndex(e => e.NotificationId);
@@ -348,11 +432,13 @@ public class NotificationUserEntityConfiguration : IEntityTypeConfiguration<Noti
     }
 }
 
-public class NotificationDeliveryEntityConfiguration : IEntityTypeConfiguration<NotificationDeliveryEntity>
+public class NotificationDeliveryEntityConfiguration(DatabaseFacade database)
+    : IEntityTypeConfiguration<NotificationDeliveryEntity>
 {
     public void Configure(EntityTypeBuilder<NotificationDeliveryEntity> builder)
     {
-        builder.ToTable("NotificationDeliveries");
+        // Set table with schema for notifications
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
 
         builder.HasKey(e => e.NotificationDeliveryId);
 
@@ -376,6 +462,10 @@ public class NotificationDeliveryEntityConfiguration : IEntityTypeConfiguration<
 
         builder.Property(e => e.CreatedAt)
             .IsRequired();
+
+        builder.Property(e => e.SentAt);
+
+        builder.Property(e => e.DeliveredAt);
 
         // Indexes
         builder.HasIndex(e => e.NotificationUserId);
