@@ -1,9 +1,11 @@
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Oip.Data.Contexts;
+using Oip.Data.EntityConfigurations;
 using Oip.Data.Extensions;
 
 namespace Oip.Notifications.Contexts;
@@ -582,7 +584,7 @@ public class NotificationsDbContextPostgres(
 /// <param name="options">The options for this context</param>
 /// <param name="designTime">Whether this context is being used at design time</param>
 public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> options, bool designTime = false)
-    : DbContext(options)
+    : DbContext(options), IDataProtectionKeyContext
 {
     /// <summary>
     /// Schema name for notification entities
@@ -593,6 +595,11 @@ public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> opt
     /// Table name for tracking Entity Framework Core migrations
     /// </summary>
     public const string MigrationHistoryTableName = "__EFMigrationHistory";
+
+    /// <summary>
+    /// Data protection keys
+    /// </summary>
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
     /// <summary>
     /// Collection of notification types
@@ -652,6 +659,8 @@ public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> opt
         modelBuilder.ApplyConfiguration(new NotificationEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new NotificationUserEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new NotificationDeliveryEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new DataProtectionKeyEntityConfiguration(Database, SchemaName));
+        
         modelBuilder.ApplyXmlDocumentation(designTime);
     }
 
