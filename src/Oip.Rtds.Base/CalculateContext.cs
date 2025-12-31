@@ -141,6 +141,9 @@ public class CompiledFormula : IDisposable
     }
 }
 
+/// <summary>
+/// Manages the compilation and evaluation of formulas for tag calculations
+/// </summary>
 public class FormulaManager : IDisposable
 {
     private readonly ConcurrentDictionary<uint, CompiledFormula> _compiled = new();
@@ -148,6 +151,9 @@ public class FormulaManager : IDisposable
     private readonly ReaderWriterLockSlim _lock = new();
     private readonly MetadataReference[] _defaultReferences;
 
+    /// <summary>
+    /// Manages the compilation and evaluation of formulas for tag calculations
+    /// </summary>
     public FormulaManager()
     {
         var refs = new List<MetadataReference>();
