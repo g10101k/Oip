@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Oip.Data.Contexts;
 using Oip.Data.Repositories;
