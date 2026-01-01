@@ -30,7 +30,7 @@ public interface INotificationChannel
     /// <summary>
     /// Оповещение
     /// </summary>
-    void Send(UserInfoDto userInfoDto, string subject, string message);
+    void Notify(UserInfoDto userInfoDto, string subject, string message);
 
     /// <summary>
     /// Оповещение с вложением
@@ -39,7 +39,7 @@ public interface INotificationChannel
     /// <param name="subject"></param>
     /// <param name="message"></param>
     /// <param name="attachments"></param>
-    void Send(UserInfoDto userInfoDto, string subject, string message, Attachment[] attachments);
+    void Notify(UserInfoDto userInfoDto, string subject, string message, Attachment[] attachments);
 }
 
 public class UserInfoDto

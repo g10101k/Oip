@@ -4,8 +4,10 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
+using Oip.Notifications.Channels;
 using Oip.Notifications.Contexts;
 using Oip.Notifications.Extensions;
+using Oip.Notifications.Services;
 using Oip.Notifications.Settings;
 
 namespace Oip.Notifications;
@@ -30,6 +32,9 @@ internal static class Program
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
+            builder.Services.AddGrpc().AddJsonTranscoding();
+            builder.Services.AddGrpcSwagger();
+            builder.Services.AddScoped<SmtpChannel>();
             builder.AddControllersAndView();
             builder.AddLocalization();
             builder.Services.AddDataProtection<NotificationsDbContext>();
@@ -47,6 +52,7 @@ internal static class Program
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
+            app.MapGrpcService<NotificationService>();
             app.MigrateNotificationDatabase();
             app.Run();
         }
