@@ -1,9 +1,7 @@
 using NLog;
 using NLog.Web;
-using Oip.Base.Clients;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
-using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
