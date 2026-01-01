@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "google/api/annotations.proto";
 option csharp_namespace = "Oip.Notifications";
 
 package notifications;
@@ -7,43 +8,153 @@ package notifications;
 // Notification service for managing notification types, channels, templates and deliveries
 service NotificationService {
   // Notification Type Management
-  rpc CreateNotificationType(CreateNotificationTypeRequest) returns (CreateNotificationTypeResponse);
-  rpc GetNotificationType(GetNotificationTypeRequest) returns (GetNotificationTypeResponse);
-  rpc UpdateNotificationType(UpdateNotificationTypeRequest) returns (UpdateNotificationTypeResponse);
-  rpc DeleteNotificationType(DeleteNotificationTypeRequest) returns (DeleteNotificationTypeResponse);
-  rpc ListNotificationTypes(ListNotificationTypesRequest) returns (ListNotificationTypesResponse);
+  rpc CreateNotificationType(CreateNotificationTypeRequest) returns (CreateNotificationTypeResponse) {
+    option (google.api.http) = {
+      post: "/v1/notification-types"
+      body: "*"
+    };
+  }
+  rpc GetNotificationType(GetNotificationTypeRequest) returns (GetNotificationTypeResponse) {
+    option (google.api.http) = {
+      get: "/v1/notification-types/{notification_type_id}"
+    };
+  }
+  rpc UpdateNotificationType(UpdateNotificationTypeRequest) returns (UpdateNotificationTypeResponse) {
+    option (google.api.http) = {
+      put: "/v1/notification-types/{notification_type_id}"
+      body: "*"
+    };
+  }
+  rpc DeleteNotificationType(DeleteNotificationTypeRequest) returns (DeleteNotificationTypeResponse) {
+    option (google.api.http) = {
+      delete: "/v1/notification-types/{notification_type_id}"
+    };
+  }
+  rpc ListNotificationTypes(ListNotificationTypesRequest) returns (ListNotificationTypesResponse) {
+    option (google.api.http) = {
+      get: "/v1/notification-types"
+    };
+  }
 
   // Notification Channel Management
-  rpc CreateNotificationChannel(CreateNotificationChannelRequest) returns (CreateNotificationChannelResponse);
-  rpc GetNotificationChannel(GetNotificationChannelRequest) returns (GetNotificationChannelResponse);
-  rpc UpdateNotificationChannel(UpdateNotificationChannelRequest) returns (UpdateNotificationChannelResponse);
-  rpc DeleteNotificationChannel(DeleteNotificationChannelRequest) returns (DeleteNotificationChannelResponse);
-  rpc ListNotificationChannels(ListNotificationChannelsRequest) returns (ListNotificationChannelsResponse);
+  rpc CreateNotificationChannel(CreateNotificationChannelRequest) returns (CreateNotificationChannelResponse) {
+    option (google.api.http) = {
+      post: "/v1/notification-channels"
+      body: "*"
+    };
+  }
+  rpc GetNotificationChannel(GetNotificationChannelRequest) returns (GetNotificationChannelResponse) {
+    option (google.api.http) = {
+      get: "/v1/notification-channels/{notification_channel_id}"
+    };
+  }
+  rpc UpdateNotificationChannel(UpdateNotificationChannelRequest) returns (UpdateNotificationChannelResponse) {
+    option (google.api.http) = {
+      put: "/v1/notification-channels/{notification_channel_id}"
+      body: "*"
+    };
+  }
+  rpc DeleteNotificationChannel(DeleteNotificationChannelRequest) returns (DeleteNotificationChannelResponse) {
+    option (google.api.http) = {
+      delete: "/v1/notification-channels/{notification_channel_id}"
+    };
+  }
+  rpc ListNotificationChannels(ListNotificationChannelsRequest) returns (ListNotificationChannelsResponse) {
+    option (google.api.http) = {
+      get: "/v1/notification-channels"
+    };
+  }
 
   // Notification Template Management
-  rpc CreateNotificationTemplate(CreateNotificationTemplateRequest) returns (CreateNotificationTemplateResponse);
-  rpc GetNotificationTemplate(GetNotificationTemplateRequest) returns (GetNotificationTemplateResponse);
-  rpc UpdateNotificationTemplate(UpdateNotificationTemplateRequest) returns (UpdateNotificationTemplateResponse);
-  rpc DeleteNotificationTemplate(DeleteNotificationTemplateRequest) returns (DeleteNotificationTemplateResponse);
-  rpc ListNotificationTemplates(ListNotificationTemplatesRequest) returns (ListNotificationTemplatesResponse);
+  rpc CreateNotificationTemplate(CreateNotificationTemplateRequest) returns (CreateNotificationTemplateResponse) {
+    option (google.api.http) = {
+      post: "/v1/notification-templates"
+      body: "*"
+    };
+  }
+  rpc GetNotificationTemplate(GetNotificationTemplateRequest) returns (GetNotificationTemplateResponse) {
+    option (google.api.http) = {
+      get: "/v1/notification-templates/{notification_template_id}"
+    };
+  }
+  rpc UpdateNotificationTemplate(UpdateNotificationTemplateRequest) returns (UpdateNotificationTemplateResponse) {
+    option (google.api.http) = {
+      put: "/v1/notification-templates/{notification_template_id}"
+      body: "*"
+    };
+  }
+  rpc DeleteNotificationTemplate(DeleteNotificationTemplateRequest) returns (DeleteNotificationTemplateResponse) {
+    option (google.api.http) = {
+      delete: "/v1/notification-templates/{notification_template_id}"
+    };
+  }
+  rpc ListNotificationTemplates(ListNotificationTemplatesRequest) returns (ListNotificationTemplatesResponse) {
+    option (google.api.http) = {
+      get: "/v1/notification-templates"
+    };
+  }
 
   // User Notification Preferences
-  rpc SetUserNotificationPreference(SetUserNotificationPreferenceRequest) returns (SetUserNotificationPreferenceResponse);
-  rpc GetUserNotificationPreference(GetUserNotificationPreferenceRequest) returns (GetUserNotificationPreferenceResponse);
-  rpc ListUserNotificationPreferences(ListUserNotificationPreferencesRequest) returns (ListUserNotificationPreferencesResponse);
+  rpc SetUserNotificationPreference(SetUserNotificationPreferenceRequest) returns (SetUserNotificationPreferenceResponse) {
+    option (google.api.http) = {
+      post: "/v1/user-notification-preferences"
+      body: "*"
+    };
+  }
+  rpc GetUserNotificationPreference(GetUserNotificationPreferenceRequest) returns (GetUserNotificationPreferenceResponse) {
+    option (google.api.http) = {
+      get: "/v1/user-notification-preferences"
+    };
+  }
+  rpc ListUserNotificationPreferences(ListUserNotificationPreferencesRequest) returns (ListUserNotificationPreferencesResponse) {
+    option (google.api.http) = {
+      get: "/v1/user-notification-preferences"
+    };
+  }
 
   // Notification Management
-  rpc CreateNotification(CreateNotificationRequest) returns (CreateNotificationResponse);
-  rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse);
-  rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsResponse);
+  rpc CreateNotification(CreateNotificationRequest) returns (CreateNotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications"
+      body: "*"
+    };
+  }
+  rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse) {
+    option (google.api.http) = {
+      get: "/v1/notifications/{notification_id}"
+    };
+  }
+  rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsResponse) {
+    option (google.api.http) = {
+      get: "/v1/notifications"
+    };
+  }
 
   // Notification Delivery Management
-  rpc GetNotificationDelivery(GetNotificationDeliveryRequest) returns (GetNotificationDeliveryResponse);
-  rpc UpdateNotificationDeliveryStatus(UpdateNotificationDeliveryStatusRequest) returns (UpdateNotificationDeliveryStatusResponse);
-  rpc ListNotificationDeliveries(ListNotificationDeliveriesRequest) returns (ListNotificationDeliveriesResponse);
+  rpc GetNotificationDelivery(GetNotificationDeliveryRequest) returns (GetNotificationDeliveryResponse) {
+    option (google.api.http) = {
+      get: "/v1/notification-deliveries/{notification_delivery_id}"
+    };
+  }
+  rpc UpdateNotificationDeliveryStatus(UpdateNotificationDeliveryStatusRequest) returns (UpdateNotificationDeliveryStatusResponse) {
+    option (google.api.http) = {
+      put: "/v1/notification-deliveries/{notification_delivery_id}/status"
+      body: "*"
+    };
+  }
+  rpc ListNotificationDeliveries(ListNotificationDeliveriesRequest) returns (ListNotificationDeliveriesResponse) {
+    option (google.api.http) = {
+      get: "/v1/notification-deliveries"
+    };
+  }
 
   // Event Handling
-  rpc HandleNotificationEvent(HandleNotificationEventRequest) returns (HandleNotificationEventResponse);
+  rpc HandleNotificationEvent(HandleNotificationEventRequest) returns (HandleNotificationEventResponse) {
+    option (google.api.http) = {
+      post: "/v1/notification-events"
+      body: "*"
+    };
+  }
 }
 
 // Common message types
