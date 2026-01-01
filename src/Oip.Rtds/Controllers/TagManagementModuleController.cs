@@ -6,7 +6,6 @@ using Oip.Data.Constants;
 using Oip.Data.Repositories;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Repositories;
-using Resources = Oip.Rtds.Properties.Resources;
 
 namespace Oip.Rtds.Controllers;
 
