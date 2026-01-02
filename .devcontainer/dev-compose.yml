@@ -74,6 +74,15 @@ services:
       - CLICKHOUSE_PASSWORD=P@ssw0rd
     networks:
       - bridge-network
+  
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025"  # SMTP порт для приложения
+      - "8025:8025"  # Веб-интерфейс
+    restart: unless-stopped
+    networks:
+      - backend-network
 
 networks:
   backend-network: { }
