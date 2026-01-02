@@ -54,28 +54,11 @@
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
     </ItemGroup>
-
-    <ItemGroup>
-        <Protobuf Include="Protos\notifications_service.proto">
-            <GrpcServices>Server</GrpcServices>
-            <Access>Public</Access>
-            <ProtoCompile>True</ProtoCompile>
-            <CompileOutputs>True</CompileOutputs>
-            <OutputDir>obj/Debug/net8.0/</OutputDir>
-            <Generator>MSBuild:Compile</Generator>
-            <AdditionalImportDirs>$(NuGetPackageRoot)\google.api.commonprotos\2.17.0\content\protos\</AdditionalImportDirs>
-        </Protobuf>
-    </ItemGroup>
     
     <ItemGroup>
         <None Include="appsettings.Development.json">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <_ContentIncludedByDefault Remove="SwaggerFiles\swagger-base.json" />
-        <_ContentIncludedByDefault Remove="SwaggerFiles\swagger-users.json" />
     </ItemGroup>
     
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

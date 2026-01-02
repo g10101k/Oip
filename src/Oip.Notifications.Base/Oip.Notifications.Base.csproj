@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\Common.props"/>
+    <Import Project="..\Common.props" />
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -11,12 +11,45 @@
 
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Title>Base library for OIP template</Title>
+        <Title>Notification library for OIP template</Title>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include=".\README.md" Pack="true" PackagePath="\"/>
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.22" />
+        <PackageReference Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="8.0.22" />
+        <PackageReference Include="Microsoft.AspNetCore.Grpc.Swagger" Version="0.8.22" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />
+        <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.22" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="NLog" Version="5.3.4" />
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
+        <PackageReference Include="Google.Protobuf" Version="3.31.1" />
+        <PackageReference Include="Google.Api.CommonProtos" Version="2.17.0" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.76.0" PrivateAssets="All" />
+        <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     </ItemGroup>
 
+
+    <ItemGroup>
+        <None Include=".\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="Protos\notifications_service.proto" GrpcServices="Client">
+            <Generator>MSBuild:Compile</Generator>
+            <AdditionalImportDirs>$(NuGetPackageRoot)\google.api.commonprotos\2.17.0\content\protos\</AdditionalImportDirs>
+        </Protobuf>
+
+        <Protobuf Include="Protos\notifications_service.proto" GrpcServices="GrpcServices">
+            <Generator>MSBuild:Compile</Generator>
+            <AdditionalImportDirs>$(NuGetPackageRoot)\google.api.commonprotos\2.17.0\content\protos\</AdditionalImportDirs>
+        </Protobuf>
+    </ItemGroup>
 
 </Project>
