@@ -62,10 +62,11 @@ public abstract class BaseRepository<TEntity, TKey>(NotificationsDbContext conte
     /// </summary>
     /// <param name="entity">The entity to add</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    public virtual async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         await DbSet.AddAsync(entity, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
+        return entity;
     }
 
     /// <summary>
