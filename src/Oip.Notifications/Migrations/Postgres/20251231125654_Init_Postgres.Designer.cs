@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Oip.Notifications.Contexts;
+using Oip.Notifications.Data;
+using Oip.Notifications.Data.Contexts;
 
 #nullable disable
 

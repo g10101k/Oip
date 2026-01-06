@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Oip.Notifications.Contexts;
+using Oip.Notifications.Data;
+using Oip.Notifications.Data.Contexts;
 
 #nullable disable
 

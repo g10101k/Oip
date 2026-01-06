@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Oip.Notifications.Contexts;
+using Oip.Notifications.Data.Contexts;
 
 #nullable disable
 
@@ -49,7 +49,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationChannelEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationChannelEntity", b =>
                 {
                     b.Property<int>("NotificationChannelId")
                         .ValueGeneratedOnAdd()
@@ -57,6 +57,12 @@ namespace Oip.Notifications.Migrations.SqlServer
                         .HasComment("Unique identifier for the notification channel");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationChannelId"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
+                        .HasComment("Name of the notification channel");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -82,6 +88,9 @@ namespace Oip.Notifications.Migrations.SqlServer
 
                     b.HasKey("NotificationChannelId");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.HasIndex("Name")
                         .IsUnique();
 
@@ -91,7 +100,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationDeliveryEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationDeliveryEntity", b =>
                 {
                     b.Property<long>("NotificationDeliveryId")
                         .ValueGeneratedOnAdd()
@@ -170,7 +179,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationEntity", b =>
                 {
                     b.Property<long>("NotificationId")
                         .ValueGeneratedOnAdd()
@@ -187,10 +196,6 @@ namespace Oip.Notifications.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)")
                         .HasComment("JSON data associated with the notification");
 
-                    b.Property<int>("Importance")
-                        .HasColumnType("int")
-                        .HasComment("Importance level of the notification");
-
                     b.Property<int>("NotificationTypeId")
                         .HasColumnType("int")
                         .HasComment("Notification type identifier");
@@ -198,8 +203,6 @@ namespace Oip.Notifications.Migrations.SqlServer
                     b.HasKey("NotificationId");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("Importance");
 
                     b.HasIndex("NotificationTypeId");
 
@@ -209,7 +212,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationTemplateChannelEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationTemplateChannelEntity", b =>
                 {
                     b.Property<int>("NotificationTemplateChannelId")
                         .ValueGeneratedOnAdd()
@@ -239,7 +242,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationTemplateEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationTemplateEntity", b =>
                 {
                     b.Property<int>("NotificationTemplateId")
                         .ValueGeneratedOnAdd()
@@ -247,6 +250,10 @@ namespace Oip.Notifications.Migrations.SqlServer
                         .HasComment("Unique identifier for the notification template");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationTemplateId"));
+
+                    b.Property<int>("Importance")
+                        .HasColumnType("int")
+                        .HasComment("Importance level of the notification");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -284,7 +291,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationTemplateUserEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationTemplateUserEntity", b =>
                 {
                     b.Property<int>("NotificationTemplateUserId")
                         .ValueGeneratedOnAdd()
@@ -314,7 +321,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationTypeEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationTypeEntity", b =>
                 {
                     b.Property<int>("NotificationTypeId")
                         .ValueGeneratedOnAdd()
@@ -324,20 +331,20 @@ namespace Oip.Notifications.Migrations.SqlServer
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationTypeId"));
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)")
                         .HasComment("Detailed explanation of the notification type");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("Name of the notification type");
 
                     b.Property<string>("Scope")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("Scope of notification type (global, appName, feature)");
 
                     b.HasKey("NotificationTypeId");
@@ -353,7 +360,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationUserEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationUserEntity", b =>
                 {
                     b.Property<long>("NotificationUserId")
                         .ValueGeneratedOnAdd()
@@ -361,6 +368,10 @@ namespace Oip.Notifications.Migrations.SqlServer
                         .HasComment("Unique identifier for the notification user");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("NotificationUserId"));
+
+                    b.Property<int>("Importance")
+                        .HasColumnType("int")
+                        .HasComment("Importance level of the notification");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -396,7 +407,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.UserNotificationPreferenceEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.UserNotificationPreferenceEntity", b =>
                 {
                     b.Property<int>("UserNotificationPreferenceId")
                         .ValueGeneratedOnAdd()
@@ -442,15 +453,15 @@ namespace Oip.Notifications.Migrations.SqlServer
                         });
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationDeliveryEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationDeliveryEntity", b =>
                 {
-                    b.HasOne("Oip.Notifications.Contexts.NotificationChannelEntity", "NotificationChannel")
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationChannelEntity", "NotificationChannel")
                         .WithMany("Deliveries")
                         .HasForeignKey("NotificationChannelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Oip.Notifications.Contexts.NotificationUserEntity", "NotificationUser")
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationUserEntity", "NotificationUser")
                         .WithMany("Deliveries")
                         .HasForeignKey("NotificationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -461,9 +472,9 @@ namespace Oip.Notifications.Migrations.SqlServer
                     b.Navigation("NotificationUser");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationEntity", b =>
                 {
-                    b.HasOne("Oip.Notifications.Contexts.NotificationTypeEntity", "NotificationType")
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationTypeEntity", "NotificationType")
                         .WithMany()
                         .HasForeignKey("NotificationTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -472,15 +483,15 @@ namespace Oip.Notifications.Migrations.SqlServer
                     b.Navigation("NotificationType");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationTemplateChannelEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationTemplateChannelEntity", b =>
                 {
-                    b.HasOne("Oip.Notifications.Contexts.NotificationChannelEntity", "NotificationChannel")
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationChannelEntity", "NotificationChannel")
                         .WithMany()
                         .HasForeignKey("NotificationChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Oip.Notifications.Contexts.NotificationTemplateEntity", "NotificationTemplate")
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationTemplateEntity", "NotificationTemplate")
                         .WithMany("NotificationTemplateChannels")
                         .HasForeignKey("NotificationTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -491,13 +502,13 @@ namespace Oip.Notifications.Migrations.SqlServer
                     b.Navigation("NotificationTemplate");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationTemplateEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationTemplateEntity", b =>
                 {
-                    b.HasOne("Oip.Notifications.Contexts.NotificationChannelEntity", null)
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationChannelEntity", null)
                         .WithMany("Templates")
                         .HasForeignKey("NotificationChannelEntityNotificationChannelId");
 
-                    b.HasOne("Oip.Notifications.Contexts.NotificationTypeEntity", "NotificationType")
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationTypeEntity", "NotificationType")
                         .WithMany("Templates")
                         .HasForeignKey("NotificationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -506,18 +517,18 @@ namespace Oip.Notifications.Migrations.SqlServer
                     b.Navigation("NotificationType");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationTemplateUserEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationTemplateUserEntity", b =>
                 {
-                    b.HasOne("Oip.Notifications.Contexts.NotificationTemplateEntity", null)
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationTemplateEntity", null)
                         .WithMany("NotificationTemplateUsers")
                         .HasForeignKey("NotificationTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationUserEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationUserEntity", b =>
                 {
-                    b.HasOne("Oip.Notifications.Contexts.NotificationEntity", "Notification")
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationEntity", "Notification")
                         .WithMany("NotificationUsers")
                         .HasForeignKey("NotificationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -526,15 +537,15 @@ namespace Oip.Notifications.Migrations.SqlServer
                     b.Navigation("Notification");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.UserNotificationPreferenceEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.UserNotificationPreferenceEntity", b =>
                 {
-                    b.HasOne("Oip.Notifications.Contexts.NotificationChannelEntity", "NotificationChannel")
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationChannelEntity", "NotificationChannel")
                         .WithMany("UserPreferences")
                         .HasForeignKey("NotificationChannelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Oip.Notifications.Contexts.NotificationTypeEntity", "NotificationType")
+                    b.HasOne("Oip.Notifications.Data.Entities.NotificationTypeEntity", "NotificationType")
                         .WithMany("UserPreferences")
                         .HasForeignKey("NotificationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -545,7 +556,7 @@ namespace Oip.Notifications.Migrations.SqlServer
                     b.Navigation("NotificationType");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationChannelEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationChannelEntity", b =>
                 {
                     b.Navigation("Deliveries");
 
@@ -554,26 +565,26 @@ namespace Oip.Notifications.Migrations.SqlServer
                     b.Navigation("UserPreferences");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationEntity", b =>
                 {
                     b.Navigation("NotificationUsers");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationTemplateEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationTemplateEntity", b =>
                 {
                     b.Navigation("NotificationTemplateChannels");
 
                     b.Navigation("NotificationTemplateUsers");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationTypeEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationTypeEntity", b =>
                 {
                     b.Navigation("Templates");
 
                     b.Navigation("UserPreferences");
                 });
 
-            modelBuilder.Entity("Oip.Notifications.Contexts.NotificationUserEntity", b =>
+            modelBuilder.Entity("Oip.Notifications.Data.Entities.NotificationUserEntity", b =>
                 {
                     b.Navigation("Deliveries");
                 });
