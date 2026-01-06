@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Oip.Base.Helpers;
 
 namespace Oip.Base.Clients;
 
@@ -278,7 +279,7 @@ public sealed class KeycloakClient : HttpClient
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        var uriBuilder = new UriBuilder($"{_httpClient.BaseAddress}/admin/realms/{realm}/users")
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress!.ToString().UrlAppend($"/admin/realms/{realm}/users"))
         {
             Query = $"first={first}&max={max}"
         };
