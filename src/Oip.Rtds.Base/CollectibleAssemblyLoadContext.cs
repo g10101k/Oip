@@ -13,6 +13,9 @@ public class CollectibleAssemblyLoadContext : AssemblyLoadContext
     {
     }
 
+    
     /// <inheritdoc />
+#pragma warning disable CS8603 // Possible null reference return.
     protected override Assembly Load(AssemblyName assemblyName) => null;
+#pragma warning restore CS8603 // Possible null reference return.
 }
