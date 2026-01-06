@@ -33,7 +33,7 @@ public static class ServiceCollectionExtensions
             .AddScoped<TStartupTask>()
             .AddScoped<IStartupTask, TStartupTask>(sp => sp.GetRequiredService<TStartupTask>());
     }
-
+    
     /// <summary>
     /// Adds a startup task to the dependency injection container.
     /// </summary>
