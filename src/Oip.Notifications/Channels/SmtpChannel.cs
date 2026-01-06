@@ -17,7 +17,13 @@ public class SmtpChannel : INotificationChannel
     private readonly SmtpSettings _settings;
 
     /// <inheritdoc />
+    public string Code { get; set; } = typeof(SmtpChannel).FullName!;
+
+    /// <inheritdoc />
     public string Name { get; set; } = "Smtp client";
+
+    /// <inheritdoc />
+    public int MaxRetryCount { get; set; } = 5;
 
     /// <summary>A channel that sends notifications via SMTP email using configured mail settings and encryption services</summary>
     public SmtpChannel(ILogger<SmtpChannel> logger, CryptService cryptService, IConfiguration configuration)
@@ -27,7 +33,7 @@ public class SmtpChannel : INotificationChannel
         _cryptService = cryptService;
         _settings = configuration.GetSection("SmtpSettings").Get<SmtpSettings>() ?? new SmtpSettings();
 
-        // Валидация настроек
+        // Settings validation
         if (string.IsNullOrEmpty(_settings.MailFrom))
             throw new ArgumentException("MailFrom is required in SmtpSettings");
 
@@ -42,7 +48,10 @@ public class SmtpChannel : INotificationChannel
     }
 
     /// <inheritdoc />
-    public bool IsEnable { get; set; }
+    public bool IsEnable { get; set; } = true;
+
+    /// <inheritdoc />
+    public bool RequiresVerification { get; set; } = false;
 
     /// <inheritdoc />
     public void OpenChannel()
@@ -82,15 +91,16 @@ public class SmtpChannel : INotificationChannel
         try
         {
             smtpClient.Send(mail);
-            _logger.LogInformation($"Письмо успешно отправлено: {subject}");
+            _logger.LogInformation("Email successfully sent: {Subject}", subject);
         }
         catch (SmtpException e)
         {
-            _logger.LogError($"Ошибка SMTP при отправке письма {subject}: {e.Message}", e.StatusCode);
+            _logger.LogError("SMTP error when sending email {Subject}: {StatusCode} {Message}", subject, e.StatusCode,
+                e.Message);
         }
         catch (Exception e)
         {
-            _logger.LogError($"Общая ошибка при отправке письма {subject}: {e.Message}");
+            _logger.LogError("General error when sending email {Subject}: {Message}", subject, e.Message);
         }
     }
 
@@ -126,7 +136,7 @@ public class SmtpChannel : INotificationChannel
             catch (CryptographicException)
             {
                 _settings.IsEnable = false;
-                _logger.LogError("Cannot decrypt password, mail notification disable");
+                _logger.LogError("Cannot decrypt password, email notification disabled");
             }
         }
         else
