@@ -2,13 +2,14 @@ using NLog;
 using NLog.Web;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
+using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
-using Oip.Notifications.Channels;
-using Oip.Notifications.Contexts;
+using Oip.Notifications.Data.Contexts;
 using Oip.Notifications.Extensions;
 using Oip.Notifications.Services;
 using Oip.Notifications.Settings;
+using Oip.Notifications.Startups;
 
 namespace Oip.Notifications;
 
@@ -29,16 +30,18 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
+            builder.Services.AddSingleton<CryptService>();
+            builder.Services.AddSingleton<ChannelService>();
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+            builder.Services.AddStartupTask<ChannelStartup>();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.Services.AddGrpc().AddJsonTranscoding();
             builder.Services.AddGrpcSwagger();
-            builder.Services.AddScoped<SmtpChannel>();
             builder.AddControllersAndView();
             builder.AddLocalization();
             builder.Services.AddDataProtection<NotificationsDbContext>();
-                        
+
             var app = builder.Build();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
