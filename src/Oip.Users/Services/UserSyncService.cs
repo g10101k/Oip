@@ -1,5 +1,7 @@
 using Oip.Base.Services;
+using Oip.Notifications;
 using Oip.Users.Entities;
+using Oip.Users.Notifications;
 using Oip.Users.Repositories;
 using Oip.Users.Settings;
 using UserRepresentation = Oip.Base.Clients.UserRepresentation;
@@ -12,6 +14,7 @@ namespace Oip.Users.Services;
 public class UserSyncService(
     KeycloakService keycloakService,
     UserRepository userRepository,
+    BaseNotificationService notificationServiceClient,
     ILogger<UserSyncService> logger) : IPeriodicalService
 {
     /// <inheritdoc />
@@ -95,7 +98,7 @@ public class UserSyncService(
     public async Task SyncAllUsersAsync()
     {
         logger.LogInformation("Starting full user synchronization");
-
+        var startTime = DateTimeOffset.UtcNow;
         var totalUsers = await keycloakService.GetUsersCountAsync();
         var batches = (int)Math.Ceiling((double)totalUsers / AppSettings.Instance.SyncOptions.BatchSize);
 
@@ -111,7 +114,10 @@ public class UserSyncService(
             await Task.Delay(1000);
         }
 
+        var endTime = DateTimeOffset.UtcNow;
         logger.LogInformation("Full user synchronization completed");
+        await notificationServiceClient.Notify(new SyncUsersCompleteNotify(totalUsers, startTime, endTime),
+            ImportanceLevel.Low);
     }
 
     /// <summary>

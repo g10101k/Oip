@@ -9,6 +9,9 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     /// <inheritdoc />
     public string OipUrls { get; set; } = null!;
 
+    /// <summary>Gets or sets the URL for the notification service</summary>
+    public string NotificationServiceUrl { get; set; } = null!;
+
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();
 
