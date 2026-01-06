@@ -25,22 +25,14 @@ internal static class Program
             builder.Services.AddStartupTask<NotificationStartup>();
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddUsersData(settings);
-
             builder.Services.AddGrpcClient<GrpcNotificationService.GrpcNotificationServiceClient>(x =>
             {
-                x.Address = new Uri(settings.NotificationServiceUrl);
+                x.Address = new Uri(settings.Services.OipNotifications);
             });
 
-            // Repositories
             builder.Services.AddScoped<UserRepository>();
-
-            // Services
             builder.Services.AddScoped<UserSyncService>();
-
-            // Background service
             builder.Services.AddHostedService<KeycloakSyncBackgroundService>();
-
-            // HTTP Client
             builder.Services.AddHttpClient();
             var app = builder.BuildApp(settings);
             app.MigrateUserDatabase();

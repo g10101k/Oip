@@ -7,9 +7,7 @@ option csharp_namespace = "Oip.Notifications";
 
 package notifications;
 
-// Notification service for managing notification types, channels, templates and deliveries
 service GrpcNotificationService {
-  // Notification Type Management
   rpc CreateNotificationTypes(CreateNotificationTypesRequest) returns (CreateNotificationTypesResponse) {
     option (google.api.http) = {
       post: "/grpc/v1/notification-types"
@@ -38,7 +36,6 @@ service GrpcNotificationService {
     };
   }
 
-  // Notification Channel Management
   rpc CreateNotificationChannel(CreateNotificationChannelRequest) returns (CreateNotificationChannelResponse) {
     option (google.api.http) = {
       post: "/grpc/v1/notification-channels"
@@ -50,24 +47,26 @@ service GrpcNotificationService {
       get: "/grpc/v1/notification-channels/{notification_channel_id}"
     };
   }
+  
   rpc UpdateNotificationChannel(UpdateNotificationChannelRequest) returns (UpdateNotificationChannelResponse) {
     option (google.api.http) = {
       put: "/grpc/v1/notification-channels/{notification_channel_id}"
       body: "*"
     };
   }
+  
   rpc DeleteNotificationChannel(DeleteNotificationChannelRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/grpc/v1/notification-channels/{notification_channel_id}"
     };
   }
+  
   rpc ListNotificationChannels(ListNotificationChannelsRequest) returns (ListNotificationChannelsResponse) {
     option (google.api.http) = {
       get: "/grpc/v1/notification-channels"
     };
   }
 
-  // Notification Template Management
   rpc CreateNotificationTemplate(CreateNotificationTemplateRequest) returns (CreateNotificationTemplateResponse) {
     option (google.api.http) = {
       post: "/grpc/v1/notification-templates"
@@ -234,7 +233,6 @@ message ListNotificationTypesResponse {
   PaginationResponse pagination = 2;
 }
 
-// Notification Channel messages
 message NotificationChannel {
   int32 notification_channel_id = 1;
   string code = 2;
@@ -294,7 +292,6 @@ message ListNotificationChannelsResponse {
   PaginationResponse pagination = 2;
 }
 
-// Notification Template messages
 message NotificationTemplate {
   int32 notification_template_id = 1;
   int32 notification_type_id = 2;
@@ -312,6 +309,8 @@ message CreateNotificationTemplateRequest {
   bool is_active = 4;
   ImportanceLevel importance = 5;
   repeated int32 channel_ids = 6;
+  repeated int32 users_ids = 7;
+  repeated int32 roles_ids = 8;
 }
 
 message CreateNotificationTemplateResponse {
@@ -358,7 +357,6 @@ message ListNotificationTemplatesResponse {
   PaginationResponse pagination = 2;
 }
 
-// User Notification Preference messages
 message UserNotificationPreference {
   int32 user_notification_preference_id = 1;
   int32 user_id = 2;
@@ -412,7 +410,6 @@ message Notification {
   int32 notification_type_id = 2;
   string created_at = 4;
   optional string data_json = 5;
-  repeated NotificationUser notification_users = 6;
 }
 
 message NotificationUser {

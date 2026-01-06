@@ -8,7 +8,7 @@ namespace Oip.Settings;
 public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
 {
     /// <inheritdoc />
-    public string OipUrls { get; set; } = null!;
+    public OipServices Services { get; set; }
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();

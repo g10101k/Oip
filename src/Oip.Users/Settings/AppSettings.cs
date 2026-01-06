@@ -7,10 +7,7 @@ namespace Oip.Users.Settings;
 public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
 {
     /// <inheritdoc />
-    public string OipUrls { get; set; } = null!;
-
-    /// <summary>Gets or sets the URL for the notification service</summary>
-    public string NotificationServiceUrl { get; set; } = null!;
+    public OipServices Services { get; set; } = new();
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();

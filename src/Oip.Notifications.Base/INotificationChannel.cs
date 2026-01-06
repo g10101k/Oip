@@ -8,10 +8,15 @@ namespace Oip.Notifications.Base;
 public interface INotificationChannel
 {
     /// <summary>
+    /// Gets or sets the queue of notifications to be processed by the channel
+    /// </summary>
+    Queue<NotificationDto> Queue { get; set; }
+
+    /// <summary>
     /// Unique identifier for the notification channel
     /// </summary>
-    string Code { get; set; } 
-    
+    string Code { get; set; }
+
     /// <summary>
     /// Channel name
     /// </summary>
@@ -21,7 +26,7 @@ public interface INotificationChannel
     /// Gets or sets the maximum number of retry attempts for sending notifications through this channel
     /// </summary>
     int MaxRetryCount { get; set; }
-    
+
     /// <summary>
     /// Channel activity
     /// </summary>
@@ -43,18 +48,9 @@ public interface INotificationChannel
     void CloseChannel();
 
     /// <summary>
-    /// Notification
-    /// </summary>
-    void Notify(UserInfoDto userInfoDto, string subject, string message);
-
-    /// <summary>
     /// Notification with attachment
     /// </summary>
-    /// <param name="userInfoDto"></param>
-    /// <param name="subject"></param>
-    /// <param name="message"></param>
-    /// <param name="attachments"></param>
-    void Notify(UserInfoDto userInfoDto, string subject, string message, Attachment[] attachments);
+    void ProcessNotify(NotificationDto message, CancellationToken cancellationToken = default);
 }
 
 public class UserInfoDto
@@ -62,4 +58,12 @@ public class UserInfoDto
     public int Id { get; set; }
     public string Email { get; set; }
     public string Phone { get; set; }
+}
+
+public class NotificationDto
+{
+    public UserInfoDto UserInfo { get; set; }
+    public string Subject { get; set; }
+    public string Message { get; set; }
+    public Attachment[] Attachment { get; set; }
 }

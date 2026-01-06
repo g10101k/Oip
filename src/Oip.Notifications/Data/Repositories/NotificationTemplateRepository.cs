@@ -22,6 +22,9 @@ public class NotificationTemplateRepository(NotificationsDbContext context)
         int notificationTypeId, CancellationToken cancellationToken = default)
     {
         return await DbSet
+            .Include(e => e.NotificationTemplateChannels)
+            .ThenInclude(tc => tc.NotificationChannel)
+            .Include(e => e.NotificationTemplateUsers)
             .Where(e => e.NotificationTypeId == notificationTypeId && e.IsActive)
             .ToListAsync(cancellationToken);
     }
@@ -38,7 +41,9 @@ public class NotificationTemplateRepository(NotificationsDbContext context)
         return await DbSet
             .Include(e => e.NotificationTemplateChannels)
             .ThenInclude(tc => tc.NotificationChannel)
+            .AsSplitQuery()
             .Include(e => e.NotificationType)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.NotificationTemplateId == id, cancellationToken);
     }
 

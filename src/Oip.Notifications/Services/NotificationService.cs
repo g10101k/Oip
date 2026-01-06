@@ -1,7 +1,10 @@
+using System.Text.Json;
 using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Notifications.Base;
 using Oip.Notifications.Data.Entities;
 using Oip.Notifications.Data.Repositories;
+using EmptyResponse = Google.Protobuf.WellKnownTypes.Empty;
 
 namespace Oip.Notifications.Services;
 
@@ -153,18 +156,18 @@ public class NotificationService(
     /// <param name="request">The request containing the notification type ID to delete</param>
     /// <param name="context">The server call context</param>
     /// <returns>A response indicating the success or failure of the deletion operation</returns>
-    public override async Task<Google.Protobuf.WellKnownTypes.Empty> DeleteNotificationType(
+    public override async Task<EmptyResponse> DeleteNotificationType(
         DeleteNotificationTypeRequest request, ServerCallContext context)
     {
         try
         {
             await notificationTypeRepository.DeleteAsync(request.NotificationTypeId);
-            return new Google.Protobuf.WellKnownTypes.Empty();
+            return new EmptyResponse();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error deleting notification type: {Id}", request.NotificationTypeId);
-            return new Google.Protobuf.WellKnownTypes.Empty();
+            return new EmptyResponse();
         }
     }
 
@@ -353,18 +356,18 @@ public class NotificationService(
     /// <param name="request">The request containing the notification channel ID to delete</param>
     /// <param name="context">The server call context</param>
     /// <returns>A response indicating whether the deletion was successful</returns>
-    public override async Task<Google.Protobuf.WellKnownTypes.Empty> DeleteNotificationChannel(
+    public override async Task<EmptyResponse> DeleteNotificationChannel(
         DeleteNotificationChannelRequest request, ServerCallContext context)
     {
         try
         {
             await notificationChannelRepository.DeleteAsync(request.NotificationChannelId);
-            return new Google.Protobuf.WellKnownTypes.Empty();
+            return new EmptyResponse();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error deleting notification channel: {Id}", request.NotificationChannelId);
-            return new Google.Protobuf.WellKnownTypes.Empty();
+            return new EmptyResponse();
         }
     }
 
@@ -433,7 +436,15 @@ public class NotificationService(
                 NotificationTypeId = request.NotificationTypeId,
                 SubjectTemplate = request.SubjectTemplate,
                 MessageTemplate = request.MessageTemplate,
-                IsActive = request.IsActive
+                IsActive = request.IsActive,
+                NotificationTemplateChannels = request.ChannelIds.Select(x => new NotificationTemplateChannelEntity()
+                {
+                    NotificationChannelId = x
+                }).ToList(),
+                NotificationTemplateUsers = request.UsersIds.Select(x => new NotificationTemplateUserEntity()
+                {
+                    UserId = x
+                }).ToList()
             };
 
             await notificationTemplateRepository.AddAsync(notificationTemplate);
@@ -572,18 +583,18 @@ public class NotificationService(
     /// <param name="request">The request containing the notification template ID to delete</param>
     /// <param name="context">The server call context</param>
     /// <returns>A response indicating whether the deletion was successful</returns>
-    public override async Task<Google.Protobuf.WellKnownTypes.Empty> DeleteNotificationTemplate(
+    public override async Task<EmptyResponse> DeleteNotificationTemplate(
         DeleteNotificationTemplateRequest request, ServerCallContext context)
     {
         try
         {
             await notificationTemplateRepository.DeleteAsync(request.NotificationTemplateId);
-            return new Google.Protobuf.WellKnownTypes.Empty();
+            return new EmptyResponse();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error deleting notification template: {Id}", request.NotificationTemplateId);
-            return new Google.Protobuf.WellKnownTypes.Empty();
+            return new EmptyResponse();
         }
     }
 
@@ -773,11 +784,9 @@ public class NotificationService(
     /// <param name="request">The request containing notification details</param>
     /// <param name="context">The server call context</param>
     /// <return>CreateNotificationResponse containing the created notification details</return>
-    public override async Task<Google.Protobuf.WellKnownTypes.Empty> CreateNotification(
-        CreateNotificationRequest request,
+    public override async Task<EmptyResponse> CreateNotification(CreateNotificationRequest request,
         ServerCallContext context)
     {
-        
         try
         {
             var notification = new NotificationEntity
@@ -786,17 +795,27 @@ public class NotificationService(
                 CreatedAt = DateTimeOffset.UtcNow,
                 DataJson = request.DataJson
             };
-
             await notificationRepository.AddAsync(notification);
 
-            var activeTemplates = await notificationTemplateRepository.GetActiveTemplatesByTypeAsync(notification.NotificationTypeId);
+            var activeTemplates =
+                await notificationTemplateRepository.GetActiveTemplatesByTypeAsync(notification.NotificationTypeId);
 
             foreach (var activeTemplate in activeTemplates)
             {
-                
+                var q = GenerateMessagesFromTemplateAsync(request, activeTemplate, notification.NotificationId);
+
+                foreach (var channel in activeTemplate.NotificationTemplateChannels)
+                {
+                    // проверка, что у пользователя этот канал включен
+                    foreach (var qq in q)
+                    {
+                        channelService.Notify(channel.NotificationChannel.Code, new UserInfoDto(), qq.Subject,
+                            qq.Message);
+                    }
+                }
             }
 
-            return new Google.Protobuf.WellKnownTypes.Empty();
+            return new EmptyResponse();
         }
         catch (Exception ex)
         {
@@ -804,6 +823,64 @@ public class NotificationService(
             throw new RpcException(new Status(StatusCode.Internal, "Failed to create notification"));
         }
     }
+
+    /// <summary>
+    /// Генерирует персонализированные сообщения для каждого пользователя на основе шаблона
+    /// </summary>
+    private List<NotificationUserEntity> GenerateMessagesFromTemplateAsync(
+        CreateNotificationRequest request,
+        NotificationTemplateEntity template, long notificationId)
+    {
+        var userMessages = new List<NotificationUserEntity>();
+
+        // Получаем данные из JSON
+        var data = JsonSerializer.Deserialize<Dictionary<string, string>>(request.DataJson ?? "{}")
+                   ?? new Dictionary<string, string>();
+
+        // Получаем список пользователей для этого шаблона
+        var templateUsers = template.NotificationTemplateUsers;
+
+        foreach (var user in templateUsers)
+        {
+            var subject = ReplaceTemplatePlaceholders(template.SubjectTemplate, data, user.UserId);
+            var message = ReplaceTemplatePlaceholders(template.MessageTemplate, data, user.UserId);
+
+            userMessages.Add(new NotificationUserEntity
+            {
+                NotificationId = notificationId,
+                UserId = user.UserId,
+                Subject = subject,
+                Message = message,
+            });
+        }
+
+        return userMessages;
+    }
+
+    /// <summary>
+    /// Заменяет плейсхолдеры в шаблоне на реальные данные
+    /// </summary>
+    private string ReplaceTemplatePlaceholders(string template, Dictionary<string, string> data, long userId)
+    {
+        if (string.IsNullOrEmpty(template))
+            return template;
+
+        var result = template;
+
+        // Заменяем стандартные плейсхолдеры
+        result = result.Replace("{UserId}", userId.ToString());
+        result = result.Replace("{Date}", DateTime.UtcNow.ToString("yyyy-MM-dd"));
+        result = result.Replace("{Time}", DateTime.UtcNow.ToString("HH:mm:ss"));
+
+        // Заменяем пользовательские плейсхолдеры из данных
+        foreach (var kvp in data)
+        {
+            result = result.Replace($"{{{kvp.Key}}}", kvp.Value);
+        }
+
+        return result;
+    }
+
 
     /// <summary>
     /// Retrieves a notification by its ID along with associated user details
@@ -840,7 +917,6 @@ public class NotificationService(
                     NotificationTypeId = notification.NotificationTypeId,
                     CreatedAt = notification.CreatedAt.ToString("o"),
                     DataJson = notification.DataJson,
-                    NotificationUsers = { notificationUsers }
                 }
             };
         }
