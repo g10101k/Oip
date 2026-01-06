@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
 option csharp_namespace = "Oip.Notifications";
 
 package notifications;
@@ -8,7 +10,7 @@ package notifications;
 // Notification service for managing notification types, channels, templates and deliveries
 service GrpcNotificationService {
   // Notification Type Management
-  rpc CreateNotificationType(CreateNotificationTypeRequest) returns (CreateNotificationTypeResponse) {
+  rpc CreateNotificationTypes(CreateNotificationTypesRequest) returns (CreateNotificationTypesResponse) {
     option (google.api.http) = {
       post: "/grpc/v1/notification-types"
       body: "*"
@@ -25,7 +27,7 @@ service GrpcNotificationService {
       body: "*"
     };
   }
-  rpc DeleteNotificationType(DeleteNotificationTypeRequest) returns (DeleteNotificationTypeResponse) {
+  rpc DeleteNotificationType(DeleteNotificationTypeRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/grpc/v1/notification-types/{notification_type_id}"
     };
@@ -54,7 +56,7 @@ service GrpcNotificationService {
       body: "*"
     };
   }
-  rpc DeleteNotificationChannel(DeleteNotificationChannelRequest) returns (DeleteNotificationChannelResponse) {
+  rpc DeleteNotificationChannel(DeleteNotificationChannelRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/grpc/v1/notification-channels/{notification_channel_id}"
     };
@@ -83,7 +85,7 @@ service GrpcNotificationService {
       body: "*"
     };
   }
-  rpc DeleteNotificationTemplate(DeleteNotificationTemplateRequest) returns (DeleteNotificationTemplateResponse) {
+  rpc DeleteNotificationTemplate(DeleteNotificationTemplateRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/grpc/v1/notification-templates/{notification_template_id}"
     };
@@ -113,7 +115,7 @@ service GrpcNotificationService {
   }
 
   // Notification Management
-  rpc CreateNotification(CreateNotificationRequest) returns (CreateNotificationResponse) {
+  rpc CreateNotification(CreateNotificationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/grpc/v1/notifications"
       body: "*"
@@ -180,14 +182,19 @@ message NotificationType {
   string scope = 4;
 }
 
+
 message CreateNotificationTypeRequest {
   string name = 1;
   string description = 2;
   string scope = 3;
 }
 
-message CreateNotificationTypeResponse {
-  NotificationType notification_type = 1;
+message CreateNotificationTypesRequest {
+  repeated CreateNotificationTypeRequest requests = 1;
+}
+
+message CreateNotificationTypesResponse {
+  repeated NotificationType notification_type = 1;
 }
 
 message GetNotificationTypeRequest {
@@ -230,17 +237,19 @@ message ListNotificationTypesResponse {
 // Notification Channel messages
 message NotificationChannel {
   int32 notification_channel_id = 1;
+  string code = 2;
+  string name = 3;
+  bool is_active = 4;
+  bool requires_verification = 5;
+  optional int32 max_retry_count = 6;
+}
+
+message CreateNotificationChannelRequest {
+  string code = 1;
   string name = 2;
   bool is_active = 3;
   bool requires_verification = 4;
   optional int32 max_retry_count = 5;
-}
-
-message CreateNotificationChannelRequest {
-  string name = 1;
-  bool is_active = 2;
-  bool requires_verification = 3;
-  optional int32 max_retry_count = 4;
 }
 
 message CreateNotificationChannelResponse {
@@ -292,7 +301,8 @@ message NotificationTemplate {
   string subject_template = 3;
   string message_template = 4;
   bool is_active = 5;
-  repeated int32 channel_ids = 6;
+  ImportanceLevel importance = 6;
+  repeated int32 channel_ids = 7;
 }
 
 message CreateNotificationTemplateRequest {
@@ -300,7 +310,8 @@ message CreateNotificationTemplateRequest {
   string subject_template = 2;
   string message_template = 3;
   bool is_active = 4;
-  repeated int32 channel_ids = 5;
+  ImportanceLevel importance = 5;
+  repeated int32 channel_ids = 6;
 }
 
 message CreateNotificationTemplateResponse {
@@ -399,7 +410,6 @@ enum ImportanceLevel {
 message Notification {
   int64 notification_id = 1;
   int32 notification_type_id = 2;
-  ImportanceLevel importance = 3;
   string created_at = 4;
   optional string data_json = 5;
   repeated NotificationUser notification_users = 6;
@@ -408,16 +418,15 @@ message Notification {
 message NotificationUser {
   int64 notification_user_id = 1;
   int64 notification_id = 2;
-  int32 user_id = 3;
-  string subject = 4;
-  string message = 5;
+  ImportanceLevel importance = 3;
+  int32 user_id = 4;
+  string subject = 5;
+  string message = 6;
 }
 
 message CreateNotificationRequest {
   int32 notification_type_id = 1;
-  ImportanceLevel importance = 2;
   optional string data_json = 3;
-  repeated int32 user_ids = 4;
 }
 
 message CreateNotificationResponse {
@@ -435,9 +444,8 @@ message GetNotificationResponse {
 message ListNotificationsRequest {
   Pagination pagination = 1;
   optional int32 notification_type_id = 2;
-  optional ImportanceLevel importance_filter = 3;
-  optional string created_after = 4;
-  optional int32 user_id = 5;
+  optional string created_after = 3;
+  optional int32 user_id = 4;
 }
 
 message ListNotificationsResponse {

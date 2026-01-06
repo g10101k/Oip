@@ -8,32 +8,47 @@ namespace Oip.Notifications.Base;
 public interface INotificationChannel
 {
     /// <summary>
-    /// Имя канала
+    /// Unique identifier for the notification channel
+    /// </summary>
+    string Code { get; set; } 
+    
+    /// <summary>
+    /// Channel name
     /// </summary>
     string Name { get; set; }
 
     /// <summary>
-    /// Активность канала
+    /// Gets or sets the maximum number of retry attempts for sending notifications through this channel
+    /// </summary>
+    int MaxRetryCount { get; set; }
+    
+    /// <summary>
+    /// Channel activity
     /// </summary>
     bool IsEnable { get; }
 
     /// <summary>
-    /// Открытие канала
+    /// Whether the channel requires user verification
+    /// </summary>
+    bool RequiresVerification { get; set; }
+
+    /// <summary>
+    /// Opening the channel
     /// </summary>
     void OpenChannel();
 
     /// <summary>
-    /// Закрытие канала
+    /// Closing the channel
     /// </summary>
     void CloseChannel();
 
     /// <summary>
-    /// Оповещение
+    /// Notification
     /// </summary>
     void Notify(UserInfoDto userInfoDto, string subject, string message);
 
     /// <summary>
-    /// Оповещение с вложением
+    /// Notification with attachment
     /// </summary>
     /// <param name="userInfoDto"></param>
     /// <param name="subject"></param>
