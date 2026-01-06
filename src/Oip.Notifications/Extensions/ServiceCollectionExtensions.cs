@@ -2,7 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Oip.Base.Clients;
 using Oip.Base.Extensions;
 using Oip.Base.Settings;
-using Oip.Notifications.Contexts;
+using Oip.Notifications.Data;
+using Oip.Notifications.Data.Contexts;
 
 namespace Oip.Notifications.Extensions;
 
