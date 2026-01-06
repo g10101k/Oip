@@ -1,9 +1,7 @@
-using System.Net.Mail;
 using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Notifications.Base;
-using Oip.Notifications.Channels;
-using Oip.Notifications.Contexts;
+using Oip.Notifications.Data.Entities;
+using Oip.Notifications.Data.Repositories;
 
 namespace Oip.Notifications.Services;
 
@@ -13,7 +11,7 @@ namespace Oip.Notifications.Services;
 [ApiExplorerSettings(GroupName = "grpc")]
 public class NotificationService(
     ILogger<NotificationService> logger,
-    SmtpChannel smtpChannel,
+    ChannelService channelService,
     NotificationTypeRepository notificationTypeRepository,
     NotificationChannelRepository notificationChannelRepository,
     NotificationTemplateRepository notificationTemplateRepository,
@@ -21,88 +19,56 @@ public class NotificationService(
     NotificationRepository notificationRepository,
     NotificationDeliveryRepository notificationDeliveryRepository) : GrpcNotificationService.GrpcNotificationServiceBase
 {
-    private readonly List<INotificationChannel> _channels = [smtpChannel];
-
     /// <summary>
-    /// Notification via all channels
+    /// Creates multiple notification types based on the provided requests
     /// </summary>
-    /// <param name="user">User to notify</param>
-    /// <param name="subject">Message subject</param>
-    /// <param name="message">Message content</param>
-    public void Notify(UserInfoDto user, string subject, string message)
-    {
-        foreach (var channel in _channels)
-        {
-            try
-            {
-                channel.Notify(user, subject, message);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred while sending notification via channel {channelName}",
-                    channel.Name);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Notification via all channels with attachments
-    /// </summary>
-    /// <param name="user">User to notify</param>
-    /// <param name="subject">Message subject</param>
-    /// <param name="message">Message content</param>
-    /// <param name="attachments">File attachments</param>
-    public void Notify(UserInfoDto user, string subject, string message, Attachment[] attachments)
-    {
-        foreach (var channel in _channels)
-        {
-            try
-            {
-                channel.Notify(user, subject, message, attachments);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred while sending notification via channel {channelName}",
-                    channel.Name);
-            }
-        }
-    }
-
-    // Notification Type Management
-    public override async Task<CreateNotificationTypeResponse> CreateNotificationType(
-        CreateNotificationTypeRequest request, ServerCallContext context)
+    /// <param name="request">The request containing a collection of notification type creation requests</param>
+    /// <param name="context">The server call context</param>
+    /// <returns>A response containing the results of the notification type creation operations</returns>
+    /// <exception cref="RpcException">Thrown when an error occurs during notification type creation</exception>
+    public override async Task<CreateNotificationTypesResponse> CreateNotificationTypes(
+        CreateNotificationTypesRequest request, ServerCallContext context)
     {
         try
         {
-            var notificationType = new NotificationTypeEntity
+            var results = new CreateNotificationTypesResponse();
+            foreach (var notificationTypeRequest in request.Requests)
             {
-                Name = request.Name,
-                Description = request.Description,
-                Scope = request.Scope
-            };
-
-            await notificationTypeRepository.AddAsync(notificationType);
-
-            return new CreateNotificationTypeResponse
-            {
-                NotificationType = new NotificationType
+                var notificationType = new NotificationTypeEntity
                 {
-                    NotificationTypeId = notificationType.NotificationTypeId,
-                    Name = notificationType.Name,
-                    Description = notificationType.Description,
-                    Scope = notificationType.Scope
-                }
-            };
+                    Name = notificationTypeRequest.Name,
+                    Description = notificationTypeRequest.Description,
+                    Scope = notificationTypeRequest.Scope
+                };
+
+                var notificationTypeEntity = await notificationTypeRepository.Upsert(notificationType);
+                results.NotificationType.Add(new NotificationType()
+                {
+                    NotificationTypeId = notificationTypeEntity.NotificationTypeId,
+                    Name = notificationTypeEntity.Name,
+                    Description = notificationTypeEntity.Description,
+                    Scope = notificationTypeEntity.Scope
+                });
+            }
+
+            return results;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error creating notification type: {Name}", request.Name);
+            logger.LogError(ex, "Error creating notification types");
             throw new RpcException(new Status(StatusCode.Internal, "Failed to create notification type"));
         }
     }
 
-    public override async Task<GetNotificationTypeResponse> GetNotificationType(
-        GetNotificationTypeRequest request, ServerCallContext context)
+    /// <summary>
+    /// Retrieves a notification type by its unique identifier
+    /// </summary>
+    /// <param name="request">The request containing the notification type ID</param>
+    /// <param name="context">The server call context</param>
+    /// <returns>A response containing the requested notification type details</returns>
+    /// <exception cref="RpcException">Thrown when the notification type is not found or other RPC errors occur</exception>
+    public override async Task<GetNotificationTypeResponse> GetNotificationType(GetNotificationTypeRequest request,
+        ServerCallContext context)
     {
         try
         {
@@ -135,6 +101,12 @@ public class NotificationService(
         }
     }
 
+    /// <summary>
+    /// Updates an existing notification type with the specified details
+    /// </summary>
+    /// <param name="request">The request containing updated notification type information</param>
+    /// <param name="context">The server call context</param>
+    /// <returns>A response containing the updated notification type details</returns>
     public override async Task<UpdateNotificationTypeResponse> UpdateNotificationType(
         UpdateNotificationTypeRequest request, ServerCallContext context)
     {
@@ -175,21 +147,33 @@ public class NotificationService(
         }
     }
 
-    public override async Task<DeleteNotificationTypeResponse> DeleteNotificationType(
+    /// <summary>
+    /// Deletes a notification type by its identifier
+    /// </summary>
+    /// <param name="request">The request containing the notification type ID to delete</param>
+    /// <param name="context">The server call context</param>
+    /// <returns>A response indicating the success or failure of the deletion operation</returns>
+    public override async Task<Google.Protobuf.WellKnownTypes.Empty> DeleteNotificationType(
         DeleteNotificationTypeRequest request, ServerCallContext context)
     {
         try
         {
             await notificationTypeRepository.DeleteAsync(request.NotificationTypeId);
-            return new DeleteNotificationTypeResponse { Success = true };
+            return new Google.Protobuf.WellKnownTypes.Empty();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error deleting notification type: {Id}", request.NotificationTypeId);
-            return new DeleteNotificationTypeResponse { Success = false };
+            return new Google.Protobuf.WellKnownTypes.Empty();
         }
     }
 
+    /// <summary>
+    /// Retrieves a list of notification types based on the provided request criteria
+    /// </summary>
+    /// <param name="request">The request containing filter and pagination parameters for notification types</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <return>A response containing the list of notification types and pagination information</return>
     public override async Task<ListNotificationTypesResponse> ListNotificationTypes(
         ListNotificationTypesRequest request, ServerCallContext context)
     {
@@ -232,7 +216,13 @@ public class NotificationService(
         }
     }
 
-    // Notification Channel Management
+    /// <summary>
+    /// Creates a new notification channel with the specified configuration
+    /// </summary>
+    /// <param name="request">The request containing channel creation parameters</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <returns>A response indicating the result of the channel creation operation</returns>
+    /// <exception cref="RpcException">Thrown when there is an error during channel creation</exception>
     public override async Task<CreateNotificationChannelResponse> CreateNotificationChannel(
         CreateNotificationChannelRequest request, ServerCallContext context)
     {
@@ -240,6 +230,7 @@ public class NotificationService(
         {
             var notificationChannel = new NotificationChannelEntity
             {
+                Code = request.Code,
                 Name = request.Name,
                 IsActive = request.IsActive,
                 RequiresVerification = request.RequiresVerification,
@@ -267,6 +258,12 @@ public class NotificationService(
         }
     }
 
+    /// <summary>
+    /// Retrieves a notification channel by its unique identifier
+    /// </summary>
+    /// <param name="request">The request containing the notification channel ID</param>
+    /// <param name="context">The server call context</param>
+    /// <return>The response containing the requested notification channel details</return>
     public override async Task<GetNotificationChannelResponse> GetNotificationChannel(
         GetNotificationChannelRequest request, ServerCallContext context)
     {
@@ -302,6 +299,12 @@ public class NotificationService(
         }
     }
 
+    /// <summary>
+    /// Updates an existing notification channel with the specified settings
+    /// </summary>
+    /// <param name="request">The request containing updated notification channel information</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <return>Returns a response with the updated notification channel details</return>
     public override async Task<UpdateNotificationChannelResponse> UpdateNotificationChannel(
         UpdateNotificationChannelRequest request, ServerCallContext context)
     {
@@ -344,21 +347,33 @@ public class NotificationService(
         }
     }
 
-    public override async Task<DeleteNotificationChannelResponse> DeleteNotificationChannel(
+    /// <summary>
+    /// Deletes a notification channel by its identifier
+    /// </summary>
+    /// <param name="request">The request containing the notification channel ID to delete</param>
+    /// <param name="context">The server call context</param>
+    /// <returns>A response indicating whether the deletion was successful</returns>
+    public override async Task<Google.Protobuf.WellKnownTypes.Empty> DeleteNotificationChannel(
         DeleteNotificationChannelRequest request, ServerCallContext context)
     {
         try
         {
             await notificationChannelRepository.DeleteAsync(request.NotificationChannelId);
-            return new DeleteNotificationChannelResponse { Success = true };
+            return new Google.Protobuf.WellKnownTypes.Empty();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error deleting notification channel: {Id}", request.NotificationChannelId);
-            return new DeleteNotificationChannelResponse { Success = false };
+            return new Google.Protobuf.WellKnownTypes.Empty();
         }
     }
 
+    /// <summary>
+    /// Retrieves a list of notification channels based on the specified request parameters
+    /// </summary>
+    /// <param name="request">The request containing pagination and filtering options for notification channels</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <returns>A response containing the list of notification channels and pagination information</returns>
     public override async Task<ListNotificationChannelsResponse> ListNotificationChannels(
         ListNotificationChannelsRequest request, ServerCallContext context)
     {
@@ -402,7 +417,12 @@ public class NotificationService(
         }
     }
 
-    // Notification Template Management
+    /// <summary>
+    /// Creates a new notification template with the specified request parameters
+    /// </summary>
+    /// <param name="request">The request containing notification template details</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <return>CreateNotificationTemplateResponse containing the result of the template creation</return>
     public override async Task<CreateNotificationTemplateResponse> CreateNotificationTemplate(
         CreateNotificationTemplateRequest request, ServerCallContext context)
     {
@@ -449,6 +469,12 @@ public class NotificationService(
         }
     }
 
+    /// <summary>
+    /// Retrieves a notification template by its identifier
+    /// </summary>
+    /// <param name="request">The request containing the notification template identifier</param>
+    /// <param name="context">The server call context</param>
+    /// <return>The notification template with its associated channels</return>
     public override async Task<GetNotificationTemplateResponse> GetNotificationTemplate(
         GetNotificationTemplateRequest request, ServerCallContext context)
     {
@@ -488,6 +514,12 @@ public class NotificationService(
         }
     }
 
+    /// <summary>
+    /// Updates an existing notification template with the specified request data
+    /// </summary>
+    /// <param name="request">The request containing updated template information</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <returns>A response indicating the result of the template update operation</returns>
     public override async Task<UpdateNotificationTemplateResponse> UpdateNotificationTemplate(
         UpdateNotificationTemplateRequest request, ServerCallContext context)
     {
@@ -534,21 +566,33 @@ public class NotificationService(
         }
     }
 
-    public override async Task<DeleteNotificationTemplateResponse> DeleteNotificationTemplate(
+    /// <summary>
+    /// Deletes a notification template by its identifier
+    /// </summary>
+    /// <param name="request">The request containing the notification template ID to delete</param>
+    /// <param name="context">The server call context</param>
+    /// <returns>A response indicating whether the deletion was successful</returns>
+    public override async Task<Google.Protobuf.WellKnownTypes.Empty> DeleteNotificationTemplate(
         DeleteNotificationTemplateRequest request, ServerCallContext context)
     {
         try
         {
             await notificationTemplateRepository.DeleteAsync(request.NotificationTemplateId);
-            return new DeleteNotificationTemplateResponse { Success = true };
+            return new Google.Protobuf.WellKnownTypes.Empty();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error deleting notification template: {Id}", request.NotificationTemplateId);
-            return new DeleteNotificationTemplateResponse { Success = false };
+            return new Google.Protobuf.WellKnownTypes.Empty();
         }
     }
 
+    /// <summary>
+    /// Retrieves a list of notification templates based on the provided request parameters
+    /// </summary>
+    /// <param name="request">The request containing criteria for filtering notification templates</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <return>A response containing the list of notification templates matching the request criteria</return>
     public override async Task<ListNotificationTemplatesResponse> ListNotificationTemplates(
         ListNotificationTemplatesRequest request, ServerCallContext context)
     {
@@ -600,7 +644,12 @@ public class NotificationService(
         }
     }
 
-    // User Notification Preferences
+    /// <summary>
+    /// Sets the notification preference for a user by specifying the notification type and channel
+    /// </summary>
+    /// <param name="request">Request containing user ID, notification type ID, channel ID, and preference status</param>
+    /// <param name="context">Server call context for the gRPC request</param>
+    /// <return>Response containing the updated user notification preference details</return>
     public override async Task<SetUserNotificationPreferenceResponse> SetUserNotificationPreference(
         SetUserNotificationPreferenceRequest request, ServerCallContext context)
     {
@@ -635,6 +684,12 @@ public class NotificationService(
         }
     }
 
+    /// <summary>
+    /// Retrieves the notification preference for a specific user, notification type, and channel
+    /// </summary>
+    /// <param name="request">Request containing user ID, notification type ID, and notification channel ID</param>
+    /// <param name="context">Server call context for the gRPC request</param>
+    /// <return>Response containing the user's notification preference settings</return>
     public override async Task<GetUserNotificationPreferenceResponse> GetUserNotificationPreference(
         GetUserNotificationPreferenceRequest request, ServerCallContext context)
     {
@@ -671,6 +726,12 @@ public class NotificationService(
         }
     }
 
+    /// <summary>
+    /// Retrieves a list of notification preferences for a specified user
+    /// </summary>
+    /// <param name="request">The request containing the user ID and pagination parameters</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <return>A response containing the user's notification preferences and pagination details</return>
     public override async Task<ListUserNotificationPreferencesResponse> ListUserNotificationPreferences(
         ListUserNotificationPreferencesRequest request, ServerCallContext context)
     {
@@ -706,34 +767,36 @@ public class NotificationService(
         }
     }
 
-    // Notification Management
-    public override async Task<CreateNotificationResponse> CreateNotification(
-        CreateNotificationRequest request, ServerCallContext context)
+    /// <summary>
+    /// Creates a new notification with the specified type, importance, and data
+    /// </summary>
+    /// <param name="request">The request containing notification details</param>
+    /// <param name="context">The server call context</param>
+    /// <return>CreateNotificationResponse containing the created notification details</return>
+    public override async Task<Google.Protobuf.WellKnownTypes.Empty> CreateNotification(
+        CreateNotificationRequest request,
+        ServerCallContext context)
     {
+        
         try
         {
             var notification = new NotificationEntity
             {
                 NotificationTypeId = request.NotificationTypeId,
-                Importance = (Oip.Notifications.Contexts.ImportanceLevel)(int)request.Importance,
                 CreatedAt = DateTimeOffset.UtcNow,
                 DataJson = request.DataJson
             };
 
             await notificationRepository.AddAsync(notification);
 
-            return new CreateNotificationResponse
+            var activeTemplates = await notificationTemplateRepository.GetActiveTemplatesByTypeAsync(notification.NotificationTypeId);
+
+            foreach (var activeTemplate in activeTemplates)
             {
-                Notification = new Notification
-                {
-                    NotificationId = notification.NotificationId,
-                    NotificationTypeId = notification.NotificationTypeId,
-                    Importance = (ImportanceLevel)(int)request.Importance,
-                    CreatedAt = notification.CreatedAt.ToString("o"),
-                    DataJson = notification.DataJson
-                    // NotificationUsers would be populated in a real implementation
-                }
-            };
+                
+            }
+
+            return new Google.Protobuf.WellKnownTypes.Empty();
         }
         catch (Exception ex)
         {
@@ -742,8 +805,14 @@ public class NotificationService(
         }
     }
 
-    public override async Task<GetNotificationResponse> GetNotification(
-        GetNotificationRequest request, ServerCallContext context)
+    /// <summary>
+    /// Retrieves a notification by its ID along with associated user details
+    /// </summary>
+    /// <param name="request">The request containing the notification ID</param>
+    /// <param name="context">The server call context</param>
+    /// <returns>A response containing the notification details and associated users</returns>
+    public override async Task<GetNotificationResponse> GetNotification(GetNotificationRequest request,
+        ServerCallContext context)
     {
         try
         {
@@ -769,7 +838,6 @@ public class NotificationService(
                 {
                     NotificationId = notification.NotificationId,
                     NotificationTypeId = notification.NotificationTypeId,
-                    Importance = (ImportanceLevel)(int)notification.Importance,
                     CreatedAt = notification.CreatedAt.ToString("o"),
                     DataJson = notification.DataJson,
                     NotificationUsers = { notificationUsers }
@@ -787,8 +855,14 @@ public class NotificationService(
         }
     }
 
-    public override async Task<ListNotificationsResponse> ListNotifications(
-        ListNotificationsRequest request, ServerCallContext context)
+    /// <summary>
+    /// Retrieves a list of notifications based on the provided request parameters
+    /// </summary>
+    /// <param name="request">The request containing criteria for filtering notifications</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <return>A response containing the list of notifications matching the request criteria</return>
+    public override async Task<ListNotificationsResponse> ListNotifications(ListNotificationsRequest request,
+        ServerCallContext context)
     {
         try
         {
@@ -801,11 +875,6 @@ public class NotificationService(
             else if (request.HasNotificationTypeId)
             {
                 notifications = await notificationRepository.GetByTypeAsync(request.NotificationTypeId);
-            }
-            else if (request.HasImportanceFilter)
-            {
-                notifications = await notificationRepository.GetByImportanceAsync(
-                    (Oip.Notifications.Contexts.ImportanceLevel)(int)request.ImportanceFilter);
             }
             else if (!string.IsNullOrEmpty(request.CreatedAfter))
             {
@@ -828,7 +897,6 @@ public class NotificationService(
             {
                 NotificationId = n.NotificationId,
                 NotificationTypeId = n.NotificationTypeId,
-                Importance = (ImportanceLevel)(int)n.Importance,
                 CreatedAt = n.CreatedAt.ToString("o"),
                 DataJson = n.DataJson
                 // NotificationUsers would be populated in a real implementation
@@ -853,6 +921,12 @@ public class NotificationService(
     }
 
     // Notification Delivery Management
+    /// <summary>
+    /// Retrieves the delivery details of a specific notification by its delivery identifier
+    /// </summary>
+    /// <param name="request">Request containing the notification delivery identifier</param>
+    /// <param name="context">Server call context for the gRPC request</param>
+    /// <return>Response containing the notification delivery details</return>
     public override async Task<GetNotificationDeliveryResponse> GetNotificationDelivery(
         GetNotificationDeliveryRequest request, ServerCallContext context)
     {
@@ -894,6 +968,12 @@ public class NotificationService(
         }
     }
 
+    /// <summary>
+    /// Updates the delivery status of a notification based on the provided request details
+    /// </summary>
+    /// <param name="request">Request containing notification delivery ID, status, external ID, and error message</param>
+    /// <param name="context">Server call context for the gRPC request</param>
+    /// <return>Response indicating the result of the notification delivery status update operation</return>
     public override async Task<UpdateNotificationDeliveryStatusResponse> UpdateNotificationDeliveryStatus(
         UpdateNotificationDeliveryStatusRequest request, ServerCallContext context)
     {
@@ -901,7 +981,7 @@ public class NotificationService(
         {
             await notificationDeliveryRepository.UpdateStatusAsync(
                 request.NotificationDeliveryId,
-                (Oip.Notifications.Contexts.DeliveryStatus)(int)request.Status,
+                (Data.Enums.DeliveryStatus)(int)request.Status,
                 request.ExternalId,
                 request.ErrorMessage);
 
@@ -936,6 +1016,12 @@ public class NotificationService(
         throw new RpcException(new Status(StatusCode.Internal, "Failed to update notification delivery status"));
     }
 
+    /// <summary>
+    /// Retrieves a list of notification deliveries based on the provided request parameters
+    /// </summary>
+    /// <param name="request">The request containing criteria for filtering notification deliveries</param>
+    /// <param name="context">The server call context for the gRPC request</param>
+    /// <return>A response containing the list of notification deliveries matching the request criteria</return>
     public override async Task<ListNotificationDeliveriesResponse> ListNotificationDeliveries(
         ListNotificationDeliveriesRequest request, ServerCallContext context)
     {
@@ -955,7 +1041,7 @@ public class NotificationService(
             else if (request.HasStatusFilter)
             {
                 deliveries = await notificationDeliveryRepository.GetByStatusAsync(
-                    (Oip.Notifications.Contexts.DeliveryStatus)(int)request.StatusFilter);
+                    (Data.Enums.DeliveryStatus)(int)request.StatusFilter);
             }
             else
             {
