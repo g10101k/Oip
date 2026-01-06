@@ -41,7 +41,7 @@
     "@primeng/themes": "^20.2.0",
     "angular-auth-oidc-client": "^20.0.3",
     "chart.js": "4.4.2",
-    "oip-common": "0.0.15",
+    "oip-common": "0.0.21",
     "primeclt": "^0.1.5",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
