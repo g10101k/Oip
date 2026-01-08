@@ -43,10 +43,6 @@ public class OipModuleContext : DbContext
     /// </summary>
     public DbSet<ModuleSecurityEntity> ModuleSecurities => Set<ModuleSecurityEntity>();
 
-    /// <summary>
-    /// Users
-    /// </summary>
-    public DbSet<UserEntity> Users => Set<UserEntity>();
 
     /// <summary>
     /// .ctor
