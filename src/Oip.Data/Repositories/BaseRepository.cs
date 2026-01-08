@@ -66,10 +66,11 @@ public abstract class BaseRepository<TEntity, TKey>(DbContext context) where TEn
     /// </summary>
     /// <param name="entity">The entity to update</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    public virtual async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         DbSet.Update(entity);
         await context.SaveChangesAsync(cancellationToken);
+        return entity;
     }
 
     /// <summary>
