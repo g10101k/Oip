@@ -24,7 +24,7 @@ public class SwaggerGenerateWebClientStartupTask(
     IBaseOipModuleAppSettings settings) : IStartupTask
 {
     /// <inheritdoc />
-    public int Order { get; } = 0;
+    public int Order => 0;
 
     /// <inheritdoc />
     public async Task ExecuteAsync(CancellationToken cancellationToken = default)
