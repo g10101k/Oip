@@ -9,8 +9,7 @@ namespace Oip.Data.Repositories;
 /// <typeparam name="TEntity">The entity type</typeparam>
 /// <typeparam name="TKey">The type of the entity's primary key</typeparam>
 /// <param name="context">The database context</param>
-public abstract class BaseRepository<TEntity, TKey>(DbContext context)
-    where TEntity : class 
+public abstract class BaseRepository<TEntity, TKey>(DbContext context) where TEntity : class
 {
     /// <summary>
     /// Represents the set of entities in the database for a given type
