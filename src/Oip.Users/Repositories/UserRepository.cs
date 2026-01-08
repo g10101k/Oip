@@ -23,6 +23,34 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     }
 
     /// <summary>
+    /// Gets all users with pagination support
+    /// </summary>
+    /// <param name="pageNumber">Page number (starting from 1)</param>
+    /// <param name="pageSize">Number of users per page</param>
+    /// <returns>UsersPagedResult with users list and total count</returns>
+    public async Task<PageResult<UserEntity>> GetAllUsersAsync(int pageNumber, int pageSize)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 100; // Default page size
+        if (pageSize > 1000) pageSize = 1000; // Maximum page size
+
+        var query = context.Users
+            .Where(u => u.IsActive) // Filter by active users if needed
+            .OrderBy(u => u.UserId); // Order by ID for consistent pagination
+
+        var totalCount = await query.CountAsync();
+
+        var users = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return new PageResult<UserEntity>(users, totalCount, pageNumber);
+    }
+
+
+    /// <summary>
     /// Asynchronously retrieves all user entities with support for pagination.
     /// </summary>
     /// <param name="skip">The number of elements to skip before returning the remaining elements.</param>
@@ -50,18 +78,6 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
                         u.LastName.Contains(searchTerm))
             .Take(50)
             .ToListAsync();
-    }
-
-    /// <summary>
-    /// Asynchronously adds a new user entity to the data store.
-    /// </summary>
-    /// <param name="user">The user entity to add.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the added user entity.</returns>
-    public async Task<UserEntity> AddAsync(UserEntity user)
-    {
-        context.Users.Add(user);
-        await context.SaveChangesAsync();
-        return user;
     }
 
     /// <summary>

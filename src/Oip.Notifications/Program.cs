@@ -10,6 +10,7 @@ using Oip.Notifications.Extensions;
 using Oip.Notifications.Services;
 using Oip.Notifications.Settings;
 using Oip.Notifications.Startups;
+using Oip.Users.Base;
 
 namespace Oip.Notifications;
 
@@ -30,6 +31,12 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
+            builder.Services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(x =>
+            {
+                x.Address = new Uri(settings.Services.OipUsers);
+            });
+            builder.Services.AddSingleton<UserCacheRepository>();
+            builder.Services.AddHostedService<UserCacheRepositoryHostedService>();
             builder.Services.AddSingleton<CryptService>();
             builder.Services.AddSingleton<ChannelService>();
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();

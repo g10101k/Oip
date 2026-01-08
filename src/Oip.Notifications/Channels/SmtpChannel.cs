@@ -141,7 +141,7 @@ public class SmtpChannel : INotificationChannel
     public void Notify(NotificationDto notification)
     {
         var smtpClient = CreateSmtpClient();
-        var mail = new MailMessage(_settings.MailFrom, notification.UserInfo.Email)
+        var mail = new MailMessage(_settings.MailFrom, notification.User.Email)
         {
             Subject = notification.Subject,
             Body = notification.Message,

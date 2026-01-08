@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-option csharp_namespace = "Oip.Notifications";
+option csharp_namespace = "Oip.Notifications.Base";
 
 package notifications;
 

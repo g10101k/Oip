@@ -38,6 +38,7 @@
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
         <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
         <ProjectReference Include="..\Oip.Notifications.Base\Oip.Notifications.Base.csproj" />
+        <ProjectReference Include="..\Oip.Users.Base\Oip.Users.Base.csproj" />
     </ItemGroup>
 
     <ItemGroup>

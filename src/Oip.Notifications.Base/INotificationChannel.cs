@@ -53,16 +53,20 @@ public interface INotificationChannel
     void ProcessNotify(NotificationDto message, CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// Contains user identification and contact information
+/// </summary>
 public class UserInfoDto
 {
-    public int Id { get; set; }
+    /// *Documentation for `UserId` property:**
+    public int UserId { get; set; }
     public string Email { get; set; }
     public string Phone { get; set; }
 }
 
 public class NotificationDto
 {
-    public UserInfoDto UserInfo { get; set; }
+    public UserInfoDto User { get; set; }
     public string Subject { get; set; }
     public string Message { get; set; }
     public Attachment[] Attachment { get; set; }

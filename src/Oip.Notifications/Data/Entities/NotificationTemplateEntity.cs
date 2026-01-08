@@ -1,3 +1,5 @@
+using Oip.Notifications.Base;
+
 namespace Oip.Notifications.Data.Entities;
 
 /// <summary>

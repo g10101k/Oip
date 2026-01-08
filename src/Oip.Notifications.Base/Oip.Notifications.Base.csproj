@@ -50,4 +50,10 @@
         </Protobuf>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Oip.Users.Base">
+        <HintPath>..\Oip.Notifications\bin\Debug\net8.0\Oip.Users.Base.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

@@ -6,9 +6,8 @@ namespace Oip.Notifications.Settings;
 /// <inheritdoc cref="IBaseOipModuleAppSettings"/>
 public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
 {
-
-
-    public OipServices Services { get; set; }
+    /// <inheritdoc />
+    public OipServices Services { get; set; } = new();
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();

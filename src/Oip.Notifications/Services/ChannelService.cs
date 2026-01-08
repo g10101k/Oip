@@ -1,11 +1,13 @@
 using System.Net.Mail;
 using System.Reflection;
 using Oip.Notifications.Base;
+using Oip.Users.Base;
 
 namespace Oip.Notifications.Services;
 
 /// <summary>
-/// Сервис, который регистрирует каналы в бд
+/// Provides channel-based notification functionality by dynamically discovering and managing notification channel
+/// implementations for sending messages with optional attachments
 /// </summary>
 public class ChannelService(IServiceProvider serviceProvider, ILogger<ChannelService> logger)
 {
@@ -45,7 +47,7 @@ public class ChannelService(IServiceProvider serviceProvider, ILogger<ChannelSer
     /// <param name="subject">Message subject</param>
     /// <param name="message">Message content</param>
     /// <param name="attachments">File attachments</param>
-    public void Notify(string channelCode, UserInfoDto user, string subject, string message,
+    public void Notify(string channelCode, User user, string subject, string message,
         Attachment[]? attachments = null)
     {
         if (_channels == null) throw new InvalidOperationException("Channels is not initialized");
@@ -53,13 +55,18 @@ public class ChannelService(IServiceProvider serviceProvider, ILogger<ChannelSer
 
         if (channel == null)
         {
-            logger.LogError($"Channel {channelCode} not found");
+            logger.LogError("Channel {ChannelCode} not found", channelCode);
         }
         else
         {
             channel.ProcessNotify(new NotificationDto()
             {
-                UserInfo = user,
+                User = new UserInfoDto()
+                {
+                    UserId = user.UserId,
+                    Email = user.Email,
+                    Phone = user.Phone,
+                },
                 Subject = subject,
                 Message = message,
                 Attachment = attachments ?? []

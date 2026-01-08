@@ -1,9 +1,11 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 using Oip.Notifications.Base;
 using Oip.Notifications.Data.Entities;
 using Oip.Notifications.Data.Repositories;
+using Oip.Users.Base;
 using EmptyResponse = Google.Protobuf.WellKnownTypes.Empty;
 
 namespace Oip.Notifications.Services;
@@ -20,7 +22,8 @@ public class NotificationService(
     NotificationTemplateRepository notificationTemplateRepository,
     UserNotificationPreferenceRepository userNotificationPreferenceRepository,
     NotificationRepository notificationRepository,
-    NotificationDeliveryRepository notificationDeliveryRepository) : GrpcNotificationService.GrpcNotificationServiceBase
+    NotificationDeliveryRepository notificationDeliveryRepository,
+    UserCacheRepository userRepository) : GrpcNotificationService.GrpcNotificationServiceBase
 {
     /// <summary>
     /// Creates multiple notification types based on the provided requests
@@ -800,17 +803,27 @@ public class NotificationService(
             var activeTemplates =
                 await notificationTemplateRepository.GetActiveTemplatesByTypeAsync(notification.NotificationTypeId);
 
-            foreach (var activeTemplate in activeTemplates)
+            if (activeTemplates.Count == 0)
             {
-                var q = GenerateMessagesFromTemplateAsync(request, activeTemplate, notification.NotificationId);
-
-                foreach (var channel in activeTemplate.NotificationTemplateChannels)
+                logger.LogWarning("No active templates found");
+            }
+            else
+            {
+                foreach (var activeTemplate in activeTemplates)
                 {
-                    // проверка, что у пользователя этот канал включен
-                    foreach (var qq in q)
+                    var messages =
+                        GenerateMessagesFromTemplateAsync(request, activeTemplate, notification.NotificationId);
+
+                    foreach (var channel in activeTemplate.NotificationTemplateChannels)
                     {
-                        channelService.Notify(channel.NotificationChannel.Code, new UserInfoDto(), qq.Subject,
-                            qq.Message);
+                        foreach (var userNotify in messages)
+                        {
+                           
+
+                            channelService.Notify(channel.NotificationChannel.Code,  userRepository.Users[userNotify.UserId],
+                                userNotify.Subject,
+                                userNotify.Message);
+                        }
                     }
                 }
             }
@@ -833,9 +846,9 @@ public class NotificationService(
     {
         var userMessages = new List<NotificationUserEntity>();
 
-        // Получаем данные из JSON
-        var data = JsonSerializer.Deserialize<Dictionary<string, string>>(request.DataJson ?? "{}")
-                   ?? new Dictionary<string, string>();
+        // Используем JsonDocument для парсинга без полной десериализации
+        using var doc = JsonDocument.Parse(request.DataJson ?? "{}");
+        var data = doc.RootElement;
 
         // Получаем список пользователей для этого шаблона
         var templateUsers = template.NotificationTemplateUsers;
@@ -857,30 +870,47 @@ public class NotificationService(
         return userMessages;
     }
 
-    /// <summary>
-    /// Заменяет плейсхолдеры в шаблоне на реальные данные
-    /// </summary>
-    private string ReplaceTemplatePlaceholders(string template, Dictionary<string, string> data, long userId)
+
+    private string ReplaceTemplatePlaceholders(string template, JsonElement data, int userId)
     {
-        if (string.IsNullOrEmpty(template))
-            return template;
-
         var result = template;
-
-        // Заменяем стандартные плейсхолдеры
         result = result.Replace("{UserId}", userId.ToString());
         result = result.Replace("{Date}", DateTime.UtcNow.ToString("yyyy-MM-dd"));
         result = result.Replace("{Time}", DateTime.UtcNow.ToString("HH:mm:ss"));
 
-        // Заменяем пользовательские плейсхолдеры из данных
-        foreach (var kvp in data)
+        // Ищем все плейсхолдеры в формате {PropertyName}
+        var matches = Regex.Matches(template, @"{(\w+)}");
+
+        foreach (Match match in matches)
         {
-            result = result.Replace($"{{{kvp.Key}}}", kvp.Value);
+            var propertyName = match.Groups[1].Value;
+
+            // Игнорируем системные плейсхолдеры
+            if (propertyName.Equals("UserId", StringComparison.OrdinalIgnoreCase))
+            {
+                result = result.Replace(match.Value, userId.ToString());
+                continue;
+            }
+
+            // Ищем свойство в JSON
+            if (data.TryGetProperty(propertyName, out var propertyValue) &&
+                propertyValue.ValueKind != JsonValueKind.Null)
+            {
+                var value = propertyValue.ValueKind switch
+                {
+                    JsonValueKind.String => propertyValue.GetString(),
+                    JsonValueKind.Number => propertyValue.GetDecimal().ToString(),
+                    JsonValueKind.True => "true",
+                    JsonValueKind.False => "false",
+                    _ => string.Empty
+                };
+
+                result = result.Replace(match.Value, value ?? string.Empty);
+            }
         }
 
         return result;
     }
-
 
     /// <summary>
     /// Retrieves a notification by its ID along with associated user details

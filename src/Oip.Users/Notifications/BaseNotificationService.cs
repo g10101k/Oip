@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 using Oip.Base.Runtime;
-using Oip.Notifications;
+using Oip.Notifications.Base;
 
 namespace Oip.Users.Notifications;
 
@@ -27,17 +27,27 @@ public class BaseNotificationService(
         }
     ];
 
+    /// <summary>
+    /// Sends a notification with the specified importance level.
+    /// </summary>
+    /// <param name="notification">The notification object to send.</param>
+    /// <param name="level">The importance level of the notification.</param>
+    /// <typeparam name="TNotification">The type of the notification object.</typeparam>
+    /// <return>A task that represents the asynchronous notification operation.</return>
     public async Task Notify<TNotification>(TNotification notification, ImportanceLevel level)
     {
-        var q = NotificationTypes.FirstOrDefault(x => x.Name == typeof(TNotification).FullName);
+        var notificationType = NotificationTypes.FirstOrDefault(x => x.Name == typeof(TNotification).FullName);
         await client.CreateNotificationAsync(new CreateNotificationRequest()
         {
-            NotificationTypeId = q.NotificationTypeId,
+            NotificationTypeId = notificationType.NotificationTypeId,
             DataJson = JsonConvert.SerializeObject(notification)
         });
     }
 }
 
+/// <summary>
+/// NotificationStartup is an IStartupTask that registers notification types with a gRPC notification service during application startup
+/// </summary>
 public class NotificationStartup(
     GrpcNotificationService.GrpcNotificationServiceClient client,
     ILogger<BaseNotificationService> logger,
@@ -45,7 +55,7 @@ public class NotificationStartup(
 ) : IStartupTask
 {
     /// <inheritdoc />
-    public int Order { get; } = 0;
+    public int Order => 0;
 
     /// <inheritdoc />
     public async Task ExecuteAsync(CancellationToken cancellationToken = default)
@@ -60,7 +70,7 @@ public class NotificationStartup(
                     Description = x.Description,
                     Scope = x.Scope,
                 }));
-            var response = await client.CreateNotificationTypesAsync(request);
+            var response = await client.CreateNotificationTypesAsync(request, cancellationToken: cancellationToken);
             notificationService.NotificationTypes = response.NotificationType.ToList();
         }
         catch (Exception e)

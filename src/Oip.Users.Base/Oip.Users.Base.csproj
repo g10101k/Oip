@@ -40,4 +40,9 @@
         </Protobuf>
     </ItemGroup>
 
+
+    <ItemGroup>
+      <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
+    </ItemGroup>
+
 </Project>

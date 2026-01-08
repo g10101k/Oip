@@ -3,6 +3,7 @@ using NLog.Web;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Notifications;
+using Oip.Notifications.Base;
 using Oip.Users.Extensions;
 using Oip.Users.Notifications;
 using Oip.Users.Repositories;
@@ -34,7 +35,10 @@ internal static class Program
             builder.Services.AddScoped<UserSyncService>();
             builder.Services.AddHostedService<KeycloakSyncBackgroundService>();
             builder.Services.AddHttpClient();
+            builder.Services.AddSingleton<UserService>();
+            builder.Services.AddGrpc();
             var app = builder.BuildApp(settings);
+            app.MapGrpcService<UserService>();
             app.MigrateUserDatabase();
             app.Run();
         }
