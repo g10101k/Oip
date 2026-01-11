@@ -10,8 +10,7 @@ namespace Oip.Users.Notifications;
 /// notification service during application startup
 /// </summary>
 public class BaseNotificationService(
-    GrpcNotificationService.GrpcNotificationServiceClient client,
-    ILogger<BaseNotificationService> logger)
+    GrpcNotificationService.GrpcNotificationServiceClient client)
 {
     /// <summary>
     /// Gets or sets the list of notification types that are registered with the gRPC notification service during
@@ -31,12 +30,12 @@ public class BaseNotificationService(
     /// Sends a notification with the specified importance level.
     /// </summary>
     /// <param name="notification">The notification object to send.</param>
-    /// <param name="level">The importance level of the notification.</param>
     /// <typeparam name="TNotification">The type of the notification object.</typeparam>
-    /// <return>A task that represents the asynchronous notification operation.</return>
-    public async Task Notify<TNotification>(TNotification notification, ImportanceLevel level)
+    public async Task Notify<TNotification>(TNotification notification)
     {
-        var notificationType = NotificationTypes.FirstOrDefault(x => x.Name == typeof(TNotification).FullName);
+        var notificationType = NotificationTypes.FirstOrDefault(x => x.Name == typeof(TNotification).FullName) ??
+                               throw new InvalidOperationException($"Notification type not found {typeof(TNotification).FullName}");
+
         await client.CreateNotificationAsync(new CreateNotificationRequest()
         {
             NotificationTypeId = notificationType.NotificationTypeId,
