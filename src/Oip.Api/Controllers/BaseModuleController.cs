@@ -143,6 +143,6 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
         /// <summary>
         /// Gets or sets the settings object to be saved.
         /// </summary>
-        public TSettings Settings { get; set; }
+        public TSettings Settings { get; set; } = null!;
     }
 }
