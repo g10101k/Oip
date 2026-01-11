@@ -1,11 +1,81 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.4",
   "info": {
     "title": "Base service web-api",
     "description": "Base service web-api",
     "version": "v1.0.0"
   },
   "paths": {
+    "/api/crypt/protect": {
+      "post": {
+        "tags": [
+          "Crypt"
+        ],
+        "summary": "Protects a message using encryption services.",
+        "requestBody": {
+          "description": "The message to be protected",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CryptRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CryptRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CryptRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiExceptionResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiExceptionResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/folder-module/get-module-rights": {
       "get": {
         "tags": [
@@ -14,7 +84,7 @@
         "summary": "Returns a list of rights (permissions) required to access the folder module.",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -104,7 +174,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -203,7 +273,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request",
@@ -287,7 +357,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": { }
@@ -369,7 +439,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request",
@@ -442,7 +512,7 @@
         "summary": "Retrieves the menu available to the current authenticated user.",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -481,7 +551,7 @@
         "summary": "Retrieves the admin-specific menu.",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -520,7 +590,7 @@
         "summary": "Retrieves all available modules in the system.",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -579,7 +649,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "OK"
           }
         }
       }
@@ -612,7 +682,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "OK"
           }
         }
       }
@@ -636,7 +706,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "OK"
           }
         }
       }
@@ -650,7 +720,7 @@
         "description": "Only accessible to users with the Admin role.",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -749,7 +819,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "OK"
           },
           "401": {
             "description": "Unauthorized",
@@ -822,7 +892,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "OK"
           },
           "401": {
             "description": "Unauthorized",
@@ -875,7 +945,7 @@
         "summary": "Returns all registered modules and indicates whether each one is currently loaded into the application.",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -954,7 +1024,7 @@
         "summary": "Retrieves Keycloak client settings needed by frontend applications.",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -994,7 +1064,7 @@
             }
           },
           "500": {
-            "description": "Server Error",
+            "description": "Internal Server Error",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1024,7 +1094,7 @@
         "summary": "Retrieves all realm roles from Keycloak.",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1120,6 +1190,18 @@
         },
         "additionalProperties": false,
         "description": "Standardized response format for API exceptions"
+      },
+      "CryptRequest": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The message to be protected or decrypted.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request for cryptographic operations with a message to be processed."
       },
       "EditModuleInstanceDto": {
         "type": "object",
@@ -1377,6 +1459,10 @@
         "description": "Module Instance Dto"
       },
       "ModuleSecurityDto": {
+        "required": [
+          "right",
+          "role"
+        ],
         "type": "object",
         "properties": {
           "right": {
