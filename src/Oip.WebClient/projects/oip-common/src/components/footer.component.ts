@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { LogoComponent } from './logo.component';
 import { TranslatePipe } from '@ngx-translate/core';
-import { NgComponentOutlet } from "@angular/common";
-import { LogoService } from "../services/logo.service";
+import { NgComponentOutlet } from '@angular/common';
+import { LogoService } from '../services/logo.service';
 
 @Component({
   selector: 'app-footer',

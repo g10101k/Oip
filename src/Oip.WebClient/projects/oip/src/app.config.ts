@@ -14,7 +14,8 @@ import {
   langIntercept,
   httpLoaderAuthFactory,
   SecurityService,
-  KeycloakSecurityService
+  KeycloakSecurityService,
+  NotificationService
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ProductService } from './app/service/product.service';
@@ -45,6 +46,7 @@ export const appConfig: ApplicationConfig = {
     SecurityDataService,
     BaseDataService,
     UserService,
+    NotificationService,
     importProvidersFrom([
       TranslateModule.forRoot({
         loader: {

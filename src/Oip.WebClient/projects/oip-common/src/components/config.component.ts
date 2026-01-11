@@ -67,7 +67,7 @@ interface L10n {
                   <div>{{ selectedOption.name }}</div>
                 </div>
               </ng-template>
-              <ng-template let-languages #item>
+              <ng-template #item let-languages>
                 <div class="flex items-center gap-2">
                   <span [class]="languages.icon"></span>
                   <div>{{ languages.name }}</div>
@@ -79,29 +79,29 @@ interface L10n {
             <div class="mt-5">{{ 'config.dateTimeFormat' | translate }}</div>
             <p-select
               class="w-full md:w-56"
-              [placeholder]="'config.dateFormat' | translate"
               qa-id="oip-app-config-date-format-select"
               [options]="dateFormats"
+              [placeholder]="'config.dateFormat' | translate"
               [(ngModel)]="selectedDateFormat"
-              (onChange)="changeDateFormat()"/>
+              (onChange)="changeDateFormat()" />
             <p-select
               class="w-full md:w-56"
-              [placeholder]="'config.timeFormat' | translate"
               qa-id="oip-app-config-time-format-select"
               [options]="timeFormats"
+              [placeholder]="'config.timeFormat' | translate"
               [(ngModel)]="selectedTimeFormat"
-              (onChange)="changeTimeFormat()"/>
+              (onChange)="changeTimeFormat()" />
             <div class="mt-5">{{ 'config.timeZone' | translate }}</div>
             <p-select
               class="w-full md:w-56"
-              [placeholder]="'config.timeZone' | translate"
               qa-id="oip-app-config-timezone-select"
               [filter]="true"
               [options]="allTimeZones"
+              [placeholder]="'config.timeZone' | translate"
               [virtualScroll]="true"
               [virtualScrollItemSize]="34"
               [(ngModel)]="selectedTimeZone"
-              (onChange)="changeTimeZone()"/>
+              (onChange)="changeTimeZone()" />
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@ interface L10n {
             </div>
             <div class="flex items-center gap-2">
               <label for="oip-app-config-admin-mode">{{ 'config.moduleManagement' | translate }}</label>
-              <p-button icon="pi pi-cog" label="{{ 'config.goTo' | translate }}" routerLink="/modules"/>
+              <p-button icon="pi pi-cog" label="{{ 'config.goTo' | translate }}" routerLink="/modules" />
             </div>
           </div>
         </div>
@@ -153,7 +153,6 @@ export class ConfigComponent {
   protected selectedDateFormat: string;
   protected selectedTimeFormat: string;
   protected selectedTimeZone: string;
-
 
   constructor() {
     this.l10nService.loadComponentTranslations('config');
