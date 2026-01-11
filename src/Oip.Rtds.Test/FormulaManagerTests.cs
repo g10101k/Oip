@@ -85,7 +85,7 @@ public class FormulaManagerTests : IDisposable
     {
         var ex = Assert.Throws<KeyNotFoundException>(() =>
             _manager.Evaluate(999, 1, null, DateTimeOffset.Now));
-        Assert.That(ex.Message, Does.Contain("Formula '999' not found"));
+        Assert.That(ex?.Message, Does.Contain("Formula '999' not found"));
     }
 
     [Test]
@@ -99,7 +99,7 @@ public class FormulaManagerTests : IDisposable
         var ex = Assert.Throws<InvalidOperationException>(() =>
             _manager.UpdateFormulas(id, TagTypes.Float32, badValueFormula, timeFormula, errFormula));
 
-        Assert.That(ex.Message, Does.Contain("Compilation failed"));
+        Assert.That(ex?.Message, Does.Contain("Compilation failed"));
     }
 
     [Test]
@@ -119,7 +119,7 @@ namespace Test
         var ex = Assert.Throws<InvalidOperationException>(() =>
             ForbiddenIdentifierWalker.Validate(tree));
 
-        Assert.That(ex.Message, Does.Contain("System.IO"));
+        Assert.That(ex?.Message, Does.Contain("System.IO"));
     }
 
     [Test]
