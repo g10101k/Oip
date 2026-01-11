@@ -85,13 +85,4 @@
         </ItemGroup>
     </Target>
 
-    <ItemGroup>
-        <RuntimeHostConfigurationOption Include="Services__OipNotifications" Value="https://api.localhost" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Oip.Notifications.Base">
-        <HintPath>bin\Debug\net8.0\Oip.Notifications.Base.dll</HintPath>
-      </Reference>
-    </ItemGroup>
 </Project>
