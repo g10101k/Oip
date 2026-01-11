@@ -7,10 +7,9 @@ namespace Oip.Base.Services;
 /// <summary>
 /// Provides services for interacting with Keycloak identity management system.
 /// </summary>
-public class KeycloakService(KeycloakClient client, ILogger<KeycloakService> logger, SecurityServiceSettings _options)
+public class KeycloakService(KeycloakClient client, ILogger<KeycloakService> logger, SecurityServiceSettings options)
 {
     private bool _isAuthenticated;
-
 
     /// <summary>
     /// Asynchronously retrieves a user by their ID.
@@ -20,7 +19,7 @@ public class KeycloakService(KeycloakClient client, ILogger<KeycloakService> log
     public async Task<UserRepresentation?> GetUserAsync(string userId)
     {
         await EnsureAuthenticatedAsync();
-        return await client.GetUserAsync(_options.Realm, userId);
+        return await client.GetUserAsync(options.Realm, userId);
     }
 
     /// <summary>
@@ -32,7 +31,7 @@ public class KeycloakService(KeycloakClient client, ILogger<KeycloakService> log
     public async Task<IEnumerable<UserRepresentation>> GetUsersAsync(int offset = 0, int limit = 100)
     {
         await EnsureAuthenticatedAsync();
-        var users = await client.GetUsersAsync(_options.Realm, first: offset, max: limit);
+        var users = await client.GetUsersAsync(options.Realm, first: offset, max: limit);
         return users ?? [];
     }
 
@@ -46,7 +45,7 @@ public class KeycloakService(KeycloakClient client, ILogger<KeycloakService> log
         {
             try
             {
-                await client.AuthenticateAsync(_options.ClientId, _options.ClientSecret, _options.Realm);
+                await client.AuthenticateAsync(options.ClientId, options.ClientSecret, options.Realm);
                 _isAuthenticated = true;
                 logger.LogInformation("Successfully authenticated with Keycloak");
             }
@@ -67,7 +66,7 @@ public class KeycloakService(KeycloakClient client, ILogger<KeycloakService> log
         try
         {
             await EnsureAuthenticatedAsync();
-            return await client.GetUsersCountAsync(_options.Realm);
+            return await client.GetUsersCountAsync(options.Realm);
         }
         catch (Exception ex)
         {
@@ -82,9 +81,9 @@ public class KeycloakService(KeycloakClient client, ILogger<KeycloakService> log
     /// <returns></returns>
     public async Task<List<Role>> GetRealmRoles()
     {
-        _ = await client.Authentication(_options.ClientId, _options.ClientSecret, _options.Realm,
+        _ = await client.Authentication(options.ClientId, options.ClientSecret, options.Realm,
             CancellationToken.None);
 
-        return await client.GetRoles(_options.Realm, CancellationToken.None);
+        return await client.GetRoles(options.Realm, CancellationToken.None);
     }
 }
