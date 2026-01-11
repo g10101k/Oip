@@ -8,20 +8,11 @@ namespace Oip.Rtds.Services;
 /// <summary>
 /// Implements the Rtds service for handling real-time data streams.
 /// </summary>
-public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
+public class RtdsService(IServiceScopeFactory scopeFactory) : Rtds.Grpc.RtdsService.RtdsServiceBase
 {
-    private readonly IServiceScopeFactory _scopeFactory;
     private static readonly ConcurrentDictionary<string, IServerStreamWriter<EventMessage>> Subscribers = new();
     private static readonly object Lock = new();
     private static int _eventCounter;
-
-    /// <summary>
-    /// Implements the Rtds service for handling real-time data streams.
-    /// </summary>
-    public RtdsService(IServiceScopeFactory scopeFactory)
-    {
-        _scopeFactory = scopeFactory;
-    }
 
     /// <summary>
     /// Subscribes a client to real-time data streams for specified event types.
@@ -88,7 +79,7 @@ public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
     /// <returns>A response containing the retrieved tags.</returns>
     public override Task<GetTagsResponse> GetTags(GetTagsRequest request, ServerCallContext context)
     {
-        return _scopeFactory.ExecuteAsync<TagService, GetTagsResponse>(x => x.GetTagsByInterfaceId(request));
+        return scopeFactory.ExecuteAsync<TagService, GetTagsResponse>(x => x.GetTagsByInterfaceId(request));
     }
 
     private async Task BroadcastEvent(EventMessage eventMessage)
@@ -109,7 +100,7 @@ public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
             }
         }
     }
-    
+
     /// <summary>
     /// Writes data to tags
     /// </summary>
@@ -118,7 +109,7 @@ public class RtdsService : Rtds.Grpc.RtdsService.RtdsServiceBase
     /// <returns>Response indicating success or failure</returns>
     public override async Task<WriteDataResponse> WriteData(WriteDataRequest request, ServerCallContext context)
     {
-        return await _scopeFactory.ExecuteAsync<TagService, WriteDataResponse>(x => x.WriteData(request));
+        return await scopeFactory.ExecuteAsync<TagService, WriteDataResponse>(x => x.WriteData(request));
     }
 
     private string GenerateEventId()

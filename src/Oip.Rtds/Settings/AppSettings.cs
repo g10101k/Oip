@@ -13,7 +13,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public string RtsConnectionString { get; set; } = null!;
 
     /// <inheritdoc />
-    public string OipUrls { get; set; } = null!;
+    public OipServices Services { get; set; } = new();
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();

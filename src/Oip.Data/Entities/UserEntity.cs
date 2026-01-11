@@ -13,7 +13,7 @@ public class UserEntity
     /// <summary>
     /// E-mail
     /// </summary>
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
 
     /// <summary>
     /// User photo

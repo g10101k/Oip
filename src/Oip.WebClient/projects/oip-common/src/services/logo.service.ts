@@ -1,6 +1,6 @@
 import { Injectable, Type, InjectionToken, inject } from '@angular/core';
 import { LogoComponent } from '../components/logo.component';
-import { Provider, } from '@angular/core';
+import { Provider } from '@angular/core';
 
 export const LOGO_COMPONENT_TOKEN = new InjectionToken<Type<any>>('LOGO_COMPONENT_TOKEN');
 

@@ -1,0 +1,13 @@
+﻿{
+  "profiles": {
+    "Oip.Notifications": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:5007",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+      }
+    }
+  }
+}
+

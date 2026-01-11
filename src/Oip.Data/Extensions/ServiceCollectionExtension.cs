@@ -15,11 +15,6 @@ public static class ServiceCollectionExtension
     /// <summary>
     /// Add data context
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="connectionString"></param>
-    /// <param name="migrationHistoryTableName"></param>
-    /// <param name="migrationHistorySchemaName"></param>
-    /// <returns></returns>
     public static IServiceCollection AddOipModuleContext(this IServiceCollection services, string connectionString,
         string migrationHistoryTableName = OipModuleContext.MigrationHistoryTableName,
         string migrationHistorySchemaName = OipModuleContext.SchemaName)

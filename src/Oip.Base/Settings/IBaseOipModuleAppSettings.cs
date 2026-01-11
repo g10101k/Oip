@@ -9,9 +9,9 @@ namespace Oip.Base.Settings;
 public interface IBaseOipModuleAppSettings : IAppSettings
 {
     /// <summary>
-    /// Main service with shell
+    /// Collection of urls OIP services
     /// </summary>
-    string OipUrls { get; set; }
+    OipServices Services { get; set; }
 
     /// <summary>
     /// Collection of OpenAPI specification configurations for the application
@@ -36,3 +36,19 @@ public interface IBaseOipModuleAppSettings : IAppSettings
 /// Contains OpenAPI/Swagger configuration items for the application
 /// </summary>
 public class OpenApiSettings : List<OpenApiItem>;
+
+/// <summary>
+/// Contains service endpoint configurations for OIP app
+/// </summary>
+public class OipServices
+{
+    /// <summary>
+    /// URL endpoint for the OIP users service
+    /// </summary>
+    public string OipUsers { get; set; } = "https://localhost:5005";
+
+    /// <summary>
+    /// Gets or sets the endpoint URL for the OIP notifications service
+    /// </summary>
+    public string OipNotifications { get; set; } = "https://localhost:5007";
+}

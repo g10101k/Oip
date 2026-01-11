@@ -32,7 +32,7 @@ public class TagService(TagRepository tagRepository, RtdsRepository rtdsReposito
             ErrorCalculation = x.ErrorCalculation ?? string.Empty,
             TimeCalculation = x.TimeCalculation ?? string.Empty,
             ValueCalculation = x.ValueCalculation ?? string.Empty,
-            ValueType = (TagTypes)x.ValueType,
+            ValueType = x.ValueType,
         });
         var response = new GetTagsResponse();
         response.Tags.AddRange(tags);

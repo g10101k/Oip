@@ -2,9 +2,12 @@ using System.Net;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Oip.Base.Helpers;
 
 namespace Oip.Base.Clients;
 
+#pragma warning disable CS8604
+#pragma warning disable CS8602
 /// <summary>
 /// Keycloak client for authentication and user management with Keycloak server
 /// </summary>
@@ -81,7 +84,7 @@ public sealed class KeycloakClient : HttpClient
             var objectResponse =
                 await ReadObjectResponseAsync<AuthResponse>(response, cancellationToken)
                     .ConfigureAwait(false);
-            objectResponse.Object.ExpiresOn = DateTime.UtcNow.AddSeconds(objectResponse.Object.ExpiresIn);
+            objectResponse.Object?.ExpiresOn = DateTime.UtcNow.AddSeconds(objectResponse.Object.ExpiresIn);
             _authResponse = objectResponse.Object;
             if (objectResponse.Object == null)
             {
@@ -182,13 +185,13 @@ public sealed class KeycloakClient : HttpClient
     /// <typeparam name="T">The type of object to deserialize.</typeparam>
     /// <returns>An <see cref="ObjectResponseResult{T}"/> containing the deserialized object and the response text.</returns>
     /// <exception cref="ApiException">Thrown if deserialization fails.</exception>
-    private async Task<ObjectResponseResult<T>> ReadObjectResponseAsync<T>(
+    private async Task<ObjectResponseResult<T?>> ReadObjectResponseAsync<T>(
         HttpResponseMessage? response,
         CancellationToken cancellationToken, bool readResponseAsString = false)
     {
         if (response == null)
         {
-            return new ObjectResponseResult<T>(default(T), string.Empty);
+            return new ObjectResponseResult<T?>(default(T), string.Empty);
         }
 
         try
@@ -199,7 +202,7 @@ public sealed class KeycloakClient : HttpClient
                 try
                 {
                     var typedBody = JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T?>(typedBody, responseText);
                 }
                 catch (JsonException exception)
                 {
@@ -216,7 +219,7 @@ public sealed class KeycloakClient : HttpClient
             {
                 var serializer = JsonSerializer.Create(JsonSerializerSettings);
                 var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                return new ObjectResponseResult<T>(typedBody, string.Empty);
+                return new ObjectResponseResult<T?>(typedBody, string.Empty);
             }
         }
         catch (JsonException exception)
@@ -237,7 +240,7 @@ public sealed class KeycloakClient : HttpClient
     public async Task<UserRepresentation?> GetUserAsync(string realm, string userId,
         CancellationToken cancellationToken = default)
     {
-        await EnsureAuthenticatedAsync(cancellationToken);
+        EnsureAuthenticatedAsync(cancellationToken);
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
@@ -274,11 +277,11 @@ public sealed class KeycloakClient : HttpClient
     public async Task<List<UserRepresentation>> GetUsersAsync(string realm, int first = 0, int max = 100,
         CancellationToken cancellationToken = default)
     {
-        await EnsureAuthenticatedAsync(cancellationToken);
+        EnsureAuthenticatedAsync(cancellationToken);
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        var uriBuilder = new UriBuilder($"{_httpClient.BaseAddress}/admin/realms/{realm}/users")
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress!.ToString().UrlAppend($"/admin/realms/{realm}/users"))
         {
             Query = $"first={first}&max={max}"
         };
@@ -290,7 +293,7 @@ public sealed class KeycloakClient : HttpClient
         if (response.StatusCode == HttpStatusCode.OK)
         {
             var objectResponse = await ReadObjectResponseAsync<List<UserRepresentation>>(response, cancellationToken);
-            return objectResponse.Object ?? new List<UserRepresentation>();
+            return objectResponse.Object ?? [];
         }
         else
         {
@@ -307,7 +310,7 @@ public sealed class KeycloakClient : HttpClient
     /// <returns>Users count</returns>
     public async Task<int> GetUsersCountAsync(string realm, CancellationToken cancellationToken = default)
     {
-        await EnsureAuthenticatedAsync(cancellationToken);
+        EnsureAuthenticatedAsync(cancellationToken);
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
@@ -340,7 +343,7 @@ public sealed class KeycloakClient : HttpClient
     public async Task<List<UserRepresentation>> SearchUsersAsync(string realm, string search, int first = 0,
         int max = 100, CancellationToken cancellationToken = default)
     {
-        await EnsureAuthenticatedAsync(cancellationToken);
+        EnsureAuthenticatedAsync(cancellationToken);
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
@@ -369,7 +372,7 @@ public sealed class KeycloakClient : HttpClient
     /// Ensure client is authenticated
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
-    private async Task EnsureAuthenticatedAsync(CancellationToken cancellationToken)
+    private void EnsureAuthenticatedAsync(CancellationToken cancellationToken)
     {
         if (_authResponse == null || _authResponse.ExpiresOn <= DateTime.UtcNow.AddMinutes(-5))
         {
@@ -429,12 +432,12 @@ public partial class ApiException : Exception
     /// <param name="headers">The response headers</param>
     /// <param name="innerException">The inner exception</param>
     public ApiException(string message, HttpStatusCode statusCode, string response,
-        IReadOnlyDictionary<string, IEnumerable<string>> headers,
-        Exception innerException)
+        IReadOnlyDictionary<string, IEnumerable<string>>? headers,
+        Exception? innerException)
         : base(
-            message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null)
+            message + "\n\nStatus: " + statusCode + "\nResponse: \n" + (string.IsNullOrEmpty(response)
                 ? "(null)"
-                : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
+                : response[..(response.Length >= 512 ? 512 : response.Length)]), innerException)
     {
         StatusCode = (int)statusCode;
         Response = response;
@@ -444,25 +447,12 @@ public partial class ApiException : Exception
     /// <summary>
     /// Collection of HTTP response headers returned by the failed API request.
     /// </summary>
-    public IReadOnlyDictionary<string, IEnumerable<string>> Headers { get; set; }
+    public IReadOnlyDictionary<string, IEnumerable<string>>? Headers { get; set; }
 
     /// <summary>
     /// The HTTP status code returned by the API call
     /// </summary>
     public int StatusCode { get; set; }
-
-    /// <summary>
-    /// Exception for API calls.
-    /// </summary>
-    public ApiException(string message, HttpStatusCode statusCode, string response, Exception innerException)
-        : base(
-            message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null)
-                ? "(null)"
-                : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
-    {
-        StatusCode = (int)statusCode;
-        Response = response;
-    }
 
     /// <summary>
     /// Represents the response from an API call
@@ -479,7 +469,7 @@ public class AuthResponse
     /// The access token.
     /// </summary>
     [JsonProperty("access_token")]
-    public string AccessToken { get; set; }
+    public string AccessToken { get; set; } = null!;
 
     /// <summary>
     /// The number of seconds the access token is valid for.
@@ -502,7 +492,7 @@ public class AuthResponse
     /// The type of the token.
     /// </summary>
     [JsonProperty("token_type")]
-    public string TokenType { get; set; }
+    public string TokenType { get; set; } = null!;
 
     /// <summary>
     /// The number of seconds before the access token is valid.
@@ -514,7 +504,7 @@ public class AuthResponse
     /// Gets or sets the scope.
     /// </summary>
     [JsonProperty("scope")]
-    public string Scope { get; set; }
+    public string Scope { get; set; } = null!;
 }
 
 /// <summary>
@@ -636,3 +626,6 @@ public class UsersResponse
     [JsonProperty("count")]
     public int Count { get; set; }
 }
+
+#pragma warning restore CS8604
+#pragma warning restore CS8602

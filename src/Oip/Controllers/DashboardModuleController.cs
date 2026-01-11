@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oip.Api.Controllers;
 using Oip.Data.Repositories;
-using Oip.Properties;
 
 namespace Oip.Controllers;
 

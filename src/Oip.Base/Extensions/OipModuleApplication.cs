@@ -4,10 +4,13 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -258,10 +261,28 @@ public static class OipModuleApplication
                                 return keys;
                             };
                     }
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            if (context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+                            {
+                                var accessToken = context.Request.Query["access_token"];
+                                if (!string.IsNullOrEmpty(accessToken))
+                                {
+                                    context.Token = accessToken;
+                                }
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
             builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
             builder.Services.AddAuthorization();
-            builder.Services.AddHttpClient<KeycloakClient>(x=>x.BaseAddress = new Uri(settings.SecurityService.BaseUrl));
+            builder.Services.AddHttpClient<KeycloakClient>(x =>
+                x.BaseAddress = new Uri(settings.SecurityService.BaseUrl));
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<KeycloakService>();
             return builder;
@@ -415,5 +436,19 @@ public static class OipModuleApplication
             .HandleTransientHttpError()
             .OrResult(msg => msg.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.InternalServerError)
             .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+    }
+
+    /// <summary>
+    /// Configures data protection services for a given DbContext
+    /// </summary>
+    /// <typeparam name="TContext">The DbContext to use for persisting data protection keys</typeparam>
+    public static void AddDataProtection<TContext>(this IServiceCollection services)
+        where TContext : DbContext, IDataProtectionKeyContext
+    {
+        services.AddDataProtection()
+            .SetApplicationName("OIP")
+            .PersistKeysToDbContext<TContext>()
+            .SetDefaultKeyLifetime(TimeSpan.FromDays(36500));
+        services.AddScoped<CryptService>();
     }
 }

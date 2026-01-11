@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+// Specifies the C# namespace for the generated code
+option csharp_namespace = "Oip.Users.Base";
+
+package users;
+
+import "google/protobuf/timestamp.proto";
+
+// Service definition for user management operations
+service GrpcUserService {
+  // Retrieves all users (initial data load)
+  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse);
+
+  // Subscribes to user change events (creates, updates, deletes, etc.)
+  rpc SubscribeToUserChanges(SubscribeRequest) returns (stream UserChangeEvent);
+}
+
+// Request message for retrieving all users
+message GetAllUsersRequest {
+  // Maximum number of users to return in a single response (for pagination)
+  int32 page_size = 1;
+  // Token to retrieve the next page of results
+  string page_token = 2;
+}
+
+// Response message containing the list of users
+message GetAllUsersResponse {
+  // List of user objects
+  repeated User users = 1;
+  // Token for retrieving the next page of results (empty if no more pages)
+  string next_page_token = 2;
+  // Total number of users available
+  int32 total_count = 3;
+}
+
+// Request message for subscribing to user change events
+message SubscribeRequest {
+  // Client id
+  string client_id = 1;
+}
+
+// Event message sent when a user is changed
+message UserChangeEvent {
+  // Type of change event
+  EventType event_type = 1;
+  // User data affected by the event
+  User user = 2;
+  // Timestamp when the event occurred
+  google.protobuf.Timestamp event_time = 3;
+}
+
+// Enumeration defining possible user event types
+enum EventType {
+  // New user was created
+  USER_CREATED = 0;
+  // Existing user was updated
+  USER_UPDATED = 1;
+  // User was deleted
+  USER_DELETED = 2;
+  // User status changed to active
+  USER_ACTIVATED = 3;
+  // User status changed to inactive
+  USER_DEACTIVATED = 4;
+}
+
+// User data representation in gRPC
+message User {
+  // Internal unique user identifier
+  int32 user_id = 1;
+  // External Keycloak identifier
+  string keycloak_id = 2;
+  // User's email address
+  string email = 3;
+  // User's first name
+  string first_name = 4;
+  // User's last name
+  string last_name = 5;
+  // Indicates if user account is active
+  bool is_active = 6;
+  // Timestamp when user was created
+  google.protobuf.Timestamp created_at = 7;
+  // Timestamp when user was last updated
+  google.protobuf.Timestamp updated_at = 8;
+  // Timestamp of last sync with external system
+  google.protobuf.Timestamp last_synced_at = 9;
+  // Optional field for profile photo (binary data)
+  bytes photo = 10;
+  // Optional field for user settings (likely JSON)
+  string settings = 11;
+  // Phone
+  string phone = 12;
+}

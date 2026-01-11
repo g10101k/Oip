@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Data.Dtos;
+using Oip.Data.Repositories;
 using Oip.Users.Contexts;
 using Oip.Users.Entities;
 
@@ -8,28 +9,8 @@ namespace Oip.Users.Repositories;
 /// <summary>
 /// Provides data access operations for user entities.
 /// </summary>
-public class UserRepository
+public class UserRepository(UserContext context) : BaseRepository<UserEntity, int>(context)
 {
-    private readonly UserContext _context;
-
-    /// <summary>
-    /// Provides data access operations for user entities.
-    /// </summary>
-    public UserRepository(UserContext context)
-    {
-        _context = context;
-    }
-
-    /// <summary>
-    /// Asynchronously retrieves a user entity by its unique identifier.
-    /// </summary>
-    /// <param name="userId">The unique identifier of the user to retrieve.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the user entity if found; otherwise, null.</returns>
-    public async Task<UserEntity?> GetByIdAsync(int userId)
-    {
-        return await _context.Users.FindAsync(userId);
-    }
-
     /// <summary>
     /// Asynchronously retrieves a user entity by its Keycloak identifier.
     /// </summary>
@@ -37,9 +18,37 @@ public class UserRepository
     /// <returns>A task that represents the asynchronous operation. The task result contains the user entity if found; otherwise, null.</returns>
     public async Task<UserEntity?> GetByKeycloakIdAsync(string keycloakId)
     {
-        return await _context.Users
+        return await context.Users
             .FirstOrDefaultAsync(u => u.KeycloakId == keycloakId);
     }
+
+    /// <summary>
+    /// Gets all users with pagination support
+    /// </summary>
+    /// <param name="pageNumber">Page number (starting from 1)</param>
+    /// <param name="pageSize">Number of users per page</param>
+    /// <returns>UsersPagedResult with users list and total count</returns>
+    public async Task<PageResult<UserEntity>> GetAllUsersAsync(int pageNumber, int pageSize)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 100; // Default page size
+        if (pageSize > 1000) pageSize = 1000; // Maximum page size
+
+        var query = context.Users
+            .Where(u => u.IsActive) // Filter by active users if needed
+            .OrderBy(u => u.UserId); // Order by ID for consistent pagination
+
+        var totalCount = await query.CountAsync();
+
+        var users = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return new PageResult<UserEntity>(users, totalCount, pageNumber);
+    }
+
 
     /// <summary>
     /// Asynchronously retrieves all user entities with support for pagination.
@@ -49,7 +58,7 @@ public class UserRepository
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of user entities.</returns>
     public async Task<IEnumerable<UserEntity>> GetAllAsync(int skip = 0, int take = 100)
     {
-        return await _context.Users
+        return await context.Users
             .OrderBy(u => u.UserId)
             .Skip(skip)
             .Take(take)
@@ -63,24 +72,12 @@ public class UserRepository
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of user entities matching the search term.</returns>
     public async Task<IEnumerable<UserEntity>> SearchAsync(string searchTerm)
     {
-        return await _context.Users
+        return await context.Users
             .Where(u => u.Email.Contains(searchTerm) ||
                         u.FirstName.Contains(searchTerm) ||
                         u.LastName.Contains(searchTerm))
             .Take(50)
             .ToListAsync();
-    }
-
-    /// <summary>
-    /// Asynchronously adds a new user entity to the data store.
-    /// </summary>
-    /// <param name="user">The user entity to add.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the added user entity.</returns>
-    public async Task<UserEntity> AddAsync(UserEntity user)
-    {
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-        return user;
     }
 
     /// <summary>
@@ -90,8 +87,8 @@ public class UserRepository
     /// <returns>A task that represents the asynchronous operation. The task result contains the updated user entity.</returns>
     public async Task<UserEntity> UpdateAsync(UserEntity user)
     {
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
+        context.Users.Update(user);
+        await context.SaveChangesAsync();
         return user;
     }
 
@@ -105,8 +102,8 @@ public class UserRepository
         var user = await GetByIdAsync(userId);
         if (user != null)
         {
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
         }
     }
 
@@ -117,7 +114,7 @@ public class UserRepository
     /// <returns>A task that represents the asynchronous operation. The task result is true if the user exists; otherwise, false.</returns>
     public async Task<bool> ExistsByKeycloakIdAsync(string keycloakId)
     {
-        return await _context.Users
+        return await context.Users
             .AnyAsync(u => u.KeycloakId == keycloakId);
     }
 
@@ -127,7 +124,7 @@ public class UserRepository
     /// <returns>A task that represents the asynchronous operation. The task result contains the total count of user entities.</returns>
     public async Task<int> CountAsync()
     {
-        return await _context.Users.CountAsync();
+        return await context.Users.CountAsync();
     }
 
     /// <summary>
@@ -137,7 +134,7 @@ public class UserRepository
     /// <returns></returns>
     public GetUserDto? GetUserByEmail(string email)
     {
-        var user = _context.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefault();
+        var user = context.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefault();
         if (user == null)
             return null;
         else
@@ -151,7 +148,7 @@ public class UserRepository
     /// <returns></returns>
     public string GetUserSettings(string email)
     {
-        return _context.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefault()?.Settings ?? string.Empty;
+        return context.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefault()?.Settings ?? string.Empty;
     }
 
     /// <summary>
@@ -161,7 +158,7 @@ public class UserRepository
     /// <param name="photo"></param>
     public void UpsertUserPhoto(string email, byte[] photo)
     {
-        var user = _context.Users.FirstOrDefault(x => x.Email == email);
+        var user = context.Users.FirstOrDefault(x => x.Email == email);
         if (user == null)
         {
             user = new UserEntity()
@@ -169,14 +166,14 @@ public class UserRepository
                 Email = email,
                 Photo = photo
             };
-            _context.Users.Add(user);
+            context.Users.Add(user);
         }
         else
         {
             user.Photo = photo;
         }
 
-        _context.SaveChanges();
+        context.SaveChanges();
     }
 
     /// <summary>
@@ -187,9 +184,9 @@ public class UserRepository
     /// <exception cref="InvalidOperationException">User not found</exception>
     public async Task UpdateUserSettings(string email, string json)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email) ??
+        var user = await context.Users.FirstOrDefaultAsync(x => x.Email == email) ??
                    throw new InvalidOperationException($"User with email: {email} - not found");
         user.Settings = json;
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 }

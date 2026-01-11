@@ -10,9 +10,9 @@ namespace Oip.Rtds.Test;
 [TestFixture]
 public class CompressServiceTests
 {
-    private Mock<TagCacheService> _tagCacheServiceMock;
-    private Mock<ILogger<CompressService>> _loggerMock;
-    private CompressService _compressService;
+    private Mock<TagCacheService> _tagCacheServiceMock = null!;
+    private Mock<ILogger<CompressService>> _loggerMock = null!;
+    private CompressService _compressService = null!;
 
     [SetUp]
     public void SetUp()
@@ -58,7 +58,7 @@ public class CompressServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Error processing tag with ID 1")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error processing tag with ID 1")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
             Times.Once);
@@ -100,8 +100,8 @@ public class CompressServiceTests
         // Assert
         Assert.That(result, Is.Not.Null);
         Assert.That(result.Tags, Has.Count.EqualTo(2));
-        Assert.That(result.Tags, Has.Some.Matches<TagResponse>(t => t.Id == 1 && t.DoubleValue == 100));
-        Assert.That(result.Tags, Has.Some.Matches<TagResponse>(t => t.Id == 2 && t.DoubleValue == 200));
+        Assert.That(result.Tags, Has.Some.Matches<WriteDataTag>(t => t.Id == 1 && Math.Abs(t.DoubleValue - 100.0d) < 0.001));
+        Assert.That(result.Tags, Has.Some.Matches<WriteDataTag>(t => t.Id == 2 && Math.Abs(t.DoubleValue - 200) < 0.001));
     }
 
     [Test]
@@ -277,18 +277,18 @@ public class CompressServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Error processing tag with ID 1")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error processing tag with ID 1")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
             Times.Once);
     }
 
-    [TestCase(false, 500, 1000, 99.9, 100.0, 1.0, 1, true)]
-    [TestCase(true, 500, 1000, 99.9, 100.0, 1.0, 200, false)] // Time diff < min time
-    [TestCase(true, 1000, 5000, 99.9, 100.0, 1.0, 2000, false)] // Value change < error
-    [TestCase(true, 1000, 5000, 90.0, 100.0, 1.0, 2000, true)] // Value change > error
-    [TestCase(true, 1000, 5000, 99.9, 100.0, 0.05, 2000, true)] // Value change > error (small error)
-    [TestCase(true, 1000, 5000, 99.9, 100.0, 1.0, 6000, true)] // Time diff > max time
+    [TestCase(false, 500u, 1000u, 99.9, 100.0, 1.0, 1u, true)]
+    [TestCase(true, 500u, 1000u, 99.9, 100.0, 1.0, 200u, false)] // Time diff < min time
+    [TestCase(true, 1000u, 5000u, 99.9, 100.0, 1.0, 2000u, false)] // Value change < error
+    [TestCase(true, 1000u, 5000u, 90.0, 100.0, 1.0, 2000u, true)] // Value change > error
+    [TestCase(true, 1000u, 5000u, 99.9, 100.0, 0.05, 2000u, true)] // Value change > error (small error)
+    [TestCase(true, 1000u, 5000u, 99.9, 100.0, 1.0, 6000u, true)] // Time diff > max time
     public void ShouldWriteValue_WithVariousScenarios_ReturnsExpectedResult(
         bool compressing,
         uint compressionMinTime,
@@ -296,7 +296,7 @@ public class CompressServiceTests
         double lastValue,
         double currentValue,
         double error,
-        uint valueTimeOffset, // новый параметр - смещение от now в миллисекундах
+        uint valueTimeOffset, 
         bool expectedResult)
     {
         // Arrange

@@ -1,0 +1,518 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "Oip.Notifications.Base";
+
+package notifications;
+
+service GrpcNotificationService {
+  rpc CreateNotificationTypes(CreateNotificationTypesRequest) returns (CreateNotificationTypesResponse) {
+    option (google.api.http) = {
+      post: "/grpc/v1/notification-types"
+      body: "*"
+    };
+  }
+  rpc GetNotificationType(GetNotificationTypeRequest) returns (GetNotificationTypeResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notification-types/{notification_type_id}"
+    };
+  }
+  rpc UpdateNotificationType(UpdateNotificationTypeRequest) returns (UpdateNotificationTypeResponse) {
+    option (google.api.http) = {
+      put: "/grpc/v1/notification-types/{notification_type_id}"
+      body: "*"
+    };
+  }
+  rpc DeleteNotificationType(DeleteNotificationTypeRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/grpc/v1/notification-types/{notification_type_id}"
+    };
+  }
+  rpc ListNotificationTypes(ListNotificationTypesRequest) returns (ListNotificationTypesResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notification-types"
+    };
+  }
+
+  rpc CreateNotificationChannel(CreateNotificationChannelRequest) returns (CreateNotificationChannelResponse) {
+    option (google.api.http) = {
+      post: "/grpc/v1/notification-channels"
+      body: "*"
+    };
+  }
+  rpc GetNotificationChannel(GetNotificationChannelRequest) returns (GetNotificationChannelResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notification-channels/{notification_channel_id}"
+    };
+  }
+  
+  rpc UpdateNotificationChannel(UpdateNotificationChannelRequest) returns (UpdateNotificationChannelResponse) {
+    option (google.api.http) = {
+      put: "/grpc/v1/notification-channels/{notification_channel_id}"
+      body: "*"
+    };
+  }
+  
+  rpc DeleteNotificationChannel(DeleteNotificationChannelRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/grpc/v1/notification-channels/{notification_channel_id}"
+    };
+  }
+  
+  rpc ListNotificationChannels(ListNotificationChannelsRequest) returns (ListNotificationChannelsResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notification-channels"
+    };
+  }
+
+  rpc CreateNotificationTemplate(CreateNotificationTemplateRequest) returns (CreateNotificationTemplateResponse) {
+    option (google.api.http) = {
+      post: "/grpc/v1/notification-templates"
+      body: "*"
+    };
+  }
+  rpc GetNotificationTemplate(GetNotificationTemplateRequest) returns (GetNotificationTemplateResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notification-templates/{notification_template_id}"
+    };
+  }
+  rpc UpdateNotificationTemplate(UpdateNotificationTemplateRequest) returns (UpdateNotificationTemplateResponse) {
+    option (google.api.http) = {
+      put: "/grpc/v1/notification-templates/{notification_template_id}"
+      body: "*"
+    };
+  }
+  rpc DeleteNotificationTemplate(DeleteNotificationTemplateRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/grpc/v1/notification-templates/{notification_template_id}"
+    };
+  }
+  rpc ListNotificationTemplates(ListNotificationTemplatesRequest) returns (ListNotificationTemplatesResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notification-templates"
+    };
+  }
+
+  // User Notification Preferences
+  rpc SetUserNotificationPreference(SetUserNotificationPreferenceRequest) returns (SetUserNotificationPreferenceResponse) {
+    option (google.api.http) = {
+      post: "/grpc/v1/user-notification-preferences"
+      body: "*"
+    };
+  }
+  rpc GetUserNotificationPreference(GetUserNotificationPreferenceRequest) returns (GetUserNotificationPreferenceResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/user-notification-preferences"
+    };
+  }
+  rpc ListUserNotificationPreferences(ListUserNotificationPreferencesRequest) returns (ListUserNotificationPreferencesResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/user-notification-preferences/get-list"
+    };
+  }
+
+  // Notification Management
+  rpc CreateNotification(CreateNotificationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/grpc/v1/notifications"
+      body: "*"
+    };
+  }
+  rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notifications/{notification_id}"
+    };
+  }
+  rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notifications"
+    };
+  }
+
+  // Notification Delivery Management
+  rpc GetNotificationDelivery(GetNotificationDeliveryRequest) returns (GetNotificationDeliveryResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notification-deliveries/{notification_delivery_id}"
+    };
+  }
+  rpc UpdateNotificationDeliveryStatus(UpdateNotificationDeliveryStatusRequest) returns (UpdateNotificationDeliveryStatusResponse) {
+    option (google.api.http) = {
+      put: "/grpc/v1/notification-deliveries/{notification_delivery_id}/status"
+      body: "*"
+    };
+  }
+  rpc ListNotificationDeliveries(ListNotificationDeliveriesRequest) returns (ListNotificationDeliveriesResponse) {
+    option (google.api.http) = {
+      get: "/grpc/v1/notification-deliveries"
+    };
+  }
+
+  // Event Handling
+  rpc HandleNotificationEvent(HandleNotificationEventRequest) returns (HandleNotificationEventResponse) {
+    option (google.api.http) = {
+      post: "/grpc/v1/notification-events"
+      body: "*"
+    };
+  }
+}
+
+// Common message types
+message Empty {}
+
+message Pagination {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message PaginationResponse {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 total_count = 3;
+  int32 total_pages = 4;
+}
+
+// Notification Type messages
+message NotificationType {
+  int32 notification_type_id = 1;
+  string name = 2;
+  string description = 3;
+  string scope = 4;
+}
+
+
+message CreateNotificationTypeRequest {
+  string name = 1;
+  string description = 2;
+  string scope = 3;
+}
+
+message CreateNotificationTypesRequest {
+  repeated CreateNotificationTypeRequest requests = 1;
+}
+
+message CreateNotificationTypesResponse {
+  repeated NotificationType notification_type = 1;
+}
+
+message GetNotificationTypeRequest {
+  int32 notification_type_id = 1;
+}
+
+message GetNotificationTypeResponse {
+  NotificationType notification_type = 1;
+}
+
+message UpdateNotificationTypeRequest {
+  int32 notification_type_id = 1;
+  string name = 2;
+  string description = 3;
+  string scope = 4;
+}
+
+message UpdateNotificationTypeResponse {
+  NotificationType notification_type = 1;
+}
+
+message DeleteNotificationTypeRequest {
+  int32 notification_type_id = 1;
+}
+
+message DeleteNotificationTypeResponse {
+  bool success = 1;
+}
+
+message ListNotificationTypesRequest {
+  Pagination pagination = 1;
+  string scope_filter = 2;
+}
+
+message ListNotificationTypesResponse {
+  repeated NotificationType notification_types = 1;
+  PaginationResponse pagination = 2;
+}
+
+message NotificationChannel {
+  int32 notification_channel_id = 1;
+  string code = 2;
+  string name = 3;
+  bool is_active = 4;
+  bool requires_verification = 5;
+  optional int32 max_retry_count = 6;
+}
+
+message CreateNotificationChannelRequest {
+  string code = 1;
+  string name = 2;
+  bool is_active = 3;
+  bool requires_verification = 4;
+  optional int32 max_retry_count = 5;
+}
+
+message CreateNotificationChannelResponse {
+  NotificationChannel notification_channel = 1;
+}
+
+message GetNotificationChannelRequest {
+  int32 notification_channel_id = 1;
+}
+
+message GetNotificationChannelResponse {
+  NotificationChannel notification_channel = 1;
+}
+
+message UpdateNotificationChannelRequest {
+  int32 notification_channel_id = 1;
+  string name = 2;
+  bool is_active = 3;
+  bool requires_verification = 4;
+  optional int32 max_retry_count = 5;
+}
+
+message UpdateNotificationChannelResponse {
+  NotificationChannel notification_channel = 1;
+}
+
+message DeleteNotificationChannelRequest {
+  int32 notification_channel_id = 1;
+}
+
+message DeleteNotificationChannelResponse {
+  bool success = 1;
+}
+
+message ListNotificationChannelsRequest {
+  Pagination pagination = 1;
+  optional bool active_only = 2;
+}
+
+message ListNotificationChannelsResponse {
+  repeated NotificationChannel notification_channels = 1;
+  PaginationResponse pagination = 2;
+}
+
+message NotificationTemplate {
+  int32 notification_template_id = 1;
+  int32 notification_type_id = 2;
+  string subject_template = 3;
+  string message_template = 4;
+  bool is_active = 5;
+  ImportanceLevel importance = 6;
+  repeated int32 channel_ids = 7;
+}
+
+message CreateNotificationTemplateRequest {
+  int32 notification_type_id = 1;
+  string subject_template = 2;
+  string message_template = 3;
+  bool is_active = 4;
+  ImportanceLevel importance = 5;
+  repeated int32 channel_ids = 6;
+  repeated int32 users_ids = 7;
+  repeated int32 roles_ids = 8;
+}
+
+message CreateNotificationTemplateResponse {
+  NotificationTemplate notification_template = 1;
+}
+
+message GetNotificationTemplateRequest {
+  int32 notification_template_id = 1;
+}
+
+message GetNotificationTemplateResponse {
+  NotificationTemplate notification_template = 1;
+}
+
+message UpdateNotificationTemplateRequest {
+  int32 notification_template_id = 1;
+  int32 notification_type_id = 2;
+  string subject_template = 3;
+  string message_template = 4;
+  bool is_active = 5;
+  repeated int32 channel_ids = 6;
+}
+
+message UpdateNotificationTemplateResponse {
+  NotificationTemplate notification_template = 1;
+}
+
+message DeleteNotificationTemplateRequest {
+  int32 notification_template_id = 1;
+}
+
+message DeleteNotificationTemplateResponse {
+  bool success = 1;
+}
+
+message ListNotificationTemplatesRequest {
+  Pagination pagination = 1;
+  optional int32 notification_type_id = 2;
+  optional bool active_only = 3;
+}
+
+message ListNotificationTemplatesResponse {
+  repeated NotificationTemplate notification_templates = 1;
+  PaginationResponse pagination = 2;
+}
+
+message UserNotificationPreference {
+  int32 user_notification_preference_id = 1;
+  int32 user_id = 2;
+  int32 notification_type_id = 3;
+  int32 notification_channel_id = 4;
+  bool is_enabled = 5;
+}
+
+message SetUserNotificationPreferenceRequest {
+  int32 user_id = 1;
+  int32 notification_type_id = 2;
+  int32 notification_channel_id = 3;
+  bool is_enabled = 4;
+}
+
+message SetUserNotificationPreferenceResponse {
+  UserNotificationPreference preference = 1;
+}
+
+message GetUserNotificationPreferenceRequest {
+  int32 user_id = 1;
+  int32 notification_type_id = 2;
+  int32 notification_channel_id = 3;
+}
+
+message GetUserNotificationPreferenceResponse {
+  UserNotificationPreference preference = 1;
+}
+
+message ListUserNotificationPreferencesRequest {
+  int32 user_id = 1;
+  Pagination pagination = 2;
+}
+
+message ListUserNotificationPreferencesResponse {
+  repeated UserNotificationPreference preferences = 1;
+  PaginationResponse pagination = 2;
+}
+
+// Notification messages
+enum ImportanceLevel {
+  IMPORTANCE_LEVEL_UNSPECIFIED = 0;
+  IMPORTANCE_LEVEL_LOW = 1;
+  IMPORTANCE_LEVEL_MEDIUM = 2;
+  IMPORTANCE_LEVEL_HIGH = 3;
+  IMPORTANCE_LEVEL_CRITICAL = 4;
+}
+
+message Notification {
+  int64 notification_id = 1;
+  int32 notification_type_id = 2;
+  string created_at = 4;
+  optional string data_json = 5;
+}
+
+message NotificationUser {
+  int64 notification_user_id = 1;
+  int64 notification_id = 2;
+  ImportanceLevel importance = 3;
+  int32 user_id = 4;
+  string subject = 5;
+  string message = 6;
+}
+
+message CreateNotificationRequest {
+  int32 notification_type_id = 1;
+  optional string data_json = 3;
+}
+
+message CreateNotificationResponse {
+  Notification notification = 1;
+}
+
+message GetNotificationRequest {
+  int64 notification_id = 1;
+}
+
+message GetNotificationResponse {
+  Notification notification = 1;
+}
+
+message ListNotificationsRequest {
+  Pagination pagination = 1;
+  optional int32 notification_type_id = 2;
+  optional string created_after = 3;
+  optional int32 user_id = 4;
+}
+
+message ListNotificationsResponse {
+  repeated Notification notifications = 1;
+  PaginationResponse pagination = 2;
+}
+
+// Notification Delivery messages
+enum DeliveryStatus {
+  DELIVERY_STATUS_UNSPECIFIED = 0;
+  DELIVERY_STATUS_PENDING = 1;
+  DELIVERY_STATUS_PROCESSING = 2;
+  DELIVERY_STATUS_SENT = 3;
+  DELIVERY_STATUS_DELIVERED = 4;
+  DELIVERY_STATUS_FAILED = 5;
+  DELIVERY_STATUS_CANCELLED = 6;
+}
+
+message NotificationDelivery {
+  int64 notification_delivery_id = 1;
+  int64 notification_user_id = 2;
+  int32 user_id = 3;
+  int32 notification_channel_id = 4;
+  DeliveryStatus status = 5;
+  optional string external_id = 6;
+  optional string error_message = 7;
+  int32 retry_count = 8;
+  string created_at = 9;
+  optional string sent_at = 10;
+  optional string delivered_at = 11;
+}
+
+message GetNotificationDeliveryRequest {
+  int64 notification_delivery_id = 1;
+}
+
+message GetNotificationDeliveryResponse {
+  NotificationDelivery delivery = 1;
+}
+
+message UpdateNotificationDeliveryStatusRequest {
+  int64 notification_delivery_id = 1;
+  DeliveryStatus status = 2;
+  optional string external_id = 3;
+  optional string error_message = 4;
+}
+
+message UpdateNotificationDeliveryStatusResponse {
+  NotificationDelivery delivery = 1;
+}
+
+message ListNotificationDeliveriesRequest {
+  Pagination pagination = 1;
+  optional int32 user_id = 2;
+  optional int32 notification_channel_id = 3;
+  optional DeliveryStatus status_filter = 4;
+}
+
+message ListNotificationDeliveriesResponse {
+  repeated NotificationDelivery deliveries = 1;
+  PaginationResponse pagination = 2;
+}
+
+// Event Handling messages
+message HandleNotificationEventRequest {
+  string event_type = 1;
+  string event_data_json = 2;
+  map<string, string> metadata = 3;
+}
+
+message HandleNotificationEventResponse {
+  repeated int64 created_notification_ids = 1;
+}

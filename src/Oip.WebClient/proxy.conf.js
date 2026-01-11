@@ -18,6 +18,15 @@ const PROXY_CONFIG = [
   },
   {
     context: [
+      "/hubs/notification"
+    ],
+    target: "https://localhost:5007",
+    secure: false,
+    changeOrigin: true,
+    ws: true,
+  },
+  {
+    context: [
       "/api",
       "/swagger",
       "/health"

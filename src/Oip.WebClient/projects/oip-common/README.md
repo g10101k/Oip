@@ -30,16 +30,16 @@ Add scss
 Init L10nService to AppComponent
 
 ```ts
-import { Component, inject, OnInit } from '@angular/core';
-import { SecurityService } from 'oip-common';
-import { RouterOutlet } from '@angular/router';
-import { ToastModule } from 'primeng/toast';
-import { L10nService } from '../../../oip-common/src/services/l10n.service';
+import { Component, inject, OnInit } from "@angular/core";
+import { SecurityService } from "oip-common";
+import { RouterOutlet } from "@angular/router";
+import { ToastModule } from "primeng/toast";
+import { L10nService } from "../../../oip-common/src/services/l10n.service";
 
 @Component({
-  selector: 'app-root',
+  selector: "app-root",
   template: `
-    <p-toast/>
+    <p-toast />
     <router-outlet></router-outlet>
   `,
   standalone: true,
@@ -51,16 +51,18 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.securityService.auth();
-    this.translateService.init([{
-      code: 'en',
-      name: "English",
-      icon: "flag flag-gb"
-    }, {
-      code: 'ru',
-      name: "Русский",
-      icon: "flag flag-ru"
-    }]);
+    this.translateService.init([
+      {
+        code: "en",
+        name: "English",
+        icon: "flag flag-gb"
+      },
+      {
+        code: "ru",
+        name: "Русский",
+        icon: "flag flag-ru"
+      }
+    ]);
   }
 }
-
 ```

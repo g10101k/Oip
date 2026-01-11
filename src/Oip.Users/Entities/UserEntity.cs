@@ -56,7 +56,8 @@ public class UserEntity
     public byte[]? Photo { get; set; }
 
     /// <summary>
-    /// User settings
+    /// User settings in json
     /// </summary>
+    // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string Settings { get; set; } = null!;
 }
