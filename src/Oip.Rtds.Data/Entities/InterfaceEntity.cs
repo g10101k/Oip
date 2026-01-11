@@ -13,12 +13,12 @@ public class InterfaceEntity
     /// <summary>
     /// Name of the interface
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Description of the interface
     /// </summary>
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     /// <summary>
     /// Collection of tag entities associated with this interface

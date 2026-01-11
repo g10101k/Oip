@@ -5,6 +5,9 @@ using Oip.Rtds.Grpc;
 
 namespace Oip.Rtds.Base.Services;
 
+/// <summary>
+/// Service for writing buffered data to the RTDS service with compression and retry capabilities.
+/// </summary>
 public class BufferWriterService
 {
     private readonly RtdsService.RtdsServiceClient _client;
@@ -16,6 +19,13 @@ public class BufferWriterService
     private readonly TimeSpan _retryInterval = TimeSpan.FromSeconds(10);
     private readonly Timer _retryTimer;
 
+    /// <summary>
+    /// Service for writing buffered data to the RTDS service with compression and retry capabilities.
+    /// </summary>
+    /// <param name="client">The RTDS service client for communication with the server.</param>
+    /// <param name="logger">Logger for recording service operations and errors.</param>
+    /// <param name="compressService">Service for handling data compression before writing.</param>
+    /// <param name="cacheService">Service for managing tag cache operations.</param>
     public BufferWriterService(RtdsService.RtdsServiceClient client, ILogger<BufferWriterService> logger,
         CompressService compressService, TagCacheService cacheService)
     {

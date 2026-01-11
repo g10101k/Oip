@@ -44,6 +44,11 @@ public class TagCacheService
         }
     }
 
+    /// <summary>
+    /// Updates cached tag values with new data from the write request.
+    /// </summary>
+    /// <param name="request">The write request containing tag values to update.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the request contains an unsupported value type.</exception>
     public void UpdateValues(WriteDataRequest request)
     {
         foreach (var t in request.Tags)
