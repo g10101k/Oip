@@ -261,10 +261,28 @@ public static class OipModuleApplication
                                 return keys;
                             };
                     }
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            if (context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+                            {
+                                var accessToken = context.Request.Query["access_token"];
+                                if (!string.IsNullOrEmpty(accessToken))
+                                {
+                                    context.Token = accessToken;
+                                }
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
             builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
             builder.Services.AddAuthorization();
-            builder.Services.AddHttpClient<KeycloakClient>(x=>x.BaseAddress = new Uri(settings.SecurityService.BaseUrl));
+            builder.Services.AddHttpClient<KeycloakClient>(x =>
+                x.BaseAddress = new Uri(settings.SecurityService.BaseUrl));
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<KeycloakService>();
             return builder;
@@ -419,7 +437,7 @@ public static class OipModuleApplication
             .OrResult(msg => msg.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.InternalServerError)
             .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
     }
-    
+
     /// <summary>
     /// Configures data protection services for a given DbContext
     /// </summary>
