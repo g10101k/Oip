@@ -85,4 +85,9 @@ public class UserCacheRepository(GrpcUserService.GrpcUserServiceClient client, I
         Users.AddOrUpdate(eventMessage.User.UserId, eventMessage.User, (i, user) => user);
         logger.LogDebug("{json}", JsonConvert.SerializeObject(eventMessage));
     }
+
+    public User? GetUserByKeycloakUserId(string key)
+    {
+        return Users.Values.FirstOrDefault(x => x.KeycloakId == key);
+    }
 }
