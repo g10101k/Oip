@@ -36,6 +36,12 @@ export interface ApiExceptionResponse {
   stackTrace?: string | null;
 }
 
+/** Request for cryptographic operations with a message to be processed. */
+export interface CryptRequest {
+  /** The message to be protected or decrypted. */
+  message?: string | null;
+}
+
 /** Data Transfer Object for editing an existing module instance */
 export interface EditModuleInstanceDto {
   /** The identifier of the module instance to edit */
@@ -145,9 +151,9 @@ export interface ModuleInstanceDto {
 /** Module security DTO */
 export interface ModuleSecurityDto {
   /** Right */
-  right?: string | null;
+  right: string | null;
   /** Role */
-  role?: string | null;
+  role: string | null;
 }
 
 /** Put security dto */
