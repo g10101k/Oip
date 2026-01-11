@@ -1,12 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { SecurityService, L10nService } from 'oip-common';
+import { SecurityService, L10nService, NotificationService } from 'oip-common';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-root',
   template: `
-    <p-toast/>
+    <p-toast />
     <router-outlet></router-outlet>
   `,
   standalone: true,
@@ -15,17 +15,21 @@ import { ToastModule } from 'primeng/toast';
 export class AppComponent implements OnInit {
   private readonly securityService = inject(SecurityService);
   private readonly translateService = inject(L10nService);
+  private readonly notificationService = inject(NotificationService);
 
   ngOnInit() {
     this.securityService.auth();
-    this.translateService.init([{
-      code: 'en',
-      name: "English",
-      icon: "flag flag-gb"
-    }, {
-      code: 'ru',
-      name: "Русский",
-      icon: "flag flag-ru"
-    }]);
+    this.translateService.init([
+      {
+        code: 'en',
+        name: 'English',
+        icon: 'flag flag-gb'
+      },
+      {
+        code: 'ru',
+        name: 'Русский',
+        icon: 'flag flag-ru'
+      }
+    ]);
   }
 }
