@@ -1,8 +1,6 @@
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Oip.Base.Clients;
 using Oip.Base.Services;
-using Oip.Notifications.Base;
 using Oip.Users.Base;
 using Oip.Users.Entities;
 using Oip.Users.Notifications;
@@ -162,8 +160,7 @@ public class UserSyncService(
 
         var endTime = DateTimeOffset.UtcNow;
         logger.LogInformation("Full user synchronization completed");
-        await notificationServiceClient.Notify(new SyncUsersCompleteNotify(totalUsers, startTime, endTime),
-            ImportanceLevel.Low);
+        await notificationServiceClient.Notify(new SyncUsersCompleteNotify(totalUsers, startTime, endTime));
     }
 
     /// <summary>
