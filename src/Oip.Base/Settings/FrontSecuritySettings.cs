@@ -13,12 +13,12 @@ public class FrontSecuritySettings
     /// <summary>
     /// Scope
     /// </summary>
-    public string Scope { get; set; }
+    public string Scope { get; set; } = null!;
 
     /// <summary>
     /// Response type
     /// </summary>
-    public string ResponseType { get; set; }
+    public string ResponseType { get; set; } = null!;
 
     /// <summary>
     /// Silent renew
