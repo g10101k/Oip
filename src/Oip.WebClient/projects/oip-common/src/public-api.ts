@@ -29,13 +29,14 @@ export { TopBarService } from './services/top-bar.service';
 export { SecurityService, KeycloakSecurityService } from './services/security.service';
 export { SecurityDataService } from './services/security-data.service';
 export { MsgService } from './services/msg.service';
-export { AuthGuardService } from './services/auth.service';
+export { AuthGuardService } from './services/auth-guard.service';
 export { AppConfig, LayoutService } from './services/app.layout.service';
 export { MenuService } from './services/app.menu.service';
 export { UserService } from './services/user.service';
 export { SecurityStorageService } from './services/security-storage.service';
 export { L10nService, LanguageDto } from './services/l10n.service';
 export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './services/logo.service';
+export { NotificationService } from './services/notification.service';
 // Events
 export { MenuChangeEvent } from './events/menu-change.event';
 

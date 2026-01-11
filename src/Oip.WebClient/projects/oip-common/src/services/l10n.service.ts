@@ -84,7 +84,7 @@ export class L10nService {
 
   init(languages: LanguageDto[]) {
     this.availableLanguages = languages;
-    this.translateService.addLangs(languages.map(x=>x.code));
+    this.translateService.addLangs(languages.map((x) => x.code));
     const lang = this.layoutService.language() ? this.layoutService.language() : 'en';
     this.translateService.setDefaultLang(lang);
     this.translateService.use(lang);

@@ -4,9 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ToastMessageOptions } from 'primeng/api';
 import { TranslateService } from '@ngx-translate/core';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class MsgService {
   protected readonly messageService: MessageService = inject(MessageService);
   private readonly translate = inject(TranslateService);
