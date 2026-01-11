@@ -31,8 +31,15 @@ public class ChannelService(IServiceProvider serviceProvider, ILogger<ChannelSer
             var scope = serviceProvider.CreateScope();
             foreach (var type in channelTypes)
             {
-                if (ActivatorUtilities.CreateInstance(scope.ServiceProvider, type) is INotificationChannel channel)
-                    _channels.Add(channel);
+                try
+                {
+                    if (ActivatorUtilities.CreateInstance(scope.ServiceProvider, type) is INotificationChannel channel)
+                        _channels.Add(channel);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "An error occured while creating channel: {Name}", type.Name);
+                }
             }
 
             return _channels;
@@ -46,8 +53,9 @@ public class ChannelService(IServiceProvider serviceProvider, ILogger<ChannelSer
     /// <param name="user">User to notify</param>
     /// <param name="subject">Message subject</param>
     /// <param name="message">Message content</param>
+    /// <param name="importanceLevel">Importance level</param>
     /// <param name="attachments">File attachments</param>
-    public void Notify(string channelCode, User user, string subject, string message,
+    public void Notify(string channelCode, User user, string subject, string message, ImportanceLevel importanceLevel,
         Attachment[]? attachments = null)
     {
         if (_channels == null) throw new InvalidOperationException("Channels is not initialized");
@@ -69,6 +77,7 @@ public class ChannelService(IServiceProvider serviceProvider, ILogger<ChannelSer
                 },
                 Subject = subject,
                 Message = message,
+                ImportanceLevel = importanceLevel,
                 Attachment = attachments ?? []
             });
         }

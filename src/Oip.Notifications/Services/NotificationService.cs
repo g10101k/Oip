@@ -818,11 +818,10 @@ public class NotificationService(
                     {
                         foreach (var userNotify in messages)
                         {
-                           
-
-                            channelService.Notify(channel.NotificationChannel.Code,  userRepository.Users[userNotify.UserId],
+                           channelService.Notify(channel.NotificationChannel.Code,  userRepository.Users[userNotify.UserId],
                                 userNotify.Subject,
-                                userNotify.Message);
+                                userNotify.Message,
+                                importanceLevel: activeTemplate.Importance);
                         }
                     }
                 }
@@ -1188,7 +1187,7 @@ public class NotificationService(
         }
     }
 
-    // Event Handling
+    /// <inheritdoc />
     public override async Task<HandleNotificationEventResponse> HandleNotificationEvent(
         HandleNotificationEventRequest request, ServerCallContext context)
     {

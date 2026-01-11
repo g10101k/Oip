@@ -81,7 +81,7 @@ public class NotificationsDbContext(DbContextOptions<NotificationsDbContext> opt
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfiguration(new NotificationTypeEntityConfiguration(Database, designTime));
+        modelBuilder.ApplyConfiguration(new NotificationTypeEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new NotificationChannelEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new NotificationTemplateEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new NotificationTemplateChannelEntityConfiguration(Database));

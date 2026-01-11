@@ -32,7 +32,7 @@ public class SmtpChannel : INotificationChannel
     public int MaxRetryCount { get; set; } = 5;
 
     /// <summary>
-    /// Пробует получить первый элемент очереди и осуществить обработку
+    /// The action that processes notifications in the queue when invoked
     /// </summary>
     private Action ProcessQueueAction => async void () =>
     {
@@ -46,13 +46,13 @@ public class SmtpChannel : INotificationChannel
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "Ошибка в ProcessQueueAction");
+                    _logger.LogError(e, "Error in ProcessQueueAction");
                 }
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "При попытке получения сообщения из очереди");
+            _logger.LogError(e, "Attempt to retrieve message from queue");
         }
         finally
         {
@@ -67,7 +67,7 @@ public class SmtpChannel : INotificationChannel
         {
             try
             {
-                _logger.LogTrace("Обработка запроса {Subject} попытка №{Retry}", message.Subject, retry);
+                _logger.LogTrace("Processing request {Subject} attempt #{Retry}", message.Subject, retry);
 
                 Notify(message);
 
@@ -82,7 +82,7 @@ public class SmtpChannel : INotificationChannel
             {
                 var delay = _settings.ProcessingIntervalMs * retry;
                 _logger.LogError(ex,
-                    "Ошибка обработки запроса {Subject}, попытка №{Retry} - следующая попытка через {Delay}ms \r\n",
+                    "Error processing request {Subject}, attempt #{Retry} - next attempt in {Delay}ms",
                     message.Subject, retry, delay);
                 await Task.Delay(delay, _stoppingToken);
                 retry++;
@@ -90,7 +90,7 @@ public class SmtpChannel : INotificationChannel
             catch (Exception ex) when (retry == _settings.RetryCount)
             {
                 _logger.LogError(ex,
-                    "Не удалось отправить запрос {Subject}, сообщение удалено будет удалено из очереди",
+                    "Failed to send request {Subject}, message will be removed from queue",
                     message.Subject);
                 _ = Queue.Dequeue();
                 return;
@@ -116,7 +116,7 @@ public class SmtpChannel : INotificationChannel
 
     private void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
     {
-        _logger.LogInformation("Message sent");
+        _logger.LogInformation("SendCompletedCallback");
         ((SmtpClient)sender).Dispose();
     }
 
@@ -138,7 +138,7 @@ public class SmtpChannel : INotificationChannel
         // Nothing do
     }
 
-    public void Notify(NotificationDto notification)
+    private void Notify(NotificationDto notification)
     {
         var smtpClient = CreateSmtpClient();
         var mail = new MailMessage(_settings.MailFrom, notification.User.Email)
@@ -213,7 +213,7 @@ public class SmtpChannel : INotificationChannel
     }
 
     /// <summary>
-    /// Обработка запроса
+    /// A simple calculator class that provides basic arithmetic operations.
     /// </summary>
     public void ProcessNotify(NotificationDto message, CancellationToken cancellationToken = default)
     {

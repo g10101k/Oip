@@ -11,8 +11,7 @@ namespace Oip.Notifications.Data.EntityConfigurations;
 /// Configures database mapping for NotificationTypeEntity
 /// </summary>
 /// <param name="database">The database facade</param>
-/// <param name="designTime">Whether this configuration is being used at design time</param>
-public class NotificationTypeEntityConfiguration(DatabaseFacade database, bool designTime = false)
+public class NotificationTypeEntityConfiguration(DatabaseFacade database)
     : IEntityTypeConfiguration<NotificationTypeEntity>
 {
     /// <inheritdoc />

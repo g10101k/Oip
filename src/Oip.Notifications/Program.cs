@@ -7,6 +7,7 @@ using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
 using Oip.Notifications.Data.Contexts;
 using Oip.Notifications.Extensions;
+using Oip.Notifications.Hubs;
 using Oip.Notifications.Services;
 using Oip.Notifications.Settings;
 using Oip.Notifications.Startups;
@@ -48,7 +49,8 @@ internal static class Program
             builder.AddControllersAndView();
             builder.AddLocalization();
             builder.Services.AddDataProtection<NotificationsDbContext>();
-
+            builder.Services.AddSignalR();
+            
             var app = builder.Build();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
@@ -63,6 +65,8 @@ internal static class Program
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
             app.MapGrpcService<NotificationService>();
+            app.MapHub<NotificationHub>("/hubs/notification");
+
             app.MigrateNotificationDatabase();
             app.Run();
         }

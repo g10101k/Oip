@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Settings;
-using Oip.Notifications.Data;
 using Oip.Notifications.Data.Contexts;
 using Oip.Notifications.Data.Repositories;
 using Oip.Settings.Enums;

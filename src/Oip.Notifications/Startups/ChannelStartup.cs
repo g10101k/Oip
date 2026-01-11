@@ -1,5 +1,4 @@
 using Oip.Base.Runtime;
-using Oip.Notifications.Channels;
 using Oip.Notifications.Data.Entities;
 using Oip.Notifications.Data.Repositories;
 using Oip.Notifications.Services;

@@ -23,29 +23,19 @@ public interface INotificationChannel
     string Name { get; set; }
 
     /// <summary>
-    /// Gets or sets the maximum number of retry attempts for sending notifications through this channel
+    /// Maximum number of retry attempts for sending notifications through this channel
     /// </summary>
     int MaxRetryCount { get; set; }
 
     /// <summary>
     /// Channel activity
     /// </summary>
-    bool IsEnable { get; }
+    bool IsEnable { get; set; }
 
     /// <summary>
     /// Whether the channel requires user verification
     /// </summary>
     bool RequiresVerification { get; set; }
-
-    /// <summary>
-    /// Opening the channel
-    /// </summary>
-    void OpenChannel();
-
-    /// <summary>
-    /// Closing the channel
-    /// </summary>
-    void CloseChannel();
 
     /// <summary>
     /// Notification with attachment
@@ -58,16 +48,49 @@ public interface INotificationChannel
 /// </summary>
 public class UserInfoDto
 {
-    /// *Documentation for `UserId` property:**
+    /// <summary>
+    /// Unique identifier for the user in the system
+    /// </summary>
     public int UserId { get; set; }
-    public string Email { get; set; }
-    public string Phone { get; set; }
+
+    /// <summary>
+    /// Email address associated with the user
+    /// </summary>
+    public string Email { get; set; } = null!;
+
+    /// <summary>
+    /// Phone number associated with the user for contact and notification purposes
+    /// </summary>
+    public string Phone { get; set; } = null!;
 }
 
+/// <summary>
+/// Notification data container holding message content, recipient information, and file attachments
+/// </summary>
 public class NotificationDto
 {
-    public UserInfoDto User { get; set; }
-    public string Subject { get; set; }
-    public string Message { get; set; }
-    public Attachment[] Attachment { get; set; }
+    /// <summary>
+    /// User entity containing account identification and contact details
+    /// </summary>
+    public UserInfoDto User { get; set; } = null!;
+
+    /// <summary>
+    /// Subject line of the notification message
+    /// </summary>
+    public string Subject { get; set; } = null!;
+
+    /// <summary>
+    /// Notification message content to be sent to the recipient
+    /// </summary>
+    public string Message { get; set; } = null!;
+
+    /// <summary>
+    /// Importance level of the notification indicating priority for delivery handling
+    /// </summary>
+    public ImportanceLevel ImportanceLevel { get; set; } 
+
+    /// <summary>
+    /// File attachments included with the notification
+    /// </summary>
+    public Attachment[] Attachment { get; set; } = null!;
 }
