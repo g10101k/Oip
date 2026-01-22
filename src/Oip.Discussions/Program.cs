@@ -1,52 +1,56 @@
+using NLog;
+using NLog.Web;
+using Oip.Base.Extensions;
+using Oip.Base.Runtime;
+using Oip.Base.Settings;
+using Oip.Base.StartupTasks;
+using Oip.Data.Extensions;
+using Oip.Settings;
+
 namespace Oip.Discussions;
 
 internal static class Program
 {
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
-
-        // Add services to the container.
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-
-        var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
+        var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+        try
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            var settings = AppSettings.Initialize(args, false, true);
+            var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
+
+            builder.AddNlog();
+            builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
+            builder.Services.AddSettingsToDependencyInjection(settings);
+            builder.Services.AddOipModuleContext(settings.ConnectionString);
+            builder.AddDefaultHealthChecks();
+            builder.AddDefaultAuthentication(settings);
+            builder.AddOpenApi(settings);
+            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+            builder.Services.AddStartupRunner();
+            builder.Services.AddCors();
+            builder.AddControllersAndView();
+            builder.AddLocalization();
+
+            var app = builder.Build();
+            app.AddRequestLocalization();
+            app.AddExceptionHandler();
+            app.MapDefaultEndpoints();
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseCors(options => options.AllowAnyOrigin());
+            app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
+            app.MapOpenApi(settings);
+            app.MapFallbackToFile("index.html");
+            app.MigrateOipModuleDatabase();
+            app.Run();
         }
-
-        app.UseHttpsRedirection();
-
-        var summaries = new[]
+        catch (Exception e)
         {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
-        app.MapGet("/weatherforecast", () =>
-            {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                        new WeatherForecast
-                        (
-                            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                            Random.Shared.Next(-20, 55),
-                            summaries[Random.Shared.Next(summaries.Length)]
-                        ))
-                    .ToArray();
-                return forecast;
-            })
-            .WithName("GetWeatherForecast")
-            .WithOpenApi();
-
-        app.Run();
+            logger.Error(e, "Unhandled exception");
+        }
     }
-}
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
