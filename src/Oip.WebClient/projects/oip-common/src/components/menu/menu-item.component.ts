@@ -6,7 +6,7 @@ import { filter } from 'rxjs/operators';
 import { LayoutService } from '../../services/app.layout.service';
 import { MenuService } from '../../services/app.menu.service';
 import { RippleModule } from 'primeng/ripple';
-import { NgIf, NgClass, NgFor } from '@angular/common';
+import { NgClass, NgFor } from '@angular/common';
 import { ConfirmationService, ContextMenuService, MenuItem, MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
 import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.component';
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
@@ -35,70 +35,78 @@ interface MenuItemComponentTranslation {
   template: `
     <ng-container>
       <p-confirm-dialog />
-      <div
-        *ngIf="root && item.visible !== false"
-        class="layout-menuitem-root-text"
-        (contextmenu)="onContextMenu($event, item)">
-        {{ item.label }}
-      </div>
-      <a
-        *ngIf="(!item.routerLink || item.items) && item.visible !== false"
-        pRipple
-        tabindex="0"
-        [attr.href]="item.url"
-        [attr.target]="item.target"
-        [ngClass]="item.class"
-        (click)="itemClick($event)">
-        <i class="layout-menuitem-icon" [ngClass]="item.icon"></i>
-        <span class="layout-menuitem-text">{{ item.label }}</span>
-        <i *ngIf="item.items" class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
-      </a>
-      <a
-        *ngIf="item.routerLink && !item.items && item.visible !== false"
-        pRipple
-        routerLinkActive="active-route"
-        tabindex="0"
-        [attr.target]="item.target"
-        [fragment]="item.fragment"
-        [ngClass]="item.class"
-        [preserveFragment]="item.preserveFragment"
-        [queryParams]="item.queryParams"
-        [queryParamsHandling]="item.queryParamsHandling"
-        [replaceUrl]="item.replaceUrl"
-        [routerLink]="item.routerLink"
-        [routerLinkActiveOptions]="
-          item.routerLinkActiveOptions || {
-            paths: 'exact',
-            queryParams: 'ignored',
-            matrixParams: 'ignored',
-            fragment: 'ignored'
+      @if (root && item.visible !== false) {
+        <div
+          class="layout-menuitem-root-text"
+          (contextmenu)="onContextMenu($event, item)">
+          {{ item.label }}
+        </div>
+      }
+      @if ((!item.routerLink || item.items) && item.visible !== false) {
+        <a
+          pRipple
+          tabindex="0"
+          [attr.href]="item.url"
+          [attr.target]="item.target"
+          [ngClass]="item.class"
+          (click)="itemClick($event)">
+          <i class="layout-menuitem-icon" [ngClass]="item.icon"></i>
+          <span class="layout-menuitem-text">{{ item.label }}</span>
+          @if (item.items) {
+            <i class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
           }
-        "
-        [skipLocationChange]="item.skipLocationChange"
-        [state]="item.state"
-        (click)="itemClick($event)"
-        (contextmenu)="onContextMenu($event, item)">
-        <i class="layout-menuitem-icon" [ngClass]="item.icon"></i>
-        <span class="layout-menuitem-text">{{ item.label }}</span>
-        <i *ngIf="item.items" class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
-      </a>
+        </a>
+      }
+      @if (item.routerLink && !item.items && item.visible !== false) {
+        <a
+          pRipple
+          routerLinkActive="active-route"
+          tabindex="0"
+          [attr.target]="item.target"
+          [fragment]="item.fragment"
+          [ngClass]="item.class"
+          [preserveFragment]="item.preserveFragment"
+          [queryParams]="item.queryParams"
+          [queryParamsHandling]="item.queryParamsHandling"
+          [replaceUrl]="item.replaceUrl"
+          [routerLink]="item.routerLink"
+          [routerLinkActiveOptions]="
+                item.routerLinkActiveOptions || {
+                  paths: 'exact',
+                  queryParams: 'ignored',
+                  matrixParams: 'ignored',
+                  fragment: 'ignored'
+                }
+              "
+          [skipLocationChange]="item.skipLocationChange"
+          [state]="item.state"
+          (click)="itemClick($event)"
+          (contextmenu)="onContextMenu($event, item)">
+          <i class="layout-menuitem-icon" [ngClass]="item.icon"></i>
+          <span class="layout-menuitem-text">{{ item.label }}</span>
+          @if (item.items) {
+            <i class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
+          }
+        </a>
+      }
 
-      <ul
-        *ngIf="item.items && item.visible !== false"
-        [@children]="submenuAnimation"
-        (contextmenu)="onContextMenu($event, item)">
-        <ng-template let-child let-i="index" ngFor [ngForOf]="item.items">
-          <li
-            app-menuitem
-            [class]="child.badgeClass"
-            [contextMenu]="contextMenu"
-            [index]="i"
-            [item]="child"
-            [menuItemCreateDialogComponent]="menuItemCreateDialogComponent"
-            [menuItemEditDialogComponent]="menuItemEditDialogComponent"
-            [parentKey]="key"></li>
-        </ng-template>
-      </ul>
+      @if (item.items && item.visible !== false) {
+        <ul
+          [@children]="submenuAnimation"
+          (contextmenu)="onContextMenu($event, item)">
+          <ng-template let-child let-i="index" ngFor [ngForOf]="item.items">
+            <li
+              app-menuitem
+              [class]="child.badgeClass"
+              [contextMenu]="contextMenu"
+              [index]="i"
+              [item]="child"
+              [menuItemCreateDialogComponent]="menuItemCreateDialogComponent"
+              [menuItemEditDialogComponent]="menuItemEditDialogComponent"
+              [parentKey]="key"></li>
+          </ng-template>
+        </ul>
+      }
     </ng-container>
   `,
   animations: [
@@ -118,7 +126,7 @@ interface MenuItemComponentTranslation {
       transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
     ])
   ],
-  imports: [NgIf, RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor, ContextMenuModule, ConfirmDialog],
+  imports: [RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor, ContextMenuModule, ConfirmDialog],
   providers: [ConfirmationService]
 })
 export class MenuItemComponent implements OnInit, OnDestroy {
