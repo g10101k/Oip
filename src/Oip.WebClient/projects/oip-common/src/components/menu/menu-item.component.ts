@@ -94,7 +94,7 @@ interface MenuItemComponentTranslation {
         <ul
           [@children]="submenuAnimation"
           (contextmenu)="onContextMenu($event, item)">
-          <ng-template let-child let-i="index" ngFor [ngForOf]="item.items">
+          @for (child of item.items; track child; let i = $index) {
             <li
               app-menuitem
               [class]="child.badgeClass"
@@ -104,7 +104,7 @@ interface MenuItemComponentTranslation {
               [menuItemCreateDialogComponent]="menuItemCreateDialogComponent"
               [menuItemEditDialogComponent]="menuItemEditDialogComponent"
               [parentKey]="key"></li>
-          </ng-template>
+          }
         </ul>
       }
     </ng-container>
@@ -190,7 +190,6 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.key = this.parentKey ? this.parentKey + '-' + this.index : String(this.index);
-
     if (this.item.routerLink) {
       this.updateActiveStateFromRoute();
     }
