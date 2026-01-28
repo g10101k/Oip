@@ -13,8 +13,10 @@
 import { Injectable } from "@angular/core";
 import {
   AddModuleInstanceDto,
+  ApiExceptionResponse,
   EditModuleInstanceDto,
   IntKeyValueDto,
+  MenuChangeOrderParams,
   MenuDeleteModuleInstanceParams,
   ModuleInstanceDto,
 } from "./data-contracts";
@@ -127,6 +129,25 @@ export class Menu<
     this.request<void, any>({
       path: `/api/menu/delete-module-instance`,
       method: "DELETE",
+      query: query,
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description Swaps the order positions of two modules in the menu structure.
+   *
+   * @tags Menu
+   * @name menuChangeOrder
+   * @request POST:/api/menu/change-order
+   * @secure
+   */
+  menuChangeOrder = (
+    query: MenuChangeOrderParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/menu/change-order`,
+      method: "POST",
       query: query,
       secure: true,
       ...params,
