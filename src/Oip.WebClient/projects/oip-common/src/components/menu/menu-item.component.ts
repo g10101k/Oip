@@ -1,22 +1,22 @@
-import { ChangeDetectorRef, Component, HostBinding, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { NavigationEnd, Router, RouterLinkActive, RouterLink } from '@angular/router';
-import { animate, state, style, transition, trigger } from '@angular/animations';
-import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
-import { LayoutService } from '../../services/app.layout.service';
-import { MenuService } from '../../services/app.menu.service';
-import { RippleModule } from 'primeng/ripple';
-import { NgClass, NgFor } from '@angular/common';
-import { ConfirmationService, ContextMenuService, MenuItem, MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
-import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.component';
-import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
-import { MsgService } from '../../services/msg.service';
-import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
-import { ContextMenuItemDto } from '../../dtos/context-menu-item.dto';
-import { TranslateService } from '@ngx-translate/core';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Menu } from '../../api/Menu';
-import { MenuDeleteModuleInstanceParams } from '../../api/data-contracts';
+import {ChangeDetectorRef, Component, HostBinding, inject, Input, OnDestroy, OnInit} from '@angular/core';
+import {NavigationEnd, Router, RouterLinkActive, RouterLink} from '@angular/router';
+import {animate, state, style, transition, trigger} from '@angular/animations';
+import {Subscription} from 'rxjs';
+import {filter} from 'rxjs/operators';
+import {LayoutService} from '../../services/app.layout.service';
+import {MenuService} from '../../services/app.menu.service';
+import {RippleModule} from 'primeng/ripple';
+import {NgClass} from '@angular/common';
+import {ConfirmationService, ContextMenuService, MenuItem, MenuItemCommandEvent, PrimeIcons} from 'primeng/api';
+import {MenuItemCreateDialogComponent} from './menu-item-create-dialog.component';
+import {ContextMenu, ContextMenuModule} from 'primeng/contextmenu';
+import {MsgService} from '../../services/msg.service';
+import {MenuItemEditDialogComponent} from './menu-item-edit-dialog.component';
+import {ContextMenuItemDto} from '../../dtos/context-menu-item.dto';
+import {TranslateService} from '@ngx-translate/core';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Menu} from '../../api/Menu';
+import {MenuChangeOrderParams, MenuDeleteModuleInstanceParams} from '../../api/data-contracts';
 
 interface MenuItemComponentTranslation {
   delete: string;
@@ -34,7 +34,7 @@ interface MenuItemComponentTranslation {
   selector: '[app-menuitem]',
   template: `
     <ng-container>
-      <p-confirm-dialog />
+      <p-confirm-dialog/>
       @if (root && item.visible !== false) {
         <div
           class="layout-menuitem-root-text"
@@ -126,7 +126,7 @@ interface MenuItemComponentTranslation {
       transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
     ])
   ],
-  imports: [RippleModule, NgClass, RouterLinkActive, RouterLink, NgFor, ContextMenuModule, ConfirmDialog],
+  imports: [RippleModule, NgClass, RouterLinkActive, RouterLink, ContextMenuModule, ConfirmDialog],
   providers: [ConfirmationService]
 })
 export class MenuItemComponent implements OnInit, OnDestroy {
@@ -221,7 +221,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
     // execute command
     if (this.item.command) {
-      this.item.command({ originalEvent: event, item: this.item });
+      this.item.command({originalEvent: event, item: this.item});
     }
 
     // toggle active state
@@ -229,7 +229,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
       this.active = !this.active;
     }
 
-    this.menuService.onMenuStateChange({ key: this.key, item: this.item });
+    this.menuService.onMenuStateChange({key: this.key, item: this.item});
   }
 
   get submenuAnimation() {
@@ -262,11 +262,32 @@ export class MenuItemComponent implements OnInit, OnDestroy {
         icon: PrimeIcons.FILE_EDIT,
         command: (event) => this.editClick(event)
       },
-      { separator: true },
+      {separator: true},
       {
         label: this.localization.delete,
         icon: PrimeIcons.TRASH,
         command: (event) => this.deleteItem(event)
+      },
+      {separator: true, visible: this.hasVisibleNext(item) || this.hasVisiblePrev(item)},
+      {
+        label: 'Up',
+        icon: PrimeIcons.ANGLE_UP,
+        command: (event) => {
+          this.moveUp(item);
+          $event.stopPropagation();
+          $event.preventDefault();
+        },
+        visible: this.hasVisiblePrev(item)
+      },
+      {
+        label: 'Down',
+        icon: PrimeIcons.ANGLE_DOWN,
+        command: (event) => {
+          this.moveDown(item);
+          $event.stopPropagation();
+          $event.preventDefault();
+        },
+        visible: this.hasVisibleNext(item)
       }
     ];
     this.contextMenu.show($event);
@@ -298,5 +319,83 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
   private editClick(event: MenuItemCommandEvent) {
     this.menuItemEditDialogComponent.showDialog().then();
+  }
+
+  moveUp(currentItem: any) {
+    const items = this.getItems(currentItem);
+    const currentIndex = items.findIndex((item) => item.moduleInstanceId === currentItem.moduleInstanceId);
+
+    if (currentIndex > 0) {
+      const prevVisibleItem = this.findPrevVisibleItem(items, currentIndex);
+      if (prevVisibleItem !== null) {
+        this.swapItems(items[currentIndex], items[prevVisibleItem]);
+      }
+    }
+  }
+
+  moveDown(currentItem: any) {
+    const items = this.getItems(currentItem);
+    const currentIndex = items.findIndex((item) => item.moduleInstanceId === currentItem.moduleInstanceId);
+
+    if (currentIndex < items.length - 1) {
+      const nextVisibleIndex = this.findNextVisibleIndex(items, currentIndex);
+      if (nextVisibleIndex !== -1) {
+        this.swapItems(items[currentIndex], items[nextVisibleIndex]);
+      }
+    }
+  }
+
+  private findPrevVisibleItem(items: any[], currentIndex: number): number {
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      if (items[i].visible !== false) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private findNextVisibleIndex(items: any[], currentIndex: number): number {
+    for (let i = currentIndex + 1; i < items.length; i++) {
+      if (items[i].visible !== false) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private swapItems(firstModule: any, secondModule: any) {
+    const items = this.getItems(firstModule);
+
+    const firstIndex = items.findIndex((item) => item.moduleInstanceId === firstModule.moduleInstanceId);
+    const secondIndex = items.findIndex((item) => item.moduleInstanceId === secondModule.moduleInstanceId);
+
+    [items[firstIndex], items[secondIndex]] = [items[secondIndex], items[firstIndex]];
+
+    this.menuDataService.menuChangeOrder({
+      firstModuleId: firstModule.moduleInstanceId,
+      secondModuleId: secondModule.moduleInstanceId
+    } as MenuChangeOrderParams).then();
+  }
+
+  hasVisiblePrev(currentItem: any): boolean {
+    const items = this.getItems(currentItem);
+    const currentIndex = items.findIndex((item) => item.moduleInstanceId == currentItem.moduleInstanceId);
+    return currentIndex > 0;
+  }
+
+  getItems(currentItem: any) {
+    return !currentItem.parentId
+      ? this.menuService.menu
+      : this.menuService.menu.find((m) => m.moduleInstanceId == currentItem.parentId).items;
+  }
+
+  hasVisibleNext(currentItem: any): boolean {
+    const items = this.getItems(currentItem);
+    const currentIndex = items.findIndex((item) => item.moduleInstanceId == currentItem.moduleInstanceId);
+    return currentIndex < items.length - 1;
+  }
+
+  swapModulesInBackend(firstModuleId: number, secondModuleId: number) {
+
   }
 }
