@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Exceptions;
 using Oip.Base.Services;
 using Oip.Data.Constants;
 using Oip.Data.Dtos;
@@ -13,31 +15,16 @@ namespace Oip.Api.Controllers;
 [ApiController]
 [Route("api/menu")]
 [ApiExplorerSettings(GroupName = "base")]
-public class MenuController : ControllerBase
+public class MenuController(ModuleRepository moduleRepository, UserService userService) : ControllerBase
 {
-    private readonly ModuleRepository _moduleRepository;
-    private readonly UserService _userService;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MenuController"/> class.
-    /// </summary>
-    /// <param name="moduleRepository">The module repository instance for accessing module data.</param>
-    /// <param name="userService">The user service instance for retrieving user roles and identity.</param>
-    public MenuController(ModuleRepository moduleRepository, UserService userService)
-    {
-        _moduleRepository = moduleRepository;
-        _userService = userService;
-    }
-
     /// <summary>
     /// Retrieves the menu available to the current authenticated user.
     /// </summary>
     /// <returns>A list of <see cref="ModuleInstanceDto"/> objects available to the user.</returns>
-    [HttpGet("get")]
-    [Authorize]
+    [Authorize, HttpGet("get")]
     public async Task<IEnumerable<ModuleInstanceDto>> Get()
     {
-        return await _moduleRepository.GetModuleForMenuAll(_userService.GetUserRoles());
+        return await moduleRepository.GetModuleForMenuAll(userService.GetUserRoles());
     }
 
     /// <summary>
@@ -48,7 +35,7 @@ public class MenuController : ControllerBase
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<IEnumerable<ModuleInstanceDto>> GetAdminMenu()
     {
-        return await _moduleRepository.GetAdminMenu();
+        return await moduleRepository.GetAdminMenu();
     }
 
     /// <summary>
@@ -59,7 +46,7 @@ public class MenuController : ControllerBase
     [Authorize(Roles = SecurityConstants.AdminRole)]
     public async Task<IEnumerable<IntKeyValueDto>> GetModules()
     {
-        return await _moduleRepository.GetModules();
+        return await moduleRepository.GetModules();
     }
 
     /// <summary>
@@ -69,9 +56,11 @@ public class MenuController : ControllerBase
     /// <returns>A task representing the asynchronous operation.</returns>
     [HttpPost("add-module-instance")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task AddModuleInstance(AddModuleInstanceDto addModuleInstanceDto)
     {
-        await _moduleRepository.AddModuleInstance(addModuleInstanceDto);
+        await moduleRepository.AddModuleInstance(addModuleInstanceDto);
     }
 
     /// <summary>
@@ -81,9 +70,11 @@ public class MenuController : ControllerBase
     /// <returns>A task representing the asynchronous operation.</returns>
     [HttpPost("edit-module-instance")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task EditModuleInstance(EditModuleInstanceDto editModel)
     {
-        await _moduleRepository.EditModuleInstance(editModel);
+        await moduleRepository.EditModuleInstance(editModel);
     }
 
     /// <summary>
@@ -93,8 +84,24 @@ public class MenuController : ControllerBase
     /// <returns>A task representing the asynchronous operation.</returns>
     [HttpDelete("delete-module-instance")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task DeleteModuleInstance(int id)
     {
-        await _moduleRepository.DeleteModuleInstance(id);
+        await moduleRepository.DeleteModuleInstance(id);
+    }
+
+    /// <summary>
+    /// Swaps the order positions of two modules in the menu structure.
+    /// </summary>
+    /// <param name="firstModuleId">The identifier of the first module to swap.</param>
+    /// <param name="secondModuleId">The identifier of the second module to swap with.</param>
+    /// <returns>A task that represents the asynchronous swap operation.</returns>
+    [Authorize(Roles = SecurityConstants.AdminRole), HttpPost("change-order")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task ChangeModuleOrder(int firstModuleId, int secondModuleId)
+    {
+        await moduleRepository.ChangeModuleOrder(firstModuleId, secondModuleId);
     }
 }

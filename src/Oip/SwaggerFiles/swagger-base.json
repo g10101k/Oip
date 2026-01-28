@@ -711,6 +711,59 @@
         }
       }
     },
+    "/api/menu/change-order": {
+      "post": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Swaps the order positions of two modules in the menu structure.",
+        "parameters": [
+          {
+            "name": "firstModuleId",
+            "in": "query",
+            "description": "The identifier of the first module to swap.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "secondModuleId",
+            "in": "query",
+            "description": "The identifier of the second module to swap with.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiExceptionResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiExceptionResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/module/get-all": {
       "get": {
         "tags": [
@@ -1453,6 +1506,17 @@
             },
             "description": "Securities",
             "nullable": true
+          },
+          "parentId": {
+            "type": "integer",
+            "description": "Identifier for the parent module instance.",
+            "format": "int32",
+            "nullable": true
+          },
+          "order": {
+            "type": "integer",
+            "description": "Sort order position for the module instance.",
+            "format": "int32"
           }
         },
         "additionalProperties": false,

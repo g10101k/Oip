@@ -54,4 +54,14 @@ public class ModuleInstanceDto
     /// Securities
     /// </summary>
     public List<string>? Securities { get; set; }
+
+    /// <summary>
+    /// Identifier for the parent module instance.
+    /// </summary>
+    public int? ParentId { get; set; }
+
+    /// <summary>
+    /// Sort order position for the module instance.
+    /// </summary>
+    public int Order { get; set; }
 }
