@@ -133,7 +133,7 @@ public class SwaggerGenerateWebClientStartupTask(
 
     private string GetHashFilePath(OpenApiItem config)
     {
-        return Path.Combine(environment.ContentRootPath, "SwaggerFiles",
+        return Path.Combine(environment.ContentRootPath, "obj/SwaggerFiles",
             $"swagger-{config.Name.ToLower()}.json");
     }
 }
