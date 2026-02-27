@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,6 +6,8 @@ using Microsoft.OpenApi.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Oip.Base.StartupTasks;
 
@@ -94,7 +95,14 @@ public class SwaggerGenerateWebClientStartupTask(
 
     private async Task GenerateTypeScriptClient(OpenApiItem config, string swaggerJsonPath)
     {
-        string[] parts = config.GenerateCommand!.Replace("{SwaggerJsonPath}", swaggerJsonPath).Split(' ', 2);
+        // In case of paths with spaces
+        string protectedSwaggerJsonPath = swaggerJsonPath.Any(char.IsWhiteSpace) ? "\""+ swaggerJsonPath + "\"" : swaggerJsonPath;
+
+        // Windows platform requires CMD to execute NPX command
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            config.GenerateCommand = "cmd.exe /c " + config.GenerateCommand!;
+
+        string[] parts = config.GenerateCommand!.Replace("{SwaggerJsonPath}", protectedSwaggerJsonPath).Split(' ', 2);
         
         var processStartInfo = new ProcessStartInfo
         {
