@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using Microsoft.Extensions.Configuration;
-using OllamaSharp;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace Oip.CodeReview;
 
@@ -15,86 +18,53 @@ public static class Program
     /// <param name="args">Command line arguments.</param>
     public static async Task Main(string[] args)
     {
-        var config = BindConfig(args);
-
-        var ollamaApiClient = new OllamaApiClient(new Uri(config.Ollama.Url));
-        ollamaApiClient.SelectedModel = config.Ollama.Model;
-
-        GitFetchBranch(config.WorkDir, config.SourceBranch);
-
-        var diff = GetDiffUsingGitCli(config.WorkDir, config.SourceBranch, config.TargetBranch, config.FilePath);
-
-        var promptFormat = await File.ReadAllTextAsync("prompt.txt");
-
-        var prompt = string.Format(promptFormat, diff);
-        if (config.PromptOnly)
+        try
         {
-            Console.WriteLine(prompt);
+            var config = BindConfig(args);
+
+            var diff = GitHelper.GetDiffUsingGitCli(config.WorkDir, config.SourceBranch, config.TargetBranch,
+                config.ExcludeFolders, config.FilePath, config.NewCodeOnly);
+
+            var systemMessage = await File.ReadAllTextAsync("prompt.txt");
+            var openAiApiSettings = config.OpenAiApiSettings;
+            if (!config.PromptOnly && openAiApiSettings != null)
+            {
+                if (string.IsNullOrEmpty(openAiApiSettings.BaseUrl))
+                    throw new InvalidOperationException("BaseUrl is not set");
+                if (string.IsNullOrEmpty(openAiApiSettings.ModelId))
+                    throw new InvalidOperationException("ModelId is not set");
+
+                var builder = Kernel.CreateBuilder();
+                builder.Services.AddHttpClient();
+                builder.Services.AddOpenAIChatCompletion(openAiApiSettings.ModelId, new Uri(openAiApiSettings.BaseUrl),
+                    openAiApiSettings.ApiKey);
+                var kernel = builder.Build();
+
+                var history = new ChatHistory();
+                history.AddSystemMessage(systemMessage);
+                history.AddUserMessage(diff);
+
+                var chat = kernel.GetRequiredService<IChatCompletionService>();
+                var result = await chat.GetChatMessageContentAsync(history, kernel: kernel);
+
+                if (result.Content is null)
+                    throw new InvalidOperationException("Content is null");
+
+                Console.WriteLine(result.Content);
+            }
+            else
+            {
+                Console.WriteLine(systemMessage);
+                Console.WriteLine(diff);
+            }
         }
-        else
+        catch (Exception e)
         {
-            await foreach (var stream in ollamaApiClient.GenerateAsync(prompt))
-                Console.Write(stream?.Response);
+            Console.WriteLine(e);
+            throw;
         }
     }
 
-    /// <summary>
-    /// Retrieves the diff between two branches using the Git command-line interface
-    /// </summary>
-    /// <param name="repoPath">The path to the Git repository</param>
-    /// <param name="sourceBranch">The source branch</param>
-    /// <param name="targetBranch">The target branch</param>
-    /// <param name="filePath">Optional path to specific file for diff comparison</param>
-    /// <returns>The diff output as a string</returns>
-    private static string GetDiffUsingGitCli(string repoPath, string sourceBranch, string targetBranch,
-        string? filePath = null)
-    {
-        return GitProcessStartInfo(repoPath,
-            $"diff -w --inter-hunk-context=100 --ignore-all-space {targetBranch}...{sourceBranch} {filePath}".Trim());
-    }
-
-    private static void GitFetchBranch(string repoPath, string targetBranch)
-    {
-        GitProcessStartInfo(repoPath, "fetch origin");
-        GitProcessStartInfo(repoPath, $"checkout {targetBranch}");
-    }
-
-    /// <summary>
-    /// Executes a Git command and returns the output.
-    /// </summary>
-    /// <param name="repoPath">The path to the Git repository.</param>
-    /// <param name="arguments">The arguments to pass to the Git command.</param>
-    /// <returns>The output of the Git command.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if the Git command fails.</exception>
-    private static string GitProcessStartInfo(string repoPath, string arguments)
-    {
-        var processStartInfo = new ProcessStartInfo
-        {
-            FileName = "git",
-            Arguments = arguments,
-            WorkingDirectory = repoPath,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        using var process = new Process();
-        process.StartInfo = processStartInfo;
-        process.Start();
-
-        var output = process.StandardOutput.ReadToEnd();
-        var error = process.StandardError.ReadToEnd();
-
-        process.WaitForExit();
-
-        if (process.ExitCode != 0)
-        {
-            throw new InvalidOperationException($"Command failed: {error}");
-        }
-
-        return output;
-    }
 
     /// <summary>
     /// Binds configuration settings from various sources
