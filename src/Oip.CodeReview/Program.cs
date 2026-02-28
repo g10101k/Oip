@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -23,9 +21,12 @@ public static class Program
             var config = BindConfig(args);
 
             var diff = GitHelper.GetDiffUsingGitCli(config.WorkDir, config.SourceBranch, config.TargetBranch,
-                config.ExcludeFolders, config.FilePath, config.NewCodeOnly);
+                config.ExcludePatterns, config.FilePath, config.NewCodeOnly);
 
-            var systemMessage = await File.ReadAllTextAsync("prompt.txt");
+            if (!File.Exists(config.SystemPromptFilePath))
+                throw new FileNotFoundException($"SystemPrompt file not found: {config.SystemPromptFilePath}");
+
+            var systemMessage = await File.ReadAllTextAsync(config.SystemPromptFilePath);
             var openAiApiSettings = config.OpenAiApiSettings;
             if (!config.PromptOnly && openAiApiSettings != null)
             {
@@ -45,12 +46,38 @@ public static class Program
                 history.AddUserMessage(diff);
 
                 var chat = kernel.GetRequiredService<IChatCompletionService>();
-                var result = await chat.GetChatMessageContentAsync(history, kernel: kernel);
 
-                if (result.Content is null)
-                    throw new InvalidOperationException("Content is null");
+                if (openAiApiSettings.UseStream)
+                {
+                    try
+                    {
+                        var streamingResult = chat.GetStreamingChatMessageContentsAsync(history, kernel: kernel);
 
-                Console.WriteLine(result.Content);
+                        await foreach (var chunk in streamingResult)
+                        {
+                            if (chunk.Content is not null)
+                            {
+                                Console.Write(chunk.Content);
+                            }
+                        }
+
+                        Console.WriteLine();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка при получении потока: {ex.Message}");
+                        throw;
+                    }
+                }
+                else
+                {
+                    var result = await chat.GetChatMessageContentAsync(history, kernel: kernel);
+
+                    if (result.Content is null)
+                        throw new InvalidOperationException("Content is null");
+
+                    Console.WriteLine(result.Content);
+                }
             }
             else
             {

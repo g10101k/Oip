@@ -38,12 +38,17 @@ public class AppSettings
     /// <summary>
     /// List of folders to exclude from the code review process.
     /// </summary>
-    public List<string> ExcludeFolders { get; set; } = [];
+    public List<string> ExcludePatterns { get; set; } = [];
 
     /// <summary>
     /// Only new code changes during the code review process.
     /// </summary>
     public bool NewCodeOnly { get; set; }
+
+    /// <summary>
+    /// The file path to the system prompt file.
+    /// </summary>
+    public string SystemPromptFilePath { get; set; } = "prompt.txt";
 }
 
 /// <summary>
@@ -62,7 +67,12 @@ public class OpenAiApiSettings
     public string? BaseUrl { get; set; }
 
     /// <summary>
-    /// The API key used for authentication.
+    /// The API key used for authentication. Use secrets.
     /// </summary>
     public string ApiKey { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Indicates whether to use streaming for the Open AI API calls.
+    /// </summary>
+    public bool UseStream { get; set; }
 }
