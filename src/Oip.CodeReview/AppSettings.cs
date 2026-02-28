@@ -31,23 +31,48 @@ public class AppSettings
     public bool PromptOnly { get; set; }
 
     /// <summary>
-    /// Represents the Ollama settings.
+    /// Contains settings related to the OpenAI API.
     /// </summary>
-    public OllamaSettings Ollama { get; set; } = null!;
+    public OpenAiApiSettings? OpenAiApiSettings { get; set; }
+
+    /// <summary>
+    /// List of folders to exclude from the code review process.
+    /// </summary>
+    public List<string> ExcludePatterns { get; set; } = [];
+
+    /// <summary>
+    /// Only new code changes during the code review process.
+    /// </summary>
+    public bool NewCodeOnly { get; set; }
+
+    /// <summary>
+    /// The file path to the system prompt file.
+    /// </summary>
+    public string SystemPromptFilePath { get; set; } = "prompt.txt";
 }
 
 /// <summary>
-/// Represents the Ollama settings.
+/// Represents the Open AI API settings.
 /// </summary>
-public class OllamaSettings
+public class OpenAiApiSettings
 {
     /// <summary>
-    /// The URL of the Ollama server.
+    /// The ID of the model to use for the code review process.
     /// </summary>
-    public string Url { get; set; } = null!;
+    public string ModelId { get; set; } = "gemma3:27b";
 
     /// <summary>
-    /// The name of the Ollama model to use for code review.
+    /// Base URL for the OpenAI API service.
     /// </summary>
-    public string Model { get; set; } = null!;
+    public string? BaseUrl { get; set; }
+
+    /// <summary>
+    /// The API key used for authentication. Use secrets.
+    /// </summary>
+    public string ApiKey { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Indicates whether to use streaming for the Open AI API calls.
+    /// </summary>
+    public bool UseStream { get; set; }
 }
