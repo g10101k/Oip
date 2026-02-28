@@ -41,6 +41,11 @@ public class ModuleInstanceEntity
     public int? ParentId { get; set; }
 
     /// <summary>
+    /// Module position
+    /// </summary>
+    public int Order { get; set; }
+    
+    /// <summary>
     /// Parent instance
     /// </summary>
     public ModuleInstanceEntity? Parent { get; set; }

@@ -64,7 +64,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Manages the lifecycle of receiving data from the observable and allows unsubscribing to stop receiving data.
    * @type {Subscription}
    */
-  private subscriptions: Subscription[] = [];
+  public subscriptions: Subscription[] = [];
   /**
    * Configuration object for backend storage
    * @type {TBackendStoreSettings}

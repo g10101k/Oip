@@ -22,3 +22,9 @@ a {
 .layout-wrapper {
   min-height: 100vh;
 }
+
+.p-column-filter-active {
+  filtericon {
+    color: color-mix(in srgb, var(--primary-color), transparent 20%);
+  }
+}

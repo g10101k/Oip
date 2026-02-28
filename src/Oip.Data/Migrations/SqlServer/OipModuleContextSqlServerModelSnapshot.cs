@@ -17,7 +17,7 @@ namespace Oip.Base.Data.SqlServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.22")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -75,6 +75,10 @@ namespace Oip.Base.Data.SqlServer.Migrations
                         .HasComment("Id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleInstanceId"));
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int")
+                        .HasComment("Module position");
 
                     b.Property<int?>("ParentId")
                         .HasColumnType("int")

@@ -37,6 +37,8 @@ export { SecurityStorageService } from './services/security-storage.service';
 export { L10nService, LanguageDto } from './services/l10n.service';
 export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './services/logo.service';
 export { NotificationService } from './services/notification.service';
+export { TableFilterService }from './services/table-filter.service';
+
 // Events
 export { MenuChangeEvent } from './events/menu-change.event';
 

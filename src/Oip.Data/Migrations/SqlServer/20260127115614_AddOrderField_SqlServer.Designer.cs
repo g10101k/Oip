@@ -2,48 +2,51 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Base.Data.Postgres.Migrations
+namespace Oip.Data.Migrations.SqlServer
 {
-    [DbContext(typeof(OipModuleContextPostgres))]
-    partial class OipModuleContextPostgresModelSnapshot : ModelSnapshot
+    [DbContext(typeof(OipModuleContextSqlServer))]
+    [Migration("20260127115614_AddOrderField_SqlServer")]
+    partial class AddOrderField_SqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.22")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Oip.Data.Entities.ModuleEntity", b =>
                 {
                     b.Property<int>("ModuleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("Name");
 
                     b.Property<string>("RouterLink")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("nvarchar(256)")
                         .HasComment("Route link to component");
 
                     b.Property<string>("Settings")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Settings for module");
 
                     b.ToTable("Module", "oip", t =>
@@ -56,47 +59,47 @@ namespace Oip.Base.Data.Postgres.Migrations
                 {
                     b.Property<string>("Icon")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("nvarchar(64)")
                         .HasComment("Label");
 
                     b.Property<string>("Label")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("nvarchar(128)")
                         .HasComment("Label");
 
                     b.Property<int>("ModuleId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Module id");
 
                     b.Property<int>("ModuleInstanceId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleInstanceId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleInstanceId"));
 
                     b.Property<int>("Order")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Module position");
 
                     b.Property<int?>("ParentId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Parent id");
 
                     b.Property<string>("Settings")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Settings");
 
                     b.Property<string>("Target")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("nvarchar(64)")
                         .HasComment("Target");
 
                     b.Property<string>("Url")
                         .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
+                        .HasColumnType("nvarchar(1024)")
                         .HasComment("Url");
 
                     b.ToTable("ModuleInstance", "oip", t =>
@@ -108,26 +111,26 @@ namespace Oip.Base.Data.Postgres.Migrations
             modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleInstanceId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("ModuleId");
 
                     b.Property<int>("ModuleInstanceSecurityId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleInstanceSecurityId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleInstanceSecurityId"));
 
                     b.Property<string>("Right")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Right (max 255 chars)");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Role (max 255 chars)");
 
                     b.ToTable("ModuleInstanceSecurity", "oip", t =>
@@ -139,26 +142,26 @@ namespace Oip.Base.Data.Postgres.Migrations
             modelBuilder.Entity("Oip.Data.Entities.ModuleSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("ModuleId");
 
                     b.Property<int>("ModuleSecurityId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleSecurityId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleSecurityId"));
 
                     b.Property<string>("Right")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Right");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Role");
 
                     b.ToTable("ModuleSecurity", "oip", t =>
@@ -172,19 +175,19 @@ namespace Oip.Base.Data.Postgres.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("E-mail");
 
                     b.Property<byte[]>("Photo")
-                        .HasColumnType("bytea")
+                        .HasColumnType("varbinary(max)")
                         .HasComment("User photo");
 
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("User id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
                     b.ToTable("User", "oip", t =>
                         {

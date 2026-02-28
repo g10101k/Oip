@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Base.Data.Postgres.Migrations
+namespace Oip.Data.Migrations.Postgres
 {
     [DbContext(typeof(OipModuleContextPostgres))]
-    partial class OipModuleContextPostgresModelSnapshot : ModelSnapshot
+    [Migration("20260127115610_AddOrderField_Postgres")]
+    partial class AddOrderField_Postgres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

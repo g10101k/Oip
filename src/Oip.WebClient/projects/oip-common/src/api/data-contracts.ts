@@ -146,6 +146,10 @@ export interface ModuleInstanceDto {
   items?: ModuleInstanceDto[] | null;
   /** Securities */
   securities?: string[] | null;
+  /** Identifier for the parent module instance. */
+  parentId?: number | null;
+  /** Sort order position for the module instance. */
+  order?: number;
 }
 
 /** Module security DTO */
@@ -189,4 +193,11 @@ export interface FolderModuleGetModuleInstanceSettingsParams {
 export interface MenuDeleteModuleInstanceParams {
   /** The unique identifier of the module instance to delete. */
   id?: number;
+}
+
+export interface MenuChangeOrderParams {
+  /** The identifier of the first module to swap. */
+  firstModuleId?: number;
+  /** The identifier of the second module to swap with. */
+  secondModuleId?: number;
 }
