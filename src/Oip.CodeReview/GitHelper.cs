@@ -6,7 +6,7 @@ namespace Oip.CodeReview;
 /// <summary>
 /// Provides helper methods for interacting with Git repositories.
 /// </summary>
-public class GitHelper
+public static class GitHelper
 {
     /// <summary>
     /// Retrieves the diff between two branches using Git command-line interface.
@@ -95,12 +95,13 @@ public class GitHelper
 
         foreach (var line in lines)
         {
-            if (line.StartsWith("+") && !line.StartsWith("+++"))
+            if (line.StartsWith('+') && !line.StartsWith("+++"))
             {
                 result.AppendLine(line.Remove(0, 1).Insert(0, " "));
                 continue;
             }
-            else if (line.StartsWith("-") && !line.StartsWith("---"))
+
+            if (line.StartsWith('-') && !line.StartsWith("---"))
             {
                 continue;
             }
