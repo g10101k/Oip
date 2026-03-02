@@ -8,7 +8,7 @@ namespace Oip.Discussions.Data.EntityConfigurations;
 /// <summary>
 /// Configures the database mapping for the MentionEntity.
 /// </summary>
-public class MentionEntityConfiguration(DatabaseFacade database, bool designTime)
+public class MentionEntityConfiguration(DatabaseFacade database, bool designTime, string schemaName)
     : IEntityTypeConfiguration<MentionEntity>
 {
     /// <inheritdoc />
@@ -17,7 +17,7 @@ public class MentionEntityConfiguration(DatabaseFacade database, bool designTime
         if (designTime)
             Console.Write($"Configuring {nameof(MentionEntityConfiguration)}");
 
-        builder.SetTableWithSchema(database, DiscussionsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, schemaName);
         builder.HasKey(e => e.MentionId);
         builder.Property(e => e.MentionId).ValueGeneratedOnAdd();
         builder.Property(e => e.CommentId).IsRequired();

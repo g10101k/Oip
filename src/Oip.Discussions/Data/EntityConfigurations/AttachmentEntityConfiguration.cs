@@ -10,7 +10,7 @@ namespace Oip.Discussions.Data.EntityConfigurations;
 /// </summary>
 /// <param name="database">Database facade instance for schema operations.</param>
 /// <param name="designTime">Indicates if configuration is running at design time.</param>
-public class AttachmentEntityConfiguration(DatabaseFacade database, bool designTime)
+public class AttachmentEntityConfiguration(DatabaseFacade database, bool designTime, string schemaName)
     : IEntityTypeConfiguration<AttachmentEntity>
 {
     /// <inheritdoc />
@@ -19,7 +19,7 @@ public class AttachmentEntityConfiguration(DatabaseFacade database, bool designT
         if (designTime)
             Console.Write($"Configuring {nameof(AttachmentEntityConfiguration)}");
 
-        builder.SetTableWithSchema(database, DiscussionsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, schemaName);
         builder.HasKey(e => e.AttachmentId);
         builder.Property(e => e.AttachmentId).ValueGeneratedOnAdd();
         builder.Property(e => e.CommentId).IsRequired();

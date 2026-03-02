@@ -5,7 +5,8 @@ using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
-using Oip.Settings;
+using Oip.Discussions.Extensions;
+using Oip.Discussions.Settings;
 
 namespace Oip.Discussions;
 
@@ -29,6 +30,7 @@ internal static class Program
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
+            builder.AddDiscussionsService(settings);
             builder.AddControllersAndView();
             builder.AddLocalization();
 
@@ -45,7 +47,10 @@ internal static class Program
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
+            
             app.MigrateOipModuleDatabase();
+            app.AddDiscussions(settings);
+            
             app.Run();
         }
         catch (Exception e)

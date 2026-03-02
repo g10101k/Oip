@@ -1,6 +1,7 @@
 using Oip.Base.Settings;
+using Oip.Settings;
 
-namespace Oip.Settings;
+namespace Oip.Discussions.Settings;
 
 /// <summary>
 /// Application settings

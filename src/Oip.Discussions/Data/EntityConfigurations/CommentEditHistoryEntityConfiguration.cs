@@ -10,7 +10,7 @@ namespace Oip.Discussions.Data.EntityConfigurations;
 /// </summary>
 /// <param name="database">Database facade instance for schema operations.</param>
 /// <param name="designTime">Indicates if configuration is running at design time.</param>
-public class CommentEditHistoryEntityConfiguration(DatabaseFacade database, bool designTime)
+public class CommentEditHistoryEntityConfiguration(DatabaseFacade database, bool designTime, string schemaName)
     : IEntityTypeConfiguration<CommentEditHistoryEntity>
 {
     /// <inheritdoc />
@@ -19,7 +19,7 @@ public class CommentEditHistoryEntityConfiguration(DatabaseFacade database, bool
         if (designTime)
             Console.Write($"Configuring {nameof(CommentEditHistoryEntity)}");
 
-        builder.SetTableWithSchema(database, DiscussionsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, schemaName);
 
         builder.HasKey(e => e.CommentEditHistoryId);
         builder.Property(e => e.CommentEditHistoryId).ValueGeneratedOnAdd();

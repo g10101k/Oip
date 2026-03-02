@@ -8,7 +8,7 @@ namespace Oip.Discussions.Data.EntityConfigurations;
 /// <summary>
 /// Configuration for the ReactionEntity model.
 /// </summary>
-public class ReactionEntityConfiguration(DatabaseFacade database, bool designTime)
+public class ReactionEntityConfiguration(DatabaseFacade database, bool designTime, string schemaName)
     : IEntityTypeConfiguration<ReactionEntity>
 {
     /// <summary>
@@ -20,7 +20,7 @@ public class ReactionEntityConfiguration(DatabaseFacade database, bool designTim
         if (designTime)
             Console.Write($"Configuring {nameof(ReactionEntityConfiguration)}");
 
-        builder.SetTableWithSchema(database, DiscussionsDbContext.SchemaName);
+        builder.SetTableWithSchema(database, schemaName);
         builder.HasKey(e => e.ReactionId);
         builder.Property(e => e.ReactionId).ValueGeneratedOnAdd();
         builder.Property(e => e.CommentId).IsRequired();

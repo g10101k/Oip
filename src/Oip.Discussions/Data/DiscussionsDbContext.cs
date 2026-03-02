@@ -16,12 +16,12 @@ public class DiscussionsDbContext(DbContextOptions<DiscussionsDbContext> options
     : DbContext(options), IDataProtectionKeyContext
 {
     /// <summary>
-    /// The name of the database schema used for user entities
+    /// The name of the database schema used for discussions-related entities.
     /// </summary>
     public const string SchemaName = "discussions";
 
     /// <summary>
-    /// The name of the table used to store EF Core migration history
+    /// The name of the table used to store migration history.
     /// </summary>
     public const string MigrationHistoryTableName = "__MigrationHistory";
 
@@ -76,11 +76,11 @@ public class DiscussionsDbContext(DbContextOptions<DiscussionsDbContext> options
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfiguration(new CommentEntityConfiguration(Database, designTime));
-        modelBuilder.ApplyConfiguration(new AttachmentEntityConfiguration(Database, designTime));
-        modelBuilder.ApplyConfiguration(new CommentEditHistoryEntityConfiguration(Database, designTime));
-        modelBuilder.ApplyConfiguration(new ReactionEntityConfiguration(Database, designTime));
-        modelBuilder.ApplyConfiguration(new MentionEntityConfiguration(Database, designTime));
+        modelBuilder.ApplyConfiguration(new CommentEntityConfiguration(Database, designTime, SchemaName));
+        modelBuilder.ApplyConfiguration(new AttachmentEntityConfiguration(Database, designTime, SchemaName));
+        modelBuilder.ApplyConfiguration(new CommentEditHistoryEntityConfiguration(Database, designTime, SchemaName));
+        modelBuilder.ApplyConfiguration(new ReactionEntityConfiguration(Database, designTime, SchemaName));
+        modelBuilder.ApplyConfiguration(new MentionEntityConfiguration(Database, designTime, SchemaName));
 
         modelBuilder.ApplyXmlDocumentation(designTime);
     }
@@ -89,13 +89,17 @@ public class DiscussionsDbContext(DbContextOptions<DiscussionsDbContext> options
 /// <summary>
 /// Represents the SQL Server database context for user-related entities.
 /// </summary>
-public class DiscussionsDbContextSqlServer(DbContextOptions<DiscussionsDbContext> options, bool designTime = true)
+public class DiscussionsDbContextSqlServer(
+    DbContextOptions<DiscussionsDbContext> options,
+    bool designTime = true)
     : DiscussionsDbContext(options, designTime);
 
 /// <summary>
 /// Represents the PostgreSQL database context for user-related entities.
 /// </summary>
-public class DiscussionsDbContextPostgres(DbContextOptions<DiscussionsDbContext> options, bool designTime = true)
+public class DiscussionsDbContextPostgres(
+    DbContextOptions<DiscussionsDbContext> options,
+    bool designTime = true)
     : DiscussionsDbContext(options, designTime);
 
 /// <summary>
@@ -103,6 +107,11 @@ public class DiscussionsDbContextPostgres(DbContextOptions<DiscussionsDbContext>
 /// </summary>
 public class CommentEntity
 {
+    /// <summary>
+    /// Unique identifier of the comment.
+    /// </summary>
+    public long CommentId { get; set; }
+
     /// <summary>
     /// Identifier of the object type associated with the comment.
     /// </summary>
@@ -112,11 +121,6 @@ public class CommentEntity
     /// Identifier of the object associated with the comment.
     /// </summary>
     public long ObjectId { get; set; }
-
-    /// <summary>
-    /// Unique identifier of the comment.
-    /// </summary>
-    public long CommentId { get; set; }
 
     /// <summary>
     /// Content of the comment.
