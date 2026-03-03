@@ -43,7 +43,8 @@
     "label": "Имя",
     "icon": "Иконка",
     "cancel": "Отмена",
-    "save": "Сохранить"
+    "save": "Сохранить",
+    "security": "Доступ на чтение"
   },
   "menuItemCreateDialogComponent": {
     "header": "Новый элемент меню",

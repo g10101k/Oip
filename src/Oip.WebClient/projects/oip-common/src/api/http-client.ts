@@ -11,7 +11,8 @@
  */
 
 import { inject, Injectable } from "@angular/core";
-import { LayoutService, SecurityService } from "oip-common";
+import { LayoutService, } from "../services/app.layout.service";
+import { SecurityService } from "../services/security.service";
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
