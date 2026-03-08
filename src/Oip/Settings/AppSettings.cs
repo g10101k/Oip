@@ -8,7 +8,7 @@ namespace Oip.Settings;
 public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
 {
     /// <inheritdoc />
-    public OipServices Services { get; set; } = new();
+    public OipServicesSettings Services { get; set; } = new();
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();
@@ -20,5 +20,5 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public SecurityServiceSettings SecurityService { get; set; } = new();
 
     /// <inheritdoc />
-    public OpenTelemetrySettins OpenTelemetry { get; set; } = new();
+    public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 }
