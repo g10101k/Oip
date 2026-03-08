@@ -30,6 +30,22 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     [NotSaveToDb]
     SecurityServiceSettings SecurityService { get; set; }
+
+    /// <summary>
+    /// OpenTelemetry settings.
+    /// </summary>
+    [NotSaveToDb] OpenTelemetrySettins OpenTelemetry { get; set; }
+}
+
+/// <summary>
+/// OpenTelemetry settings.
+/// </summary>
+public class OpenTelemetrySettins
+{
+    /// <summary>
+    /// Indicates whether OpenTelemetry is enabled.
+    /// </summary>
+    public bool Enable { get; set; }
 }
 
 /// <summary>

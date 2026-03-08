@@ -18,4 +18,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public SecurityServiceSettings SecurityService { get; set; } = new();
+
+    /// <inheritdoc />
+    public OpenTelemetrySettins OpenTelemetry { get; set; } = new();
 }
