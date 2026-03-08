@@ -50,7 +50,8 @@ internal static class Program
             builder.AddLocalization();
             builder.Services.AddDataProtection<NotificationsDbContext>();
             builder.Services.AddSignalR();
-            
+            builder.AddOpenTelemetry(settings);
+
             var app = builder.Build();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
@@ -66,7 +67,7 @@ internal static class Program
             app.MapFallbackToFile("index.html");
             app.MapGrpcService<NotificationService>();
             app.MapHub<NotificationHub>("/hubs/notification");
-
+            app.MapOpenTelemetry(settings);
             app.MigrateNotificationDatabase();
             app.Run();
         }

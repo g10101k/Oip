@@ -48,7 +48,8 @@ internal static class Program
             builder.Services.AddHttpClient();
             builder.Services.AddSingleton<UserService>();
             builder.Services.AddGrpc();
-            
+            builder.AddOpenTelemetry(settings);
+
             var app = builder.Build();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
@@ -64,6 +65,7 @@ internal static class Program
             app.MapFallbackToFile("index.html");
             app.MapGrpcService<UserService>();
             app.MigrateUserDatabase();
+            app.MapOpenTelemetry(settings);
             app.Run();
         }
         catch (Exception e)

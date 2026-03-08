@@ -29,7 +29,8 @@ const PROXY_CONFIG = [
     context: [
       "/api",
       "/swagger",
-      "/health"
+      "/health",
+      "/metrics"
     ],
     target: target,
     secure: false,

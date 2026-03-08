@@ -11,7 +11,7 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// <summary>
     /// Collection of urls OIP services
     /// </summary>
-    OipServices Services { get; set; }
+    OipServicesSettings Services { get; set; }
 
     /// <summary>
     /// Collection of OpenAPI specification configurations for the application
@@ -30,25 +30,9 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     [NotSaveToDb]
     SecurityServiceSettings SecurityService { get; set; }
-}
-
-/// <summary>
-/// Contains OpenAPI/Swagger configuration items for the application
-/// </summary>
-public class OpenApiSettings : List<OpenApiItem>;
-
-/// <summary>
-/// Contains service endpoint configurations for OIP app
-/// </summary>
-public class OipServices
-{
-    /// <summary>
-    /// URL endpoint for the OIP users service
-    /// </summary>
-    public string OipUsers { get; set; } = "https://localhost:5005";
 
     /// <summary>
-    /// Gets or sets the endpoint URL for the OIP notifications service
+    /// OpenTelemetry settings.
     /// </summary>
-    public string OipNotifications { get; set; } = "https://localhost:5007";
+    [NotSaveToDb] OpenTelemetrySettings OpenTelemetry { get; set; }
 }

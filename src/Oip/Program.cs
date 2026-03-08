@@ -31,6 +31,7 @@ internal static class Program
             builder.Services.AddCors();
             builder.AddControllersAndView();
             builder.AddLocalization();
+            builder.AddOpenTelemetry(settings);
 
             var app = builder.Build();
             app.AddRequestLocalization();
@@ -45,6 +46,7 @@ internal static class Program
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
+            app.MapOpenTelemetry(settings);
             app.MigrateOipModuleDatabase();
             app.Run();
         }

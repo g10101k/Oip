@@ -42,7 +42,8 @@ internal static class Program
             builder.Services.AddScoped<TagService>();
             builder.Services.AddRtdsData(settings);
             builder.Services.AddHostedService<RtdsHostedService>();
-            
+            builder.AddOpenTelemetry(settings);
+
             var app = builder.Build();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
@@ -57,6 +58,7 @@ internal static class Program
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
             app.MapGrpcService<RtdsService>();
+            app.MapOpenTelemetry(settings);
             app.Run();
         }
         catch (Exception e)
