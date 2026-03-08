@@ -48,7 +48,7 @@ public static class OipModuleApplication
     /// </summary>
     /// <param name="settings">App settings</param>
     /// <returns></returns>
-    [Obsolete("Use particle call")]
+    [Obsolete("Use particle method call")]
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
@@ -65,7 +65,7 @@ public static class OipModuleApplication
     /// </summary>
     /// <param name="settings">App settings</param>
     /// <returns></returns>
-    [Obsolete("Use particle call")]
+    [Obsolete("Use particle method call")]
     public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
@@ -311,7 +311,7 @@ public static class OipModuleApplication
     /// <param name="settings"></param>
     /// <param name="builder">The WebApplicationBuilder instance</param>
     /// <returns></returns>
-    [Obsolete]
+    [Obsolete("Use particle method call")]
     public static WebApplication BuildApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var app = builder.Build();
