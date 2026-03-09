@@ -1,4 +1,4 @@
-import { ApplicationRef, inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { InterpolationParameters, TranslateService, Translation, TranslationObject } from '@ngx-translate/core';
 import { LayoutService } from './app.layout.service';
@@ -21,7 +21,6 @@ export class L10nService {
   private readonly primeNg = inject(PrimeNG);
   private readonly layoutService = inject(LayoutService);
   public availableLanguages: LanguageDto[];
-  private appRef = inject(ApplicationRef)
 
   /**
    * Loads translations for a specific component
@@ -57,7 +56,6 @@ export class L10nService {
         const current = this.translateService.translations[lang] || {};
         this.translateService.setTranslation(lang, {...current, ...translations}, true);
         this.loadedTranslations.add(key);
-        this.appRef.tick();
       });
     } catch (e) {
       console.error(`No translations found for ${component}.${lang}.json`);
@@ -80,9 +78,11 @@ export class L10nService {
     this.translateService.addLangs(languages.map((x) => x.code));
     const lang = this.layoutService.language() ? this.layoutService.language() : 'en';
     this.translateService.setDefaultLang(lang);
-    this.translateService.use(lang);
-    this.loadComponentTranslations('app-info');
-    this.translateService.get('primeng').subscribe((res) => this.primeNg.setTranslation(res));
+    this.translateService.use(lang).subscribe(() => {
+        this.loadComponentTranslations('app-info');
+        this.translateService.get('primeng').subscribe((res) => this.primeNg.setTranslation(res));
+      }
+    );
   }
 
   instant(key: string | string[], interpolateParams?: InterpolationParameters): Translation | TranslationObject {
