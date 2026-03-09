@@ -13,7 +13,7 @@ export interface LanguageDto {
 /**
  * Service for managing translation loading in the application
  */
-@Injectable({ providedIn: 'root' }) // Provided at root level for singleton usage
+@Injectable({providedIn: 'root'}) // Provided at root level for singleton usage
 export class L10nService {
   private loadedTranslations: Set<string> = new Set();
   private httpClient = inject(HttpClient);
@@ -46,28 +46,19 @@ export class L10nService {
    * @param lang - Language code to load translations for
    */
   private loadTranslations(component: string, lang: string) {
-    // Create unique key for this component-language combination
     const key = `${component}.${lang}`;
-
-    // Skip if translations are already loaded
     if (this.loadedTranslations.has(key)) {
       return;
     }
 
     try {
-      // Load translation file from assets
       this.httpClient.get(`./assets/i18n/${component}.${lang}.json`).subscribe((translations) => {
-        // Get existing translations for the language
         const current = this.translateService.translations[lang] || {};
-
-        // Merge new translations with existing ones
-        this.translateService.setTranslation(lang, { ...current, ...translations }, true);
-
-        // Mark these translations as loaded
+        this.translateService.setTranslation(lang, {...current, ...translations}, true);
         this.loadedTranslations.add(key);
       });
     } catch (e) {
-      console.warn(`No translations found for ${component}.${lang}.json`);
+      console.error(`No translations found for ${component}.${lang}.json`);
       console.error(e);
     }
   }
@@ -87,9 +78,11 @@ export class L10nService {
     this.translateService.addLangs(languages.map((x) => x.code));
     const lang = this.layoutService.language() ? this.layoutService.language() : 'en';
     this.translateService.setDefaultLang(lang);
-    this.translateService.use(lang);
-    this.loadComponentTranslations('app-info');
-    this.translateService.get('primeng').subscribe((res) => this.primeNg.setTranslation(res));
+    this.translateService.use(lang).subscribe(() => {
+        this.loadComponentTranslations('app-info');
+        this.translateService.get('primeng').subscribe((res) => this.primeNg.setTranslation(res));
+      }
+    );
   }
 
   instant(key: string | string[], interpolateParams?: InterpolationParameters): Translation | TranslationObject {
