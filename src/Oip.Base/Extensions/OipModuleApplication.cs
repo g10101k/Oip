@@ -29,6 +29,7 @@ using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
+using OpenTelemetry.Metrics;
 using Polly;
 using Polly.Extensions.Http;
 using ApiException = Oip.Base.Exceptions.ApiException;
@@ -47,7 +48,7 @@ public static class OipModuleApplication
     /// </summary>
     /// <param name="settings">App settings</param>
     /// <returns></returns>
-    [Obsolete("Use particle call ")]
+    [Obsolete("Use particle method call")]
     public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
@@ -64,7 +65,7 @@ public static class OipModuleApplication
     /// </summary>
     /// <param name="settings">App settings</param>
     /// <returns></returns>
-    [Obsolete]
+    [Obsolete("Use particle method call")]
     public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
@@ -212,13 +213,26 @@ public static class OipModuleApplication
             .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
     }
 
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    /// <param name="settings">Settings</param>
+    public static void AddOpenTelemetry(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    {
+        if (settings.OpenTelemetry.Enable)
+            builder.Services.AddOpenTelemetry()
+                .WithMetrics(metrics => metrics
+                    .AddAspNetCoreInstrumentation()
+                    .AddRuntimeInstrumentation()
+                    .AddPrometheusExporter());
+    }
+
     /// <summary>
     /// Configures default authentication using JWT Bearer scheme.
     /// </summary>
     /// <param name="settings">The base Oip module application settings.</param>
     /// <param name="builder">The WebApplicationBuilder instance</param>
     /// <returns>The configured web application builder.</returns>
-    public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder,
+        IBaseOipModuleAppSettings settings)
     {
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -297,7 +311,7 @@ public static class OipModuleApplication
     /// <param name="settings"></param>
     /// <param name="builder">The WebApplicationBuilder instance</param>
     /// <returns></returns>
-    [Obsolete]
+    [Obsolete("Use particle method call")]
     public static WebApplication BuildApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var app = builder.Build();
@@ -317,108 +331,131 @@ public static class OipModuleApplication
         return app;
     }
 
+    /// <summary>
+    /// Maps default health check endpoints for application monitoring
+    /// </summary>
     /// <param name="app">The application builder</param>
-    extension(WebApplication app)
+    public static void MapDefaultEndpoints(this WebApplication app)
     {
-        /// <summary>
-        /// Maps default health check endpoints for application monitoring
-        /// </summary>
-        public void MapDefaultEndpoints()
-        {
-            // All health checks must pass for app to be considered ready to accept traffic after starting
-            app.MapHealthChecks("/health");
-
-            // Only health checks tagged with the "live" tag must pass for app to be considered alive
-            app.MapHealthChecks("/liveness", new HealthCheckOptions
+        // All health checks must pass for app to be considered ready to accept traffic after starting
+        app.MapGet("/health", async (HealthCheckService health) =>
             {
-                Predicate = r => r.Tags.Contains("live")
-            });
-        }
+                var result = await health.CheckHealthAsync();
+                return result.Status == HealthStatus.Healthy
+                    ? Results.Ok(result)
+                    : Results.StatusCode(503);
+            })
+            .WithGroupName("v1")
+            .WithName("HealthCheck")
+            .WithTags("v1")
+            .WithOpenApi();
 
-        /// <summary>
-        /// Configures HTTP Strict Transport Security to help protect against man-in-the-middle attacks
-        /// </summary>
-        /// <returns></returns>
-        public WebApplication AddHsts()
+        // Only health checks tagged with the "live" tag must pass for app to be considered alive
+        app.MapHealthChecks("/liveness", new HealthCheckOptions
         {
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
-
-            return app;
-        }
-
-        /// <summary>
-        /// Configures request localization for the application
-        /// </summary>
-        /// <returns></returns>
-        public WebApplication AddRequestLocalization()
-        {
-            var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
-            if (localizeOptions != null) app.UseRequestLocalization(localizeOptions.Value);
-            return app;
-        }
-
-        /// <summary>
-        /// Configures the application to handle exceptions and return a JSON response
-        /// </summary>
-        public WebApplication AddExceptionHandler()
-        {
-            app.UseExceptionHandler(errorApp =>
-            {
-                errorApp.Run(async context =>
-                {
-                    context.Response.StatusCode = 500;
-                    context.Response.ContentType = "application/json";
-
-                    var error = context.Features.Get<IExceptionHandlerFeature>();
-                    if (error != null)
-                    {
-                        ApiExceptionResponse response;
-                        if (error.Error is ApiException oipException)
-                        {
-                            response = new ApiExceptionResponse(oipException.Title, oipException.Message,
-                                oipException.StatusCode,
-                                app.Environment.IsDevelopment() ? oipException.StackTrace : null);
-                        }
-                        else
-                        {
-                            var ex = error.Error;
-                            response = new ApiExceptionResponse("Unexpected error", ex.Message, 500,
-                                app.Environment.IsDevelopment() ? ex.StackTrace : null);
-                        }
-
-                        await context.Response.WriteAsync(JsonConvert.SerializeObject(response, JsonSettings.Value));
-                    }
-                });
-            });
-            return app;
-        }
-
-        /// <summary>
-        /// Configures and maps Open API endpoints for the application
-        /// </summary>
-        /// <param name="settings">The application settings</param>
-        public void MapOpenApi(IBaseOipModuleAppSettings settings)
-        {
-            if (settings.OpenApi.All(x => !x.Publish))
-                return;
-            app.UseSwagger();
-            app.UseSwaggerUI(swaggerUiOptions =>
-            {
-                swaggerUiOptions.EnableTryItOutByDefault();
-                settings.OpenApi.ForEach(api =>
-                {
-                    if (api.Publish)
-                    {
-                        swaggerUiOptions.SwaggerEndpoint(api.Url, api.Name);
-                    }
-                });
-            });
-        }
+            Predicate = r => r.Tags.Contains("live")
+        });
     }
+
+    /// <summary>
+    /// Configures HTTP Strict Transport Security to help protect against man-in-the-middle attacks
+    /// </summary>
+    /// <param name="app">The application builder</param>
+    /// <returns></returns>
+    public static WebApplication AddHsts(this WebApplication app)
+    {
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Home/Error");
+            app.UseHsts();
+        }
+
+        return app;
+    }
+
+    /// <summary>
+    /// Configures request localization for the application
+    /// </summary>
+    /// <param name="app">The application builder</param>
+    /// <returns></returns>
+    public static WebApplication AddRequestLocalization(this WebApplication app)
+    {
+        var localizeOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+        if (localizeOptions != null) app.UseRequestLocalization(localizeOptions.Value);
+        return app;
+    }
+
+    /// <summary>
+    /// Configures the application to handle exceptions and return a JSON response
+    /// </summary>
+    /// <param name="app">The application builder</param>
+    public static WebApplication AddExceptionHandler(this WebApplication app)
+    {
+        app.UseExceptionHandler(errorApp =>
+        {
+            errorApp.Run(async context =>
+            {
+                context.Response.StatusCode = 500;
+                context.Response.ContentType = "application/json";
+
+                var error = context.Features.Get<IExceptionHandlerFeature>();
+                if (error != null)
+                {
+                    ApiExceptionResponse response;
+                    if (error.Error is ApiException oipException)
+                    {
+                        response = new ApiExceptionResponse(oipException.Title, oipException.Message,
+                            oipException.StatusCode,
+                            app.Environment.IsDevelopment() ? oipException.StackTrace : null);
+                    }
+                    else
+                    {
+                        var ex = error.Error;
+                        response = new ApiExceptionResponse("Unexpected error", ex.Message, 500,
+                            app.Environment.IsDevelopment() ? ex.StackTrace : null);
+                    }
+
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(response, JsonSettings.Value));
+                }
+            });
+        });
+        return app;
+    }
+
+    /// <summary>
+    /// Configures and maps Open API endpoints for the application
+    /// </summary>
+    /// <param name="settings">The application settings</param>
+    /// <param name="app">The application builder</param>
+    public static void MapOpenApi(this WebApplication app, IBaseOipModuleAppSettings settings)
+    {
+        if (settings.OpenApi.All(x => !x.Publish))
+            return;
+        app.UseSwagger();
+        app.UseSwaggerUI(swaggerUiOptions =>
+        {
+            swaggerUiOptions.EnableTryItOutByDefault();
+            settings.OpenApi.ForEach(api =>
+            {
+                if (api.Publish)
+                {
+                    swaggerUiOptions.SwaggerEndpoint(api.Url, api.Name);
+                }
+            });
+        });
+    }
+
+    /// <summary>
+    /// Configures and maps Open API endpoints for the application
+    /// </summary>
+    /// <param name="settings">The application settings</param>
+    /// <param name="app">The application builder</param>
+    public static void MapOpenTelemetry(this WebApplication app, IBaseOipModuleAppSettings settings)
+    {
+        if (settings.OpenTelemetry.Enable)
+            app.MapPrometheusScrapingEndpoint();
+    }
+
 
     private static readonly Lazy<JsonSerializerSettings> JsonSettings = new(() => new JsonSerializerSettings
     {

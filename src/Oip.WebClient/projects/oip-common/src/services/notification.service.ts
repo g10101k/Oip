@@ -3,7 +3,7 @@ import { SecurityService } from './security.service';
 import { inject, Injectable } from '@angular/core';
 import { MsgService } from './msg.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class NotificationService {
   private connection: signalR.HubConnection;
   private securityService = inject(SecurityService);
@@ -37,16 +37,5 @@ export class NotificationService {
       };
       this.msgService.add(opt);
     });
-  }
-
-  private async startConnection() {
-    try {
-      await this.connection.start();
-      console.log('SignalR Connected');
-    } catch (err) {
-      this.msgService.error(err.message);
-      console.error('SignalR Connection Failed: ', err);
-      setTimeout(() => this.startConnection(), 5000);
-    }
   }
 }

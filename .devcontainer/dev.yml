@@ -78,12 +78,30 @@ services:
   mailhog:
     image: mailhog/mailhog:latest
     ports:
-      - "1025:1025"  # SMTP порт для приложения
-      - "8025:8025"  # Веб-интерфейс
+      - "1025:1025"
+      - "8025:8025"
     restart: unless-stopped
     networks:
       - backend-network
-      
+  
+  prometheus:
+    image:  registry.hub.docker.com/prom/prometheus:main
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - bridge-network
+
+  grafana:
+    image:  registry.hub.docker.com/grafana/grafana:main
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - bridge-network
+
   minio:
     image: minio/minio:latest
     command: server --console-address ":9001" /data
