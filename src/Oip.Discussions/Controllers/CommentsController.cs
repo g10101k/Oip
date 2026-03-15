@@ -50,7 +50,7 @@ public class CommentsController(CommentRepository commentRepository) : Controlle
     /// <param name="comment">Comment data</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Created comment</returns>
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<ActionResult<CommentEntity>> CreateAsync(CommentEntity comment,
         CancellationToken cancellationToken = default)
     {
@@ -65,7 +65,7 @@ public class CommentsController(CommentRepository commentRepository) : Controlle
     /// <param name="comment">Updated comment data</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated comment</returns>
-    [HttpPut("{id}")]
+    [HttpPut("update/{id}")]
     public async Task<ActionResult<CommentEntity>> UpdateAsync(long id, CommentEntity comment,
         CancellationToken cancellationToken = default)
     {
@@ -90,7 +90,7 @@ public class CommentsController(CommentRepository commentRepository) : Controlle
     /// <param name="id">Comment identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>No content</returns>
-    [HttpDelete("{id}")]
+    [HttpDelete("delete/{id}")]
     public async Task<IActionResult> DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
         await commentRepository.SoftDeleteAsync(id, cancellationToken);

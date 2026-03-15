@@ -36,7 +36,8 @@ public static class WebApplicationBuilderExtension
     /// <returns>The same <see cref="IApplicationBuilder"/> instance, to support method chaining.</returns>
     public static IApplicationBuilder MigrateDatabase<T>(this IApplicationBuilder app) where T : DbContext
     {
-        using var context = app.ApplicationServices.GetRequiredService<T>();
+        using var scope = app.ApplicationServices.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<T>();
         context.Database.Migrate();
         return app;
     }
