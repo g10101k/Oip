@@ -6,7 +6,7 @@ import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AddModuleInstanceDto, IntKeyValueDto } from '../../api/data-contracts';
-import { Menu } from '../../api/Menu';
+import { MenuApi } from '../../api/menu.api';
 import { MenuService } from '../../services/app.menu.service';
 
 @Component({
@@ -30,14 +30,14 @@ import { MenuService } from '../../services/app.menu.service';
             id="oip-menu-item-create-dialog-parent-input"
             pInputText
             readonly
-            [ngModel]="menuService.contextMenuItem?.label" />
+            [ngModel]="menuService.contextMenuItem?.label"/>
         </div>
       }
       <div class="flex items-center gap-4 mb-4">
         <label class="font-semibold w-1/3" for="oip-menu-item-create-label">
           {{ 'menuItemCreateDialogComponent.label' | translate }}
         </label>
-        <input autocomplete="off" class="flex-auto" id="oip-menu-item-create-label" pInputText [(ngModel)]="label" />
+        <input autocomplete="off" class="flex-auto" id="oip-menu-item-create-label" pInputText [(ngModel)]="label"/>
       </div>
       <div class="flex items-center gap-4 mb-4">
         <label class="font-semibold w-1/3" for="oip-menu-item-create-module">
@@ -51,14 +51,14 @@ import { MenuService } from '../../services/app.menu.service';
           optionValue="key"
           placeholder="{{ 'menuItemCreateDialogComponent.selectModule' | translate }}"
           [options]="modules"
-          [(ngModel)]="selectModule" />
+          [(ngModel)]="selectModule"/>
       </div>
       <div class="flex items-center gap-4 mb-4">
         <label class="font-semibold w-1/3" for="oip-menu-item-create-dialog-icon">
           {{ 'menuItemCreateDialogComponent.icon' | translate }}
         </label>
         <i class="{{ selectIcon }}"></i>
-        <input class="flex-auto" id="oip-menu-item-create-dialog-icon" pInputText [(ngModel)]="selectIcon" />
+        <input class="flex-auto" id="oip-menu-item-create-dialog-icon" pInputText [(ngModel)]="selectIcon"/>
       </div>
       <div class="flex justify-end gap-2">
         <p-button
@@ -66,19 +66,19 @@ import { MenuService } from '../../services/app.menu.service';
           label="{{ 'menuItemCreateDialogComponent.cancel' | translate }}"
           severity="secondary"
           (click)="changeVisible()"
-          (keydown)="changeVisible()" />
+          (keydown)="changeVisible()"/>
         <p-button
           id="oip-menu-item-create-save"
           label="{{ 'menuItemCreateDialogComponent.save' | translate }}"
           (click)="save()"
-          (keydown)="save()" />
+          (keydown)="save()"/>
       </div>
     </p-dialog>
   `
 })
 export class MenuItemCreateDialogComponent implements OnInit {
-  menuService = inject(MenuService);
-  protected readonly menu = inject(Menu);
+  protected readonly menuService = inject(MenuService);
+  protected readonly menu = inject(MenuApi);
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
   modules: IntKeyValueDto[] = [];
@@ -87,7 +87,7 @@ export class MenuItemCreateDialogComponent implements OnInit {
   selectIcon: string = 'pi pi-box';
 
   async ngOnInit() {
-    this.modules = await this.menu.menuGetModules();
+    this.modules = await this.menu.getModules();
   }
 
   changeVisible() {
