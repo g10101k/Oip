@@ -10,8 +10,13 @@ const parser = new ArgumentParser({
 parser.add_argument('-o', '--output', {help: 'Output path'});
 parser.add_argument('-i', '--input', {help: 'Input swagger file path'});
 parser.add_argument('-t', '--templates', {help: 'Templates'});
-let a = parser.parse_args();
+parser.add_argument('-d', '--data-contract-prefix', {help: 'Data Contract Prefix'});
+parser.add_argument('-c', '--use-common-client', {action: 'store_true', help: 'Use common http client'});
 
+let a = parser.parse_args();
+a.data_contract_prefix ??= "";
+
+console.log(a);
 /* NOTE: all fields are optional expect one of `input`, `url`, `spec` */
 
 let config = {
@@ -20,6 +25,7 @@ let config = {
   httpClientType: "fetch", // or "fetch"
   defaultResponseAsSuccess: false,
   generateClient: true,
+  useCommonClient: a.use_common_client,
   generateRouteTypes: false,
   generateResponses: true,
   toJS: false,
@@ -35,12 +41,12 @@ let config = {
     parser: "typescript",
   },
   defaultResponseType: "void",
-  singleHttpClient: true,
+  singleHttpClient: false,
   cleanOutput: false,
   enumNamesAsValues: false,
   moduleNameFirstTag: true,
   generateUnionEnums: false,
-  dataContractPrefix: "test-",
+  dataContractPrefix: a.data_contract_prefix,
   typePrefix: "",
   typeSuffix: "",
   enumKeyPrefix: "",
@@ -114,17 +120,23 @@ const toKebabCase = (str) =>
 
 generateApi(config)
   .then(async ({files, configuration}) => {
-    console.log(files);
     for (const f of files) {
       if (f.fileContent) {
+        if (f.fileName === 'http-client')
+          continue;
         let dir = path.join(process.cwd(), a.output);
         if (!fs.existsSync(dir))
           fs.mkdirSync(dir);
 
-        if (f.fileName === 'data-contracts')
+        if (f.fileName === 'data-contracts') {
           f.fileName = config.dataContractPrefix + f.fileName;
+        } else if (f.fileName.endsWith('http-client')) {
+          // do nothing
+        } else {
+          f.fileName = `${toKebabCase(f.fileName)}.api`;
+        }
 
-        const absolutePath = path.join(dir, `${toKebabCase(f.fileName)}${f.fileExtension}`);
+        const absolutePath = path.join(dir, `${f.fileName}${f.fileExtension}`);
         fs.writeFile(absolutePath, f.fileContent, (err) => {
           if (err) {
             console.log(err);
