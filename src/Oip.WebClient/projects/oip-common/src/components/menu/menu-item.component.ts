@@ -1,22 +1,22 @@
-import {ChangeDetectorRef, Component, HostBinding, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {NavigationEnd, Router, RouterLinkActive, RouterLink} from '@angular/router';
-import {animate, state, style, transition, trigger} from '@angular/animations';
-import {Subscription} from 'rxjs';
-import {filter} from 'rxjs/operators';
-import {LayoutService} from '../../services/app.layout.service';
-import {MenuService} from '../../services/app.menu.service';
-import {RippleModule} from 'primeng/ripple';
-import {NgClass} from '@angular/common';
-import {ConfirmationService, ContextMenuService, MenuItem, MenuItemCommandEvent, PrimeIcons} from 'primeng/api';
-import {MenuItemCreateDialogComponent} from './menu-item-create-dialog.component';
-import {ContextMenu, ContextMenuModule} from 'primeng/contextmenu';
-import {MsgService} from '../../services/msg.service';
-import {MenuItemEditDialogComponent} from './menu-item-edit-dialog.component';
-import {ContextMenuItemDto} from '../../dtos/context-menu-item.dto';
-import {TranslateService} from '@ngx-translate/core';
-import {ConfirmDialog} from 'primeng/confirmdialog';
-import {Menu} from '../../api/Menu';
-import {MenuChangeOrderParams, MenuDeleteModuleInstanceParams} from '../../api/data-contracts';
+import { ChangeDetectorRef, Component, HostBinding, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterLinkActive, RouterLink } from '@angular/router';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { LayoutService } from '../../services/app.layout.service';
+import { MenuService } from '../../services/app.menu.service';
+import { RippleModule } from 'primeng/ripple';
+import { NgClass } from '@angular/common';
+import { ConfirmationService, ContextMenuService, MenuItem, MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
+import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.component';
+import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
+import { MsgService } from '../../services/msg.service';
+import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
+import { ContextMenuItemDto } from '../../dtos/context-menu-item.dto';
+import { TranslateService } from '@ngx-translate/core';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { MenuApi } from '../../api/menu.api';
+import { ChangeOrderParams, DeleteModuleInstanceParams } from '../../api/data-contracts';
 
 interface MenuItemComponentTranslation {
   delete: string;
@@ -134,7 +134,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   private readonly translateService = inject(TranslateService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly msgService = inject(MsgService);
-  private readonly menuDataService = inject(Menu);
+  private readonly menuDataService = inject(MenuApi);
 
   @Input() item: ContextMenuItemDto;
   @Input() index!: number;
@@ -308,9 +308,9 @@ export class MenuItemComponent implements OnInit, OnDestroy {
         severity: 'danger'
       },
       accept: async () => {
-        await this.menuDataService.menuDeleteModuleInstance({
+        await this.menuDataService.deleteModuleInstance({
           id: this.menuService.contextMenuItem?.moduleInstanceId
-        } as MenuDeleteModuleInstanceParams);
+        } as DeleteModuleInstanceParams);
         this.msgService.success(this.localization.deleteItemSuccessMessage);
         await this.menuService.loadMenu();
       }
@@ -371,10 +371,10 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
     [items[firstIndex], items[secondIndex]] = [items[secondIndex], items[firstIndex]];
 
-    this.menuDataService.menuChangeOrder({
+    this.menuDataService.changeOrder({
       firstModuleId: firstModule.moduleInstanceId,
       secondModuleId: secondModule.moduleInstanceId
-    } as MenuChangeOrderParams).then();
+    } as ChangeOrderParams).then();
   }
 
   hasVisiblePrev(currentItem: any): boolean {
@@ -393,9 +393,5 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     const items = this.getItems(currentItem);
     const currentIndex = items.findIndex((item) => item.moduleInstanceId == currentItem.moduleInstanceId);
     return currentIndex < items.length - 1;
-  }
-
-  swapModulesInBackend(firstModuleId: number, secondModuleId: number) {
-
   }
 }
