@@ -2,17 +2,21 @@ import { inject, Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { BaseDataService } from './base-data.service';
 import { MenuChangeEvent } from '../events/menu-change.event';
-import { EditModuleInstanceDto } from '../dtos/edit-module-instance.dto';
-import { Menu } from '../api/Menu';
+import { MenuApi } from '../api/menu.api';
 import { AppTitleService } from './app-title.service';
-import { AddModuleInstanceDto, ModuleInstanceDto } from '../api/data-contracts';
+import {
+  AddModuleInstanceDto,
+  DeleteModuleInstanceParams,
+  EditModuleInstanceDto,
+  ModuleInstanceDto
+} from '../api/data-contracts';
 
 @Injectable()
 export class MenuService extends BaseDataService {
   private readonly menuSource = new Subject<MenuChangeEvent>();
   private readonly resetSource = new Subject();
   private readonly titleService = inject(AppTitleService);
-  private readonly menuDataService = inject(Menu);
+  private readonly menuDataService = inject(MenuApi);
   menuSource$ = this.menuSource.asObservable();
   resetSource$ = this.resetSource.asObservable();
   contextMenuItem: any;
@@ -39,26 +43,26 @@ export class MenuService extends BaseDataService {
   }
 
   getMenu() {
-    return this.menuDataService.menuGet();
+    return this.menuDataService.get();
   }
 
   getAdminMenu() {
-    return this.menuDataService.menuGetAdminMenu();
+    return this.menuDataService.getAdminMenu();
   }
 
   getModules() {
-    return this.menuDataService.menuGetModules();
+    return this.menuDataService.getModules();
   }
 
   addModuleInstance(addModuleInstance: AddModuleInstanceDto) {
-    return this.menuDataService.menuAddModuleInstance(addModuleInstance as AddModuleInstanceDto);
+    return this.menuDataService.addModuleInstance(addModuleInstance as AddModuleInstanceDto);
   }
 
   deleteItem(moduleInstanceId: number) {
-    return this.sendRequest(this.baseUrl + 'api/menu/delete-module-instance?id=' + moduleInstanceId, 'DELETE');
+    return this.menuDataService.deleteModuleInstance({id: moduleInstanceId} as DeleteModuleInstanceParams)
   }
 
   editModuleInstance(item: EditModuleInstanceDto) {
-    return this.sendRequest(this.baseUrl + 'api/menu/edit-module-instance', 'POST', item);
+    return this.menuDataService.editModuleInstance(item);
   }
 }
