@@ -34,9 +34,14 @@ public class OpenApiItem
     /// Description
     /// </summary>
     public string Description { get; set; } = "Add block \"OpenApi\" in appsettings.json";
-    
+
     /// <summary>
-    /// Output path for
+    /// Command to generate API client.
     /// </summary>
     public string? GenerateCommand { get; set; }
+
+    /// <summary>
+    /// Forces generation of the OpenAPI document, even if no changes are detected.
+    /// </summary>
+    public bool ForceGeneration { get; set; }
 }
