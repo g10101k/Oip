@@ -1,42 +1,33 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
 import { Injectable } from "@angular/core";
+import { ContentType, HttpClient, RequestParams } from "oip-common";
 import {
   ApiExceptionResponse,
+  GetModuleInstanceSettingsParams,
+  GetSecurityParams,
+  GetWeatherForecastParams,
   PutSecurityRequest,
   SecurityResponse,
-  WeatherForecastModuleGetModuleInstanceSettingsParams,
-  WeatherForecastModuleGetSecurityParams,
-  WeatherForecastModuleGetWeatherForecastParams,
   WeatherForecastResponse,
   WeatherModuleSettingsSaveSettingsRequest,
 } from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class WeatherForecastModule<
+export class WeatherForecastModuleApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
    * @description Retrieves example weather forecast data.
    *
    * @tags WeatherForecastModule
-   * @name weatherForecastModuleGetWeatherForecast
+   * @name getWeatherForecast
+   * @summary Retrieves example weather forecast data.
    * @request GET:/api/weather-forecast-module/get-weather-forecast
    * @secure
+   * @response `200` `(WeatherForecastResponse)[]` OK
+   * @response `500` `ApiExceptionResponse` Internal Server Error
    */
-  weatherForecastModuleGetWeatherForecast = (
-    query: WeatherForecastModuleGetWeatherForecastParams,
+  getWeatherForecast = (
+    query: GetWeatherForecastParams,
     params: RequestParams = {},
   ) =>
     this.request<WeatherForecastResponse[], ApiExceptionResponse>({
@@ -51,11 +42,15 @@ export class WeatherForecastModule<
    * @description <inheritdoc />
    *
    * @tags WeatherForecastModule
-   * @name weatherForecastModuleGetModuleRights
+   * @name getModuleRights
+   * @summary <inheritdoc />
    * @request GET:/api/weather-forecast-module/get-module-rights
    * @secure
+   * @response `200` `(SecurityResponse)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
-  weatherForecastModuleGetModuleRights = (params: RequestParams = {}) =>
+  getModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/weather-forecast-module/get-module-rights`,
       method: "GET",
@@ -67,14 +62,15 @@ export class WeatherForecastModule<
    * @description Gets the security configuration for the specified module instance ID.
    *
    * @tags WeatherForecastModule
-   * @name weatherForecastModuleGetSecurity
+   * @name getSecurity
+   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/weather-forecast-module/get-security
    * @secure
+   * @response `200` `(SecurityResponse)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
-  weatherForecastModuleGetSecurity = (
-    query: WeatherForecastModuleGetSecurityParams,
-    params: RequestParams = {},
-  ) =>
+  getSecurity = (query: GetSecurityParams, params: RequestParams = {}) =>
     this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/weather-forecast-module/get-security`,
       method: "GET",
@@ -87,14 +83,16 @@ export class WeatherForecastModule<
    * @description Updates the security configuration for the specified module instance.
    *
    * @tags WeatherForecastModule
-   * @name weatherForecastModulePutSecurity
+   * @name putSecurity
+   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/weather-forecast-module/put-security
    * @secure
+   * @response `200` `void` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
-  weatherForecastModulePutSecurity = (
-    data: PutSecurityRequest,
-    params: RequestParams = {},
-  ) =>
+  putSecurity = (data: PutSecurityRequest, params: RequestParams = {}) =>
     this.request<void, ApiExceptionResponse>({
       path: `/api/weather-forecast-module/put-security`,
       method: "PUT",
@@ -107,12 +105,16 @@ export class WeatherForecastModule<
    * @description Gets the settings for the specified module instance.
    *
    * @tags WeatherForecastModule
-   * @name weatherForecastModuleGetModuleInstanceSettings
+   * @name getModuleInstanceSettings
+   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/weather-forecast-module/get-module-instance-settings
    * @secure
+   * @response `200` `any` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
-  weatherForecastModuleGetModuleInstanceSettings = (
-    query: WeatherForecastModuleGetModuleInstanceSettingsParams,
+  getModuleInstanceSettings = (
+    query: GetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
     this.request<any, ApiExceptionResponse>({
@@ -127,11 +129,15 @@ export class WeatherForecastModule<
    * No description
    *
    * @tags WeatherForecastModule
-   * @name weatherForecastModulePutModuleInstanceSettings
+   * @name putModuleInstanceSettings
    * @request PUT:/api/weather-forecast-module/put-module-instance-settings
    * @secure
+   * @response `200` `void` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
-  weatherForecastModulePutModuleInstanceSettings = (
+  putModuleInstanceSettings = (
     data: WeatherModuleSettingsSaveSettingsRequest,
     params: RequestParams = {},
   ) =>

@@ -1,16 +1,5 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
 import { Injectable } from "@angular/core";
+import { ContentType, HttpClient, RequestParams } from "oip-common";
 import {
   ApiExceptionResponse,
   DashboardGetModuleInstanceSettingsParams,
@@ -19,10 +8,9 @@ import {
   PutSecurityRequest,
   SecurityResponse,
 } from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class DashboardModule<
+export class DashboardModuleApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
@@ -30,8 +18,12 @@ export class DashboardModule<
    *
    * @tags DashboardModule
    * @name dashboardGetSecurity
+   * @summary Gets the security configuration for the specified module instance ID.
    * @request GET:/api/dashboard/get-security
    * @secure
+   * @response `200` `(SecurityResponse)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
   dashboardGetSecurity = (
     query: DashboardGetSecurityParams,
@@ -50,8 +42,13 @@ export class DashboardModule<
    *
    * @tags DashboardModule
    * @name dashboardPutSecurity
+   * @summary Updates the security configuration for the specified module instance.
    * @request PUT:/api/dashboard/put-security
    * @secure
+   * @response `200` `void` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
   dashboardPutSecurity = (
     data: PutSecurityRequest,
@@ -70,8 +67,12 @@ export class DashboardModule<
    *
    * @tags DashboardModule
    * @name dashboardGetModuleInstanceSettings
+   * @summary Gets the settings for the specified module instance.
    * @request GET:/api/dashboard/get-module-instance-settings
    * @secure
+   * @response `200` `any` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
   dashboardGetModuleInstanceSettings = (
     query: DashboardGetModuleInstanceSettingsParams,
@@ -92,6 +93,10 @@ export class DashboardModule<
    * @name dashboardPutModuleInstanceSettings
    * @request PUT:/api/dashboard/put-module-instance-settings
    * @secure
+   * @response `200` `void` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
   dashboardPutModuleInstanceSettings = (
     data: DashboardSettingsSaveSettingsRequest,
@@ -110,8 +115,12 @@ export class DashboardModule<
    *
    * @tags DashboardModule
    * @name dashboardGetModuleRights
+   * @summary Gets the list of security rights supported by the module.
    * @request GET:/api/dashboard/get-module-rights
    * @secure
+   * @response `200` `(SecurityResponse)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
    */
   dashboardGetModuleRights = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], ApiExceptionResponse>({

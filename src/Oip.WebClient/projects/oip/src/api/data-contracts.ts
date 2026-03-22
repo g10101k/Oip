@@ -1,22 +1,13 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
 /** Standardized response format for API exceptions */
 export interface ApiExceptionResponse {
   /** User-friendly title of the exception */
   title?: string | null;
   /** Detailed description of the error */
   message?: string | null;
-  /** HTTP status code associated with the exception */
+  /**
+   * HTTP status code associated with the exception
+   * @format int32
+   */
   statusCode?: number;
   /** Stack trace information (optional, typically omitted in production) */
   stackTrace?: string | null;
@@ -30,7 +21,10 @@ export interface DashboardSettings {
 
 /** Represents a request to save module instance settings. */
 export interface DashboardSettingsSaveSettingsRequest {
-  /** Gets or sets the ID of the module instance. */
+  /**
+   * Gets or sets the ID of the module instance.
+   * @format int32
+   */
   id?: number;
   /** Settings */
   settings?: DashboardSettings;
@@ -38,7 +32,10 @@ export interface DashboardSettingsSaveSettingsRequest {
 
 /** Put security dto */
 export interface PutSecurityRequest {
-  /** Instance id */
+  /**
+   * Instance id
+   * @format int32
+   */
   id?: number;
   /** Securities */
   securities?: SecurityResponse[] | null;
@@ -58,11 +55,20 @@ export interface SecurityResponse {
 
 /** Response */
 export interface WeatherForecastResponse {
-  /** Date */
+  /**
+   * Date
+   * @format date-time
+   */
   date?: Date;
-  /** Temp in ºC */
+  /**
+   * Temp in ºC
+   * @format int32
+   */
   temperatureC?: number;
-  /** Temp in ºF */
+  /**
+   * Temp in ºF
+   * @format int32
+   */
   temperatureF?: number;
   /** Summary */
   summary?: string | null;
@@ -70,38 +76,57 @@ export interface WeatherForecastResponse {
 
 /** Module settings */
 export interface WeatherModuleSettings {
-  /** Day count */
+  /**
+   * Day count
+   * @format int32
+   */
   dayCount?: number;
 }
 
 /** Represents a request to save module instance settings. */
 export interface WeatherModuleSettingsSaveSettingsRequest {
-  /** Gets or sets the ID of the module instance. */
+  /**
+   * Gets or sets the ID of the module instance.
+   * @format int32
+   */
   id?: number;
   /** Module settings */
   settings?: WeatherModuleSettings;
 }
 
 export interface DashboardGetSecurityParams {
-  /** The ID of the module instance. */
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
   id?: number;
 }
 
 export interface DashboardGetModuleInstanceSettingsParams {
-  /** The ID of the module instance. */
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
   id?: number;
 }
 
-export interface WeatherForecastModuleGetWeatherForecastParams {
+export interface GetWeatherForecastParams {
+  /** @format int32 */
   dayCount?: number;
 }
 
-export interface WeatherForecastModuleGetSecurityParams {
-  /** The ID of the module instance. */
+export interface GetSecurityParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
   id?: number;
 }
 
-export interface WeatherForecastModuleGetModuleInstanceSettingsParams {
-  /** The ID of the module instance. */
+export interface GetModuleInstanceSettingsParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
   id?: number;
 }
