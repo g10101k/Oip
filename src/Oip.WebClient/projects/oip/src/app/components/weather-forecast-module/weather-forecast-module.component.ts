@@ -1,6 +1,6 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
 import { BaseModuleComponent, SecurityComponent } from 'oip-common';
-import { WeatherForecastModule } from '../../../api/WeatherForecastModule';
+import { WeatherForecastModuleApi } from '../../../api/weather-forecast-module.api';
 import { WeatherForecastResponse, WeatherModuleSettings } from '../../../api/data-contracts';
 import { TagModule } from 'primeng/tag';
 import { FilterMetadata, SharedModule } from 'primeng/api';
@@ -29,23 +29,23 @@ interface WeatherModuleLocalSettings {
               <tr>
                 <th pSortableColumn="date" scope="col">
                   Date
-                  <p-sortIcon field="date" />
-                  <p-columnFilter display="menu" field="date" type="date" />
+                  <p-sortIcon field="date"/>
+                  <p-columnFilter display="menu" field="date" type="date"/>
                 </th>
                 <th pSortableColumn="temperatureC" scope="col">
                   Temperature C
-                  <p-sortIcon field="temperatureC" />
-                  <p-columnFilter display="menu" field="temperatureC" type="numeric" />
+                  <p-sortIcon field="temperatureC"/>
+                  <p-columnFilter display="menu" field="temperatureC" type="numeric"/>
                 </th>
                 <th pSortableColumn="temperatureF" scope="col">
                   Temperature F
-                  <p-sortIcon field="temperatureF" />
-                  <p-columnFilter display="menu" field="temperatureF" type="numeric" />
+                  <p-sortIcon field="temperatureF"/>
+                  <p-columnFilter display="menu" field="temperatureF" type="numeric"/>
                 </th>
                 <th pSortableColumn="summary" scope="col">
                   Summary
-                  <p-sortIcon field="summary" />
-                  <p-columnFilter display="menu" field="summary" type="text" />
+                  <p-sortIcon field="summary"/>
+                  <p-columnFilter display="menu" field="summary" type="text"/>
                 </th>
               </tr>
             </ng-template>
@@ -70,7 +70,7 @@ interface WeatherModuleLocalSettings {
             <div class="grid grid-cols-12 gap-4">
               <label class="flex items-center col-span-12 mb-2 md:col-span-2 md:mb-0" for="dayCount">Day Count</label>
               <div class="col-span-12 md:col-span-10">
-                <input id="dayCount" pInputText type="text" [(ngModel)]="settings.dayCount" />
+                <input id="dayCount" pInputText type="text" [(ngModel)]="settings.dayCount"/>
               </div>
             </div>
             <div class="flex justify-end">
@@ -80,18 +80,16 @@ interface WeatherModuleLocalSettings {
         </div>
       </div>
     } @else if (isSecurity) {
-      <security [controller]="controller" [id]="id" />
+      <security [controller]="controller" [id]="id"/>
     }
   `,
-  providers: [WeatherForecastModule],
+  providers: [WeatherForecastModuleApi],
   imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText, DatePipe]
 })
-export class WeatherForecastModuleComponent
-  extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
-  implements OnInit, OnDestroy
-{
+export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
+  implements OnInit, OnDestroy {
   @ViewChild('table') table!: Table;
-  protected readonly dataService = inject(WeatherForecastModule);
+  protected readonly dataService = inject(WeatherForecastModuleApi);
   protected data: WeatherForecastResponse[] = [];
 
   constructor() {
@@ -101,7 +99,7 @@ export class WeatherForecastModuleComponent
   async ngOnInit() {
     await super.ngOnInit();
     try {
-      this.data = await this.dataService.weatherForecastModuleGetWeatherForecast({
+      this.data = await this.dataService.getWeatherForecast({
         dayCount: this.settings.dayCount
       });
     } catch (error) {
