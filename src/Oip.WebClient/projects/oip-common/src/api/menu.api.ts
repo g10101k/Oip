@@ -1,40 +1,30 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
 import { Injectable } from "@angular/core";
 import {
   AddModuleInstanceDto,
   ApiExceptionResponse,
+  ChangeOrderParams,
+  DeleteModuleInstanceParams,
   EditModuleInstanceDto,
   IntKeyValueDto,
-  MenuChangeOrderParams,
-  MenuDeleteModuleInstanceParams,
   ModuleInstanceDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class Menu<
+export class MenuApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
    * @description Retrieves the menu available to the current authenticated user.
    *
    * @tags Menu
-   * @name menuGet
+   * @name get
+   * @summary Retrieves the menu available to the current authenticated user.
    * @request GET:/api/menu/get
    * @secure
+   * @response `200` `(ModuleInstanceDto)[]` OK
    */
-  menuGet = (params: RequestParams = {}) =>
+  get = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get`,
       method: "GET",
@@ -46,11 +36,13 @@ export class Menu<
    * @description Retrieves the admin-specific menu.
    *
    * @tags Menu
-   * @name menuGetAdminMenu
+   * @name getAdminMenu
+   * @summary Retrieves the admin-specific menu.
    * @request GET:/api/menu/get-admin-menu
    * @secure
+   * @response `200` `(ModuleInstanceDto)[]` OK
    */
-  menuGetAdminMenu = (params: RequestParams = {}) =>
+  getAdminMenu = (params: RequestParams = {}) =>
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get-admin-menu`,
       method: "GET",
@@ -62,11 +54,13 @@ export class Menu<
    * @description Retrieves all available modules in the system.
    *
    * @tags Menu
-   * @name menuGetModules
+   * @name getModules
+   * @summary Retrieves all available modules in the system.
    * @request GET:/api/menu/get-modules
    * @secure
+   * @response `200` `(IntKeyValueDto)[]` OK
    */
-  menuGetModules = (params: RequestParams = {}) =>
+  getModules = (params: RequestParams = {}) =>
     this.request<IntKeyValueDto[], any>({
       path: `/api/menu/get-modules`,
       method: "GET",
@@ -78,15 +72,18 @@ export class Menu<
    * @description Adds a new module instance to the system.
    *
    * @tags Menu
-   * @name menuAddModuleInstance
+   * @name addModuleInstance
+   * @summary Adds a new module instance to the system.
    * @request POST:/api/menu/add-module-instance
    * @secure
+   * @response `200` `void` OK
+   * @response `500` `ApiExceptionResponse` Internal Server Error
    */
-  menuAddModuleInstance = (
+  addModuleInstance = (
     data: AddModuleInstanceDto,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/menu/add-module-instance`,
       method: "POST",
       body: data,
@@ -98,15 +95,18 @@ export class Menu<
    * @description Edits an existing module instance.
    *
    * @tags Menu
-   * @name menuEditModuleInstance
+   * @name editModuleInstance
+   * @summary Edits an existing module instance.
    * @request POST:/api/menu/edit-module-instance
    * @secure
+   * @response `200` `void` OK
+   * @response `500` `ApiExceptionResponse` Internal Server Error
    */
-  menuEditModuleInstance = (
+  editModuleInstance = (
     data: EditModuleInstanceDto,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/menu/edit-module-instance`,
       method: "POST",
       body: data,
@@ -118,15 +118,18 @@ export class Menu<
    * @description Deletes a module instance by its identifier.
    *
    * @tags Menu
-   * @name menuDeleteModuleInstance
+   * @name deleteModuleInstance
+   * @summary Deletes a module instance by its identifier.
    * @request DELETE:/api/menu/delete-module-instance
    * @secure
+   * @response `200` `void` OK
+   * @response `500` `ApiExceptionResponse` Internal Server Error
    */
-  menuDeleteModuleInstance = (
-    query: MenuDeleteModuleInstanceParams,
+  deleteModuleInstance = (
+    query: DeleteModuleInstanceParams,
     params: RequestParams = {},
   ) =>
-    this.request<void, any>({
+    this.request<void, ApiExceptionResponse>({
       path: `/api/menu/delete-module-instance`,
       method: "DELETE",
       query: query,
@@ -137,14 +140,14 @@ export class Menu<
    * @description Swaps the order positions of two modules in the menu structure.
    *
    * @tags Menu
-   * @name menuChangeOrder
+   * @name changeOrder
+   * @summary Swaps the order positions of two modules in the menu structure.
    * @request POST:/api/menu/change-order
    * @secure
+   * @response `200` `void` OK
+   * @response `500` `ApiExceptionResponse` Internal Server Error
    */
-  menuChangeOrder = (
-    query: MenuChangeOrderParams,
-    params: RequestParams = {},
-  ) =>
+  changeOrder = (query: ChangeOrderParams, params: RequestParams = {}) =>
     this.request<void, ApiExceptionResponse>({
       path: `/api/menu/change-order`,
       method: "POST",

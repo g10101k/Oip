@@ -1,15 +1,3 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
 import { Injectable } from "@angular/core";
 import {
   ApiExceptionResponse,
@@ -18,18 +6,22 @@ import {
 import { HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class Security<
+export class SecurityApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
    * @description Retrieves Keycloak client settings needed by frontend applications.
    *
    * @tags Security
-   * @name securityGetKeycloakClientSettings
+   * @name getKeycloakClientSettings
+   * @summary Retrieves Keycloak client settings needed by frontend applications.
    * @request GET:/api/security/get-keycloak-client-settings
    * @secure
+   * @response `200` `GetKeycloakClientSettingsResponse` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `500` `ApiExceptionResponse` Internal Server Error
    */
-  securityGetKeycloakClientSettings = (params: RequestParams = {}) =>
+  getKeycloakClientSettings = (params: RequestParams = {}) =>
     this.request<GetKeycloakClientSettingsResponse, ApiExceptionResponse>({
       path: `/api/security/get-keycloak-client-settings`,
       method: "GET",
@@ -41,11 +33,13 @@ export class Security<
    * @description Retrieves all realm roles from Keycloak.
    *
    * @tags Security
-   * @name securityGetRealmRoles
+   * @name getRealmRoles
+   * @summary Retrieves all realm roles from Keycloak.
    * @request GET:/api/security/get-realm-roles
    * @secure
+   * @response `200` `(string)[]` OK
    */
-  securityGetRealmRoles = (params: RequestParams = {}) =>
+  getRealmRoles = (params: RequestParams = {}) =>
     this.request<string[], any>({
       path: `/api/security/get-realm-roles`,
       method: "GET",
