@@ -3,7 +3,7 @@ import { SecurityService } from './security.service';
 import { inject, Injectable } from '@angular/core';
 import { MsgService } from './msg.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class NotificationService {
   private connection: signalR.HubConnection;
   private securityService = inject(SecurityService);

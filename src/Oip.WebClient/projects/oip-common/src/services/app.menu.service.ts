@@ -59,7 +59,7 @@ export class MenuService extends BaseDataService {
   }
 
   deleteItem(moduleInstanceId: number) {
-    return this.menuDataService.deleteModuleInstance({id: moduleInstanceId} as DeleteModuleInstanceParams)
+    return this.menuDataService.deleteModuleInstance({ id: moduleInstanceId } as DeleteModuleInstanceParams);
   }
 
   editModuleInstance(item: EditModuleInstanceDto) {

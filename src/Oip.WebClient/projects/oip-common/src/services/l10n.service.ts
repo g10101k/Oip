@@ -13,7 +13,7 @@ export interface LanguageDto {
 /**
  * Service for managing translation loading in the application
  */
-@Injectable({providedIn: 'root'}) // Provided at root level for singleton usage
+@Injectable({ providedIn: 'root' }) // Provided at root level for singleton usage
 export class L10nService {
   private loadedTranslations: Set<string> = new Set();
   private httpClient = inject(HttpClient);
@@ -54,7 +54,7 @@ export class L10nService {
     try {
       this.httpClient.get(`./assets/i18n/${component}.${lang}.json`).subscribe((translations) => {
         const current = this.translateService.translations[lang] || {};
-        this.translateService.setTranslation(lang, {...current, ...translations}, true);
+        this.translateService.setTranslation(lang, { ...current, ...translations }, true);
         this.loadedTranslations.add(key);
       });
     } catch (e) {
@@ -79,10 +79,9 @@ export class L10nService {
     const lang = this.layoutService.language() ? this.layoutService.language() : 'en';
     this.translateService.setDefaultLang(lang);
     this.translateService.use(lang).subscribe(() => {
-        this.loadComponentTranslations('app-info');
-        this.translateService.get('primeng').subscribe((res) => this.primeNg.setTranslation(res));
-      }
-    );
+      this.loadComponentTranslations('app-info');
+      this.translateService.get('primeng').subscribe((res) => this.primeNg.setTranslation(res));
+    });
   }
 
   instant(key: string | string[], interpolateParams?: InterpolationParameters): Translation | TranslationObject {
