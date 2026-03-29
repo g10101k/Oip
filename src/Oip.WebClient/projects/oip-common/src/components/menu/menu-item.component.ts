@@ -34,11 +34,9 @@ interface MenuItemComponentTranslation {
   selector: '[app-menuitem]',
   template: `
     <ng-container>
-      <p-confirm-dialog/>
+      <p-confirm-dialog />
       @if (root && item.visible !== false) {
-        <div
-          class="layout-menuitem-root-text"
-          (contextmenu)="onContextMenu($event, item)">
+        <div class="layout-menuitem-root-text" (contextmenu)="onContextMenu($event, item)">
           {{ item.label }}
         </div>
       }
@@ -71,13 +69,13 @@ interface MenuItemComponentTranslation {
           [replaceUrl]="item.replaceUrl"
           [routerLink]="item.routerLink"
           [routerLinkActiveOptions]="
-                item.routerLinkActiveOptions || {
-                  paths: 'exact',
-                  queryParams: 'ignored',
-                  matrixParams: 'ignored',
-                  fragment: 'ignored'
-                }
-              "
+            item.routerLinkActiveOptions || {
+              paths: 'exact',
+              queryParams: 'ignored',
+              matrixParams: 'ignored',
+              fragment: 'ignored'
+            }
+          "
           [skipLocationChange]="item.skipLocationChange"
           [state]="item.state"
           (click)="itemClick($event)"
@@ -91,9 +89,7 @@ interface MenuItemComponentTranslation {
       }
 
       @if (item.items && item.visible !== false) {
-        <ul
-          [@children]="submenuAnimation"
-          (contextmenu)="onContextMenu($event, item)">
+        <ul [@children]="submenuAnimation" (contextmenu)="onContextMenu($event, item)">
           @for (child of item.items; track child; let i = $index) {
             <li
               app-menuitem
@@ -221,7 +217,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
     // execute command
     if (this.item.command) {
-      this.item.command({originalEvent: event, item: this.item});
+      this.item.command({ originalEvent: event, item: this.item });
     }
 
     // toggle active state
@@ -229,7 +225,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
       this.active = !this.active;
     }
 
-    this.menuService.onMenuStateChange({key: this.key, item: this.item});
+    this.menuService.onMenuStateChange({ key: this.key, item: this.item });
   }
 
   get submenuAnimation() {
@@ -262,13 +258,13 @@ export class MenuItemComponent implements OnInit, OnDestroy {
         icon: PrimeIcons.FILE_EDIT,
         command: (event) => this.editClick(event)
       },
-      {separator: true},
+      { separator: true },
       {
         label: this.localization.delete,
         icon: PrimeIcons.TRASH,
         command: (event) => this.deleteItem(event)
       },
-      {separator: true, visible: this.hasVisibleNext(item) || this.hasVisiblePrev(item)},
+      { separator: true, visible: this.hasVisibleNext(item) || this.hasVisiblePrev(item) },
       {
         label: 'Up',
         icon: PrimeIcons.ANGLE_UP,
@@ -371,10 +367,12 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
     [items[firstIndex], items[secondIndex]] = [items[secondIndex], items[firstIndex]];
 
-    this.menuDataService.changeOrder({
-      firstModuleId: firstModule.moduleInstanceId,
-      secondModuleId: secondModule.moduleInstanceId
-    } as ChangeOrderParams).then();
+    this.menuDataService
+      .changeOrder({
+        firstModuleId: firstModule.moduleInstanceId,
+        secondModuleId: secondModule.moduleInstanceId
+      } as ChangeOrderParams)
+      .then();
   }
 
   hasVisiblePrev(currentItem: any): boolean {
