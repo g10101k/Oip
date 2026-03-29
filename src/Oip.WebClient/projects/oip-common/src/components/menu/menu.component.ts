@@ -11,7 +11,7 @@ import { MenuItemComponent } from './menu-item.component';
 import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
-import { MenuApi} from '../../api/menu.api';
+import { MenuApi } from '../../api/menu.api';
 import { L10nService } from '../../services/l10n.service';
 
 @Component({
