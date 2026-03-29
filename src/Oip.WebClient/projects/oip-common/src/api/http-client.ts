@@ -2,9 +2,7 @@
 /* tslint:disable */
 // @ts-nocheck
 
-import { inject, Injectable } from "@angular/core";
-import { LayoutService, } from "../services/app.layout.service";
-import { SecurityService } from "../services/security.service";
+import { Injectable } from "@angular/core";
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -60,21 +58,9 @@ export enum ContentType {
 
 @Injectable({ providedIn: "root" })
 export class HttpClient<SecurityDataType = unknown> {
-  protected securityService = inject(SecurityService);
-  protected layoutService = inject(LayoutService);
   public baseUrl: string = "";
   private securityData: SecurityDataType | null = null;
-  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] = (
-    securityData,
-  ) => ({
-    headers: {
-      "Accept-language": this.layoutService.language()
-        ? this.layoutService.language()
-        : "en",
-      "X-Timezone": this.layoutService.timeZone(),
-      Authorization: `Bearer ${securityData}`,
-    },
-  });
+  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
   private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
     fetch(...fetchParams);
@@ -86,10 +72,8 @@ export class HttpClient<SecurityDataType = unknown> {
     referrerPolicy: "no-referrer",
   };
 
-  constructor() {
-    this.securityService.getAccessToken().subscribe((token) => {
-      this.securityData = token;
-    });
+  constructor(apiConfig: ApiConfig<SecurityDataType> = {}) {
+    Object.assign(this, apiConfig);
   }
 
   public setSecurityData = (data: SecurityDataType | null) => {
@@ -223,7 +207,7 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const queryString = query && this.toQueryString(query);
     const payloadFormatter = this.contentFormatters[type || ContentType.Json];
-    let responseFormat = format || requestParams.format;
+    const responseFormat = format || requestParams.format;
 
     return this.customFetch(
       `${baseUrl || this.baseUrl || ""}${path}${queryString ? `?${queryString}` : ""}`,

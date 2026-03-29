@@ -1,3 +1,7 @@
+/* eslint-disable */
+/* tslint:disable */
+// @ts-nocheck
+
 import { Injectable } from "@angular/core";
 import {
   ApiExceptionResponse,
