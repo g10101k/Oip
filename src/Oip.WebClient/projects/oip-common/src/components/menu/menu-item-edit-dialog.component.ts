@@ -7,7 +7,7 @@ import { MenuService } from '../../services/app.menu.service';
 import { SecurityDataService } from '../../services/security-data.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { EditModuleInstanceDto } from "../../api/data-contracts";
+import { EditModuleInstanceDto } from '../../api/data-contracts';
 
 @Component({
   imports: [ButtonModule, DialogModule, InputTextModule, FormsModule, TranslatePipe, MultiSelectModule],
