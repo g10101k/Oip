@@ -28,9 +28,6 @@ try {
   const packageJson = JSON.parse(fs.readFileSync(path.join(distPath, 'package.json'), 'utf8'));
   console.log(`📋 Version for publication: ${packageJson.version}`);
 
-  console.log('🗝️ Login...');
-  execSync('npm login', {cwd: distPath, stdio: 'inherit'});
-
   // 4. Publish
   console.log('📤 Publishing to npm...');
   execSync('npm publish', {cwd: distPath, stdio: 'inherit'});

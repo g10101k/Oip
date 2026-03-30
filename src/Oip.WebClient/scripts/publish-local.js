@@ -17,7 +17,6 @@ try {
   execSync('ng build oip-common', {stdio: 'inherit'});
 
   // 2. Navigate to dist directory
-
   if (!fs.existsSync(distPath)) {
     throw new Error(`Directory ${distPath} not found!`);
   }
@@ -28,7 +27,7 @@ try {
   console.log('🪃 Copy oip-common library...!');
   execSync(`cp -r ${distPath} ./node_modules/oip-common`);
 
-  console.log('⛳ Publication completed successfully!');
+  console.log('⛳  Publication completed successfully!');
 } catch (error) {
   console.error('❌ Error during publication:', error.message);
   process.exit(1);
