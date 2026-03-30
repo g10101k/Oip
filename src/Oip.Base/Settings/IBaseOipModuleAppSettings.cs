@@ -34,5 +34,6 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// <summary>
     /// OpenTelemetry settings.
     /// </summary>
-    [NotSaveToDb] OpenTelemetrySettings OpenTelemetry { get; set; }
+    [NotSaveToDb]
+    OpenTelemetrySettings OpenTelemetry { get; set; }
 }

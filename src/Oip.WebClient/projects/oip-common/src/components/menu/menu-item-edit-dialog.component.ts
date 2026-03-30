@@ -6,8 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { MenuService } from '../../services/app.menu.service';
 import { SecurityDataService } from '../../services/security-data.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { EditModuleInstanceDto } from '../../dtos/edit-module-instance.dto';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { EditModuleInstanceDto } from '../../api/data-contracts';
 
 @Component({
   imports: [ButtonModule, DialogModule, InputTextModule, FormsModule, TranslatePipe, MultiSelectModule],

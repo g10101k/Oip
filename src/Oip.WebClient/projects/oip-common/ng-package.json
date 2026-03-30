@@ -14,6 +14,11 @@
       "input": "./templates",
       "glob": "**/*",
       "output": "templates"
+    },
+    {
+      "input": "./scripts",
+      "glob": "**/*",
+      "output": "scripts"
     }
   ]
 }

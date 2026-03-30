@@ -42,7 +42,9 @@ public class SwaggerGenerateWebClientStartupTask(
                 {
                     logger.LogDebug("Checking Swagger for {Name}", config.Name);
                     var swaggerJson = GetSwaggerJson(config);
-                    if (!await HasSwaggerChanged(config, swaggerJson)) continue;
+                    if (!config.ForceGeneration)
+                        if (!await HasSwaggerChanged(config, swaggerJson))
+                            continue;
                     logger.LogInformation("Swagger changed detected for {Name}. Generating client...", config.Name);
                     var path = await SaveSwaggerHash(config, swaggerJson);
                     await GenerateTypeScriptClient(config, path);
@@ -96,14 +98,15 @@ public class SwaggerGenerateWebClientStartupTask(
     private async Task GenerateTypeScriptClient(OpenApiItem config, string swaggerJsonPath)
     {
         // In case of paths with spaces
-        string protectedSwaggerJsonPath = swaggerJsonPath.Any(char.IsWhiteSpace) ? "\""+ swaggerJsonPath + "\"" : swaggerJsonPath;
+        string protectedSwaggerJsonPath =
+            swaggerJsonPath.Any(char.IsWhiteSpace) ? "\"" + swaggerJsonPath + "\"" : swaggerJsonPath;
 
         // Windows platform requires CMD to execute NPX command
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             config.GenerateCommand = "cmd.exe /c " + config.GenerateCommand!;
 
         string[] parts = config.GenerateCommand!.Replace("{SwaggerJsonPath}", protectedSwaggerJsonPath).Split(' ', 2);
-        
+
         var processStartInfo = new ProcessStartInfo
         {
             FileName = parts[0],

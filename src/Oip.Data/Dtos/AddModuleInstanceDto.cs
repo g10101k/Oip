@@ -18,4 +18,5 @@ public record AddModuleInstanceDto(int ModuleId, string Label, string? Icon, int
 /// <param name="Icon">The updated icon identifier for the module instance (optional)</param>
 /// <param name="ParentId">The updated parent module instance identifier (optional)</param>
 /// <param name="ViewRoles">Updated array of role identifiers that can view this module instance (optional)</param>
-public record EditModuleInstanceDto(int ModuleInstanceId, string Label, string? Icon, int? ParentId, string[]? ViewRoles);
+/// <param name="ModuleId">For front compatibility</param>
+public record EditModuleInstanceDto(int ModuleInstanceId, string Label, string? Icon, int? ParentId, string[]? ViewRoles, int? ModuleId);

@@ -1,6 +1,6 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
 import { BaseModuleComponent, SecurityComponent } from 'oip-common';
-import { WeatherForecastModule } from '../../../api/WeatherForecastModule';
+import { WeatherForecastModuleApi } from '../../../api/weather-forecast-module.api';
 import { WeatherForecastResponse, WeatherModuleSettings } from '../../../api/data-contracts';
 import { TagModule } from 'primeng/tag';
 import { FilterMetadata, SharedModule } from 'primeng/api';
@@ -83,7 +83,7 @@ interface WeatherModuleLocalSettings {
       <security [controller]="controller" [id]="id" />
     }
   `,
-  providers: [WeatherForecastModule],
+  providers: [WeatherForecastModuleApi],
   imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText, DatePipe]
 })
 export class WeatherForecastModuleComponent
@@ -91,7 +91,7 @@ export class WeatherForecastModuleComponent
   implements OnInit, OnDestroy
 {
   @ViewChild('table') table!: Table;
-  protected readonly dataService = inject(WeatherForecastModule);
+  protected readonly dataService = inject(WeatherForecastModuleApi);
   protected data: WeatherForecastResponse[] = [];
 
   constructor() {
@@ -101,7 +101,7 @@ export class WeatherForecastModuleComponent
   async ngOnInit() {
     await super.ngOnInit();
     try {
-      this.data = await this.dataService.weatherForecastModuleGetWeatherForecast({
+      this.data = await this.dataService.getWeatherForecast({
         dayCount: this.settings.dayCount
       });
     } catch (error) {

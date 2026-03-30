@@ -11,7 +11,7 @@ import { MenuItemComponent } from './menu-item.component';
 import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
-import { Menu } from '../../api/Menu';
+import { MenuApi } from '../../api/menu.api';
 import { L10nService } from '../../services/l10n.service';
 
 @Component({
@@ -25,7 +25,7 @@ import { L10nService } from '../../services/l10n.service';
     FormsModule,
     MenuItemEditDialogComponent
   ],
-  providers: [Menu],
+  providers: [MenuApi],
   selector: 'app-menu',
   standalone: true,
   template: ` <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">

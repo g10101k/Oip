@@ -1,3 +1,7 @@
+/* eslint-disable */
+/* tslint:disable */
+// @ts-nocheck
+
 <%
 const { utils, route, config, modelTypes } = it;
 const { _, pascalCase, require } = utils;
@@ -8,14 +12,14 @@ const dataContracts = _.map(modelTypes, "name");
 
 <% if (config.httpClientType === config.constants.HTTP_CLIENT.AXIOS) { %> import type { AxiosRequestConfig, AxiosResponse } from "axios"; <% } %>
 
-import { HttpClient, RequestParams, ContentType, HttpResponse } from "./<%~ config.fileNames.httpClient %>";
+import { HttpClient, RequestParams, ContentType, HttpResponse } from "<%~ (config.useCommonClient) ? 'oip-common' : './' + config.fileNames.httpClient %>";
 <% if (dataContracts.length) { %>
-import { <%~ dataContracts.join(", ") %> } from "./<%~ config.fileNames.dataContracts %>"
+import { <%~ dataContracts.join(", ") %> } from "./<%~ config.dataContractPrefix + config.fileNames.dataContracts %>"
 <% } %>
 import { Injectable } from "@angular/core";
 
 @Injectable()
-export class <%= apiClassName %><SecurityDataType = unknown><% if (!config.singleHttpClient) { %> extends HttpClient<SecurityDataType> <% } %> {
+export class <%= apiClassName %>Api<SecurityDataType = unknown><% if (!config.singleHttpClient) { %> extends HttpClient<SecurityDataType> <% } %> {
 <% if(config.singleHttpClient) { %>
   http: HttpClient<SecurityDataType>;
 

@@ -20,7 +20,7 @@ const dataContractTemplates = {
     return `enum ${contract.name} {\r\n${contract.content} \r\n }`;
   },
   interface: (contract) => {
-    return `interface ${contract.name}${buildGenerics(contract)} {\r\n${contract.content}}\r\n\r\n`;
+    return `interface ${contract.name}${buildGenerics(contract)} {\r\n${contract.content}}`;
   },
   type: (contract) => {
     return `type ${contract.name}${buildGenerics(contract)} = ${contract.content}`;
@@ -32,21 +32,9 @@ const dataContractTemplates = {
 type <%~ config.Ts.CodeGenKeyword.UtilRequiredKeys %><T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 <% } %>
 
-<% for (const contract of modelTypes) {
-  if (contract.typeIdentifier === 'interface' && contract.rawContent && Array.isArray(contract.rawContent)) {
-    contract.rawContent.forEach((prop) => {
-      if (prop.format ==='date-time') {
-        prop.field = prop.field.replace(': string', ': Date');
-      }
-    })
-      let customContent = '';
-      contract.rawContent.forEach((prop) => {
-          if (prop.description) customContent += `/** ${prop.description} */ \r\n`;
-          customContent += `${prop.field};\r\n`;
-      })
-      contract.content = customContent;
-  }
-%>
+<% for (const contract of modelTypes) { %>
   <%~ includeFile('./data-contract-jsdoc.ejs', { ...it, data: { ...contract, ...contract.typeData } }) %>
   <%~ contract.internal ? '' : 'export'%> <%~ (dataContractTemplates[contract.typeIdentifier] || dataContractTemplates.type)(contract) %>
+
+
 <% } %>
