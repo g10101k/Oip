@@ -6,7 +6,7 @@ import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AddModuleInstanceDto, IntKeyValueDto } from '../../api/data-contracts';
-import { Menu } from '../../api/Menu';
+import { MenuApi } from '../../api/menu.api';
 import { MenuService } from '../../services/app.menu.service';
 
 @Component({
@@ -77,8 +77,8 @@ import { MenuService } from '../../services/app.menu.service';
   `
 })
 export class MenuItemCreateDialogComponent implements OnInit {
-  menuService = inject(MenuService);
-  protected readonly menu = inject(Menu);
+  protected readonly menuService = inject(MenuService);
+  protected readonly menu = inject(MenuApi);
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
   modules: IntKeyValueDto[] = [];
@@ -87,7 +87,7 @@ export class MenuItemCreateDialogComponent implements OnInit {
   selectIcon: string = 'pi pi-box';
 
   async ngOnInit() {
-    this.modules = await this.menu.menuGetModules();
+    this.modules = await this.menu.getModules();
   }
 
   changeVisible() {

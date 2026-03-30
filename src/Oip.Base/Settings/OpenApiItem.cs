@@ -34,7 +34,7 @@ public class OpenApiItem
     /// Description
     /// </summary>
     public string Description { get; set; } = "Add block \"OpenApi\" in appsettings.json";
-
+    
     /// <summary>
     /// Output path for
     /// </summary>
@@ -45,4 +45,9 @@ public class OpenApiItem
     /// Use if service not use SPA
     /// </summary>
     public string? WorkingDirectory { get; set; } = null;
+
+    /// <summary>
+    /// Forces generation of the OpenAPI document, even if no changes are detected.
+    /// </summary>
+    public bool ForceGeneration { get; set; }
 }

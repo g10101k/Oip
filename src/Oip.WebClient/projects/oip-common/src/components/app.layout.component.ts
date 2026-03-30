@@ -6,7 +6,7 @@ import { AppTopbar } from './top-bar.component';
 import { FooterComponent } from './footer.component';
 import { LayoutService } from './../services/app.layout.service';
 import { SidebarComponent } from './sidebar.component';
-import { Menu } from '../api/Menu';
+import { MenuApi } from '../api/menu.api';
 import { MenuService } from '../services/app.menu.service';
 
 @Component({
@@ -26,7 +26,7 @@ import { MenuService } from '../services/app.menu.service';
       <div class="layout-mask animate-fadein"></div>
     </div>
   `,
-  providers: [MenuService, Menu]
+  providers: [MenuService, MenuApi]
 })
 export class AppLayoutComponent implements OnDestroy {
   protected layoutService = inject(LayoutService);

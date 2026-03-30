@@ -1,24 +1,18 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
 /** Data Transfer Object for creating a new module instance */
 export interface AddModuleInstanceDto {
-  /** The identifier of the module to create an instance of */
+  /**
+   * The identifier of the module to create an instance of
+   * @format int32
+   */
   moduleId?: number;
   /** The display label for the module instance */
   label?: string | null;
   /** The icon identifier for the module instance (optional) */
   icon?: string | null;
-  /** The parent module instance identifier (optional) */
+  /**
+   * The parent module instance identifier (optional)
+   * @format int32
+   */
   parentId?: number | null;
   /** Array of role identifiers that can view this module instance (optional) */
   viewRoles?: string[] | null;
@@ -30,7 +24,10 @@ export interface ApiExceptionResponse {
   title?: string | null;
   /** Detailed description of the error */
   message?: string | null;
-  /** HTTP status code associated with the exception */
+  /**
+   * HTTP status code associated with the exception
+   * @format int32
+   */
   statusCode?: number;
   /** Stack trace information (optional, typically omitted in production) */
   stackTrace?: string | null;
@@ -44,21 +41,35 @@ export interface CryptRequest {
 
 /** Data Transfer Object for editing an existing module instance */
 export interface EditModuleInstanceDto {
-  /** The identifier of the module instance to edit */
+  /**
+   * The identifier of the module instance to edit
+   * @format int32
+   */
   moduleInstanceId?: number;
   /** The updated display label for the module instance */
   label?: string | null;
   /** The updated icon identifier for the module instance (optional) */
   icon?: string | null;
-  /** The updated parent module instance identifier (optional) */
+  /**
+   * The updated parent module instance identifier (optional)
+   * @format int32
+   */
   parentId?: number | null;
   /** Updated array of role identifiers that can view this module instance (optional) */
   viewRoles?: string[] | null;
+  /**
+   * For front compatibility
+   * @format int32
+   */
+  moduleId?: number | null;
 }
 
 /** Data transfer object representing a module and its loaded status. */
 export interface ExistModuleDto {
-  /** Gets or sets the unique identifier of the module. */
+  /**
+   * Gets or sets the unique identifier of the module.
+   * @format int32
+   */
   moduleId?: number;
   /** Gets or sets the name of the module. */
   name?: string | null;
@@ -74,7 +85,10 @@ export interface FolderModuleSettings {
 
 /** Represents a request to save module instance settings. */
 export interface FolderModuleSettingsSaveSettingsRequest {
-  /** Gets or sets the ID of the module instance. */
+  /**
+   * Gets or sets the ID of the module instance.
+   * @format int32
+   */
   id?: number;
   /** Module settings. */
   settings?: FolderModuleSettings;
@@ -94,7 +108,10 @@ export interface GetKeycloakClientSettingsResponse {
   useRefreshToken?: boolean;
   /** Silent Renew */
   silentRenew?: boolean;
-  /** Log level None = 0, Debug = 1, Warn = 2, Error = 3 */
+  /**
+   * Log level None = 0, Debug = 1, Warn = 2, Error = 3
+   * @format int32
+   */
   logLevel?: number;
   /** Urls with auth */
   secureRoutes?: string[] | null;
@@ -102,19 +119,26 @@ export interface GetKeycloakClientSettingsResponse {
 
 /** Represents a key-value pair where the key is an integer and the value is a string. */
 export interface IntKeyValueDto {
+  /** @format int32 */
   key?: number;
   value?: string | null;
 }
 
 /** Represents a request to delete a module by its identifier. */
 export interface ModuleDeleteRequest {
-  /** Gets or sets the unique identifier of the module to be deleted. */
+  /**
+   * Gets or sets the unique identifier of the module to be deleted.
+   * @format int32
+   */
   moduleId?: number;
 }
 
 /** It module in app */
 export interface ModuleDto {
-  /** Id */
+  /**
+   * Id
+   * @format int32
+   */
   moduleId?: number;
   /** Name */
   name?: string | null;
@@ -126,9 +150,15 @@ export interface ModuleDto {
 
 /** Module Instance Dto */
 export interface ModuleInstanceDto {
-  /** Unique identifier for the module instance. */
+  /**
+   * Unique identifier for the module instance.
+   * @format int32
+   */
   moduleInstanceId?: number;
-  /** Identifier for the module. */
+  /**
+   * Identifier for the module.
+   * @format int32
+   */
   moduleId?: number;
   /** The label for the module instance. */
   label?: string | null;
@@ -146,10 +176,18 @@ export interface ModuleInstanceDto {
   items?: ModuleInstanceDto[] | null;
   /** Securities */
   securities?: string[] | null;
-  /** Identifier for the parent module instance. */
+  /**
+   * Identifier for the parent module instance.
+   * @format int32
+   */
   parentId?: number | null;
-  /** Sort order position for the module instance. */
+  /**
+   * Sort order position for the module instance.
+   * @format int32
+   */
   order?: number;
+  /** Indicates whether this module instance should be displayed as a separator. */
+  separator?: boolean;
 }
 
 /** Module security DTO */
@@ -162,7 +200,10 @@ export interface ModuleSecurityDto {
 
 /** Put security dto */
 export interface PutSecurityRequest {
-  /** Instance id */
+  /**
+   * Instance id
+   * @format int32
+   */
   id?: number;
   /** Securities */
   securities?: SecurityResponse[] | null;
@@ -180,24 +221,39 @@ export interface SecurityResponse {
   roles?: string[] | null;
 }
 
-export interface FolderModuleGetSecurityParams {
-  /** The ID of the module instance. */
+export interface GetSecurityParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
   id?: number;
 }
 
-export interface FolderModuleGetModuleInstanceSettingsParams {
-  /** The ID of the module instance. */
+export interface GetModuleInstanceSettingsParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
   id?: number;
 }
 
-export interface MenuDeleteModuleInstanceParams {
-  /** The unique identifier of the module instance to delete. */
+export interface DeleteModuleInstanceParams {
+  /**
+   * The unique identifier of the module instance to delete.
+   * @format int32
+   */
   id?: number;
 }
 
-export interface MenuChangeOrderParams {
-  /** The identifier of the first module to swap. */
+export interface ChangeOrderParams {
+  /**
+   * The identifier of the first module to swap.
+   * @format int32
+   */
   firstModuleId?: number;
-  /** The identifier of the second module to swap with. */
+  /**
+   * The identifier of the second module to swap with.
+   * @format int32
+   */
   secondModuleId?: number;
 }

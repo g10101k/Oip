@@ -64,4 +64,9 @@ public class ModuleInstanceDto
     /// Sort order position for the module instance.
     /// </summary>
     public int Order { get; set; }
+
+    /// <summary>
+    /// Indicates whether this module instance should be displayed as a separator.
+    /// </summary>
+    public bool Separator { get; set; }
 }

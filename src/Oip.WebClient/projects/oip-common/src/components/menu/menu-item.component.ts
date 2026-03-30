@@ -1,22 +1,22 @@
-import {ChangeDetectorRef, Component, HostBinding, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import {NavigationEnd, Router, RouterLinkActive, RouterLink} from '@angular/router';
-import {animate, state, style, transition, trigger} from '@angular/animations';
-import {Subscription} from 'rxjs';
-import {filter} from 'rxjs/operators';
-import {LayoutService} from '../../services/app.layout.service';
-import {MenuService} from '../../services/app.menu.service';
-import {RippleModule} from 'primeng/ripple';
-import {NgClass} from '@angular/common';
-import {ConfirmationService, ContextMenuService, MenuItem, MenuItemCommandEvent, PrimeIcons} from 'primeng/api';
-import {MenuItemCreateDialogComponent} from './menu-item-create-dialog.component';
-import {ContextMenu, ContextMenuModule} from 'primeng/contextmenu';
-import {MsgService} from '../../services/msg.service';
-import {MenuItemEditDialogComponent} from './menu-item-edit-dialog.component';
-import {ContextMenuItemDto} from '../../dtos/context-menu-item.dto';
-import {TranslateService} from '@ngx-translate/core';
-import {ConfirmDialog} from 'primeng/confirmdialog';
-import {Menu} from '../../api/Menu';
-import {MenuChangeOrderParams, MenuDeleteModuleInstanceParams} from '../../api/data-contracts';
+import { ChangeDetectorRef, Component, HostBinding, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterLinkActive, RouterLink } from '@angular/router';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { LayoutService } from '../../services/app.layout.service';
+import { MenuService } from '../../services/app.menu.service';
+import { RippleModule } from 'primeng/ripple';
+import { NgClass } from '@angular/common';
+import { ConfirmationService, ContextMenuService, MenuItem, MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
+import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.component';
+import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
+import { MsgService } from '../../services/msg.service';
+import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
+import { ContextMenuItemDto } from '../../dtos/context-menu-item.dto';
+import { TranslateService } from '@ngx-translate/core';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { MenuApi } from '../../api/menu.api';
+import { ChangeOrderParams, DeleteModuleInstanceParams } from '../../api/data-contracts';
 
 interface MenuItemComponentTranslation {
   delete: string;
@@ -34,11 +34,9 @@ interface MenuItemComponentTranslation {
   selector: '[app-menuitem]',
   template: `
     <ng-container>
-      <p-confirm-dialog/>
+      <p-confirm-dialog />
       @if (root && item.visible !== false) {
-        <div
-          class="layout-menuitem-root-text"
-          (contextmenu)="onContextMenu($event, item)">
+        <div class="layout-menuitem-root-text" (contextmenu)="onContextMenu($event, item)">
           {{ item.label }}
         </div>
       }
@@ -71,13 +69,13 @@ interface MenuItemComponentTranslation {
           [replaceUrl]="item.replaceUrl"
           [routerLink]="item.routerLink"
           [routerLinkActiveOptions]="
-                item.routerLinkActiveOptions || {
-                  paths: 'exact',
-                  queryParams: 'ignored',
-                  matrixParams: 'ignored',
-                  fragment: 'ignored'
-                }
-              "
+            item.routerLinkActiveOptions || {
+              paths: 'exact',
+              queryParams: 'ignored',
+              matrixParams: 'ignored',
+              fragment: 'ignored'
+            }
+          "
           [skipLocationChange]="item.skipLocationChange"
           [state]="item.state"
           (click)="itemClick($event)"
@@ -91,9 +89,7 @@ interface MenuItemComponentTranslation {
       }
 
       @if (item.items && item.visible !== false) {
-        <ul
-          [@children]="submenuAnimation"
-          (contextmenu)="onContextMenu($event, item)">
+        <ul [@children]="submenuAnimation" (contextmenu)="onContextMenu($event, item)">
           @for (child of item.items; track child; let i = $index) {
             <li
               app-menuitem
@@ -134,7 +130,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   private readonly translateService = inject(TranslateService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly msgService = inject(MsgService);
-  private readonly menuDataService = inject(Menu);
+  private readonly menuDataService = inject(MenuApi);
 
   @Input() item: ContextMenuItemDto;
   @Input() index!: number;
@@ -221,7 +217,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
     // execute command
     if (this.item.command) {
-      this.item.command({originalEvent: event, item: this.item});
+      this.item.command({ originalEvent: event, item: this.item });
     }
 
     // toggle active state
@@ -229,7 +225,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
       this.active = !this.active;
     }
 
-    this.menuService.onMenuStateChange({key: this.key, item: this.item});
+    this.menuService.onMenuStateChange({ key: this.key, item: this.item });
   }
 
   get submenuAnimation() {
@@ -262,13 +258,13 @@ export class MenuItemComponent implements OnInit, OnDestroy {
         icon: PrimeIcons.FILE_EDIT,
         command: (event) => this.editClick(event)
       },
-      {separator: true},
+      { separator: true },
       {
         label: this.localization.delete,
         icon: PrimeIcons.TRASH,
         command: (event) => this.deleteItem(event)
       },
-      {separator: true, visible: this.hasVisibleNext(item) || this.hasVisiblePrev(item)},
+      { separator: true, visible: this.hasVisibleNext(item) || this.hasVisiblePrev(item) },
       {
         label: 'Up',
         icon: PrimeIcons.ANGLE_UP,
@@ -308,9 +304,9 @@ export class MenuItemComponent implements OnInit, OnDestroy {
         severity: 'danger'
       },
       accept: async () => {
-        await this.menuDataService.menuDeleteModuleInstance({
+        await this.menuDataService.deleteModuleInstance({
           id: this.menuService.contextMenuItem?.moduleInstanceId
-        } as MenuDeleteModuleInstanceParams);
+        } as DeleteModuleInstanceParams);
         this.msgService.success(this.localization.deleteItemSuccessMessage);
         await this.menuService.loadMenu();
       }
@@ -371,10 +367,12 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
     [items[firstIndex], items[secondIndex]] = [items[secondIndex], items[firstIndex]];
 
-    this.menuDataService.menuChangeOrder({
-      firstModuleId: firstModule.moduleInstanceId,
-      secondModuleId: secondModule.moduleInstanceId
-    } as MenuChangeOrderParams).then();
+    this.menuDataService
+      .changeOrder({
+        firstModuleId: firstModule.moduleInstanceId,
+        secondModuleId: secondModule.moduleInstanceId
+      } as ChangeOrderParams)
+      .then();
   }
 
   hasVisiblePrev(currentItem: any): boolean {
@@ -393,9 +391,5 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     const items = this.getItems(currentItem);
     const currentIndex = items.findIndex((item) => item.moduleInstanceId == currentItem.moduleInstanceId);
     return currentIndex < items.length - 1;
-  }
-
-  swapModulesInBackend(firstModuleId: number, secondModuleId: number) {
-
   }
 }

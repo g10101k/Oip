@@ -42,7 +42,9 @@ public class SwaggerGenerateWebClientStartupTask(
                 {
                     logger.LogDebug("Checking Swagger for {Name}", config.Name);
                     var swaggerJson = GetSwaggerJson(config);
-                    if (!await HasSwaggerChanged(config, swaggerJson)) continue;
+                    if (!config.ForceGeneration)
+                        if (!await HasSwaggerChanged(config, swaggerJson))
+                            continue;
                     logger.LogInformation("Swagger changed detected for {Name}. Generating client...", config.Name);
                     var path = await SaveSwaggerHash(config, swaggerJson);
                     await GenerateTypeScriptClient(config, path);

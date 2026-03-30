@@ -38,7 +38,7 @@ export { SecurityStorageService } from './services/security-storage.service';
 export { L10nService, LanguageDto } from './services/l10n.service';
 export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './services/logo.service';
 export { NotificationService } from './services/notification.service';
-export { TableFilterService }from './services/table-filter.service';
+export { TableFilterService } from './services/table-filter.service';
 
 // Events
 export { MenuChangeEvent } from './events/menu-change.event';
@@ -47,3 +47,4 @@ export { MenuChangeEvent } from './events/menu-change.event';
 export { langIntercept } from './intercepts/i18n-intercept.service';
 export { SecurePipe } from './modules/secure.pipe';
 export { httpLoaderAuthFactory } from './modules/http-loader.factory';
+export { ContentType, HttpClient, RequestParams } from './api/http-client';

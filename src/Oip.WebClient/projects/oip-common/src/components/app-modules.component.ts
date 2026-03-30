@@ -10,7 +10,7 @@ import { MsgService } from '../services/msg.service';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { L10nService } from '../services/l10n.service';
-import { Module } from '../api/Module';
+import { ModuleApi } from '../api/module.api';
 import { ModuleDto } from '../api/data-contracts';
 import { AppTitleService } from '../services/app-title.service';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -39,7 +39,7 @@ interface L10n {
 
 @Component({
   imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog, TranslatePipe],
-  providers: [ConfirmationService, Module],
+  providers: [ConfirmationService, ModuleApi],
   selector: 'app-modules',
   template: `
     <p-confirmDialog></p-confirmDialog>
@@ -105,7 +105,7 @@ export class AppModulesComponent implements OnInit {
   protected l10nService = inject(L10nService);
   protected l10n: L10n = {} as L10n;
   protected titleService = inject(AppTitleService);
-  private moduleService = inject(Module);
+  private moduleService = inject(ModuleApi);
 
   async ngOnInit() {
     this.l10nService.get('app-modules').subscribe((l10n) => {
@@ -116,7 +116,7 @@ export class AppModulesComponent implements OnInit {
   }
 
   async refreshAction() {
-    this.modules = await this.moduleService.moduleGetModulesWithLoadStatus();
+    this.modules = await this.moduleService.getModulesWithLoadStatus();
   }
 
   deleteModule(module: ModuleDto) {
