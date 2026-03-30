@@ -1,17 +1,17 @@
 import fs from "node:fs";
 import path from "node:path";
-import {generateApi, generateTemplates} from "swagger-typescript-api";
-import {ArgumentParser} from 'argparse';
+import { generateApi, generateTemplates } from "swagger-typescript-api";
+import { ArgumentParser } from "argparse";
 
 const parser = new ArgumentParser({
-  description: 'Argparse example'
+  description: "Argparse example"
 });
 
-parser.add_argument('-o', '--output', {help: 'Output path'});
-parser.add_argument('-i', '--input', {help: 'Input swagger file path'});
-parser.add_argument('-t', '--templates', {help: 'Templates'});
-parser.add_argument('-d', '--data-contract-prefix', {help: 'Data Contract Prefix'});
-parser.add_argument('-c', '--use-common-client', {action: 'store_true', help: 'Use common http client'});
+parser.add_argument("-o", "--output", { help: "Output path" });
+parser.add_argument("-i", "--input", { help: "Input swagger file path" });
+parser.add_argument("-t", "--templates", { help: "Templates" });
+parser.add_argument("-d", "--data-contract-prefix", { help: "Data Contract Prefix" });
+parser.add_argument("-c", "--use-common-client", { action: "store_true", help: "Use common http client" });
 
 let a = parser.parse_args();
 a.data_contract_prefix ??= "";
@@ -38,7 +38,7 @@ let config = {
     printWidth: 120,
     tabWidth: 2,
     trailingComma: "all",
-    parser: "typescript",
+    parser: "typescript"
   },
   defaultResponseType: "void",
   singleHttpClient: false,
@@ -58,14 +58,7 @@ let config = {
     requestBodySuffix: ["Payload", "Body", "Input"],
     requestParamsSuffix: ["Params"],
     responseBodySuffix: ["Data", "Result", "Output"],
-    responseErrorSuffix: [
-      "Error",
-      "Fail",
-      "Fails",
-      "ErrorData",
-      "HttpError",
-      "BadResponse",
-    ],
+    responseErrorSuffix: ["Error", "Fail", "Fails", "ErrorData", "HttpError", "BadResponse"]
   },
   /** allow to generate extra files based with this extra templates, see more below */
   extraTemplates: [],
@@ -74,21 +67,18 @@ let config = {
   fixInvalidEnumKeyPrefix: "Value",
   codeGenConstructs: (constructs) => ({
     ...constructs,
-    RecordType: (key, value) => `MyRecord<key, value>`,
+    RecordType: (key, value) => `MyRecord<key, value>`
   }),
   primitiveTypeConstructs: (constructs) => ({
     ...constructs,
     string: {
-      "date-time": "Date",
-    },
+      "date-time": "Date"
+    }
   }),
   hooks: {
-    onCreateComponent: (component) => {
-    },
-    onCreateRequestParams: (rawType) => {
-    },
-    onCreateRoute: (routeData) => {
-    },
+    onCreateComponent: (component) => {},
+    onCreateRequestParams: (rawType) => {},
+    onCreateRoute: (routeData) => {},
     onCreateRouteName: (routeNameInfo, rawRouteInfo) => {
       if (routeNameInfo.usage.startsWith(rawRouteInfo.moduleName)) {
         const str = routeNameInfo.usage.substring(rawRouteInfo.moduleName.length);
@@ -97,40 +87,36 @@ let config = {
       }
       return routeNameInfo;
     },
-    onFormatRouteName: (routeInfo, templateRouteName) => {
-    },
-    onFormatTypeName: (typeName, rawTypeName, schemaType) => {
-    },
-    onInit: (configuration) => {
-    },
-    onPreParseSchema: (originalSchema, typeName, schemaType) => {
-    },
-    onParseSchema: (originalSchema, parsedSchema) => {
-    },
-    onPrepareConfig: (currentConfiguration) => {
-    },
-  },
-}
+    onFormatRouteName: (routeInfo, templateRouteName) => {},
+    onFormatTypeName: (typeName, rawTypeName, schemaType) => {},
+    onInit: (configuration) => {},
+    onPreParseSchema: (originalSchema, typeName, schemaType) => {},
+    onParseSchema: (originalSchema, parsedSchema) => {},
+    onPrepareConfig: (currentConfiguration) => {}
+  }
+};
 const toKebabCase = (str) =>
   str &&
   str
     .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
-    .map(x => x.toLowerCase())
-    .join('-');
+    .map((x) => x.toLowerCase())
+    .join("-");
 
 generateApi(config)
-  .then(async ({files, configuration}) => {
+  .then(async ({ files, configuration }) => {
+    let dir = path.join(process.cwd(), a.output);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+
     for (const f of files) {
       if (f.fileContent) {
-        if (f.fileName === 'http-client')
+        if (a.use_common_client && f.fileName === "http-client") {
+          console.log("Use common http client from oip, skip generate http-client.ts");
           continue;
-        let dir = path.join(process.cwd(), a.output);
-        if (!fs.existsSync(dir))
-          fs.mkdirSync(dir);
+        }
 
-        if (f.fileName === 'data-contracts') {
+        if (f.fileName === "data-contracts") {
           f.fileName = config.dataContractPrefix + f.fileName;
-        } else if (f.fileName.endsWith('http-client')) {
+        } else if (f.fileName.endsWith("http-client")) {
           // do nothing
         } else {
           f.fileName = `${toKebabCase(f.fileName)}.api`;
