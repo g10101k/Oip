@@ -22,6 +22,7 @@
     "build:oip-common": "ng build oip-common",
     "publish": "node scripts/publish-common.js",
     "publish:local": "node scripts/publish-local.js",
+    "generate-api": "node ./node_modules/oip-common/scripts/generate-api.mjs  -c -o ./projects/oip-common/src/tmp/ -i ./../Oip/src/Oip.Discussions/obj/SwaggerFiles/swagger-v1.json -t ./node_modules/oip-common/templates",
     "test": "ng test",
     "lint": "ng lint --fix || npx prettier --write projects/",
     "e2e": "ng e2e"
