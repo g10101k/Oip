@@ -24,8 +24,8 @@ try {
   console.log('🧹 Delete oip-common library...!');
   execSync('rm -rf ./node_modules/oip-common', {stdio: 'inherit'});
 
-  console.log('🪃 Copy oip-common library...!');
-  execSync(`cp -r ${distPath} ./node_modules/oip-common`);
+  console.log('🪃 Install oip-common library...!');
+  execSync(`npm i ${distPath}`);
 
   console.log('⛳  Publication completed successfully!');
 } catch (error) {
