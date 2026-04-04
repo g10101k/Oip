@@ -27,23 +27,23 @@ import {
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 @Injectable()
-export class CommentsApi<
+export class DiscussionApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
    * @description Gets comments by object type and object identifier.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name getByObject
    * @summary Gets comments by object type and object identifier.
-   * @request GET:/api/comments/get-by-object
+   * @request GET:/api/discussion/get-by-object
    * @secure
    * @response `200` `(CommentDto)[]` OK
    * @response `401` `ApiExceptionResponse` Unauthorized
    */
   getByObject = (query: GetByObjectParams, params: RequestParams = {}) =>
     this.request<CommentDto[], ApiExceptionResponse>({
-      path: `/api/comments/get-by-object`,
+      path: `/api/discussion/get-by-object`,
       method: "GET",
       query: query,
       secure: true,
@@ -53,10 +53,10 @@ export class CommentsApi<
   /**
    * @description Gets a comment by identifier.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name getById
    * @summary Gets a comment by identifier.
-   * @request GET:/api/comments/get-by-id
+   * @request GET:/api/discussion/get-by-id
    * @secure
    * @response `200` `CommentDto` OK
    * @response `401` `ApiExceptionResponse` Unauthorized
@@ -64,7 +64,7 @@ export class CommentsApi<
    */
   getById = (query: GetByIdParams, params: RequestParams = {}) =>
     this.request<CommentDto, ApiExceptionResponse>({
-      path: `/api/comments/get-by-id`,
+      path: `/api/discussion/get-by-id`,
       method: "GET",
       query: query,
       secure: true,
@@ -74,10 +74,10 @@ export class CommentsApi<
   /**
    * @description Creates a new comment
    *
-   * @tags Comments
+   * @tags Discussion
    * @name create
    * @summary Creates a new comment
-   * @request POST:/api/comments/create
+   * @request POST:/api/discussion/create
    * @secure
    * @response `200` `CommentDto` OK
    * @response `400` `ApiExceptionResponse` Bad Request
@@ -85,7 +85,7 @@ export class CommentsApi<
    */
   create = (data: CreateCommentRequest, params: RequestParams = {}) =>
     this.request<CommentDto, ApiExceptionResponse>({
-      path: `/api/comments/create`,
+      path: `/api/discussion/create`,
       method: "POST",
       body: data,
       secure: true,
@@ -96,10 +96,10 @@ export class CommentsApi<
   /**
    * @description Updates an existing comment.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name update
    * @summary Updates an existing comment.
-   * @request PUT:/api/comments/update/{id}
+   * @request PUT:/api/discussion/update/{id}
    * @secure
    * @response `200` `CommentDto` OK
    * @response `400` `ApiExceptionResponse` Bad Request
@@ -113,7 +113,7 @@ export class CommentsApi<
     params: RequestParams = {},
   ) =>
     this.request<CommentDto, ApiExceptionResponse>({
-      path: `/api/comments/update/${id}`,
+      path: `/api/discussion/update/${id}`,
       method: "PUT",
       body: data,
       secure: true,
@@ -124,10 +124,10 @@ export class CommentsApi<
   /**
    * @description Soft deletes a comment.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name delete
    * @summary Soft deletes a comment.
-   * @request DELETE:/api/comments/delete/{id}
+   * @request DELETE:/api/discussion/delete/{id}
    * @secure
    * @response `204` `void` No Content
    * @response `401` `ApiExceptionResponse` Unauthorized
@@ -136,7 +136,7 @@ export class CommentsApi<
    */
   delete = ({ id, ...query }: DeleteParams, params: RequestParams = {}) =>
     this.request<void, ApiExceptionResponse>({
-      path: `/api/comments/delete/${id}`,
+      path: `/api/discussion/delete/${id}`,
       method: "DELETE",
       secure: true,
       ...params,
@@ -144,10 +144,10 @@ export class CommentsApi<
   /**
    * @description Gets edit history for a comment.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name getHistory
    * @summary Gets edit history for a comment.
-   * @request GET:/api/comments/get-history/{id}
+   * @request GET:/api/discussion/get-history/{id}
    * @secure
    * @response `200` `(CommentHistoryDto)[]` OK
    * @response `401` `ApiExceptionResponse` Unauthorized
@@ -158,7 +158,7 @@ export class CommentsApi<
     params: RequestParams = {},
   ) =>
     this.request<CommentHistoryDto[], ApiExceptionResponse>({
-      path: `/api/comments/get-history/${id}`,
+      path: `/api/discussion/get-history/${id}`,
       method: "GET",
       secure: true,
       format: "json",
@@ -167,10 +167,10 @@ export class CommentsApi<
   /**
    * @description Uploads an attachment for a comment.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name uploadAttachment
    * @summary Uploads an attachment for a comment.
-   * @request POST:/api/comments/upload-attachment
+   * @request POST:/api/discussion/upload-attachment
    * @secure
    * @response `200` `AttachmentDto` OK
    * @response `400` `ApiExceptionResponse` Bad Request
@@ -183,7 +183,7 @@ export class CommentsApi<
     params: RequestParams = {},
   ) =>
     this.request<AttachmentDto, ApiExceptionResponse>({
-      path: `/api/comments/upload-attachment`,
+      path: `/api/discussion/upload-attachment`,
       method: "POST",
       body: data,
       secure: true,
@@ -194,10 +194,10 @@ export class CommentsApi<
   /**
    * @description Deletes an attachment.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name deleteAttachment
    * @summary Deletes an attachment.
-   * @request DELETE:/api/comments/delete-attachment/{id}
+   * @request DELETE:/api/discussion/delete-attachment/{id}
    * @secure
    * @response `204` `void` No Content
    * @response `401` `ApiExceptionResponse` Unauthorized
@@ -209,7 +209,7 @@ export class CommentsApi<
     params: RequestParams = {},
   ) =>
     this.request<void, ApiExceptionResponse>({
-      path: `/api/comments/delete-attachment/${id}`,
+      path: `/api/discussion/delete-attachment/${id}`,
       method: "DELETE",
       secure: true,
       ...params,
@@ -217,10 +217,10 @@ export class CommentsApi<
   /**
    * @description Downloads attachment content.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name getAttachmentContent
    * @summary Downloads attachment content.
-   * @request GET:/api/comments/get-attachment-content/{id}
+   * @request GET:/api/discussion/get-attachment-content/{id}
    * @secure
    * @response `200` `void` OK
    * @response `401` `ApiExceptionResponse` Unauthorized
@@ -231,7 +231,7 @@ export class CommentsApi<
     params: RequestParams = {},
   ) =>
     this.request<void, ApiExceptionResponse>({
-      path: `/api/comments/get-attachment-content/${id}`,
+      path: `/api/discussion/get-attachment-content/${id}`,
       method: "GET",
       secure: true,
       ...params,
@@ -239,10 +239,10 @@ export class CommentsApi<
   /**
    * @description Adds or toggles a reaction for a comment.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name addReaction
    * @summary Adds or toggles a reaction for a comment.
-   * @request POST:/api/comments/add-reaction
+   * @request POST:/api/discussion/add-reaction
    * @secure
    * @response `200` `(CommentReactionDto)[]` OK
    * @response `400` `ApiExceptionResponse` Bad Request
@@ -251,7 +251,7 @@ export class CommentsApi<
    */
   addReaction = (data: AddReactionRequest, params: RequestParams = {}) =>
     this.request<CommentReactionDto[], ApiExceptionResponse>({
-      path: `/api/comments/add-reaction`,
+      path: `/api/discussion/add-reaction`,
       method: "POST",
       body: data,
       secure: true,
@@ -262,10 +262,10 @@ export class CommentsApi<
   /**
    * @description Removes a reaction from a comment.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name removeReaction
    * @summary Removes a reaction from a comment.
-   * @request DELETE:/api/comments/remove-reaction
+   * @request DELETE:/api/discussion/remove-reaction
    * @secure
    * @response `200` `(CommentReactionDto)[]` OK
    * @response `401` `ApiExceptionResponse` Unauthorized
@@ -273,7 +273,7 @@ export class CommentsApi<
    */
   removeReaction = (query: RemoveReactionParams, params: RequestParams = {}) =>
     this.request<CommentReactionDto[], ApiExceptionResponse>({
-      path: `/api/comments/remove-reaction`,
+      path: `/api/discussion/remove-reaction`,
       method: "DELETE",
       query: query,
       secure: true,
@@ -283,10 +283,10 @@ export class CommentsApi<
   /**
    * @description Searches users that can be mentioned in a comment.
    *
-   * @tags Comments
+   * @tags Discussion
    * @name searchMentionUsers
    * @summary Searches users that can be mentioned in a comment.
-   * @request GET:/api/comments/search-mention-users
+   * @request GET:/api/discussion/search-mention-users
    * @secure
    * @response `200` `(MentionUserDto)[]` OK
    * @response `400` `ApiExceptionResponse` Bad Request
@@ -297,7 +297,7 @@ export class CommentsApi<
     params: RequestParams = {},
   ) =>
     this.request<MentionUserDto[], ApiExceptionResponse>({
-      path: `/api/comments/search-mention-users`,
+      path: `/api/discussion/search-mention-users`,
       method: "GET",
       query: query,
       secure: true,
