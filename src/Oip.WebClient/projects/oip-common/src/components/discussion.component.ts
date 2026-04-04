@@ -72,7 +72,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
     DatePipe
   ],
   template: `
-    <section class="discussion-shell">
+    <section class="flex flex-col gap-4">
       <p-card class="discussion-hero">
         <ng-template pTemplate="header">
           <div class="hero-header">
