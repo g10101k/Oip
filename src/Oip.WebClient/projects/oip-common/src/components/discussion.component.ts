@@ -484,7 +484,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy {
   pendingFiles: File[] = [];
   mentionSuggestions: DiscussionMentionUser[] = [];
   historyByComment: Record<number, HistoryState> = {};
-  emojiPalette = ['👍', '❤️', '🎉', '👀'];
+  emojiPalette = ['👍', '👎', '🐳', '🍆', '🍑' ];
   private mentionSearchTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {
