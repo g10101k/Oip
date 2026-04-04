@@ -24,6 +24,14 @@ the attribute `[ApiExplorerSettings(GroupName = "users")]`.
 3. Generation is performed via `npx swagger-typescript-api generate` in an external process.
 4. All process logs (`stdout` and `stderr`) are output to `ILogger`.
 
+### Important for controller routes
+
+For services that generate a TypeScript client, keep explicit `action-style` routes in controller attributes, for
+example: `get-by-object`, `get-by-id`, `create`, `update/{id}`, `delete/{id}`.
+
+Switching to "pure" REST-style paths without these suffixes can degrade or break client generation and the expected
+shape of generated methods.
+
 ---
 
 ## ⚙️ Example configuration `appsettings.Development.json`
