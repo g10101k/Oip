@@ -11,8 +11,8 @@ namespace Oip.Discussions.Controllers;
 /// </summary>
 [ApiController]
 [Authorize]
-[Route("api/comments")]
-public class CommentsController(CommentService commentService) : ControllerBase
+[Route("api/discussion")]
+public class DiscussionController(CommentService commentService) : ControllerBase
 {
     /// <summary>
     /// Gets comments by object type and object identifier.
