@@ -265,7 +265,19 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                           [(ngModel)]="editContent"
                           placeholder="Edit comment"
                         ></textarea>
-                        <div class="editor-actions">
+                        <div class="flex justify-end gap-1">
+                          <div class="inline-upload">
+                            <label class="file-trigger">
+                              <p-button
+                                label="Add attachment"
+                                icon="pi pi-upload"
+                                severity="secondary"
+                                [outlined]="true"
+                              />
+                              <input type="file" multiple (change)="onInlineFilesSelected(comment, $event)"/>
+                            </label>
+                          </div>
+
                           <p-button
                             label="Save"
                             icon="pi pi-check"
@@ -318,19 +330,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                       </div>
                     }
 
-                    @if (comment.canEdit) {
-                      <div class="inline-upload">
-                        <label class="file-trigger">
-                          <p-button
-                            label="Add attachment"
-                            icon="pi pi-upload"
-                            severity="secondary"
-                            [outlined]="true"
-                          />
-                          <input type="file" multiple (change)="onInlineFilesSelected(comment, $event)"/>
-                        </label>
-                      </div>
-                    }
+
 
                     <div class="reaction-row">
                       @for (reaction of comment.reactions; track reaction.emojiCode) {
@@ -407,18 +407,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
         display: block;
       }
 
-      .discussion-shell {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .hero-header,
-      .comment-header,
-      .comment-actions,
-      .editor-actions,
-      .attachment-item,
-      .pending-file {
+      .hero-header, .comment-header, .comment-actions, .attachment-item, .pending-file {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -444,7 +433,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
         font-size: 0.78rem;
         text-transform: uppercase;
         letter-spacing: 0.12em;
-        color: var(--text-color-secondary, #64748b);
+        color: var(--text-color-secondary);
         margin-bottom: 0.45rem;
       }
 
@@ -455,7 +444,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
 
       .hero-header p,
       .comment-date {
-        color: var(--text-color-secondary, #64748b);
+        color: var(--text-color-secondary);
       }
 
       .composer-shell,
