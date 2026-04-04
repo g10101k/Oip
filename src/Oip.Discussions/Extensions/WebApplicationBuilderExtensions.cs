@@ -2,6 +2,9 @@ using Oip.Base.Settings;
 using Oip.Data.Extensions;
 using Oip.Discussions.Data;
 using Oip.Discussions.Data.Repositories;
+using Oip.Discussions.Services;
+using Oip.Users.Extensions;
+using Oip.Users.Repositories;
 
 namespace Oip.Discussions.Extensions;
 
@@ -19,11 +22,15 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services.AddOipBasedContext<DiscussionsDbContext>(settings.ConnectionString,
             DiscussionsDbContext.MigrationHistoryTableName, DiscussionsDbContext.SchemaName);
+        builder.Services.AddUsersData(settings);
         builder.Services.AddScoped<AttachmentRepository>()
             .AddScoped<CommentEditHistoryRepository>()
             .AddScoped<CommentRepository>()
             .AddScoped<MentionRepository>()
-            .AddScoped<ReactionRepository>();
+            .AddScoped<ReactionRepository>()
+            .AddScoped<CommentService>()
+            .AddScoped<UserRepository>()
+            .AddScoped<IDiscussionAttachmentStorage, LocalDiscussionAttachmentStorage>();
     }
 
     /// <summary>
