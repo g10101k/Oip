@@ -1,0 +1,307 @@
+/* eslint-disable */
+/* tslint:disable */
+// @ts-nocheck
+
+import { Injectable } from "@angular/core";
+import {
+  AddReactionRequest,
+  ApiExceptionResponse,
+  AttachmentDto,
+  CommentDto,
+  CommentHistoryDto,
+  CommentReactionDto,
+  CreateCommentRequest,
+  DeleteAttachmentParams,
+  DeleteParams,
+  GetAttachmentContentParams,
+  GetByIdParams,
+  GetByObjectParams,
+  GetHistoryParams,
+  MentionUserDto,
+  RemoveReactionParams,
+  SearchMentionUsersParams,
+  UpdateCommentRequest,
+  UpdateParams,
+  UploadAttachmentPayload,
+} from "./discussion-data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
+
+@Injectable()
+export class CommentsApi<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
+  /**
+   * @description Gets comments by object type and object identifier.
+   *
+   * @tags Comments
+   * @name getByObject
+   * @summary Gets comments by object type and object identifier.
+   * @request GET:/api/comments/get-by-object
+   * @secure
+   * @response `200` `(CommentDto)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   */
+  getByObject = (query: GetByObjectParams, params: RequestParams = {}) =>
+    this.request<CommentDto[], ApiExceptionResponse>({
+      path: `/api/comments/get-by-object`,
+      method: "GET",
+      query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Gets a comment by identifier.
+   *
+   * @tags Comments
+   * @name getById
+   * @summary Gets a comment by identifier.
+   * @request GET:/api/comments/get-by-id
+   * @secure
+   * @response `200` `CommentDto` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `404` `ApiExceptionResponse` Not Found
+   */
+  getById = (query: GetByIdParams, params: RequestParams = {}) =>
+    this.request<CommentDto, ApiExceptionResponse>({
+      path: `/api/comments/get-by-id`,
+      method: "GET",
+      query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Creates a new comment
+   *
+   * @tags Comments
+   * @name create
+   * @summary Creates a new comment
+   * @request POST:/api/comments/create
+   * @secure
+   * @response `200` `CommentDto` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   */
+  create = (data: CreateCommentRequest, params: RequestParams = {}) =>
+    this.request<CommentDto, ApiExceptionResponse>({
+      path: `/api/comments/create`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Updates an existing comment.
+   *
+   * @tags Comments
+   * @name update
+   * @summary Updates an existing comment.
+   * @request PUT:/api/comments/update/{id}
+   * @secure
+   * @response `200` `CommentDto` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `404` `ApiExceptionResponse` Not Found
+   */
+  update = (
+    { id, ...query }: UpdateParams,
+    data: UpdateCommentRequest,
+    params: RequestParams = {},
+  ) =>
+    this.request<CommentDto, ApiExceptionResponse>({
+      path: `/api/comments/update/${id}`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Soft deletes a comment.
+   *
+   * @tags Comments
+   * @name delete
+   * @summary Soft deletes a comment.
+   * @request DELETE:/api/comments/delete/{id}
+   * @secure
+   * @response `204` `void` No Content
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `404` `ApiExceptionResponse` Not Found
+   */
+  delete = ({ id, ...query }: DeleteParams, params: RequestParams = {}) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/comments/delete/${id}`,
+      method: "DELETE",
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description Gets edit history for a comment.
+   *
+   * @tags Comments
+   * @name getHistory
+   * @summary Gets edit history for a comment.
+   * @request GET:/api/comments/get-history/{id}
+   * @secure
+   * @response `200` `(CommentHistoryDto)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `404` `ApiExceptionResponse` Not Found
+   */
+  getHistory = (
+    { id, ...query }: GetHistoryParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<CommentHistoryDto[], ApiExceptionResponse>({
+      path: `/api/comments/get-history/${id}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Uploads an attachment for a comment.
+   *
+   * @tags Comments
+   * @name uploadAttachment
+   * @summary Uploads an attachment for a comment.
+   * @request POST:/api/comments/upload-attachment
+   * @secure
+   * @response `200` `AttachmentDto` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `404` `ApiExceptionResponse` Not Found
+   */
+  uploadAttachment = (
+    data: UploadAttachmentPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<AttachmentDto, ApiExceptionResponse>({
+      path: `/api/comments/upload-attachment`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.FormData,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Deletes an attachment.
+   *
+   * @tags Comments
+   * @name deleteAttachment
+   * @summary Deletes an attachment.
+   * @request DELETE:/api/comments/delete-attachment/{id}
+   * @secure
+   * @response `204` `void` No Content
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `404` `ApiExceptionResponse` Not Found
+   */
+  deleteAttachment = (
+    { id, ...query }: DeleteAttachmentParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/comments/delete-attachment/${id}`,
+      method: "DELETE",
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description Downloads attachment content.
+   *
+   * @tags Comments
+   * @name getAttachmentContent
+   * @summary Downloads attachment content.
+   * @request GET:/api/comments/get-attachment-content/{id}
+   * @secure
+   * @response `200` `void` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `404` `ApiExceptionResponse` Not Found
+   */
+  getAttachmentContent = (
+    { id, ...query }: GetAttachmentContentParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/comments/get-attachment-content/${id}`,
+      method: "GET",
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description Adds or toggles a reaction for a comment.
+   *
+   * @tags Comments
+   * @name addReaction
+   * @summary Adds or toggles a reaction for a comment.
+   * @request POST:/api/comments/add-reaction
+   * @secure
+   * @response `200` `(CommentReactionDto)[]` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `404` `ApiExceptionResponse` Not Found
+   */
+  addReaction = (data: AddReactionRequest, params: RequestParams = {}) =>
+    this.request<CommentReactionDto[], ApiExceptionResponse>({
+      path: `/api/comments/add-reaction`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Removes a reaction from a comment.
+   *
+   * @tags Comments
+   * @name removeReaction
+   * @summary Removes a reaction from a comment.
+   * @request DELETE:/api/comments/remove-reaction
+   * @secure
+   * @response `200` `(CommentReactionDto)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `404` `ApiExceptionResponse` Not Found
+   */
+  removeReaction = (query: RemoveReactionParams, params: RequestParams = {}) =>
+    this.request<CommentReactionDto[], ApiExceptionResponse>({
+      path: `/api/comments/remove-reaction`,
+      method: "DELETE",
+      query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Searches users that can be mentioned in a comment.
+   *
+   * @tags Comments
+   * @name searchMentionUsers
+   * @summary Searches users that can be mentioned in a comment.
+   * @request GET:/api/comments/search-mention-users
+   * @secure
+   * @response `200` `(MentionUserDto)[]` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   */
+  searchMentionUsers = (
+    query: SearchMentionUsersParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<MentionUserDto[], ApiExceptionResponse>({
+      path: `/api/comments/search-mention-users`,
+      method: "GET",
+      query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+}

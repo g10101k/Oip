@@ -2,7 +2,9 @@
 /* tslint:disable */
 // @ts-nocheck
 
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
+import { LayoutService } from "../services/app.layout.service";
+import { SecurityService } from "../services/security.service";
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -58,9 +60,22 @@ export enum ContentType {
 
 @Injectable({ providedIn: "root" })
 export class HttpClient<SecurityDataType = unknown> {
+  protected securityService = inject(SecurityService);
+  protected layoutService = inject(LayoutService);
   public baseUrl: string = "";
   private securityData: SecurityDataType | null = null;
-  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
+  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] = (
+    securityData,
+  ) => ({
+    headers: {
+      "Accept-language": this.layoutService.language()
+        ? this.layoutService.language()
+        : "en",
+      "X-Timezone": this.layoutService.timeZone(),
+      Authorization: `Bearer ${securityData}`,
+    },
+  });
+
   private abortControllers = new Map<CancelToken, AbortController>();
   private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
     fetch(...fetchParams);
@@ -72,10 +87,11 @@ export class HttpClient<SecurityDataType = unknown> {
     referrerPolicy: "no-referrer",
   };
 
-  constructor(apiConfig: ApiConfig<SecurityDataType> = {}) {
-    Object.assign(this, apiConfig);
+  constructor() {
+    this.securityService.getAccessToken().subscribe((token) => {
+      this.securityData = token;
+    });
   }
-
   public setSecurityData = (data: SecurityDataType | null) => {
     this.securityData = data;
   };
