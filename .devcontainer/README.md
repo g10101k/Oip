@@ -15,7 +15,7 @@ dotnet dev-certs https --trust
 To start dev containers use:
 
 ````shell
-docker compose -f dev-compose.yml up
+docker compose -f dev.yml up -d
 ````
 
 ## Test Container Startup
@@ -23,5 +23,5 @@ docker compose -f dev-compose.yml up
 To start dev containers use:
 
 ````shell
-docker compose -f test-compose.yml up --build --force-recreate
+docker compose -f test.yml up --build --force-recreate
 ````

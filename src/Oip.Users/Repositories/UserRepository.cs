@@ -142,6 +142,33 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     }
 
     /// <summary>
+    /// Gets a user entity by e-mail.
+    /// </summary>
+    public async Task<UserEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets user entities by identifier list.
+    /// </summary>
+    public async Task<List<UserEntity>> GetByIdsAsync(IEnumerable<int> userIds, CancellationToken cancellationToken = default)
+    {
+        var ids = userIds.Distinct().ToList();
+        if (ids.Count == 0)
+        {
+            return [];
+        }
+
+        return await context.Users
+            .AsNoTracking()
+            .Where(x => ids.Contains(x.UserId))
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// Get user settings
     /// </summary>
     /// <param name="email"></param>

@@ -27,6 +27,15 @@ const PROXY_CONFIG = [
   },
   {
     context: [
+      "/api/discussion"
+    ],
+    target: "https://localhost:5006",
+    secure: false,
+    changeOrigin: true,
+    ws: true,
+  },
+  {
+    context: [
       "/api",
       "/swagger",
       "/health",
