@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Oip.Data.Contexts;
 using Oip.Data.Dtos;
 using Oip.Data.Entities;
+using Oip.Data.Extensions;
 
 namespace Oip.Data.Repositories;
 
@@ -66,11 +67,12 @@ public class ModuleRepository(OipModuleContext db)
     /// <returns>A collection of module instances accessible to the specified roles.</returns>
     public async Task<IEnumerable<ModuleInstanceDto>> GetModuleForMenuAll(List<string> roles)
     {
+        var loadedModules = await WebApplicationBuilderExtension.GetAllLoadedModulesAsync();
+        var modulesLoadedNames = loadedModules.Select(x => x.Name.Replace("Controller", string.Empty)).ToList();
         var query = await db.ModuleInstances
-            .Include(x => x.Module) // Загружаем связанный Module
+            .Include(x => x.Module).Where(x => modulesLoadedNames.Contains(x.Module.Name)) // Загружаем связанный Module
             .Include(x => x.Securities) // Загружаем Securities (если нужно)
-            .Where(m => m.Securities
-                .Any(s => s.Right == "read" && roles.Contains(s.Role)))
+            .Where(m => m.Securities.Any(s => s.Right == "read" && roles.Contains(s.Role)))
             .OrderBy(m => m.Order)
             .ToListAsync();
 
