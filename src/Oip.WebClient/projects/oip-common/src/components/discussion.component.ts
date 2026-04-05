@@ -322,12 +322,11 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                     }
 
                     <div class="flex flex-wrap items-center gap-2">
-                      @for (reaction of getUserReactions(comment); track reaction.emojiCode) {
+                      @for (reaction of getReactions(comment); track reaction.emojiCode) {
                         <p-button
                           [label]="reaction.emojiCode + ' ' + reaction.count"
                           severity="secondary"
                           [outlined]="false"
-                          styleClass="reaction-button"
                           (onClick)="toggleReaction(comment, reaction)"
                         />
                       }
@@ -338,7 +337,6 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                           severity="secondary"
                           [rounded]="true"
                           [text]="true"
-                          styleClass="reaction-button"
                           (onClick)="reactionPopover.toggle($event)"
                         />
                         <p-popover #reactionPopover>
@@ -831,8 +829,8 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     return comment.reactions.some((reaction) => reaction.reactedByCurrentUser);
   }
 
-  getUserReactions(comment: DiscussionComment): DiscussionReaction[] {
-    return comment.reactions.filter((reaction) => reaction.reactedByCurrentUser);
+  getReactions(comment: DiscussionComment): DiscussionReaction[] {
+    return comment.reactions;
   }
 
   private applyReactions(commentId: number, reactions: DiscussionReaction[]): void {
