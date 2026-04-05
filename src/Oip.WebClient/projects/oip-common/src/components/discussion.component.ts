@@ -20,6 +20,7 @@ import { CardModule } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { DividerModule } from 'primeng/divider';
 import { PanelModule } from 'primeng/panel';
+import { PopoverModule } from 'primeng/popover';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
 import { Textarea } from 'primeng/textarea';
@@ -69,6 +70,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
     ConfirmDialog,
     DividerModule,
     PanelModule,
+    PopoverModule,
     ProgressSpinnerModule,
     TagModule,
     Textarea,
@@ -317,24 +319,38 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                     }
 
                     <div class="flex flex-wrap items-center gap-2">
-                      @for (reaction of comment.reactions; track reaction.emojiCode) {
+                      @for (reaction of getUserReactions(comment); track reaction.emojiCode) {
                         <p-button
                           [label]="reaction.emojiCode + ' ' + reaction.count"
                           severity="secondary"
-                          [outlined]="!reaction.reactedByCurrentUser"
+                          [outlined]="false"
                           styleClass="reaction-button"
                           (onClick)="toggleReaction(comment, reaction)"
                         />
                       }
 
-                      @for (emoji of emojiPalette; track emoji) {
+                      @if (!hasUserReaction(comment)) {
                         <p-button
-                          [label]="emoji"
-                          severity="contrast"
+                          icon="pi pi-face-smile"
+                          severity="secondary"
+                          [rounded]="true"
                           [text]="true"
-                          styleClass="reaction-button quick-reaction"
-                          (onClick)="reactWithEmoji(comment, emoji)"
+                          styleClass="reaction-button"
+                          (onClick)="reactionPopover.toggle($event)"
                         />
+                        <p-popover #reactionPopover>
+                          <div class="emoji-popover">
+                            @for (emoji of emojiPalette; track emoji) {
+                              <button
+                                type="button"
+                                class="emoji-option"
+                                (click)="reactWithEmoji(comment, emoji, reactionPopover)"
+                              >
+                                {{ emoji }}
+                              </button>
+                            }
+                          </div>
+                        </p-popover>
                       }
                     </div>
 
@@ -425,6 +441,23 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
         color: #2563eb;
         text-decoration: underline;
         text-underline-offset: 0.18em;
+      }
+
+      .emoji-popover {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        max-width: 16rem;
+      }
+
+      .emoji-option {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.25rem;
+        cursor: pointer;
       }
     `
   ],
@@ -717,10 +750,11 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     }
   }
 
-  async reactWithEmoji(comment: DiscussionComment, emojiCode: string): Promise<void> {
+  async reactWithEmoji(comment: DiscussionComment, emojiCode: string, popover?: { hide: () => void }): Promise<void> {
     try {
       const reactions = await this.discussionApi.addReaction({commentId: comment.commentId, emojiCode});
       this.applyReactions(comment.commentId, reactions.map((item) => this.normalizeReaction(item)));
+      popover?.hide();
     } catch (error) {
       this.msgService.errorFromException(error, 'Failed to add reaction.');
     } finally {
@@ -787,6 +821,14 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       return `${(value / 1024).toFixed(1)} KB`;
     }
     return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  hasUserReaction(comment: DiscussionComment): boolean {
+    return comment.reactions.some((reaction) => reaction.reactedByCurrentUser);
+  }
+
+  getUserReactions(comment: DiscussionComment): DiscussionReaction[] {
+    return comment.reactions.filter((reaction) => reaction.reactedByCurrentUser);
   }
 
   private applyReactions(commentId: number, reactions: DiscussionReaction[]): void {
