@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,12 +23,40 @@ public static class WebApplicationBuilderExtension
     /// <exception cref="InvalidOperationException">Thrown if the <see cref="OipModuleContext"/> cannot be resolved.</exception>
     public static IApplicationBuilder MigrateOipModuleDatabase(this IApplicationBuilder app)
     {
-        using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        var context = serviceScope.ServiceProvider.GetService<OipModuleContext>() ??
-                      throw new InvalidOperationException("Could not find OipModuleContext.");
-        context.Database.Migrate();
+        using var context = app.MigrateDatabaseInternal<OipModuleContext>();
         AddModulesFromAssemblies(context);
         return app;
+    }
+
+    /// <summary>
+    /// Applies any pending migrations for the specified database context.
+    /// </summary>
+    /// <typeparam name="T">The type of the database context to migrate.</typeparam>
+    /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+    /// <returns>The same <see cref="IApplicationBuilder"/> instance, to support method chaining.</returns>
+    public static IApplicationBuilder MigrateDatabase<T>(this IApplicationBuilder app) where T : DbContext
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<T>();
+        context.Database.Migrate();
+        return app;
+    }
+
+    /// <summary>
+    /// Applies any pending migrations for the specified database context.
+    /// </summary>
+    /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+    /// <typeparam name="T">The type of the <see cref="DbContext"/> to migrate.</typeparam>
+    /// <returns>The migrated <see cref="DbContext"/> instance.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the specified <see cref="DbContext"/> cannot be resolved.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static T MigrateDatabaseInternal<T>(this IApplicationBuilder app) where T : DbContext
+    {
+        var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        var context = serviceScope.ServiceProvider.GetService<T>() ??
+                      throw new InvalidOperationException($"Could not find {typeof(T)}.");
+        context.Database.Migrate();
+        return context;
     }
 
     /// <summary>

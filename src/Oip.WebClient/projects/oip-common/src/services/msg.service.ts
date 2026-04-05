@@ -54,6 +54,30 @@ export class MsgService {
     });
   }
 
+  extractErrorMessage(error: unknown, fallback: string): string {
+    if (
+      typeof error === 'object' &&
+      error &&
+      'error' in error &&
+      typeof error.error === 'object' &&
+      error.error &&
+      'message' in error.error &&
+      typeof error.error.message === 'string'
+    ) {
+      return error.error.message;
+    }
+
+    if (typeof error === 'object' && error && 'message' in error && typeof error.message === 'string') {
+      return error.message;
+    }
+
+    return fallback;
+  }
+
+  errorFromException(error: unknown, fallback: string, summary: string = fallback, life: number = this.lifetime) {
+    this.error(this.extractErrorMessage(error, fallback), summary, life);
+  }
+
   contrast(detail: any, summary: any = this.translate.instant('msgService.error'), life: number = this.lifetime) {
     this.messageService.add({
       severity: 'contrast',

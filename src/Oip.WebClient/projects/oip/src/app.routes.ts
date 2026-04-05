@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuardService, NotfoundComponent, AppLayoutComponent } from 'oip-common';
+import { AuthGuardService, NotfoundComponent, AppLayoutComponent, DiscussionComponent } from 'oip-common';
 import { inject } from '@angular/core';
 
 export const appRoutes: Routes = [
@@ -19,6 +19,10 @@ export const appRoutes: Routes = [
           import('./app/components/weather-forecast-module/weather-forecast-module.component').then(
             (m) => m.WeatherForecastModuleComponent
           ),
+        canActivate: [() => inject(AuthGuardService).canActivate()]
+      }, {
+        path: 'discussion/:id',
+        loadComponent: () => import('oip-common').then((m) => m.DiscussionComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
       },
       {
@@ -51,6 +55,6 @@ export const appRoutes: Routes = [
     path: 'unauthorized',
     loadComponent: () => import('oip-common').then((m) => m.UnauthorizedComponent)
   },
-  { path: 'notfound', component: NotfoundComponent },
-  { path: '**', redirectTo: '/notfound' }
+  {path: 'notfound', component: NotfoundComponent},
+  {path: '**', redirectTo: '/notfound'}
 ];

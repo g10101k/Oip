@@ -34,11 +34,17 @@ public class OpenApiItem
     /// Description
     /// </summary>
     public string Description { get; set; } = "Add block \"OpenApi\" in appsettings.json";
-
+    
     /// <summary>
-    /// Command to generate API client.
+    /// Output path for
     /// </summary>
     public string? GenerateCommand { get; set; }
+
+    /// <summary>
+    /// Working directory for generating openapi specification. By default, is null and use SpaProxy config
+    /// Use if service not use SPA
+    /// </summary>
+    public string? WorkingDirectory { get; set; } = null;
 
     /// <summary>
     /// Forces generation of the OpenAPI document, even if no changes are detected.

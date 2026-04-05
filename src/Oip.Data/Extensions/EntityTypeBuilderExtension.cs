@@ -15,20 +15,16 @@ public static class EntityTypeBuilderExtension
     /// <summary>
     /// Set table by default and exec tableBuilder
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="database"></param>
-    /// <param name="tableBuilder"></param>
-    /// <typeparam name="TEntity"></typeparam>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetTable<TEntity>(this EntityTypeBuilder<TEntity> builder, DatabaseFacade database,
         Action<TableBuilder<TEntity>>? tableBuilder = null)
         where TEntity : class
     {
         builder.SetTableWithSchema(database, OipModuleContext.SchemaName, tableBuilder);
     }
-
-
+    
     /// <summary>
-    /// Set table by default and exec tableBuilder
+    /// Set table with schema name for entity type builder, with optional table builder action
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="database"></param>
@@ -37,7 +33,7 @@ public static class EntityTypeBuilderExtension
     /// <typeparam name="TEntity"></typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetTableWithSchema<TEntity>(
-        this EntityTypeBuilder<TEntity> builder, 
+        this EntityTypeBuilder<TEntity> builder,
         DatabaseFacade database,
         string schemaName,
         Action<TableBuilder<TEntity>>? tableBuilder = null)
@@ -51,10 +47,7 @@ public static class EntityTypeBuilderExtension
     /// <summary>
     /// Design without key but using with key
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="designTime"></param>
-    /// <param name="keyExpression"></param>
-    /// <typeparam name="TEntity"></typeparam>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetPrimaryKey<TEntity>(this EntityTypeBuilder<TEntity> builder, bool designTime,
         Expression<Func<TEntity, object?>> keyExpression) where TEntity : class
     {
