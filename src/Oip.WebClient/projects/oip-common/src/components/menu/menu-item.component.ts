@@ -27,6 +27,8 @@ interface MenuItemComponentTranslation {
   deleteItemSuccessMessage: string;
   deleteItemConfirmRejectButtonPropsLabel: string;
   deleteItemConfirmAcceptButtonPropsLabel: string;
+  moveUp: string;
+  moveDown: string
 }
 
 @Component({
@@ -266,7 +268,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
       },
       { separator: true, visible: this.hasVisibleNext(item) || this.hasVisiblePrev(item) },
       {
-        label: 'Up',
+        label: this.localization.moveUp,
         icon: PrimeIcons.ANGLE_UP,
         command: (event) => {
           this.moveUp(item);
@@ -276,7 +278,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
         visible: this.hasVisiblePrev(item)
       },
       {
-        label: 'Down',
+        label: this.localization.moveDown,
         icon: PrimeIcons.ANGLE_DOWN,
         command: (event) => {
           this.moveDown(item);
