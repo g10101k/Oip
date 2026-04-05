@@ -1,43 +1,57 @@
 {
+  "app-configurator": {
+    "primary": "Primary",
+    "surface": "Surface",
+    "presets": "Presets",
+    "menuMode": "Menu Mode"
+  },
   "msgService": {
     "success": "Success",
     "info": "Info",
-    "warn": "Warm",
+    "warn": "Warn",
     "error": "Error",
     "secondary": "Secondary"
   },
   "securityComponent": {
     "security": "Security",
     "save": "Save",
-    "savedSecurity": "Saved security"
+    "savedSecurity": "Security settings saved"
   },
   "profileComponent": {
-    "changePhoto": "Change Photo",
-    "successfullyUploaded": "Successfully uploaded"
+    "changePhoto": "Upload Photo",
+    "successfullyUploaded": "Uploaded successfully"
+  },
+  "configComponent": {
+    "profile": "Profile",
+    "photo": "Photo",
+    "usePhoto256x256Pixel": "Use a 256x256 pixel photo",
+    "localization": "Language",
+    "selectLanguage": "Select language"
   },
   "baseComponent": {
     "content": "Content",
     "settings": "Settings",
     "security": "Security",
-    "success": "Save successfully"
+    "success": "Saved successfully"
   },
   "menuComponent": {
-    "new": "New"
+    "all": "All",
+    "new": "Add"
   },
   "menuItemEditDialogComponent": {
     "header": "Edit menu item",
-    "parentLabel": "Parent",
+    "parentLabel": "Parent item",
     "label": "Label",
     "module": "Module",
-    "selectModule": "",
+    "selectModule": "Select module",
     "icon": "Icon",
     "cancel": "Cancel",
     "save": "Save",
-    "security": "Security - read"
+    "security": "Read access"
   },
   "menuItemCreateDialogComponent": {
-    "header": "Create new menu item",
-    "parentLabel": "Parent",
+    "header": "New menu item",
+    "parentLabel": "Parent item",
     "label": "Label",
     "module": "Module",
     "selectModule": "Select module",
@@ -45,26 +59,22 @@
     "cancel": "Cancel",
     "save": "Save"
   },
+  "unauthorized": {
+    "welcomeToOip": "Welcome to OIP!",
+    "signInToContinue": "Sign in to continue",
+    "signIn": "Sign In"
+  },
   "menuItemComponent": {
     "new": "Add",
     "edit": "Edit",
     "delete": "Delete",
     "deleteItemConfirmHeader": "Delete",
     "deleteItemConfirmMessage": "Are you sure you want to delete the item?",
-    "deleteItemSuccessMessage": "Successfully deleted",
+    "deleteItemSuccessMessage": "Deleted successfully",
     "deleteItemConfirmRejectButtonPropsLabel": "Cancel",
-    "deleteItemConfirmAcceptButtonPropsLabel": "Delete"
-  },
-  "unauthorized": {
-    "welcomeToOip": "Welcome to OIP!",
-    "signInToContinue": "Sign in to continue",
-    "signIn": "Sign In"
-  },
-  "app-configurator": {
-    "primary": "Primary",
-    "surface": "Surface",
-    "presets": "Presets",
-    "menuMode": "Menu Mode"
+    "deleteItemConfirmAcceptButtonPropsLabel": "Delete",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   },
   "topbar": {
     "logout": "Logout",

@@ -40,7 +40,10 @@
   },
   "menuItemEditDialogComponent": {
     "header": "Редактировать элемент меню",
+    "parentLabel": "Родительский узел",
     "label": "Имя",
+    "module": "Модуль",
+    "selectModule": "Выберите модуль",
     "icon": "Иконка",
     "cancel": "Отмена",
     "save": "Сохранить",
@@ -51,7 +54,7 @@
     "parentLabel": "Родительский узел",
     "label": "Имя",
     "module": "Модуль",
-    "selectModule": "Выбери модуль",
+    "selectModule": "Выберите модуль",
     "icon": "Иконка",
     "cancel": "Отмена",
     "save": "Сохранить"
@@ -69,7 +72,9 @@
     "deleteItemConfirmMessage": "Вы уверены что хотите удалить элемент?",
     "deleteItemSuccessMessage": "Успешно удалено",
     "deleteItemConfirmRejectButtonPropsLabel": "Отмена",
-    "deleteItemConfirmAcceptButtonPropsLabel": "Удалить"
+    "deleteItemConfirmAcceptButtonPropsLabel": "Удалить",
+    "moveUp": "Вверх",
+    "moveDown": "Вниз"
   },
   "topbar": {
     "logout": "Выход",
