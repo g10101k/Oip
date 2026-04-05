@@ -8,7 +8,7 @@ import {
   OnDestroy,
   SecurityContext,
   SimpleChanges,
-  inject
+  inject, OnInit
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -73,32 +73,12 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
   ],
   template: `
     <section class="flex flex-col gap-4">
-      <p-card class="discussion-hero">
-        <ng-template pTemplate="header">
-          <div class="hero-header">
-            <div>
-              <div class="eyebrow">
-                <i class="pi pi-comments"></i>
-                <span>Entity Discussion</span>
-              </div>
-              <h3>Comments and collaboration</h3>
-              <p>Entity {{ objectTypeId }} / {{ objectId }}</p>
-            </div>
-            <p-button
-              icon="pi pi-refresh"
-              severity="secondary"
-              [outlined]="true"
-              [loading]="loading"
-              (onClick)="loadComments()"
-            />
-          </div>
-        </ng-template>
-
-        <div class="composer-shell">
+      <p-card class="block">
+        <div class="flex flex-col gap-4">
           @if (!previewMode) {
             <textarea
               pTextarea
-              class="composer-textarea"
+              class="min-h-28 w-full"
               [autoResize]="true"
               rows="5"
               [(ngModel)]="newComment"
@@ -106,26 +86,33 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
               placeholder="Write a comment. Use @email or @first.last for mentions."
             ></textarea>
           } @else {
-            <div class="markdown-preview composer-preview" [innerHTML]="renderMarkdown(newComment)"></div>
+            <div
+              class="markdown-preview min-h-28 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 leading-7 dark:border-surface-700 dark:bg-surface-900/40"
+              [innerHTML]="renderMarkdown(newComment)"
+            ></div>
           }
 
           @if (mentionSuggestions.length > 0) {
-            <p-panel class="mention-panel">
+            <p-panel class="block">
               <ng-template pTemplate="header">
-                <div class="panel-title">
+                <div class="inline-flex items-center gap-2 text-sm font-medium">
                   <i class="pi pi-at"></i>
                   <span>Mention suggestions</span>
                 </div>
               </ng-template>
 
-              <div class="mention-list">
+              <div class="flex flex-col gap-3">
                 @for (candidate of mentionSuggestions; track candidate.userId) {
-                  <button type="button" class="mention-item" (click)="insertMention(candidate)">
-                    <div>
+                  <button
+                    type="button"
+                    class="flex w-full items-center justify-between gap-4 rounded-xl border border-transparent px-3 py-3 text-left transition hover:border-primary-200 hover:bg-primary-50 dark:hover:border-primary-800 dark:hover:bg-primary-950/30"
+                    (click)="insertMention(candidate)"
+                  >
+                    <div class="min-w-0">
                       <strong>{{ candidate.displayName }}</strong>
-                      <small>{{ candidate.email }}</small>
+                      <small class="mt-1 block text-surface-500">{{ candidate.email }}</small>
                     </div>
-                    <i class="pi pi-arrow-up-left"></i>
+                    <i class="pi pi-arrow-up-left shrink-0 text-surface-400"></i>
                   </button>
                 }
               </div>
@@ -133,12 +120,13 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
           }
 
           @if (pendingFiles.length > 0) {
-            <div class="pending-files">
+            <div class="flex flex-col gap-3">
               @for (file of pendingFiles; track file.name + file.size) {
-                <div class="pending-file">
-                  <div class="pending-file-meta">
+                <div
+                  class="flex flex-col gap-3 rounded-2xl border border-surface-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-surface-700">
+                  <div class="inline-flex items-center gap-2">
                     <i class="pi pi-file"></i>
-                    <span>{{ file.name }}</span>
+                    <span class="break-all">{{ file.name }}</span>
                     <p-tag [value]="formatBytes(file.size)" severity="contrast"/>
                   </div>
                   <p-button
@@ -157,7 +145,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
             <p-message severity="error" [textContent]="errorMessage"></p-message>
           }
 
-          <div class="flex justify-end gap-1">
+          <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
             <p-button
               [label]="previewMode ? 'Edit' : 'Preview'"
               [icon]="previewMode ? 'pi pi-pencil' : 'pi pi-eye'"
@@ -175,53 +163,51 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
               />
               <input type="file" multiple (change)="onFilesSelected($event)"/>
             </label>
-            <p-button class=""
-                      label="Send"
-                      icon="pi pi-send"
-                      [loading]="submitting"
-                      [disabled]="submitting || !newComment.trim()"
-                      (onClick)="createComment()"
+            <p-button
+              label="Send"
+              icon="pi pi-send"
+              [loading]="submitting"
+              [disabled]="submitting || !newComment.trim()"
+              (onClick)="createComment()"
             />
           </div>
         </div>
       </p-card>
 
       @if (loading) {
-        <div class="state-card loading-state">
-          <p-progressSpinner strokeWidth="4" class="state-spinner"/>
+        <div
+          class="flex min-h-20 flex-col items-center justify-center gap-3 rounded-2xl border border-surface-200 px-4 py-5 text-surface-500 dark:border-surface-700">
+          <p-progressSpinner strokeWidth="4"/>
           <span>Loading comments...</span>
         </div>
       } @else if (comments.length === 0) {
-        <div class="state-card">
+        <div
+          class="flex min-h-20 items-center justify-center gap-3 rounded-2xl border border-surface-200 px-4 py-5 text-surface-500 dark:border-surface-700">
           <i class="pi pi-inbox"></i>
           <span>No comments yet.</span>
         </div>
       } @else {
-        <div class="comments-list">
+        <div class="flex flex-col gap-4">
           @for (comment of comments; track comment.commentId) {
-            <p-card class="comment-card">
+            <p-card class="block">
               <ng-template pTemplate="content">
-                <div class="comment-layout">
-                  <div class="comment-side">
+                <div class="grid gap-4 md:grid-cols-[3.2rem_minmax(0,1fr)]">
+                  <div>
                     <p-avatar
                       [label]="comment.authorDisplayName.slice(0, 2).toUpperCase()"
                       shape="circle"
-                      class="comment-avatar"
                     />
                   </div>
 
-                  <div class="comment-body">
-                    <div class="comment-header">
-                      <div class="comment-author-block">
-                        <div class="comment-author-line">
-                          <strong>{{ comment.authorDisplayName }}</strong>
-                          <span class="comment-date">{{ comment.createdAt | date: 'short' }}</span>
-                        </div>
-
+                  <div class="flex flex-col gap-2">
+                    <div class="flex flex-row gap-3 justify-between">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <strong>{{ comment.authorDisplayName }}</strong>
+                        <span class="text-sm text-surface-500">{{ comment.createdAt | date: 'short' }}</span>
                       </div>
 
-                      <div class="comment-actions">
-                        <div class="comment-meta-tags">
+                      <div class="flex flex-wrap items-center justify-end gap-2">
+                        <div class="flex flex-wrap items-center">
                           @if (comment.isEdited) {
                             <p-tag value="Edited" icon="pi pi-pencil" severity="warn"/>
                           }
@@ -256,23 +242,23 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                       </div>
                     </div>
                     @if (editingCommentId === comment.commentId) {
-                      <div class="editor-block">
+                      <div class="flex flex-col gap-4">
                         <textarea
                           pTextarea
-                          class="composer-textarea"
+                          class="min-h-24 w-full"
                           [autoResize]="true"
                           rows="4"
                           [(ngModel)]="editContent"
                           placeholder="Edit comment"
                         ></textarea>
-                        <div class="flex justify-end gap-1">
-                          <div class="inline-upload">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                          <div>
                             <label class="file-trigger">
                               <p-button
                                 label="Add attachment"
-                                icon="pi pi-upload"
+                                icon="pi pi-paperclip"
+                                [text]="true"
                                 severity="secondary"
-                                [outlined]="true"
                               />
                               <input type="file" multiple (change)="onInlineFilesSelected(comment, $event)"/>
                             </label>
@@ -298,41 +284,38 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                     }
 
                     @if (comment.attachments.length > 0) {
-                      <ng-template pTemplate="header">
-                        <div class="panel-title">
-                          <i class="pi pi-paperclip"></i>
-                          <span>Attachments</span>
-                        </div>
-                      </ng-template>
+                      <div class="flex flex-col gap-3">
+                        <div class="flex flex-col gap-3">
+                          @for (attachment of comment.attachments; track attachment.attachmentId) {
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                              <div class="inline-flex items-center gap-2">
+                                <i class="pi pi-file"></i>
+                                <button
+                                  type="button"
+                                  class="break-all bg-transparent p-0 text-left font-semibold text-primary-600 transition hover:text-primary-500"
+                                  (click)="downloadAttachment(attachment)"
+                                >
+                                  {{ attachment.fileName }}
+                                </button>
+                                <p-tag [value]="formatBytes(attachment.fileSize)" severity="contrast"/>
+                              </div>
 
-                      <div class="attachment-list">
-                        @for (attachment of comment.attachments; track attachment.attachmentId) {
-                          <div class="attachment-item">
-                            <div class="attachment-main">
-                              <i class="pi pi-file"></i>
-                              <button type="button" class="attachment-link" (click)="downloadAttachment(attachment)">
-                                {{ attachment.fileName }}
-                              </button>
-                              <p-tag [value]="formatBytes(attachment.fileSize)" severity="contrast"/>
+                              @if (comment.canEdit) {
+                                <p-button
+                                  icon="pi pi-times"
+                                  severity="danger"
+                                  [rounded]="true"
+                                  [text]="true"
+                                  (onClick)="deleteAttachment(comment, attachment)"
+                                />
+                              }
                             </div>
-
-                            @if (comment.canEdit) {
-                              <p-button
-                                icon="pi pi-trash"
-                                severity="danger"
-                                [rounded]="true"
-                                [text]="true"
-                                (onClick)="deleteAttachment(comment, attachment)"
-                              />
-                            }
-                          </div>
-                        }
+                          }
+                        </div>
                       </div>
                     }
 
-
-
-                    <div class="reaction-row">
+                    <div class="flex flex-wrap items-center gap-2">
                       @for (reaction of comment.reactions; track reaction.emojiCode) {
                         <p-button
                           [label]="reaction.emojiCode + ' ' + reaction.count"
@@ -355,35 +338,41 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                     </div>
 
                     @if (historyByComment[comment.commentId]?.opened) {
-                      <p-panel class="history-panel" [toggleable]="true" [collapsed]="false">
+                      <p-panel class="block" [toggleable]="true" [collapsed]="false">
                         <ng-template pTemplate="header">
-                          <div class="panel-title">
+                          <div class="inline-flex items-center gap-2 text-sm font-medium">
                             <i class="pi pi-history"></i>
                             <span>Edit history</span>
                           </div>
                         </ng-template>
 
                         @if (historyByComment[comment.commentId]?.loading) {
-                          <div class="history-loading">
+                          <div class="flex items-center gap-3 text-surface-500">
                             <p-progressSpinner strokeWidth="4" styleClass="history-spinner"/>
                             <span>Loading history...</span>
                           </div>
                         } @else {
-                          <div class="history-list">
+                          <div class="flex flex-col gap-4">
                             @for (item of historyByComment[comment.commentId]?.items ?? []; track item.commentEditHistoryId) {
-                              <div class="history-item">
-                                <div class="history-title">
+                              <div class="rounded-2xl border border-surface-200 px-4 py-4 dark:border-surface-700">
+                                <div class="mb-3 inline-flex items-center gap-2 text-sm font-semibold">
                                   <i class="pi pi-clock"></i>
                                   <span>{{ item.editedByDisplayName }} · {{ item.editedAt | date: 'short' }}</span>
                                 </div>
-                                <div class="history-columns">
-                                  <div class="history-column">
+                                <div class="grid gap-4 lg:grid-cols-2">
+                                  <div class="flex flex-col gap-2">
                                     <p-tag value="Before" severity="secondary"/>
-                                    <div class="history-markdown" [innerHTML]="renderMarkdown(item.oldContent)"></div>
+                                    <div
+                                      class="history-markdown rounded-2xl bg-surface-50 px-4 py-3 leading-7 dark:bg-surface-900/40"
+                                      [innerHTML]="renderMarkdown(item.oldContent)"
+                                    ></div>
                                   </div>
-                                  <div class="history-column">
+                                  <div class="flex flex-col gap-2">
                                     <p-tag value="After" severity="success"/>
-                                    <div class="history-markdown" [innerHTML]="renderMarkdown(item.newContent)"></div>
+                                    <div
+                                      class="history-markdown rounded-2xl bg-surface-50 px-4 py-3 leading-7 dark:bg-surface-900/40"
+                                      [innerHTML]="renderMarkdown(item.newContent)"
+                                    ></div>
                                   </div>
                                 </div>
                               </div>
@@ -407,104 +396,6 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
         display: block;
       }
 
-      .hero-header, .comment-header, .comment-actions, .attachment-item, .pending-file {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem;
-      }
-
-      .discussion-hero :is(h3, p),
-      .hero-header :is(h3, p) {
-        margin: 0;
-      }
-
-      .eyebrow,
-      .panel-title,
-      .history-title,
-      .pending-file-meta,
-      .attachment-main {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .eyebrow {
-        font-size: 0.78rem;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: var(--text-color-secondary);
-        margin-bottom: 0.45rem;
-      }
-
-      .hero-header h3 {
-        font-size: 1.45rem;
-        margin-bottom: 0.35rem;
-      }
-
-      .hero-header p,
-      .comment-date {
-        color: var(--text-color-secondary);
-      }
-
-      .composer-shell,
-      .comment-body,
-      .editor-block,
-      .history-list,
-      .attachment-list,
-      .pending-files,
-      .mention-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .comment-meta-tags,
-      .reaction-row {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-
-      .composer-textarea {
-        width: 100%;
-        min-height: 7rem;
-      }
-
-      .composer-preview,
-      .markdown-preview,
-      .history-markdown {
-        border-radius: 1rem;
-        line-height: 1.65;
-        word-break: break-word;
-      }
-
-      .mention-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        width: 100%;
-        border: 0;
-        border-radius: 0.85rem;
-        background: transparent;
-        padding: 0.7rem 0.8rem;
-        text-align: left;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-      }
-
-      .mention-item:hover {
-        background: rgba(59, 130, 246, 0.08);
-      }
-
-      .mention-item small {
-        display: block;
-        margin-top: 0.2rem;
-        color: var(--text-color-secondary, #64748b);
-      }
-
       .file-trigger {
         position: relative;
         display: inline-flex;
@@ -517,123 +408,29 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
         cursor: pointer;
       }
 
-      .pending-file,
-      .attachment-item,
-      .state-card {
-        border: 1px solid var(--surface-border, #dbe4f0);
-        border-radius: 1rem;
-        padding: 0.8rem 0.95rem;
+      .markdown-preview,
+      .history-markdown {
+        word-break: break-word;
       }
 
-      .state-card {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-        min-height: 5rem;
-        color: var(--text-color-secondary, #64748b);
+      .markdown-preview :is(h1, h2, h3),
+      .history-markdown :is(h1, h2, h3) {
+        margin: 0 0 0.75rem;
+        font-weight: 600;
       }
 
-      .loading-state {
-        flex-direction: column;
-      }
-
-      .comments-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .comment-layout {
-        display: grid;
-        grid-template-columns: 3.2rem 1fr;
-        gap: 1rem;
-      }
-
-      .comment-author-block {
-        display: flex;
-        flex-direction: column;
-        gap: 0.45rem;
-      }
-
-      .comment-author-line {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.6rem;
-      }
-
-      .comment-actions {
-        flex-wrap: wrap;
-        justify-content: flex-end;
-      }
-
-      .attachment-link {
-        border: 0;
-        background: transparent;
-        padding: 0;
+      .markdown-preview a,
+      .history-markdown a {
         color: #2563eb;
-        cursor: pointer;
-        font-weight: 600;
-      }
-
-      .reaction-row {
-        margin-top: 0.25rem;
-      }
-
-      .history-loading {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        color: var(--text-color-secondary, #64748b);
-      }
-
-      .history-item {
-        border: 1px solid var(--surface-border, #dbe4f0);
-        border-radius: 1rem;
-        padding: 0.95rem;
-      }
-
-      .history-title {
-        margin-bottom: 0.8rem;
-        font-weight: 600;
-      }
-
-      .history-columns {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.85rem;
-      }
-
-      .history-column {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      @media (max-width: 720px) {
-        .hero-header,
-        .composer-footer,
-        .comment-header,
-        .pending-file,
-        .attachment-item {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        .comment-layout {
-          grid-template-columns: 1fr;
-        }
-
-        .history-columns {
-          grid-template-columns: 1fr;
-        }
+        text-decoration: underline;
+        text-underline-offset: 0.18em;
       }
     `
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DiscussionComponent implements OnChanges, OnDestroy {
+export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
+
   private readonly discussionApi = inject(DiscussionApi);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -657,8 +454,12 @@ export class DiscussionComponent implements OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['objectTypeId'] || changes['objectId']) && this.objectTypeId && this.objectId) {
-      this.loadComments();
+      this.loadComments().then( );
     }
+  }
+
+  async ngOnInit() {
+    await this.loadComments();
   }
 
   ngOnDestroy(): void {
