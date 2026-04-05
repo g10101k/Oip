@@ -78,8 +78,9 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
     DatePipe
   ],
   template: `
+    <p-confirmDialog/>
+
     <section class="flex flex-col gap-4">
-      <p-confirmDialog/>
 
       <p-card class="block">
         <div class="flex flex-col gap-4">
