@@ -13,9 +13,11 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ConfirmationService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 import { DividerModule } from 'primeng/divider';
 import { PanelModule } from 'primeng/panel';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -57,13 +59,14 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
 @Component({
   selector: 'discussion',
   standalone: true,
-  providers: [DiscussionApi],
+  providers: [ConfirmationService, DiscussionApi],
   imports: [
     CommonModule,
     FormsModule,
     AvatarModule,
     ButtonModule,
     CardModule,
+    ConfirmDialog,
     DividerModule,
     PanelModule,
     ProgressSpinnerModule,
@@ -73,6 +76,8 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
   ],
   template: `
     <section class="flex flex-col gap-4">
+      <p-confirmDialog/>
+
       <p-card class="block">
         <div class="flex flex-col gap-4">
           @if (!previewMode) {
@@ -430,6 +435,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   private readonly discussionApi = inject(DiscussionApi);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly confirmationService = inject(ConfirmationService);
 
   @Input({required: true}) objectTypeId = 1;
   @Input({required: true}) objectId = 1;
@@ -552,15 +558,24 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     }
   }
 
-  async deleteComment(comment: DiscussionComment): Promise<void> {
-    try {
-      await this.discussionApi.delete({id: comment.commentId});
-      this.comments = this.comments.filter((item) => item.commentId !== comment.commentId);
-    } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to delete comment.');
-    } finally {
-      this.cdr.markForCheck();
-    }
+  deleteComment(comment: DiscussionComment): void {
+    this.confirmationService.confirm({
+      header: 'Warning',
+      message: 'Are you sure you want to delete this comment?',
+      icon: 'pi pi-trash',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true
+      },
+      acceptButtonProps: {
+        label: 'Delete',
+        severity: 'danger'
+      },
+      accept: async () => {
+        await this.performDeleteComment(comment);
+      }
+    });
   }
 
   async toggleHistory(comment: DiscussionComment): Promise<void> {
@@ -625,7 +640,38 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     }
   }
 
-  async deleteAttachment(comment: DiscussionComment, attachment: DiscussionAttachment): Promise<void> {
+  deleteAttachment(comment: DiscussionComment, attachment: DiscussionAttachment): void {
+    this.confirmationService.confirm({
+      header: 'Warning',
+      message: `Are you sure you want to delete the file "${attachment.fileName}"?`,
+      icon: 'pi pi-trash',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true
+      },
+      acceptButtonProps: {
+        label: 'Delete',
+        severity: 'danger'
+      },
+      accept: async () => {
+        await this.performDeleteAttachment(comment, attachment);
+      }
+    });
+  }
+
+  private async performDeleteComment(comment: DiscussionComment): Promise<void> {
+    try {
+      await this.discussionApi.delete({id: comment.commentId});
+      this.comments = this.comments.filter((item) => item.commentId !== comment.commentId);
+    } catch (error) {
+      this.msgService.errorFromException(error, 'Failed to delete comment.');
+    } finally {
+      this.cdr.markForCheck();
+    }
+  }
+
+  private async performDeleteAttachment(comment: DiscussionComment, attachment: DiscussionAttachment): Promise<void> {
     try {
       await this.discussionApi.deleteAttachment({id: attachment.attachmentId});
       this.comments = this.comments.map((item) =>
