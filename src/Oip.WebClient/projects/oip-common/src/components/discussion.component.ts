@@ -34,6 +34,7 @@ import {
 import { DiscussionApi } from '../api/discussion.api';
 import { MsgService } from "../services/msg.service";
 import { LayoutService } from "../services/app.layout.service";
+import { getInitialsFromString } from "../helpers/avatar.helper";
 
 type HistoryState = {
   loading: boolean;
@@ -199,7 +200,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                 <div class="grid gap-4 md:grid-cols-[3.2rem_minmax(0,1fr)]">
                   <div>
                     <p-avatar
-                      [label]="comment.authorDisplayName.slice(0, 2).toUpperCase()"
+                      [label]="getInitialsFromString(comment.authorDisplayName)"
                       shape="circle"
                     />
                   </div>
@@ -366,7 +367,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
 
                         @if (historyByComment[comment.commentId]?.loading) {
                           <div class="flex items-center gap-3 text-surface-500">
-                            <p-progressSpinner strokeWidth="4" styleClass="history-spinner"/>
+                            <p-progressSpinner strokeWidth="4"/>
                             <span>Loading history...</span>
                           </div>
                         } @else {
@@ -897,4 +898,5 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     return match?.[1] ?? null;
   }
 
+  protected readonly getInitialsFromString = getInitialsFromString;
 }
