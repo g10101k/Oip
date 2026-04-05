@@ -53,7 +53,7 @@ public class CommentService(
         var comments = await discussionsDbContext.Comments
             .AsNoTracking()
             .Where(c => c.ObjectTypeId == objectTypeId && c.ObjectId == objectId)
-            .OrderBy(c => c.CreatedAt)
+            .OrderByDescending(c => c.CreatedAt)
             .Skip(skip)
             .Take(take)
             .ToListAsync(cancellationToken);
