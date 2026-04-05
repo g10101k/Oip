@@ -75,6 +75,46 @@
     "logout": "Выход",
     "profile": "Профиль"
   },
+  "discussionComponent": {
+    "writeCommentPlaceholder": "Напишите комментарий. Используйте @email или @first.last для упоминаний.",
+    "mentionSuggestions": "Варианты упоминаний",
+    "edit": "Редактировать",
+    "preview": "Предпросмотр",
+    "attachFiles": "Прикрепить файлы",
+    "send": "Отправить",
+    "loadingComments": "Загрузка комментариев...",
+    "noCommentsYet": "Комментариев пока нет.",
+    "edited": "Изменено",
+    "editCommentPlaceholder": "Изменить комментарий",
+    "addAttachment": "Добавить вложение",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "editHistory": "История изменений",
+    "loadingHistory": "Загрузка истории...",
+    "before": "До",
+    "after": "После",
+    "warning": "Предупреждение",
+    "delete": "Удалить",
+    "confirmDeleteComment": "Вы уверены, что хотите удалить этот комментарий?",
+    "confirmDeleteFile": "Вы уверены, что хотите удалить файл \"{{fileName}}\"?",
+    "units": {
+      "bytes": "Б",
+      "kilobytes": "КБ",
+      "megabytes": "МБ"
+    },
+    "errors": {
+      "loadComments": "Не удалось загрузить комментарии.",
+      "createComment": "Не удалось создать комментарий.",
+      "updateComment": "Не удалось обновить комментарий.",
+      "loadEditHistory": "Не удалось загрузить историю изменений.",
+      "uploadAttachment": "Не удалось загрузить вложение.",
+      "deleteComment": "Не удалось удалить комментарий.",
+      "deleteAttachment": "Не удалось удалить вложение.",
+      "downloadAttachment": "Не удалось скачать вложение.",
+      "updateReaction": "Не удалось обновить реакцию.",
+      "addReaction": "Не удалось добавить реакцию."
+    }
+  },
   "primeng": {
     "accept": "Да",
     "addRule": "Добавить правило",

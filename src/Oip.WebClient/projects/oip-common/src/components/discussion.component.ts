@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ConfirmationService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
@@ -76,7 +77,8 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
     ProgressSpinnerModule,
     TagModule,
     Textarea,
-    DatePipe
+    DatePipe,
+    TranslatePipe
   ],
   template: `
     <p-confirmDialog/>
@@ -93,7 +95,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
               rows="5"
               [(ngModel)]="newComment"
               (ngModelChange)="onComposerInput()"
-              placeholder="Write a comment. Use @email or @first.last for mentions."
+              [placeholder]="'discussionComponent.writeCommentPlaceholder' | translate"
             ></textarea>
           } @else {
             <div
@@ -107,7 +109,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
               <ng-template pTemplate="header">
                 <div class="inline-flex items-center gap-2 text-sm font-medium">
                   <i class="pi pi-at"></i>
-                  <span>Mention suggestions</span>
+                  <span>{{ 'discussionComponent.mentionSuggestions' | translate }}</span>
                 </div>
               </ng-template>
 
@@ -153,7 +155,11 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
 
           <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
             <p-button
-              [label]="previewMode ? 'Edit' : 'Preview'"
+              [label]="
+                previewMode
+                  ? ('discussionComponent.edit' | translate)
+                  : ('discussionComponent.preview' | translate)
+              "
               [icon]="previewMode ? 'pi pi-pencil' : 'pi pi-eye'"
               severity="secondary"
               [text]="true"
@@ -162,7 +168,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
 
             <label class="file-trigger">
               <p-button
-                label="Attach files"
+                [label]="'discussionComponent.attachFiles' | translate"
                 icon="pi pi-paperclip"
                 severity="secondary"
                 [text]="true"
@@ -170,7 +176,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
               <input type="file" multiple (change)="onFilesSelected($event)"/>
             </label>
             <p-button
-              label="Send"
+              [label]="'discussionComponent.send' | translate"
               icon="pi pi-send"
               [loading]="submitting"
               [disabled]="submitting || !newComment.trim()"
@@ -184,13 +190,13 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
         <div
           class="flex min-h-20 flex-col items-center justify-center gap-3 rounded-2xl border border-surface-200 px-4 py-5 text-surface-500 dark:border-surface-700">
           <p-progressSpinner strokeWidth="4"/>
-          <span>Loading comments...</span>
+          <span>{{ 'discussionComponent.loadingComments' | translate }}</span>
         </div>
       } @else if (comments.length === 0) {
         <div
           class="flex min-h-20 items-center justify-center gap-3 rounded-2xl border border-surface-200 px-4 py-5 text-surface-500 dark:border-surface-700">
           <i class="pi pi-inbox"></i>
-          <span>No comments yet.</span>
+          <span>{{ 'discussionComponent.noCommentsYet' | translate }}</span>
         </div>
       } @else {
         <div class="flex flex-col gap-4">
@@ -216,7 +222,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                       <div class="flex flex-wrap items-center justify-end gap-2">
                         <div class="flex flex-wrap items-center">
                           @if (comment.isEdited) {
-                            <p-tag value="Edited" icon="pi pi-pencil" severity="warn"/>
+                            <p-tag [value]="'discussionComponent.edited' | translate" icon="pi pi-pencil" severity="warn"/>
                           }
                         </div>
                         @if (comment.canEdit) {
@@ -256,13 +262,13 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                           [autoResize]="true"
                           rows="4"
                           [(ngModel)]="editContent"
-                          placeholder="Edit comment"
+                          [placeholder]="'discussionComponent.editCommentPlaceholder' | translate"
                         ></textarea>
                         <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
                           <div>
                             <label class="file-trigger">
                               <p-button
-                                label="Add attachment"
+                                [label]="'discussionComponent.addAttachment' | translate"
                                 icon="pi pi-paperclip"
                                 [text]="true"
                                 severity="secondary"
@@ -272,13 +278,13 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                           </div>
 
                           <p-button
-                            label="Save"
+                            [label]="'discussionComponent.save' | translate"
                             icon="pi pi-check"
                             [disabled]="!editContent.trim()"
                             (onClick)="saveEdit(comment)"
                           />
                           <p-button
-                            label="Cancel"
+                            [label]="'discussionComponent.cancel' | translate"
                             icon="pi pi-times"
                             severity="secondary"
                             [text]="true"
@@ -361,14 +367,14 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                         <ng-template pTemplate="header">
                           <div class="inline-flex items-center gap-2 text-sm font-medium">
                             <i class="pi pi-history"></i>
-                            <span>Edit history</span>
+                            <span>{{ 'discussionComponent.editHistory' | translate }}</span>
                           </div>
                         </ng-template>
 
                         @if (historyByComment[comment.commentId]?.loading) {
                           <div class="flex items-center gap-3 text-surface-500">
                             <p-progressSpinner strokeWidth="4"/>
-                            <span>Loading history...</span>
+                            <span>{{ 'discussionComponent.loadingHistory' | translate }}</span>
                           </div>
                         } @else {
                           <div class="flex flex-col gap-4">
@@ -380,14 +386,14 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                                 </div>
                                 <div class="grid gap-4 lg:grid-cols-2">
                                   <div class="flex flex-col gap-2">
-                                    <p-tag value="Before" severity="secondary"/>
+                                    <p-tag [value]="'discussionComponent.before' | translate" severity="secondary"/>
                                     <div
                                       class="history-markdown rounded-2xl bg-surface-50 px-4 py-3 leading-7 dark:bg-surface-900/40"
                                       [innerHTML]="renderMarkdown(item.oldContent)"
                                     ></div>
                                   </div>
                                   <div class="flex flex-col gap-2">
-                                    <p-tag value="After" severity="success"/>
+                                    <p-tag [value]="'discussionComponent.after' | translate" severity="success"/>
                                     <div
                                       class="history-markdown rounded-2xl bg-surface-50 px-4 py-3 leading-7 dark:bg-surface-900/40"
                                       [innerHTML]="renderMarkdown(item.newContent)"
@@ -469,6 +475,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   private readonly msgService = inject(MsgService);
   private readonly discussionApi = inject(DiscussionApi);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly translateService = inject(TranslateService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly confirmationService = inject(ConfirmationService);
   protected readonly layoutService = inject(LayoutService);
@@ -522,7 +529,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       });
       this.comments = items.map((item) => this.normalizeComment(item));
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to load comments.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.loadComments'));
     } finally {
       this.loading = false;
       this.cdr.markForCheck();
@@ -560,7 +567,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       this.mentionSuggestions = [];
       await this.loadComments();
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to create comment.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.createComment'));
     } finally {
       this.submitting = false;
       this.cdr.markForCheck();
@@ -588,7 +595,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       );
       this.cancelEdit();
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to update comment.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.updateComment'));
     } finally {
       this.cdr.markForCheck();
     }
@@ -596,16 +603,16 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
 
   deleteComment(comment: DiscussionComment): void {
     this.confirmationService.confirm({
-      header: 'Warning',
-      message: 'Are you sure you want to delete this comment?',
+      header: this.translateService.instant('discussionComponent.warning'),
+      message: this.translateService.instant('discussionComponent.confirmDeleteComment'),
       icon: 'pi pi-trash',
       rejectButtonProps: {
-        label: 'Cancel',
+        label: this.translateService.instant('discussionComponent.cancel'),
         severity: 'secondary',
         outlined: true
       },
       acceptButtonProps: {
-        label: 'Delete',
+        label: this.translateService.instant('discussionComponent.delete'),
         severity: 'danger'
       },
       accept: async () => {
@@ -636,7 +643,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
         items: items.map((item) => this.normalizeHistoryItem(item))
       };
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to load edit history.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.loadEditHistory'));
       this.historyByComment[comment.commentId] = {
         opened: false,
         loading: false,
@@ -671,23 +678,23 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       }
       await this.loadComments();
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to upload attachment.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.uploadAttachment'));
       this.cdr.markForCheck();
     }
   }
 
   deleteAttachment(comment: DiscussionComment, attachment: DiscussionAttachment): void {
     this.confirmationService.confirm({
-      header: 'Warning',
-      message: `Are you sure you want to delete the file "${attachment.fileName}"?`,
+      header: this.translateService.instant('discussionComponent.warning'),
+      message: this.translateService.instant('discussionComponent.confirmDeleteFile', { fileName: attachment.fileName }),
       icon: 'pi pi-trash',
       rejectButtonProps: {
-        label: 'Cancel',
+        label: this.translateService.instant('discussionComponent.cancel'),
         severity: 'secondary',
         outlined: true
       },
       acceptButtonProps: {
-        label: 'Delete',
+        label: this.translateService.instant('discussionComponent.delete'),
         severity: 'danger'
       },
       accept: async () => {
@@ -701,7 +708,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       await this.discussionApi.delete({id: comment.commentId});
       this.comments = this.comments.filter((item) => item.commentId !== comment.commentId);
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to delete comment.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.deleteComment'));
     } finally {
       this.cdr.markForCheck();
     }
@@ -716,7 +723,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
           : item
       );
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to delete attachment.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.deleteAttachment'));
     } finally {
       this.cdr.markForCheck();
     }
@@ -735,7 +742,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       link.click();
       URL.revokeObjectURL(url);
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to download attachment.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.downloadAttachment'));
       this.cdr.markForCheck();
     }
   }
@@ -747,7 +754,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
         : await this.discussionApi.addReaction({commentId: comment.commentId, emojiCode: reaction.emojiCode});
       this.applyReactions(comment.commentId, reactions.map((item) => this.normalizeReaction(item)));
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to update reaction.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.updateReaction'));
     } finally {
       this.cdr.markForCheck();
     }
@@ -759,7 +766,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       this.applyReactions(comment.commentId, reactions.map((item) => this.normalizeReaction(item)));
       popover?.hide();
     } catch (error) {
-      this.msgService.errorFromException(error, 'Failed to add reaction.');
+      this.msgService.errorFromException(error, this.translateService.instant('discussionComponent.errors.addReaction'));
     } finally {
       this.cdr.markForCheck();
     }
@@ -818,12 +825,12 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
 
   formatBytes(value: number): string {
     if (value < 1024) {
-      return `${value} B`;
+      return `${value} ${this.translateService.instant('discussionComponent.units.bytes')}`;
     }
     if (value < 1024 * 1024) {
-      return `${(value / 1024).toFixed(1)} KB`;
+      return `${(value / 1024).toFixed(1)} ${this.translateService.instant('discussionComponent.units.kilobytes')}`;
     }
-    return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(value / (1024 * 1024)).toFixed(1)} ${this.translateService.instant('discussionComponent.units.megabytes')}`;
   }
 
   hasUserReaction(comment: DiscussionComment): boolean {
