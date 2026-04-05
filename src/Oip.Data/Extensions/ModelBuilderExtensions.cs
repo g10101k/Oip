@@ -9,7 +9,7 @@ namespace Oip.Data.Extensions;
 public static class ModelBuilderExtensions
 {
     /// <summary>
-    /// Add xml doc annotation
+    /// Add XML doc annotation
     /// </summary>
     /// <param name="modelBuilder"></param>
     /// <param name="designTime"></param>

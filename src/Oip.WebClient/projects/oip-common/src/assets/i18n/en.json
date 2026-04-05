@@ -70,5 +70,45 @@
     "logout": "Logout",
     "profile": "Profile"
   },
+  "discussionComponent": {
+    "writeCommentPlaceholder": "Write a comment. Use @email or @first.last for mentions.",
+    "mentionSuggestions": "Mention suggestions",
+    "edit": "Edit",
+    "preview": "Preview",
+    "attachFiles": "Attach files",
+    "send": "Send",
+    "loadingComments": "Loading comments...",
+    "noCommentsYet": "No comments yet.",
+    "edited": "Edited",
+    "editCommentPlaceholder": "Edit comment",
+    "addAttachment": "Add attachment",
+    "save": "Save",
+    "cancel": "Cancel",
+    "editHistory": "Edit history",
+    "loadingHistory": "Loading history...",
+    "before": "Before",
+    "after": "After",
+    "warning": "Warning",
+    "delete": "Delete",
+    "confirmDeleteComment": "Are you sure you want to delete this comment?",
+    "confirmDeleteFile": "Are you sure you want to delete the file \"{{fileName}}\"?",
+    "units": {
+      "bytes": "B",
+      "kilobytes": "KB",
+      "megabytes": "MB"
+    },
+    "errors": {
+      "loadComments": "Failed to load comments.",
+      "createComment": "Failed to create comment.",
+      "updateComment": "Failed to update comment.",
+      "loadEditHistory": "Failed to load edit history.",
+      "uploadAttachment": "Failed to upload attachment.",
+      "deleteComment": "Failed to delete comment.",
+      "deleteAttachment": "Failed to delete attachment.",
+      "downloadAttachment": "Failed to download attachment.",
+      "updateReaction": "Failed to update reaction.",
+      "addReaction": "Failed to add reaction."
+    }
+  },
   "primeng": ""
 }

@@ -86,3 +86,4 @@ The library supports a role-based security model:
 - Available modules are filtered based on roles
 
 Use `ModuleRepository` methods to manage access rights for specific modules.
+

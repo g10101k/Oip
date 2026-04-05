@@ -21,9 +21,6 @@ public class ModuleController(ModuleRepository moduleRepository) : ControllerBas
     /// <summary>
     /// Retrieves all modules stored in the system.
     /// </summary>
-    /// <remarks>
-    /// Only accessible to users with the Admin role.
-    /// </remarks>
     /// <returns>A list of <see cref="ModuleDto"/> objects representing all modules.</returns>
     [HttpGet("get-all")]
     [Authorize(Roles = SecurityConstants.AdminRole)]

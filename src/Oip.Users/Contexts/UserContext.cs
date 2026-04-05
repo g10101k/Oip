@@ -67,7 +67,6 @@ public class UserContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration(Database, _designTime));
-
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }
 
