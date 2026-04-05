@@ -33,6 +33,7 @@ import {
 } from '../api/discussion-data-contracts';
 import { DiscussionApi } from '../api/discussion.api';
 import { MsgService } from "../services/msg.service";
+import { LayoutService } from "../services/app.layout.service";
 
 type HistoryState = {
   loading: boolean;
@@ -206,7 +207,8 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                     <div class="flex flex-row gap-3 justify-between">
                       <div class="flex flex-wrap items-center gap-2">
                         <strong>{{ comment.authorDisplayName }}</strong>
-                        <span class="text-sm text-surface-500">{{ comment.createdAt | date: 'short' }}</span>
+                        <span
+                          class="text-sm text-surface-500">{{ comment.createdAt | date: layoutService.dateTimeFormat() }}</span>
                       </div>
 
                       <div class="flex flex-wrap items-center justify-end gap-2">
@@ -469,6 +471,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly confirmationService = inject(ConfirmationService);
+  protected readonly layoutService = inject(LayoutService);
 
   @Input({required: true}) objectTypeId = 1;
   @Input({required: true}) objectId = 1;
