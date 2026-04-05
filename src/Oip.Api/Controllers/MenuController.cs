@@ -24,7 +24,8 @@ public class MenuController(ModuleRepository moduleRepository, UserService userS
     [Authorize, HttpGet("get")]
     public async Task<IEnumerable<ModuleInstanceDto>> Get()
     {
-        return await moduleRepository.GetModuleForMenuAll(userService.GetUserRoles());
+        var menu = await moduleRepository.GetModuleForMenuAll(userService.GetUserRoles());
+        return menu;
     }
 
     /// <summary>
