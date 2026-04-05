@@ -8,7 +8,8 @@ import {
   OnDestroy,
   SecurityContext,
   SimpleChanges,
-  inject, OnInit
+  inject,
+  OnInit
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -16,7 +17,6 @@ import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
-import { MessageModule } from 'primeng/message';
 import { PanelModule } from 'primeng/panel';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
@@ -29,6 +29,7 @@ import {
   MentionUserDto
 } from '../api/discussion-data-contracts';
 import { DiscussionApi } from '../api/discussion.api';
+import { MsgService } from "../services/msg.service";
 
 type HistoryState = {
   loading: boolean;
@@ -64,7 +65,6 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
     ButtonModule,
     CardModule,
     DividerModule,
-    MessageModule,
     PanelModule,
     ProgressSpinnerModule,
     TagModule,
@@ -139,10 +139,6 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                 </div>
               }
             </div>
-          }
-
-          @if (errorMessage) {
-            <p-message severity="error" [textContent]="errorMessage"></p-message>
           }
 
           <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
@@ -430,13 +426,13 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
-
+  private readonly msgService = inject(MsgService);
   private readonly discussionApi = inject(DiscussionApi);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  @Input({ required: true }) objectTypeId = 1;
-  @Input({ required: true }) objectId = 1;
+  @Input({required: true}) objectTypeId = 1;
+  @Input({required: true}) objectId = 1;
 
   comments: DiscussionComment[] = [];
   loading = false;
@@ -445,7 +441,6 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   newComment = '';
   editContent = '';
   editingCommentId: number | null = null;
-  errorMessage = '';
   pendingFiles: File[] = [];
   mentionSuggestions: DiscussionMentionUser[] = [];
   historyByComment: Record<number, HistoryState> = {};
@@ -454,7 +449,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['objectTypeId'] || changes['objectId']) && this.objectTypeId && this.objectId) {
-      this.loadComments().then( );
+      this.loadComments().then();
     }
   }
 
@@ -474,7 +469,6 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     }
 
     this.loading = true;
-    this.errorMessage = '';
     this.cdr.markForCheck();
 
     try {
@@ -486,7 +480,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       });
       this.comments = items.map((item) => this.normalizeComment(item));
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to load comments.');
+      this.msgService.errorFromException(error, 'Failed to load comments.');
     } finally {
       this.loading = false;
       this.cdr.markForCheck();
@@ -500,7 +494,6 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     }
 
     this.submitting = true;
-    this.errorMessage = '';
     this.cdr.markForCheck();
 
     try {
@@ -525,7 +518,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       this.mentionSuggestions = [];
       await this.loadComments();
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to create comment.');
+      this.msgService.errorFromException(error, 'Failed to create comment.');
     } finally {
       this.submitting = false;
       this.cdr.markForCheck();
@@ -545,15 +538,15 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   async saveEdit(comment: DiscussionComment): Promise<void> {
     try {
       const updated = await this.discussionApi.update(
-        { id: comment.commentId },
-        { content: this.editContent.trim() }
+        {id: comment.commentId},
+        {content: this.editContent.trim()}
       );
       this.comments = this.comments.map((item) =>
         item.commentId === comment.commentId ? this.normalizeComment(updated) : item
       );
       this.cancelEdit();
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to update comment.');
+      this.msgService.errorFromException(error, 'Failed to update comment.');
     } finally {
       this.cdr.markForCheck();
     }
@@ -561,10 +554,10 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
 
   async deleteComment(comment: DiscussionComment): Promise<void> {
     try {
-      await this.discussionApi.delete({ id: comment.commentId });
+      await this.discussionApi.delete({id: comment.commentId});
       this.comments = this.comments.filter((item) => item.commentId !== comment.commentId);
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to delete comment.');
+      this.msgService.errorFromException(error, 'Failed to delete comment.');
     } finally {
       this.cdr.markForCheck();
     }
@@ -573,7 +566,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   async toggleHistory(comment: DiscussionComment): Promise<void> {
     const current = this.historyByComment[comment.commentId];
     if (current?.opened) {
-      this.historyByComment[comment.commentId] = { ...current, opened: false };
+      this.historyByComment[comment.commentId] = {...current, opened: false};
       return;
     }
 
@@ -585,14 +578,14 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     this.cdr.markForCheck();
 
     try {
-      const items = await this.discussionApi.getHistory({ id: comment.commentId });
+      const items = await this.discussionApi.getHistory({id: comment.commentId});
       this.historyByComment[comment.commentId] = {
         opened: true,
         loading: false,
         items: items.map((item) => this.normalizeHistoryItem(item))
       };
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to load edit history.');
+      this.msgService.errorFromException(error, 'Failed to load edit history.');
       this.historyByComment[comment.commentId] = {
         opened: false,
         loading: false,
@@ -627,21 +620,21 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       }
       await this.loadComments();
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to upload attachment.');
+      this.msgService.errorFromException(error, 'Failed to upload attachment.');
       this.cdr.markForCheck();
     }
   }
 
   async deleteAttachment(comment: DiscussionComment, attachment: DiscussionAttachment): Promise<void> {
     try {
-      await this.discussionApi.deleteAttachment({ id: attachment.attachmentId });
+      await this.discussionApi.deleteAttachment({id: attachment.attachmentId});
       this.comments = this.comments.map((item) =>
         item.commentId === comment.commentId
-          ? { ...item, attachments: item.attachments.filter((entry) => entry.attachmentId !== attachment.attachmentId) }
+          ? {...item, attachments: item.attachments.filter((entry) => entry.attachmentId !== attachment.attachmentId)}
           : item
       );
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to delete attachment.');
+      this.msgService.errorFromException(error, 'Failed to delete attachment.');
     } finally {
       this.cdr.markForCheck();
     }
@@ -650,8 +643,8 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   async downloadAttachment(attachment: DiscussionAttachment): Promise<void> {
     try {
       const blob = (await this.discussionApi.getAttachmentContent(
-        { id: attachment.attachmentId },
-        { format: 'blob' }
+        {id: attachment.attachmentId},
+        {format: 'blob'}
       )) as unknown as Blob;
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -660,7 +653,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
       link.click();
       URL.revokeObjectURL(url);
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to download attachment.');
+      this.msgService.errorFromException(error, 'Failed to download attachment.');
       this.cdr.markForCheck();
     }
   }
@@ -668,11 +661,11 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   async toggleReaction(comment: DiscussionComment, reaction: DiscussionReaction): Promise<void> {
     try {
       const reactions = reaction.reactedByCurrentUser
-        ? await this.discussionApi.removeReaction({ commentId: comment.commentId, emojiCode: reaction.emojiCode })
-        : await this.discussionApi.addReaction({ commentId: comment.commentId, emojiCode: reaction.emojiCode });
+        ? await this.discussionApi.removeReaction({commentId: comment.commentId, emojiCode: reaction.emojiCode})
+        : await this.discussionApi.addReaction({commentId: comment.commentId, emojiCode: reaction.emojiCode});
       this.applyReactions(comment.commentId, reactions.map((item) => this.normalizeReaction(item)));
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to update reaction.');
+      this.msgService.errorFromException(error, 'Failed to update reaction.');
     } finally {
       this.cdr.markForCheck();
     }
@@ -680,10 +673,10 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
 
   async reactWithEmoji(comment: DiscussionComment, emojiCode: string): Promise<void> {
     try {
-      const reactions = await this.discussionApi.addReaction({ commentId: comment.commentId, emojiCode });
+      const reactions = await this.discussionApi.addReaction({commentId: comment.commentId, emojiCode});
       this.applyReactions(comment.commentId, reactions.map((item) => this.normalizeReaction(item)));
     } catch (error) {
-      this.errorMessage = this.extractErrorMessage(error, 'Failed to add reaction.');
+      this.msgService.errorFromException(error, 'Failed to add reaction.');
     } finally {
       this.cdr.markForCheck();
     }
@@ -703,7 +696,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
 
     this.mentionSearchTimer = setTimeout(async () => {
       try {
-        const users = await this.discussionApi.searchMentionUsers({ term: token });
+        const users = await this.discussionApi.searchMentionUsers({term: token});
         this.mentionSuggestions = users.map((item) => this.normalizeMentionUser(item));
       } catch {
         this.mentionSuggestions = [];
@@ -751,7 +744,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   private applyReactions(commentId: number, reactions: DiscussionReaction[]): void {
-    this.comments = this.comments.map((item) => (item.commentId === commentId ? { ...item, reactions } : item));
+    this.comments = this.comments.map((item) => (item.commentId === commentId ? {...item, reactions} : item));
   }
 
   private normalizeComment(comment: CommentDto): DiscussionComment {
@@ -814,11 +807,4 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     return match?.[1] ?? null;
   }
 
-  private extractErrorMessage(error: unknown, fallback: string): string {
-    if (typeof error === 'object' && error && 'message' in error && typeof error.message === 'string') {
-      return error.message;
-    }
-
-    return fallback;
-  }
 }
