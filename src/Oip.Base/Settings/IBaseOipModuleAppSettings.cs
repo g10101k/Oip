@@ -36,4 +36,10 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     [NotSaveToDb]
     OpenTelemetrySettings OpenTelemetry { get; set; }
+
+    /// <summary>
+    /// Is the application running in standalone mode?
+    /// </summary>
+    [NotSaveToDb]
+    bool IsStandalone { get; set; }
 }
