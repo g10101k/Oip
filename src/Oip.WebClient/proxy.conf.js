@@ -2,8 +2,27 @@ const {env} = require('process');
 
 const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
   env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:5002';
+const appMode = env.OIP_APP_MODE === 'distributed' ? 'distributed' : 'standalone';
 
-const PROXY_CONFIG = [
+const standaloneProxy = [
+  {
+    context: [
+      "/api",
+      "/swagger",
+      "/health",
+      "/metrics",
+      "/hubs/notification"
+    ],
+    target: target,
+    secure: false,
+    headers: {
+      Connection: 'Keep-Alive'
+    },
+    ws: true
+  }
+];
+
+const distributedProxy = [
   {
     context: [
       "/api/users",
@@ -47,8 +66,9 @@ const PROXY_CONFIG = [
       Connection: 'Keep-Alive'
     },
     ws: true
-  },
+  }
+];
 
-]
+const PROXY_CONFIG = appMode === 'distributed' ? distributedProxy : standaloneProxy;
 
-module.exports = PROXY_CONFIG;
+module.exports = distributedProxy;
