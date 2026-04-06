@@ -10,6 +10,7 @@ namespace Oip.Discussions.Data.EntityConfigurations;
 /// </summary>
 /// <param name="database">Database facade instance</param>
 /// <param name="designTime">Indicates if configuration is running during design time</param>
+/// <param name="schemaName">Database schema name used for table mapping</param>
 public class CommentEntityConfiguration(DatabaseFacade database, bool designTime, string schemaName)
     : IEntityTypeConfiguration<CommentEntity>
 {
