@@ -89,20 +89,20 @@ public class UserService(IServiceScopeFactory scopeFactory, ILogger<UserService>
 
             // Calculate next page token
             var nextPageToken = string.Empty;
-            if (pageNumber * pageSize < res.TotalPages)
+            if (pageNumber * pageSize < res.TotalCount)
             {
                 nextPageToken = (pageNumber + 1).ToString();
             }
-
+ 
             var response = new GetAllUsersResponse
             {
                 Users = { grpcUsers },
                 NextPageToken = nextPageToken,
-                TotalCount = res.TotalPages
+                TotalCount = res.TotalCount
             };
-
+ 
             logger.LogDebug("Retrieved {Count} users for page {PageNumber} (size {PageSize}), total: {TotalCount}",
-                grpcUsers.Count, pageNumber, pageSize, res.TotalPages);
+                grpcUsers.Count, pageNumber, pageSize, res.TotalCount);
 
             return response;
         });

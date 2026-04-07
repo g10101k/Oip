@@ -82,6 +82,7 @@
           },
           "defaultConfiguration": "development",
           "options": {
+            "proxyConfig": "proxy.conf.js",
             "publicHost": "https://localhost:50002",
             "port": 50002,
             "headers": {

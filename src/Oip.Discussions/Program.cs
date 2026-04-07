@@ -7,6 +7,7 @@ using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
 using Oip.Discussions.Extensions;
 using Oip.Discussions.Settings;
+using Oip.Users.Extensions;
 
 namespace Oip.Discussions;
 
@@ -14,10 +15,17 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
-        var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+            var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
         try
         {
             var settings = AppSettings.Initialize(args, false, true);
+
+            if (settings.IsStandalone)
+            {
+                logger.Warn("Oip.Discussions service is configured to run in Standalone mode. Run the main Oip host instead.");
+                return;
+            }
+
             var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
 
             builder.AddNlog();
@@ -30,7 +38,8 @@ internal static class Program
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
-            builder.AddDiscussionsService(settings);
+            builder.Services.AddUsersModuleRemote(settings);
+            builder.AddDiscussionsModuleRemote(settings);
             builder.AddControllersAndView();
             builder.AddLocalization();
 

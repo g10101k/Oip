@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,10 @@ namespace Oip.Users.Base;
 public class UserCacheRepositoryHostedService(IServiceScopeFactory scopeFactory, ILogger<UserCacheRepository> logger)
     : PeriodicBackgroundService<UserCacheRepository>(scopeFactory, logger);
 
-public class UserCacheRepository(GrpcUserService.GrpcUserServiceClient client, ILogger<UserCacheRepository> logger)
+public class UserCacheRepository(
+    IUserService userService,
+    IServiceProvider serviceProvider,
+    ILogger<UserCacheRepository> logger)
     : IPeriodicalService
 {
     public readonly ConcurrentDictionary<int, User> Users = new();
@@ -29,14 +33,12 @@ public class UserCacheRepository(GrpcUserService.GrpcUserServiceClient client, I
             SubscribeAction.Invoke(cancellationToken);
         }
 
-        var response = await client.GetAllUsersAsync(new GetAllUsersRequest()
-        {
-            PageSize = 1000, PageToken = string.Empty
-        }, cancellationToken: cancellationToken);
+        var response = await userService.GetAllUsersAsync(1, 1000, cancellationToken);
 
         foreach (var user in response.Users)
         {
-            Users.AddOrUpdate(user.UserId, user, (key, oldValue) => user);
+            var grpcUser = MapToGrpcUser(user);
+            Users.AddOrUpdate(grpcUser.UserId, grpcUser, (key, oldValue) => grpcUser);
         }
     }
 
@@ -47,6 +49,12 @@ public class UserCacheRepository(GrpcUserService.GrpcUserServiceClient client, I
             {
                 try
                 {
+                    var client = serviceProvider.GetService<GrpcUserService.GrpcUserServiceClient>();
+                    if (client == null)
+                    {
+                        return;
+                    }
+
                     var clientId = $"client_{Guid.NewGuid().ToString()[..8]}";
 
                     logger.LogInformation("Connecting as {ClientId}...", clientId);
@@ -84,6 +92,25 @@ public class UserCacheRepository(GrpcUserService.GrpcUserServiceClient client, I
     {
         Users.AddOrUpdate(eventMessage.User.UserId, eventMessage.User, (i, user) => user);
         logger.LogDebug("{json}", JsonConvert.SerializeObject(eventMessage));
+    }
+
+    private static User MapToGrpcUser(UserDto user)
+    {
+        return new User
+        {
+            UserId = user.UserId,
+            KeycloakId = user.KeycloakId,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            IsActive = user.IsActive,
+            CreatedAt = Timestamp.FromDateTimeOffset(user.CreatedAt),
+            UpdatedAt = Timestamp.FromDateTimeOffset(user.UpdatedAt),
+            LastSyncedAt = user.LastSyncedAt.HasValue ? Timestamp.FromDateTimeOffset(user.LastSyncedAt.Value) : null,
+            Photo = user.Photo != null ? Google.Protobuf.ByteString.CopyFrom(user.Photo) : Google.Protobuf.ByteString.Empty,
+            Settings = user.Settings,
+            Phone = user.Phone
+        };
     }
 
     public User? GetUserByKeycloakUserId(string key)

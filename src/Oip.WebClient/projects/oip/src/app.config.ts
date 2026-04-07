@@ -8,6 +8,8 @@ import { appRoutes } from './app.routes';
 import {
   AuthGuardService,
   BaseDataService,
+  DEFAULT_OIP_FRONTEND_CONFIG,
+  OIP_FRONTEND_CONFIG,
   SecurityDataService,
   SecurityStorageService,
   UserService,
@@ -23,6 +25,7 @@ import { MessageService } from 'primeng/api';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
+import { environment } from './environments/environment';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
@@ -40,6 +43,13 @@ export const appConfig: ApplicationConfig = {
     { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: SecurityService, useClass: KeycloakSecurityService },
+    {
+      provide: OIP_FRONTEND_CONFIG,
+      useValue: {
+        ...DEFAULT_OIP_FRONTEND_CONFIG,
+        ...environment.frontend
+      }
+    },
     ProductService,
     AuthGuardService,
     MessageService,

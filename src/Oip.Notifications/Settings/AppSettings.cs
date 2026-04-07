@@ -21,6 +21,9 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     /// <inheritdoc />
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
+    /// <inheritdoc />
+    public bool IsStandalone { get; set; } = false;
+    
     /// <summary>
     /// Represents synchronization options for the application.
     /// </summary>

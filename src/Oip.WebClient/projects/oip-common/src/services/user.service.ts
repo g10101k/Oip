@@ -44,7 +44,9 @@ export class UserService {
    * and updates the `photo` and `photoLoaded` properties accordingly.
    */
   getUserPhoto(): void {
-    const url = `${this.baseDataService.baseUrl}api/user-profile/get-user-photo?email=${this.securityService.getCurrentUser().email}`;
+    const url = this.baseDataService.buildUrl(
+      `api/user-profile/get-user-photo?email=${this.securityService.getCurrentUser().email}`
+    );
     this.baseDataService.getBlob(url).then(
       (data) => {
         this.createImageFromBlob(data as Blob);

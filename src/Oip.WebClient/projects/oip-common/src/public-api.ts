@@ -39,6 +39,12 @@ export { L10nService, LanguageDto } from './services/l10n.service';
 export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './services/logo.service';
 export { NotificationService } from './services/notification.service';
 export { TableFilterService } from './services/table-filter.service';
+export {
+  DEFAULT_OIP_FRONTEND_CONFIG,
+  OIP_FRONTEND_CONFIG,
+  OipFrontendConfig,
+  OipFrontendAppMode
+} from './services/frontend-config';
 
 // Events
 export { MenuChangeEvent } from './events/menu-change.event';
