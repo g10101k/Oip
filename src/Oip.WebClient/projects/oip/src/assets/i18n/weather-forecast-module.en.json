@@ -1,0 +1,18 @@
+{
+  "weather-forecast-module": {
+    "title": "Weather Forecast",
+    "content": {
+      "table": {
+        "date": "Date",
+        "temperatureC": "Temperature C",
+        "temperatureF": "Temperature F",
+        "summary": "Summary"
+      }
+    },
+    "settings": {
+      "title": "Weather Settings",
+      "dayCount": "Day Count",
+      "save": "Save"
+    }
+  }
+}
