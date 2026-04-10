@@ -17,6 +17,9 @@ interface BaseComponentLocalization {
 
 @Component({ standalone: true, template: '' })
 export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSettings> implements OnInit, OnDestroy {
+  private isInitialized = false;
+  private moduleInstanceReloadPromise: Promise<void> = Promise.resolve();
+
   /**
    * Provide access to app settings
    */
@@ -113,6 +116,8 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
       const localStorageSettingsString = localStorage.getItem(`Instance_${this.id}`);
       if (localStorageSettingsString != null) {
         this.localSettings.set(JSON.parse(localStorageSettingsString) as TLocalStoreSettings);
+      } else {
+        this.localSettings.set({} as TLocalStoreSettings);
       }
     } catch (error) {
       this.msgService.error(error, 'Error parsing layoutConfig:');
@@ -182,8 +187,16 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     );
     this.subscriptions.push(
       this.route.paramMap.subscribe((params) => {
-        this.id = +params.get('id');
+        const routeId = params.get('id');
+        const nextId = routeId != null ? +routeId : undefined;
+        const idChanged = this.id !== nextId;
+
+        this.id = nextId;
         this.getLocalStorageSettings();
+
+        if (this.isInitialized && idChanged) {
+          void this.reloadModuleInstance();
+        }
       })
     );
   }
@@ -218,7 +231,8 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     this.topBarService.setTopBarItems(this.topBarItems);
     this.topBarService.activeId = this.topBarItems[0].id;
 
-    await this.getSettings();
+    this.isInitialized = true;
+    await this.reloadModuleInstance();
 
     this.subscriptions.push(
       this.appTitleService.title$.subscribe((title) => {
@@ -259,5 +273,20 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
       .catch((error) => {
         this.msgService.error(error);
       });
+  }
+
+  /**
+   * Called whenever the module instance changes, including the first load.
+   * Derived components can override this to refresh module-specific data.
+   */
+  protected async onModuleInstanceChange(): Promise<void> {}
+
+  private async reloadModuleInstance(): Promise<void> {
+    this.moduleInstanceReloadPromise = this.moduleInstanceReloadPromise.then(async () => {
+      await this.getSettings();
+      await this.onModuleInstanceChange();
+    });
+
+    await this.moduleInstanceReloadPromise;
   }
 }
