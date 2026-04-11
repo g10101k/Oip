@@ -31,12 +31,15 @@ export class UserService {
    */
   get shortLabel(): string {
     const data = this.securityService.getCurrentUser();
-    return data ? data.given_name[0].toUpperCase() + data.family_name[0].toUpperCase() : '';
+    const givenNameInitial = data?.given_name?.trim()?.[0];
+    const familyNameInitial = data?.family_name?.trim()?.[0];
+
+    return `${givenNameInitial ?? ''}${familyNameInitial ?? ''}`.toUpperCase();
   }
 
   get userName(): string {
     const data = this.securityService.getCurrentUser();
-    return `${data.given_name} ${data.family_name}`;
+    return [data?.given_name, data?.family_name].filter(Boolean).join(' ');
   }
 
   /**
@@ -44,8 +47,15 @@ export class UserService {
    * and updates the `photo` and `photoLoaded` properties accordingly.
    */
   getUserPhoto(): void {
+    const email = this.securityService.getCurrentUser()?.email;
+
+    if (!email) {
+      this.photoLoaded = true;
+      return;
+    }
+
     const url = this.baseDataService.buildUrl(
-      `api/user-profile/get-user-photo?email=${this.securityService.getCurrentUser().email}`
+      `api/user-profile/get-user-photo?email=${email}`
     );
     this.baseDataService.getBlob(url).then(
       (data) => {
@@ -54,6 +64,7 @@ export class UserService {
       },
       (error) => {
         console.log(error);
+        this.photoLoaded = false;
       }
     );
   }
