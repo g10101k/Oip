@@ -34,13 +34,18 @@ function createFallbackConfig() {
   const appMode = env.OIP_APP_MODE === 'standalone' ? 'standalone' : 'distributed';
 
   const standaloneProxy = [
+    createWsProxy(
+      [
+        '/hubs/notification'
+      ],
+      defaultTarget
+    ),
     createKeepAliveProxy(
       [
         '/api',
         '/swagger',
         '/health',
-        '/metrics',
-        '/hubs/notification'
+        '/metrics'
       ],
       defaultTarget
     )
