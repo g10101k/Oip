@@ -16,10 +16,5 @@
       "dom"
     ],
     "useDefineForClassFields": false,
-    "paths": {
-      "oip-common": [
-        "projects/oip-common/src/public-api.ts"
-      ]
-    },
   }
 }
