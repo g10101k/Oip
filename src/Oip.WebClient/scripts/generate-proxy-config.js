@@ -44,13 +44,18 @@ function createProxyConfig(targets, appMode) {
   };
 
   const standaloneProxy = [
+    createWsProxy(
+      [
+        '/hubs/notification'
+      ],
+      normalizedTargets.main
+    ),
     createKeepAliveProxy(
       [
         '/api',
         '/swagger',
         '/health',
-        '/metrics',
-        '/hubs/notification'
+        '/metrics'
       ],
       normalizedTargets.main
     )
