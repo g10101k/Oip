@@ -21,6 +21,16 @@ internal static class Program
         try
         {
             var settings = AppSettings.Initialize(args, false, true);
+            
+            // Check if running in standalone mode (should only run as microservice)
+            if (settings.IsStandalone)
+            {
+                logger.Warn("Oip.Users service is configured to run in Standalone mode. " +
+                          "This service should only run in Microservices mode. " +
+                          "Consider running the main Oip application instead.");
+                return;
+            }
+            
             var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
             builder.AddNlog();
             builder.AddDefaultHealthChecks();
@@ -37,9 +47,10 @@ internal static class Program
             builder.AddLocalization();
             builder.Services.AddStartupRunner();
             builder.Services.AddSingleton<BaseNotificationService>();
+            builder.Services.AddSingleton<INotificationPublisher>(sp => sp.GetRequiredService<BaseNotificationService>());
             builder.Services.AddStartupTask<NotificationStartup>();
             builder.Services.AddSettingsToDependencyInjection(settings);
-            builder.Services.AddUsersData(settings);
+            builder.Services.AddUsersModuleLocal(settings);
             builder.Services.AddGrpcClient<GrpcNotificationService.GrpcNotificationServiceClient>(x =>
             {
                 x.Address = new Uri(settings.Services.OipNotifications);

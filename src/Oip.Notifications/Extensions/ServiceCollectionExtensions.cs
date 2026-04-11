@@ -1,8 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Oip.Base.Clients;
 using Oip.Base.Extensions;
+using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Notifications.Data.Contexts;
+using Oip.Notifications.Hubs;
+using Oip.Notifications.Services;
+using Oip.Notifications.Startups;
+using Oip.Users.Base;
 
 namespace Oip.Notifications.Extensions;
 
@@ -53,5 +59,49 @@ public static class ServiceCollectionExtensions
                 return handler;
             });
         }
+    }
+
+    /// <summary>
+    /// Registers notifications for local composition.
+    /// </summary>
+    public static IServiceCollection AddNotificationsModuleLocal(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
+    {
+        return services.AddNotificationsModuleCore(settings);
+    }
+
+    /// <summary>
+    /// Registers notifications for distributed composition.
+    /// </summary>
+    public static IServiceCollection AddNotificationsModuleRemote(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
+    {
+        return services.AddNotificationsModuleCore(settings);
+    }
+
+    private static IServiceCollection AddNotificationsModuleCore(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
+    {
+        if (services.All(x => x.ServiceType != typeof(DbContextOptions<NotificationsDbContext>)))
+        {
+            services.AddNotificationData(settings);
+        }
+
+        services.TryAddSingleton<UserCacheRepository>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, UserCacheRepositoryHostedService>());
+        services.TryAddSingleton<ChannelService>();
+        services.TryAddScoped<NotificationService>();
+        services.TryAddScoped<NotificationHub>();
+        services.AddStartupTask<ChannelStartup>();
+        return services;
+    }
+
+    /// <summary>
+    /// Maps notification endpoints for the current host.
+    /// </summary>
+    public static void MapNotificationsModule(this WebApplication app)
+    {
+        app.MapGrpcService<NotificationService>();
+        app.MapHub<NotificationHub>("/hubs/notification");
     }
 }

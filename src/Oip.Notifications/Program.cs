@@ -12,6 +12,7 @@ using Oip.Notifications.Services;
 using Oip.Notifications.Settings;
 using Oip.Notifications.Startups;
 using Oip.Users.Base;
+using Oip.Users.Extensions;
 
 namespace Oip.Notifications;
 
@@ -23,25 +24,25 @@ internal static class Program
         try
         {
             var settings = AppSettings.Initialize(args, false, true);
+
+            if (settings.IsStandalone)
+            {
+                logger.Warn("Oip.Notifications service is configured to run in Standalone mode. Run the main Oip host instead.");
+                return;
+            }
+
             var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
 
             builder.AddNlog();
             builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
-            builder.Services.AddNotificationData(settings);
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
-            builder.Services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(x =>
-            {
-                x.Address = new Uri(settings.Services.OipUsers);
-            });
-            builder.Services.AddSingleton<UserCacheRepository>();
-            builder.Services.AddHostedService<UserCacheRepositoryHostedService>();
+            builder.Services.AddUsersModuleRemote(settings);
             builder.Services.AddSingleton<CryptService>();
-            builder.Services.AddSingleton<ChannelService>();
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
-            builder.Services.AddStartupTask<ChannelStartup>();
+            builder.Services.AddNotificationsModuleRemote(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.Services.AddGrpc().AddJsonTranscoding();
@@ -65,8 +66,7 @@ internal static class Program
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
-            app.MapGrpcService<NotificationService>();
-            app.MapHub<NotificationHub>("/hubs/notification");
+            app.MapNotificationsModule();
             app.MapOpenTelemetry(settings);
             app.MigrateNotificationDatabase();
             app.Run();

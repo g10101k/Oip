@@ -3,9 +3,18 @@ using NLog.Web;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
+using Oip.Base.Services;
 using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
+using Oip.Discussions.Extensions;
+using Oip.Notifications.Data.Contexts;
+using Oip.Notifications.Extensions;
 using Oip.Settings;
+using Oip.Users.Notifications;
+using Oip.Users.Repositories;
+using Oip.Users.Services;
+using Oip.Users.Extensions;
+using GrpcUserServiceImpl = Oip.Users.Services.UserService;
 
 namespace Oip;
 
@@ -26,12 +35,32 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.AddControllersAndView();
             builder.AddLocalization();
             builder.AddOpenTelemetry(settings);
+
+            if (settings.IsStandalone)
+            {
+                builder.Services.AddUsersModuleLocal(settings);
+                builder.Services.AddScoped<GrpcUserServiceImpl>();
+                builder.Services.AddScoped<UserSyncService>();
+                builder.Services.AddSingleton<INotificationPublisher, NoOpNotificationPublisher>();
+
+                builder.AddDiscussionsModuleLocal(settings);
+
+                builder.Services.AddNotificationsModuleLocal(settings);
+                builder.Services.AddDataProtection<NotificationsDbContext>();
+                builder.Services.AddSignalR();
+                builder.Services.AddGrpc().AddJsonTranscoding();
+                builder.Services.AddGrpcSwagger();
+                builder.Services.AddSingleton<CryptService>();
+            }
+            else
+            {
+                builder.Services.AddUsersModuleRemote(settings);
+            }
 
             var app = builder.Build();
             app.AddRequestLocalization();
@@ -48,6 +77,15 @@ internal static class Program
             app.MapFallbackToFile("index.html");
             app.MapOpenTelemetry(settings);
             app.MigrateOipModuleDatabase();
+
+            if (settings.IsStandalone)
+            {
+                app.MigrateUserDatabase();
+                app.AddDiscussions(settings);
+                app.MigrateNotificationDatabase();
+                app.MapNotificationsModule();
+            }
+
             app.Run();
         }
         catch (Exception e)

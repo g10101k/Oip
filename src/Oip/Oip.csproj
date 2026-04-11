@@ -25,6 +25,9 @@
         <ProjectReference Include="..\Oip.Api\Oip.Api.csproj"/>
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
         <ProjectReference Include="..\Oip.Data\Oip.Data.csproj"/>
+        <ProjectReference Include="..\Oip.Users\Oip.Users.csproj"/>
+        <ProjectReference Include="..\Oip.Discussions\Oip.Discussions.csproj"/>
+        <ProjectReference Include="..\Oip.Notifications\Oip.Notifications.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Oip.Base.Exceptions;
 using Oip.Discussions.Contracts;
 using Oip.Discussions.Data;
-using Oip.Users.Entities;
-using Oip.Users.Repositories;
+using Oip.Users.Base;
 using BaseUserService = Oip.Base.Services.UserService;
 
 namespace Oip.Discussions.Services;
@@ -15,7 +14,7 @@ namespace Oip.Discussions.Services;
 /// </summary>
 public class CommentService(
     DiscussionsDbContext discussionsDbContext,
-    UserRepository userRepository,
+    IUserService userService,
     BaseUserService currentUserService,
     IDiscussionAttachmentStorage attachmentStorage)
 {
@@ -394,7 +393,7 @@ public class CommentService(
             throw new CommentValidationException("Search term must contain at least 2 characters.");
         }
 
-        var users = await userRepository.SearchAsync(normalizedTerm);
+        var users = await userService.SearchUsersAsync(normalizedTerm, cancellationToken);
         return users
             .Take(20)
             .Select(user => new MentionUserDto
@@ -561,7 +560,7 @@ public class CommentService(
         await discussionsDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<Dictionary<string, UserEntity>> ResolveMentionUsersAsync(
+    private async Task<Dictionary<string, UserDto>> ResolveMentionUsersAsync(
         IEnumerable<string> tokens,
         CancellationToken cancellationToken)
     {
@@ -576,7 +575,7 @@ public class CommentService(
         }
 
         var lowered = tokenList.Select(x => x.ToLowerInvariant()).ToList();
-        var users = await userRepository.GetAllAsync(0, 500);
+        var users = await GetAllUsersAsync(cancellationToken);
 
         return users
             .Where(user => MatchesMentionCandidate(user, lowered))
@@ -599,7 +598,7 @@ public class CommentService(
             .ToDictionary(x => x.Key, x => x.First().User);
     }
 
-    private static bool MatchesMentionCandidate(UserEntity user, IReadOnlyCollection<string> loweredTokens)
+    private static bool MatchesMentionCandidate(UserDto user, IReadOnlyCollection<string> loweredTokens)
     {
         var candidates = new[]
         {
@@ -630,7 +629,7 @@ public class CommentService(
         };
     }
 
-    private async Task<UserEntity> GetCurrentUserAsync(CancellationToken cancellationToken)
+    private async Task<UserDto> GetCurrentUserAsync(CancellationToken cancellationToken)
     {
         var email = GetCurrentUserEmail();
         if (string.IsNullOrWhiteSpace(email))
@@ -638,7 +637,7 @@ public class CommentService(
             throw new UnauthorizedDiscussionException("Current user e-mail claim was not found.");
         }
 
-        var user = await userRepository.GetByEmailAsync(email, cancellationToken);
+        var user = await userService.GetUserByEmailAsync(email, cancellationToken);
         if (user == null)
         {
             throw new CommentValidationException($"User profile for '{email}' was not found.");
@@ -655,11 +654,11 @@ public class CommentService(
             return 0;
         }
 
-        var user = await userRepository.GetByEmailAsync(email, cancellationToken);
+        var user = await userService.GetUserByEmailAsync(email, cancellationToken);
         return user?.UserId ?? 0;
     }
 
-    private async Task<Dictionary<int, UserEntity>> GetUsersByIdsAsync(
+    private async Task<Dictionary<int, UserDto>> GetUsersByIdsAsync(
         IEnumerable<long> userIds,
         CancellationToken cancellationToken)
     {
@@ -673,8 +672,35 @@ public class CommentService(
             return [];
         }
 
-        var users = await userRepository.GetByIdsAsync(ids, cancellationToken);
+        var users = await userService.GetUsersByIdsAsync(ids, cancellationToken);
         return users.ToDictionary(x => x.UserId);
+    }
+
+    private async Task<IReadOnlyList<UserDto>> GetAllUsersAsync(CancellationToken cancellationToken)
+    {
+        const int pageSize = 500;
+        var pageNumber = 1;
+        var users = new List<UserDto>();
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var page = await userService.GetAllUsersAsync(pageNumber, pageSize, cancellationToken);
+            var pageUsers = page.Users.ToList();
+            if (pageUsers.Count == 0)
+            {
+                break;
+            }
+
+            users.AddRange(pageUsers);
+            if (pageUsers.Count < pageSize || users.Count >= page.TotalCount)
+            {
+                break;
+            }
+
+            pageNumber++;
+        }
+
+        return users;
     }
 
     private static int NormalizeTake(int take)
@@ -745,7 +771,7 @@ public class CommentService(
         }
     }
 
-    private static string FormatUserDisplayName(UserEntity? user, long fallbackUserId)
+    private static string FormatUserDisplayName(UserDto? user, long fallbackUserId)
     {
         if (user == null)
         {

@@ -4,7 +4,12 @@
 
 export const environment = {
   production: false,
-  useAuthentication: true
+  useAuthentication: true,
+  frontend: {
+    appMode: 'standalone',
+    apiBaseUrl: '',
+    notificationHubUrl: ''
+  }
 };
 
 /*

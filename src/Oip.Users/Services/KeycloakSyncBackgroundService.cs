@@ -24,7 +24,7 @@ public class UserSyncService(
     KeycloakService keycloakService,
     UserRepository userRepository,
     UserService userService,
-    BaseNotificationService notificationServiceClient,
+    INotificationPublisher notificationPublisher,
     ILogger<UserSyncService> logger) : IPeriodicalService
 {
     /// <inheritdoc />
@@ -160,7 +160,7 @@ public class UserSyncService(
 
         var endTime = DateTimeOffset.UtcNow;
         logger.LogInformation("Full user synchronization completed");
-        await notificationServiceClient.Notify(new SyncUsersCompleteNotify(totalUsers, startTime, endTime));
+        await notificationPublisher.Notify(new SyncUsersCompleteNotify(totalUsers, startTime, endTime));
     }
 
     /// <summary>

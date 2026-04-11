@@ -2,12 +2,14 @@ import * as signalR from '@microsoft/signalr';
 import { SecurityService } from './security.service';
 import { inject, Injectable } from '@angular/core';
 import { MsgService } from './msg.service';
+import { OIP_FRONTEND_CONFIG } from './frontend-config';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private connection: signalR.HubConnection;
   private securityService = inject(SecurityService);
   private msgService = inject(MsgService);
+  private frontendConfig = inject(OIP_FRONTEND_CONFIG);
   private securityData: string;
 
   constructor() {
@@ -20,7 +22,7 @@ export class NotificationService {
       }
     });
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('/hubs/notification', {
+      .withUrl(this.resolveHubUrl(), {
         accessTokenFactory: () => this.securityData,
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
@@ -37,5 +39,17 @@ export class NotificationService {
       };
       this.msgService.add(opt);
     });
+  }
+
+  private resolveHubUrl(): string {
+    if (this.frontendConfig.notificationHubUrl) {
+      return this.frontendConfig.notificationHubUrl;
+    }
+
+    if (this.frontendConfig.apiBaseUrl) {
+      return `${this.frontendConfig.apiBaseUrl.replace(/\/$/, '')}/hubs/notification`;
+    }
+
+    return '/hubs/notification';
   }
 }

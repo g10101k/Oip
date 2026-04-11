@@ -4,7 +4,6 @@ using Oip.Discussions.Data;
 using Oip.Discussions.Data.Repositories;
 using Oip.Discussions.Services;
 using Oip.Users.Extensions;
-using Oip.Users.Repositories;
 
 namespace Oip.Discussions.Extensions;
 
@@ -20,16 +19,43 @@ public static class WebApplicationBuilderExtensions
     /// <param name="settings"></param>
     public static void AddDiscussionsService(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
+        if (settings.IsStandalone)
+        {
+            builder.AddDiscussionsModuleLocal(settings);
+        }
+        else
+        {
+            builder.AddDiscussionsModuleRemote(settings);
+        }
+    }
+
+    /// <summary>
+    /// Registers the discussions module for local standalone composition.
+    /// </summary>
+    public static void AddDiscussionsModuleLocal(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    {
+        AddDiscussionsModuleCore(builder, settings);
+    }
+
+    /// <summary>
+    /// Registers the discussions module for distributed mode.
+    /// </summary>
+    public static void AddDiscussionsModuleRemote(this WebApplicationBuilder builder,
+        IBaseOipModuleAppSettings settings)
+    {
+        AddDiscussionsModuleCore(builder, settings);
+    }
+
+    private static void AddDiscussionsModuleCore(WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    {
         builder.Services.AddOipBasedContext<DiscussionsDbContext>(settings.ConnectionString,
             DiscussionsDbContext.MigrationHistoryTableName, DiscussionsDbContext.SchemaName);
-        builder.Services.AddUsersData(settings);
         builder.Services.AddScoped<AttachmentRepository>()
             .AddScoped<CommentEditHistoryRepository>()
             .AddScoped<CommentRepository>()
             .AddScoped<MentionRepository>()
             .AddScoped<ReactionRepository>()
             .AddScoped<CommentService>()
-            .AddScoped<UserRepository>()
             .AddScoped<IDiscussionAttachmentStorage, LocalDiscussionAttachmentStorage>();
     }
 

@@ -9,8 +9,20 @@ namespace Oip.Users.Notifications;
 /// types with a gRPC service during application startupStartupTask to register notification types with a gRPC
 /// notification service during application startup
 /// </summary>
+public interface INotificationPublisher
+{
+    /// <summary>
+    /// Sends a notification payload to the configured notification transport.
+    /// </summary>
+    Task Notify<TNotification>(TNotification notification);
+}
+
+/// <summary>
+/// Publishes notifications through the notifications gRPC service.
+/// </summary>
 public class BaseNotificationService(
     GrpcNotificationService.GrpcNotificationServiceClient client)
+    : INotificationPublisher
 {
     /// <summary>
     /// Gets or sets the list of notification types that are registered with the gRPC notification service during
@@ -41,6 +53,19 @@ public class BaseNotificationService(
             NotificationTypeId = notificationType.NotificationTypeId,
             DataJson = JsonConvert.SerializeObject(notification)
         });
+    }
+}
+
+/// <summary>
+/// Safe no-op publisher used when notifications are hosted in-process without a loopback client.
+/// </summary>
+public class NoOpNotificationPublisher(ILogger<NoOpNotificationPublisher> logger) : INotificationPublisher
+{
+    /// <inheritdoc />
+    public Task Notify<TNotification>(TNotification notification)
+    {
+        logger.LogDebug("Skipping notification publishing for {NotificationType} in local module mode", typeof(TNotification).FullName);
+        return Task.CompletedTask;
     }
 }
 
