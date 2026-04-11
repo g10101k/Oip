@@ -4,6 +4,7 @@ using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Oip.Base.Extensions;
 using Oip.Base.Services;
 
 namespace Oip.Users.Base;
@@ -15,7 +16,7 @@ public class UserCacheRepositoryHostedService(IServiceScopeFactory scopeFactory,
     : PeriodicBackgroundService<UserCacheRepository>(scopeFactory, logger);
 
 public class UserCacheRepository(
-    IUserService userService,
+    IServiceScopeFactory scopeFactory,
     IServiceProvider serviceProvider,
     ILogger<UserCacheRepository> logger)
     : IPeriodicalService
@@ -33,13 +34,23 @@ public class UserCacheRepository(
             SubscribeAction.Invoke(cancellationToken);
         }
 
-        var response = await userService.GetAllUsersAsync(1, 1000, cancellationToken);
-
-        foreach (var user in response.Users)
+        await scopeFactory.ExecuteAsync<IUserService>(async (userService) =>
         {
-            var grpcUser = MapToGrpcUser(user);
-            Users.AddOrUpdate(grpcUser.UserId, grpcUser, (key, oldValue) => grpcUser);
-        }
+            try
+            {
+                var response = await userService.GetAllUsersAsync(1, 1000, cancellationToken);
+
+                foreach (var user in response.Users)
+                {
+                    var grpcUser = MapToGrpcUser(user);
+                    Users.AddOrUpdate(grpcUser.UserId, grpcUser, (key, oldValue) => grpcUser);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Unhandled exception.");
+            }
+        });
     }
 
     private Action<CancellationToken> SubscribeAction =>
@@ -107,7 +118,9 @@ public class UserCacheRepository(
             CreatedAt = Timestamp.FromDateTimeOffset(user.CreatedAt),
             UpdatedAt = Timestamp.FromDateTimeOffset(user.UpdatedAt),
             LastSyncedAt = user.LastSyncedAt.HasValue ? Timestamp.FromDateTimeOffset(user.LastSyncedAt.Value) : null,
-            Photo = user.Photo != null ? Google.Protobuf.ByteString.CopyFrom(user.Photo) : Google.Protobuf.ByteString.Empty,
+            Photo = user.Photo != null
+                ? Google.Protobuf.ByteString.CopyFrom(user.Photo)
+                : Google.Protobuf.ByteString.Empty,
             Settings = user.Settings,
             Phone = user.Phone
         };
