@@ -60,7 +60,7 @@ interface CustomerModuleLocalSettings {
           [rows]="localSettings().rows ?? 10"
           [first]="localSettings().first ?? 0"
           [totalRecords]="totalRecords"
-          [rowsPerPageOptions]="[10, 25, 50]"
+          [rowsPerPageOptions]="[10, 50, 100, 500, 1000, { showAll: 'customer-module.content.rowsPerPageOptionsAll' | translate }]"
           [filters]="localSettings().filters ?? {}"
           [sortField]="localSettings().sortField ?? undefined"
           [sortOrder]="localSettings().sortOrder ?? 1"
