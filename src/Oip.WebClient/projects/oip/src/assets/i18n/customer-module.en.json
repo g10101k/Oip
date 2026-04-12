@@ -2,6 +2,7 @@
   "customer-module": {
     "title": "Customer Module",
     "content": {
+      "rowsPerPageOptionsAll": "All",
       "subtitle": "Demo customer data with server-side filtering, sorting and pagination.",
       "globalSearch": "Search by name, email, country or category",
       "search": "Search",

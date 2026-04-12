@@ -2,6 +2,7 @@
   "customer-module": {
     "title": "Модуль клиентов",
     "content": {
+      "rowsPerPageOptionsAll": "Все",
       "subtitle": "Демо-таблица клиентов с серверной фильтрацией, сортировкой и пагинацией.",
       "globalSearch": "Поиск по имени, email, стране или категории",
       "search": "Найти",
