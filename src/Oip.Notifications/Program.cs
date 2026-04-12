@@ -7,11 +7,7 @@ using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
 using Oip.Notifications.Data.Contexts;
 using Oip.Notifications.Extensions;
-using Oip.Notifications.Hubs;
-using Oip.Notifications.Services;
 using Oip.Notifications.Settings;
-using Oip.Notifications.Startups;
-using Oip.Users.Base;
 using Oip.Users.Extensions;
 
 namespace Oip.Notifications;
