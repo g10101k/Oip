@@ -32,6 +32,48 @@ public class TableQueryProcessorTests
     }
 
     [Test]
+    public async Task GetPage_AllowsLargePageSize_ForExtendedRowsPerPageOptions()
+    {
+        await using var context = CreateContext();
+
+        var payload = await ExecuteRequest(context, new TableQueryRequest
+        {
+            First = 0,
+            Rows = 500,
+            SortField = "email",
+            SortOrder = 1
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(payload.Total, Is.EqualTo(100));
+            Assert.That(payload.Rows, Is.EqualTo(500));
+            Assert.That(payload.Data, Has.Count.EqualTo(100));
+        });
+    }
+
+    [Test]
+    public async Task GetPage_AllowsRowsValueGreaterThanDatasetSize_ForShowAllMode()
+    {
+        await using var context = CreateContext();
+
+        var payload = await ExecuteRequest(context, new TableQueryRequest
+        {
+            First = 0,
+            Rows = 5000,
+            SortField = "email",
+            SortOrder = 1
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(payload.Total, Is.EqualTo(100));
+            Assert.That(payload.Rows, Is.EqualTo(5000));
+            Assert.That(payload.Data, Has.Count.EqualTo(100));
+        });
+    }
+
+    [Test]
     public async Task GetPage_FiltersByNestedProperty_WhenCategoryNameIsProvided()
     {
         await using var context = CreateContext();
@@ -342,7 +384,7 @@ public class TableQueryProcessorTests
         options.GlobalFilterFields.Add(nameof(DemoCustomer.Email));
         options.GlobalFilterFields.Add($"{nameof(DemoCustomer.Category)}.{nameof(DemoCustomerCategory.Name)}");
         options.GlobalFilterFields.Add($"{nameof(DemoCustomer.Country)}.{nameof(DemoCountry.Name)}");
-        options.MaxRows = 100;
+        options.MaxRows = int.MaxValue;
 
         return TableQueryProcessor.ExecuteAsync(
             query,
