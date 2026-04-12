@@ -56,7 +56,7 @@ public class CustomerModuleController(
             options.GlobalFilterFields.Add(nameof(DemoCustomer.Email));
             options.GlobalFilterFields.Add($"{nameof(DemoCustomer.Category)}.{nameof(DemoCustomerCategory.Name)}");
             options.GlobalFilterFields.Add($"{nameof(DemoCustomer.Country)}.{nameof(DemoCountry.Name)}");
-            options.MaxRows = 100;
+            options.MaxRows = int.MaxValue;
 
             var query = context.Customers
                 .AsNoTracking()
