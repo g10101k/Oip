@@ -1,12 +1,6 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Api.Controllers.Api;
-using Oip.Base.Exceptions;
-using Oip.Base.Helpers;
 using Oip.Base.Services;
 using Oip.Base.Settings;
-using Oip.Data.Constants;
 
 namespace Oip.Api.Controllers;
 
