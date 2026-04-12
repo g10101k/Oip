@@ -354,6 +354,11 @@ public static class TableQueryProcessor
         }
 
         var targetType = Nullable.GetUnderlyingType(propertyExpression.Type) ?? propertyExpression.Type;
+        if (targetType.IsEnum)
+        {
+            return BuildEnumComparison(propertyExpression, matchMode, value, targetType);
+        }
+
         var convertedValue = ConvertJsonElement(value, targetType);
         var constant = Expression.Constant(convertedValue, targetType);
         var left = propertyExpression.Type == targetType
@@ -371,6 +376,96 @@ public static class TableQueryProcessor
             _ => throw new ArgumentException(
                 $"Match mode '{matchMode}' is not supported for property type '{targetType.Name}'.")
         };
+    }
+
+    private static Expression BuildEnumComparison(
+        Expression propertyExpression,
+        string matchMode,
+        JsonElement value,
+        Type enumType)
+    {
+        if (value.ValueKind != JsonValueKind.String)
+        {
+            var convertedValue = ConvertJsonElement(value, enumType);
+            var constant = Expression.Constant(convertedValue, enumType);
+            var left = propertyExpression.Type == enumType
+                ? propertyExpression
+                : Expression.Convert(propertyExpression, enumType);
+
+            return matchMode.ToLowerInvariant() switch
+            {
+                "equals" => Expression.Equal(left, constant),
+                "notequals" => Expression.NotEqual(left, constant),
+                _ => throw new ArgumentException(
+                    $"Match mode '{matchMode}' is not supported for property type '{enumType.Name}'.")
+            };
+        }
+
+        var stringValue = value.GetString() ?? string.Empty;
+        var normalizedValue = stringValue.Trim();
+        var matchedValues = Enum.GetValues(enumType)
+            .Cast<object>()
+            .Where(enumValue => EnumNameMatches(enumValue.ToString()!, normalizedValue, matchMode, enumType))
+            .ToArray();
+
+        if (matchedValues.Length == 0)
+        {
+            return matchMode.Equals("notequals", StringComparison.OrdinalIgnoreCase)
+                ? Expression.Constant(true)
+                : Expression.Constant(false);
+        }
+
+        return BuildEnumSetExpression(propertyExpression, enumType, matchedValues, matchMode);
+    }
+
+    private static bool EnumNameMatches(string enumName, string filterValue, string matchMode, Type enumType)
+    {
+        if (string.IsNullOrWhiteSpace(filterValue))
+        {
+            return false;
+        }
+
+        return matchMode.ToLowerInvariant() switch
+        {
+            "contains" => enumName.Contains(filterValue, StringComparison.OrdinalIgnoreCase),
+            "startswith" => enumName.StartsWith(filterValue, StringComparison.OrdinalIgnoreCase),
+            "endswith" => enumName.EndsWith(filterValue, StringComparison.OrdinalIgnoreCase),
+            "equals" => enumName.Equals(filterValue, StringComparison.OrdinalIgnoreCase),
+            "notequals" => !enumName.Equals(filterValue, StringComparison.OrdinalIgnoreCase),
+            _ => throw new ArgumentException(
+                $"Match mode '{matchMode}' is not supported for property type '{enumType.Name}'.")
+        };
+    }
+
+    private static Expression BuildEnumSetExpression(
+        Expression propertyExpression,
+        Type enumType,
+        object[] matchedValues,
+        string matchMode)
+    {
+        var left = propertyExpression.Type == enumType
+            ? propertyExpression
+            : Expression.Convert(propertyExpression, enumType);
+
+        var containsMethod = typeof(Enumerable).GetMethods()
+            .Single(method => method.Name == nameof(Enumerable.Contains) &&
+                              method.GetParameters().Length == 2)
+            .MakeGenericMethod(enumType);
+
+        var array = Array.CreateInstance(enumType, matchedValues.Length);
+        for (var i = 0; i < matchedValues.Length; i++)
+        {
+            array.SetValue(matchedValues[i], i);
+        }
+
+        var containsExpression = Expression.Call(
+            containsMethod,
+            Expression.Constant(array, enumType.MakeArrayType()),
+            left);
+
+        return matchMode.Equals("notequals", StringComparison.OrdinalIgnoreCase)
+            ? Expression.Not(containsExpression)
+            : containsExpression;
     }
 
     private static bool IsDateComparison(Type propertyType)
