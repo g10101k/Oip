@@ -6,77 +6,58 @@ import { Injectable } from "@angular/core";
 import { ContentType, HttpClient, RequestParams } from "oip-common";
 import {
   ApiExceptionResponse,
-  GetModuleInstanceSettingsParams2,
-  GetSecurityParams2,
-  GetWeatherForecastParams,
+  CustomerModuleSettingsSaveSettingsRequest,
+  DemoCustomerTableRowDtoTablePageResult,
+  GetModuleInstanceSettingsParams,
+  GetSecurityParams,
   PutSecurityRequest,
   SecurityResponse,
-  WeatherForecastResponse,
-  WeatherModuleSettingsSaveSettingsRequest,
+  TableQueryRequest,
 } from "./data-contracts";
 
 @Injectable()
-export class WeatherForecastModuleApi<
+export class CustomerModuleApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
-   * @description Retrieves example weather forecast data.
+   * @description Retrieves a filtered page of customers for the customer module table.
    *
-   * @tags WeatherForecastModule
-   * @name getWeatherForecast
-   * @summary Retrieves example weather forecast data.
-   * @request GET:/api/weather-forecast-module/get-weather-forecast
+   * @tags CustomerModule
+   * @name getPage
+   * @summary Retrieves a filtered page of customers for the customer module table.
+   * @request POST:/api/customer-module/get-page
    * @secure
-   * @response `200` `(WeatherForecastResponse)[]` OK
-   * @response `500` `ApiExceptionResponse` Internal Server Error
-   */
-  getWeatherForecast = (
-    query: GetWeatherForecastParams,
-    params: RequestParams = {},
-  ) =>
-    this.request<WeatherForecastResponse[], ApiExceptionResponse>({
-      path: `/api/weather-forecast-module/get-weather-forecast`,
-      method: "GET",
-      query: query,
-      secure: true,
-      format: "json",
-      ...params,
-    });
-  /**
-   * @description <inheritdoc />
-   *
-   * @tags WeatherForecastModule
-   * @name getModuleRights
-   * @summary <inheritdoc />
-   * @request GET:/api/weather-forecast-module/get-module-rights
-   * @secure
-   * @response `200` `(SecurityResponse)[]` OK
+   * @response `200` `DemoCustomerTableRowDtoTablePageResult` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
    * @response `401` `ApiExceptionResponse` Unauthorized
    * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `500` `ApiExceptionResponse` Internal Server Error
    */
-  getModuleRights = (params: RequestParams = {}) =>
-    this.request<SecurityResponse[], ApiExceptionResponse>({
-      path: `/api/weather-forecast-module/get-module-rights`,
-      method: "GET",
+  getPage = (data: TableQueryRequest, params: RequestParams = {}) =>
+    this.request<DemoCustomerTableRowDtoTablePageResult, ApiExceptionResponse>({
+      path: `/api/customer-module/get-page`,
+      method: "POST",
+      body: data,
       secure: true,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });
   /**
    * @description Gets the security configuration for the specified module instance ID.
    *
-   * @tags WeatherForecastModule
+   * @tags CustomerModule
    * @name getSecurity
    * @summary Gets the security configuration for the specified module instance ID.
-   * @request GET:/api/weather-forecast-module/get-security
+   * @request GET:/api/customer-module/get-security
    * @secure
    * @response `200` `(SecurityResponse)[]` OK
    * @response `401` `ApiExceptionResponse` Unauthorized
    * @response `403` `ApiExceptionResponse` Forbidden
    */
-  getSecurity = (query: GetSecurityParams2, params: RequestParams = {}) =>
+  getSecurity = (query: GetSecurityParams, params: RequestParams = {}) =>
     this.request<SecurityResponse[], ApiExceptionResponse>({
-      path: `/api/weather-forecast-module/get-security`,
+      path: `/api/customer-module/get-security`,
       method: "GET",
       query: query,
       secure: true,
@@ -86,10 +67,10 @@ export class WeatherForecastModuleApi<
   /**
    * @description Updates the security configuration for the specified module instance.
    *
-   * @tags WeatherForecastModule
+   * @tags CustomerModule
    * @name putSecurity
    * @summary Updates the security configuration for the specified module instance.
-   * @request PUT:/api/weather-forecast-module/put-security
+   * @request PUT:/api/customer-module/put-security
    * @secure
    * @response `200` `void` OK
    * @response `400` `ApiExceptionResponse` Bad Request
@@ -98,7 +79,7 @@ export class WeatherForecastModuleApi<
    */
   putSecurity = (data: PutSecurityRequest, params: RequestParams = {}) =>
     this.request<void, ApiExceptionResponse>({
-      path: `/api/weather-forecast-module/put-security`,
+      path: `/api/customer-module/put-security`,
       method: "PUT",
       body: data,
       secure: true,
@@ -108,21 +89,21 @@ export class WeatherForecastModuleApi<
   /**
    * @description Gets the settings for the specified module instance.
    *
-   * @tags WeatherForecastModule
+   * @tags CustomerModule
    * @name getModuleInstanceSettings
    * @summary Gets the settings for the specified module instance.
-   * @request GET:/api/weather-forecast-module/get-module-instance-settings
+   * @request GET:/api/customer-module/get-module-instance-settings
    * @secure
    * @response `200` `any` OK
    * @response `401` `ApiExceptionResponse` Unauthorized
    * @response `403` `ApiExceptionResponse` Forbidden
    */
   getModuleInstanceSettings = (
-    query: GetModuleInstanceSettingsParams2,
+    query: GetModuleInstanceSettingsParams,
     params: RequestParams = {},
   ) =>
     this.request<any, ApiExceptionResponse>({
-      path: `/api/weather-forecast-module/get-module-instance-settings`,
+      path: `/api/customer-module/get-module-instance-settings`,
       method: "GET",
       query: query,
       secure: true,
@@ -132,9 +113,9 @@ export class WeatherForecastModuleApi<
   /**
    * No description
    *
-   * @tags WeatherForecastModule
+   * @tags CustomerModule
    * @name putModuleInstanceSettings
-   * @request PUT:/api/weather-forecast-module/put-module-instance-settings
+   * @request PUT:/api/customer-module/put-module-instance-settings
    * @secure
    * @response `200` `void` OK
    * @response `400` `ApiExceptionResponse` Bad Request
@@ -142,15 +123,35 @@ export class WeatherForecastModuleApi<
    * @response `403` `ApiExceptionResponse` Forbidden
    */
   putModuleInstanceSettings = (
-    data: WeatherModuleSettingsSaveSettingsRequest,
+    data: CustomerModuleSettingsSaveSettingsRequest,
     params: RequestParams = {},
   ) =>
     this.request<void, ApiExceptionResponse>({
-      path: `/api/weather-forecast-module/put-module-instance-settings`,
+      path: `/api/customer-module/put-module-instance-settings`,
       method: "PUT",
       body: data,
       secure: true,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description Gets the list of security rights supported by the module.
+   *
+   * @tags CustomerModule
+   * @name getModuleRights
+   * @summary Gets the list of security rights supported by the module.
+   * @request GET:/api/customer-module/get-module-rights
+   * @secure
+   * @response `200` `(SecurityResponse)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   */
+  getModuleRights = (params: RequestParams = {}) =>
+    this.request<SecurityResponse[], ApiExceptionResponse>({
+      path: `/api/customer-module/get-module-rights`,
+      method: "GET",
+      secure: true,
+      format: "json",
       ...params,
     });
 }
