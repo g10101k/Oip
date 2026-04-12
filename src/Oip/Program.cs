@@ -1,5 +1,6 @@
 using NLog;
 using NLog.Web;
+using Microsoft.EntityFrameworkCore;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
@@ -11,9 +12,10 @@ using Oip.Notifications.Data.Contexts;
 using Oip.Notifications.Extensions;
 using Oip.Settings;
 using Oip.Users.Notifications;
-using Oip.Users.Repositories;
 using Oip.Users.Services;
 using Oip.Users.Extensions;
+using Oip.Demo.TableQueryDemo;
+using Oip.Extensions;
 using GrpcUserServiceImpl = Oip.Users.Services.UserService;
 
 namespace Oip;
@@ -32,9 +34,12 @@ internal static class Program
             builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddOipModuleContext(settings.ConnectionString);
+            builder.Services.AddDbContext<DemoCustomerTableContext>(options =>
+                options.UseInMemoryDatabase("CustomerTableDemo"));
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
+            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.AddControllersAndView();
@@ -48,7 +53,7 @@ internal static class Program
                 builder.Services.AddScoped<UserSyncService>();
                 builder.Services.AddSingleton<INotificationPublisher, NoOpNotificationPublisher>();
 
-                builder.AddDiscussionsModuleLocal(settings);
+                builder.Services.AddDiscussionsModuleLocal(settings);
 
                 builder.Services.AddNotificationsModuleLocal(settings);
                 builder.Services.AddDataProtection<NotificationsDbContext>();
@@ -63,6 +68,8 @@ internal static class Program
             }
 
             var app = builder.Build();
+
+
             app.AddRequestLocalization();
             app.AddExceptionHandler();
             app.MapDefaultEndpoints();
@@ -76,7 +83,9 @@ internal static class Program
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
             app.MapOpenTelemetry(settings);
+
             app.MigrateOipModuleDatabase();
+            app.MigrateDemoCustomerTableContext();
 
             if (settings.IsStandalone)
             {
