@@ -271,6 +271,37 @@ public class TableQueryProcessorTests
     }
 
     [Test]
+    public async Task GetPage_FiltersEnumField_WithCaseInsensitiveStartsWith()
+    {
+        await using var context = CreateContext();
+
+        var payload = await ExecuteRequest(context, new TableQueryRequest
+        {
+            First = 0,
+            Rows = 100,
+            Filters = new Dictionary<string, JsonElement>
+            {
+                ["status"] = JsonSerializer.SerializeToElement(new[]
+                {
+                    new
+                    {
+                        value = "act",
+                        matchMode = "startsWith",
+                        @operator = "and"
+                    }
+                })
+            }
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(payload.Total, Is.EqualTo(33));
+            Assert.That(payload.Data, Has.Count.EqualTo(33));
+            Assert.That(payload.Data.All(x => x.Status == DemoCustomerStatus.Active), Is.True);
+        });
+    }
+
+    [Test]
     public void GetPage_ThrowsArgumentException_ForUnsupportedField()
     {
         using var context = CreateContext();
