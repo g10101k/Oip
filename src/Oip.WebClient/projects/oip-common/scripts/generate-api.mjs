@@ -67,7 +67,6 @@ let config = {
   fixInvalidEnumKeyPrefix: "Value",
   codeGenConstructs: (constructs) => ({
     ...constructs,
-    RecordType: (key, value) => `MyRecord<key, value>`
   }),
   primitiveTypeConstructs: (constructs) => ({
     ...constructs,
