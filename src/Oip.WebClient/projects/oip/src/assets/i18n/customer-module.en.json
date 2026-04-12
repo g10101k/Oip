@@ -1,0 +1,27 @@
+{
+  "customer-module": {
+    "title": "Customer Module",
+    "content": {
+      "subtitle": "Demo customer data with server-side filtering, sorting and pagination.",
+      "globalSearch": "Search by name, email, country or category",
+      "search": "Search",
+      "clear": "Clear",
+      "empty": "No customers match the selected filters.",
+      "table": {
+        "fullName": "Customer",
+        "email": "Email",
+        "category": "Category",
+        "country": "Country",
+        "status": "Status",
+        "creditScore": "Credit Score",
+        "lifetimeValue": "Lifetime Value",
+        "createdAt": "Created",
+        "ordersCount": "Orders"
+      }
+    },
+    "settings": {
+      "title": "Customer Module Settings",
+      "description": "This demo module uses in-memory data and does not require extra settings yet."
+    }
+  }
+}
