@@ -15,14 +15,15 @@ internal static class Program
 {
     public static void Main(string[] args)
     {
-            var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+        var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
         try
         {
             var settings = AppSettings.Initialize(args, false, true);
 
             if (settings.IsStandalone)
             {
-                logger.Warn("Oip.Discussions service is configured to run in Standalone mode. Run the main Oip host instead.");
+                logger.Warn(
+                    "Oip.Discussions service is configured to run in Standalone mode. Run the main Oip host instead.");
                 return;
             }
 
@@ -39,7 +40,7 @@ internal static class Program
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.Services.AddUsersModuleRemote(settings);
-            builder.AddDiscussionsModuleRemote(settings);
+            builder.Services.AddDiscussionsModuleRemote(settings);
             builder.AddControllersAndView();
             builder.AddLocalization();
 
@@ -56,10 +57,10 @@ internal static class Program
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
-            
+
             app.MigrateOipModuleDatabase();
             app.AddDiscussions(settings);
-            
+
             app.Run();
         }
         catch (Exception e)
