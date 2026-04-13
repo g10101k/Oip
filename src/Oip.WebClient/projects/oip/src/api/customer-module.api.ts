@@ -7,12 +7,16 @@ import { ContentType, HttpClient, RequestParams } from "oip-common";
 import {
   ApiExceptionResponse,
   CustomerModuleSettingsSaveSettingsRequest,
+  DeleteParams,
+  DemoCustomerTableRowDto,
   DemoCustomerTableRowDtoTablePageResult,
   GetModuleInstanceSettingsParams,
   GetSecurityParams,
   PutSecurityRequest,
+  SaveDemoCustomerRequest,
   SecurityResponse,
   TableQueryRequest,
+  UpdateParams,
 } from "./data-contracts";
 
 @Injectable()
@@ -41,6 +45,80 @@ export class CustomerModuleApi<
       secure: true,
       type: ContentType.Json,
       format: "json",
+      ...params,
+    });
+  /**
+   * @description Creates a new customer.
+   *
+   * @tags CustomerModule
+   * @name create
+   * @summary Creates a new customer.
+   * @request POST:/api/customer-module/create
+   * @secure
+   * @response `200` `DemoCustomerTableRowDto` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `500` `ApiExceptionResponse` Internal Server Error
+   */
+  create = (data: SaveDemoCustomerRequest, params: RequestParams = {}) =>
+    this.request<DemoCustomerTableRowDto, ApiExceptionResponse>({
+      path: `/api/customer-module/create`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Updates an existing customer.
+   *
+   * @tags CustomerModule
+   * @name update
+   * @summary Updates an existing customer.
+   * @request PUT:/api/customer-module/update/{id}
+   * @secure
+   * @response `200` `DemoCustomerTableRowDto` OK
+   * @response `400` `ApiExceptionResponse` Bad Request
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `404` `ApiExceptionResponse` Not Found
+   * @response `500` `ApiExceptionResponse` Internal Server Error
+   */
+  update = (
+    { id, ...query }: UpdateParams,
+    data: SaveDemoCustomerRequest,
+    params: RequestParams = {},
+  ) =>
+    this.request<DemoCustomerTableRowDto, ApiExceptionResponse>({
+      path: `/api/customer-module/update/${id}`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Deletes a customer.
+   *
+   * @tags CustomerModule
+   * @name delete
+   * @summary Deletes a customer.
+   * @request DELETE:/api/customer-module/delete/{id}
+   * @secure
+   * @response `204` `void` No Content
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `404` `ApiExceptionResponse` Not Found
+   * @response `500` `ApiExceptionResponse` Internal Server Error
+   */
+  delete = ({ id, ...query }: DeleteParams, params: RequestParams = {}) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/customer-module/delete/${id}`,
+      method: "DELETE",
+      secure: true,
       ...params,
     });
   /**

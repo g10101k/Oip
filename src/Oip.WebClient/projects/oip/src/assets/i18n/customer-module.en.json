@@ -7,6 +7,7 @@
       "globalSearch": "Search by name, email, country or category",
       "search": "Search",
       "clear": "Clear",
+      "add": "Add",
       "empty": "No customers match the selected filters.",
       "table": {
         "fullName": "Customer",
@@ -17,8 +18,16 @@
         "creditScore": "Credit Score",
         "lifetimeValue": "Lifetime Value",
         "createdAt": "Created",
-        "ordersCount": "Orders"
+        "ordersCount": "Orders",
+        "actions": "Actions"
       }
+    },
+    "messages": {
+      "requiredFields": "Fill in name, email, category and country.",
+      "createSuccess": "Customer created successfully.",
+      "updateSuccess": "Customer updated successfully.",
+      "deleteSuccess": "Customer deleted.",
+      "deleteConfirm": "Delete this customer?"
     },
     "settings": {
       "title": "Customer Module Settings",

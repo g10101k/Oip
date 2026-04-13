@@ -13,7 +13,7 @@ import {
   CommentReactionDto,
   CreateCommentRequest,
   DeleteAttachmentParams,
-  DeleteParams,
+  DeleteParams2,
   GetAttachmentContentParams,
   GetByIdParams,
   GetByObjectParams,
@@ -22,7 +22,7 @@ import {
   RemoveReactionParams,
   SearchMentionUsersParams,
   UpdateCommentRequest,
-  UpdateParams,
+  UpdateParams2,
   UploadAttachmentPayload,
 } from "./data-contracts";
 
@@ -108,7 +108,7 @@ export class DiscussionApi<
    * @response `404` `ApiExceptionResponse` Not Found
    */
   update = (
-    { id, ...query }: UpdateParams,
+    { id, ...query }: UpdateParams2,
     data: UpdateCommentRequest,
     params: RequestParams = {},
   ) =>
@@ -134,7 +134,7 @@ export class DiscussionApi<
    * @response `403` `ApiExceptionResponse` Forbidden
    * @response `404` `ApiExceptionResponse` Not Found
    */
-  delete = ({ id, ...query }: DeleteParams, params: RequestParams = {}) =>
+  delete = ({ id, ...query }: DeleteParams2, params: RequestParams = {}) =>
     this.request<void, ApiExceptionResponse>({
       path: `/api/discussion/delete/${id}`,
       method: "DELETE",

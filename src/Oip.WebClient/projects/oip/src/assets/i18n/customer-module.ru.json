@@ -7,6 +7,7 @@
       "globalSearch": "Поиск по имени, email, стране или категории",
       "search": "Найти",
       "clear": "Сбросить",
+      "add": "Добавить",
       "empty": "По текущим фильтрам клиенты не найдены.",
       "table": {
         "fullName": "Клиент",
@@ -17,8 +18,16 @@
         "creditScore": "Кредитный рейтинг",
         "lifetimeValue": "Суммарная ценность",
         "createdAt": "Создан",
-        "ordersCount": "Заказы"
+        "ordersCount": "Заказы",
+        "actions": "Действия"
       }
+    },
+    "messages": {
+      "requiredFields": "Заполните имя, email, категорию и страну.",
+      "createSuccess": "Клиент успешно добавлен.",
+      "updateSuccess": "Изменения клиента сохранены.",
+      "deleteSuccess": "Клиент удалён.",
+      "deleteConfirm": "Удалить клиента?"
     },
     "settings": {
       "title": "Настройки модуля клиентов",

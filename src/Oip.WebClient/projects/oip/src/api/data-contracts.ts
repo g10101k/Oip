@@ -282,6 +282,49 @@ export interface PutSecurityRequest {
   securities?: SecurityResponse[] | null;
 }
 
+/** Request for creating or updating a demo customer. */
+export interface SaveDemoCustomerRequest {
+  /**
+   * Full customer name.
+   * @minLength 1
+   * @maxLength 200
+   */
+  fullName: string;
+  /**
+   * Customer email.
+   * @format email
+   * @minLength 1
+   * @maxLength 200
+   */
+  email: string;
+  /**
+   * Customer category name.
+   * @minLength 1
+   * @maxLength 100
+   */
+  category: string;
+  /**
+   * Customer country name.
+   * @minLength 1
+   * @maxLength 100
+   */
+  country: string;
+  status: DemoCustomerStatus;
+  /**
+   * Credit score.
+   * @format int32
+   * @min 0
+   * @max 1000
+   */
+  creditScore?: number;
+  /**
+   * Lifetime value.
+   * @format double
+   * @min 0
+   */
+  lifetimeValue?: number;
+}
+
 /** Security dto */
 export interface SecurityResponse {
   /** Code */
@@ -417,6 +460,16 @@ export interface WeatherModuleSettingsSaveSettingsRequest {
   settings?: WeatherModuleSettings;
 }
 
+export interface UpdateParams {
+  /** @format int32 */
+  id: number;
+}
+
+export interface DeleteParams {
+  /** @format int32 */
+  id: number;
+}
+
 export interface GetSecurityParams {
   /**
    * The ID of the module instance.
@@ -471,12 +524,12 @@ export interface GetByIdParams {
   id?: number;
 }
 
-export interface UpdateParams {
+export interface UpdateParams2 {
   /** @format int64 */
   id: number;
 }
 
-export interface DeleteParams {
+export interface DeleteParams2 {
   /** @format int64 */
   id: number;
 }
