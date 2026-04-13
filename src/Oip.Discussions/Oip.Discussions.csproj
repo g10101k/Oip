@@ -2,9 +2,14 @@
     <Import Project="..\Common.props" />
 
     <PropertyGroup>
+        <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>Discussion library for OIP template</Title>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include=".\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
     
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
