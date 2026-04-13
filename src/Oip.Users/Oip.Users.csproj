@@ -6,9 +6,13 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>User library for OIP template</Title>
     </PropertyGroup>
+    
     <ItemGroup>
         <None Include=".\README.md" Pack="true" PackagePath="\"/>
+        <Content Update="appsettings*.json" Pack="false" />
+        <Content Update="SwaggerFiles\swagger*.json" Pack="false" />
     </ItemGroup>
+    
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
