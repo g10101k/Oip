@@ -11,7 +11,11 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
+    
+    <ItemGroup>
+        <None Include=".\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.22" />
         <PackageReference Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="8.0.22" />
@@ -33,6 +37,9 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
+    </ItemGroup>
 
     <ItemGroup>
         <Protobuf Include="Protos\user_service.proto" GrpcServices="Client">
@@ -45,10 +52,6 @@
             <AdditionalImportDirs>$(NuGetPackageRoot)\google.api.commonprotos\2.17.0\content\protos\</AdditionalImportDirs>
         </Protobuf>
     </ItemGroup>
-
-
-    <ItemGroup>
-      <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
-    </ItemGroup>
+    
 
 </Project>
