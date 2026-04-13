@@ -11,6 +11,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,10 +26,6 @@
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
         <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
         <ProjectReference Include="..\Oip.Users\Oip.Users.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Data\Repositories\" />
     </ItemGroup>
 
 </Project>
