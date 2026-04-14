@@ -3,7 +3,6 @@ using Oip.Data.Extensions;
 using Oip.Discussions.Data;
 using Oip.Discussions.Data.Repositories;
 using Oip.Discussions.Services;
-using Oip.Users.Extensions;
 
 namespace Oip.Discussions.Extensions;
 
