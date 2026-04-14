@@ -1,12 +1,5 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Api.Controllers.Api;
-using Oip.Base.Exceptions;
-using Oip.Base.Helpers;
-using Oip.Base.Services;
 using Oip.Base.Settings;
-using Oip.Data.Constants;
 
 namespace Oip.Api.Controllers;
 
@@ -16,9 +9,8 @@ namespace Oip.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/proxy-settings")]
-[ApiExplorerSettings(GroupName = "base")]
-public class ProxySettingsController(IBaseOipModuleAppSettings appSettings, KeycloakService keycloakService)
-    : ControllerBase
+[ApiExplorerSettings(GroupName = "ignore")]
+public class ProxySettingsController(IBaseOipModuleAppSettings appSettings) : ControllerBase
 {
     /// <summary>
     /// Retrieves the current proxy configuration settings for the application.

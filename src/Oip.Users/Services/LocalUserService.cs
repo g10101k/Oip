@@ -1,7 +1,6 @@
 using Oip.Users.Base;
 using Oip.Users.Repositories;
 using Oip.Users.Entities;
-using Oip.Data.Dtos;
 
 namespace Oip.Users.Services;
 

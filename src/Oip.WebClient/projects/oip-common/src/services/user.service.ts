@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { SecurityService } from './security.service';
 import { BaseDataService } from './base-data.service';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 
 /**
  * UserService is responsible for retrieving and handling user-related data,
@@ -10,9 +11,19 @@ import { BaseDataService } from './base-data.service';
 export class UserService {
   private readonly securityService = inject(SecurityService);
   private readonly baseDataService = inject(BaseDataService);
+  private requestedPhotoEmail: string | null = null;
 
   constructor() {
-    this.getUserPhoto();
+    this.securityService
+      .getCurrentUser$()
+      .pipe(
+        map((user) => user?.email ?? null),
+        filter((email) => !!email),
+        distinctUntilChanged()
+      )
+      .subscribe(() => {
+        this.getUserPhoto();
+      });
   }
 
   /**
@@ -50,9 +61,14 @@ export class UserService {
     const email = this.securityService.getCurrentUser()?.email;
 
     if (!email) {
-      this.photoLoaded = true;
       return;
     }
+
+    if (this.requestedPhotoEmail === email && (this.photoLoaded || this.photo)) {
+      return;
+    }
+
+    this.requestedPhotoEmail = email;
 
     const url = this.baseDataService.buildUrl(
       `api/user-profile/get-user-photo?email=${email}`

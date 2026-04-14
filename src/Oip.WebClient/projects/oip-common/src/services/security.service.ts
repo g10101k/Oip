@@ -23,6 +23,8 @@ export abstract class SecurityService {
 
   abstract getCurrentUser(): any;
 
+  abstract getCurrentUser$(): Observable<any>;
+
   abstract forceRefreshSession(): Observable<LoginResponse>;
 
   abstract isAdmin(): boolean;
@@ -57,7 +59,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   /**
    * Stores user-specific data from the login response.
    */
-  userData: any;
+  private readonly currentUser = new BehaviorSubject<any>(null);
 
   /**
    * Initializes service and subscribes to authentication events.
@@ -74,7 +76,11 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   }
 
   getCurrentUser() {
-    return this.userData;
+    return this.currentUser.getValue();
+  }
+
+  getCurrentUser$(): Observable<any> {
+    return this.currentUser.asObservable();
   }
 
   /**
@@ -82,7 +88,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
    * @returns A string with the id token.
    */
   override getAccessToken(): Observable<string> {
-    return this.loginResponse.pipe(map((data) => data?.accessToken));
+    return super.getAccessToken();
   }
 
   /**
@@ -101,7 +107,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   auth() {
     super.checkAuth().subscribe((_response: LoginResponse) => {
       this.loginResponse.next(_response);
-      this.userData = _response.userData;
+      this.currentUser.next(_response.userData);
       this.getPayloadFromAccessToken().subscribe((_token) => {
         this.payload.next(_token);
       });
@@ -124,6 +130,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   ngOnDestroy(): void {
     this.loginResponse.complete();
     this.payload.complete();
+    this.currentUser.complete();
   }
 
   /**

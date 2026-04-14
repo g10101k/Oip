@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Settings;
@@ -6,7 +5,6 @@ using Oip.Users.Base;
 using Oip.Users.Contexts;
 using Oip.Users.Repositories;
 using Oip.Users.Services;
-using Oip.Users.Extensions;
 
 namespace Oip.Users.Extensions;
 

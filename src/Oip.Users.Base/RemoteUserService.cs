@@ -1,7 +1,5 @@
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
-using Oip.Users.Base;
-using Google.Protobuf.WellKnownTypes;
 
 namespace Oip.Users.Base;
 
