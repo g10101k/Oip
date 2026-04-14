@@ -10,20 +10,12 @@ export class NotificationService {
   private securityService = inject(SecurityService);
   private msgService = inject(MsgService);
   private frontendConfig = inject(OIP_FRONTEND_CONFIG);
-  private securityData: string;
+  private securityData: string | null = null;
 
   constructor() {
-    this.securityService.getAccessToken().subscribe((token) => {
-      this.securityData = token;
-      if (token) {
-        this.connection.stop().then(() => {
-          this.connection.start().then();
-        });
-      }
-    });
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(this.resolveHubUrl(), {
-        accessTokenFactory: () => this.securityData,
+        accessTokenFactory: () => this.securityData ?? '',
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
       })
@@ -38,6 +30,22 @@ export class NotificationService {
         life: 0
       };
       this.msgService.add(opt);
+    });
+
+    this.securityService.getAccessToken().subscribe((token) => {
+      this.securityData = token;
+      if (!token) {
+        return;
+      }
+
+      if (this.connection.state === signalR.HubConnectionState.Disconnected) {
+        this.connection.start().catch((error) => console.error('Failed to start notification connection', error));
+        return;
+      }
+
+      this.connection.stop().then(() => {
+        this.connection.start().catch((error) => console.error('Failed to restart notification connection', error));
+      });
     });
   }
 
