@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { SecurityService } from '../../services/security.service';
 import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { DialogModule } from 'primeng/dialog';
-import { ContextMenuService, MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
+import { MenuItemCommandEvent, PrimeIcons } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { MenuItemComponent } from './menu-item.component';
@@ -12,7 +12,6 @@ import { MenuItemCreateDialogComponent } from './menu-item-create-dialog.compone
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
 import { MenuApi } from '../../api/menu.api';
-import { L10nService } from '../../services/l10n.service';
 
 @Component({
   imports: [
@@ -28,7 +27,8 @@ import { L10nService } from '../../services/l10n.service';
   providers: [MenuApi],
   selector: 'app-menu',
   standalone: true,
-  template: ` <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
+  template: `
+    <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
       <ul class="layout-menu">
         @for (item of menuService.menu; track item; let i = $index) {
           <ng-container>
@@ -48,10 +48,10 @@ import { L10nService } from '../../services/l10n.service';
         }
       </ul>
     </div>
-    <p-contextMenu [target]="empty" />
-    @if (securityService.isAdmin) {
-      <menu-item-create-dialog />
-      <menu-item-edit-dialog />
+    <p-contextMenu [target]="empty"/>
+    @if (securityService.isAdmin()) {
+      <menu-item-create-dialog/>
+      <menu-item-edit-dialog/>
     }`
 })
 export class MenuComponent implements OnInit {
@@ -70,7 +70,7 @@ export class MenuComponent implements OnInit {
     this.menuItemCreateDialogComponent.showDialog();
   }
 
-  onContextMenu($event: MouseEvent) {
+  protected onContextMenu($event: MouseEvent) {
     this.menuService.contextMenuItem = null;
     this.contextMenu.model = [
       {

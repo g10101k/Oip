@@ -82,7 +82,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
    * @returns A string with the id token.
    */
   override getAccessToken(): Observable<string> {
-    return this.loginResponse.pipe(map((data) => data?.accessToken));
+    return super.getAccessToken();
   }
 
   /**
