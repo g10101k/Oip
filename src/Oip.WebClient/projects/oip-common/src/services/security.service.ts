@@ -7,8 +7,8 @@ import {
   EventTypes,
   AuthOptions
 } from 'angular-auth-oidc-client';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { BehaviorSubject, merge, Observable, ReplaySubject, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 
 export abstract class SecurityService {
   abstract auth(): void;
@@ -62,6 +62,12 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   private readonly currentUser = new BehaviorSubject<any>(null);
 
   /**
+   * Emits access token updates from initial auth check, manual refresh,
+   * and library authentication events.
+   */
+  private accessToken = new ReplaySubject<string>(1);
+
+  /**
    * Initializes service and subscribes to authentication events.
    * When a 'NewAuthenticationResult' event is received, the `auth` method is called.
    */
@@ -71,6 +77,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
       .registerForEvents()
       .pipe(filter((event) => event.type === EventTypes.NewAuthenticationResult))
       .subscribe(() => {
+        super.getAccessToken().subscribe(token => {this.accessToken.next(token); });
         this.auth();
       });
   }
@@ -87,9 +94,13 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
    * Returns the ID token for the sign-in.
    * @returns A string with the id token.
    */
-  override getAccessToken(): Observable<string> {
-    return super.getAccessToken();
+  override getAccessToken(configId?: string): Observable<string> {
+    return merge(
+      super.getAccessToken(configId),
+      this.accessToken.asObservable()
+    ).pipe(distinctUntilChanged());
   }
+
 
   /**
    * Indicates whether the current user has the 'admin' role.
