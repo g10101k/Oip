@@ -30,6 +30,8 @@ export abstract class SecurityService {
   abstract isAdmin(): boolean;
 
   abstract authorize(configId?: string, authOptions?: AuthOptions): void;
+
+  abstract payload: BehaviorSubject<any>;
 }
 
 /**
@@ -49,12 +51,12 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   /**
    * Stores the latest login response from checkAuth().
    */
-  private loginResponse = new BehaviorSubject<LoginResponse>(null);
+  public loginResponse = new BehaviorSubject<LoginResponse>(null);
 
   /**
    * Stores the decoded access token payload.
    */
-  private payload = new BehaviorSubject<any>(null);
+  public readonly payload = new BehaviorSubject<any>(null);
 
   /**
    * Stores user-specific data from the login response.
