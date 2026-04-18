@@ -13,6 +13,7 @@
       "title": "Weather Settings",
       "dayCount": "Day Count",
       "save": "Save"
-    }
+    },
+    "errorFetchingMessage": "Error fetching weather data:"
   }
 }

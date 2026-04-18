@@ -4,10 +4,11 @@ import { TopBarService } from '../services/top-bar.service';
 import { MsgService } from '../services/msg.service';
 import { ActivatedRoute } from '@angular/router';
 import { BaseDataService } from '../services/base-data.service';
-import { TranslateService } from '@ngx-translate/core';
-import { Subject, Subscription } from 'rxjs';
+import { InterpolationParameters, TranslateService, Translation, TranslationObject } from '@ngx-translate/core';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { AppTitleService } from '../services/app-title.service';
 import { LayoutService } from '../services/app.layout.service';
+import { L10nService } from '../services/l10n.service';
 
 interface BaseComponentLocalization {
   security: string;
@@ -15,7 +16,7 @@ interface BaseComponentLocalization {
   content: string;
 }
 
-@Component({ standalone: true, template: '' })
+@Component({standalone: true, template: ''})
 export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSettings> implements OnInit, OnDestroy {
   private isInitialized = false;
   private moduleInstanceReloadPromise: Promise<void> = Promise.resolve();
@@ -98,6 +99,8 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @type {string}
    */
   public title: string;
+  public l10nService = inject(L10nService);
+  public l10n$: Observable<Translation | TranslationObject>;
 
   /**
    * Updates local settings and persists them to local storage.
@@ -105,7 +108,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    */
   private onConfigUpdate(): void {
     if (Object.keys(this.localSettings()).length > 0) {
-      this._localSettings = { ...this.localSettings() };
+      this._localSettings = {...this.localSettings()};
       this.localSettingsUpdate.next(this._localSettings);
       localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this._localSettings));
     }
@@ -165,10 +168,17 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Defines the top bar items.
    */
   public topBarItems: TopBarDto[] = [
-    { id: 'content', icon: 'pi-box', caption: '' },
-    { id: 'settings', icon: 'pi-cog', caption: '' },
-    { id: 'security', icon: 'pi-lock', caption: '' }
+    {id: 'content', icon: 'pi-box', caption: ''},
+    {id: 'settings', icon: 'pi-cog', caption: ''},
+    {id: 'security', icon: 'pi-lock', caption: ''}
   ];
+
+  /**
+   * Gets an instant translation for a key or an array of keys.
+   */
+  public t(key: string | string[], interpolateParams?: InterpolationParameters): Translation | TranslationObject {
+    return this.translateService.instant(key, interpolateParams);
+  }
 
   /**
    * Initializes the component and subscribes to local settings updates.
@@ -183,6 +193,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     this.subscriptions.push(
       this.route.url.subscribe((url) => {
         this.controller = url[0].path;
+        this.l10n$ = this.l10nService.get(this.controller);
       })
     );
     this.subscriptions.push(
@@ -279,7 +290,8 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Called whenever the module instance changes, including the first load.
    * Derived components can override this to refresh module-specific data.
    */
-  protected async onModuleInstanceChange(): Promise<void> {}
+  protected async onModuleInstanceChange(): Promise<void> {
+  }
 
   private async reloadModuleInstance(): Promise<void> {
     this.moduleInstanceReloadPromise = this.moduleInstanceReloadPromise.then(async () => {

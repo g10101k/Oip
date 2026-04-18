@@ -92,20 +92,11 @@ interface WeatherModuleLocalSettings {
   providers: [WeatherForecastModuleApi],
   imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText, DatePipe, TranslatePipe]
 })
-export class WeatherForecastModuleComponent
-  extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
+export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
   implements OnInit, OnDestroy {
   @ViewChild('table') table!: Table;
   protected readonly dataService = inject(WeatherForecastModuleApi);
-  protected readonly l10nService = inject(L10nService);
   protected data: WeatherForecastResponse[] = [];
-
-  constructor() {
-    super();
-    this.l10nService.get('weather-forecast-module').subscribe((q) => {
-      this.appTitleService.setTitle(q.title);
-    });
-  }
 
   protected override async onModuleInstanceChange(): Promise<void> {
     try {
@@ -114,7 +105,7 @@ export class WeatherForecastModuleComponent
       });
     } catch (error) {
       this.data = [];
-      console.error('Error fetching weather data:', error);
+      console.error(this.t('weather-forecast-module.errorFetchingMessage'), error);
       this.msgService.error(error.error.message);
     }
     if (this.localSettings().filters && this.table) this.table.filters = this.localSettings().filters;
