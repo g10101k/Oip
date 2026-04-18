@@ -6,6 +6,7 @@ import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
 import {
+  AppThemePreset,
   AuthGuardService,
   BaseDataService,
   DEFAULT_OIP_FRONTEND_CONFIG,
@@ -15,6 +16,7 @@ import {
   UserService,
   langIntercept,
   httpLoaderAuthFactory,
+  provideAppThemes,
   SecurityService,
   KeycloakSecurityService,
   NotificationService
@@ -26,9 +28,90 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 import { environment } from './environments/environment';
+import { definePreset } from '@primeng/themes';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
+
+const customThemes: AppThemePreset[] = [
+  {
+    id: 'Corporate',
+    label: 'Corporate',
+    preset: definePreset(Aura, {
+      components: {
+        toolbar: {
+          colorScheme: {
+            light: {
+              root: {
+                borderRadius: '0.7rem'
+              }
+            },
+            dark: {
+              root: {
+                borderRadius: '0.7rem'
+              }
+            }
+          }
+        },
+
+        tooltip: {
+          colorScheme: {
+            light: {
+              root: {
+                background: 'var(--color-light-tooltip)',
+                borderRadius: '0.7rem'
+              }
+            },
+            dark: {
+              root: {
+                background: 'var(--color-light-tooltip)',
+                borderRadius: '0.7rem'
+              }
+            }
+          }
+        },
+
+        datatable: {
+          colorScheme: {
+            light: {
+              root: {
+                borderColor: 'var(--color-light-green)'
+              },
+              header: {
+                background: 'var(--color-light-green)',
+                color: 'var(--color-dark)'
+              },
+              headerCell: {
+                gap: '0px',
+                background: 'var(--color-light-green)',
+                color: 'var(--color-dark)',
+                borderColor: 'var(--color-light-green)'
+              }
+            },
+            dark: {
+              root: {
+                borderColor: 'var(--color-gray)'
+              },
+              header: {
+                background: 'var(--color-gray)',
+                color: 'var(--color-dark)'
+              },
+              headerCell: {
+                background: 'var(--color-gray)',
+                color: 'var(--color-dark)',
+                borderColor: 'var(--color-gray)'
+              }
+            }
+          }
+        }
+      }
+    }),
+    primaryColors: {
+      rose: { 500: '#f43f5e', 600: '#e11d48', 700: '#be123c' }
+    }
+  }
+];
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -40,6 +123,7 @@ export const appConfig: ApplicationConfig = {
         deps: [HttpClient]
       }
     }),
+    provideAppThemes(customThemes, { mode: 'replaceDefaults' }),
     { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: SecurityService, useClass: KeycloakSecurityService },
