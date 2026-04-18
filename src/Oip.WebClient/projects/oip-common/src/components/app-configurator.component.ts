@@ -75,7 +75,7 @@ declare type SurfacesType = {
       <div>
         <span class="text-sm text-muted-color font-semibold">{{ 'app-configurator.surface' | translate }}</span>
         <div class="pt-2 flex gap-2 flex-wrap justify-start">
-          @for (surface of surfaces; track surface.name) {
+          @for (surface of surfaceColors(); track surface.name) {
             <button
               class="border-none w-5 h-5 rounded-full p-0 cursor-pointer outline-none outline-offset-1"
               id="oip-app-configurator-surface-color-{{ surface.name }}"
@@ -319,6 +319,11 @@ export class AppConfiguratorComponent implements OnInit {
     return this.getPrimaryColorOptions(activeThemePreset);
   });
 
+  surfaceColors = computed<SurfacesType[]>(() => {
+    const activeThemePreset = this.getThemeById(this.layoutService.layoutConfig().preset);
+    return this.getSurfaceColorOptions(activeThemePreset);
+  });
+
   getPresetExt() {
     const color: SurfacesType = this.primaryColors().find((c) => c.name === this.selectedPrimaryColor()) || {};
     const preset = this.getThemeById(this.layoutService.layoutConfig().preset).id;
@@ -487,6 +492,16 @@ export class AppConfiguratorComponent implements OnInit {
     return palettes;
   }
 
+  private getSurfaceColorOptions(activeThemePreset: AppThemePreset): SurfacesType[] {
+    if (activeThemePreset.surfaceColors) {
+      return Object.entries(activeThemePreset.surfaceColors)
+        .filter((entry): entry is [string, PaletteDesignToken] => Boolean(entry[1]))
+        .map(([name, palette]) => ({ name, palette }));
+    }
+
+    return this.surfaces;
+  }
+
   private ensureValidThemeId(themeId?: string): string {
     if (themeId && this.themePresetsMap.has(themeId)) {
       return themeId;
@@ -526,15 +541,21 @@ export class AppConfiguratorComponent implements OnInit {
 
   onPresetChange(event: string) {
     const nextThemeId = this.ensureValidThemeId(event);
-    const primaryColors = this.getPrimaryColorOptions(this.getThemeById(nextThemeId));
+    const nextTheme = this.getThemeById(nextThemeId);
+    const primaryColors = this.getPrimaryColorOptions(nextTheme);
+    const surfaceColors = this.getSurfaceColorOptions(nextTheme);
 
     this.layoutService.layoutConfig.update((state) => ({
       ...state,
       preset: nextThemeId,
-      primary: primaryColors.some((color) => color.name === state.primary) ? state.primary : (primaryColors[0]?.name ?? state.primary)
+      primary: primaryColors.some((color) => color.name === state.primary) ? state.primary : (primaryColors[0]?.name ?? state.primary),
+      surface:
+        nextTheme.surfaceColors && !surfaceColors.some((color) => color.name === state.surface)
+          ? (surfaceColors[0]?.name ?? state.surface)
+          : state.surface
     }));
-    const preset = this.getThemeById(nextThemeId).preset;
-    const surfacePalette = this.surfaces.find((s) => s.name === this.selectedSurfaceColor())?.palette;
+    const preset = nextTheme.preset;
+    const surfacePalette = this.surfaceColors().find((s) => s.name === this.selectedSurfaceColor())?.palette;
     $t().preset(preset).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
   }
 
