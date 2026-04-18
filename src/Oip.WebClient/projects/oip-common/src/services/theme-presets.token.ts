@@ -6,6 +6,7 @@ export interface AppThemePreset {
   label?: string;
   preset: Preset;
   primaryColors?: Record<string, PaletteDesignToken | undefined>;
+  surfaceColors?: Record<string, PaletteDesignToken | undefined>;
 }
 
 export type AppThemePresetMergeMode = 'mergeWithDefaults' | 'replaceDefaults';
