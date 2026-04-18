@@ -6,7 +6,6 @@ import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
 import {
-  AppThemePreset,
   AuthGuardService,
   BaseDataService,
   DEFAULT_OIP_FRONTEND_CONFIG,
@@ -28,40 +27,10 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 import { environment } from './environments/environment';
-import { definePreset } from '@primeng/themes';
-import { primitive as AuraPrimitive } from '@primeng/themes/aura/base';
+import { appTheme } from "./app.theme";
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
-
-const customThemes: AppThemePreset[] = [
-  {
-    id: 'Corporate',
-    label: 'Corporate',
-    preset: definePreset(Aura, {
-      components: {
-        toolbar: {
-          colorScheme: {
-            light: {
-              root: {
-                borderRadius: '0.7rem'
-              }
-            },
-            dark: {
-              root: {
-                borderRadius: '0.7rem'
-              }
-            }
-          }
-        }
-      }
-    }),
-    primaryColors: {
-      rose: AuraPrimitive['rose']
-    }
-  }
-];
-
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -73,7 +42,7 @@ export const appConfig: ApplicationConfig = {
         deps: [HttpClient]
       }
     }),
-    provideAppThemes(customThemes, { mode: 'replaceDefaults' }),
+    provideAppThemes(appTheme, { mode: 'replaceDefaults' }),
     { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: SecurityService, useClass: KeycloakSecurityService },
