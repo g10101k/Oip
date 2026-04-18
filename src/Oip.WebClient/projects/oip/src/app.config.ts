@@ -15,6 +15,7 @@ import {
   UserService,
   langIntercept,
   httpLoaderAuthFactory,
+  provideAppThemes,
   SecurityService,
   KeycloakSecurityService,
   NotificationService
@@ -26,6 +27,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 import { environment } from './environments/environment';
+import { appTheme } from "./app.theme";
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
@@ -40,6 +42,7 @@ export const appConfig: ApplicationConfig = {
         deps: [HttpClient]
       }
     }),
+    provideAppThemes(appTheme, { mode: 'replaceDefaults' }),
     { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: SecurityService, useClass: KeycloakSecurityService },
