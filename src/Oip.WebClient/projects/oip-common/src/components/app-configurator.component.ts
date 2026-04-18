@@ -316,18 +316,7 @@ export class AppConfiguratorComponent implements OnInit {
 
   primaryColors = computed<SurfacesType[]>(() => {
     const activeThemePreset = this.getThemeById(this.layoutService.layoutConfig().preset);
-    const presetPalette = activeThemePreset.primaryColors
-      ?? ((activeThemePreset.preset as { primitive?: Record<string, PaletteDesignToken> }).primitive ?? {});
-    const palettes: SurfacesType[] = [{ name: 'noir', palette: {} }];
-
-    PRIMARY_COLORS.forEach((color) => {
-      palettes.push({
-        name: color,
-        palette: presetPalette[color] ?? this.fallbackPrimaryColors[color]
-      });
-    });
-
-    return palettes;
+    return this.getPrimaryColorOptions(activeThemePreset);
   });
 
   getPresetExt() {
@@ -478,6 +467,26 @@ export class AppConfiguratorComponent implements OnInit {
     return this.themePresetsMap.get(themeId ?? '') ?? this.defaultThemePreset;
   }
 
+  private getPrimaryColorOptions(activeThemePreset: AppThemePreset): SurfacesType[] {
+    if (activeThemePreset.primaryColors) {
+      return Object.entries(activeThemePreset.primaryColors)
+        .filter((entry): entry is [string, PaletteDesignToken] => Boolean(entry[1]))
+        .map(([name, palette]) => ({ name, palette }));
+    }
+
+    const presetPalette = ((activeThemePreset.preset as { primitive?: Record<string, PaletteDesignToken> }).primitive ?? {});
+    const palettes: SurfacesType[] = [{ name: 'noir', palette: {} }];
+
+    PRIMARY_COLORS.forEach((color) => {
+      palettes.push({
+        name: color,
+        palette: presetPalette[color] ?? this.fallbackPrimaryColors[color]
+      });
+    });
+
+    return palettes;
+  }
+
   private ensureValidThemeId(themeId?: string): string {
     if (themeId && this.themePresetsMap.has(themeId)) {
       return themeId;
@@ -517,10 +526,12 @@ export class AppConfiguratorComponent implements OnInit {
 
   onPresetChange(event: string) {
     const nextThemeId = this.ensureValidThemeId(event);
+    const primaryColors = this.getPrimaryColorOptions(this.getThemeById(nextThemeId));
 
     this.layoutService.layoutConfig.update((state) => ({
       ...state,
-      preset: nextThemeId
+      preset: nextThemeId,
+      primary: primaryColors.some((color) => color.name === state.primary) ? state.primary : (primaryColors[0]?.name ?? state.primary)
     }));
     const preset = this.getThemeById(nextThemeId).preset;
     const surfacePalette = this.surfaces.find((s) => s.name === this.selectedSurfaceColor())?.palette;

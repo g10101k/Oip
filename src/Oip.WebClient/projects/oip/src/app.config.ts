@@ -29,6 +29,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 import { environment } from './environments/environment';
 import { definePreset } from '@primeng/themes';
+import { primitive as AuraPrimitive } from '@primeng/themes/aura/base';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
@@ -52,62 +53,11 @@ const customThemes: AppThemePreset[] = [
               }
             }
           }
-        },
-
-        tooltip: {
-          colorScheme: {
-            light: {
-              root: {
-                background: 'var(--color-light-tooltip)',
-                borderRadius: '0.7rem'
-              }
-            },
-            dark: {
-              root: {
-                background: 'var(--color-light-tooltip)',
-                borderRadius: '0.7rem'
-              }
-            }
-          }
-        },
-
-        datatable: {
-          colorScheme: {
-            light: {
-              root: {
-                borderColor: 'var(--color-light-green)'
-              },
-              header: {
-                background: 'var(--color-light-green)',
-                color: 'var(--color-dark)'
-              },
-              headerCell: {
-                gap: '0px',
-                background: 'var(--color-light-green)',
-                color: 'var(--color-dark)',
-                borderColor: 'var(--color-light-green)'
-              }
-            },
-            dark: {
-              root: {
-                borderColor: 'var(--color-gray)'
-              },
-              header: {
-                background: 'var(--color-gray)',
-                color: 'var(--color-dark)'
-              },
-              headerCell: {
-                background: 'var(--color-gray)',
-                color: 'var(--color-dark)',
-                borderColor: 'var(--color-gray)'
-              }
-            }
-          }
         }
       }
     }),
     primaryColors: {
-      rose: { 500: '#f43f5e', 600: '#e11d48', 700: '#be123c' }
+      rose: AuraPrimitive['rose']
     }
   }
 ];
