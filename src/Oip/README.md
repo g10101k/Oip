@@ -1,7 +1,7 @@
 # Shell
 
-* Dotnet app start at http://localhost:5002
-* Angular client start at http://localhost:50000
+* Dotnet app start at https://localhost:5002
+* Angular client start at https://localhost:50002
 
 ## DbMigration
 
