@@ -7,8 +7,19 @@ import {
   EventTypes,
   AuthOptions
 } from 'angular-auth-oidc-client';
-import { BehaviorSubject, merge, Observable, ReplaySubject, tap } from 'rxjs';
-import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { BehaviorSubject, merge, Observable, ReplaySubject, throwError } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+
+type RefreshLock = {
+  owner: string;
+  expiresAt: number;
+};
+
+type RefreshMessage = {
+  owner: string;
+  success: boolean;
+  timestamp: number;
+};
 
 export abstract class SecurityService {
   abstract auth(): void;
@@ -25,7 +36,10 @@ export abstract class SecurityService {
 
   abstract getCurrentUser$(): Observable<any>;
 
-  abstract forceRefreshSession(): Observable<LoginResponse>;
+  abstract forceRefreshSession(
+    customParams?: { [key: string]: string | number | boolean },
+    configId?: string
+  ): Observable<LoginResponse>;
 
   abstract isAdmin(): boolean;
 
@@ -43,6 +57,22 @@ export abstract class SecurityService {
  */
 @Injectable()
 export class KeycloakSecurityService extends OidcSecurityService implements OnDestroy, SecurityService {
+  private static readonly refreshLockKey = 'oip.auth.refresh.lock';
+
+  private static readonly refreshResultKey = 'oip.auth.refresh.result';
+
+  private static readonly refreshChannelName = 'oip.auth.refresh';
+
+  private static readonly refreshLockTtlMs = 15000;
+
+  private static readonly refreshWaitTimeoutMs = 20000;
+
+  private readonly tabId = this.createTabId();
+
+  private readonly refreshChannel = this.createRefreshChannel();
+
+  private currentTabRefresh$: Observable<LoginResponse> | null = null;
+
   /**
    * Handles angular OIDC events.
    */
@@ -79,7 +109,9 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
       .registerForEvents()
       .pipe(filter((event) => event.type === EventTypes.NewAuthenticationResult))
       .subscribe(() => {
-        super.getAccessToken().subscribe(token => {this.accessToken.next(token); });
+        super.getAccessToken().subscribe((token) => {
+          this.accessToken.next(token);
+        });
         this.auth();
       });
   }
@@ -97,12 +129,56 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
    * @returns A string with the id token.
    */
   override getAccessToken(configId?: string): Observable<string> {
-    return merge(
-      super.getAccessToken(configId),
-      this.accessToken.asObservable()
-    ).pipe(distinctUntilChanged());
+    return merge(super.getAccessToken(configId), this.accessToken.asObservable()).pipe(distinctUntilChanged());
   }
 
+  /**
+   * Refreshes tokens in only one browser tab at a time. Other tabs wait for the
+   * refresh result and then read the updated tokens from shared storage.
+   */
+  override forceRefreshSession(
+    customParams?: { [key: string]: string | number | boolean },
+    configId?: string
+  ): Observable<LoginResponse> {
+    if (this.currentTabRefresh$) {
+      return this.currentTabRefresh$;
+    }
+
+    const refreshRequestedAt = Date.now();
+
+    if (!this.canUseBrowserStorage()) {
+      return this.refreshCurrentTab(customParams, configId);
+    }
+
+    if (this.tryAcquireRefreshLock()) {
+      this.currentTabRefresh$ = this.refreshCurrentTab(customParams, configId).pipe(
+        tap(() => this.publishRefreshResult(true)),
+        catchError((error) => {
+          this.publishRefreshResult(false);
+          return throwError(() => error);
+        }),
+        finalize(() => {
+          this.releaseRefreshLock();
+          this.currentTabRefresh$ = null;
+        }),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+
+      return this.currentTabRefresh$;
+    }
+
+    const refreshOwner = this.readRefreshLock()?.owner ?? null;
+
+    return this.waitForRefreshResult(refreshRequestedAt, refreshOwner).pipe(
+      switchMap((success) => {
+        if (!success) {
+          return throwError(() => new Error('Token refresh failed in another tab'));
+        }
+
+        return super.checkAuth(undefined, configId).pipe(tap((response) => this.setLoginResponse(response)));
+      })
+    );
+  }
 
   /**
    * Indicates whether the current user has the 'admin' role.
@@ -119,11 +195,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
    */
   auth() {
     super.checkAuth().subscribe((_response: LoginResponse) => {
-      this.loginResponse.next(_response);
-      this.currentUser.next(_response.userData);
-      this.getPayloadFromAccessToken().subscribe((_token) => {
-        this.payload.next(_token);
-      });
+      this.setLoginResponse(_response);
     });
   }
 
@@ -141,9 +213,11 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
    * Completes the BehaviorSubjects when the service is destroyed to avoid memory leaks.
    */
   ngOnDestroy(): void {
+    this.refreshChannel?.close();
     this.loginResponse.complete();
     this.payload.complete();
     this.currentUser.complete();
+    this.accessToken.complete();
   }
 
   /**
@@ -157,5 +231,145 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
         return payload.exp < Math.floor(Date.now() / 1000);
       })
     );
+  }
+
+  private refreshCurrentTab(
+    customParams?: { [key: string]: string | number | boolean },
+    configId?: string
+  ): Observable<LoginResponse> {
+    return super.forceRefreshSession(customParams, configId).pipe(tap((response) => this.setLoginResponse(response)));
+  }
+
+  private setLoginResponse(response: LoginResponse): void {
+    this.loginResponse.next(response);
+    this.currentUser.next(response?.userData);
+
+    if (response?.accessToken) {
+      this.accessToken.next(response.accessToken);
+      this.getPayloadFromAccessToken().subscribe((_token) => {
+        this.payload.next(_token);
+      });
+    }
+  }
+
+  private tryAcquireRefreshLock(): boolean {
+    const now = Date.now();
+    const currentLock = this.readRefreshLock();
+
+    if (currentLock && currentLock.expiresAt > now && currentLock.owner !== this.tabId) {
+      return false;
+    }
+
+    const lock: RefreshLock = {
+      owner: this.tabId,
+      expiresAt: now + KeycloakSecurityService.refreshLockTtlMs
+    };
+
+    localStorage.setItem(KeycloakSecurityService.refreshLockKey, JSON.stringify(lock));
+
+    return this.readRefreshLock()?.owner === this.tabId;
+  }
+
+  private releaseRefreshLock(): void {
+    if (this.readRefreshLock()?.owner === this.tabId) {
+      localStorage.removeItem(KeycloakSecurityService.refreshLockKey);
+    }
+  }
+
+  private readRefreshLock(): RefreshLock | null {
+    const lock = localStorage.getItem(KeycloakSecurityService.refreshLockKey);
+
+    if (!lock) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(lock) as RefreshLock;
+    } catch {
+      localStorage.removeItem(KeycloakSecurityService.refreshLockKey);
+      return null;
+    }
+  }
+
+  private publishRefreshResult(success: boolean): void {
+    const message: RefreshMessage = {
+      owner: this.tabId,
+      success,
+      timestamp: Date.now()
+    };
+
+    localStorage.setItem(KeycloakSecurityService.refreshResultKey, JSON.stringify(message));
+    this.refreshChannel?.postMessage(message);
+  }
+
+  private waitForRefreshResult(refreshRequestedAt: number, refreshOwner: string | null): Observable<boolean> {
+    return new Observable<boolean>((subscriber) => {
+      const completeWith = (success: boolean) => {
+        if (!subscriber.closed) {
+          subscriber.next(success);
+          subscriber.complete();
+        }
+      };
+
+      const handleMessage = (message: RefreshMessage | null) => {
+        if (
+          !message ||
+          message.owner === this.tabId ||
+          message.timestamp < refreshRequestedAt ||
+          (refreshOwner && message.owner !== refreshOwner)
+        ) {
+          return;
+        }
+
+        completeWith(message.success);
+      };
+
+      const onBroadcastMessage = (event: MessageEvent<RefreshMessage>) => handleMessage(event.data);
+      const onStorageMessage = (event: StorageEvent) => {
+        if (event.key !== KeycloakSecurityService.refreshResultKey || !event.newValue) {
+          return;
+        }
+
+        handleMessage(this.parseRefreshMessage(event.newValue));
+      };
+
+      this.refreshChannel?.addEventListener('message', onBroadcastMessage);
+      window.addEventListener('storage', onStorageMessage);
+      handleMessage(this.parseRefreshMessage(localStorage.getItem(KeycloakSecurityService.refreshResultKey)));
+
+      const timeoutId = window.setTimeout(() => completeWith(false), KeycloakSecurityService.refreshWaitTimeoutMs);
+
+      return () => {
+        this.refreshChannel?.removeEventListener('message', onBroadcastMessage);
+        window.removeEventListener('storage', onStorageMessage);
+        window.clearTimeout(timeoutId);
+      };
+    });
+  }
+
+  private parseRefreshMessage(value: string | null): RefreshMessage | null {
+    if (!value) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(value) as RefreshMessage;
+    } catch {
+      return null;
+    }
+  }
+
+  private createTabId(): string {
+    return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+  }
+
+  private createRefreshChannel(): BroadcastChannel | null {
+    return typeof BroadcastChannel === 'undefined'
+      ? null
+      : new BroadcastChannel(KeycloakSecurityService.refreshChannelName);
+  }
+
+  private canUseBrowserStorage(): boolean {
+    return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
   }
 }
