@@ -62,7 +62,7 @@ public sealed class KeycloakClient : HttpClient
 
         using var request = new HttpRequestMessage();
         request.Content = content;
-        request.RequestUri = new Uri($"realms/{realm}/protocol/openid-connect/token", UriKind.RelativeOrAbsolute);
+        request.RequestUri = CreateRequestUri($"realms/{realm}/protocol/openid-connect/token");
         request.Method = new HttpMethod("POST");
 
         using var response = await client
@@ -118,7 +118,7 @@ public sealed class KeycloakClient : HttpClient
 
         using var request = new HttpRequestMessage();
         request.Method = new HttpMethod("GET");
-        request.RequestUri = new Uri($"/admin/realms/{realm}/roles", UriKind.RelativeOrAbsolute);
+        request.RequestUri = CreateRequestUri($"admin/realms/{realm}/roles");
 
         var response = await _httpClient
             .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
@@ -244,7 +244,7 @@ public sealed class KeycloakClient : HttpClient
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = new Uri($"/admin/realms/{realm}/users/{userId}", UriKind.RelativeOrAbsolute);
+        request.RequestUri = CreateRequestUri($"admin/realms/{realm}/users/{userId}");
 
 
         using var response =
@@ -281,11 +281,7 @@ public sealed class KeycloakClient : HttpClient
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        var uriBuilder = new UriBuilder(_httpClient.BaseAddress!.ToString().UrlAppend($"/admin/realms/{realm}/users"))
-        {
-            Query = $"first={first}&max={max}"
-        };
-        request.RequestUri = uriBuilder.Uri;
+        request.RequestUri = CreateRequestUri($"admin/realms/{realm}/users", $"first={first}&max={max}");
 
         using var response =
             await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
@@ -314,7 +310,7 @@ public sealed class KeycloakClient : HttpClient
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = new Uri($"/admin/realms/{realm}/users/count", UriKind.RelativeOrAbsolute);
+        request.RequestUri = CreateRequestUri($"admin/realms/{realm}/users/count");
 
         using var response =
             await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
@@ -347,11 +343,9 @@ public sealed class KeycloakClient : HttpClient
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        var uriBuilder = new UriBuilder($"/admin/realms/{realm}/users")
-        {
-            Query = $"search={Uri.EscapeDataString(search)}&first={first}&max={max}"
-        };
-        request.RequestUri = uriBuilder.Uri;
+        request.RequestUri = CreateRequestUri(
+            $"admin/realms/{realm}/users",
+            $"search={Uri.EscapeDataString(search)}&first={first}&max={max}");
 
         using var response =
             await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
@@ -382,6 +376,21 @@ public sealed class KeycloakClient : HttpClient
 
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _authResponse.AccessToken);
+    }
+
+    private Uri CreateRequestUri(string path, string? query = null)
+    {
+        var normalizedPath = path.TrimStart('/');
+        var requestUri = _httpClient.BaseAddress is null
+            ? normalizedPath
+            : _httpClient.BaseAddress.ToString().UrlAppend(normalizedPath);
+
+        if (!string.IsNullOrEmpty(query))
+        {
+            requestUri = $"{requestUri}?{query.TrimStart('?')}";
+        }
+
+        return new Uri(requestUri, UriKind.RelativeOrAbsolute);
     }
 
     /// <summary>
