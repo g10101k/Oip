@@ -6,8 +6,8 @@ import { Injectable } from "@angular/core";
 import { ContentType, HttpClient, RequestParams } from "oip-common";
 import {
   ApiExceptionResponse,
-  GetModuleInstanceSettingsParams,
-  GetSecurityParams,
+  GetModuleInstanceSettingsParams2,
+  GetSecurityParams2,
   GetWeatherForecastParams,
   PutSecurityRequest,
   SecurityResponse,
@@ -74,7 +74,7 @@ export class WeatherForecastModuleApi<
    * @response `401` `ApiExceptionResponse` Unauthorized
    * @response `403` `ApiExceptionResponse` Forbidden
    */
-  getSecurity = (query: GetSecurityParams, params: RequestParams = {}) =>
+  getSecurity = (query: GetSecurityParams2, params: RequestParams = {}) =>
     this.request<SecurityResponse[], ApiExceptionResponse>({
       path: `/api/weather-forecast-module/get-security`,
       method: "GET",
@@ -118,7 +118,7 @@ export class WeatherForecastModuleApi<
    * @response `403` `ApiExceptionResponse` Forbidden
    */
   getModuleInstanceSettings = (
-    query: GetModuleInstanceSettingsParams,
+    query: GetModuleInstanceSettingsParams2,
     params: RequestParams = {},
   ) =>
     this.request<any, ApiExceptionResponse>({

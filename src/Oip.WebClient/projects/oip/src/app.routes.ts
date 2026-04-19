@@ -20,6 +20,14 @@ export const appRoutes: Routes = [
             (m) => m.WeatherForecastModuleComponent
           ),
         canActivate: [() => inject(AuthGuardService).canActivate()]
+      },
+      {
+        path: 'customer-module/:id',
+        loadComponent: () =>
+          import('./app/components/customer-module/customer-module.component').then(
+            (m) => m.CustomerModuleComponent
+          ),
+        canActivate: [() => inject(AuthGuardService).canActivate()]
       }, {
         path: 'discussion/:id',
         loadComponent: () => import('oip-common').then((m) => m.DiscussionComponent),

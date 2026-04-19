@@ -20,36 +20,36 @@ public static class WebApplicationBuilderExtensions
     {
         if (settings.IsStandalone)
         {
-            builder.AddDiscussionsModuleLocal(settings);
+            builder.Services.AddDiscussionsModuleLocal(settings);
         }
         else
         {
-            builder.AddDiscussionsModuleRemote(settings);
+            builder.Services.AddDiscussionsModuleRemote(settings);
         }
     }
 
     /// <summary>
     /// Registers the discussions module for local standalone composition.
     /// </summary>
-    public static void AddDiscussionsModuleLocal(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    public static void AddDiscussionsModuleLocal(this IServiceCollection services, IBaseOipModuleAppSettings settings)
     {
-        AddDiscussionsModuleCore(builder, settings);
+        AddDiscussionsModuleCore(services, settings);
     }
 
     /// <summary>
     /// Registers the discussions module for distributed mode.
     /// </summary>
-    public static void AddDiscussionsModuleRemote(this WebApplicationBuilder builder,
+    public static void AddDiscussionsModuleRemote(this IServiceCollection services,
         IBaseOipModuleAppSettings settings)
     {
-        AddDiscussionsModuleCore(builder, settings);
+        AddDiscussionsModuleCore(services, settings);
     }
 
-    private static void AddDiscussionsModuleCore(WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    private static void AddDiscussionsModuleCore(IServiceCollection services, IBaseOipModuleAppSettings settings)
     {
-        builder.Services.AddOipBasedContext<DiscussionsDbContext>(settings.ConnectionString,
+        services.AddOipBasedContext<DiscussionsDbContext>(settings.ConnectionString,
             DiscussionsDbContext.MigrationHistoryTableName, DiscussionsDbContext.SchemaName);
-        builder.Services.AddScoped<AttachmentRepository>()
+        services.AddScoped<AttachmentRepository>()
             .AddScoped<CommentEditHistoryRepository>()
             .AddScoped<CommentRepository>()
             .AddScoped<MentionRepository>()
