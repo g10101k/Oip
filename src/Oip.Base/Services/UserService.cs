@@ -14,14 +14,52 @@ public class UserService(IHttpContextAccessor httpContextAccessor)
     /// <returns></returns>
     public string? GetUserEmail()
     {
-        var searchResult =
-            httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-        if (searchResult is { } claim)
-        {
-            return claim.Value;
-        }
+        return GetClaimValue(ClaimTypes.Email);
+    }
 
-        return null;
+    /// <summary>
+    /// Get user login
+    /// </summary>
+    /// <returns></returns>
+    public string? GetUserLogin()
+    {
+        return GetClaimValue(ClaimTypes.Name) ??
+               GetClaimValue("preferred_username");
+    }
+
+    /// <summary>
+    /// Get user first name
+    /// </summary>
+    /// <returns></returns>
+    public string? GetUserFirstName()
+    {
+        return GetClaimValue(ClaimTypes.GivenName) ??
+               GetClaimValue("given_name");
+    }
+
+    /// <summary>
+    /// Get user last name
+    /// </summary>
+    /// <returns></returns>
+    public string? GetUserLastName()
+    {
+        return GetClaimValue(ClaimTypes.Surname) ??
+               GetClaimValue("family_name");
+    }
+
+    /// <summary>
+    /// Get user full name
+    /// </summary>
+    /// <returns></returns>
+    public string? GetUserFullName()
+    {
+        var firstName = GetUserFirstName();
+        var lastName = GetUserLastName();
+        var fullName = string.Join(" ", new[] { firstName, lastName }.Where(v => !string.IsNullOrWhiteSpace(v)));
+
+        return !string.IsNullOrWhiteSpace(fullName)
+            ? fullName
+            : GetClaimValue("name") ?? GetUserLogin() ?? GetUserEmail();
     }
 
     /// <summary>
@@ -36,5 +74,11 @@ public class UserService(IHttpContextAccessor httpContextAccessor)
         return httpContextAccessor.HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role)
             .Select(c => c.Value)
             .ToList();
+    }
+
+    private string? GetClaimValue(string claimType)
+    {
+        return httpContextAccessor.HttpContext?.User.Claims
+            .FirstOrDefault(c => c.Type == claimType)?.Value;
     }
 }

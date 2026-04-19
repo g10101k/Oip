@@ -2,7 +2,6 @@
 
 * Dotnet app start at https://localhost:5003
 * Angular client start at https://localhost:50003
-* Grcp service start at https://localhost:50004
 
 ## DbMigration
 

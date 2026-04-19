@@ -5,7 +5,6 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Base.Services;
-using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
 using Oip.Discussions.Extensions;
 using Oip.Notifications.Data.Contexts;

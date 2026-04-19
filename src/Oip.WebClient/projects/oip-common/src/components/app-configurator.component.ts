@@ -3,6 +3,7 @@ import { Component, computed, inject, PLATFORM_ID, signal, OnInit } from '@angul
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { $t, updatePreset, updateSurfacePalette } from '@primeng/themes';
+import type { PaletteDesignToken, Preset } from '@primeuix/themes/types';
 import Aura from '@primeng/themes/aura';
 import Lara from '@primeng/themes/lara';
 import Nora from '@primeng/themes/nora';
@@ -10,31 +11,40 @@ import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '../services/app.layout.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import {
+  APP_THEME_PRESETS,
+  APP_THEME_PRESETS_MERGE_MODE,
+  AppThemePreset
+} from '../services/theme-presets.token';
 
-const presets = {
-  Aura,
-  Lara,
-  Nora
-} as const;
+const DEFAULT_THEME_PRESETS: ReadonlyArray<AppThemePreset> = [
+  { id: 'Aura', label: 'Aura', preset: Aura as Preset },
+  { id: 'Lara', label: 'Lara', preset: Lara as Preset },
+  { id: 'Nora', label: 'Nora', preset: Nora as Preset }
+];
 
-declare type KeyOfType<T> = keyof T extends infer U ? U : never;
+const PRIMARY_COLORS = [
+  'emerald',
+  'green',
+  'lime',
+  'orange',
+  'amber',
+  'yellow',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose'
+] as const;
 
 declare type SurfacesType = {
   name?: string;
-  palette?: {
-    0?: string;
-    50?: string;
-    100?: string;
-    200?: string;
-    300?: string;
-    400?: string;
-    500?: string;
-    600?: string;
-    700?: string;
-    800?: string;
-    900?: string;
-    950?: string;
-  };
+  palette?: PaletteDesignToken;
 };
 
 @Component({
@@ -65,7 +75,7 @@ declare type SurfacesType = {
       <div>
         <span class="text-sm text-muted-color font-semibold">{{ 'app-configurator.surface' | translate }}</span>
         <div class="pt-2 flex gap-2 flex-wrap justify-start">
-          @for (surface of surfaces; track surface.name) {
+          @for (surface of surfaceColors(); track surface.name) {
             <button
               class="border-none w-5 h-5 rounded-full p-0 cursor-pointer outline-none outline-offset-1"
               id="oip-app-configurator-surface-color-{{ surface.name }}"
@@ -93,6 +103,8 @@ declare type SurfacesType = {
           [allowEmpty]="false"
           [ngModel]="selectedPreset()"
           [options]="presets"
+          optionLabel="label"
+          optionValue="value"
           (ngModelChange)="onPresetChange($event)" />
       </div>
       @if (showMenuModeButton()) {
@@ -125,7 +137,19 @@ export class AppConfiguratorComponent implements OnInit {
 
   primeng = inject(PrimeNG);
 
-  presets = Object.keys(presets);
+  private readonly injectedThemePresets = inject(APP_THEME_PRESETS);
+  private readonly themePresetMergeMode = inject(APP_THEME_PRESETS_MERGE_MODE);
+
+  private readonly themePresets = this.getThemePresets();
+
+  private readonly themePresetsMap = new Map(this.themePresets.map((theme) => [theme.id, theme]));
+
+  private readonly defaultThemePreset = this.themePresets[0] ?? DEFAULT_THEME_PRESETS[0];
+
+  private readonly fallbackPrimaryColors = ((DEFAULT_THEME_PRESETS[0].preset as { primitive?: Record<string, PaletteDesignToken> })
+    .primitive ?? {}) as Record<string, PaletteDesignToken>;
+
+  presets = this.themePresets.map((theme) => ({ label: theme.label ?? theme.id, value: theme.id }));
 
   showMenuModeButton = signal(!this.router.url.includes('auth'));
 
@@ -136,7 +160,8 @@ export class AppConfiguratorComponent implements OnInit {
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      this.onPresetChange(this.layoutService.layoutConfig().preset);
+      const presetId = this.ensureValidThemeId(this.layoutService.layoutConfig().preset);
+      this.onPresetChange(presetId);
     }
   }
 
@@ -290,40 +315,18 @@ export class AppConfiguratorComponent implements OnInit {
   menuMode = computed(() => this.layoutService.layoutConfig().menuMode);
 
   primaryColors = computed<SurfacesType[]>(() => {
-    const presetPalette = presets[this.layoutService.layoutConfig().preset as KeyOfType<typeof presets>].primitive;
-    const colors = [
-      'emerald',
-      'green',
-      'lime',
-      'orange',
-      'amber',
-      'yellow',
-      'teal',
-      'cyan',
-      'sky',
-      'blue',
-      'indigo',
-      'violet',
-      'purple',
-      'fuchsia',
-      'pink',
-      'rose'
-    ];
-    const palettes: SurfacesType[] = [{ name: 'noir', palette: {} }];
+    const activeThemePreset = this.getThemeById(this.layoutService.layoutConfig().preset);
+    return this.getPrimaryColorOptions(activeThemePreset);
+  });
 
-    colors.forEach((color) => {
-      palettes.push({
-        name: color,
-        palette: presetPalette?.[color as KeyOfType<typeof presetPalette>] as SurfacesType['palette']
-      });
-    });
-
-    return palettes;
+  surfaceColors = computed<SurfacesType[]>(() => {
+    const activeThemePreset = this.getThemeById(this.layoutService.layoutConfig().preset);
+    return this.getSurfaceColorOptions(activeThemePreset);
   });
 
   getPresetExt() {
     const color: SurfacesType = this.primaryColors().find((c) => c.name === this.selectedPrimaryColor()) || {};
-    const preset = this.layoutService.layoutConfig().preset;
+    const preset = this.getThemeById(this.layoutService.layoutConfig().preset).id;
 
     if (color.name === 'noir') {
       return {
@@ -448,6 +451,69 @@ export class AppConfiguratorComponent implements OnInit {
     }
   }
 
+  private getThemePresets(): AppThemePreset[] {
+    const source = this.themePresetMergeMode === 'replaceDefaults' ? [] : [...DEFAULT_THEME_PRESETS];
+    const result = [...source];
+    for (const theme of this.injectedThemePresets ?? []) {
+      if (!theme?.id || !theme?.preset) {
+        continue;
+      }
+      const index = result.findIndex((item) => item.id === theme.id);
+      if (index >= 0) {
+        result[index] = theme;
+      } else {
+        result.push(theme);
+      }
+    }
+    return result;
+  }
+
+  private getThemeById(themeId?: string): AppThemePreset {
+    return this.themePresetsMap.get(themeId ?? '') ?? this.defaultThemePreset;
+  }
+
+  private getPrimaryColorOptions(activeThemePreset: AppThemePreset): SurfacesType[] {
+    if (activeThemePreset.primaryColors) {
+      return Object.entries(activeThemePreset.primaryColors)
+        .filter((entry): entry is [string, PaletteDesignToken] => Boolean(entry[1]))
+        .map(([name, palette]) => ({ name, palette }));
+    }
+
+    const presetPalette = ((activeThemePreset.preset as { primitive?: Record<string, PaletteDesignToken> }).primitive ?? {});
+    const palettes: SurfacesType[] = [{ name: 'noir', palette: {} }];
+
+    PRIMARY_COLORS.forEach((color) => {
+      palettes.push({
+        name: color,
+        palette: presetPalette[color] ?? this.fallbackPrimaryColors[color]
+      });
+    });
+
+    return palettes;
+  }
+
+  private getSurfaceColorOptions(activeThemePreset: AppThemePreset): SurfacesType[] {
+    if (activeThemePreset.surfaceColors) {
+      return Object.entries(activeThemePreset.surfaceColors)
+        .filter((entry): entry is [string, PaletteDesignToken] => Boolean(entry[1]))
+        .map(([name, palette]) => ({ name, palette }));
+    }
+
+    return this.surfaces;
+  }
+
+  private ensureValidThemeId(themeId?: string): string {
+    if (themeId && this.themePresetsMap.has(themeId)) {
+      return themeId;
+    }
+
+    if (themeId && isPlatformBrowser(this.platformId)) {
+      console.warn(`[AppConfigurator] Unknown theme preset "${themeId}", fallback to "${this.defaultThemePreset.id}".`);
+    }
+
+    return this.defaultThemePreset.id;
+  }
+
   updateColors(event: MouseEvent, type: string, color: SurfacesType) {
     if (type === 'primary') {
       this.layoutService.layoutConfig.update((state) => ({
@@ -474,12 +540,22 @@ export class AppConfiguratorComponent implements OnInit {
   }
 
   onPresetChange(event: string) {
+    const nextThemeId = this.ensureValidThemeId(event);
+    const nextTheme = this.getThemeById(nextThemeId);
+    const primaryColors = this.getPrimaryColorOptions(nextTheme);
+    const surfaceColors = this.getSurfaceColorOptions(nextTheme);
+
     this.layoutService.layoutConfig.update((state) => ({
       ...state,
-      preset: event
+      preset: nextThemeId,
+      primary: primaryColors.some((color) => color.name === state.primary) ? state.primary : (primaryColors[0]?.name ?? state.primary),
+      surface:
+        nextTheme.surfaceColors && !surfaceColors.some((color) => color.name === state.surface)
+          ? (surfaceColors[0]?.name ?? state.surface)
+          : state.surface
     }));
-    const preset = presets[event as KeyOfType<typeof presets>];
-    const surfacePalette = this.surfaces.find((s) => s.name === this.selectedSurfaceColor())?.palette;
+    const preset = nextTheme.preset;
+    const surfacePalette = this.surfaceColors().find((s) => s.name === this.selectedSurfaceColor())?.palette;
     $t().preset(preset).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
   }
 

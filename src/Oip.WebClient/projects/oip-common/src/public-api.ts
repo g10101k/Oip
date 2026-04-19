@@ -40,6 +40,13 @@ export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './servi
 export { NotificationService } from './services/notification.service';
 export { TableFilterService } from './services/table-filter.service';
 export {
+  APP_THEME_PRESETS,
+  APP_THEME_PRESETS_MERGE_MODE,
+  AppThemePreset,
+  AppThemePresetMergeMode
+} from './services/theme-presets.token';
+export { mergeWithDefaults, provideAppThemes, replaceDefaults } from './services/theme-presets.provider';
+export {
   DEFAULT_OIP_FRONTEND_CONFIG,
   OIP_FRONTEND_CONFIG,
   OipFrontendConfig,

@@ -7,8 +7,8 @@ import {
   EventTypes,
   AuthOptions
 } from 'angular-auth-oidc-client';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { BehaviorSubject, merge, Observable, ReplaySubject, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 
 export abstract class SecurityService {
   abstract auth(): void;
@@ -23,11 +23,15 @@ export abstract class SecurityService {
 
   abstract getCurrentUser(): any;
 
+  abstract getCurrentUser$(): Observable<any>;
+
   abstract forceRefreshSession(): Observable<LoginResponse>;
 
   abstract isAdmin(): boolean;
 
   abstract authorize(configId?: string, authOptions?: AuthOptions): void;
+
+  abstract payload: BehaviorSubject<any>;
 }
 
 /**
@@ -47,17 +51,23 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   /**
    * Stores the latest login response from checkAuth().
    */
-  private loginResponse = new BehaviorSubject<LoginResponse>(null);
+  public loginResponse = new BehaviorSubject<LoginResponse>(null);
 
   /**
    * Stores the decoded access token payload.
    */
-  private payload = new BehaviorSubject<any>(null);
+  public readonly payload = new BehaviorSubject<any>(null);
 
   /**
    * Stores user-specific data from the login response.
    */
-  userData: any;
+  private readonly currentUser = new BehaviorSubject<any>(null);
+
+  /**
+   * Emits access token updates from initial auth check, manual refresh,
+   * and library authentication events.
+   */
+  private accessToken = new ReplaySubject<string>(1);
 
   /**
    * Initializes service and subscribes to authentication events.
@@ -69,21 +79,30 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
       .registerForEvents()
       .pipe(filter((event) => event.type === EventTypes.NewAuthenticationResult))
       .subscribe(() => {
+        super.getAccessToken().subscribe(token => {this.accessToken.next(token); });
         this.auth();
       });
   }
 
   getCurrentUser() {
-    return this.userData;
+    return this.currentUser.getValue();
+  }
+
+  getCurrentUser$(): Observable<any> {
+    return this.currentUser.asObservable();
   }
 
   /**
    * Returns the ID token for the sign-in.
    * @returns A string with the id token.
    */
-  override getAccessToken(): Observable<string> {
-    return this.loginResponse.pipe(map((data) => data?.accessToken));
+  override getAccessToken(configId?: string): Observable<string> {
+    return merge(
+      super.getAccessToken(configId),
+      this.accessToken.asObservable()
+    ).pipe(distinctUntilChanged());
   }
+
 
   /**
    * Indicates whether the current user has the 'admin' role.
@@ -101,7 +120,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   auth() {
     super.checkAuth().subscribe((_response: LoginResponse) => {
       this.loginResponse.next(_response);
-      this.userData = _response.userData;
+      this.currentUser.next(_response.userData);
       this.getPayloadFromAccessToken().subscribe((_token) => {
         this.payload.next(_token);
       });
@@ -124,6 +143,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   ngOnDestroy(): void {
     this.loginResponse.complete();
     this.payload.complete();
+    this.currentUser.complete();
   }
 
   /**
