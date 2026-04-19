@@ -39,6 +39,11 @@ interface CustomerTableItem extends DemoCustomerTableRowDto {
   _editModel?: CustomerEditModel;
 }
 
+interface SelectOption<TValue = string> {
+  label: string;
+  value: TValue;
+}
+
 @Component({
   template: `
     @if (isContent) {
@@ -160,14 +165,30 @@ interface CustomerTableItem extends DemoCustomerTableRowDto {
               </td>
               <td>
                 @if (customer._isEditing && customer._editModel; as editModel) {
-                  <input pInputText class="w-full min-w-32" [(ngModel)]="editModel.category"/>
+                  <p-select
+                    class="w-full min-w-36"
+                    appendTo="body"
+                    optionLabel="label"
+                    optionValue="value"
+                    [filter]="true"
+                    [options]="categoryOptions"
+                    [placeholder]="'customer-module.content.table.category' | translate"
+                    [(ngModel)]="editModel.category"/>
                 } @else {
                   {{ customer.category }}
                 }
               </td>
               <td>
                 @if (customer._isEditing && customer._editModel; as editModel) {
-                  <input pInputText class="w-full min-w-32" [(ngModel)]="editModel.country"/>
+                  <p-select
+                    class="w-full min-w-36"
+                    appendTo="body"
+                    optionLabel="label"
+                    optionValue="value"
+                    [filter]="true"
+                    [options]="countryOptions"
+                    [placeholder]="'customer-module.content.table.country' | translate"
+                    [(ngModel)]="editModel.country"/>
                 } @else {
                   {{ customer.country }}
                 }
@@ -281,11 +302,13 @@ export class CustomerModuleComponent
   protected readonly dataService = inject(CustomerModuleApi);
 
   protected readonly globalFilterFields = ['fullName', 'email', 'categoryName', 'countryName'];
-  protected readonly statusOptions = Object.values(DemoCustomerStatus).map((status) => ({
+  protected readonly statusOptions: SelectOption<DemoCustomerStatus>[] = Object.values(DemoCustomerStatus).map((status) => ({
     label: status,
     value: status
   }));
 
+  protected categoryOptions: SelectOption[] = [];
+  protected countryOptions: SelectOption[] = [];
   protected customers: CustomerTableItem[] = [];
   protected visibleCustomers: CustomerTableItem[] = [];
   protected totalRecords = 0;
@@ -302,6 +325,11 @@ export class CustomerModuleComponent
     this.l10nService.get('customer-module').subscribe((l10n) => {
       this.appTitleService.setTitle(l10n.title);
     });
+  }
+
+  override async ngOnInit(): Promise<void> {
+    await super.ngOnInit();
+    await this.loadLookupOptions();
   }
 
   ngAfterViewInit(): void {
@@ -507,6 +535,41 @@ export class CustomerModuleComponent
       sortOrder: this.localSettings().sortOrder ?? 1,
       filters: this.localSettings().filters ?? {}
     };
+  }
+
+  private async loadLookupOptions(): Promise<void> {
+    try {
+      const [categories, countries] = await Promise.all([
+        this.dataService.request<string[]>({
+          path: '/api/customer-module/get-categories',
+          method: 'GET',
+          secure: true,
+          format: 'json'
+        }),
+        this.dataService.request<string[]>({
+          path: '/api/customer-module/get-countries',
+          method: 'GET',
+          secure: true,
+          format: 'json'
+        })
+      ]);
+
+      this.categoryOptions = this.toSelectOptions(categories);
+      this.countryOptions = this.toSelectOptions(countries);
+    } catch (error) {
+      this.categoryOptions = [];
+      this.countryOptions = [];
+      this.msgService.errorFromException(error, 'Load customer lookups error');
+    }
+  }
+
+  private toSelectOptions(values: string[] | null | undefined): SelectOption[] {
+    return (values ?? [])
+      .filter((value): value is string => !!value)
+      .map((value) => ({
+        label: value,
+        value
+      }));
   }
 
   private createEditModel(customer?: DemoCustomerTableRowDto): CustomerEditModel {

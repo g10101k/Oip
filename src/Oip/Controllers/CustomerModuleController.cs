@@ -91,6 +91,44 @@ public class CustomerModuleController(
     }
 
     /// <summary>
+    /// Retrieves available customer categories.
+    /// </summary>
+    [HttpGet("get-categories")]
+    [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string[]>> GetCategories(CancellationToken cancellationToken = default)
+    {
+        var categories = await context.Categories
+            .AsNoTracking()
+            .OrderBy(x => x.Name)
+            .Select(x => x.Name)
+            .ToArrayAsync(cancellationToken);
+
+        return Ok(categories);
+    }
+
+    /// <summary>
+    /// Retrieves available customer countries.
+    /// </summary>
+    [HttpGet("get-countries")]
+    [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string[]>> GetCountries(CancellationToken cancellationToken = default)
+    {
+        var countries = await context.Countries
+            .AsNoTracking()
+            .OrderBy(x => x.Name)
+            .Select(x => x.Name)
+            .ToArrayAsync(cancellationToken);
+
+        return Ok(countries);
+    }
+
+    /// <summary>
     /// Creates a new customer.
     /// </summary>
     [HttpPost("create")]

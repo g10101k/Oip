@@ -116,7 +116,7 @@ public static class TableQueryProcessor
         var orderedExpression = Expression.Call(
             typeof(Queryable),
             methodName,
-            new[] { typeof(TEntity), body.Type },
+            [typeof(TEntity), body.Type],
             query.Expression,
             Expression.Quote(lambda));
 

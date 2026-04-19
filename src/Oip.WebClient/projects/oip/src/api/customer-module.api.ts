@@ -48,6 +48,48 @@ export class CustomerModuleApi<
       ...params,
     });
   /**
+   * @description Retrieves available customer categories.
+   *
+   * @tags CustomerModule
+   * @name getCategories
+   * @summary Retrieves available customer categories.
+   * @request GET:/api/customer-module/get-categories
+   * @secure
+   * @response `200` `(string)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `500` `ApiExceptionResponse` Internal Server Error
+   */
+  getCategories = (params: RequestParams = {}) =>
+    this.request<string[], ApiExceptionResponse>({
+      path: `/api/customer-module/get-categories`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Retrieves available customer countries.
+   *
+   * @tags CustomerModule
+   * @name getCountries
+   * @summary Retrieves available customer countries.
+   * @request GET:/api/customer-module/get-countries
+   * @secure
+   * @response `200` `(string)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   * @response `500` `ApiExceptionResponse` Internal Server Error
+   */
+  getCountries = (params: RequestParams = {}) =>
+    this.request<string[], ApiExceptionResponse>({
+      path: `/api/customer-module/get-countries`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
    * @description Creates a new customer.
    *
    * @tags CustomerModule
