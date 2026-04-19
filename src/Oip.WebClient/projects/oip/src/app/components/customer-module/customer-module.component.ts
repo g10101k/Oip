@@ -279,7 +279,6 @@ export class CustomerModuleComponent
   @ViewChild('table') table!: Table;
 
   protected readonly dataService = inject(CustomerModuleApi);
-  protected readonly l10nService = inject(L10nService);
 
   protected readonly globalFilterFields = ['fullName', 'email', 'categoryName', 'countryName'];
   protected readonly statusOptions = Object.values(DemoCustomerStatus).map((status) => ({
