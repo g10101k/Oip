@@ -66,20 +66,15 @@ export class HttpClient<SecurityDataType = unknown> {
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] = (
     securityData,
-  ) => {
-    const headers: Record<string, string> = {
+  ) => ({
+    headers: {
       "Accept-language": this.layoutService.language()
         ? this.layoutService.language()
         : "en",
       "X-Timezone": this.layoutService.timeZone(),
-    };
-
-    if (securityData) {
-      headers.Authorization = `Bearer ${securityData}`;
-    }
-
-    return { headers };
-  };
+      Authorization: `Bearer ${securityData}`,
+    },
+  });
 
   private abortControllers = new Map<CancelToken, AbortController>();
   private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
