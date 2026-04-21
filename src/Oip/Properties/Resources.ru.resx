@@ -66,6 +66,24 @@
     <data name="WeatherForecastController_GetModuleRights_Can_delete_edit_data" xml:space="preserve">
         <value>Право удалять</value>
     </data>
+    <data name="CustomerModuleController_GetModuleRights_Read" xml:space="preserve">
+        <value>Чтение</value>
+    </data>
+    <data name="CustomerModuleController_GetModuleRights_Edit" xml:space="preserve">
+        <value>Редактирование</value>
+    </data>
+    <data name="CustomerModuleController_GetModuleRights_Delete" xml:space="preserve">
+        <value>Удаление</value>
+    </data>
+    <data name="CustomerModuleController_GetModuleRights_Can_view_customer_module" xml:space="preserve">
+        <value>Право просматривать модуль клиентов</value>
+    </data>
+    <data name="CustomerModuleController_GetModuleRights_Can_edit_customer_data" xml:space="preserve">
+        <value>Право редактировать данные клиентов</value>
+    </data>
+    <data name="CustomerModuleController_GetModuleRights_Can_delete_customer_data" xml:space="preserve">
+        <value>Право удалять данные клиентов</value>
+    </data>
     <data name="DataContextMigrationController_GetModuleRights_Can_this_module" xml:space="preserve">
         <value>Право просматривать</value>
     </data>

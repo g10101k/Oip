@@ -141,6 +141,42 @@ namespace Oip.Properties {
             }
         }
         
+        internal static string CustomerModuleController_GetModuleRights_Read {
+            get {
+                return ResourceManager.GetString("CustomerModuleController_GetModuleRights_Read", resourceCulture);
+            }
+        }
+        
+        internal static string CustomerModuleController_GetModuleRights_Edit {
+            get {
+                return ResourceManager.GetString("CustomerModuleController_GetModuleRights_Edit", resourceCulture);
+            }
+        }
+        
+        internal static string CustomerModuleController_GetModuleRights_Delete {
+            get {
+                return ResourceManager.GetString("CustomerModuleController_GetModuleRights_Delete", resourceCulture);
+            }
+        }
+        
+        internal static string CustomerModuleController_GetModuleRights_Can_view_customer_module {
+            get {
+                return ResourceManager.GetString("CustomerModuleController_GetModuleRights_Can_view_customer_module", resourceCulture);
+            }
+        }
+        
+        internal static string CustomerModuleController_GetModuleRights_Can_edit_customer_data {
+            get {
+                return ResourceManager.GetString("CustomerModuleController_GetModuleRights_Can_edit_customer_data", resourceCulture);
+            }
+        }
+        
+        internal static string CustomerModuleController_GetModuleRights_Can_delete_customer_data {
+            get {
+                return ResourceManager.GetString("CustomerModuleController_GetModuleRights_Can_delete_customer_data", resourceCulture);
+            }
+        }
+        
         internal static string DataContextMigrationController_GetModuleRights_Can_this_module {
             get {
                 return ResourceManager.GetString("DataContextMigrationController_GetModuleRights_Can_this_module", resourceCulture);
