@@ -1,14 +1,19 @@
-import { ChangeDetectorRef, Component, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TopBarDto } from '../dtos/top-bar.dto';
 import { TopBarService } from '../services/top-bar.service';
 import { MsgService } from '../services/msg.service';
 import { ActivatedRoute } from '@angular/router';
 import { BaseDataService } from '../services/base-data.service';
 import { InterpolationParameters, TranslateService, Translation, TranslationObject } from '@ngx-translate/core';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { from, Observable, Subject, Subscription } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { AppTitleService } from '../services/app-title.service';
 import { LayoutService } from '../services/app.layout.service';
 import { L10nService } from '../services/l10n.service';
+import { SecurityDataService } from '../services/security-data.service';
+import { SecurityDto } from '../dtos/security.dto';
+import { SecurityService } from '../services/security.service';
 
 interface BaseComponentLocalization {
   security: string;
@@ -18,8 +23,16 @@ interface BaseComponentLocalization {
 
 @Component({standalone: true, template: ''})
 export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSettings> implements OnInit, OnDestroy {
+  private static readonly readRight = 'read';
+  private static readonly editRight = 'edit';
+  private static readonly deleteRight = 'delete';
+
   private isInitialized = false;
   private moduleInstanceReloadPromise: Promise<void> = Promise.resolve();
+  private rightsSubscription?: Subscription;
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly securityDataService = inject(SecurityDataService);
+  private readonly securityService = inject(SecurityService);
 
   /**
    * Provide access to app settings
@@ -101,6 +114,10 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   public title: string;
   public l10nService = inject(L10nService);
   public l10n$: Observable<Translation | TranslationObject>;
+  public canRead = false;
+  public canEdit = false;
+  public canDelete = false;
+  public securityRightsLoaded = false;
 
   /**
    * Updates local settings and persists them to local storage.
@@ -221,6 +238,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   ngOnDestroy() {
     this.topBarService.setTopBarItems([]);
     this.topBarService.activeId = this.topBarItems[0].id;
+    this.rightsSubscription?.unsubscribe();
     this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
@@ -293,9 +311,70 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   protected async onModuleInstanceChange(): Promise<void> {
   }
 
+  /**
+   * Called whenever current user rights for the active module instance are recalculated.
+   */
+  protected onSecurityRightsChange(): void {
+  }
+
+  /**
+   * Starts watching current token roles and maps them to module instance security settings.
+   */
+  protected watchSecurityRights(controller: string = this.controller, id: number | undefined = this.id): void {
+    this.rightsSubscription?.unsubscribe();
+    this.resetRightsState();
+
+    if (!controller || id == null) {
+      return;
+    }
+
+    this.rightsSubscription = this.securityService.payload
+      .pipe(
+        switchMap((payload) =>
+          from(this.securityDataService.getSecurity(controller, id)).pipe(
+            map((securitySettings) => ({ payload, securitySettings }))
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: ({ payload, securitySettings }) => {
+          const roles = payload?.realm_access?.roles ?? [];
+          this.updateRightsState(roles, securitySettings);
+        },
+        error: (error) => {
+          this.securityRightsLoaded = true;
+          console.error('Не удалось загрузить права', error);
+          this.onSecurityRightsChange();
+        }
+      });
+  }
+
+  private resetRightsState(): void {
+    this.canRead = false;
+    this.canEdit = false;
+    this.canDelete = false;
+    this.securityRightsLoaded = false;
+  }
+
+  private updateRightsState(roles: string[], securitySettings: SecurityDto[]): void {
+    this.canRead = this.hasSecurityRight(roles, securitySettings, BaseModuleComponent.readRight);
+    this.canEdit = this.hasSecurityRight(roles, securitySettings, BaseModuleComponent.editRight);
+    this.canDelete = this.hasSecurityRight(roles, securitySettings, BaseModuleComponent.deleteRight);
+    this.securityRightsLoaded = true;
+    this.onSecurityRightsChange();
+  }
+
+  protected hasSecurityRight(roles: string[], securitySettings: SecurityDto[], code: string): boolean {
+    return securitySettings
+      .find((security) => security.code === code)
+      ?.roles?.some((role) => roles.includes(role)) ?? false;
+  }
+
   private async reloadModuleInstance(): Promise<void> {
     this.moduleInstanceReloadPromise = this.moduleInstanceReloadPromise.then(async () => {
       await this.getSettings();
+      this.watchSecurityRights();
       await this.onModuleInstanceChange();
     });
 

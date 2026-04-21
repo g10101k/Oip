@@ -10,7 +10,12 @@ import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { BaseModuleComponent, ContentType, L10nService, SecurityComponent } from 'oip-common';
 import { CustomerModuleApi } from '../../../api/customer-module.api';
-import { CustomerModuleSettings, DemoCustomerStatus, DemoCustomerTableRowDto, TableQueryRequest } from '../../../api/data-contracts';
+import {
+  CustomerModuleSettings,
+  DemoCustomerStatus,
+  DemoCustomerTableRowDto,
+  TableQueryRequest
+} from '../../../api/data-contracts';
 
 interface CustomerModuleLocalSettings {
   first?: number;
@@ -72,7 +77,7 @@ interface SelectOption<TValue = string> {
             <p-button
               icon="pi pi-plus"
               severity="success"
-              [disabled]="loading"
+              [disabled]="loading || !canEdit"
               [label]="'customer-module.content.add' | translate"
               (onClick)="beginCreateCustomer()"/>
           </div>
@@ -207,14 +212,16 @@ interface SelectOption<TValue = string> {
               </td>
               <td>
                 @if (customer._isEditing && customer._editModel; as editModel) {
-                  <input pInputText type="number" class="w-full min-w-28 text-right" [(ngModel)]="editModel.creditScore"/>
+                  <input pInputText type="number" class="w-full min-w-28 text-right"
+                         [(ngModel)]="editModel.creditScore"/>
                 } @else {
                   <span class="block text-right tabular-nums">{{ customer.creditScore }}</span>
                 }
               </td>
               <td>
                 @if (customer._isEditing && customer._editModel; as editModel) {
-                  <input pInputText type="number" class="w-full min-w-32 text-right" [(ngModel)]="editModel.lifetimeValue"/>
+                  <input pInputText type="number" class="w-full min-w-32 text-right"
+                         [(ngModel)]="editModel.lifetimeValue"/>
                 } @else {
                   <span class="block text-right tabular-nums">{{ customer.lifetimeValue | number: '1.2-2' }}</span>
                 }
@@ -233,7 +240,7 @@ interface SelectOption<TValue = string> {
                     <p-button
                       icon="pi pi-check"
                       severity="success"
-                      [disabled]="activeRowAction"
+                      [disabled]="activeRowAction || !canEdit"
                       [text]="true"
                       (onClick)="saveCustomer(customer)"/>
                     <p-button
@@ -245,13 +252,13 @@ interface SelectOption<TValue = string> {
                   } @else {
                     <p-button
                       icon="pi pi-pencil"
-                      [disabled]="activeRowAction"
+                      [disabled]="activeRowAction || !canEdit"
                       [text]="true"
                       (onClick)="editCustomer(customer)"/>
                     <p-button
                       icon="pi pi-trash"
                       severity="danger"
-                      [disabled]="activeRowAction"
+                      [disabled]="activeRowAction || !canDelete"
                       [text]="true"
                       (onClick)="deleteCustomer(customer)"/>
                   }
@@ -360,6 +367,11 @@ export class CustomerModuleComponent
   }
 
   protected async loadCustomers(event: TableLazyLoadEvent): Promise<void> {
+    if (this.securityRightsLoaded && !this.canRead) {
+      this.clearCustomerTable();
+      return;
+    }
+
     this.loading = true;
 
     const filters = (event.filters ?? this.localSettings().filters ?? {}) as {
@@ -377,7 +389,7 @@ export class CustomerModuleComponent
 
     try {
       const response = await this.dataService.getPage(request);
-      this.customers = (response.data ?? []).map((customer) => ({ ...customer }));
+      this.customers = (response.data ?? []).map((customer) => ({...customer}));
       this.totalRecords = response.total ?? 0;
       this.syncVisibleCustomers();
 
@@ -409,6 +421,10 @@ export class CustomerModuleComponent
   }
 
   protected beginCreateCustomer(): void {
+    if (!this.canEdit) {
+      return;
+    }
+
     this.cancelAllEdits();
 
     this.draftCustomer = {
@@ -430,6 +446,10 @@ export class CustomerModuleComponent
   }
 
   protected editCustomer(customer: CustomerTableItem): void {
+    if (!this.canEdit) {
+      return;
+    }
+
     this.cancelAllEdits(customer);
     customer._isEditing = true;
     customer._editModel = this.createEditModel(customer);
@@ -448,6 +468,10 @@ export class CustomerModuleComponent
   }
 
   protected async saveCustomer(customer: CustomerTableItem): Promise<void> {
+    if (!this.canEdit) {
+      return;
+    }
+
     const editModel = customer._editModel;
     if (!editModel) {
       return;
@@ -499,6 +523,10 @@ export class CustomerModuleComponent
   }
 
   protected async deleteCustomer(customer: CustomerTableItem): Promise<void> {
+    if (!this.canDelete) {
+      return;
+    }
+
     if (customer._isNew) {
       this.cancelEdit(customer);
       return;
@@ -609,6 +637,13 @@ export class CustomerModuleComponent
       customer._isEditing = false;
       customer._editModel = undefined;
     }
+  }
+
+  private clearCustomerTable(): void {
+    this.draftCustomer = null;
+    this.customers = [];
+    this.totalRecords = 0;
+    this.syncVisibleCustomers();
   }
 
   private syncVisibleCustomers(): void {
