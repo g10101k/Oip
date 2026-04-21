@@ -25,7 +25,7 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// <param name="id">The ID of the module instance.</param>
     /// <returns>A list of <see cref="SecurityResponse"/> objects representing the security rights and associated roles.</returns>
     [HttpGet("get-security")]
-    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [Authorize]
     [ProducesResponseType<List<SecurityResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]

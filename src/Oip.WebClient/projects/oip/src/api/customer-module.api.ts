@@ -164,6 +164,26 @@ export class CustomerModuleApi<
       ...params,
     });
   /**
+   * @description <inheritdoc />
+   *
+   * @tags CustomerModule
+   * @name getModuleRights
+   * @summary <inheritdoc />
+   * @request GET:/api/customer-module/get-module-rights
+   * @secure
+   * @response `200` `(SecurityResponse)[]` OK
+   * @response `401` `ApiExceptionResponse` Unauthorized
+   * @response `403` `ApiExceptionResponse` Forbidden
+   */
+  getModuleRights = (params: RequestParams = {}) =>
+    this.request<SecurityResponse[], ApiExceptionResponse>({
+      path: `/api/customer-module/get-module-rights`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
    * @description Gets the security configuration for the specified module instance ID.
    *
    * @tags CustomerModule
@@ -252,26 +272,6 @@ export class CustomerModuleApi<
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * @description Gets the list of security rights supported by the module.
-   *
-   * @tags CustomerModule
-   * @name getModuleRights
-   * @summary Gets the list of security rights supported by the module.
-   * @request GET:/api/customer-module/get-module-rights
-   * @secure
-   * @response `200` `(SecurityResponse)[]` OK
-   * @response `401` `ApiExceptionResponse` Unauthorized
-   * @response `403` `ApiExceptionResponse` Forbidden
-   */
-  getModuleRights = (params: RequestParams = {}) =>
-    this.request<SecurityResponse[], ApiExceptionResponse>({
-      path: `/api/customer-module/get-module-rights`,
-      method: "GET",
-      secure: true,
-      format: "json",
       ...params,
     });
 }

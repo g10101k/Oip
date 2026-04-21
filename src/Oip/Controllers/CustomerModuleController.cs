@@ -2,11 +2,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Oip.Api.Controllers;
+using Oip.Api.Controllers.Api;
 using Oip.Base.Exceptions;
+using Oip.Data.Constants;
 using Oip.Data.Dtos;
 using Oip.Data.Repositories;
 using Oip.Data.Services;
 using Oip.Demo.TableQueryDemo;
+using Oip.Properties;
 
 namespace Oip.Controllers;
 
@@ -284,6 +287,38 @@ public class CustomerModuleController(
             customer.LifetimeValue,
             customer.CreatedAt,
             customer.Orders.Count);
+    }
+    
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override List<SecurityResponse> GetModuleRights()
+    {
+        return new()
+        {
+            new()
+            {
+                Code = SecurityConstants.Read,
+                Name = Resources.CustomerModuleController_GetModuleRights_Read,
+                Description = Resources.CustomerModuleController_GetModuleRights_Can_view_customer_module,
+                Roles = [SecurityConstants.AdminRole]
+            },
+            new()
+            {
+                Code = SecurityConstants.Edit,
+                Name = Resources.CustomerModuleController_GetModuleRights_Edit,
+                Description = Resources.CustomerModuleController_GetModuleRights_Can_edit_customer_data,
+                Roles = [SecurityConstants.AdminRole]
+            },
+            new()
+            {
+                Code = SecurityConstants.Delete,
+                Name = Resources.CustomerModuleController_GetModuleRights_Delete,
+                Description = Resources.CustomerModuleController_GetModuleRights_Can_delete_customer_data,
+                Roles = [SecurityConstants.AdminRole]
+            },
+        };
     }
 }
 
