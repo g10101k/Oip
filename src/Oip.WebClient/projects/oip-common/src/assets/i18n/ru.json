@@ -15,7 +15,8 @@
   "securityComponent": {
     "security": "Безопасность",
     "save": "Сохранить",
-    "savedSecurity": "Настройки сохранены"
+    "savedSecurity": "Настройки сохранены",
+    "selectRoles": "Выберите роли"
   },
   "profileComponent": {
     "changePhoto": "Загрузить фото",

@@ -15,7 +15,8 @@
   "securityComponent": {
     "security": "Security",
     "save": "Save",
-    "savedSecurity": "Security settings saved"
+    "savedSecurity": "Security settings saved",
+    "selectRoles": "Select roles"
   },
   "profileComponent": {
     "changePhoto": "Upload Photo",

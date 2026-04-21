@@ -25,7 +25,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
               </label>
               <p-multiSelect
                 id="oip-security-multiselect-{{ item.name }}"
-                placeholder="Select roles"
+                placeholder="{{ 'securityComponent.selectRoles' | translate }}"
                 [maxSelectedLabels]="10"
                 [options]="roles"
                 [(ngModel)]="item.roles" />
