@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
@@ -46,33 +46,28 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
   imports: [MultiSelectModule, TooltipModule, FormsModule, ButtonModule, TranslatePipe],
   standalone: true
 })
-export class SecurityComponent implements OnInit, OnDestroy {
+export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
   private readonly msgService = inject(MsgService);
   private readonly dataService = inject(SecurityDataService);
   private readonly translateService = inject(TranslateService);
-  securityData: any[];
-  @Input() id: number;
-  @Input() controller: string;
+  private securityLoadToken = 0;
+
+  securityData: any[] = [];
+  @Input() id?: number;
+  @Input() controller?: string;
   roles: string[] = [];
 
   ngOnDestroy(): void {
     // on destroy
   }
 
-  ngOnInit(): void {
-    if (!this.id) {
-      this.msgService.error('Module id not passed!');
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['id'] || changes['controller']) {
+      void this.loadSecurity();
     }
-    if (!this.controller) {
-      this.msgService.error('Controller not passed!');
-    }
-    this.dataService.getSecurity(this.controller, this.id).then(
-      (result) => {
-        this.securityData = result;
-      },
-      (error) => this.msgService.error(error)
-    );
+  }
 
+  ngOnInit(): void {
     this.dataService.getRealmRoles().then(
       (result) => {
         this.roles = result;
@@ -82,6 +77,15 @@ export class SecurityComponent implements OnInit, OnDestroy {
   }
 
   saveClick() {
+    if (this.id == null) {
+      this.msgService.error('Module id not passed!');
+      return;
+    }
+    if (!this.controller) {
+      this.msgService.error('Controller not passed!');
+      return;
+    }
+
     const request: PutSecurityDto = {
       id: this.id,
       securities: this.securityData
@@ -96,7 +100,30 @@ export class SecurityComponent implements OnInit, OnDestroy {
 
   saveKeyDown($event: KeyboardEvent) {
     if ($event.key === 'Enter' || $event.key === 'Space') {
-      this.saveKeyDown(null);
+      this.saveClick();
+    }
+  }
+
+  private async loadSecurity(): Promise<void> {
+    const loadToken = ++this.securityLoadToken;
+    const controller = this.controller;
+    const id = this.id;
+
+    this.securityData = [];
+
+    if (!controller || id == null) {
+      return;
+    }
+
+    try {
+      const result = await this.dataService.getSecurity(controller, id);
+      if (loadToken === this.securityLoadToken) {
+        this.securityData = result;
+      }
+    } catch (error) {
+      if (loadToken === this.securityLoadToken) {
+        this.msgService.error(error);
+      }
     }
   }
 }
