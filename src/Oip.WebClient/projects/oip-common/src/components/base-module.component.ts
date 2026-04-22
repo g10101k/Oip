@@ -30,9 +30,9 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   private isInitialized = false;
   private moduleInstanceReloadPromise: Promise<void> = Promise.resolve();
   private rightsSubscription?: Subscription;
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly securityDataService = inject(SecurityDataService);
-  private readonly securityService = inject(SecurityService);
+  protected readonly destroyRef = inject(DestroyRef);
+  protected readonly securityDataService = inject(SecurityDataService);
+  protected readonly securityService = inject(SecurityService);
 
   /**
    * Provide access to app settings
