@@ -3,6 +3,11 @@ import { map, Observable } from 'rxjs';
 import { OpenIdConfiguration, StsConfigHttpLoader } from 'angular-auth-oidc-client';
 import { GetKeycloakClientSettingsResponse } from '../api/data-contracts';
 
+const appendCurrentOriginSecureRoute = (secureRoutes?: string[] | null): string[] => {
+  const currentOriginRoute = `${window.location.origin}/`;
+  return Array.from(new Set([...(secureRoutes ?? []), currentOriginRoute]));
+};
+
 /**
  * Load keycloak settings from backend and save to sessionStorage
  * @param httpClient
@@ -29,7 +34,7 @@ export const httpLoaderAuthFactory = (httpClient: HttpClient) => {
           useRefreshToken: config.useRefreshToken,
           silentRenew: config.silentRenew,
           logLevel: config.logLevel,
-          secureRoutes: config.secureRoutes
+          secureRoutes: appendCurrentOriginSecureRoute(config.secureRoutes)
         };
         sessionStorage.setItem(KEYCLOAK_SETTINGS_KEY, JSON.stringify(authConfig));
         return authConfig;
