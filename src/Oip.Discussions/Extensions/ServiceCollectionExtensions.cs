@@ -1,5 +1,4 @@
 using Oip.Base.Settings;
-using Oip.Data.Extensions;
 using Oip.Discussions.Data;
 using Oip.Discussions.Data.Repositories;
 using Oip.Discussions.Services;
@@ -7,27 +6,10 @@ using Oip.Discussions.Services;
 namespace Oip.Discussions.Extensions;
 
 /// <summary>
-/// Extension methods for the WebApplicationBuilder class.
+/// Provides extension methods for configuring discussions module services.
 /// </summary>
-public static class WebApplicationBuilderExtensions
+public static class ServiceCollectionExtensions
 {
-    /// <summary>
-    /// Adds the discussion service to the application.
-    /// </summary>
-    /// <param name="builder">The web application builder.</param>
-    /// <param name="settings"></param>
-    public static void AddDiscussionsService(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
-        if (settings.IsStandalone)
-        {
-            builder.Services.AddDiscussionsModuleLocal(settings);
-        }
-        else
-        {
-            builder.Services.AddDiscussionsModuleRemote(settings);
-        }
-    }
-
     /// <summary>
     /// Registers the discussions module for local standalone composition.
     /// </summary>
@@ -56,15 +38,5 @@ public static class WebApplicationBuilderExtensions
             .AddScoped<ReactionRepository>()
             .AddScoped<CommentService>()
             .AddScoped<IDiscussionAttachmentStorage, LocalDiscussionAttachmentStorage>();
-    }
-
-    /// <summary>
-    /// Adds the discussions service to the application.
-    /// </summary>
-    /// <param name="app">The application builder.</param>
-    /// <param name="settings">The application settings.</param>
-    public static void AddDiscussions(this WebApplication app, IBaseOipModuleAppSettings settings)
-    {
-        app.MigrateDatabase<DiscussionsDbContext>();
     }
 }

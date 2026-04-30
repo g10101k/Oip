@@ -4,10 +4,7 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
-using Oip.Notifications.Base;
 using Oip.Users.Extensions;
-using Oip.Users.Notifications;
-using Oip.Users.Repositories;
 using Oip.Users.Services;
 using Oip.Users.Settings;
 
@@ -41,26 +38,15 @@ internal static class Program
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
             builder.Services.AddSingleton(settings);
-            builder.Services.AddScoped<UserService>();
             builder.Services.AddCors();
             builder.AddControllersAndView();
             builder.AddLocalization();
             builder.Services.AddStartupRunner();
-            builder.Services.AddSingleton<BaseNotificationService>();
-            builder.Services.AddSingleton<INotificationPublisher>(sp => sp.GetRequiredService<BaseNotificationService>());
-            builder.Services.AddStartupTask<NotificationStartup>();
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddUsersModuleLocal(settings);
-            builder.Services.AddGrpcClient<GrpcNotificationService.GrpcNotificationServiceClient>(x =>
-            {
-                x.Address = new Uri(settings.Services.OipNotifications);
-            });
 
-            builder.Services.AddScoped<UserRepository>();
-            builder.Services.AddScoped<UserSyncService>();
             builder.Services.AddHostedService<KeycloakSyncBackgroundService>();
             builder.Services.AddHttpClient();
-            builder.Services.AddSingleton<UserService>();
             builder.Services.AddGrpc();
             builder.AddOpenTelemetry(settings);
 

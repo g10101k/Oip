@@ -4,19 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
-using Oip.Base.Services;
 using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
 using Oip.Discussions.Extensions;
-using Oip.Notifications.Data.Contexts;
 using Oip.Notifications.Extensions;
 using Oip.Settings;
-using Oip.Users.Notifications;
-using Oip.Users.Services;
 using Oip.Users.Extensions;
 using Oip.Demo.TableQueryDemo;
 using Oip.Extensions;
-using GrpcUserServiceImpl = Oip.Users.Services.UserService;
 
 namespace Oip;
 
@@ -49,18 +44,13 @@ internal static class Program
             if (settings.IsStandalone)
             {
                 builder.Services.AddUsersModuleLocal(settings);
-                builder.Services.AddScoped<GrpcUserServiceImpl>();
-                builder.Services.AddScoped<UserSyncService>();
-                builder.Services.AddSingleton<INotificationPublisher, NoOpNotificationPublisher>();
 
                 builder.Services.AddDiscussionsModuleLocal(settings);
 
                 builder.Services.AddNotificationsModuleLocal(settings);
-                builder.Services.AddDataProtection<NotificationsDbContext>();
+                
                 builder.Services.AddSignalR();
-                builder.Services.AddGrpc().AddJsonTranscoding();
-                builder.Services.AddGrpcSwagger();
-                builder.Services.AddSingleton<CryptService>();
+                builder.Services.AddGrpc();
             }
             else
             {
@@ -68,7 +58,6 @@ internal static class Program
             }
 
             var app = builder.Build();
-
 
             app.AddRequestLocalization();
             app.AddExceptionHandler();
@@ -89,10 +78,9 @@ internal static class Program
 
             if (settings.IsStandalone)
             {
-                app.MigrateUserDatabase();
-                app.AddDiscussions(settings);
-                app.MigrateNotificationDatabase();
-                app.MapNotificationsModule();
+                app.AddUserModuleLocal();
+                app.AddDiscussionsModuleLocal();
+                app.AddNotificationsModuleLocal();
             }
 
             app.Run();

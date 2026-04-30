@@ -1,73 +1,37 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Oip.Base.Clients;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
+using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Notifications.Data.Contexts;
+using Oip.Notifications.Data.Repositories;
 using Oip.Notifications.Hubs;
 using Oip.Notifications.Services;
 using Oip.Notifications.Startups;
+using Oip.Settings.Enums;
+using Oip.Settings.Helpers;
 using Oip.Users.Base;
+using Oip.Users.Notifications;
 
 namespace Oip.Notifications.Extensions;
 
 /// <summary>
-/// Provides extension methods for configuring and migrating the user database context.
+/// Provides extension methods for configuring notifications module services.
 /// </summary>
 public static class ServiceCollectionExtensions
 {
-    /// <summary>
-    /// Migrates the user database to the latest version using the configured database context.
-    /// </summary>
-    /// <param name="app">The <see cref="IApplicationBuilder"/> instance to extend.</param>
-    /// <exception cref="InvalidOperationException">Thrown when the <see cref="NotificationsDbContext"/> cannot be resolved from the service provider.</exception>
-    public static void MigrateNotificationDatabase(this IApplicationBuilder app)
-    {
-        ArgumentNullException.ThrowIfNull(app);
-        using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        var context = serviceScope.ServiceProvider.GetService<NotificationsDbContext>()
-                      ?? throw new InvalidOperationException();
-        context.Database.Migrate();
-    }
-
-
-    /// <summary>
-    /// Configures and registers the Keycloak client service with the specified settings.
-    /// </summary>
-    /// <param name="builder">The <see cref="WebApplicationBuilder"/> instance to extend.</param>
-    /// <param name="settings">The base OIP module application settings containing security service configuration.</param>
-    /// <remarks>
-    /// This method sets up an HTTP client for Keycloak with retry policies and configures SSL certificate validation for development environments.
-    /// </remarks>
-    public static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
-    {
-        var httpClientBuilder = builder.Services.AddHttpClient<KeycloakClient>(httpClient =>
-        {
-            var url = settings.SecurityService.DockerUrl ?? settings.SecurityService.BaseUrl;
-            httpClient.BaseAddress = new Uri(url);
-        }).AddPolicyHandler(OipModuleApplication.GetRetryPolicy());
-
-        if (builder.Environment.IsDevelopment() && settings.SecurityService.DockerUrl is not null)
-        {
-            httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
-            {
-                HttpClientHandler handler = new HttpClientHandler();
-
-                handler.ServerCertificateCustomValidationCallback =
-                    (message, cert, chain, errors) => true;
-                return handler;
-            });
-        }
-    }
-
     /// <summary>
     /// Registers notifications for local composition.
     /// </summary>
     public static IServiceCollection AddNotificationsModuleLocal(this IServiceCollection services,
         IBaseOipModuleAppSettings settings)
     {
-        return services.AddNotificationsModuleCore(settings);
+        services.AddNotificationsModuleCore(settings);
+        services.TryAddScoped<INotificationServiceClient, LocalNotificationServiceClient>();
+        services.AddDataProtection<NotificationsDbContext>();
+        services.TryAddActivatedSingleton<CryptService>();
+        return services;
     }
 
     /// <summary>
@@ -97,11 +61,55 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Maps notification endpoints for the current host.
+    /// Adds notification data services to the dependency injection container.
     /// </summary>
-    public static void MapNotificationsModule(this WebApplication app)
+    /// <param name="services">The service collection.</param>
+    /// <param name="settings">The application settings.</param>
+    /// <returns>The modified service collection.</returns>
+    public static IServiceCollection AddNotificationData(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
     {
-        app.MapGrpcService<NotificationService>();
-        app.MapHub<NotificationHub>("/hubs/notification");
+        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
+        switch (connectionModel.Provider)
+        {
+            case XpoProvider.Postgres:
+                services.AddDbContext<NotificationsDbContext>(option =>
+                {
+                    option.UseNpgsql(connectionModel.NormalizeConnectionString,
+                        x =>
+                        {
+                            x.MigrationsHistoryTable(NotificationsDbContext.MigrationHistoryTableName,
+                                NotificationsDbContext.SchemaName);
+                        });
+                });
+                break;
+            case XpoProvider.MSSqlServer:
+                services.AddDbContext<NotificationsDbContext>(option =>
+                {
+                    option.UseSqlServer(connectionModel.NormalizeConnectionString,
+                        x =>
+                        {
+                            x.MigrationsHistoryTable(NotificationsDbContext.MigrationHistoryTableName,
+                                NotificationsDbContext.SchemaName);
+                        });
+                });
+                break;
+            default:
+                services.AddDbContext<NotificationsDbContext>(option =>
+                {
+                    option.UseInMemoryDatabase("Oip.Notifications");
+                });
+                break;
+        }
+
+        services.AddScoped<NotificationDeliveryRepository>();
+        services.AddScoped<NotificationTypeRepository>();
+        services.AddScoped<NotificationChannelRepository>();
+        services.AddScoped<NotificationTemplateRepository>();
+        services.AddScoped<UserNotificationPreferenceRepository>();
+        services.AddScoped<NotificationRepository>();
+        services.AddScoped<NotificationDeliveryRepository>();
+
+        return services;
     }
 }
