@@ -13,6 +13,8 @@ import { UserService } from '../services/user.service';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LogoService } from '../services/logo.service';
+import { BadgeModule } from 'primeng/badge';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
   selector: 'app-topbar',
@@ -27,6 +29,7 @@ import { LogoService } from '../services/logo.service';
     Tab,
     AvatarModule,
     ButtonModule,
+    BadgeModule,
     TranslatePipe
   ],
   template: ` <div class="layout-topbar">
@@ -55,6 +58,19 @@ import { LogoService } from '../services/logo.service';
     }
     <div class="layout-topbar-actions">
       <div class="layout-config-menu">
+        <button
+          class="layout-topbar-action relative"
+          id="oip-app-topbar-notification-button"
+          type="button"
+          aria-label="Notifications">
+          <i class="pi pi-bell"></i>
+          @if (notificationService.unreadNotificationCount() > 0) {
+            <p-badge
+              class="absolute -top-1 -right-1"
+              severity="danger"
+              [value]="notificationService.unreadNotificationCount().toString()" />
+          }
+        </button>
         <p-button
           class="layout-topbar-action"
           id="oip-app-topbar-theme-button"
@@ -133,6 +149,7 @@ export class AppTopbar {
   userService = inject(UserService);
   layoutService = inject(LayoutService);
   logoService = inject(LogoService);
+  notificationService = inject(NotificationService);
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({

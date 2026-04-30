@@ -20,8 +20,7 @@ public interface INotificationPublisher
 /// <summary>
 /// Publishes notifications through the notifications gRPC service.
 /// </summary>
-public class BaseNotificationService(
-    GrpcNotificationService.GrpcNotificationServiceClient client)
+public class BaseNotificationService(GrpcNotificationService.GrpcNotificationServiceClient client)
     : INotificationPublisher
 {
     /// <summary>

@@ -18,7 +18,8 @@ import {
   provideAppThemes,
   SecurityService,
   KeycloakSecurityService,
-  NotificationService
+  NotificationService,
+  NotificationApi
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ProductService } from './app/service/product.service';
@@ -60,6 +61,7 @@ export const appConfig: ApplicationConfig = {
     BaseDataService,
     UserService,
     NotificationService,
+    NotificationApi,
     importProvidersFrom([
       TranslateModule.forRoot({
         loader: {

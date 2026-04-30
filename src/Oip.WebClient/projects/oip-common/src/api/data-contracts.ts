@@ -1,3 +1,12 @@
+/** Notification messages */
+export enum ImportanceLevel {
+  Unspecified = "Unspecified",
+  Low = "Low",
+  Medium = "Medium",
+  High = "High",
+  Critical = "Critical",
+}
+
 /** Data Transfer Object for creating a new module instance */
 export interface AddModuleInstanceDto {
   /**
@@ -221,6 +230,37 @@ export interface SecurityResponse {
   roles?: string[] | null;
 }
 
+/** Response with current user notification count. */
+export interface UserNotificationCountResponse {
+  /** @format int32 */
+  count?: number;
+}
+
+/** User notification for displaying in the portal. */
+export interface UserNotificationDto {
+  /** @format int64 */
+  notificationUserId?: number;
+  /** @format int64 */
+  notificationId?: number;
+  /** @format int32 */
+  notificationTypeId?: number;
+  notificationTypeName?: string | null;
+  subject?: string | null;
+  message?: string | null;
+  /** Notification messages */
+  importance?: ImportanceLevel;
+  /** @format date-time */
+  createdAt?: Date;
+  dataJson?: string | null;
+}
+
+/** Paged response with current user notifications. */
+export interface UserNotificationListResponse {
+  notifications?: UserNotificationDto[] | null;
+  /** @format int32 */
+  totalCount?: number;
+}
+
 export interface GetSecurityParams {
   /**
    * The ID of the module instance.
@@ -256,4 +296,22 @@ export interface ChangeOrderParams {
    * @format int32
    */
   secondModuleId?: number;
+}
+
+export interface GetNotificationByUserParams {
+  /**
+   * @format int32
+   * @default 0
+   */
+  skip?: number;
+  /**
+   * @format int32
+   * @default 20
+   */
+  take?: number;
+}
+
+export interface GetNotificationByIdParams {
+  /** @format int64 */
+  id?: number;
 }
