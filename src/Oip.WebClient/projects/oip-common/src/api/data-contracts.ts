@@ -117,6 +117,20 @@ export interface GetKeycloakClientSettingsResponse {
   secureRoutes?: string[] | null;
 }
 
+export interface IframeModuleSettings {
+  url?: string | null;
+}
+
+/** Represents a request to save module instance settings. */
+export interface IframeModuleSettingsSaveSettingsRequest {
+  /**
+   * Gets or sets the ID of the module instance.
+   * @format int32
+   */
+  id?: number;
+  settings?: IframeModuleSettings;
+}
+
 /** Represents a key-value pair where the key is an integer and the value is a string. */
 export interface IntKeyValueDto {
   /** @format int32 */
@@ -230,6 +244,22 @@ export interface GetSecurityParams {
 }
 
 export interface GetModuleInstanceSettingsParams {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
+  id?: number;
+}
+
+export interface GetSecurityParams2 {
+  /**
+   * The ID of the module instance.
+   * @format int32
+   */
+  id?: number;
+}
+
+export interface GetModuleInstanceSettingsParams2 {
   /**
    * The ID of the module instance.
    * @format int32

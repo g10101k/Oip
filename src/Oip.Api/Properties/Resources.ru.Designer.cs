@@ -25,7 +25,7 @@ namespace Oip.Api.Properties {
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Oip.Base.Properties.Resources_ru", typeof(Resources_ru).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Oip.Api.Properties.Resources_ru", typeof(Resources_ru).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

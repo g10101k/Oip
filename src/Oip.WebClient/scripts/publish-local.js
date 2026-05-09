@@ -25,7 +25,7 @@ try {
   execSync('rm -rf ./node_modules/oip-common', {stdio: 'inherit'});
 
   console.log('🪃 Install oip-common library...!');
-  execSync(`npm i ${distPath}`);
+  execSync(`npm i ${distPath} --no-save`);
 
   console.log('⛳  Publication completed successfully!');
 } catch (error) {
