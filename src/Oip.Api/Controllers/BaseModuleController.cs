@@ -24,11 +24,11 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// </summary>
     /// <param name="id">The ID of the module instance.</param>
     /// <returns>A list of <see cref="SecurityResponse"/> objects representing the security rights and associated roles.</returns>
-    [HttpGet("get-security")]
-    [Authorize]
+    [Authorize, HttpGet("get-security")]
     [ProducesResponseType<List<SecurityResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<List<SecurityResponse>> GetSecurity(int id)
     {
         var roleRightPair = await moduleRepository.GetSecurityByInstanceId(id);
@@ -53,6 +53,7 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<IActionResult> PutSecurity(PutSecurityRequest request)
     {
         List<ModuleSecurityDto> securityDtos = new();
@@ -78,12 +79,11 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// </summary>
     /// <param name="id">The ID of the module instance.</param>
     /// <returns>An <see cref="IActionResult"/> containing the deserialized settings object.</returns>
-    [HttpGet("get-module-instance-settings")]
-    [Authorize]
-    [ProducesResponseType<object>(StatusCodes.Status200OK)]
+    [Authorize, HttpGet("get-module-instance-settings")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
-    public IActionResult GetModuleInstanceSettings(int id)
+    public ActionResult<TSettings> GetModuleInstanceSettings(int id)
     {
         var settingString = moduleRepository.GetModuleInstanceSettings(id);
         var result = JsonConvert.DeserializeObject<TSettings>(settingString) ??
@@ -101,6 +101,7 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public void SaveSettings(SaveSettingsRequest request)
     {
         var settingString = JsonConvert.SerializeObject(request.Settings);
@@ -116,6 +117,7 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     [ProducesResponseType<List<SecurityResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public virtual List<SecurityResponse> GetModuleRights()
     {
         return new()
