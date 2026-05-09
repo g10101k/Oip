@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthGuardService, NotfoundComponent, AppLayoutComponent, DiscussionComponent } from 'oip-common';
 import { inject } from '@angular/core';
+import { loadRemoteModule } from '@angular-architects/native-federation';
 
 export const appRoutes: Routes = [
   {
@@ -27,6 +28,11 @@ export const appRoutes: Routes = [
           import('./app/components/customer-module/customer-module.component').then(
             (m) => m.CustomerModuleComponent
           ),
+        canActivate: [() => inject(AuthGuardService).canActivate()]
+      },
+      {
+        path: 'sample-module/:id',
+        loadChildren: () => loadRemoteModule('oipSampleModule', './routes').then((m) => m.remoteRoutes),
         canActivate: [() => inject(AuthGuardService).canActivate()]
       }, {
         path: 'discussion/:id',

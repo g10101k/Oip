@@ -1,0 +1,11 @@
+{
+  "sampleModule": {
+    "title": "Пример модуля",
+    "subtitle": "Этот экран загружен как Native Federation remote.",
+    "instanceId": "Экземпляр модуля",
+    "moduleName": "Backend-модуль",
+    "serverTime": "Время сервера UTC",
+    "errorTitle": "Не удалось загрузить данные модуля",
+    "retry": "Повторить"
+  }
+}

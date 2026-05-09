@@ -54,6 +54,12 @@ function createFallbackConfig() {
   const distributedProxy = [
     createKeepAliveProxy(
       [
+        '/api/sample-module'
+      ],
+      env.OIP_SAMPLE_MODULE_TARGET || 'https://localhost:5010'
+    ),
+    createKeepAliveProxy(
+      [
         '/api/users',
         '/api/user-profile'
       ],

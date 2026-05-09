@@ -1,0 +1,11 @@
+{
+  "sampleModule": {
+    "title": "Sample module",
+    "subtitle": "This screen is loaded as a Native Federation remote.",
+    "instanceId": "Module instance",
+    "moduleName": "Backend module",
+    "serverTime": "Server time UTC",
+    "errorTitle": "Could not load module data",
+    "retry": "Retry"
+  }
+}
