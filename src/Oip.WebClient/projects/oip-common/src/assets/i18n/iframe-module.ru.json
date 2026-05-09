@@ -1,0 +1,10 @@
+{
+  "iframe-module": {
+    "iframeModule": {
+      "urlPlaceholder": "URL сайта",
+      "settingSaveButtonLabel": "Сохранить",
+      "emptyUrlMessage": "URL сайта не указан.",
+      "siteLoadingMessage": "Не удалось загрузить сайт."
+    }
+  }
+}

@@ -28,7 +28,8 @@ export const appRoutes: Routes = [
             (m) => m.CustomerModuleComponent
           ),
         canActivate: [() => inject(AuthGuardService).canActivate()]
-      }, {
+      },
+      {
         path: 'discussion/:id',
         loadComponent: () => import('oip-common').then((m) => m.DiscussionComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
@@ -55,6 +56,11 @@ export const appRoutes: Routes = [
       {
         path: 'modules',
         loadComponent: () => import('oip-common').then((m) => m.AppModulesComponent),
+        canActivate: [() => inject(AuthGuardService).canActivate()]
+      },
+      {
+        path: 'iframe-module/:id',
+        loadComponent: () => import('oip-common').then((m) => m.IframeModuleComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
       }
     ]
