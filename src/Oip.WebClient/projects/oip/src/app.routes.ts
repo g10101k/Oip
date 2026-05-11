@@ -3,6 +3,47 @@ import { AuthGuardService, NotfoundComponent, AppLayoutComponent, DiscussionComp
 import { inject } from '@angular/core';
 import { loadRemoteModule } from '@angular-architects/native-federation';
 
+const fallbackRemoteRoutes: Routes = [
+  {
+    path: '',
+    component: NotfoundComponent
+  }
+];
+
+let federationManifestPromise: Promise<Record<string, string>> | undefined;
+
+const loadFederationManifest = (): Promise<Record<string, string>> => {
+  federationManifestPromise ??= fetch('assets/federation.manifest.json').then((response) => {
+    if (!response.ok) {
+      throw new Error(`Unable to load federation manifest: ${response.status}`);
+    }
+
+    return response.json() as Promise<Record<string, string>>;
+  });
+
+  return federationManifestPromise;
+};
+
+const loadOptionalRemoteRoutes = async (remoteName: string, exposedModule: string): Promise<Routes> => {
+  try {
+    const manifest = await loadFederationManifest();
+    const remoteEntry = manifest[remoteName];
+
+    if (!remoteEntry) {
+      return fallbackRemoteRoutes;
+    }
+
+    const module = await loadRemoteModule<{ remoteRoutes: Routes }>({
+      remoteEntry,
+      exposedModule
+    });
+
+    return module.remoteRoutes;
+  } catch {
+    return fallbackRemoteRoutes;
+  }
+};
+
 export const appRoutes: Routes = [
   {
     path: '',
@@ -32,7 +73,7 @@ export const appRoutes: Routes = [
       },
       {
         path: 'sample-module/:id',
-        loadChildren: () => loadRemoteModule('oipSampleModule', './routes').then((m) => m.remoteRoutes),
+        loadChildren: () => loadOptionalRemoteRoutes('oipSampleModule', './routes'),
         canActivate: [() => inject(AuthGuardService).canActivate()]
       },
       {
