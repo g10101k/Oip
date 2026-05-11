@@ -1,0 +1,13 @@
+{
+  "external-module-example-module": {
+    "title": "ExternalModuleExample Module",
+    "content": {
+      "subtitle": "ExternalModuleExample module content."
+    },
+    "settings": {
+      "title": "ExternalModuleExample Module Settings",
+      "dayCount": "Day Count",
+      "save": "Save"
+    }
+  }
+}

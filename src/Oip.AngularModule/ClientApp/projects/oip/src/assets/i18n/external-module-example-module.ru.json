@@ -1,0 +1,13 @@
+{
+  "external-module-example-module": {
+    "title": "Модуль ExternalModuleExample",
+    "content": {
+      "subtitle": "Содержимое модуля ExternalModuleExample."
+    },
+    "settings": {
+      "title": "Настройки модуля ExternalModuleExample",
+      "dayCount": "Количество дней",
+      "save": "Сохранить"
+    }
+  }
+}

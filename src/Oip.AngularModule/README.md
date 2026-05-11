@@ -1,0 +1,22 @@
+# Shell
+
+* Dotnet app start at https://localhost:5002
+* Angular client start at https://localhost:50002
+
+## DbMigration
+
+For *nix system:
+
+````shell
+migration_name=AlignmentMigration
+dotnet ef migrations add "${migration_name}_Postgres" --verbose --context OipModuleContextPostgres --project ./../Oip.Data --output-dir Migrations/Postgres -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
+dotnet ef migrations add "${migration_name}_SqlServer" --verbose --context OipModuleContextSqlServer --project ./../Oip.Data --output-dir Migrations/SqlServer -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
+````
+
+For windows:
+
+````shell
+set migration_name=InitialMigration
+dotnet ef migrations add "%migration_name%_Postgres" --context OipModuleContextPostgres --project ./../Oip.Data --output-dir Migrations/Postgres -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
+dotnet ef migrations add "%migration_name%_SqlServer" --context OipModuleContextSqlServer --project ./../Oip.Data --output-dir Migrations/SqlServer -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
+````
