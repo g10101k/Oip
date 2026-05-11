@@ -7,8 +7,32 @@ import {
   EventTypes,
   AuthOptions
 } from 'angular-auth-oidc-client';
-import { BehaviorSubject, merge, Observable, ReplaySubject, tap } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, finalize, from, merge, Observable, ReplaySubject, shareReplay } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+
+type RefreshCustomParams = { [key: string]: string | number | boolean };
+
+type WebLockManager = {
+  request<T>(
+    name: string,
+    options: { mode: 'exclusive' },
+    callback: () => T | Promise<T>
+  ): Promise<T>;
+};
+
+type RefreshLockInfo = {
+  ownerId: string;
+  expiresAt: number;
+};
+
+type RefreshResultInfo = {
+  configId?: string;
+  ownerId: string;
+  status: 'success' | 'error';
+  timestamp: number;
+};
+
+type WaitForRefreshResult = 'success' | 'error' | 'timeout';
 
 export abstract class SecurityService {
   abstract auth(): void;
@@ -25,7 +49,7 @@ export abstract class SecurityService {
 
   abstract getCurrentUser$(): Observable<any>;
 
-  abstract forceRefreshSession(): Observable<LoginResponse>;
+  abstract forceRefreshSession(customParams?: RefreshCustomParams, configId?: string): Observable<LoginResponse>;
 
   abstract isAdmin(): boolean;
 
@@ -43,6 +67,13 @@ export abstract class SecurityService {
  */
 @Injectable()
 export class KeycloakSecurityService extends OidcSecurityService implements OnDestroy, SecurityService {
+  private readonly refreshLockKeyPrefix = 'oip:keycloak-refresh-lock';
+  private readonly refreshResultKeyPrefix = 'oip:keycloak-refresh-result';
+  private readonly refreshLockTtlMs = 15000;
+  private readonly refreshWaitTimeoutMs = 10000;
+  private readonly refreshTabId = this.createRefreshTabId();
+  private refreshSession$?: Observable<LoginResponse>;
+
   /**
    * Handles angular OIDC events.
    */
@@ -103,6 +134,19 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
     ).pipe(distinctUntilChanged());
   }
 
+  override forceRefreshSession(customParams?: RefreshCustomParams, configId?: string): Observable<LoginResponse> {
+    if (!this.refreshSession$) {
+      this.refreshSession$ = from(this.runSynchronizedRefresh(customParams, configId)).pipe(
+        finalize(() => {
+          this.refreshSession$ = undefined;
+        }),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+    }
+
+    return this.refreshSession$;
+  }
+
 
   /**
    * Indicates whether the current user has the 'admin' role.
@@ -157,5 +201,222 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
         return payload.exp < Math.floor(Date.now() / 1000);
       })
     );
+  }
+
+  private async runSynchronizedRefresh(
+    customParams?: RefreshCustomParams,
+    configId?: string
+  ): Promise<LoginResponse> {
+    const webLocks = this.getWebLocks();
+    if (webLocks) {
+      return webLocks.request(this.getRefreshLockKey(configId), { mode: 'exclusive' }, async () => {
+        const currentState = await this.syncAuthState(configId);
+        if (!(await this.isCurrentAccessTokenExpired())) {
+          return currentState;
+        }
+
+        return this.refreshAsLockOwner(customParams, configId);
+      });
+    }
+
+    return this.runSynchronizedRefreshWithStorageLock(customParams, configId);
+  }
+
+  private async runSynchronizedRefreshWithStorageLock(
+    customParams?: RefreshCustomParams,
+    configId?: string
+  ): Promise<LoginResponse> {
+    const startedAt = Date.now();
+
+    if (this.tryAcquireRefreshLock(configId)) {
+      try {
+        const currentState = await this.syncAuthState(configId);
+        if (!(await this.isCurrentAccessTokenExpired())) {
+          return currentState;
+        }
+
+        return await this.refreshAsLockOwner(customParams, configId);
+      } finally {
+        this.releaseRefreshLock(configId);
+      }
+    }
+
+    const waitResult = await this.waitForRefreshResult(startedAt, configId);
+    if (waitResult === 'success') {
+      return this.syncAuthState(configId);
+    }
+
+    if (waitResult === 'error') {
+      throw new Error('Token refresh failed in another tab.');
+    }
+
+    return this.runSynchronizedRefreshWithStorageLock(customParams, configId);
+  }
+
+  private async refreshAsLockOwner(
+    customParams?: RefreshCustomParams,
+    configId?: string
+  ): Promise<LoginResponse> {
+    try {
+      const response = await firstValueFrom(super.forceRefreshSession(customParams, configId));
+      await this.applyLoginResponse(response, configId);
+      this.publishRefreshResult('success', configId);
+      return response;
+    } catch (error) {
+      this.publishRefreshResult('error', configId);
+      throw error;
+    }
+  }
+
+  private async syncAuthState(configId?: string): Promise<LoginResponse> {
+    const response = await firstValueFrom(super.checkAuth(undefined, configId));
+    await this.applyLoginResponse(response, configId);
+    return response;
+  }
+
+  private async applyLoginResponse(response: LoginResponse, configId?: string): Promise<void> {
+    this.loginResponse.next(response);
+    this.currentUser.next(response.userData);
+
+    const token = await firstValueFrom(super.getAccessToken(configId));
+    this.accessToken.next(token);
+
+    const payload = await firstValueFrom(this.getPayloadFromAccessToken());
+    this.payload.next(payload);
+  }
+
+  private async isCurrentAccessTokenExpired(): Promise<boolean> {
+    const payload = await firstValueFrom(this.getPayloadFromAccessToken());
+    return !payload?.exp || payload.exp < Math.floor(Date.now() / 1000);
+  }
+
+  private tryAcquireRefreshLock(configId?: string): boolean {
+    const lockKey = this.getRefreshLockKey(configId);
+    const now = Date.now();
+    const currentLock = this.readRefreshLock(lockKey);
+
+    if (currentLock && currentLock.ownerId !== this.refreshTabId && currentLock.expiresAt > now) {
+      return false;
+    }
+
+    const nextLock: RefreshLockInfo = {
+      ownerId: this.refreshTabId,
+      expiresAt: now + this.refreshLockTtlMs
+    };
+
+    localStorage.setItem(lockKey, JSON.stringify(nextLock));
+
+    return this.readRefreshLock(lockKey)?.ownerId === this.refreshTabId;
+  }
+
+  private releaseRefreshLock(configId?: string): void {
+    const lockKey = this.getRefreshLockKey(configId);
+    const currentLock = this.readRefreshLock(lockKey);
+
+    if (currentLock?.ownerId === this.refreshTabId) {
+      localStorage.removeItem(lockKey);
+    }
+  }
+
+  private waitForRefreshResult(startedAt: number, configId?: string): Promise<WaitForRefreshResult> {
+    const resultKey = this.getRefreshResultKey(configId);
+
+    return new Promise((resolve) => {
+      const timeoutId = window.setTimeout(() => {
+        cleanup();
+        resolve('timeout');
+      }, this.refreshWaitTimeoutMs);
+
+      const intervalId = window.setInterval(() => {
+        const result = this.tryResolveRefreshResult(resultKey, startedAt, configId);
+        if (result) {
+          cleanup();
+          resolve(result);
+        }
+      }, 250);
+
+      const onStorage = (event: StorageEvent) => {
+        if (event.key === resultKey) {
+          const result = this.tryResolveRefreshResult(resultKey, startedAt, configId);
+          if (result) {
+            cleanup();
+            resolve(result);
+          }
+        }
+      };
+
+      const cleanup = () => {
+        window.clearTimeout(timeoutId);
+        window.clearInterval(intervalId);
+        window.removeEventListener('storage', onStorage);
+      };
+
+      window.addEventListener('storage', onStorage);
+
+      const result = this.tryResolveRefreshResult(resultKey, startedAt, configId);
+      if (result) {
+        cleanup();
+        resolve(result);
+      }
+    });
+  }
+
+  private tryResolveRefreshResult(
+    resultKey: string,
+    startedAt: number,
+    configId: string | undefined
+  ): Exclude<WaitForRefreshResult, 'timeout'> | null {
+    const result = this.readRefreshResult(resultKey);
+
+    if (!result || result.timestamp < startedAt || result.configId !== configId) {
+      return null;
+    }
+
+    return result.status;
+  }
+
+  private publishRefreshResult(status: RefreshResultInfo['status'], configId?: string): void {
+    const result: RefreshResultInfo = {
+      configId,
+      ownerId: this.refreshTabId,
+      status,
+      timestamp: Date.now()
+    };
+
+    localStorage.setItem(this.getRefreshResultKey(configId), JSON.stringify(result));
+  }
+
+  private readRefreshLock(lockKey: string): RefreshLockInfo | null {
+    try {
+      const value = localStorage.getItem(lockKey);
+      return value ? JSON.parse(value) as RefreshLockInfo : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private readRefreshResult(resultKey: string): RefreshResultInfo | null {
+    try {
+      const value = localStorage.getItem(resultKey);
+      return value ? JSON.parse(value) as RefreshResultInfo : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private getRefreshLockKey(configId?: string): string {
+    return `${this.refreshLockKeyPrefix}:${configId ?? 'default'}`;
+  }
+
+  private getRefreshResultKey(configId?: string): string {
+    return `${this.refreshResultKeyPrefix}:${configId ?? 'default'}`;
+  }
+
+  private getWebLocks(): WebLockManager | null {
+    return (navigator as Navigator & { locks?: WebLockManager }).locks ?? null;
+  }
+
+  private createRefreshTabId(): string {
+    return window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
   }
 }
