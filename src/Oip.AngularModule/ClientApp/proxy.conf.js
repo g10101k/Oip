@@ -6,7 +6,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const generatedProxyConfigPath = path.join(__dirname, 'obj', 'proxy.generated.json');
 const defaultTarget = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}`
-  : env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:5002';
+  : env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:5008';
 
 function createKeepAliveProxy(context, target) {
   return {
@@ -31,7 +31,7 @@ function createWsProxy(context, target) {
 }
 
 function createFallbackConfig() {
-  const appMode = env.OIP_APP_MODE === 'standalone' ? 'standalone' : 'distributed';
+  const appMode = env.OIP_APP_MODE === 'distributed' ? 'distributed' : 'standalone';
 
   const standaloneProxy = [
     createWsProxy(
