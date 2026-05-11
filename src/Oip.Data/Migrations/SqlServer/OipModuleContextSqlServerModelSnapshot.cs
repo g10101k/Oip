@@ -29,10 +29,20 @@ namespace Oip.Base.Data.SqlServer.Migrations
                         .HasColumnType("nvarchar(2048)")
                         .HasComment("Backend API base URL for the extension service.");
 
+                    b.Property<string>("ComponentName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasComment("Exported Angular component name.");
+
                     b.Property<string>("ElementName")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)")
                         .HasComment("Custom element tag name exposed by the extension bundle.");
+
+                    b.Property<string>("ExposedModule")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasComment("Module Federation exposed module name.");
 
                     b.Property<string>("ExtensionKey")
                         .HasMaxLength(128)
@@ -42,6 +52,11 @@ namespace Oip.Base.Data.SqlServer.Migrations
                     b.Property<int>("Kind")
                         .HasColumnType("int")
                         .HasComment("Module delivery kind.");
+
+                    b.Property<string>("LoadType")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
+                        .HasComment("Extension loader type.");
 
                     b.Property<string>("ManifestUrl")
                         .HasMaxLength(2048)
@@ -60,6 +75,11 @@ namespace Oip.Base.Data.SqlServer.Migrations
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)")
                         .HasComment("Name");
+
+                    b.Property<string>("RemoteEntryUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)")
+                        .HasComment("Module Federation remote entry URL.");
 
                     b.Property<string>("RouterLink")
                         .HasMaxLength(256)

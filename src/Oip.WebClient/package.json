@@ -47,7 +47,7 @@
     "@primeng/themes": "^20.2.0",
     "angular-auth-oidc-client": "^20.0.3",
     "chart.js": "4.4.2",
-    "oip-common": "0.2.0",
+    "oip-common": "0.2.1",
     "primeclt": "^0.1.5",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
@@ -58,6 +58,7 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@angular-architects/module-federation": "^20.0.0",
     "@angular-devkit/build-angular": "^20.3.3",
     "@angular/cli": "^20.3.3",
     "@angular/compiler-cli": "^20.3.2",
@@ -78,6 +79,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^20.3.2",
+    "ngx-build-plus": "^20.0.0",
     "postcss": "^8.4.49",
     "prettier": "^3.0.0",
     "run-script-os": "^1.1.6",

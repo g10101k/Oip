@@ -9,16 +9,18 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { MsgService } from '../services/msg.service';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { L10nService } from '../services/l10n.service';
+import { ExtensionModulesApi } from '../api/extension-modules.api';
 import { ModuleApi } from '../api/module.api';
-import { ModuleDto } from '../api/data-contracts';
+import { ExistModuleDto } from '../api/data-contracts';
 import { AppTitleService } from '../services/app-title.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
-  imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog, TranslatePipe],
-  providers: [ConfirmationService, ModuleApi],
+  imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog, TranslatePipe, InputTextModule],
+  providers: [ConfirmationService, ModuleApi, ExtensionModulesApi],
   selector: 'app-modules',
   template: `
     <p-confirmDialog></p-confirmDialog>
@@ -29,14 +31,33 @@ import { firstValueFrom } from 'rxjs';
         </div>
         <div class="mb-4">
           <p-toolbar>
-            <p-button
-              icon="pi pi-refresh"
-              rounded="true"
-              severity="secondary"
-              text="true"
-              tooltipPosition="bottom"
-              [pTooltip]="'app-modules.refreshTooltip' | translate"
-              (onClick)="refreshAction()"></p-button>
+            <div class="flex flex-col md:flex-row md:items-center gap-2 w-full">
+              <div class="flex flex-col sm:flex-row gap-2 flex-1">
+                <input
+                  class="w-full"
+                  pInputText
+                  type="url"
+                  [disabled]="registeringExternalModule"
+                  [placeholder]="'app-modules.register.manifestUrlPlaceholder' | translate"
+                  [(ngModel)]="externalModuleManifestUrl"
+                  (keydown.enter)="registerExternalModule()" />
+                <p-button
+                  icon="pi pi-plus"
+                  severity="success"
+                  [disabled]="!canRegisterExternalModule"
+                  [label]="'app-modules.register.button' | translate"
+                  [loading]="registeringExternalModule"
+                  (onClick)="registerExternalModule()"></p-button>
+              </div>
+              <p-button
+                icon="pi pi-refresh"
+                rounded="true"
+                severity="secondary"
+                text="true"
+                tooltipPosition="bottom"
+                [pTooltip]="'app-modules.refreshTooltip' | translate"
+                (onClick)="refreshAction()"></p-button>
+            </div>
           </p-toolbar>
         </div>
         <p-table class="mt-4" [paginator]="true" [rows]="100" [value]="modules">
@@ -78,12 +99,15 @@ import { firstValueFrom } from 'rxjs';
 })
 export class AppModulesComponent implements OnInit {
   protected dataService = inject(BaseDataService);
-  protected modules: ModuleDto[] = [];
+  protected modules: ExistModuleDto[] = [];
   protected msgService = inject(MsgService);
   protected confirmationService = inject(ConfirmationService);
   protected l10nService = inject(L10nService);
   protected titleService = inject(AppTitleService);
+  protected externalModuleManifestUrl = '';
+  protected registeringExternalModule = false;
   private moduleService = inject(ModuleApi);
+  private extensionModulesService = inject(ExtensionModulesApi);
   private translationsReady: Promise<unknown>;
 
   constructor() {
@@ -100,7 +124,33 @@ export class AppModulesComponent implements OnInit {
     this.modules = await this.moduleService.getModulesWithLoadStatus();
   }
 
-  async deleteModule(module: ModuleDto) {
+  protected get canRegisterExternalModule() {
+    return !!this.externalModuleManifestUrl.trim() && !this.registeringExternalModule;
+  }
+
+  async registerExternalModule() {
+    if (!this.canRegisterExternalModule) {
+      return;
+    }
+
+    await this.translationsReady;
+    this.registeringExternalModule = true;
+
+    try {
+      await this.extensionModulesService.registerExtensionModule({
+        manifestUrl: this.externalModuleManifestUrl.trim()
+      });
+      this.externalModuleManifestUrl = '';
+      await this.refreshAction();
+      this.msgService.success(this.t('app-modules.messages.registerSuccess'));
+    } catch (error) {
+      this.msgService.error(error);
+    } finally {
+      this.registeringExternalModule = false;
+    }
+  }
+
+  async deleteModule(module: ExistModuleDto) {
     await this.translationsReady;
 
     this.confirmationService.confirm({

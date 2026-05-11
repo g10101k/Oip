@@ -76,6 +76,24 @@ internal static class Program
             app.UseAuthorization();
             app.UseCors(options => options.AllowAnyOrigin());
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
+            app.MapGet("/manifest.json", (HttpRequest request) =>
+            {
+                var origin = $"{request.Scheme}://{request.Host}";
+                return Results.Json(new
+                {
+                    key = "oip-angular-module",
+                    name = "OIP Angular Module",
+                    version = "1.0.0",
+                    routePath = "extensions/oip-angular-module",
+                    loadType = "moduleFederation",
+                    remoteEntryUrl = $"{origin}/remoteEntry.js",
+                    exposedModule = "./ExternalModuleExampleModule",
+                    componentName = "ExternalModuleExampleModuleComponent",
+                    apiBaseUrl = $"{origin}/api",
+                    icon = "pi pi-th-large",
+                    description = "Angular Module Federation extension loaded by the main OIP application."
+                });
+            });
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
             app.MapOpenTelemetry(settings);

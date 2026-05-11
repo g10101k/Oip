@@ -1,6 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ComponentRef,
+  ElementRef,
+  EnvironmentInjector,
+  inject,
+  Injector,
+  OnDestroy,
+  Type,
+  ViewChild,
+  ViewContainerRef
+} from '@angular/core';
 import { Router } from '@angular/router';
+import { loadRemoteModule } from '@angular-architects/module-federation';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Button } from 'primeng/button';
 import { BaseModuleComponent } from './base-module.component';
@@ -18,7 +31,7 @@ import {
   standalone: true,
   imports: [CommonModule, SecurityComponent, TranslatePipe, Button],
   template: `
-    @if (isContent) {
+    @if (showContent) {
       <div class="min-h-[calc(100vh-10rem)] w-full">
         @if (loadError) {
           <div class="card flex flex-col gap-4">
@@ -29,7 +42,7 @@ import {
           <div #extensionContainer class="w-full"></div>
         }
       </div>
-    } @else if (isSettings) {
+    } @else if (showSettings) {
       <div class="flex flex-col md:flex-row gap-8">
         <div class="md:w-1/2">
           <div class="card flex flex-col gap-4">
@@ -38,7 +51,7 @@ import {
           </div>
         </div>
       </div>
-    } @else if (isSecurity) {
+    } @else if (showSecurity) {
       <security [controller]="controller" [id]="id"/>
     }
   `
@@ -48,20 +61,52 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   @ViewChild('extensionContainer')
   private set extensionContainer(element: ElementRef<HTMLElement> | undefined) {
     this.container = element;
-    void this.renderExtension();
+    this.queueRenderExtension();
+  }
+
+  @ViewChild('extensionContainer', {read: ViewContainerRef})
+  private set extensionViewContainer(viewContainer: ViewContainerRef | undefined) {
+    this.viewContainer = viewContainer;
+    this.queueRenderExtension();
   }
 
   private readonly extensionLoader = inject(ExtensionLoaderService);
   private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
+  private readonly environmentInjector = inject(EnvironmentInjector);
+  private readonly hostChangeDetectorRef = inject(ChangeDetectorRef);
   private container?: ElementRef<HTMLElement>;
+  private viewContainer?: ViewContainerRef;
   private extensionElement?: HTMLElement;
+  private extensionComponent?: ComponentRef<unknown>;
   private extensionMetadata?: OipExtensionModuleMetadata;
   private removeListeners: Array<() => void> = [];
+  private renderQueued = false;
+  private activeTabSyncQueued = false;
+  private activeTabId = this.getCurrentActiveTabId();
+  private destroyed = false;
 
   protected loadError: string | null = null;
 
+  protected get showContent(): boolean {
+    return this.isActiveTab('content');
+  }
+
+  protected get showSettings(): boolean {
+    return this.isActiveTab('settings');
+  }
+
+  protected get showSecurity(): boolean {
+    return this.isActiveTab('security');
+  }
+
   private get extensionKey(): string {
     return this.route.snapshot.paramMap.get('extensionKey') ?? '';
+  }
+
+  constructor() {
+    super();
+    this.subscriptions.push(this.topBarService.activeId$.subscribe(() => this.queueActiveTabSync()));
   }
 
   protected override async onModuleInstanceChange(): Promise<void> {
@@ -74,6 +119,7 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   }
 
   override ngOnDestroy(): void {
+    this.destroyed = true;
     this.destroyExtensionElement();
     super.ngOnDestroy();
   }
@@ -96,31 +142,61 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   }
 
   private async renderExtension(): Promise<void> {
-    if (!this.container || !this.extensionMetadata || !this.isContent) {
-      return;
-    }
-
-    const {elementName, scriptUrl} = this.extensionMetadata;
-    if (!elementName || !scriptUrl) {
-      this.loadError = 'Extension metadata is incomplete.';
+    if (this.destroyed || !this.container || !this.extensionMetadata || !this.showContent) {
       return;
     }
 
     try {
       this.loadError = null;
-      await this.extensionLoader.loadScript(scriptUrl);
-      await customElements.whenDefined(elementName);
       this.destroyExtensionElement();
 
-      const element = document.createElement(elementName);
-      this.extensionElement = element;
-      this.attachListeners(element);
-      this.container.nativeElement.appendChild(element);
-      this.updateExtensionContext();
+      if (this.extensionMetadata.loadType === 'moduleFederation') {
+        await this.renderFederatedExtension(this.extensionMetadata);
+      } else {
+        await this.renderCustomElementExtension(this.extensionMetadata);
+      }
     } catch (error) {
       this.loadError = error instanceof Error ? error.message : 'Extension could not be loaded.';
       this.msgService.error(error);
     }
+  }
+
+  private queueRenderExtension(): void {
+    if (this.renderQueued) {
+      return;
+    }
+
+    this.renderQueued = true;
+    queueMicrotask(() => {
+      this.renderQueued = false;
+      void this.renderExtension();
+    });
+  }
+
+  private isActiveTab(id: string): boolean {
+    return this.activeTabId === id;
+  }
+
+  private queueActiveTabSync(): void {
+    const nextActiveTabId = this.getCurrentActiveTabId();
+    if (this.activeTabId === nextActiveTabId || this.activeTabSyncQueued) {
+      return;
+    }
+
+    this.activeTabSyncQueued = true;
+    queueMicrotask(() => {
+      this.activeTabSyncQueued = false;
+      if (this.destroyed) {
+        return;
+      }
+
+      this.activeTabId = this.getCurrentActiveTabId();
+      this.hostChangeDetectorRef.detectChanges();
+    });
+  }
+
+  private getCurrentActiveTabId(): string {
+    return this.topBarService.activeTopBarItem?.id ?? 'content';
   }
 
   private updateExtensionContext(): void {
@@ -201,7 +277,54 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   private destroyExtensionElement(): void {
     this.removeListeners.forEach((remove) => remove());
     this.removeListeners = [];
+    this.extensionComponent?.destroy();
+    this.extensionComponent = undefined;
+    this.viewContainer?.clear();
     this.extensionElement?.remove();
     this.extensionElement = undefined;
+  }
+
+  private async renderFederatedExtension(metadata: OipExtensionModuleMetadata): Promise<void> {
+    if (!this.viewContainer) {
+      return;
+    }
+
+    const {remoteEntryUrl, exposedModule, componentName} = metadata;
+    if (!remoteEntryUrl || !exposedModule || !componentName) {
+      this.loadError = 'Module Federation extension metadata is incomplete.';
+      return;
+    }
+
+    const remoteModule = await loadRemoteModule<Record<string, Type<unknown>>>({
+      type: 'module',
+      remoteEntry: remoteEntryUrl,
+      exposedModule
+    });
+    const component = remoteModule[componentName];
+    if (!component) {
+      throw new Error(`Remote component '${componentName}' was not exported by '${exposedModule}'.`);
+    }
+
+    this.extensionComponent = this.viewContainer.createComponent(component, {
+      injector: this.injector,
+      environmentInjector: this.environmentInjector
+    });
+  }
+
+  private async renderCustomElementExtension(metadata: OipExtensionModuleMetadata): Promise<void> {
+    const {elementName, scriptUrl} = metadata;
+    if (!this.container || !elementName || !scriptUrl) {
+      this.loadError = 'Custom Element extension metadata is incomplete.';
+      return;
+    }
+
+    await this.extensionLoader.loadScript(scriptUrl);
+    await customElements.whenDefined(elementName);
+
+    const element = document.createElement(elementName);
+    this.extensionElement = element;
+    this.attachListeners(element);
+    this.container.nativeElement.appendChild(element);
+    this.updateExtensionContext();
   }
 }

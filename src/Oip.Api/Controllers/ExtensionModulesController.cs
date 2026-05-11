@@ -165,11 +165,35 @@ public class ExtensionModulesController(ModuleRepository moduleRepository, IHttp
         RequireValue(manifest.Name, "name");
         RequireValue(manifest.Version, "version");
         RequireValue(manifest.RoutePath, "routePath");
-        RequireValue(manifest.ElementName, "elementName");
-        RequireValue(manifest.ScriptUrl, "scriptUrl");
         RequireValue(manifest.ApiBaseUrl, "apiBaseUrl");
 
-        if (!ElementNameRegex.IsMatch(manifest.ElementName))
+        var loadType = string.IsNullOrWhiteSpace(manifest.LoadType)
+            ? ExtensionModuleManifestDto.CustomElementLoadType
+            : manifest.LoadType;
+        manifest.LoadType = loadType;
+
+        if (loadType is not ExtensionModuleManifestDto.ModuleFederationLoadType and not ExtensionModuleManifestDto.CustomElementLoadType)
+        {
+            throw new ApiException(
+                "Invalid extension manifest",
+                $"loadType must be '{ExtensionModuleManifestDto.ModuleFederationLoadType}' or '{ExtensionModuleManifestDto.CustomElementLoadType}'.",
+                StatusCodes.Status400BadRequest);
+        }
+
+        if (loadType == ExtensionModuleManifestDto.CustomElementLoadType)
+        {
+            RequireValue(manifest.ElementName, "elementName");
+            RequireValue(manifest.ScriptUrl, "scriptUrl");
+        }
+        else
+        {
+            RequireValue(manifest.RemoteEntryUrl, "remoteEntryUrl");
+            RequireValue(manifest.ExposedModule, "exposedModule");
+            RequireValue(manifest.ComponentName, "componentName");
+        }
+
+        if (loadType == ExtensionModuleManifestDto.CustomElementLoadType &&
+            !ElementNameRegex.IsMatch(manifest.ElementName))
         {
             throw new ApiException(
                 "Invalid extension manifest",
@@ -186,14 +210,20 @@ public class ExtensionModulesController(ModuleRepository moduleRepository, IHttp
                 StatusCodes.Status400BadRequest);
         }
 
-        var scriptUri = ParseTrustedUrl(manifest.ScriptUrl, nameof(manifest.ScriptUrl));
         var apiUri = ParseTrustedUrl(manifest.ApiBaseUrl, nameof(manifest.ApiBaseUrl));
+        var entryUri = ParseTrustedUrl(
+            loadType == ExtensionModuleManifestDto.ModuleFederationLoadType
+                ? manifest.RemoteEntryUrl!
+                : manifest.ScriptUrl,
+            loadType == ExtensionModuleManifestDto.ModuleFederationLoadType
+                ? nameof(manifest.RemoteEntryUrl)
+                : nameof(manifest.ScriptUrl));
 
-        if (!IsTrustedOrigin(manifestUri, scriptUri) || !IsTrustedOrigin(manifestUri, apiUri))
+        if (!IsTrustedOrigin(manifestUri, entryUri) || !IsTrustedOrigin(manifestUri, apiUri))
         {
             throw new ApiException(
                 "Untrusted extension origin",
-                "scriptUrl and apiBaseUrl must use the same origin as the manifest.",
+                "remoteEntryUrl/scriptUrl and apiBaseUrl must use the same origin as the manifest.",
                 StatusCodes.Status400BadRequest);
         }
     }

@@ -2,6 +2,10 @@
   "app-modules": {
     "title": "Modules",
     "refreshTooltip": "Refresh",
+    "register": {
+      "manifestUrlPlaceholder": "External module manifest URL",
+      "button": "Register"
+    },
     "table": {
       "moduleId": "Module ID",
       "name": "Name",
@@ -17,7 +21,8 @@
       "delete": "Delete"
     },
     "messages": {
-      "deleteSuccess": "Module deleted"
+      "deleteSuccess": "Module deleted",
+      "registerSuccess": "External module registered"
     }
   }
 }

@@ -73,8 +73,12 @@ export interface ModuleDto {
   kind?: ModuleKind;
   manifestUrl?: string | null;
   extensionKey?: string | null;
+  loadType?: string | null;
   elementName?: string | null;
   scriptUrl?: string | null;
+  remoteEntryUrl?: string | null;
+  exposedModule?: string | null;
+  componentName?: string | null;
   apiBaseUrl?: string | null;
   version?: string | null;
   moduleSecurities?: ModuleSecurityDto[] | null;

@@ -12,5 +12,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/g10101k/Oip.git"
+  },
+  "peerDependencies": {
+    "@angular-architects/module-federation": "^20.0.0"
   }
 }

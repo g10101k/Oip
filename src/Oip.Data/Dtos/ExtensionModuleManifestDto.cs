@@ -8,6 +8,16 @@ namespace Oip.Data.Dtos;
 public class ExtensionModuleManifestDto
 {
     /// <summary>
+    /// Module Federation extension loader.
+    /// </summary>
+    public const string ModuleFederationLoadType = "moduleFederation";
+
+    /// <summary>
+    /// Custom Element extension loader.
+    /// </summary>
+    public const string CustomElementLoadType = "customElement";
+
+    /// <summary>
     /// Stable extension key.
     /// </summary>
     public string Key { get; set; } = null!;
@@ -28,6 +38,11 @@ public class ExtensionModuleManifestDto
     public string RoutePath { get; set; } = null!;
 
     /// <summary>
+    /// Extension loader type.
+    /// </summary>
+    public string LoadType { get; set; } = CustomElementLoadType;
+
+    /// <summary>
     /// Custom element tag name.
     /// </summary>
     public string ElementName { get; set; } = null!;
@@ -36,6 +51,21 @@ public class ExtensionModuleManifestDto
     /// JavaScript bundle URL that registers the custom element.
     /// </summary>
     public string ScriptUrl { get; set; } = null!;
+
+    /// <summary>
+    /// Module Federation remote entry URL.
+    /// </summary>
+    public string? RemoteEntryUrl { get; set; }
+
+    /// <summary>
+    /// Module Federation exposed module name.
+    /// </summary>
+    public string? ExposedModule { get; set; }
+
+    /// <summary>
+    /// Exported Angular component name.
+    /// </summary>
+    public string? ComponentName { get; set; }
 
     /// <summary>
     /// Extension backend API base URL.

@@ -38,8 +38,12 @@ public class ModuleEntityConfiguration : IEntityTypeConfiguration<ModuleEntity>
         entity.Property(e => e.RouterLink).HasMaxLength(256);
         entity.Property(e => e.ManifestUrl).HasMaxLength(2048);
         entity.Property(e => e.ExtensionKey).HasMaxLength(128);
+        entity.Property(e => e.LoadType).HasMaxLength(64);
         entity.Property(e => e.ElementName).HasMaxLength(128);
         entity.Property(e => e.ScriptUrl).HasMaxLength(2048);
+        entity.Property(e => e.RemoteEntryUrl).HasMaxLength(2048);
+        entity.Property(e => e.ExposedModule).HasMaxLength(256);
+        entity.Property(e => e.ComponentName).HasMaxLength(256);
         entity.Property(e => e.ApiBaseUrl).HasMaxLength(2048);
         entity.Property(e => e.Version).HasMaxLength(64);
 

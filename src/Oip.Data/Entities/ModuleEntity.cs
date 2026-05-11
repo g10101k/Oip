@@ -42,6 +42,11 @@ public class ModuleEntity
     public string? ExtensionKey { get; set; }
 
     /// <summary>
+    /// Extension loader type.
+    /// </summary>
+    public string? LoadType { get; set; }
+
+    /// <summary>
     /// Custom element tag name exposed by the extension bundle.
     /// </summary>
     public string? ElementName { get; set; }
@@ -50,6 +55,21 @@ public class ModuleEntity
     /// JavaScript entrypoint that registers the custom element.
     /// </summary>
     public string? ScriptUrl { get; set; }
+
+    /// <summary>
+    /// Module Federation remote entry URL.
+    /// </summary>
+    public string? RemoteEntryUrl { get; set; }
+
+    /// <summary>
+    /// Module Federation exposed module name.
+    /// </summary>
+    public string? ExposedModule { get; set; }
+
+    /// <summary>
+    /// Exported Angular component name.
+    /// </summary>
+    public string? ComponentName { get; set; }
 
     /// <summary>
     /// Backend API base URL for the extension service.

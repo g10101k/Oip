@@ -31,8 +31,12 @@ public class ModuleRepository(OipModuleContext db)
                 Kind = module.Kind,
                 ManifestUrl = module.ManifestUrl,
                 ExtensionKey = module.ExtensionKey,
+                LoadType = module.LoadType,
                 ElementName = module.ElementName,
                 ScriptUrl = module.ScriptUrl,
+                RemoteEntryUrl = module.RemoteEntryUrl,
+                ExposedModule = module.ExposedModule,
+                ComponentName = module.ComponentName,
                 ApiBaseUrl = module.ApiBaseUrl,
                 Version = module.Version,
                 ModuleSecurities = security.Select(x => new ModuleSecurityDto
@@ -59,8 +63,12 @@ public class ModuleRepository(OipModuleContext db)
                 Kind = x.Kind,
                 ManifestUrl = x.ManifestUrl,
                 ExtensionKey = x.ExtensionKey,
+                LoadType = x.LoadType,
                 ElementName = x.ElementName,
                 ScriptUrl = x.ScriptUrl,
+                RemoteEntryUrl = x.RemoteEntryUrl,
+                ExposedModule = x.ExposedModule,
+                ComponentName = x.ComponentName,
                 ApiBaseUrl = x.ApiBaseUrl,
                 Version = x.Version,
                 ModuleSecurities = x.ModuleSecurities.Select(xx => new ModuleSecurityEntity()
@@ -260,8 +268,12 @@ public class ModuleRepository(OipModuleContext db)
                 Kind = module.Kind,
                 ManifestUrl = module.ManifestUrl,
                 ExtensionKey = module.ExtensionKey,
+                LoadType = module.LoadType,
                 ElementName = module.ElementName,
                 ScriptUrl = module.ScriptUrl,
+                RemoteEntryUrl = module.RemoteEntryUrl,
+                ExposedModule = module.ExposedModule,
+                ComponentName = module.ComponentName,
                 ApiBaseUrl = module.ApiBaseUrl,
                 Version = module.Version,
                 ModuleSecurities = module.ModuleSecurities.Select(x => new ModuleSecurityDto
@@ -292,8 +304,12 @@ public class ModuleRepository(OipModuleContext db)
             Kind = ModuleKind.Extension,
             ManifestUrl = manifestUrl,
             ExtensionKey = manifest.Key,
+            LoadType = manifest.LoadType,
             ElementName = manifest.ElementName,
             ScriptUrl = manifest.ScriptUrl,
+            RemoteEntryUrl = manifest.RemoteEntryUrl,
+            ExposedModule = manifest.ExposedModule,
+            ComponentName = manifest.ComponentName,
             ApiBaseUrl = manifest.ApiBaseUrl,
             Version = manifest.Version,
             ModuleSecurities =
@@ -330,8 +346,12 @@ public class ModuleRepository(OipModuleContext db)
         module.RouterLink = $"/extensions/{manifest.Key}";
         module.ManifestUrl = manifestUrl;
         module.ExtensionKey = manifest.Key;
+        module.LoadType = manifest.LoadType;
         module.ElementName = manifest.ElementName;
         module.ScriptUrl = manifest.ScriptUrl;
+        module.RemoteEntryUrl = manifest.RemoteEntryUrl;
+        module.ExposedModule = manifest.ExposedModule;
+        module.ComponentName = manifest.ComponentName;
         module.ApiBaseUrl = manifest.ApiBaseUrl;
         module.Version = manifest.Version;
 
@@ -475,8 +495,12 @@ public class ModuleRepository(OipModuleContext db)
             Kind = module.Kind,
             ManifestUrl = module.ManifestUrl,
             ExtensionKey = module.ExtensionKey,
+            LoadType = module.LoadType,
             ElementName = module.ElementName,
             ScriptUrl = module.ScriptUrl,
+            RemoteEntryUrl = module.RemoteEntryUrl,
+            ExposedModule = module.ExposedModule,
+            ComponentName = module.ComponentName,
             ApiBaseUrl = module.ApiBaseUrl,
             Version = module.Version,
             ModuleSecurities = module.ModuleSecurities.Select(x => new ModuleSecurityDto

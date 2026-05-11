@@ -2,6 +2,10 @@
   "app-modules": {
     "title": "Модули",
     "refreshTooltip": "Обновить",
+    "register": {
+      "manifestUrlPlaceholder": "URL манифеста внешнего модуля",
+      "button": "Зарегистрировать"
+    },
     "table": {
       "moduleId": "ID модуля",
       "name": "Название",
@@ -17,7 +21,8 @@
       "delete": "Удалить"
     },
     "messages": {
-      "deleteSuccess": "Модуль удален"
+      "deleteSuccess": "Модуль удален",
+      "registerSuccess": "Внешний модуль зарегистрирован"
     }
   }
 }

@@ -3,14 +3,20 @@ export interface OipExtensionManifest {
   name: string;
   version: string;
   routePath: string;
-  elementName: string;
-  scriptUrl: string;
+  loadType?: OipExtensionLoadType;
+  elementName?: string | null;
+  scriptUrl?: string | null;
+  remoteEntryUrl?: string | null;
+  exposedModule?: string | null;
+  componentName?: string | null;
   apiBaseUrl: string;
   icon?: string | null;
   description?: string | null;
   permissions?: unknown;
   settingsSchema?: unknown;
 }
+
+export type OipExtensionLoadType = 'moduleFederation' | 'customElement';
 
 export interface OipExtensionModuleMetadata {
   moduleId: number;
@@ -19,8 +25,12 @@ export interface OipExtensionModuleMetadata {
   kind: number;
   manifestUrl?: string | null;
   extensionKey?: string | null;
+  loadType?: OipExtensionLoadType | null;
   elementName?: string | null;
   scriptUrl?: string | null;
+  remoteEntryUrl?: string | null;
+  exposedModule?: string | null;
+  componentName?: string | null;
   apiBaseUrl?: string | null;
   version?: string | null;
 }

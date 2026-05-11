@@ -66,6 +66,7 @@ export { httpLoaderAuthFactory } from './modules/http-loader.factory';
 export { ContentType, HttpClient, RequestParams } from './api/http-client';
 export {
   OipExtensionHostContext,
+  OipExtensionLoadType,
   OipExtensionManifest,
   OipExtensionModuleMetadata,
   OipExtensionNavigateEvent,
