@@ -38,6 +38,7 @@ public class SwaggerGenerateWebClientStartupTask(
 
             foreach (var config in settings.OpenApi.Where(x => x.GenerateCommand is not null))
             {
+                string? tempPath = null;
                 try
                 {
                     logger.LogDebug("Checking Swagger for {Name}", config.Name);
@@ -46,20 +47,24 @@ public class SwaggerGenerateWebClientStartupTask(
                         if (!await HasSwaggerChanged(config, swaggerJson))
                             continue;
                     logger.LogInformation("Swagger changed detected for {Name}. Generating client...", config.Name);
-                    var path = await SaveSwaggerHash(config, swaggerJson);
-                    await GenerateTypeScriptClient(config, path);
+                    tempPath = await SaveTempSwaggerFile(config, swaggerJson);
+                    await GenerateTypeScriptClient(config, tempPath, cancellationToken);
+                    await CommitSwaggerFile(config, tempPath);
 
                     logger.LogInformation("Client generated successfully for {Name}", config.Name);
                 }
                 catch (Exception ex)
                 {
+                    DeleteTempSwaggerFile(tempPath);
                     logger.LogError(ex, "Error processing Swagger config {Name}", config.Name);
+                    throw;
                 }
             }
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error in Swagger client generator");
+            throw;
         }
         finally
         {
@@ -83,7 +88,19 @@ public class SwaggerGenerateWebClientStartupTask(
         return storedSwaggerJson != currentSwaggerJson;
     }
 
-    private async Task<string> SaveSwaggerHash(OpenApiItem config, string content)
+    private async Task<string> SaveTempSwaggerFile(OpenApiItem config, string content)
+    {
+        var tempFilePath = GetTempSwaggerFilePath(config);
+
+        var directory = Path.GetDirectoryName(tempFilePath);
+        if (!Directory.Exists(directory))
+            Directory.CreateDirectory(directory!);
+
+        await File.WriteAllTextAsync(tempFilePath, content);
+        return tempFilePath;
+    }
+
+    private Task CommitSwaggerFile(OpenApiItem config, string tempFilePath)
     {
         var hashFilePath = GetHashFilePath(config);
 
@@ -91,38 +108,46 @@ public class SwaggerGenerateWebClientStartupTask(
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory!);
 
-        await File.WriteAllTextAsync(hashFilePath, content);
-        return hashFilePath;
+        File.Move(tempFilePath, hashFilePath, true);
+        return Task.CompletedTask;
     }
 
-    private async Task GenerateTypeScriptClient(OpenApiItem config, string swaggerJsonPath)
+    protected virtual async Task GenerateTypeScriptClient(
+        OpenApiItem config,
+        string swaggerJsonPath,
+        CancellationToken cancellationToken)
     {
         // In case of paths with spaces
-        string protectedSwaggerJsonPath =
+        var protectedSwaggerJsonPath =
             swaggerJsonPath.Any(char.IsWhiteSpace) ? "\"" + swaggerJsonPath + "\"" : swaggerJsonPath;
+        var generateCommand = config.GenerateCommand!;
 
         // Windows platform requires CMD to execute NPX command
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            config.GenerateCommand = "cmd.exe /c " + config.GenerateCommand!;
+            generateCommand = "cmd.exe /c " + generateCommand;
 
-        string[] parts = config.GenerateCommand!.Replace("{SwaggerJsonPath}", protectedSwaggerJsonPath).Split(' ', 2);
+        var parts = generateCommand.Replace("{SwaggerJsonPath}", protectedSwaggerJsonPath).Split(' ', 2);
+        var arguments = parts.Length > 1 ? parts[1] : string.Empty;
+        var workingDirectory = config.WorkingDirectory != null
+            ? Path.GetFullPath(config.WorkingDirectory)
+            : settings.SpaProxyServer.WorkingDirectory;
 
         var processStartInfo = new ProcessStartInfo
         {
             FileName = parts[0],
-            Arguments = parts[1],
+            Arguments = arguments,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-            WorkingDirectory = config.WorkingDirectory != null
-                ? Path.GetFullPath(config.WorkingDirectory)
-                : settings.SpaProxyServer.WorkingDirectory,
+            WorkingDirectory = workingDirectory,
             StandardOutputEncoding = System.Text.Encoding.UTF8,
-            StandardErrorEncoding = System.Text.Encoding.UTF8
+            StandardErrorEncoding = System.Text.Encoding.UTF8,
+            Environment =
+            {
+                ["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"
+            }
         };
-
-        processStartInfo.Environment.Add("NODE_TLS_REJECT_UNAUTHORIZED", "0");
 
         using var process = new Process();
         process.StartInfo = processStartInfo;
@@ -141,12 +166,32 @@ public class SwaggerGenerateWebClientStartupTask(
         process.Start();
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-        await process.WaitForExitAsync();
+        await process.WaitForExitAsync(cancellationToken);
+
+        if (process.ExitCode != 0)
+        {
+            throw new InvalidOperationException(
+                $"Web API client generation failed. Command: '{processStartInfo.FileName} {processStartInfo.Arguments}', WorkingDirectory: '{workingDirectory}', ExitCode: {process.ExitCode}.");
+        }
     }
 
     private string GetHashFilePath(OpenApiItem config)
     {
         return Path.Combine(environment.ContentRootPath, "obj/SwaggerFiles",
             $"swagger-{config.Name.ToLower()}.json");
+    }
+
+    private string GetTempSwaggerFilePath(OpenApiItem config)
+    {
+        return Path.Combine(environment.ContentRootPath, "obj/SwaggerFiles/tmp",
+            $"swagger-{config.Name.ToLower()}.json");
+    }
+
+    private static void DeleteTempSwaggerFile(string? tempFilePath)
+    {
+        if (tempFilePath is null || !File.Exists(tempFilePath))
+            return;
+
+        File.Delete(tempFilePath);
     }
 }
