@@ -5,7 +5,8 @@ const { _, getInlineParseContent, getParseContent, parseSchema, getComponentByRe
 const { parameters, path, method, payload, query, formData, security, requestParams } = route.request;
 const { type, errorType, contentTypes } = route.response;
 const { HTTP_CLIENT, RESERVED_REQ_PARAMS_ARG_NAMES } = config.constants;
-const routeDocs = includeFile("./route-docs", { config, route, utils });
+const shouldGenerateJSDoc = config.generateJSDoc !== false;
+const routeDocs = shouldGenerateJSDoc ? includeFile("./route-docs", { config, route, utils }) : null;
 const queryName = (query && query.name) || "query";
 const pathParams = _.values(parameters);
 const pathParamsNames = _.map(pathParams, "name");
@@ -82,6 +83,7 @@ const describeReturnType = () => {
 const isValidIdentifier = (name) => /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(name);
 
 %>
+<% if (shouldGenerateJSDoc) { %>
 /**
 <%~ routeDocs.description %>
 
@@ -90,6 +92,7 @@ const isValidIdentifier = (name) => /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(name);
 <%~ routeDocs.lines %>
 
  */
+<% } %>
 <% if (isValidIdentifier(route.routeName.usage)) { %><%~ route.routeName.usage %><% } else { %>"<%~ route.routeName.usage %>"<% } %> = (<%~ wrapperArgs %>)<%~ config.toJS ? `: ${describeReturnType()}` : "" %> =>
     <%~ config.singleHttpClient ? 'this.http.request' : 'this.request' %><<%~ type %>, <%~ errorType %>>({
         path: `<%~ path %>`,

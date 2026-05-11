@@ -17,6 +17,7 @@ export { AppModulesComponent } from './components/app-modules.component';
 export { AppConfiguratorComponent } from './components/app-configurator.component';
 export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator.component';
 export { DiscussionComponent } from './components/discussion.component';
+export { IframeModuleComponent } from './components/iframe-module.component';
 
 // DTOs
 export { TopBarDto } from './dtos/top-bar.dto';

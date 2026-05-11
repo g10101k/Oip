@@ -3,18 +3,21 @@ const { route, utils, config } = it;
 const { _, pascalCase, require } = utils;
 const { query, payload, pathParams, headers } = route.request;
 
-const routeDocs = includeFile("./route-docs", { config, route, utils });
+const shouldGenerateJSDoc = config.generateJSDoc !== false;
+const routeDocs = shouldGenerateJSDoc ? includeFile("./route-docs", { config, route, utils }) : null;
 const isValidIdentifier = (name) => /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(name);
 const routeNamespace = pascalCase(route.routeName.usage);
 
 %>
 
+<% if (shouldGenerateJSDoc) { %>
 /**
 <%~ routeDocs.description %>
 
 <%~ routeDocs.lines %>
 
 */
+<% } %>
 export namespace <% if (isValidIdentifier(routeNamespace)) { %><%~ routeNamespace %><% } else { %>"<%~ routeNamespace %>"<% } %> {
   export type RequestParams = <%~ (pathParams && pathParams.type) || '{}' %>;
   export type RequestQuery = <%~ (query && query.type) || '{}' %>;

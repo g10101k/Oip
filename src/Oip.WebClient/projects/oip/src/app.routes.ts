@@ -34,7 +34,8 @@ export const appRoutes: Routes = [
         path: 'sample-module/:id',
         loadChildren: () => loadRemoteModule('oipSampleModule', './routes').then((m) => m.remoteRoutes),
         canActivate: [() => inject(AuthGuardService).canActivate()]
-      }, {
+      },
+      {
         path: 'discussion/:id',
         loadComponent: () => import('oip-common').then((m) => m.DiscussionComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
@@ -61,6 +62,11 @@ export const appRoutes: Routes = [
       {
         path: 'modules',
         loadComponent: () => import('oip-common').then((m) => m.AppModulesComponent),
+        canActivate: [() => inject(AuthGuardService).canActivate()]
+      },
+      {
+        path: 'iframe-module/:id',
+        loadComponent: () => import('oip-common').then((m) => m.IframeModuleComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
       }
     ]

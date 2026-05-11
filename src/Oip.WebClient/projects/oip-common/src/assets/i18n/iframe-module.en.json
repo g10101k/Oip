@@ -1,0 +1,10 @@
+{
+  "iframe-module": {
+    "iframeModule": {
+      "urlPlaceholder": "Site URL",
+      "settingSaveButtonLabel": "Save",
+      "emptyUrlMessage": "Site URL is not specified.",
+      "siteLoadingMessage": "Failed to load the site."
+    }
+  }
+}

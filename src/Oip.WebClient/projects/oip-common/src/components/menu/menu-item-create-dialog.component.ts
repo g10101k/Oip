@@ -3,11 +3,18 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { PrimeIcons } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AddModuleInstanceDto, IntKeyValueDto } from '../../api/data-contracts';
 import { MenuApi } from '../../api/menu.api';
 import { MenuService } from '../../services/app.menu.service';
+import { MsgService } from '../../services/msg.service';
+
+type PrimeIconOption = {
+  label: string;
+  value: string;
+};
 
 @Component({
   selector: 'menu-item-create-dialog',
@@ -18,7 +25,8 @@ import { MenuService } from '../../services/app.menu.service';
       header="{{ 'menuItemCreateDialogComponent.header' | translate }}"
       [modal]="true"
       [style]="{ width: '40rem' }"
-      [(visible)]="visible">
+      [(visible)]="visible"
+      (keydown.enter)="save()">
       @if (menuService.contextMenuItem) {
         <div class="flex items-center gap-4 mb-4 mt-1">
           <label class="font-semibold w-1/3" for="oip-menu-item-create-dialog-parent-input">
@@ -57,21 +65,44 @@ import { MenuService } from '../../services/app.menu.service';
         <label class="font-semibold w-1/3" for="oip-menu-item-create-dialog-icon">
           {{ 'menuItemCreateDialogComponent.icon' | translate }}
         </label>
-        <i class="{{ selectIcon }}"></i>
-        <input class="flex-auto" id="oip-menu-item-create-dialog-icon" pInputText [(ngModel)]="selectIcon" />
+        <p-select
+          appendTo="body"
+          class="flex-auto"
+          filterBy="label,value"
+          id="oip-menu-item-create-dialog-icon"
+          optionLabel="label"
+          optionValue="value"
+          scrollHeight="18rem"
+          [filter]="true"
+          [options]="iconOptions"
+          [(ngModel)]="selectIcon">
+          <ng-template let-icon pTemplate="selectedItem">
+            <div class="flex items-center gap-2">
+              <i [class]="icon.value"></i>
+              <span>{{ icon.label }}</span>
+            </div>
+          </ng-template>
+          <ng-template let-icon pTemplate="item">
+            <div class="flex items-center gap-2">
+              <i [class]="icon.value"></i>
+              <span>{{ icon.label }}</span>
+            </div>
+          </ng-template>
+        </p-select>
       </div>
       <div class="flex justify-end gap-2">
         <p-button
           id="oip-menu-item-create-cancel"
           label="{{ 'menuItemCreateDialogComponent.cancel' | translate }}"
           severity="secondary"
-          (click)="changeVisible()"
-          (keydown)="changeVisible()" />
+          [disabled]="saving"
+          (click)="changeVisible()" />
         <p-button
           id="oip-menu-item-create-save"
           label="{{ 'menuItemCreateDialogComponent.save' | translate }}"
-          (click)="save()"
-          (keydown)="save()" />
+          [disabled]="saving"
+          [loading]="saving"
+          (click)="save()" />
       </div>
     </p-dialog>
   `
@@ -79,12 +110,21 @@ import { MenuService } from '../../services/app.menu.service';
 export class MenuItemCreateDialogComponent implements OnInit {
   protected readonly menuService = inject(MenuService);
   protected readonly menu = inject(MenuApi);
+  private readonly msgService = inject(MsgService);
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
   modules: IntKeyValueDto[] = [];
+  iconOptions: PrimeIconOption[] = Object.values(PrimeIcons)
+    .filter((icon): icon is string => typeof icon === 'string')
+    .map((icon) => ({
+      label: icon.replace('pi pi-', ''),
+      value: icon
+    }))
+    .sort((left, right) => left.label.localeCompare(right.label));
   selectModule: any;
   label: string;
   selectIcon: string = 'pi pi-box';
+  saving = false;
 
   async ngOnInit() {
     this.modules = await this.menu.getModules();
@@ -96,15 +136,27 @@ export class MenuItemCreateDialogComponent implements OnInit {
   }
 
   async save() {
+    if (this.saving) {
+      return;
+    }
+
     const item: AddModuleInstanceDto = {
       moduleId: this.selectModule,
       label: this.label,
       icon: this.selectIcon,
       parentId: this.menuService.contextMenuItem?.moduleInstanceId
     };
-    await this.menuService.addModuleInstance(item);
-    await this.menuService.loadMenu();
-    this.hide();
+
+    this.saving = true;
+    try {
+      await this.menuService.addModuleInstance(item);
+      await this.menuService.loadMenu();
+      this.hide();
+    } catch (error) {
+      this.msgService.error(error);
+    } finally {
+      this.saving = false;
+    }
   }
 
   hide() {

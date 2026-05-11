@@ -7,6 +7,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
         <UserSecretsId>b978822d-6d6b-40a7-93aa-1c8f8686ab85</UserSecretsId>
     </PropertyGroup>
 
