@@ -2,15 +2,23 @@ import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { PrimeIcons } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { MenuService } from '../../services/app.menu.service';
 import { SecurityDataService } from '../../services/security-data.service';
+import { MsgService } from '../../services/msg.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { EditModuleInstanceDto } from '../../api/data-contracts';
 
+type PrimeIconOption = {
+  label: string;
+  value: string;
+};
+
 @Component({
-  imports: [ButtonModule, DialogModule, InputTextModule, FormsModule, TranslatePipe, MultiSelectModule],
+  imports: [ButtonModule, DialogModule, InputTextModule, SelectModule, FormsModule, TranslatePipe, MultiSelectModule],
   selector: 'menu-item-edit-dialog',
   standalone: true,
   template: `
@@ -18,7 +26,8 @@ import { EditModuleInstanceDto } from '../../api/data-contracts';
       header="{{ 'menuItemEditDialogComponent.header' | translate }}"
       [modal]="true"
       [style]="{ width: '40rem' }"
-      [(visible)]="visible">
+      [(visible)]="visible"
+      (keydown.enter)="save()">
       <div class="flex items-center gap-4 mb-4 mt-1">
         <label class="font-semibold w-1/3" for="oip-menu-item-edit-dialog-menu-input">
           {{ 'menuItemEditDialogComponent.label' | translate }}
@@ -35,8 +44,30 @@ import { EditModuleInstanceDto } from '../../api/data-contracts';
         <label class="font-semibold w-1/3" for="oip-menu-item-edit-dialog-icon">
           {{ 'menuItemEditDialogComponent.icon' | translate }}
         </label>
-        <i class="{{ item.icon }}"></i>
-        <input class="flex-auto" id="oip-menu-item-edit-dialog-icon" pInputText [(ngModel)]="item.icon" />
+        <p-select
+          appendTo="body"
+          class="flex-auto"
+          filterBy="label,value"
+          id="oip-menu-item-edit-dialog-icon"
+          optionLabel="label"
+          optionValue="value"
+          scrollHeight="18rem"
+          [filter]="true"
+          [options]="iconOptions"
+          [(ngModel)]="item.icon">
+          <ng-template let-icon pTemplate="selectedItem">
+            <div class="flex items-center gap-2">
+              <i [class]="icon.value"></i>
+              <span>{{ icon.label }}</span>
+            </div>
+          </ng-template>
+          <ng-template let-icon pTemplate="item">
+            <div class="flex items-center gap-2">
+              <i [class]="icon.value"></i>
+              <span>{{ icon.label }}</span>
+            </div>
+          </ng-template>
+        </p-select>
       </div>
 
       <div class="flex items-center gap-4 mb-4">
@@ -58,13 +89,14 @@ import { EditModuleInstanceDto } from '../../api/data-contracts';
           id="oip-menu-item-edit-dialog-cancel-edit-button"
           label="{{ 'menuItemEditDialogComponent.cancel' | translate }}"
           severity="secondary"
-          (click)="changeVisible()"
-          (keydown)="changeVisible()" />
+          [disabled]="saving"
+          (click)="changeVisible()" />
         <p-button
           id="oip-menu-item-edit-dialog-save-edit-button"
           label="{{ 'menuItemEditDialogComponent.save' | translate }}"
-          (click)="save()"
-          (keydown)="save()" />
+          [disabled]="saving"
+          [loading]="saving"
+          (click)="save()" />
       </div>
     </p-dialog>
   `
@@ -72,12 +104,20 @@ import { EditModuleInstanceDto } from '../../api/data-contracts';
 export class MenuItemEditDialogComponent {
   private readonly menuService = inject(MenuService);
   private readonly securityDataService = inject(SecurityDataService);
+  private readonly msgService = inject(MsgService);
 
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
 
   modules: any[] = [];
   roles: string[] = [];
+  iconOptions: PrimeIconOption[] = Object.values(PrimeIcons)
+    .filter((icon): icon is string => typeof icon === 'string')
+    .map((icon) => ({
+      label: icon.replace('pi pi-', ''),
+      value: icon
+    }))
+    .sort((left, right) => left.label.localeCompare(right.label));
   item: EditModuleInstanceDto = {
     icon: '',
     label: '',
@@ -86,6 +126,7 @@ export class MenuItemEditDialogComponent {
     moduleInstanceId: 0,
     parentId: 0
   };
+  saving = false;
 
   changeVisible() {
     this.visible = !this.visible;
@@ -93,9 +134,20 @@ export class MenuItemEditDialogComponent {
   }
 
   async save() {
-    await this.menuService.editModuleInstance(this.item);
-    await this.menuService.loadMenu();
-    this.hide();
+    if (this.saving) {
+      return;
+    }
+
+    this.saving = true;
+    try {
+      await this.menuService.editModuleInstance(this.item);
+      await this.menuService.loadMenu();
+      this.hide();
+    } catch (error) {
+      this.msgService.error(error);
+    } finally {
+      this.saving = false;
+    }
   }
 
   hide() {
