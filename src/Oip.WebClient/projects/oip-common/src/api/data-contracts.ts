@@ -1,3 +1,9 @@
+export enum ModuleKind {
+  Core = "Core",
+  Iframe = "Iframe",
+  Extension = "Extension",
+}
+
 export interface AddModuleInstanceDto {
   moduleId?: number;
   label?: string | null;
@@ -64,6 +70,13 @@ export interface ModuleDto {
   moduleId?: number;
   name?: string | null;
   settings?: string | null;
+  kind?: ModuleKind;
+  manifestUrl?: string | null;
+  extensionKey?: string | null;
+  elementName?: string | null;
+  scriptUrl?: string | null;
+  apiBaseUrl?: string | null;
+  version?: string | null;
   moduleSecurities?: ModuleSecurityDto[] | null;
 }
 
@@ -88,11 +101,35 @@ export interface ModuleSecurityDto {
   role: string | null;
 }
 
+export interface RegisterExtensionModuleRequest {
+  manifestUrl?: string | null;
+}
+
+export interface UpdateExtensionModuleRequest {
+  manifestUrl?: string | null;
+}
+
+export interface GetExtensionModuleByKeyParams {
+  extensionKey: string;
+}
+
+export interface UpdateExtensionModuleParams {
+  id: number;
+}
+
+export interface DeleteExtensionModuleParams {
+  id: number;
+}
+
 export interface GetModuleInstanceSettingsParams {
   id?: number;
 }
 
 export interface GetModuleInstanceSettingsParams2 {
+  id?: number;
+}
+
+export interface GetModuleInstanceSettingsParams4 {
   id?: number;
 }
 

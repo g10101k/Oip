@@ -5,7 +5,7 @@
 import { Injectable } from "@angular/core";
 import {
   ApiExceptionResponse,
-  GetModuleInstanceSettingsParams2,
+  GetModuleInstanceSettingsParams4,
   IframeModuleSettings,
 } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
@@ -15,7 +15,7 @@ export class IframeModuleApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   getModuleInstanceSettings = (
-    query: GetModuleInstanceSettingsParams2,
+    query: GetModuleInstanceSettingsParams4,
     params: RequestParams = {},
   ) =>
     this.request<IframeModuleSettings, ApiExceptionResponse>({

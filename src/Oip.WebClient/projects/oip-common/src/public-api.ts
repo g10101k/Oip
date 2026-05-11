@@ -18,6 +18,7 @@ export { AppConfiguratorComponent } from './components/app-configurator.componen
 export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator.component';
 export { DiscussionComponent } from './components/discussion.component';
 export { IframeModuleComponent } from './components/iframe-module.component';
+export { ExtensionModuleHostComponent } from './components/extension-module-host.component';
 
 // DTOs
 export { TopBarDto } from './dtos/top-bar.dto';
@@ -40,6 +41,7 @@ export { L10nService, LanguageDto } from './services/l10n.service';
 export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './services/logo.service';
 export { NotificationService } from './services/notification.service';
 export { TableFilterService } from './services/table-filter.service';
+export { ExtensionLoaderService } from './extension-host/extension-loader.service';
 export {
   APP_THEME_PRESETS,
   APP_THEME_PRESETS_MERGE_MODE,
@@ -62,3 +64,19 @@ export { langIntercept } from './intercepts/i18n-intercept.service';
 export { SecurePipe } from './modules/secure.pipe';
 export { httpLoaderAuthFactory } from './modules/http-loader.factory';
 export { ContentType, HttpClient, RequestParams } from './api/http-client';
+export {
+  OipExtensionHostContext,
+  OipExtensionManifest,
+  OipExtensionModuleMetadata,
+  OipExtensionNavigateEvent,
+  OipExtensionNotifyEvent
+} from './extension-host/extension-host.types';
+export {
+  OIP_EXTENSION_EVENTS,
+  emitOipContextChange,
+  emitOipError,
+  emitOipNavigate,
+  emitOipNotify,
+  emitOipSettingsChange,
+  emitOipTitleChange
+} from './extension-host/extension-host.events';

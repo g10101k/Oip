@@ -41,6 +41,7 @@ internal static class Program
             builder.AddOpenApi(settings);
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
+            builder.Services.AddHttpClient();
             builder.Services.AddCors();
             builder.AddControllersAndView();
             builder.AddLocalization();

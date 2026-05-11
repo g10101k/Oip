@@ -24,6 +24,30 @@ namespace Oip.Base.Data.Postgres.Migrations
 
             modelBuilder.Entity("Oip.Data.Entities.ModuleEntity", b =>
                 {
+                    b.Property<string>("ApiBaseUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasComment("Backend API base URL for the extension service.");
+
+                    b.Property<string>("ElementName")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("Custom element tag name exposed by the extension bundle.");
+
+                    b.Property<string>("ExtensionKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("Stable extension key.");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("integer")
+                        .HasComment("Module delivery kind.");
+
+                    b.Property<string>("ManifestUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasComment("URL of the extension manifest, if this module is an extension.");
+
                     b.Property<int>("ModuleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -42,9 +66,19 @@ namespace Oip.Base.Data.Postgres.Migrations
                         .HasColumnType("character varying(256)")
                         .HasComment("Route link to component");
 
+                    b.Property<string>("ScriptUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)")
+                        .HasComment("JavaScript entrypoint that registers the custom element.");
+
                     b.Property<string>("Settings")
                         .HasColumnType("text")
                         .HasComment("Settings for module");
+
+                    b.Property<string>("Version")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasComment("Extension version.");
 
                     b.ToTable("Module", "oip", t =>
                         {
