@@ -36,7 +36,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 public class SyncOptions
 {
     /// <summary>
-    /// Gets or sets the synchronization interval in minutes.
+    /// Gets or sets the synchronization interval in seconds.
     /// </summary>
     public int IntervalSeconds { get; set; } = 30;
 
