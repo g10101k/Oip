@@ -73,6 +73,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   private readonly refreshWaitTimeoutMs = 10000;
   private readonly refreshTabId = this.createRefreshTabId();
   private refreshSession$?: Observable<LoginResponse>;
+  private readonly storageListener = (event: StorageEvent) => this.handleStorageEvent(event);
 
   /**
    * Handles angular OIDC events.
@@ -113,6 +114,8 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
         super.getAccessToken().subscribe(token => {this.accessToken.next(token); });
         this.auth();
       });
+
+    window.addEventListener('storage', this.storageListener);
   }
 
   getCurrentUser() {
@@ -185,9 +188,11 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
    * Completes the BehaviorSubjects when the service is destroyed to avoid memory leaks.
    */
   ngOnDestroy(): void {
+    window.removeEventListener('storage', this.storageListener);
     this.loginResponse.complete();
     this.payload.complete();
     this.currentUser.complete();
+    this.accessToken.complete();
   }
 
   /**
@@ -386,6 +391,21 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
     localStorage.setItem(this.getRefreshResultKey(configId), JSON.stringify(result));
   }
 
+  private handleStorageEvent(event: StorageEvent): void {
+    if (!event.key?.startsWith(`${this.refreshResultKeyPrefix}:`) || !event.newValue) {
+      return;
+    }
+
+    const result = this.parseRefreshResult(event.newValue);
+    if (!result || result.ownerId === this.refreshTabId || result.status !== 'success') {
+      return;
+    }
+
+    void this.syncAuthState(result.configId).catch(() => {
+      // Another auth flow will handle failures; the important bit here is not keeping a stale in-memory token.
+    });
+  }
+
   private readRefreshLock(lockKey: string): RefreshLockInfo | null {
     try {
       const value = localStorage.getItem(lockKey);
@@ -398,7 +418,15 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   private readRefreshResult(resultKey: string): RefreshResultInfo | null {
     try {
       const value = localStorage.getItem(resultKey);
-      return value ? JSON.parse(value) as RefreshResultInfo : null;
+      return value ? this.parseRefreshResult(value) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private parseRefreshResult(value: string): RefreshResultInfo | null {
+    try {
+      return JSON.parse(value) as RefreshResultInfo;
     } catch {
       return null;
     }
