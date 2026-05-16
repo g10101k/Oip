@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-import { BaseDataService } from '../services/base-data.service';
 import { Tag } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -77,7 +76,6 @@ import { firstValueFrom } from 'rxjs';
   `
 })
 export class AppModulesComponent implements OnInit {
-  protected dataService = inject(BaseDataService);
   protected modules: ModuleDto[] = [];
   protected msgService = inject(MsgService);
   protected confirmationService = inject(ConfirmationService);
@@ -118,7 +116,7 @@ export class AppModulesComponent implements OnInit {
       },
       accept: async () => {
         try {
-          await this.dataService.sendRequest(`api/module/delete`, 'DELETE', {
+          await this.moduleService.delete({
             moduleId: module.moduleId
           });
           await this.refreshAction();

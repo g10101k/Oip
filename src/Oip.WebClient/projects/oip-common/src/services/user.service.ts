@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { SecurityService } from './security.service';
-import { BaseDataService } from './base-data.service';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { UserProfileApi } from '../api/user-profile.api';
 
 /**
  * UserService is responsible for retrieving and handling user-related data,
@@ -10,7 +10,7 @@ import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 @Injectable()
 export class UserService {
   private readonly securityService = inject(SecurityService);
-  private readonly baseDataService = inject(BaseDataService);
+  private readonly userProfileApi = inject(UserProfileApi);
   private requestedPhotoEmail: string | null = null;
 
   constructor() {
@@ -77,10 +77,7 @@ export class UserService {
 
     this.requestedPhotoEmail = email;
 
-    const url = this.baseDataService.buildUrl(
-      `api/user-profile/get-user-photo?email=${email}`
-    );
-    this.baseDataService.getBlob(url).then(
+    this.userProfileApi.getUserPhoto({ email }, { format: 'blob' }).then(
       (data) => {
         this.createImageFromBlob(data as Blob);
         this.photoLoaded = true;

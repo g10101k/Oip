@@ -4,16 +4,16 @@ import { TopBarDto } from '../dtos/top-bar.dto';
 import { TopBarService } from '../services/top-bar.service';
 import { MsgService } from '../services/msg.service';
 import { ActivatedRoute } from '@angular/router';
-import { BaseDataService } from '../services/base-data.service';
 import { InterpolationParameters, TranslateService, Translation, TranslationObject } from '@ngx-translate/core';
 import { from, Observable, Subject, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AppTitleService } from '../services/app-title.service';
 import { LayoutService } from '../services/app.layout.service';
 import { L10nService } from '../services/l10n.service';
-import { SecurityDataService } from '../services/security-data.service';
 import { SecurityDto } from '../dtos/security.dto';
 import { SecurityService } from '../services/security.service';
+import { ContentType, HttpClient } from '../api/http-client';
+import { PutSecurityDto } from '../dtos/put-security.dto';
 
 interface BaseComponentLocalization {
   security: string;
@@ -31,8 +31,8 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   private moduleInstanceReloadPromise: Promise<void> = Promise.resolve();
   private rightsSubscription?: Subscription;
   protected readonly destroyRef = inject(DestroyRef);
-  protected readonly securityDataService = inject(SecurityDataService);
   protected readonly securityService = inject(SecurityService);
+  protected readonly httpClient = inject(HttpClient);
 
   /**
    * Provide access to app settings
@@ -54,12 +54,6 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Provides access to messaging services.
    */
   public readonly msgService = inject(MsgService);
-
-  /**
-   * Provides access to base data service functionality.
-   * @deprecated The method should not be used
-   */
-  public readonly baseDataService: BaseDataService = inject(BaseDataService);
 
   /**
    * Provides access to translation functionality.
@@ -277,9 +271,11 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    */
   async getSettings(): Promise<void> {
     try {
-      this.settings = await this.baseDataService.sendRequest<TBackendStoreSettings>(
-        `${this.baseDataService.baseUrl}api/${this.controller}/get-module-instance-settings?id=${this.id}`
-      );
+      if (this.id == null) {
+        return;
+      }
+
+      this.settings = await this.getModuleInstanceSettings<TBackendStoreSettings>();
     } catch (error) {
       this.msgService.error(error);
     }
@@ -291,11 +287,15 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @return {Promise<void>} A promise that resolves when the settings are saved. Reject if an error occurs.
    */
   async saveSettings(settings: TBackendStoreSettings): Promise<void> {
-    await this.baseDataService
-      .sendRequest(`api/${this.controller}/put-module-instance-settings`, 'PUT', {
-        id: this.id,
-        settings: settings
-      })
+    if (this.id == null) {
+      this.msgService.error('Module id not passed!');
+      return;
+    }
+
+    await this.saveModuleInstanceSettings({
+      id: this.id,
+      settings: settings
+    })
       .then(() => {
         this.msgService.success(this.translateService.instant('baseComponent.success'));
       })
@@ -331,7 +331,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     this.rightsSubscription = this.securityService.payload
       .pipe(
         switchMap((payload) =>
-          from(this.securityDataService.getSecurity(controller, id)).pipe(
+          from(this.getSecurity(controller, id)).pipe(
             map((securitySettings) => ({ payload, securitySettings }))
           )
         ),
@@ -369,6 +369,75 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     return securitySettings
       .find((security) => security.code === code)
       ?.roles?.some((role) => roles.includes(role)) ?? false;
+  }
+
+  protected getSecurity(controller: string = this.controller, id: number | undefined = this.id): Promise<SecurityDto[]> {
+    if (!controller || id == null) {
+      return Promise.resolve([]);
+    }
+
+    return this.httpClient.request<SecurityDto[]>({
+      path: `/api/${controller}/get-security`,
+      method: 'GET',
+      query: { id },
+      secure: true,
+      format: 'json'
+    });
+  }
+
+  protected saveSecurity(request: PutSecurityDto, controller: string = this.controller): Promise<unknown> {
+    return this.httpClient.request<unknown>({
+      path: `/api/${controller}/put-security`,
+      method: 'PUT',
+      body: request,
+      secure: true,
+      type: ContentType.Json
+    });
+  }
+
+  protected getModuleInstanceSettings<TSettings>(
+    controller: string = this.controller,
+    id: number | undefined = this.id
+  ): Promise<TSettings> {
+    return this.httpClient.request<TSettings>({
+      path: `/api/${controller}/get-module-instance-settings`,
+      method: 'GET',
+      query: { id },
+      secure: true,
+      format: 'json'
+    });
+  }
+
+  protected saveModuleInstanceSettings<TSettings>(
+    request: { id: number; settings: TSettings },
+    controller: string = this.controller
+  ): Promise<unknown> {
+    return this.httpClient.request<unknown>({
+      path: `/api/${controller}/put-module-instance-settings`,
+      method: 'PUT',
+      body: request,
+      secure: true,
+      type: ContentType.Json
+    });
+  }
+
+  protected getMigrations<TMigration>(controller: string = this.controller): Promise<TMigration[]> {
+    return this.httpClient.request<TMigration[]>({
+      path: `/api/${controller}/get-migrations`,
+      method: 'GET',
+      secure: true,
+      format: 'json'
+    });
+  }
+
+  protected applyModuleMigration(request: unknown, controller: string = this.controller): Promise<unknown> {
+    return this.httpClient.request<unknown>({
+      path: `/api/${controller}/apply-migration`,
+      method: 'POST',
+      body: request,
+      secure: true,
+      type: ContentType.Json
+    });
   }
 
   private async reloadModuleInstance(): Promise<void> {

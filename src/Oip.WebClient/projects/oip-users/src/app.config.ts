@@ -7,8 +7,6 @@ import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
 import {
   AuthGuardService,
-  BaseDataService,
-  SecurityDataService,
   UserService,
   langIntercept,
   SecurityService,
@@ -29,8 +27,6 @@ export const appConfig: ApplicationConfig = {
     { provide: SecurityService, useClass: BffSecurityService },
     AuthGuardService,
     MessageService,
-    SecurityDataService,
-    BaseDataService,
     UserService,
     importProvidersFrom([
       TranslateModule.forRoot({

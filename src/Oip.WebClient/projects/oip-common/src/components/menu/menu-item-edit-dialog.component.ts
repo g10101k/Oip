@@ -6,11 +6,11 @@ import { SelectModule } from 'primeng/select';
 import { PrimeIcons } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { MenuService } from '../../services/app.menu.service';
-import { SecurityDataService } from '../../services/security-data.service';
 import { MsgService } from '../../services/msg.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { EditModuleInstanceDto } from '../../api/data-contracts';
+import { SecurityApi } from '../../api/security.api';
 
 type PrimeIconOption = {
   label: string;
@@ -103,7 +103,7 @@ type PrimeIconOption = {
 })
 export class MenuItemEditDialogComponent {
   private readonly menuService = inject(MenuService);
-  private readonly securityDataService = inject(SecurityDataService);
+  private readonly securityApi = inject(SecurityApi);
   private readonly msgService = inject(MsgService);
 
   @Input() visible!: boolean;
@@ -165,7 +165,7 @@ export class MenuItemEditDialogComponent {
       viewRoles: this.menuService.contextMenuItem?.securities
     };
 
-    this.roles = await this.securityDataService.getRealmRoles();
+    this.roles = await this.securityApi.getRealmRoles();
     this.menuService.getModules().then((data) => {
       this.modules = data;
     });

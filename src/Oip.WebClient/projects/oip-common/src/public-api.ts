@@ -26,10 +26,8 @@ export { PutSecurityDto } from './dtos/put-security.dto';
 export { NoSettingsDto } from './dtos/no-settings.dto';
 
 // Services
-export { BaseDataService } from './services/base-data.service';
 export { TopBarService } from './services/top-bar.service';
 export { AuthCsrfToken, BffSecurityService, SecurityService, KeycloakSecurityService } from './services/security.service';
-export { SecurityDataService } from './services/security-data.service';
 export { MsgService } from './services/msg.service';
 export { AuthGuardService } from './services/auth-guard.service';
 export { AppConfig, LayoutService } from './services/app.layout.service';
@@ -56,4 +54,8 @@ export { langIntercept } from './intercepts/i18n-intercept.service';
 export { SecurePipe } from './modules/secure.pipe';
 export { httpLoaderAuthFactory } from './modules/http-loader.factory';
 export { ContentType, HttpClient, RequestParams } from './api/http-client';
+export { FolderModuleApi } from './api/folder-module.api';
+export { IframeModuleApi } from './api/iframe-module.api';
+export { SecurityApi } from './api/security.api';
+export { UserProfileApi } from './api/user-profile.api';
 export { convertToPrimeNgDateFormat } from './helpers/date.helper'

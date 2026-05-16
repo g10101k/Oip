@@ -7,14 +7,14 @@ import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
 import {
   AuthGuardService,
-  BaseDataService,
-  SecurityDataService,
   UserService,
   langIntercept,
   provideAppThemes,
   SecurityService,
   BffSecurityService,
-  NotificationService
+  NotificationService,
+  UserProfileApi,
+  SecurityApi
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ProductService } from './app/service/product.service';
@@ -32,12 +32,11 @@ export const appConfig: ApplicationConfig = {
     provideAppThemes(appTheme, { mode: 'replaceDefaults' }),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: SecurityService, useClass: BffSecurityService },
-
+    UserProfileApi,
+    SecurityApi,
     ProductService,
     AuthGuardService,
     MessageService,
-    SecurityDataService,
-    BaseDataService,
     UserService,
     NotificationService,
     importProvidersFrom([

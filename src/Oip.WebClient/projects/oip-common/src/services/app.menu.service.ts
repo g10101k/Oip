@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { BaseDataService } from './base-data.service';
 import { MenuChangeEvent } from '../events/menu-change.event';
 import { MenuApi } from '../api/menu.api';
 import { AppTitleService } from './app-title.service';
@@ -12,7 +11,7 @@ import {
 } from '../api/data-contracts';
 
 @Injectable()
-export class MenuService extends BaseDataService {
+export class MenuService {
   private readonly menuSource = new Subject<MenuChangeEvent>();
   private readonly resetSource = new Subject();
   private readonly titleService = inject(AppTitleService);
