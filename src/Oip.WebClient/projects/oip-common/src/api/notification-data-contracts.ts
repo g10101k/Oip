@@ -25,6 +25,10 @@ export interface UserNotificationDto {
   subject?: string | null;
   message?: string | null;
   importance?: ImportanceLevel;
+  notificationChannelId?: number | null;
+  sentAt?: Date | null;
+  deliveredAt?: Date | null;
+  readAt?: Date | null;
   createdAt?: Date;
   dataJson?: string | null;
 }
@@ -37,6 +41,11 @@ export interface UserNotificationListResponse {
 export interface GetNotificationByUserParams {
   skip?: number;
   take?: number;
+  unreadOnly?: boolean;
+}
+
+export interface MarkNotificationAsReadParams {
+  id: number;
 }
 
 export interface GetNotificationByIdParams {

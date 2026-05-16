@@ -34,6 +34,7 @@ public class NotificationController(
     public async Task<ActionResult<UserNotificationListResponse>> GetNotificationByUserAsync(
         [FromQuery] int skip = 0,
         [FromQuery] int take = 20,
+        [FromQuery] bool unreadOnly = true,
         CancellationToken cancellationToken = default)
     {
         if (skip < 0)
@@ -49,6 +50,11 @@ public class NotificationController(
         var query = context.NotificationUsers
             .AsNoTracking()
             .Where(x => x.UserId == userId);
+
+        if (unreadOnly)
+        {
+            query = query.Where(x => x.ReadAt == null);
+        }
 
         var totalCount = await query.CountAsync(cancellationToken);
 
@@ -89,9 +95,38 @@ public class NotificationController(
         var userId = await GetCurrentUserIdAsync(cancellationToken);
         var count = await context.NotificationUsers
             .AsNoTracking()
-            .CountAsync(x => x.UserId == userId, cancellationToken);
+            .CountAsync(x => x.UserId == userId && x.ReadAt == null, cancellationToken);
 
         return Ok(new UserNotificationCountResponse(count));
+    }
+
+    /// <summary>
+    /// Marks a current user notification as read.
+    /// </summary>
+    [HttpPost("mark-notification-as-read/{id:long}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> MarkNotificationAsReadAsync(
+        [FromRoute] long id,
+        CancellationToken cancellationToken = default)
+    {
+        var userId = await GetCurrentUserIdAsync(cancellationToken);
+
+        var notification = await context.NotificationUsers
+            .FirstOrDefaultAsync(x => x.NotificationUserId == id && x.UserId == userId, cancellationToken);
+
+        if (notification is null)
+        {
+            throw new ApiException("Notification not found", $"Notification with id {id} was not found.",
+                StatusCodes.Status404NotFound);
+        }
+
+        notification.ReadAt ??= DateTimeOffset.UtcNow;
+        await context.SaveChangesAsync(cancellationToken);
+
+        return Ok();
     }
 
     /// <summary>

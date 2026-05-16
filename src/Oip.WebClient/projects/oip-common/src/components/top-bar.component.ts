@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -13,9 +13,8 @@ import { UserService } from '../services/user.service';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LogoService } from '../services/logo.service';
-import { BadgeModule } from 'primeng/badge';
-import { NotificationService } from '../services/notification.service';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { UserNotificationsComponent } from './user-notifications.component';
 
 @Component({
   selector: 'app-topbar',
@@ -31,7 +30,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
     AvatarModule,
     ButtonModule,
     ConfirmDialog,
-    BadgeModule,
+    UserNotificationsComponent,
     TranslatePipe
   ],
   template: ` <div class="layout-topbar">
@@ -61,20 +60,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
     }
     <div class="layout-topbar-actions">
       <div class="layout-config-menu">
-        <button
-          class="layout-topbar-action relative"
-          id="oip-app-topbar-notification-button"
-          type="button"
-          [attr.aria-label]="'Notifications: ' + unreadNotificationCount()">
-          <i class="pi pi-bell"></i>
-          @if (unreadNotificationCount() > 0) {
-            <p-badge
-              class="absolute -top-1 -right-1"
-              severity="danger"
-              [badgeSize]="'small'"
-              [value]="unreadNotificationBadge()" />
-          }
-        </button>
+        <app-user-notifications />
         <p-button
           class="layout-topbar-action"
           id="oip-app-topbar-theme-button"
@@ -156,13 +142,6 @@ export class AppTopbar {
   logoService = inject(LogoService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translateService = inject(TranslateService);
-  notificationService = inject(NotificationService);
-  unreadNotificationCount = computed(() => this.notificationService.unreadNotificationCount() ?? 0);
-  unreadNotificationBadge = computed(() => {
-    const count = this.unreadNotificationCount();
-
-    return count > 99 ? '99+' : count.toString();
-  });
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({

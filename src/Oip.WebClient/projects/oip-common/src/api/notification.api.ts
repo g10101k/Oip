@@ -8,6 +8,7 @@ import {
   ApiExceptionResponse,
   GetNotificationByIdParams,
   GetNotificationByUserParams,
+  MarkNotificationAsReadParams,
   UserNotificationCountResponse,
   UserNotificationDto,
   UserNotificationListResponse,
@@ -35,6 +36,16 @@ export class NotificationApi<
       method: "GET",
       secure: true,
       format: "json",
+      ...params,
+    });
+  markNotificationAsRead = (
+    { id, ...query }: MarkNotificationAsReadParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/notification/mark-notification-as-read/${id}`,
+      method: "POST",
+      secure: true,
       ...params,
     });
   getNotificationById = (
