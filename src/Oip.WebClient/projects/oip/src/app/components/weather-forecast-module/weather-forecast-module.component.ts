@@ -10,6 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
+import { DatePicker } from "primeng/datepicker";
+import { convertToPrimeNgDateFormat } from "oip-common";
 
 interface WeatherModuleLocalSettings {
   first: number;
@@ -25,6 +27,9 @@ interface WeatherModuleLocalSettings {
       <div class="card">
         <div>
           <h5>{{ this.title }}</h5>
+          <p-date-picker
+            [dateFormat]="layoutService.primeNgDateFormat()"
+          ></p-date-picker>
           <p-table #table [value]="data" (onFilter)="onFilter()">
             <ng-template let-columns pTemplate="header">
               <tr>
@@ -90,7 +95,7 @@ interface WeatherModuleLocalSettings {
     }
   `,
   providers: [WeatherForecastModuleApi],
-  imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText, DatePipe, TranslatePipe]
+  imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText, DatePipe, TranslatePipe, DatePicker]
 })
 export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
   implements OnInit, OnDestroy {
@@ -106,7 +111,7 @@ export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherM
     } catch (error) {
       this.data = [];
       console.error(this.t('weather-forecast-module.errorFetchingMessage'), error);
-      this.msgService.error(error.error.message);
+      this.msgService.errorFromException(error, this.t('weather-forecast-module.errorFetchingMessage'));
     }
     if (this.localSettings().filters && this.table) this.table.filters = this.localSettings().filters;
   }
@@ -117,4 +122,6 @@ export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherM
       filters: this.table.filters
     }));
   }
+
+  protected readonly convertToPrimeNgDateFormat = convertToPrimeNgDateFormat;
 }

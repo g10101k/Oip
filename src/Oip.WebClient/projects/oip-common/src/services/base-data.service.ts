@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { lastValueFrom, Observable } from 'rxjs';
-import { OIP_FRONTEND_CONFIG } from './frontend-config';
 
 /**
  * BaseDataService provides a unified interface for sending HTTP requests
@@ -11,15 +10,12 @@ import { OIP_FRONTEND_CONFIG } from './frontend-config';
 @Injectable()
 export class BaseDataService {
   private readonly http = inject(HttpClient);
-  private readonly frontendConfig = inject(OIP_FRONTEND_CONFIG);
 
   /**
    * Gets the base URL of the application from the HTML <base> tag.
    */
   get baseUrl(): string {
-    return this.normalizeBaseUrl(
-      this.frontendConfig.apiBaseUrl || document.getElementsByTagName('base')[0].href
-    );
+    return document.getElementsByTagName('base')[0].href;
   }
 
   /**
@@ -49,7 +45,7 @@ export class BaseDataService {
 
     switch (method) {
       case 'GET':
-        result = this.http.get<TResponse>(url, { params: data });
+        result = this.http.get<TResponse>(url, { params: data, withCredentials: true });
         break;
       case 'PUT':
         result = this.http.put<TResponse>(url, data, httpOptions);
@@ -82,9 +78,5 @@ export class BaseDataService {
     };
     const result = this.http.get(url, httpOptions);
     return lastValueFrom(result);
-  }
-
-  private normalizeBaseUrl(baseUrl: string): string {
-    return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
   }
 }

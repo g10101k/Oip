@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { LogoComponent } from '../../logo.component';
@@ -30,7 +31,7 @@ import { TranslatePipe } from '@ngx-translate/core';
                 id="oip-unauthorized-error-sign-in-button"
                 label="{{ 'unauthorized.signIn' | translate }}"
                 styleClass="w-full"
-                (click)="securityService.authorize()"></p-button>
+                (click)="signIn()"></p-button>
             </div>
           </div>
         </div>
@@ -48,4 +49,15 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class UnauthorizedComponent {
   protected readonly securityService = inject(SecurityService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
+  protected signIn(): void {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
+
+    this.router.navigate(['/unauthorized'], {
+      queryParams: { returnUrl },
+      replaceUrl: true
+    }).then(() => this.securityService.authorize());
+  }
 }

@@ -3,6 +3,7 @@
 // @ts-nocheck
 
 import { inject, Injectable } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 import { LayoutService } from "../services/app.layout.service";
 import { SecurityService } from "../services/security.service";
 
@@ -63,18 +64,15 @@ export class HttpClient<SecurityDataType = unknown> {
   protected securityService = inject(SecurityService);
   protected layoutService = inject(LayoutService);
   public baseUrl: string = "";
-  private securityData: SecurityDataType | null = null;
-  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] = (
-    securityData,
-  ) => ({
-    headers: {
-      "Accept-language": this.layoutService.language()
-        ? this.layoutService.language()
-        : "en",
-      "X-Timezone": this.layoutService.timeZone(),
-      Authorization: `Bearer ${securityData}`,
-    },
-  });
+  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] =
+    () => ({
+      headers: {
+        "Accept-language": this.layoutService.language()
+          ? this.layoutService.language()
+          : "en",
+        "X-Timezone": this.layoutService.timeZone(),
+      },
+    });
 
   private abortControllers = new Map<CancelToken, AbortController>();
   private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
@@ -87,14 +85,7 @@ export class HttpClient<SecurityDataType = unknown> {
     referrerPolicy: "no-referrer",
   };
 
-  constructor() {
-    this.securityService.getAccessToken().subscribe((token) => {
-      this.securityData = token;
-    });
-  }
-  public setSecurityData = (data: SecurityDataType | null) => {
-    this.securityData = data;
-  };
+  public setSecurityData = (data: SecurityDataType | null) => {};
 
   protected encodeQueryParam(key: string, value: any) {
     const encodedKey = encodeURIComponent(key);
@@ -218,9 +209,13 @@ export class HttpClient<SecurityDataType = unknown> {
     const secureParams =
       ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
         this.securityWorker &&
-        (await this.securityWorker(this.securityData))) ||
+        (await this.securityWorker(null))) ||
       {};
-    const requestParams = this.mergeRequestParams(params, secureParams);
+    const csrfParams = await this.getCsrfRequestParams(params.method, path);
+    const requestParams = this.mergeRequestParams(
+      this.mergeRequestParams(params, secureParams),
+      csrfParams,
+    );
     const queryString = query && this.toQueryString(query);
     const payloadFormatter = this.contentFormatters[type || ContentType.Json];
     let responseFormat = format || requestParams.format;
@@ -277,4 +272,28 @@ export class HttpClient<SecurityDataType = unknown> {
       return data.data;
     });
   };
+
+  private async getCsrfRequestParams(
+    method: string | undefined,
+    path: string,
+  ): Promise<RequestParams> {
+    if (
+      !method ||
+      !["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase())
+    ) {
+      return {};
+    }
+
+    if (
+      path.includes("/api/security/create-auth-session") ||
+      path.includes("/api/security/get-auth-csrf-token")
+    ) {
+      return {};
+    }
+
+    const csrfToken = await firstValueFrom(this.securityService.getCsrfToken());
+    return csrfToken?.token
+      ? { headers: { [csrfToken.headerName]: csrfToken.token } }
+      : {};
+  }
 }

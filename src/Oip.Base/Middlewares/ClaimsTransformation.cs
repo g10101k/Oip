@@ -1,5 +1,7 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Oip.Base.Middlewares;
@@ -19,8 +21,31 @@ public class ClaimsTransformation : IClaimsTransformation
         var identity = new ClaimsIdentity();
         AddRolesFromRealmAccess(principal, identity);
         AddNameClaims(principal, identity);
-        principal.AddIdentity(identity);
+        if (identity.Claims.Any())
+            principal.AddIdentity(identity);
         return Task.FromResult(principal);
+    }
+
+    public static void AddRolesFromAccessToken(ClaimsPrincipal? principal, string? accessToken)
+    {
+        if (principal is null || string.IsNullOrWhiteSpace(accessToken))
+            return;
+
+        var handler = new JwtSecurityTokenHandler();
+        if (!handler.CanReadToken(accessToken))
+            return;
+
+        var token = handler.ReadJwtToken(accessToken);
+        var realmAccessJson = token.Claims.FirstOrDefault(claim => claim.Type == "realm_access")?.Value;
+        if (realmAccessJson is null)
+            return;
+
+        var identity = principal.Identities.FirstOrDefault(current => current.IsAuthenticated) ??
+                       principal.Identity as ClaimsIdentity;
+        if (identity is null)
+            return;
+
+        AddRolesFromRealmAccessJson(realmAccessJson, principal, identity);
     }
     
     private static void AddRolesFromRealmAccess(ClaimsPrincipal currentUser, ClaimsIdentity identity)
@@ -28,12 +53,42 @@ public class ClaimsTransformation : IClaimsTransformation
         var realmAccessJson = currentUser.FindFirst("realm_access")?.Value;
         if (realmAccessJson is null)
             return;
-        var json = JObject.Parse(realmAccessJson);
+
+        AddRolesFromRealmAccessJson(realmAccessJson, currentUser, identity);
+    }
+
+    private static void AddRolesFromRealmAccessJson(
+        string realmAccessJson,
+        ClaimsPrincipal currentUser,
+        ClaimsIdentity identity)
+    {
+        JObject json;
+        try
+        {
+            json = JObject.Parse(realmAccessJson);
+        }
+        catch (JsonException)
+        {
+            return;
+        }
+
         if (json["roles"] is JArray rolesArray)
         {
             foreach (var role in rolesArray)
-                identity.AddClaim(new Claim(ClaimTypes.Role, role.ToString()));
+                AddRoleIfMissing(currentUser, identity, role.ToString());
         }
+    }
+
+    private static void AddRoleIfMissing(ClaimsPrincipal currentUser, ClaimsIdentity identity, string role)
+    {
+        if (string.IsNullOrWhiteSpace(role))
+            return;
+
+        if (currentUser.HasClaim(ClaimTypes.Role, role) ||
+            identity.HasClaim(ClaimTypes.Role, role))
+            return;
+
+        identity.AddClaim(new Claim(ClaimTypes.Role, role));
     }
 
     private static void AddNameClaims(ClaimsPrincipal currentUser, ClaimsIdentity identity)

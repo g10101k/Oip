@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { Observable, combineLatest, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { SecurityService } from './security.service';
 
 /**
@@ -22,37 +22,16 @@ export class AuthGuardService {
    *
    * @returns {Observable<boolean | UrlTree>} A stream resolving to true (allow), or UrlTree (redirect).
    */
-  canActivate(): Observable<boolean | UrlTree> {
-    return combineLatest([this.oidcSecurityService.isAuthenticated(), this.oidcSecurityService.isTokenExpired()]).pipe(
-      switchMap(([authenticated, tokenExpired]) => {
-        if (!authenticated) {
-          return of(this.router.parseUrl('/unauthorized'));
-        }
-        if (!tokenExpired) {
-          return of(true);
-        }
-
-        // Token is expired; attempt to refresh
-        return this.tryRefreshToken();
-      })
+  canActivate(returnUrl = '/'): Observable<boolean | UrlTree> {
+    this.oidcSecurityService.auth();
+    return this.oidcSecurityService.isAuthenticated().pipe(
+      map((authenticated) => authenticated
+        ? true
+        : this.router.createUrlTree(['/unauthorized'], { queryParams: { returnUrl: this.getReturnUrl(returnUrl) } }))
     );
   }
 
-  /**
-   * Attempts to refresh the session using the refresh token.
-   * If successful, allows route activation; otherwise, redirects to `/unauthorized`.
-   *
-   * @returns {boolean | UrlTree} A stream resolving to true or redirect UrlTree.
-   */
-  tryRefreshToken(): Observable<boolean | UrlTree> {
-    return this.oidcSecurityService.forceRefreshSession().pipe(
-      map((refreshSuccess) => {
-        return refreshSuccess ? true : this.router.parseUrl('/unauthorized');
-      }),
-      catchError((err) => {
-        console.warn(err);
-        return of(this.router.parseUrl('/unauthorized'));
-      })
-    );
+  private getReturnUrl(returnUrl: string): string {
+    return returnUrl.startsWith('/unauthorized') ? '/' : returnUrl;
   }
 }

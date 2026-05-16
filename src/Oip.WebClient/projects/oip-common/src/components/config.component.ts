@@ -14,18 +14,6 @@ import { Button } from 'primeng/button';
 import { L10nService } from '../services/l10n.service';
 import { TranslatePipe } from '@ngx-translate/core';
 
-interface L10n {
-  menu: string;
-  all: string;
-  profile: string;
-  photo: string;
-  usePhoto256x256Pixel: string;
-  selectLanguage: string;
-  moduleManagement: string;
-  localization: string;
-  goTo: string;
-}
-
 @Component({
   selector: 'app-config',
   template: `
@@ -143,7 +131,6 @@ export class ConfigComponent {
   protected readonly userService = inject(UserService);
   protected readonly securityService = inject(SecurityService);
   protected readonly menuService = inject(MenuService);
-  protected l10n = {} as L10n;
   protected readonly dateFormats: string[] = ['dd.MM.yyyy', 'dd.MM.yy', 'yyyy-MM-dd', 'dd.MMM.yyyy'];
   protected readonly timeFormats: string[] = ['HH:mm:ss', 'HH:mm'];
   // @ts-ignore

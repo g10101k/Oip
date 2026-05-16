@@ -6,18 +6,18 @@ export const appRoutes: Routes = [
   {
     path: '',
     component: AppLayoutComponent,
-    canActivate: [() => inject(AuthGuardService).canActivate()],
+    canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)],
     children: [
       {
         path: 'tag-management/:id',
         loadComponent: () =>
           import('./app/components/tag-management/tag-management.component').then((m) => m.TagManagement),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'rtds-meta-data-context-migration-module/:id',
         loadComponent: () => import('oip-common').then((m) => m.DbMigrationComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'error',
@@ -26,12 +26,12 @@ export const appRoutes: Routes = [
       {
         path: 'profile',
         loadComponent: () => import('oip-common').then((m) => m.ProfileComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'config',
         loadComponent: () => import('oip-common').then((m) => m.ConfigComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       }
     ]
   },

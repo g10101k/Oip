@@ -28,7 +28,7 @@ export { NoSettingsDto } from './dtos/no-settings.dto';
 // Services
 export { BaseDataService } from './services/base-data.service';
 export { TopBarService } from './services/top-bar.service';
-export { SecurityService, KeycloakSecurityService } from './services/security.service';
+export { AuthCsrfToken, BffSecurityService, SecurityService, KeycloakSecurityService } from './services/security.service';
 export { SecurityDataService } from './services/security-data.service';
 export { MsgService } from './services/msg.service';
 export { AuthGuardService } from './services/auth-guard.service';
@@ -47,12 +47,6 @@ export {
   AppThemePresetMergeMode
 } from './services/theme-presets.token';
 export { mergeWithDefaults, provideAppThemes, replaceDefaults } from './services/theme-presets.provider';
-export {
-  DEFAULT_OIP_FRONTEND_CONFIG,
-  OIP_FRONTEND_CONFIG,
-  OipFrontendConfig,
-  OipFrontendAppMode
-} from './services/frontend-config';
 
 // Events
 export { MenuChangeEvent } from './events/menu-change.event';
@@ -62,3 +56,4 @@ export { langIntercept } from './intercepts/i18n-intercept.service';
 export { SecurePipe } from './modules/secure.pipe';
 export { httpLoaderAuthFactory } from './modules/http-loader.factory';
 export { ContentType, HttpClient, RequestParams } from './api/http-client';
+export { convertToPrimeNgDateFormat } from './helpers/date.helper'
