@@ -33,7 +33,6 @@ export { AuthGuardService } from './services/auth-guard.service';
 export { AppConfig, LayoutService } from './services/app.layout.service';
 export { MenuService } from './services/app.menu.service';
 export { UserService } from './services/user.service';
-export { SecurityStorageService } from './services/security-storage.service';
 export { L10nService, LanguageDto } from './services/l10n.service';
 export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './services/logo.service';
 export { NotificationService } from './services/notification.service';
@@ -51,8 +50,6 @@ export { MenuChangeEvent } from './events/menu-change.event';
 
 // other
 export { langIntercept } from './intercepts/i18n-intercept.service';
-export { SecurePipe } from './modules/secure.pipe';
-export { httpLoaderAuthFactory } from './modules/http-loader.factory';
 export { ContentType, HttpClient, RequestParams } from './api/http-client';
 export { FolderModuleApi } from './api/folder-module.api';
 export { IframeModuleApi } from './api/iframe-module.api';

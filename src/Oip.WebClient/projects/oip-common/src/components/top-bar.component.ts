@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { MenuItem } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
@@ -11,8 +11,9 @@ import { Tab, TabList, Tabs } from 'primeng/tabs';
 import { AvatarModule } from 'primeng/avatar';
 import { UserService } from '../services/user.service';
 import { ButtonModule } from 'primeng/button';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LogoService } from '../services/logo.service';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-topbar',
@@ -27,9 +28,11 @@ import { LogoService } from '../services/logo.service';
     Tab,
     AvatarModule,
     ButtonModule,
+    ConfirmDialog,
     TranslatePipe
   ],
   template: ` <div class="layout-topbar">
+    <p-confirmDialog appendTo="body" />
     <div class="layout-topbar-logo-container">
       <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
         <i class="pi pi-bars"></i>
@@ -105,7 +108,7 @@ import { LogoService } from '../services/logo.service';
             class="layout-topbar-action"
             id="oip-app-topbar-logout-button"
             type="button"
-            (click)="securityService.logout()"
+            (click)="confirmLogout()"
             (keydown)="logoutKeyDown($event)">
             <i class="pi pi-sign-out"></i>
             <span>{{ 'topbar.logout' | translate }}</span>
@@ -124,7 +127,8 @@ import { LogoService } from '../services/logo.service';
         </div>
       </div>
     </div>
-  </div>`
+  </div>`,
+  providers: [ConfirmationService]
 })
 export class AppTopbar {
   items!: MenuItem[];
@@ -133,6 +137,8 @@ export class AppTopbar {
   userService = inject(UserService);
   layoutService = inject(LayoutService);
   logoService = inject(LogoService);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly translateService = inject(TranslateService);
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({
@@ -143,7 +149,28 @@ export class AppTopbar {
 
   logoutKeyDown($event: KeyboardEvent) {
     if ($event.key === 'Enter') {
-      this.securityService.logout();
+      $event.preventDefault();
+      this.confirmLogout();
     }
+  }
+
+  confirmLogout() {
+    this.confirmationService.confirm({
+      header: this.translateService.instant('topbar.logoutConfirmHeader'),
+      message: this.translateService.instant('topbar.logoutConfirmMessage'),
+      icon: 'pi pi-sign-out',
+      rejectButtonProps: {
+        label: this.translateService.instant('topbar.logoutConfirmCancel'),
+        severity: 'secondary',
+        outlined: true
+      },
+      acceptButtonProps: {
+        label: this.translateService.instant('topbar.logoutConfirmAccept'),
+        severity: 'danger'
+      },
+      accept: () => {
+        this.securityService.logout();
+      }
+    });
   }
 }
