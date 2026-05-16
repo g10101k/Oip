@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -65,13 +65,14 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
           class="layout-topbar-action relative"
           id="oip-app-topbar-notification-button"
           type="button"
-          aria-label="Notifications">
+          [attr.aria-label]="'Notifications: ' + unreadNotificationCount()">
           <i class="pi pi-bell"></i>
-          @if (notificationService.unreadNotificationCount() > 0) {
+          @if (unreadNotificationCount() > 0) {
             <p-badge
               class="absolute -top-1 -right-1"
               severity="danger"
-              [value]="notificationService.unreadNotificationCount().toString()" />
+              [badgeSize]="'small'"
+              [value]="unreadNotificationBadge()" />
           }
         </button>
         <p-button
@@ -156,6 +157,12 @@ export class AppTopbar {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translateService = inject(TranslateService);
   notificationService = inject(NotificationService);
+  unreadNotificationCount = computed(() => this.notificationService.unreadNotificationCount() ?? 0);
+  unreadNotificationBadge = computed(() => {
+    const count = this.unreadNotificationCount();
+
+    return count > 99 ? '99+' : count.toString();
+  });
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({

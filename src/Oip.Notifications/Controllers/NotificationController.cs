@@ -16,7 +16,7 @@ namespace Oip.Notifications.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/notification")]
-[ApiExplorerSettings(GroupName = "base")]
+[ApiExplorerSettings(GroupName = "notification")]
 public class NotificationController(
     NotificationsDbContext context,
     IUserService userDirectory,

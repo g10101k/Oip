@@ -102,7 +102,7 @@ export interface GetHistoryParams {
 
 export interface UploadAttachmentPayload {
   CommentId: number;
-  File: File;
+  File: Blob;
 }
 
 export interface DeleteAttachmentParams {

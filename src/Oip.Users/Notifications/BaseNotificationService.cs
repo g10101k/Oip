@@ -49,24 +49,16 @@ public class GrpcNotificationServiceClientAdapter(GrpcNotificationService.GrpcNo
     }
 
     /// <inheritdoc />
-    public async Task CreateNotificationAsync(
-        CreateNotificationRequest request,
+    public async Task CreateNotificationAsync(CreateNotificationRequest request,
         CancellationToken cancellationToken = default)
     {
         await client.CreateNotificationAsync(request, cancellationToken: cancellationToken);
     }
 }
 
-/// <summary>
-/// Publishes notifications through the notifications gRPC service.
-/// </summary>
 public class BaseNotificationService(INotificationServiceClient client)
     : INotificationPublisher
 {
-    /// <summary>
-    /// Gets or sets the list of notification types that are registered with the gRPC notification service during
-    /// application startup.
-    /// </summary>
     internal List<NotificationType> NotificationTypes { get; set; } =
     [
         new()
@@ -74,22 +66,20 @@ public class BaseNotificationService(INotificationServiceClient client)
             Name = typeof(SyncUsersCompleteNotify).FullName,
             Description = "Sync users complete notifications.",
             Scope = typeof(SyncUsersCompleteNotify).Assembly.GetName().Name
+        },
+        new()
+        {
+            Name = typeof(CustomUserNotify).FullName,
+            Description = "Custom user notifications.",
+            Scope = typeof(CustomUserNotify).Assembly.GetName().Name
         }
     ];
 
-    /// <summary>
-    /// Sends a notification with the specified importance level.
-    /// </summary>
-    /// <param name="notification">The notification object to send.</param>
-    /// <typeparam name="TNotification">The type of the notification object.</typeparam>
     public async Task Notify<TNotification>(TNotification notification)
     {
-        var notificationType = NotificationTypes.FirstOrDefault(x => x.Name == typeof(TNotification).FullName) ??
-                               throw new InvalidOperationException($"Notification type not found {typeof(TNotification).FullName}");
-
         await client.CreateNotificationAsync(new CreateNotificationRequest()
         {
-            NotificationTypeId = notificationType.NotificationTypeId,
+            NotificationType = typeof(TNotification).FullName,
             DataJson = JsonConvert.SerializeObject(notification)
         });
     }

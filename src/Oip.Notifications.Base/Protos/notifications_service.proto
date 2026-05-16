@@ -422,7 +422,7 @@ message NotificationUser {
 }
 
 message CreateNotificationRequest {
-  int32 notification_type_id = 1;
+  string notification_type = 1;
   optional string data_json = 3;
 }
 

@@ -712,9 +712,78 @@ public static class OipModuleApplication
         if (settings.OpenApi.All(x => !x.Publish))
             return;
         app.UseSwagger();
+        app.MapGet("/swagger/oip-csrf.js", () => Results.Text("""
+            (function() {
+                const originalFetch = window.fetch.bind(window);
+                const unsafeMethods = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+                const csrfTokenUrl = "/api/security/get-auth-csrf-token";
+
+                function getUrl(input) {
+                    return new URL(input instanceof Request ? input.url : input, window.location.origin);
+                }
+
+                function getMethod(input, init) {
+                    return ((init && init.method) || (input instanceof Request && input.method) || "GET").toUpperCase();
+                }
+
+                function requiresCsrf(input, init) {
+                    const method = getMethod(input, init);
+                    if (!unsafeMethods.has(method)) {
+                        return false;
+                    }
+
+                    const url = getUrl(input);
+                    return url.pathname.startsWith("/api") &&
+                        !url.pathname.includes("/api/security/create-auth-session") &&
+                        !url.pathname.includes(csrfTokenUrl);
+                }
+
+                function appendCsrfHeader(input, init, csrfToken) {
+                    if (!csrfToken || !csrfToken.token) {
+                        return originalFetch(input, init);
+                    }
+
+                    const nextInit = Object.assign({}, init);
+                    const headers = new Headers(
+                        nextInit.headers || (input instanceof Request ? input.headers : undefined)
+                    );
+
+                    headers.set(csrfToken.headerName || "X-CSRF-TOKEN", csrfToken.token);
+                    nextInit.headers = headers;
+
+                    return originalFetch(input, nextInit);
+                }
+
+                window.fetch = function(input, init) {
+                    if (!requiresCsrf(input, init)) {
+                        return originalFetch(input, init);
+                    }
+
+                    return originalFetch(csrfTokenUrl, {
+                        method: "GET",
+                        credentials: "same-origin",
+                        headers: { "Accept": "application/json" }
+                    })
+                        .then(function(response) {
+                            if (!response.ok) {
+                                return originalFetch(input, init);
+                            }
+
+                            return response.json()
+                                .then(function(csrfToken) {
+                                    return appendCsrfHeader(input, init, csrfToken);
+                                });
+                        })
+                        .catch(function() {
+                            return originalFetch(input, init);
+                        });
+                };
+            })();
+            """, "application/javascript"));
         app.UseSwaggerUI(swaggerUiOptions =>
         {
             swaggerUiOptions.EnableTryItOutByDefault();
+            swaggerUiOptions.InjectJavascript("/swagger/oip-csrf.js");
             settings.OpenApi.ForEach(api =>
             {
                 if (api.Publish)

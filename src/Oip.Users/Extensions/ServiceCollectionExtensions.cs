@@ -46,6 +46,7 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<IUserService, LocalUserService>();
         services.TryAddScoped<UserService>();
         services.TryAddScoped<UserSyncService>();
+        services.AddHostedService<KeycloakSyncBackgroundService>();
 
         if (settings.IsStandalone)
         {

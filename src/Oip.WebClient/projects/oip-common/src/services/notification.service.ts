@@ -10,7 +10,7 @@ export class NotificationService {
   private securityService = inject(SecurityService);
   private msgService = inject(MsgService);
   private notificationApi = inject(NotificationApi);
-  unreadNotificationCount = signal(0);
+  unreadNotificationCount = signal<number | undefined>(undefined);
 
   constructor() {
     this.connection = new signalR.HubConnectionBuilder()
@@ -30,11 +30,12 @@ export class NotificationService {
         life: 0
       };
       this.msgService.add(opt);
-      this.unreadNotificationCount.update((count) => count + 1);
+      this.unreadNotificationCount.update((count) => (count ?? 0) + 1);
     });
 
     this.securityService.isAuthenticated().subscribe((authenticated) => {
       if (!authenticated) {
+        this.unreadNotificationCount.set(undefined);
         if (this.connection.state !== signalR.HubConnectionState.Disconnected) {
           this.connection.stop();
         }

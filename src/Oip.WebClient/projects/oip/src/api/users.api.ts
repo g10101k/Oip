@@ -5,6 +5,7 @@
 import { Injectable } from "@angular/core";
 import { ContentType, HttpClient, RequestParams } from "oip-common";
 import {
+  CustomUserNotify,
   GetAllUsersParams,
   GetUserByKeycloakIdParams,
   GetUserParams,
@@ -70,6 +71,15 @@ export class UsersApi<
       path: `/api/users/sync-all-users`,
       method: "POST",
       secure: true,
+      ...params,
+    });
+  customNotification = (data: CustomUserNotify, params: RequestParams = {}) =>
+    this.request<void, any>({
+      path: `/api/users/custom-notification`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
       ...params,
     });
 }

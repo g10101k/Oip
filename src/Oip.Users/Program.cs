@@ -45,7 +45,6 @@ internal static class Program
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddUsersModuleLocal(settings);
 
-            builder.Services.AddHostedService<KeycloakSyncBackgroundService>();
             builder.Services.AddHttpClient();
             builder.Services.AddGrpc();
             builder.AddOpenTelemetry(settings);

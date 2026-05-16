@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Oip.Data.Constants;
 using Oip.Users.Entities;
+using Oip.Users.Notifications;
 using Oip.Users.Repositories;
 using Oip.Users.Services;
 
@@ -15,6 +16,8 @@ namespace Oip.Users.Controllers;
 public class UsersController(
     UserRepository userRepository,
     UserSyncService userSyncService,
+    IServiceScopeFactory scopeFactory,
+    INotificationPublisher notificationPublisher,
     ILogger<UsersController> logger)
     : ControllerBase
 {
@@ -118,8 +121,20 @@ public class UsersController(
     {
         try
         {
-            // Run in background
-            _ = Task.Run(async () => await userSyncService.SyncAllUsersAsync());
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    using var scope = scopeFactory.CreateScope();
+                    var scopedUserSyncService = scope.ServiceProvider.GetRequiredService<UserSyncService>();
+                    await scopedUserSyncService.SyncAllUsersAsync();
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error syncing all users in background");
+                }
+            });
+
             return Accepted(new { message = "Full synchronization started" });
         }
         catch (Exception ex)
@@ -128,7 +143,14 @@ public class UsersController(
             return StatusCode(500, "Error starting synchronization");
         }
     }
-    
+
+    [HttpPost("custom-notification")]
+    [Authorize]
+    public async Task<ActionResult> CustomNotify(CustomUserNotify notify)
+    {
+        await notificationPublisher.Notify(notify);
+        return Ok();
+    }
 }
 
 /// <summary>
@@ -136,4 +158,3 @@ public class UsersController(
 /// </summary>
 /// <param name="KeycloakUserId">The unique identifier of the user in Keycloak</param>
 public record SyncUserRequest(string KeycloakUserId);
-

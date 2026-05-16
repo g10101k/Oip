@@ -5,3 +5,5 @@ namespace Oip.Users.Notifications;
 /// <param name="Start">The starting time of the synchronization process</param>
 /// <param name="End">The ending time of the synchronization process</param>
 public record SyncUsersCompleteNotify(int Count, DateTimeOffset Start, DateTimeOffset End);
+
+public record CustomUserNotify(string Username = "Username");
