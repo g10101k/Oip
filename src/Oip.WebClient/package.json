@@ -17,8 +17,6 @@
     "start:users": "run-script-os",
     "start:users:windows": "ng serve oip-users --port 50005 --ssl --ssl-cert \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem\" --ssl-key \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.key\"",
     "start:users:default": "ng serve oip-users --port 50005 --ssl --ssl-cert $HOME/.aspnet/https/${npm_package_name}.pem --ssl-key $HOME/.aspnet/https/${npm_package_name}.key",
-    "i18n:oip:extract": "ngx-translate-extract --input ./projects/oip-common/src ./projects/oip/src --output ./projects/oip/src/assets/i18n/{en,ru}.json --clean --format namespaced-json",
-    "serve:dist": "concurrently \"serve dist/oip -l 5000 -s\" ",
     "build": "ng build oip",
     "build:oip": "ng build oip",
     "build:oip-rtds": "ng build oip-rtds",
@@ -26,7 +24,6 @@
     "version:minor": "node scripts/bump-minor-version.js",
     "publish": "node scripts/publish-common.js",
     "publish:local": "node scripts/publish-local.js",
-    "generate-api": "node ./node_modules/oip-common/scripts/generate-api.mjs  -c -o ./projects/oip-common/src/tmp/ -i ./../Oip/src/Oip.Discussions/obj/SwaggerFiles/swagger-v1.json -t ./node_modules/oip-common/templates",
     "test": "ng test",
     "lint": "ng lint --fix || npx prettier --write projects/",
     "e2e": "ng e2e"
