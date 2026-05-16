@@ -47,12 +47,6 @@ export {
   AppThemePresetMergeMode
 } from './services/theme-presets.token';
 export { mergeWithDefaults, provideAppThemes, replaceDefaults } from './services/theme-presets.provider';
-export {
-  DEFAULT_OIP_FRONTEND_CONFIG,
-  OIP_FRONTEND_CONFIG,
-  OipFrontendConfig,
-  OipFrontendAppMode
-} from './services/frontend-config';
 
 // Events
 export { MenuChangeEvent } from './events/menu-change.event';

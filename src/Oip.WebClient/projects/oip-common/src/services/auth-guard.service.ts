@@ -27,7 +27,11 @@ export class AuthGuardService {
     return this.oidcSecurityService.isAuthenticated().pipe(
       map((authenticated) => authenticated
         ? true
-        : this.router.createUrlTree(['/unauthorized'], { queryParams: { returnUrl } }))
+        : this.router.createUrlTree(['/unauthorized'], { queryParams: { returnUrl: this.getReturnUrl(returnUrl) } }))
     );
+  }
+
+  private getReturnUrl(returnUrl: string): string {
+    return returnUrl.startsWith('/unauthorized') ? '/' : returnUrl;
   }
 }

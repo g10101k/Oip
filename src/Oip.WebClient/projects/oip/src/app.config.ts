@@ -8,8 +8,6 @@ import { appRoutes } from './app.routes';
 import {
   AuthGuardService,
   BaseDataService,
-  DEFAULT_OIP_FRONTEND_CONFIG,
-  OIP_FRONTEND_CONFIG,
   SecurityDataService,
   UserService,
   langIntercept,
@@ -23,7 +21,6 @@ import { ProductService } from './app/service/product.service';
 import { MessageService } from 'primeng/api';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { environment } from './environments/environment';
 import { appTheme } from "./app.theme";
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
@@ -35,13 +32,7 @@ export const appConfig: ApplicationConfig = {
     provideAppThemes(appTheme, { mode: 'replaceDefaults' }),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: SecurityService, useClass: BffSecurityService },
-    {
-      provide: OIP_FRONTEND_CONFIG,
-      useValue: {
-        ...DEFAULT_OIP_FRONTEND_CONFIG,
-        ...environment.frontend
-      }
-    },
+
     ProductService,
     AuthGuardService,
     MessageService,

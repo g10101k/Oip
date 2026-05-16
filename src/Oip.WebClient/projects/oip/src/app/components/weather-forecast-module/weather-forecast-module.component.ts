@@ -111,7 +111,7 @@ export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherM
     } catch (error) {
       this.data = [];
       console.error(this.t('weather-forecast-module.errorFetchingMessage'), error);
-      this.msgService.error(error.error.message);
+      this.msgService.errorFromException(error, this.t('weather-forecast-module.errorFetchingMessage'));
     }
     if (this.localSettings().filters && this.table) this.table.filters = this.localSettings().filters;
   }

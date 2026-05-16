@@ -8,9 +8,18 @@ import {
   EventTypes,
   AuthOptions
 } from 'angular-auth-oidc-client';
-import { BehaviorSubject, firstValueFrom, finalize, from, merge, Observable, of, ReplaySubject, shareReplay } from 'rxjs';
+import {
+  BehaviorSubject,
+  firstValueFrom,
+  finalize,
+  from,
+  merge,
+  Observable,
+  of,
+  ReplaySubject,
+  shareReplay
+} from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
-import { OIP_FRONTEND_CONFIG } from './frontend-config';
 
 type RefreshCustomParams = { [key: string]: string | number | boolean };
 
@@ -49,6 +58,17 @@ type AuthSessionResponse = {
   roles: string[];
 };
 
+type CurrentUser = {
+  userName?: string;
+  displayName?: string;
+  email?: string;
+  roles: string[];
+  preferred_username?: string;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+};
+
 export abstract class SecurityService {
   abstract auth(): void;
 
@@ -78,7 +98,6 @@ export abstract class SecurityService {
 @Injectable()
 export class BffSecurityService implements OnDestroy, SecurityService {
   private readonly http = inject(HttpClient);
-  private readonly frontendConfig = inject(OIP_FRONTEND_CONFIG);
   private readonly authenticated = new BehaviorSubject<boolean | null>(null);
   private readonly currentUser = new BehaviorSubject<any>(null);
   private readonly csrfToken = new ReplaySubject<AuthCsrfToken | null>(1);
@@ -137,7 +156,10 @@ export class BffSecurityService implements OnDestroy, SecurityService {
 
   forceRefreshSession(): Observable<LoginResponse> {
     this.auth();
-    return of({ isAuthenticated: this.authenticated.getValue() === true, userData: this.currentUser.getValue() } as LoginResponse);
+    return of({
+      isAuthenticated: this.authenticated.getValue() === true,
+      userData: this.currentUser.getValue()
+    } as LoginResponse);
   }
 
   getCsrfToken(): Observable<AuthCsrfToken | null> {
@@ -168,16 +190,36 @@ export class BffSecurityService implements OnDestroy, SecurityService {
 
   private applySession(session: AuthSessionResponse): void {
     const roles = session.roles ?? [];
-    const user = {
-      userName: session.userName,
-      displayName: session.displayName,
-      email: session.email,
-      roles
-    };
+    const user = this.createCurrentUser(session, roles);
 
     this.authenticated.next(session.isAuthenticated);
     this.currentUser.next(user);
-    this.payload.next({ realm_access: { roles }, ...user });
+    this.payload.next({realm_access: {roles}, ...user});
+  }
+
+  private createCurrentUser(session: AuthSessionResponse, roles: string[]): CurrentUser {
+    const displayName = session.displayName || session.userName || session.email;
+    const nameParts = this.splitDisplayName(displayName);
+
+    return {
+      userName: session.userName,
+      displayName,
+      email: session.email,
+      roles,
+      preferred_username: session.userName,
+      name: displayName,
+      given_name: nameParts.givenName,
+      family_name: nameParts.familyName
+    };
+  }
+
+  private splitDisplayName(displayName?: string): { givenName?: string; familyName?: string } {
+    const parts = displayName?.trim().split(/\s+/).filter(Boolean) ?? [];
+
+    return {
+      givenName: parts[0],
+      familyName: parts.length > 1 ? parts.slice(1).join(' ') : undefined
+    };
   }
 
   private applyAnonymousSession(): void {
@@ -196,7 +238,7 @@ export class BffSecurityService implements OnDestroy, SecurityService {
   }
 
   private buildUrl(path: string): string {
-    const baseUrl = this.frontendConfig.apiBaseUrl || document.getElementsByTagName('base')[0].href;
+    const baseUrl = document.getElementsByTagName('base')[0].href;
     const normalizedBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
     return `${normalizedBase}${path}`;
   }
@@ -254,7 +296,9 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
       .registerForEvents()
       .pipe(filter((event) => event.type === EventTypes.NewAuthenticationResult))
       .subscribe(() => {
-        super.getAccessToken().subscribe(token => {this.accessToken.next(token); });
+        super.getAccessToken().subscribe(token => {
+          this.accessToken.next(token);
+        });
         this.auth();
       });
   }
@@ -284,7 +328,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
         finalize(() => {
           this.refreshSession$ = undefined;
         }),
-        shareReplay({ bufferSize: 1, refCount: false })
+        shareReplay({bufferSize: 1, refCount: false})
       );
     }
 
@@ -357,7 +401,7 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
   ): Promise<LoginResponse> {
     const webLocks = this.getWebLocks();
     if (webLocks) {
-      return webLocks.request(this.getRefreshLockKey(configId), { mode: 'exclusive' }, async () => {
+      return webLocks.request(this.getRefreshLockKey(configId), {mode: 'exclusive'}, async () => {
         const currentState = await this.syncAuthState(configId);
         if (!(await this.isCurrentAccessTokenExpired())) {
           return currentState;
