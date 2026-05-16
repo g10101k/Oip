@@ -13,6 +13,10 @@ public record UserNotificationDto(
     string Subject,
     string Message,
     ImportanceLevel Importance,
+    int? NotificationChannelId,
+    DateTimeOffset? SentAt,
+    DateTimeOffset? DeliveredAt,
+    DateTimeOffset? ReadAt,
     DateTimeOffset CreatedAt,
     string? DataJson);
 

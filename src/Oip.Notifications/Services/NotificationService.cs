@@ -932,13 +932,26 @@ public class NotificationService(
                     $"Notification with ID {request.NotificationId} not found"));
             }
 
-            var notificationUsers = notification.NotificationUsers.Select(nu => new NotificationUser
+            var notificationUsers = notification.NotificationUsers.Select(nu =>
             {
-                NotificationUserId = nu.NotificationUserId,
-                NotificationId = nu.NotificationId,
-                UserId = nu.UserId,
-                Subject = nu.Subject,
-                Message = nu.Message
+                var notificationUser = new NotificationUser
+                {
+                    NotificationUserId = nu.NotificationUserId,
+                    NotificationId = nu.NotificationId,
+                    UserId = nu.UserId,
+                    Subject = nu.Subject,
+                    Message = nu.Message,
+                    SentAt = nu.SentAt?.ToString("o"),
+                    DeliveredAt = nu.DeliveredAt?.ToString("o"),
+                    ReadAt = nu.ReadAt?.ToString("o")
+                };
+
+                if (nu.NotificationChannelId.HasValue)
+                {
+                    notificationUser.NotificationChannelId = nu.NotificationChannelId.Value;
+                }
+
+                return notificationUser;
             }).ToList();
 
             return new GetNotificationResponse

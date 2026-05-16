@@ -64,6 +64,10 @@ public class NotificationController(
                 x.Subject,
                 x.Message,
                 x.Importance,
+                x.NotificationChannelId,
+                x.SentAt,
+                x.DeliveredAt,
+                x.ReadAt,
                 x.Notification.CreatedAt,
                 x.Notification.DataJson))
             .ToListAsync(cancellationToken);
@@ -115,6 +119,10 @@ public class NotificationController(
                 x.Subject,
                 x.Message,
                 x.Importance,
+                x.NotificationChannelId,
+                x.SentAt,
+                x.DeliveredAt,
+                x.ReadAt,
                 x.Notification.CreatedAt,
                 x.Notification.DataJson))
             .FirstOrDefaultAsync(cancellationToken);

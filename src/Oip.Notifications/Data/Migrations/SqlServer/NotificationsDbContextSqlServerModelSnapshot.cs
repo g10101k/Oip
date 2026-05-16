@@ -364,47 +364,58 @@ namespace Oip.Notifications.Migrations.SqlServer
                 {
                     b.Property<long>("NotificationUserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("Unique identifier for the notification user");
+                        .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("NotificationUserId"));
 
+                    b.Property<DateTimeOffset?>("DeliveredAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("Importance")
-                        .HasColumnType("int")
-                        .HasComment("Importance level of the notification");
+                        .HasColumnType("int");
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasComment("Message of the notification for this user");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("NotificationChannelId")
+                        .HasColumnType("int");
 
                     b.Property<long>("NotificationId")
-                        .HasColumnType("bigint")
-                        .HasComment("Notification identifier");
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("ReadAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("SentAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Subject")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)")
-                        .HasComment("Subject of the notification for this user");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasComment("User identifier");
+                        .HasColumnType("int");
 
                     b.HasKey("NotificationUserId");
 
+                    b.HasIndex("DeliveredAt");
+
+                    b.HasIndex("NotificationChannelId");
+
                     b.HasIndex("NotificationId");
+
+                    b.HasIndex("ReadAt");
+
+                    b.HasIndex("SentAt");
 
                     b.HasIndex("UserId");
 
                     b.HasIndex("NotificationId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("NotificationUser", "notifications", t =>
-                        {
-                            t.HasComment("Users who should be notified about an event");
-                        });
+                    b.ToTable("NotificationUser", "notifications");
                 });
 
             modelBuilder.Entity("Oip.Notifications.Data.Entities.UserNotificationPreferenceEntity", b =>

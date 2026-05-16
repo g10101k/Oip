@@ -27,9 +27,17 @@ public class NotificationUserEntityConfiguration(DatabaseFacade database)
             .HasMaxLength(200);
         builder.Property(e => e.Message)
             .IsRequired();
+        builder.Property(e => e.NotificationChannelId);
+        builder.Property(e => e.SentAt);
+        builder.Property(e => e.DeliveredAt);
+        builder.Property(e => e.ReadAt);
         // Indexes
         builder.HasIndex(e => e.NotificationId);
         builder.HasIndex(e => e.UserId);
+        builder.HasIndex(e => e.NotificationChannelId);
+        builder.HasIndex(e => e.SentAt);
+        builder.HasIndex(e => e.DeliveredAt);
+        builder.HasIndex(e => e.ReadAt);
         builder.HasIndex(e => new { e.NotificationId, e.UserId })
             .IsUnique();
         // Relationships
