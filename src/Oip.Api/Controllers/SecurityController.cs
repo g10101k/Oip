@@ -2,9 +2,9 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Oip.Api.Controllers.Api;
 using Oip.Base.Extensions;
 using Oip.Base.Exceptions;
@@ -57,12 +57,42 @@ public class SecurityController(
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult CreateAuthSession()
     {
-        var redirectUri = Request.Headers.Referer.FirstOrDefault();
+        var redirectUri = GetAuthRedirectUri(Request.Headers.Referer.FirstOrDefault());
         if (string.IsNullOrWhiteSpace(redirectUri))
             redirectUri = "/";
 
         return Challenge(new AuthenticationProperties { RedirectUri = redirectUri },
             OipModuleApplication.OpenIdConnectAuthenticationScheme);
+    }
+
+    private static string? GetAuthRedirectUri(string? referer)
+    {
+        if (string.IsNullOrWhiteSpace(referer))
+            return null;
+
+        if (!Uri.TryCreate(referer, UriKind.Absolute, out var refererUri))
+            return referer;
+
+        var query = QueryHelpers.ParseQuery(refererUri.Query);
+        var returnUrl = query.TryGetValue("returnUrl", out var values)
+            ? values.FirstOrDefault()
+            : null;
+
+        if (!IsLocalReturnUrl(returnUrl))
+            return referer;
+
+        return $"{refererUri.Scheme}://{refererUri.Authority}{returnUrl}";
+    }
+
+    private static bool IsLocalReturnUrl(string? returnUrl)
+    {
+        if (string.IsNullOrWhiteSpace(returnUrl))
+            return false;
+
+        return returnUrl[0] == '/'
+               && (returnUrl.Length == 1 || returnUrl[1] != '/' && returnUrl[1] != '\\')
+               && !returnUrl.Contains('\r')
+               && !returnUrl.Contains('\n');
     }
 
     [HttpPost("delete-auth-session")]
