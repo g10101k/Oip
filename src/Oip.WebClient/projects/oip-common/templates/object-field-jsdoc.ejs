@@ -2,6 +2,8 @@
 const { field, utils } = it;
 const { formatDescription, escapeJSDocContent, require, _ } = utils;
 
+if (it.config.generateJSDoc === false) return "";
+
 const comments = _.uniq(
     _.compact([
         field.title && formatDescription(field.title),

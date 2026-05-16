@@ -1,20 +1,19 @@
 #!/usr/bin/env node
 
-const {execSync} = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const {runNpm, runNpx} = require('./script-utils');
 
 console.log('🚀 Starting oip-common library publication...');
 
 try {
   // 0. Increment version
-  let commonPath = path.join(__dirname, '../projects/oip-common');
   let distPath = path.join(__dirname, '../dist/oip-common');
-  execSync(`rm -rf ${distPath}`);
+  fs.rmSync(distPath, {recursive: true, force: true});
 
   // 1. Build the library
   console.log('📦 Building library...');
-  execSync('ng build oip-common', {stdio: 'inherit'});
+  runNpx(['ng', 'build', 'oip-common']);
 
   // 2. Navigate to dist directory
   if (!fs.existsSync(distPath)) {
@@ -22,10 +21,10 @@ try {
   }
 
   console.log('🧹 Delete oip-common library...!');
-  execSync('rm -rf ./node_modules/oip-common', {stdio: 'inherit'});
+  fs.rmSync(path.join(__dirname, '../node_modules/oip-common'), {recursive: true, force: true});
 
   console.log('🪃 Install oip-common library...!');
-  execSync(`npm i ${distPath} --no-save`);
+  runNpm(['i', distPath, '--no-save']);
 
   console.log('⛳  Publication completed successfully!');
 } catch (error) {

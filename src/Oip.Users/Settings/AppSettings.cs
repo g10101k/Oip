@@ -27,18 +27,18 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     /// <summary>
     /// Represents synchronization options for the application.
     /// </summary>
-    public SyncOptions SyncOptions { get; set; } = new();
+    public UserSyncOptions UserSyncOptions { get; set; } = new();
 }
 
 /// <summary>
 /// Represents synchronization options for the application.
 /// </summary>
-public class SyncOptions
+public class UserSyncOptions
 {
     /// <summary>
-    /// Gets or sets the synchronization interval in minutes.
+    /// Gets or sets the synchronization interval in seconds.
     /// </summary>
-    public int IntervalSeconds { get; set; } = 30;
+    public int IntervalSeconds { get; set; } = 300;
 
     /// <summary>
     /// Gets or sets the batch size for synchronization operations.

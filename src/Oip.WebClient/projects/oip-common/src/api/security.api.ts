@@ -5,6 +5,8 @@
 import { Injectable } from "@angular/core";
 import {
   ApiExceptionResponse,
+  AuthCsrfTokenResponse,
+  AuthSessionResponse,
   GetKeycloakClientSettingsResponse,
 } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
@@ -13,18 +15,36 @@ import { HttpClient, RequestParams } from "./http-client";
 export class SecurityApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
-  /**
-   * @description Retrieves Keycloak client settings needed by frontend applications.
-   *
-   * @tags Security
-   * @name getKeycloakClientSettings
-   * @summary Retrieves Keycloak client settings needed by frontend applications.
-   * @request GET:/api/security/get-keycloak-client-settings
-   * @secure
-   * @response `200` `GetKeycloakClientSettingsResponse` OK
-   * @response `401` `ApiExceptionResponse` Unauthorized
-   * @response `500` `ApiExceptionResponse` Internal Server Error
-   */
+  getCurrentAuthSession = (params: RequestParams = {}) =>
+    this.request<AuthSessionResponse, ApiExceptionResponse>({
+      path: `/api/security/get-current-auth-session`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  createAuthSession = (params: RequestParams = {}) =>
+    this.request<any, void | ApiExceptionResponse>({
+      path: `/api/security/create-auth-session`,
+      method: "POST",
+      secure: true,
+      ...params,
+    });
+  deleteAuthSession = (params: RequestParams = {}) =>
+    this.request<any, void | ApiExceptionResponse>({
+      path: `/api/security/delete-auth-session`,
+      method: "POST",
+      secure: true,
+      ...params,
+    });
+  getAuthCsrfToken = (params: RequestParams = {}) =>
+    this.request<AuthCsrfTokenResponse, ApiExceptionResponse>({
+      path: `/api/security/get-auth-csrf-token`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
   getKeycloakClientSettings = (params: RequestParams = {}) =>
     this.request<GetKeycloakClientSettingsResponse, ApiExceptionResponse>({
       path: `/api/security/get-keycloak-client-settings`,
@@ -33,16 +53,6 @@ export class SecurityApi<
       format: "json",
       ...params,
     });
-  /**
-   * @description Retrieves all realm roles from Keycloak.
-   *
-   * @tags Security
-   * @name getRealmRoles
-   * @summary Retrieves all realm roles from Keycloak.
-   * @request GET:/api/security/get-realm-roles
-   * @secure
-   * @response `200` `(string)[]` OK
-   */
   getRealmRoles = (params: RequestParams = {}) =>
     this.request<string[], any>({
       path: `/api/security/get-realm-roles`,

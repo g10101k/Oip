@@ -20,6 +20,7 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
         <UserSecretsId>240c1695-547e-4873-b43c-0a540c7e9a07</UserSecretsId>
     </PropertyGroup>
 

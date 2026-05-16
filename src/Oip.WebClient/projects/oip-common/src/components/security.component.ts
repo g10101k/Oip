@@ -4,9 +4,11 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { MsgService } from './../services/msg.service';
-import { SecurityDataService } from './../services/security-data.service';
 import { PutSecurityDto } from './../dtos/put-security.dto';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ContentType, HttpClient } from '../api/http-client';
+import { SecurityDto } from '../dtos/security.dto';
+import { SecurityApi } from '../api/security.api';
 
 @Component({
   selector: 'security',
@@ -48,11 +50,12 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 })
 export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
   private readonly msgService = inject(MsgService);
-  private readonly dataService = inject(SecurityDataService);
   private readonly translateService = inject(TranslateService);
+  private readonly httpClient = inject(HttpClient);
+  private readonly securityApi = inject(SecurityApi);
   private securityLoadToken = 0;
 
-  securityData: any[] = [];
+  securityData: SecurityDto[] = [];
   @Input() id?: number;
   @Input() controller?: string;
   roles: string[] = [];
@@ -68,7 +71,7 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.dataService.getRealmRoles().then(
+    this.securityApi.getRealmRoles().then(
       (result) => {
         this.roles = result;
       },
@@ -90,7 +93,7 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
       id: this.id,
       securities: this.securityData
     };
-    this.dataService.saveSecurity(this.controller, request).then(
+    this.saveSecurity(this.controller, request).then(
       (result) => {
         this.msgService.success(this.translateService.instant('securityComponent.savedSecurity'));
       },
@@ -116,7 +119,7 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     try {
-      const result = await this.dataService.getSecurity(controller, id);
+      const result = await this.getSecurity(controller, id);
       if (loadToken === this.securityLoadToken) {
         this.securityData = result;
       }
@@ -126,4 +129,25 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
       }
     }
   }
+
+  private getSecurity(controller: string, id: number) {
+    return this.httpClient.request<SecurityDto[]>({
+      path: `/api/${controller}/get-security`,
+      method: 'GET',
+      query: {id},
+      secure: true,
+      format: 'json'
+    });
+  }
+
+  private saveSecurity(controller: string, request: PutSecurityDto) {
+    return this.httpClient.request<unknown>({
+      path: `/api/${controller}/put-security`,
+      method: 'PUT',
+      body: request,
+      secure: true,
+      type: ContentType.Json
+    });
+  }
+
 }

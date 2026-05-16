@@ -26,16 +26,13 @@ export { PutSecurityDto } from './dtos/put-security.dto';
 export { NoSettingsDto } from './dtos/no-settings.dto';
 
 // Services
-export { BaseDataService } from './services/base-data.service';
 export { TopBarService } from './services/top-bar.service';
-export { SecurityService, KeycloakSecurityService } from './services/security.service';
-export { SecurityDataService } from './services/security-data.service';
+export { AuthCsrfToken, BffSecurityService, SecurityService, KeycloakSecurityService } from './services/security.service';
 export { MsgService } from './services/msg.service';
 export { AuthGuardService } from './services/auth-guard.service';
 export { AppConfig, LayoutService } from './services/app.layout.service';
 export { MenuService } from './services/app.menu.service';
 export { UserService } from './services/user.service';
-export { SecurityStorageService } from './services/security-storage.service';
 export { L10nService, LanguageDto } from './services/l10n.service';
 export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './services/logo.service';
 export { NotificationService } from './services/notification.service';
@@ -47,19 +44,16 @@ export {
   AppThemePresetMergeMode
 } from './services/theme-presets.token';
 export { mergeWithDefaults, provideAppThemes, replaceDefaults } from './services/theme-presets.provider';
-export {
-  DEFAULT_OIP_FRONTEND_CONFIG,
-  OIP_FRONTEND_CONFIG,
-  OipFrontendConfig,
-  OipFrontendAppMode
-} from './services/frontend-config';
 
 // Events
 export { MenuChangeEvent } from './events/menu-change.event';
 
 // other
 export { langIntercept } from './intercepts/i18n-intercept.service';
-export { SecurePipe } from './modules/secure.pipe';
-export { httpLoaderAuthFactory } from './modules/http-loader.factory';
 export { ContentType, HttpClient, RequestParams } from './api/http-client';
+export { FolderModuleApi } from './api/folder-module.api';
+export { IframeModuleApi } from './api/iframe-module.api';
+export { SecurityApi } from './api/security.api';
+export { UserProfileApi } from './api/user-profile.api';
+export { convertToPrimeNgDateFormat } from './helpers/date.helper'
 export { NotificationApi } from './api/notification.api';

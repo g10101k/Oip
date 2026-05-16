@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "oip.cli": {
+      "version": "0.2.1",
+      "commands": [
+        "oip"
+      ],
+      "rollForward": false
+    }
+  }
+}

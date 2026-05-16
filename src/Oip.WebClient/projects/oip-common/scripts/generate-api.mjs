@@ -12,22 +12,23 @@ parser.add_argument("-i", "--input", { help: "Input swagger file path" });
 parser.add_argument("-t", "--templates", { help: "Templates" });
 parser.add_argument("-d", "--data-contract-prefix", { help: "Data Contract Prefix" });
 parser.add_argument("-c", "--use-common-client", { action: "store_true", help: "Use common http client" });
+parser.add_argument("--disable-jsdoc", { action: "store_true", help: "Disable JSDoc generation" });
 
 let a = parser.parse_args();
 a.data_contract_prefix ??= "";
 
-console.log(a);
 /* NOTE: all fields are optional expect one of `input`, `url`, `spec` */
 
 let config = {
   input: path.resolve(process.cwd(), a.input),
   templates: path.resolve(process.cwd(), a.templates),
-  httpClientType: "fetch", // or "fetch"
+  httpClientType: "fetch",
   defaultResponseAsSuccess: false,
   generateClient: true,
   useCommonClient: a.use_common_client,
   generateRouteTypes: false,
   generateResponses: true,
+  generateJSDoc: !a.disable_jsdoc,
   toJS: false,
   extractRequestParams: true,
   extractRequestBody: true,
@@ -71,7 +72,9 @@ let config = {
   primitiveTypeConstructs: (constructs) => ({
     ...constructs,
     string: {
-      "date-time": "Date"
+      "date-time": "Date",
+      binary: "Blob",
+      byte: "Blob"
     }
   }),
   hooks: {

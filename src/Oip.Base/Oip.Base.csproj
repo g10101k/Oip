@@ -7,6 +7,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
         <UserSecretsId>b978822d-6d6b-40a7-93aa-1c8f8686ab85</UserSecretsId>
     </PropertyGroup>
 
@@ -21,11 +22,16 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.22"/>
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.22"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />
         <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.11"/>
         <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1"/>
+        <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.2.1" />
+        <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1" />
+
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11"/>
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.0.0"/>
@@ -35,7 +41,8 @@
         <PackageReference Include="Polly" Version="8.5.0"/>
         <PackageReference Include="Polly.Extensions.Http" Version="3.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4"/>
-
+        
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.15.0-beta.1"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.0"/>
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.0"/>

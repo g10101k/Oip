@@ -8,6 +8,7 @@ const { apiConfig, generateResponses, config } = it;
 import { LayoutService } from "../services/app.layout.service";
 import { SecurityService } from "../services/security.service";
 import { inject, Injectable } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -61,15 +62,13 @@ export class HttpClient<SecurityDataType = unknown> {
     protected securityService = inject(SecurityService);
     protected layoutService = inject(LayoutService);
     public baseUrl: string = "<%~ apiConfig.baseUrl %>";
-    private securityData: SecurityDataType | null = null;
     private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"]  =
-      (securityData) => ({
+      () => ({
         headers: {
           "Accept-language": this.layoutService.language()
             ? this.layoutService.language()
             : 'en',
           "X-Timezone": this.layoutService.timeZone(),
-          Authorization: `Bearer ${securityData}`,
         },
       });
 
@@ -83,13 +82,7 @@ export class HttpClient<SecurityDataType = unknown> {
         referrerPolicy: 'no-referrer',
     }
 
-    constructor() {
-      this.securityService.getAccessToken().subscribe((token) => {
-        this.securityData = token;
-      });
-    }
     public setSecurityData = (data: SecurityDataType | null) => {
-        this.securityData = data;
     }
 
     protected encodeQueryParam(key: string, value: any) {
@@ -199,8 +192,9 @@ export class HttpClient<SecurityDataType = unknown> {
 <% } else { %>
     }: FullRequestParams): Promise<HttpResponse<T, E>> => {
 <% } %>
-        const secureParams = ((typeof secure === 'boolean' ? secure : this.baseApiParams.secure) && this.securityWorker && await this.securityWorker(this.securityData)) || {};
-        const requestParams = this.mergeRequestParams(params, secureParams);
+        const secureParams = ((typeof secure === 'boolean' ? secure : this.baseApiParams.secure) && this.securityWorker && await this.securityWorker(null)) || {};
+        const csrfParams = await this.getCsrfRequestParams(params.method, path);
+        const requestParams = this.mergeRequestParams(this.mergeRequestParams(params, secureParams), csrfParams);
         const queryString = query && this.toQueryString(query);
         const payloadFormatter = this.contentFormatters[type || ContentType.Json];
         let responseFormat = format || requestParams.format;
@@ -251,6 +245,24 @@ export class HttpClient<SecurityDataType = unknown> {
 <% } else { %>
             return data;
 <% } %>
-        });
-    };
+    });
+  };
+
+  private async getCsrfRequestParams(method: string | undefined, path: string): Promise<RequestParams> {
+    if (!method || !["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase())) {
+      return {};
+    }
+
+    if (
+      path.includes("/api/security/create-auth-session") ||
+      path.includes("/api/security/get-auth-csrf-token")
+    ) {
+      return {};
+    }
+
+    const csrfToken = await firstValueFrom(this.securityService.getCsrfToken());
+    return csrfToken?.token
+      ? { headers: { [csrfToken.headerName]: csrfToken.token } }
+      : {};
+  }
 }

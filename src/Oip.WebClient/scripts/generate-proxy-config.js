@@ -53,6 +53,9 @@ function createProxyConfig(targets, appMode) {
     createKeepAliveProxy(
       [
         '/api',
+        '/signin-oidc',
+        '/signout-callback-oidc',
+        '/signout-oidc',
         '/swagger',
         '/health',
         '/metrics'
@@ -84,6 +87,9 @@ function createProxyConfig(targets, appMode) {
     createKeepAliveProxy(
       [
         '/api',
+        '/signin-oidc',
+        '/signout-callback-oidc',
+        '/signout-oidc',
         '/swagger',
         '/health',
         '/metrics'
