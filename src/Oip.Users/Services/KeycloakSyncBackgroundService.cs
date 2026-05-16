@@ -25,19 +25,18 @@ public class UserSyncService(
     UserRepository userRepository,
     UserService userService,
     INotificationPublisher notificationPublisher,
+    UserSyncOptions userSyncOptions,
     ILogger<UserSyncService> logger) : IPeriodicalService
 {
     /// <inheritdoc />
-    public int Interval => AppSettings.Instance.SyncOptions.IntervalSeconds;
+    public int Interval => userSyncOptions.IntervalSeconds;
 
     /// <inheritdoc />
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         await SyncAllUsersAsync();
     }
-
-    private readonly SyncOptions _syncOptions = AppSettings.Instance.SyncOptions;
-
+    
     /// <summary>
     /// Synchronizes a user from Keycloak to the local database.
     /// </summary>
@@ -144,14 +143,14 @@ public class UserSyncService(
         logger.LogInformation("Starting full user synchronization");
         var startTime = DateTimeOffset.UtcNow;
         var totalUsers = await keycloakService.GetUsersCountAsync();
-        var batches = (int)Math.Ceiling((double)totalUsers / AppSettings.Instance.SyncOptions.BatchSize);
+        var batches = (int)Math.Ceiling((double)totalUsers / userSyncOptions.BatchSize);
 
         logger.LogInformation("Synchronizing {TotalUsers} users in {Batches} batches", totalUsers, batches);
 
         for (int i = 0; i < batches; i++)
         {
-            var offset = i * _syncOptions.BatchSize;
-            var syncedCount = await SyncUsersBatchAsync(offset, _syncOptions.BatchSize);
+            var offset = i * userSyncOptions.BatchSize;
+            var syncedCount = await SyncUsersBatchAsync(offset, userSyncOptions.BatchSize);
             logger.LogInformation("Batch {BatchNumber}: Synced {SyncedCount} users", i + 1, syncedCount);
 
             // Small delay to avoid overwhelming Keycloak
