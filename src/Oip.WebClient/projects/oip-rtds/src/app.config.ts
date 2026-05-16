@@ -7,8 +7,6 @@ import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
 import {
   AuthGuardService,
-  BaseDataService,
-  SecurityDataService,
   UserService,
   langIntercept,
   SecurityService,
@@ -18,6 +16,8 @@ import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { MessageService } from 'primeng/api';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { RtdsMetaDataContextMigrationModule } from './api/RtdsMetaDataContextMigrationModule';
+import { TagManagementModule } from './api/TagManagementModule';
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
@@ -29,8 +29,6 @@ export const appConfig: ApplicationConfig = {
     { provide: SecurityService, useClass: BffSecurityService },
     AuthGuardService,
     MessageService,
-    SecurityDataService,
-    BaseDataService,
     UserService,
     importProvidersFrom([
       TranslateModule.forRoot({

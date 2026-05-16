@@ -145,11 +145,11 @@ export class DbMigrationComponent extends BaseModuleComponent<NoSettingsDto, NoS
   }
 
   async getData() {
-    return this.baseDataService.sendRequest<MigrationDto[]>(`api/${this.controller}/get-migrations`, 'GET');
+    return this.getMigrations<MigrationDto>();
   }
 
   async applyMigration(rowData: MigrationDto) {
     const request = {name: rowData.name} as ApplyMigrationRequest;
-    return this.baseDataService.sendRequest(`api/${this.controller}/apply-migration`, 'POST', request);
+    return this.applyModuleMigration(request);
   }
 }

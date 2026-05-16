@@ -71,7 +71,7 @@ export interface UserEntity {
   createdAt?: Date;
   updatedAt?: Date;
   lastSyncedAt?: Date;
-  photo?: string | null;
+  photo?: Blob | null;
   settings?: string | null;
 }
 

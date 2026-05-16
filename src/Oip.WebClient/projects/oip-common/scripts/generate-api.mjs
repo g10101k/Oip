@@ -72,7 +72,9 @@ let config = {
   primitiveTypeConstructs: (constructs) => ({
     ...constructs,
     string: {
-      "date-time": "Date"
+      "date-time": "Date",
+      binary: "Blob",
+      byte: "Blob"
     }
   }),
   hooks: {

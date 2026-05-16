@@ -21,6 +21,7 @@ public class UserProfileController(UserService userService, UserRepository userR
     /// <param name="email">User's email address</param>
     /// <returns>User photo as JPEG image or NotFound result</returns>
     [Authorize, HttpGet("get-user-photo")]
+    [Produces("image/jpeg")]
     [ProducesResponseType<FileContentResult>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
