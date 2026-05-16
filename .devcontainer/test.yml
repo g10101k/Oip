@@ -13,6 +13,7 @@ services:
       ConnectionString: XpoProvider=Postgres;Server=postgres;Database=oip;uid=postgres;pwd=postgres;
       SecurityService:BaseUrl: https://localhost:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
+      SecurityService:AuthTicketStore:RedisConnectionString: redis:6379
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://+:50000
       ASPNETCORE_Kestrel__Certificates__Default__Password: P@ssw0rd
@@ -25,6 +26,8 @@ services:
       postgres:
         condition: service_healthy
       keycloak:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   postgres:
@@ -80,6 +83,21 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   prometheus:
     image: prom/prometheus
     volumes:
@@ -98,3 +116,6 @@ networks:
   backend-network: { }
   bridge-network:
     driver: bridge
+
+volumes:
+  redis-data:

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -243,9 +244,7 @@ public static class OipModuleApplication
     public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder,
         IBaseOipModuleAppSettings settings)
     {
-        var cookieTicketStore = new InMemoryAuthenticationTicketStore();
-
-        builder.Services.AddSingleton(cookieTicketStore);
+        builder.Services.AddAuthenticationTicketStore(settings.SecurityService.AuthTicketStore);
         builder.Services.AddAntiforgery(options =>
         {
             options.HeaderName = CsrfHeaderName;
@@ -279,7 +278,6 @@ public static class OipModuleApplication
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 options.SlidingExpiration = true;
-                options.SessionStore = cookieTicketStore;
                 options.Events = new CookieAuthenticationEvents
                 {
                     OnRedirectToLogin = context => WriteAuthenticationError(context.HttpContext, 401,
@@ -454,6 +452,38 @@ public static class OipModuleApplication
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<KeycloakService>();
         return builder;
+    }
+
+    private static IServiceCollection AddAuthenticationTicketStore(
+        this IServiceCollection services,
+        AuthTicketStoreSettings settings)
+    {
+        if (!string.IsNullOrWhiteSpace(settings.RedisConnectionString))
+        {
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = settings.RedisConnectionString;
+            });
+            services.AddSingleton<ITicketStore>(provider => new DistributedAuthenticationTicketStore(
+                provider.GetRequiredService<IDistributedCache>(),
+                provider.GetRequiredService<IDataProtectionProvider>(),
+                provider.GetRequiredService<ILogger<DistributedAuthenticationTicketStore>>(),
+                settings.DistributedKeyPrefix,
+                new InMemoryAuthenticationTicketStore(
+                    settings.MaxInMemoryTickets,
+                    TimeSpan.FromSeconds(settings.CleanupIntervalSeconds))));
+        }
+        else
+        {
+            services.AddSingleton<ITicketStore>(_ => new InMemoryAuthenticationTicketStore(
+                settings.MaxInMemoryTickets,
+                TimeSpan.FromSeconds(settings.CleanupIntervalSeconds)));
+        }
+
+        services.AddSingleton<IPostConfigureOptions<CookieAuthenticationOptions>,
+            CookieAuthenticationTicketStorePostConfigure>();
+
+        return services;
     }
 
     private static OpenIdConnectConfiguration CreateOpenIdConnectConfiguration(string publicUrlWithRealm,

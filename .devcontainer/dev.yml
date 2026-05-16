@@ -83,6 +83,21 @@ services:
     restart: unless-stopped
     networks:
       - backend-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   
   prometheus:
     image:  registry.hub.docker.com/prom/prometheus:main
@@ -131,4 +146,4 @@ volumes:
   pgadminhome-data:
   clickhouse_data:
   minio_data:
-
+  redis-data:
