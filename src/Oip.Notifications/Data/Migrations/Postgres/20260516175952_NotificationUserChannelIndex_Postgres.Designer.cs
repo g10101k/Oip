@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Notifications.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Notifications.Migrations.Postgres
+namespace Oip.Notifications.Data.Migrations.Postgres
 {
     [DbContext(typeof(NotificationsDbContextPostgres))]
-    partial class NotificationsDbContextPostgresModelSnapshot : ModelSnapshot
+    [Migration("20260516175952_NotificationUserChannelIndex_Postgres")]
+    partial class NotificationUserChannelIndex_Postgres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

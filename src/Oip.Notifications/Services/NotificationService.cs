@@ -22,6 +22,7 @@ public class NotificationService(
     NotificationTemplateRepository notificationTemplateRepository,
     UserNotificationPreferenceRepository userNotificationPreferenceRepository,
     NotificationRepository notificationRepository,
+    NotificationUserRepository notificationUserRepository,
     NotificationDeliveryRepository notificationDeliveryRepository,
     UserCacheRepository userRepository) : GrpcNotificationService.GrpcNotificationServiceBase
 {
@@ -820,11 +821,27 @@ public class NotificationService(
                     {
                         foreach (var userNotify in messages)
                         {
-                            channelService.Notify(channel.NotificationChannel.Code,
+                            var notificationUser = new NotificationUserEntity
+                            {
+                                NotificationId = userNotify.NotificationId,
+                                UserId = userNotify.UserId,
+                                Subject = userNotify.Subject,
+                                Message = userNotify.Message,
+                                Importance = userNotify.Importance,
+                                NotificationChannelId = channel.NotificationChannelId,
+                                SentAt = DateTimeOffset.UtcNow
+                            };
+
+                            var notified = channelService.Notify(channel.NotificationChannel.Code,
                                 userRepository.Users[userNotify.UserId],
                                 userNotify.Subject,
                                 userNotify.Message,
                                 importanceLevel: activeTemplate.Importance);
+
+                            if (notified)
+                            {
+                                await notificationUserRepository.AddAsync(notificationUser);
+                            }
                         }
                     }
                 }
@@ -866,6 +883,7 @@ public class NotificationService(
                 UserId = user.UserId,
                 Subject = subject,
                 Message = message,
+                Importance = template.Importance,
             });
         }
 

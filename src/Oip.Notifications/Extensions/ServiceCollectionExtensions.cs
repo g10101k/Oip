@@ -108,6 +108,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<NotificationTemplateRepository>();
         services.AddScoped<UserNotificationPreferenceRepository>();
         services.AddScoped<NotificationRepository>();
+        services.AddScoped<NotificationUserRepository>();
         services.AddScoped<NotificationDeliveryRepository>();
 
         return services;

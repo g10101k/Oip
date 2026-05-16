@@ -38,7 +38,7 @@ public class NotificationUserEntityConfiguration(DatabaseFacade database)
         builder.HasIndex(e => e.SentAt);
         builder.HasIndex(e => e.DeliveredAt);
         builder.HasIndex(e => e.ReadAt);
-        builder.HasIndex(e => new { e.NotificationId, e.UserId })
+        builder.HasIndex(e => new { e.NotificationId, e.UserId, e.NotificationChannelId })
             .IsUnique();
         // Relationships
         builder.HasOne(e => e.Notification)

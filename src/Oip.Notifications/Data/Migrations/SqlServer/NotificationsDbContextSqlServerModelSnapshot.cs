@@ -412,8 +412,9 @@ namespace Oip.Notifications.Migrations.SqlServer
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("NotificationId", "UserId")
-                        .IsUnique();
+                    b.HasIndex("NotificationId", "UserId", "NotificationChannelId")
+                        .IsUnique()
+                        .HasFilter("[NotificationChannelId] IS NOT NULL");
 
                     b.ToTable("NotificationUser", "notifications");
                 });

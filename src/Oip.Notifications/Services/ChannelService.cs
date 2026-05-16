@@ -55,7 +55,7 @@ public class ChannelService(IServiceProvider serviceProvider, ILogger<ChannelSer
     /// <param name="message">Message content</param>
     /// <param name="importanceLevel">Importance level</param>
     /// <param name="attachments">File attachments</param>
-    public void Notify(string channelCode, User user, string subject, string message, ImportanceLevel importanceLevel,
+    public bool Notify(string channelCode, User user, string subject, string message, ImportanceLevel importanceLevel,
         Attachment[]? attachments = null)
     {
         if (_channels == null) throw new InvalidOperationException("Channels is not initialized");
@@ -64,8 +64,10 @@ public class ChannelService(IServiceProvider serviceProvider, ILogger<ChannelSer
         if (channel == null)
         {
             logger.LogError("Channel {ChannelCode} not found", channelCode);
+            return false;
         }
-        else
+
+        try
         {
             channel.ProcessNotify(new NotificationDto()
             {
@@ -80,6 +82,13 @@ public class ChannelService(IServiceProvider serviceProvider, ILogger<ChannelSer
                 ImportanceLevel = importanceLevel,
                 Attachment = attachments ?? []
             });
+            return true;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "An error occured while notifying user {UserId} through channel {ChannelCode}",
+                user.UserId, channelCode);
+            return false;
         }
     }
 }

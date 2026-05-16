@@ -2,39 +2,42 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Notifications.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Notifications.Migrations.Postgres
+namespace Oip.Notifications.Data.Migrations.SqlServer
 {
-    [DbContext(typeof(NotificationsDbContextPostgres))]
-    partial class NotificationsDbContextPostgresModelSnapshot : ModelSnapshot
+    [DbContext(typeof(NotificationsDbContextSqlServer))]
+    [Migration("20260516175957_NotificationUserChannelIndex_SqlServer")]
+    partial class NotificationUserChannelIndex_SqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.22")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FriendlyName")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Xml")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -53,36 +56,36 @@ namespace Oip.Notifications.Migrations.Postgres
                 {
                     b.Property<int>("NotificationChannelId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Unique identifier for the notification channel");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NotificationChannelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationChannelId"));
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("Name of the notification channel");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasDefaultValue(true)
                         .HasComment("Whether the channel is active");
 
                     b.Property<int?>("MaxRetryCount")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Maximum number of delivery retry attempts");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("nvarchar(100)")
                         .HasComment("Name of the notification channel");
 
                     b.Property<bool>("RequiresVerification")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasDefaultValue(false)
                         .HasComment("Whether the channel requires user verification");
 
@@ -107,28 +110,28 @@ namespace Oip.Notifications.Migrations.Postgres
                         .HasColumnType("bigint")
                         .HasComment("Unique identifier for the notification delivery");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("NotificationDeliveryId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("NotificationDeliveryId"));
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetimeoffset")
                         .HasComment("Creation timestamp of the delivery record");
 
                     b.Property<DateTimeOffset?>("DeliveredAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetimeoffset")
                         .HasComment("Timestamp when the notification was delivered");
 
                     b.Property<string>("ErrorMessage")
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
+                        .HasColumnType("nvarchar(1000)")
                         .HasComment("Error message if delivery failed");
 
                     b.Property<string>("ExternalId")
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .HasColumnType("nvarchar(200)")
                         .HasComment("External identifier from the delivery service");
 
                     b.Property<int>("NotificationChannelId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Notification channel identifier");
 
                     b.Property<long>("NotificationUserId")
@@ -137,22 +140,22 @@ namespace Oip.Notifications.Migrations.Postgres
 
                     b.Property<int>("RetryCount")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasDefaultValue(0)
                         .HasComment("Number of delivery retry attempts");
 
                     b.Property<DateTimeOffset?>("SentAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetimeoffset")
                         .HasComment("Timestamp when the notification was sent");
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasDefaultValue(0)
                         .HasComment("Delivery status");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("User identifier");
 
                     b.HasKey("NotificationDeliveryId");
@@ -186,18 +189,18 @@ namespace Oip.Notifications.Migrations.Postgres
                         .HasColumnType("bigint")
                         .HasComment("Unique identifier for the notification");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("NotificationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("NotificationId"));
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetimeoffset")
                         .HasComment("Creation timestamp of the notification");
 
                     b.Property<string>("DataJson")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("JSON data associated with the notification");
 
                     b.Property<int>("NotificationTypeId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Notification type identifier");
 
                     b.HasKey("NotificationId");
@@ -216,17 +219,17 @@ namespace Oip.Notifications.Migrations.Postgres
                 {
                     b.Property<int>("NotificationTemplateChannelId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Unique identifier for the template-channel association");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NotificationTemplateChannelId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationTemplateChannelId"));
 
                     b.Property<int>("NotificationChannelId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Notification channel identifier");
 
                     b.Property<int>("NotificationTemplateId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Notification template identifier");
 
                     b.HasKey("NotificationTemplateChannelId");
@@ -246,37 +249,37 @@ namespace Oip.Notifications.Migrations.Postgres
                 {
                     b.Property<int>("NotificationTemplateId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Unique identifier for the notification template");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NotificationTemplateId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationTemplateId"));
 
                     b.Property<int>("Importance")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Importance level of the notification");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasDefaultValue(true)
                         .HasComment("Whether the notification template is currently active");
 
                     b.Property<string>("MessageTemplate")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Message template for the notification");
 
                     b.Property<int?>("NotificationChannelEntityNotificationChannelId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int>("NotificationTypeId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Unique identifier for the notification type");
 
                     b.Property<string>("SubjectTemplate")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .HasColumnType("nvarchar(200)")
                         .HasComment("Subject template for the notification");
 
                     b.HasKey("NotificationTemplateId");
@@ -295,17 +298,17 @@ namespace Oip.Notifications.Migrations.Postgres
                 {
                     b.Property<int>("NotificationTemplateUserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Unique identifier for the template-user mapping");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NotificationTemplateUserId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationTemplateUserId"));
 
                     b.Property<int>("NotificationTemplateId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Notification template identifier");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("User identifier");
 
                     b.HasKey("NotificationTemplateUserId");
@@ -325,26 +328,26 @@ namespace Oip.Notifications.Migrations.Postgres
                 {
                     b.Property<int>("NotificationTypeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Unique identifier for the notification type");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NotificationTypeId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationTypeId"));
 
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
+                        .HasColumnType("nvarchar(1024)")
                         .HasComment("Detailed explanation of the notification type");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("Name of the notification type");
 
                     b.Property<string>("Scope")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("Scope of notification type (global, appName, feature)");
 
                     b.HasKey("NotificationTypeId");
@@ -366,37 +369,37 @@ namespace Oip.Notifications.Migrations.Postgres
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("NotificationUserId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("NotificationUserId"));
 
                     b.Property<DateTimeOffset?>("DeliveredAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("Importance")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("NotificationChannelId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<long>("NotificationId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset?>("ReadAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset?>("SentAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Subject")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.HasKey("NotificationUserId");
 
@@ -413,7 +416,8 @@ namespace Oip.Notifications.Migrations.Postgres
                     b.HasIndex("UserId");
 
                     b.HasIndex("NotificationId", "UserId", "NotificationChannelId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[NotificationChannelId] IS NOT NULL");
 
                     b.ToTable("NotificationUser", "notifications");
                 });
@@ -422,27 +426,27 @@ namespace Oip.Notifications.Migrations.Postgres
                 {
                     b.Property<int>("UserNotificationPreferenceId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Unique identifier for the user notification preference");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserNotificationPreferenceId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserNotificationPreferenceId"));
 
                     b.Property<bool>("IsEnabled")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasDefaultValue(true)
                         .HasComment("Whether notifications are enabled for this preference");
 
                     b.Property<int>("NotificationChannelId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Notification channel identifier");
 
                     b.Property<int>("NotificationTypeId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Notification type identifier");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("User identifier");
 
                     b.HasKey("UserNotificationPreferenceId");
