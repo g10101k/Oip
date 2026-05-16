@@ -1,4 +1,5 @@
 using Oip.Base.Settings;
+using Oip.Users.Settings;
 
 namespace Oip.Settings;
 
@@ -21,6 +22,8 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
+
+    public UserSyncOptions UserSyncOptions { get; set; } = new();
 
     /// <inheritdoc />
     public bool IsStandalone { get; set; } = false;
