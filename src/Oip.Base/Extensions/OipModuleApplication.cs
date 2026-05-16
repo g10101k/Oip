@@ -277,6 +277,8 @@ public static class OipModuleApplication
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.SameSite = SameSiteMode.Lax;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(
+                    Math.Max(1, settings.SecurityService.AuthTicketStore.TicketLifetimeMinutes));
                 options.SlidingExpiration = true;
                 options.Events = new CookieAuthenticationEvents
                 {

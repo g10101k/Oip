@@ -62,6 +62,11 @@ public class SecurityServiceSettings
 public class AuthTicketStoreSettings
 {
     /// <summary>
+    /// Authentication ticket lifetime in minutes.
+    /// </summary>
+    public int TicketLifetimeMinutes { get; set; } = 20160;
+
+    /// <summary>
     /// Redis connection string for distributed authentication ticket storage.
     /// </summary>
     public string? RedisConnectionString { get; set; }
