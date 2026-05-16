@@ -23,7 +23,7 @@ import {
   UpdateCommentRequest,
   UpdateParams,
   UploadAttachmentPayload,
-} from "./data-contracts";
+} from "./discussion-data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 @Injectable()

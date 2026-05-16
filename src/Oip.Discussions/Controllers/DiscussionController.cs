@@ -12,7 +12,7 @@ namespace Oip.Discussions.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/discussion")]
-[ApiExplorerSettings(GroupName = "base")]
+[ApiExplorerSettings(GroupName = "discussion")]
 public class DiscussionController(CommentService commentService) : ControllerBase
 {
     /// <summary>
