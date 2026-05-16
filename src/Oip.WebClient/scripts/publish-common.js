@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const {execSync} = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const {runNpm, runNpx} = require('./script-utils');
 
 console.log('🚀 Starting oip-common library publication...');
 
@@ -11,11 +11,11 @@ try {
   let commonPath = path.join(__dirname, '../projects/oip-common');
 
   console.log('⬆️ Incrementing patch version...');
-  execSync('npm version patch', {cwd: commonPath, stdio: 'inherit'});
+  runNpm(['version', 'patch'], {cwd: commonPath});
 
   // 1. Build the library
   console.log('📦 Building library...');
-  execSync('ng build oip-common', {stdio: 'inherit'});
+  runNpx(['ng', 'build', 'oip-common']);
 
   // 2. Navigate to dist directory
   let distPath = path.join(__dirname, '../dist/oip-common');
@@ -29,11 +29,11 @@ try {
   console.log(`📋 Version for publication: ${packageJson.version}`);
 
   console.log('🗝️ Login...');
-  execSync('npm login', {cwd: distPath, stdio: 'inherit'});
+  runNpm(['login'], {cwd: distPath});
 
   // 4. Publish
   console.log('📤 Publishing to npm...');
-  execSync('npm publish', {cwd: distPath, stdio: 'inherit'});
+  runNpm(['publish'], {cwd: distPath});
 
   console.log('✅ Publication completed successfully!');
 } catch (error) {
