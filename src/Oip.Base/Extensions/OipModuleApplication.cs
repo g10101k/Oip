@@ -2,7 +2,11 @@
 using System.Net;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
@@ -16,6 +20,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -41,6 +46,10 @@ namespace Oip.Base.Extensions;
 /// </summary>
 public static class OipModuleApplication
 {
+    public const string CookieAuthenticationScheme = "OipCookie";
+    public const string OpenIdConnectAuthenticationScheme = "OipOpenIdConnect";
+    public const string DefaultAuthenticationScheme = "OipDefault";
+    public const string CsrfHeaderName = "X-CSRF-TOKEN";
     private const string Bearer = "Bearer";
 
     /// <summary>
@@ -234,7 +243,141 @@ public static class OipModuleApplication
     public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder,
         IBaseOipModuleAppSettings settings)
     {
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        var cookieTicketStore = new InMemoryAuthenticationTicketStore();
+
+        builder.Services.AddSingleton(cookieTicketStore);
+        builder.Services.AddAntiforgery(options =>
+        {
+            options.HeaderName = CsrfHeaderName;
+            options.Cookie.Name = "__Host-OIP-CSRF";
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
+
+        builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = DefaultAuthenticationScheme;
+                options.DefaultChallengeScheme = DefaultAuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationScheme;
+            })
+            .AddPolicyScheme(DefaultAuthenticationScheme, DefaultAuthenticationScheme, options =>
+            {
+                options.ForwardDefaultSelector = context =>
+                {
+                    var authorization = context.Request.Headers.Authorization.ToString();
+                    return authorization.StartsWith($"{Bearer} ", StringComparison.OrdinalIgnoreCase)
+                        ? JwtBearerDefaults.AuthenticationScheme
+                        : CookieAuthenticationScheme;
+                };
+                options.ForwardChallenge = CookieAuthenticationScheme;
+            })
+            .AddCookie(CookieAuthenticationScheme, options =>
+            {
+                options.Cookie.Name = "__Host-OIP";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.SlidingExpiration = true;
+                options.SessionStore = cookieTicketStore;
+                options.Events = new CookieAuthenticationEvents
+                {
+                    OnRedirectToLogin = context => WriteAuthenticationError(context.HttpContext, 401,
+                        "Unauthorized", "Authentication session is required."),
+                    OnRedirectToAccessDenied = context => WriteAuthenticationError(context.HttpContext, 403,
+                        "Forbidden", "The current user does not have permission to access this resource."),
+                    OnValidatePrincipal = context =>
+                    {
+                        ClaimsTransformation.AddRolesFromAccessToken(
+                            context.Principal,
+                            context.Properties.GetTokenValue("access_token"));
+                        return Task.CompletedTask;
+                    }
+                };
+            })
+            .AddOpenIdConnect(OpenIdConnectAuthenticationScheme, options =>
+            {
+                var urlWithRealm = settings.SecurityService.BaseUrl
+                    .UrlAppend("realms")
+                    .UrlAppend(settings.SecurityService.Realm);
+
+                var dockerInternalUrl = settings.SecurityService.DockerUrl?
+                    .UrlAppend("realms")
+                    .UrlAppend(settings.SecurityService.Realm);
+
+                options.SignInScheme = CookieAuthenticationScheme;
+                var backchannelUrlWithRealm = dockerInternalUrl ?? urlWithRealm;
+
+                options.Authority = urlWithRealm;
+                options.Configuration = CreateOpenIdConnectConfiguration(urlWithRealm, backchannelUrlWithRealm);
+                options.ClientId = settings.SecurityService.Front.ClientId;
+                if (string.Equals(options.ClientId, settings.SecurityService.ClientId, StringComparison.Ordinal))
+                    options.ClientSecret = settings.SecurityService.ClientSecret;
+                options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
+                options.UsePkce = true;
+                options.SaveTokens = true;
+                options.GetClaimsFromUserInfoEndpoint = true;
+                options.ProtocolValidator = new OipOpenIdConnectProtocolValidator();
+                options.Scope.Clear();
+                options.Scope.Add(OpenIdConnectScope.OpenId);
+                foreach (var scope in settings.SecurityService.Front.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                    if (!options.Scope.Contains(scope))
+                        options.Scope.Add(scope);
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuers = CreateValidIssuers(urlWithRealm, dockerInternalUrl),
+                    IssuerSigningKeyResolver = (_, _, _, _) =>
+                        GetSigningKeys(backchannelUrlWithRealm, builder.Environment.IsDevelopment()),
+                    ClockSkew = TimeSpan.FromSeconds(settings.SecurityService.ClockSkewSeconds)
+                };
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.BackchannelHttpHandler = CreateDevelopmentHttpClientHandler();
+                }
+                options.CorrelationCookie.SameSite = SameSiteMode.None;
+                options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.NonceCookie.SameSite = SameSiteMode.None;
+                options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Events = new OpenIdConnectEvents
+                {
+                    OnTokenResponseReceived = context =>
+                    {
+                        var tokenResponse = context.TokenEndpointResponse;
+                        if (!string.IsNullOrEmpty(tokenResponse.IdToken) ||
+                            !string.IsNullOrEmpty(context.ProtocolMessage.IdToken))
+                            return Task.CompletedTask;
+
+                        var logger = context.HttpContext.RequestServices
+                            .GetRequiredService<ILoggerFactory>()
+                            .CreateLogger(nameof(OipModuleApplication));
+                        logger.LogError(
+                            "Keycloak token response for client {ClientId} did not contain id_token. " +
+                            "HasAccessToken: {HasAccessToken}; HasRefreshToken: {HasRefreshToken}; " +
+                            "TokenType: {TokenType}; Scope: {Scope}; Error: {Error}; ErrorDescription: {ErrorDescription}",
+                            options.ClientId,
+                            !string.IsNullOrEmpty(tokenResponse.AccessToken),
+                            !string.IsNullOrEmpty(tokenResponse.RefreshToken),
+                            tokenResponse.TokenType,
+                            tokenResponse.Scope,
+                            tokenResponse.Error,
+                            tokenResponse.ErrorDescription);
+
+                        var message = $"Keycloak token endpoint did not return an id_token for client " +
+                                      $"'{options.ClientId}'. Ensure the client is an OpenID " +
+                                      $"Connect client with standard flow enabled and that the requested scope " +
+                                      $"contains '{OpenIdConnectScope.OpenId}'.";
+
+                        throw new AuthenticationFailureException(message);
+                    },
+                    OnTicketReceived = context =>
+                    {
+                        ClaimsTransformation.AddRolesFromAccessToken(
+                            context.Principal,
+                            context.Properties?.GetTokenValue("access_token"));
+                        return Task.CompletedTask;
+                    }
+                };
+            })
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 var list = new List<string>();
@@ -261,16 +404,17 @@ public static class OipModuleApplication
                     ClockSkew = TimeSpan.FromSeconds(settings.SecurityService.ClockSkewSeconds)
                 };
 
+                if (builder.Environment.IsDevelopment())
+                {
+                    options.BackchannelHttpHandler = CreateDevelopmentHttpClientHandler();
+                }
+
                 if (builder.Environment.IsDevelopment() && dockerInternalUrl is not null)
                 {
                     options.TokenValidationParameters.IssuerSigningKeyResolver =
                         (token, securityToken, kid, parameters) =>
                         {
-                            var handler = new HttpClientHandler
-                            {
-                                ServerCertificateCustomValidationCallback =
-                                    (message, cert, chain, errors) => true
-                            };
+                            var handler = CreateDevelopmentHttpClientHandler();
                             var client = new HttpClient(handler);
                             var jwksUri = dockerInternalUrl.UrlAppend("/protocol/openid-connect/certs");
                             var jwksJson = client.GetStringAsync(jwksUri).Result;
@@ -297,12 +441,114 @@ public static class OipModuleApplication
                 };
             });
         builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthorization(options =>
+        {
+            options.DefaultPolicy = new AuthorizationPolicyBuilder(
+                    CookieAuthenticationScheme,
+                    JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthenticatedUser()
+                .Build();
+        });
         builder.Services.AddHttpClient<KeycloakClient>(x =>
             x.BaseAddress = new Uri(settings.SecurityService.BaseUrl));
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<KeycloakService>();
         return builder;
+    }
+
+    private static OpenIdConnectConfiguration CreateOpenIdConnectConfiguration(string publicUrlWithRealm,
+        string backchannelUrlWithRealm)
+    {
+        return new OpenIdConnectConfiguration
+        {
+            Issuer = publicUrlWithRealm,
+            AuthorizationEndpoint = publicUrlWithRealm.UrlAppend("protocol/openid-connect/auth"),
+            EndSessionEndpoint = publicUrlWithRealm.UrlAppend("protocol/openid-connect/logout"),
+            TokenEndpoint = backchannelUrlWithRealm.UrlAppend("protocol/openid-connect/token"),
+            UserInfoEndpoint = backchannelUrlWithRealm.UrlAppend("protocol/openid-connect/userinfo"),
+            JwksUri = backchannelUrlWithRealm.UrlAppend("protocol/openid-connect/certs")
+        };
+    }
+
+    private static IEnumerable<string> CreateValidIssuers(string publicUrlWithRealm, string? internalUrlWithRealm)
+    {
+        return new[] { publicUrlWithRealm, internalUrlWithRealm }
+            .Where(x => x is not null)
+            .Select(x => x!);
+    }
+
+    private static IEnumerable<SecurityKey> GetSigningKeys(string urlWithRealm, bool allowInvalidCertificate)
+    {
+        using var handler = allowInvalidCertificate ? CreateDevelopmentHttpClientHandler() : new HttpClientHandler();
+        using var client = new HttpClient(handler);
+        var jwksJson = client.GetStringAsync(urlWithRealm.UrlAppend("protocol/openid-connect/certs")).Result;
+        return JsonWebKeySet.Create(jwksJson).GetSigningKeys();
+    }
+
+    private static HttpClientHandler CreateDevelopmentHttpClientHandler()
+    {
+        return new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback =
+                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+    }
+
+    private sealed class OipOpenIdConnectProtocolValidator : OpenIdConnectProtocolValidator
+    {
+        public OipOpenIdConnectProtocolValidator()
+        {
+            RequireState = false;
+        }
+    }
+
+    public static WebApplication UseOipCsrfProtection(this WebApplication app)
+    {
+        app.Use(async (context, next) =>
+        {
+            if (RequiresCsrfValidation(context))
+            {
+                var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+                try
+                {
+                    await antiforgery.ValidateRequestAsync(context);
+                }
+                catch (AntiforgeryValidationException)
+                {
+                    await WriteAuthenticationError(context, 403, "Forbidden", "A valid CSRF token is required.");
+                    return;
+                }
+            }
+
+            await next();
+        });
+
+        return app;
+    }
+
+    private static bool RequiresCsrfValidation(HttpContext context)
+    {
+        if (!HttpMethods.IsPost(context.Request.Method) &&
+            !HttpMethods.IsPut(context.Request.Method) &&
+            !HttpMethods.IsPatch(context.Request.Method) &&
+            !HttpMethods.IsDelete(context.Request.Method))
+            return false;
+
+        if (!context.Request.Path.StartsWithSegments("/api"))
+            return false;
+
+        if (context.Request.Path.StartsWithSegments("/api/security/create-auth-session"))
+            return false;
+
+        return context.User.Identity?.IsAuthenticated == true;
+    }
+
+    private static async Task WriteAuthenticationError(HttpContext context, int statusCode, string title, string message)
+    {
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json";
+        var response = new ApiExceptionResponse(title, message, statusCode);
+        await context.Response.WriteAsync(JsonConvert.SerializeObject(response, JsonSettings.Value));
     }
 
     /// <summary>
@@ -322,6 +568,7 @@ public static class OipModuleApplication
         app.UseStaticFiles();
         app.UseRouting();
         app.UseAuthentication();
+        app.UseOipCsrfProtection();
         app.UseAuthorization();
         app.UseCors(options => options.AllowAnyOrigin());
         app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
@@ -404,6 +651,7 @@ public static class OipModuleApplication
                     ApiExceptionResponse response;
                     if (error.Error is ApiException oipException)
                     {
+                        context.Response.StatusCode = oipException.StatusCode;
                         response = new ApiExceptionResponse(oipException.Title, oipException.Message,
                             oipException.StatusCode,
                             app.Environment.IsDevelopment() ? oipException.StackTrace : null);

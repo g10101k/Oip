@@ -11,13 +11,11 @@ import {
   DEFAULT_OIP_FRONTEND_CONFIG,
   OIP_FRONTEND_CONFIG,
   SecurityDataService,
-  SecurityStorageService,
   UserService,
   langIntercept,
-  httpLoaderAuthFactory,
   provideAppThemes,
   SecurityService,
-  KeycloakSecurityService,
+  BffSecurityService,
   NotificationService
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
@@ -25,7 +23,6 @@ import { ProductService } from './app/service/product.service';
 import { MessageService } from 'primeng/api';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { AbstractSecurityStorage, authInterceptor, provideAuth, StsConfigLoader } from 'angular-auth-oidc-client';
 import { environment } from './environments/environment';
 import { appTheme } from "./app.theme";
 
@@ -34,18 +31,10 @@ const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: Http
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(withInterceptors([authInterceptor(), langIntercept]), withFetch()),
-    provideAuth({
-      loader: {
-        provide: StsConfigLoader,
-        useFactory: httpLoaderAuthFactory,
-        deps: [HttpClient]
-      }
-    }),
+    provideHttpClient(withInterceptors([langIntercept]), withFetch()),
     provideAppThemes(appTheme, { mode: 'replaceDefaults' }),
-    { provide: AbstractSecurityStorage, useClass: SecurityStorageService },
     { provide: LocationStrategy, useClass: PathLocationStrategy },
-    { provide: SecurityService, useClass: KeycloakSecurityService },
+    { provide: SecurityService, useClass: BffSecurityService },
     {
       provide: OIP_FRONTEND_CONFIG,
       useValue: {

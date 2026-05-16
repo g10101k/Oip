@@ -49,7 +49,7 @@ export class BaseDataService {
 
     switch (method) {
       case 'GET':
-        result = this.http.get<TResponse>(url, { params: data });
+        result = this.http.get<TResponse>(url, { params: data, withCredentials: true });
         break;
       case 'PUT':
         result = this.http.put<TResponse>(url, data, httpOptions);

@@ -28,7 +28,7 @@ export { NoSettingsDto } from './dtos/no-settings.dto';
 // Services
 export { BaseDataService } from './services/base-data.service';
 export { TopBarService } from './services/top-bar.service';
-export { SecurityService, KeycloakSecurityService } from './services/security.service';
+export { AuthCsrfToken, BffSecurityService, SecurityService, KeycloakSecurityService } from './services/security.service';
 export { SecurityDataService } from './services/security-data.service';
 export { MsgService } from './services/msg.service';
 export { AuthGuardService } from './services/auth-guard.service';

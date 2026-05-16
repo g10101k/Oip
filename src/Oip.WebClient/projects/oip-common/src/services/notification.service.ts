@@ -10,12 +10,11 @@ export class NotificationService {
   private securityService = inject(SecurityService);
   private msgService = inject(MsgService);
   private frontendConfig = inject(OIP_FRONTEND_CONFIG);
-  private securityData: string | null = null;
 
   constructor() {
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(this.resolveHubUrl(), {
-        accessTokenFactory: () => this.securityData ?? '',
+        withCredentials: true,
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
       })
@@ -32,9 +31,11 @@ export class NotificationService {
       this.msgService.add(opt);
     });
 
-    this.securityService.getAccessToken().subscribe((token) => {
-      this.securityData = token;
-      if (!token) {
+    this.securityService.isAuthenticated().subscribe((authenticated) => {
+      if (!authenticated) {
+        if (this.connection.state !== signalR.HubConnectionState.Disconnected) {
+          this.connection.stop();
+        }
         return;
       }
 

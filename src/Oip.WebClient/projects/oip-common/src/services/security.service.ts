@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy, inject } from '@angular/core';
 import {
   LoginResponse,
@@ -7,8 +8,9 @@ import {
   EventTypes,
   AuthOptions
 } from 'angular-auth-oidc-client';
-import { BehaviorSubject, firstValueFrom, finalize, from, merge, Observable, ReplaySubject, shareReplay } from 'rxjs';
-import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { BehaviorSubject, firstValueFrom, finalize, from, merge, Observable, of, ReplaySubject, shareReplay } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
+import { OIP_FRONTEND_CONFIG } from './frontend-config';
 
 type RefreshCustomParams = { [key: string]: string | number | boolean };
 
@@ -34,6 +36,19 @@ type RefreshResultInfo = {
 
 type WaitForRefreshResult = 'success' | 'error' | 'timeout';
 
+export type AuthCsrfToken = {
+  token: string;
+  headerName: string;
+};
+
+type AuthSessionResponse = {
+  isAuthenticated: boolean;
+  userName?: string;
+  displayName?: string;
+  email?: string;
+  roles: string[];
+};
+
 export abstract class SecurityService {
   abstract auth(): void;
 
@@ -51,11 +66,140 @@ export abstract class SecurityService {
 
   abstract forceRefreshSession(customParams?: RefreshCustomParams, configId?: string): Observable<LoginResponse>;
 
+  abstract getCsrfToken(): Observable<AuthCsrfToken | null>;
+
   abstract isAdmin(): boolean;
 
   abstract authorize(configId?: string, authOptions?: AuthOptions): void;
 
   abstract payload: BehaviorSubject<any>;
+}
+
+@Injectable()
+export class BffSecurityService implements OnDestroy, SecurityService {
+  private readonly http = inject(HttpClient);
+  private readonly frontendConfig = inject(OIP_FRONTEND_CONFIG);
+  private readonly authenticated = new BehaviorSubject<boolean | null>(null);
+  private readonly currentUser = new BehaviorSubject<any>(null);
+  private readonly csrfToken = new ReplaySubject<AuthCsrfToken | null>(1);
+
+  public readonly payload = new BehaviorSubject<any>(null);
+
+  auth(): void {
+    this.http.get<AuthSessionResponse>(this.buildUrl('api/security/get-current-auth-session'), {
+      withCredentials: true
+    }).pipe(
+      tap((session) => this.applySession(session)),
+      catchError(() => {
+        this.applyAnonymousSession();
+        return of(null);
+      })
+    ).subscribe();
+  }
+
+  logout(): void {
+    firstValueFrom(this.getCsrfToken()).then((csrfToken) => {
+      const form = this.createPostForm(this.buildUrl('api/security/delete-auth-session'));
+      if (csrfToken?.token) {
+        const tokenInput = document.createElement('input');
+        tokenInput.type = 'hidden';
+        tokenInput.name = '__RequestVerificationToken';
+        tokenInput.value = csrfToken.token;
+        form.appendChild(tokenInput);
+      }
+      document.body.appendChild(form);
+      form.submit();
+    });
+  }
+
+  isAuthenticated(): Observable<boolean> {
+    return this.authenticated.asObservable().pipe(
+      filter((value): value is boolean => value !== null),
+      distinctUntilChanged()
+    );
+  }
+
+  getAccessToken(): Observable<string> {
+    return of('');
+  }
+
+  isTokenExpired(): Observable<boolean> {
+    return of(false);
+  }
+
+  getCurrentUser(): any {
+    return this.currentUser.getValue();
+  }
+
+  getCurrentUser$(): Observable<any> {
+    return this.currentUser.asObservable();
+  }
+
+  forceRefreshSession(): Observable<LoginResponse> {
+    this.auth();
+    return of({ isAuthenticated: this.authenticated.getValue() === true, userData: this.currentUser.getValue() } as LoginResponse);
+  }
+
+  getCsrfToken(): Observable<AuthCsrfToken | null> {
+    this.http.get<AuthCsrfToken>(this.buildUrl('api/security/get-auth-csrf-token'), {
+      withCredentials: true
+    }).pipe(
+      catchError(() => of(null))
+    ).subscribe((token) => this.csrfToken.next(token));
+
+    return this.csrfToken.asObservable();
+  }
+
+  isAdmin(): boolean {
+    return this.payload.getValue()?.realm_access?.roles?.includes('admin') ?? false;
+  }
+
+  authorize(): void {
+    const form = this.createPostForm(this.buildUrl('api/security/create-auth-session'));
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  ngOnDestroy(): void {
+    this.authenticated.complete();
+    this.currentUser.complete();
+    this.payload.complete();
+  }
+
+  private applySession(session: AuthSessionResponse): void {
+    const roles = session.roles ?? [];
+    const user = {
+      userName: session.userName,
+      displayName: session.displayName,
+      email: session.email,
+      roles
+    };
+
+    this.authenticated.next(session.isAuthenticated);
+    this.currentUser.next(user);
+    this.payload.next({ realm_access: { roles }, ...user });
+  }
+
+  private applyAnonymousSession(): void {
+    this.authenticated.next(false);
+    this.currentUser.next(null);
+    this.payload.next(null);
+    this.csrfToken.next(null);
+  }
+
+  private createPostForm(action: string): HTMLFormElement {
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = action;
+    form.style.display = 'none';
+    return form;
+  }
+
+  private buildUrl(path: string): string {
+    const baseUrl = this.frontendConfig.apiBaseUrl || document.getElementsByTagName('base')[0].href;
+    const normalizedBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+    return `${normalizedBase}${path}`;
+  }
 }
 
 /**
@@ -145,6 +289,10 @@ export class KeycloakSecurityService extends OidcSecurityService implements OnDe
     }
 
     return this.refreshSession$;
+  }
+
+  getCsrfToken(): Observable<AuthCsrfToken | null> {
+    return of(null);
   }
 
 

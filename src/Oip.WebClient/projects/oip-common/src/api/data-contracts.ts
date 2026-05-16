@@ -13,6 +13,19 @@ export interface ApiExceptionResponse {
   stackTrace?: string | null;
 }
 
+export interface AuthCsrfTokenResponse {
+  token?: string | null;
+  headerName?: string | null;
+}
+
+export interface AuthSessionResponse {
+  isAuthenticated?: boolean;
+  userName?: string | null;
+  displayName?: string | null;
+  email?: string | null;
+  roles?: string[] | null;
+}
+
 export interface CryptRequest {
   message?: string | null;
 }

@@ -43,6 +43,9 @@ function createFallbackConfig() {
     createKeepAliveProxy(
       [
         '/api',
+        '/signin-oidc',
+        '/signout-callback-oidc',
+        '/signout-oidc',
         '/swagger',
         '/health',
         '/metrics'
@@ -74,6 +77,9 @@ function createFallbackConfig() {
     createKeepAliveProxy(
       [
         '/api',
+        '/signin-oidc',
+        '/signout-callback-oidc',
+        '/signout-oidc',
         '/swagger',
         '/health',
         '/metrics'
