@@ -55,7 +55,7 @@ interface SelectOption<TValue = string> {
       <div class="card space-y-4">
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h5 class="mb-1">{{ title }}</h5>
+            <h5 class="mb-1"><i class="fa-duotone fa-solid fa-user"></i> {{ title }} </h5>
             <p class="m-0 text-surface-500">{{ 'customer-module.content.subtitle' | translate }}</p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row">
