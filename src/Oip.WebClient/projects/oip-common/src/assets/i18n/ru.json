@@ -85,6 +85,13 @@
     "logoutConfirmAccept": "Выйти",
     "profile": "Профиль"
   },
+  "userNotifications": {
+    "title": "Оповещения",
+    "empty": "Непрочитанных оповещений нет",
+    "refresh": "Обновить",
+    "markAsRead": "Прочитано",
+    "markedAsRead": "Оповещение отмечено прочитанным"
+  },
   "discussionComponent": {
     "writeCommentPlaceholder": "Напишите комментарий. Используйте @email или @first.last для упоминаний.",
     "mentionSuggestions": "Варианты упоминаний",

@@ -1,56 +1,138 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Base.Clients;
-using Oip.Base.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Oip.Base.Runtime;
 using Oip.Base.Settings;
+using Oip.Notifications.Base;
+using Oip.Settings.Enums;
+using Oip.Settings.Helpers;
+using Oip.Users.Base;
 using Oip.Users.Contexts;
+using Oip.Users.Notifications;
+using Oip.Users.Repositories;
+using Oip.Users.Services;
 
 namespace Oip.Users.Extensions;
 
 /// <summary>
-/// Provides extension methods for configuring and migrating the user database context.
+/// Provides extension methods for configuring users module services.
 /// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Migrates the user database to the latest version using the configured database context.
+    /// Adds the User service to the dependency injection container,
+    /// switching between Local and Remote implementations based on IsStandalone.
     /// </summary>
-    /// <param name="app">The <see cref="IApplicationBuilder"/> instance to extend.</param>
-    /// <exception cref="InvalidOperationException">Thrown when the <see cref="UserContext"/> cannot be resolved from the service provider.</exception>
-    public static void MigrateUserDatabase(this IApplicationBuilder app)
+    /// <param name="services">The service collection.</param>
+    /// <param name="settings">The application settings.</param>
+    /// <returns>The updated service collection.</returns>
+    public static IServiceCollection AddUserServiceProxy(this IServiceCollection services, IBaseOipModuleAppSettings settings)
     {
-        using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        var context = serviceScope.ServiceProvider.GetService<UserContext>()
-                      ?? throw new InvalidOperationException();
-        context.Database.Migrate();
+        return settings.IsStandalone
+            ? services.AddUsersModuleLocal(settings)
+            : services.AddUsersModuleRemote(settings);
     }
 
+    /// <summary>
+    /// Registers the local users module implementation.
+    /// </summary>
+    public static IServiceCollection AddUsersModuleLocal(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    {
+        if (services.All(x => x.ServiceType != typeof(DbContextOptions<UserContext>)))
+        {
+            services.AddUsersData(settings);
+        }
+
+        services.TryAddScoped<UserRepository>();
+        services.TryAddScoped<IUserService, LocalUserService>();
+        services.TryAddScoped<UserService>();
+        services.TryAddScoped<UserSyncService>();
+        services.AddHostedService<KeycloakSyncBackgroundService>();
+
+        if (settings.IsStandalone)
+        {
+            services.AddUsersNotificationPublisherCore();
+        }
+        else
+        {
+            services.AddUsersNotificationPublisherRemote(settings);
+        }
+
+        return services;
+    }
 
     /// <summary>
-    /// Configures and registers the Keycloak client service with the specified settings.
+    /// Registers the remote users module implementation.
     /// </summary>
-    /// <param name="builder">The <see cref="WebApplicationBuilder"/> instance to extend.</param>
-    /// <param name="settings">The base OIP module application settings containing security service configuration.</param>
-    /// <remarks>
-    /// This method sets up an HTTP client for Keycloak with retry policies and configures SSL certificate validation for development environments.
-    /// </remarks>
-    public static void AddKeycloakClients(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddUsersModuleRemote(this IServiceCollection services, IBaseOipModuleAppSettings settings)
     {
-        var httpClientBuilder = builder.Services.AddHttpClient<KeycloakClient>(httpClient =>
+        services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(options =>
         {
-            var url = settings.SecurityService.DockerUrl ?? settings.SecurityService.BaseUrl;
-            httpClient.BaseAddress = new Uri(url);
-        }).AddPolicyHandler(OipModuleApplication.GetRetryPolicy());
+            options.Address = new Uri(settings.Services.OipUsers);
+        });
+        services.TryAddScoped<IUserService, RemoteUserService>();
+        return services;
+    }
 
-        if (builder.Environment.IsDevelopment() && settings.SecurityService.DockerUrl is not null)
+    /// <summary>
+    /// Add user data services to the dependency injection container.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="settings">The application settings.</param>
+    /// <returns>The modified service collection.</returns>
+    public static IServiceCollection AddUsersData(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    {
+        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
+        switch (connectionModel.Provider)
         {
-            httpClientBuilder.ConfigurePrimaryHttpMessageHandler(() =>
-            {
-                HttpClientHandler handler = new HttpClientHandler();
-
-                handler.ServerCertificateCustomValidationCallback =
-                    (message, cert, chain, errors) => true;
-                return handler;
-            });
+            case XpoProvider.Postgres:
+                services.AddDbContext<UserContext>(option =>
+                {
+                    option.UseNpgsql(connectionModel.NormalizeConnectionString,
+                        x =>
+                        {
+                            x.MigrationsHistoryTable(UserContext.MigrationHistoryTableName, UserContext.SchemaName);
+                        });
+                });
+                break;
+            case XpoProvider.MSSqlServer:
+                services.AddDbContext<UserContext>(option =>
+                {
+                    option.UseSqlServer(connectionModel.NormalizeConnectionString,
+                        x =>
+                        {
+                            x.MigrationsHistoryTable(UserContext.MigrationHistoryTableName, UserContext.SchemaName);
+                        });
+                });
+                break;
         }
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers the users notification publisher against the remote notifications service.
+    /// </summary>
+    public static IServiceCollection AddUsersNotificationPublisherRemote(
+        this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
+    {
+        services.AddGrpcClient<GrpcNotificationService.GrpcNotificationServiceClient>(options =>
+        {
+            options.Address = new Uri(settings.Services.OipNotifications);
+        });
+        services.AddScoped<INotificationServiceClient, GrpcNotificationServiceClientAdapter>();
+        services.AddUsersNotificationPublisherCore();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers common users notification publisher services.
+    /// </summary>
+    public static IServiceCollection AddUsersNotificationPublisherCore(this IServiceCollection services)
+    {
+        services.AddScoped<BaseNotificationService>();
+        services.AddScoped<INotificationPublisher>(sp => sp.GetRequiredService<BaseNotificationService>());
+        services.AddStartupTask<NotificationStartup>();
+        return services;
     }
 }

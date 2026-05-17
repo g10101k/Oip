@@ -85,6 +85,13 @@
     "logoutConfirmAccept": "Logout",
     "profile": "Profile"
   },
+  "userNotifications": {
+    "title": "Notifications",
+    "empty": "No unread notifications",
+    "refresh": "Refresh",
+    "markAsRead": "Read",
+    "markedAsRead": "Notification marked as read"
+  },
   "discussionComponent": {
     "writeCommentPlaceholder": "Write a comment. Use @email or @first.last for mentions.",
     "mentionSuggestions": "Mention suggestions",

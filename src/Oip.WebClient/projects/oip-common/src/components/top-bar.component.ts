@@ -14,6 +14,7 @@ import { ButtonModule } from 'primeng/button';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LogoService } from '../services/logo.service';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { UserNotificationsComponent } from './user-notifications.component';
 
 @Component({
   selector: 'app-topbar',
@@ -29,6 +30,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
     AvatarModule,
     ButtonModule,
     ConfirmDialog,
+    UserNotificationsComponent,
     TranslatePipe
   ],
   template: ` <div class="layout-topbar">
@@ -58,6 +60,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
     }
     <div class="layout-topbar-actions">
       <div class="layout-config-menu">
+        <app-user-notifications />
         <p-button
           class="layout-topbar-action"
           id="oip-app-topbar-theme-button"

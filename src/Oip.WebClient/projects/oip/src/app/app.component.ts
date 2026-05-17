@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { SecurityService, L10nService, NotificationService } from 'oip-common';
+import { SecurityService, L10nService } from 'oip-common';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 
@@ -15,7 +15,6 @@ import { ToastModule } from 'primeng/toast';
 export class AppComponent implements OnInit {
   private readonly securityService = inject(SecurityService);
   private readonly translateService = inject(L10nService);
-  private readonly notificationService = inject(NotificationService);
 
   ngOnInit() {
     this.securityService.auth();

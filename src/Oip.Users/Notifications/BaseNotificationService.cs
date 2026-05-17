@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using Oip.Base.Runtime;
 using Oip.Notifications.Base;
 
 namespace Oip.Users.Notifications;
@@ -18,16 +17,48 @@ public interface INotificationPublisher
 }
 
 /// <summary>
-/// Publishes notifications through the notifications gRPC service.
+/// Provides the notification service operations required by users without binding callers to a transport.
 /// </summary>
-public class BaseNotificationService(
-    GrpcNotificationService.GrpcNotificationServiceClient client)
-    : INotificationPublisher
+public interface INotificationServiceClient
 {
     /// <summary>
-    /// Gets or sets the list of notification types that are registered with the gRPC notification service during
-    /// application startup.
+    /// Creates notification types in the configured notification service.
     /// </summary>
+    Task<CreateNotificationTypesResponse> CreateNotificationTypesAsync(
+        CreateNotificationTypesRequest request,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Creates a notification in the configured notification service.
+    /// </summary>
+    Task CreateNotificationAsync(CreateNotificationRequest request, CancellationToken cancellationToken = default);
+}
+
+/// <summary>
+/// Calls the remote notifications gRPC service.
+/// </summary>
+public class GrpcNotificationServiceClientAdapter(GrpcNotificationService.GrpcNotificationServiceClient client)
+    : INotificationServiceClient
+{
+    /// <inheritdoc />
+    public async Task<CreateNotificationTypesResponse> CreateNotificationTypesAsync(
+        CreateNotificationTypesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return await client.CreateNotificationTypesAsync(request, cancellationToken: cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task CreateNotificationAsync(CreateNotificationRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        await client.CreateNotificationAsync(request, cancellationToken: cancellationToken);
+    }
+}
+
+public class BaseNotificationService(INotificationServiceClient client)
+    : INotificationPublisher
+{
     internal List<NotificationType> NotificationTypes { get; set; } =
     [
         new()
@@ -35,71 +66,21 @@ public class BaseNotificationService(
             Name = typeof(SyncUsersCompleteNotify).FullName,
             Description = "Sync users complete notifications.",
             Scope = typeof(SyncUsersCompleteNotify).Assembly.GetName().Name
+        },
+        new()
+        {
+            Name = typeof(CustomUserNotify).FullName,
+            Description = "Custom user notifications.",
+            Scope = typeof(CustomUserNotify).Assembly.GetName().Name
         }
     ];
 
-    /// <summary>
-    /// Sends a notification with the specified importance level.
-    /// </summary>
-    /// <param name="notification">The notification object to send.</param>
-    /// <typeparam name="TNotification">The type of the notification object.</typeparam>
     public async Task Notify<TNotification>(TNotification notification)
     {
-        var notificationType = NotificationTypes.FirstOrDefault(x => x.Name == typeof(TNotification).FullName) ??
-                               throw new InvalidOperationException($"Notification type not found {typeof(TNotification).FullName}");
-
         await client.CreateNotificationAsync(new CreateNotificationRequest()
         {
-            NotificationTypeId = notificationType.NotificationTypeId,
+            NotificationType = typeof(TNotification).FullName,
             DataJson = JsonConvert.SerializeObject(notification)
         });
-    }
-}
-
-/// <summary>
-/// Safe no-op publisher used when notifications are hosted in-process without a loopback client.
-/// </summary>
-public class NoOpNotificationPublisher(ILogger<NoOpNotificationPublisher> logger) : INotificationPublisher
-{
-    /// <inheritdoc />
-    public Task Notify<TNotification>(TNotification notification)
-    {
-        logger.LogDebug("Skipping notification publishing for {NotificationType} in local module mode", typeof(TNotification).FullName);
-        return Task.CompletedTask;
-    }
-}
-
-/// <summary>
-/// NotificationStartup is an IStartupTask that registers notification types with a gRPC notification service during application startup
-/// </summary>
-public class NotificationStartup(
-    GrpcNotificationService.GrpcNotificationServiceClient client,
-    ILogger<BaseNotificationService> logger,
-    BaseNotificationService notificationService
-) : IStartupTask
-{
-    /// <inheritdoc />
-    public int Order => 0;
-
-    /// <inheritdoc />
-    public async Task ExecuteAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var request = new CreateNotificationTypesRequest();
-            request.Requests.AddRange(notificationService.NotificationTypes.Select(x =>
-                new CreateNotificationTypeRequest()
-                {
-                    Name = x.Name,
-                    Description = x.Description,
-                    Scope = x.Scope,
-                }));
-            var response = await client.CreateNotificationTypesAsync(request, cancellationToken: cancellationToken);
-            notificationService.NotificationTypes = response.NotificationType.ToList();
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e.Message);
-        }
     }
 }

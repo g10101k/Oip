@@ -22,6 +22,7 @@ public class NotificationService(
     NotificationTemplateRepository notificationTemplateRepository,
     UserNotificationPreferenceRepository userNotificationPreferenceRepository,
     NotificationRepository notificationRepository,
+    NotificationUserRepository notificationUserRepository,
     NotificationDeliveryRepository notificationDeliveryRepository,
     UserCacheRepository userRepository) : GrpcNotificationService.GrpcNotificationServiceBase
 {
@@ -792,9 +793,11 @@ public class NotificationService(
     {
         try
         {
+            var notificationType = await notificationTypeRepository.GetByNameAsync(request.NotificationType) ??
+                    throw new RpcException(new Status(StatusCode.NotFound, "Notification type not found"));
             var notification = new NotificationEntity
             {
-                NotificationTypeId = request.NotificationTypeId,
+                NotificationTypeId = notificationType.NotificationTypeId,
                 CreatedAt = DateTimeOffset.UtcNow,
                 DataJson = request.DataJson
             };
@@ -818,10 +821,27 @@ public class NotificationService(
                     {
                         foreach (var userNotify in messages)
                         {
-                           channelService.Notify(channel.NotificationChannel.Code,  userRepository.Users[userNotify.UserId],
+                            var notificationUser = new NotificationUserEntity
+                            {
+                                NotificationId = userNotify.NotificationId,
+                                UserId = userNotify.UserId,
+                                Subject = userNotify.Subject,
+                                Message = userNotify.Message,
+                                Importance = userNotify.Importance,
+                                NotificationChannelId = channel.NotificationChannelId,
+                                SentAt = DateTimeOffset.UtcNow
+                            };
+
+                            var notified = channelService.Notify(channel.NotificationChannel.Code,
+                                userRepository.Users[userNotify.UserId],
                                 userNotify.Subject,
                                 userNotify.Message,
                                 importanceLevel: activeTemplate.Importance);
+
+                            if (notified)
+                            {
+                                await notificationUserRepository.AddAsync(notificationUser);
+                            }
                         }
                     }
                 }
@@ -863,6 +883,7 @@ public class NotificationService(
                 UserId = user.UserId,
                 Subject = subject,
                 Message = message,
+                Importance = template.Importance,
             });
         }
 
@@ -929,13 +950,26 @@ public class NotificationService(
                     $"Notification with ID {request.NotificationId} not found"));
             }
 
-            var notificationUsers = notification.NotificationUsers.Select(nu => new NotificationUser
+            var notificationUsers = notification.NotificationUsers.Select(nu =>
             {
-                NotificationUserId = nu.NotificationUserId,
-                NotificationId = nu.NotificationId,
-                UserId = nu.UserId,
-                Subject = nu.Subject,
-                Message = nu.Message
+                var notificationUser = new NotificationUser
+                {
+                    NotificationUserId = nu.NotificationUserId,
+                    NotificationId = nu.NotificationId,
+                    UserId = nu.UserId,
+                    Subject = nu.Subject,
+                    Message = nu.Message,
+                    SentAt = nu.SentAt?.ToString("o"),
+                    DeliveredAt = nu.DeliveredAt?.ToString("o"),
+                    ReadAt = nu.ReadAt?.ToString("o")
+                };
+
+                if (nu.NotificationChannelId.HasValue)
+                {
+                    notificationUser.NotificationChannelId = nu.NotificationChannelId.Value;
+                }
+
+                return notificationUser;
             }).ToList();
 
             return new GetNotificationResponse

@@ -14,7 +14,8 @@ import {
   BffSecurityService,
   NotificationService,
   UserProfileApi,
-  SecurityApi
+  SecurityApi,
+  NotificationApi
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ProductService } from './app/service/product.service';
@@ -39,6 +40,7 @@ export const appConfig: ApplicationConfig = {
     MessageService,
     UserService,
     NotificationService,
+    NotificationApi,
     importProvidersFrom([
       TranslateModule.forRoot({
         loader: {

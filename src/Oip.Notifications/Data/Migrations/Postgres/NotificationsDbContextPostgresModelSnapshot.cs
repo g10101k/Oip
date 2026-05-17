@@ -364,47 +364,58 @@ namespace Oip.Notifications.Migrations.Postgres
                 {
                     b.Property<long>("NotificationUserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("Unique identifier for the notification user");
+                        .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("NotificationUserId"));
 
+                    b.Property<DateTimeOffset?>("DeliveredAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Importance")
-                        .HasColumnType("integer")
-                        .HasComment("Importance level of the notification");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasComment("Message of the notification for this user");
+                        .HasColumnType("text");
+
+                    b.Property<int?>("NotificationChannelId")
+                        .HasColumnType("integer");
 
                     b.Property<long>("NotificationId")
-                        .HasColumnType("bigint")
-                        .HasComment("Notification identifier");
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("ReadAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("SentAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Subject")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasComment("Subject of the notification for this user");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasComment("User identifier");
+                        .HasColumnType("integer");
 
                     b.HasKey("NotificationUserId");
 
+                    b.HasIndex("DeliveredAt");
+
+                    b.HasIndex("NotificationChannelId");
+
                     b.HasIndex("NotificationId");
+
+                    b.HasIndex("ReadAt");
+
+                    b.HasIndex("SentAt");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("NotificationId", "UserId")
+                    b.HasIndex("NotificationId", "UserId", "NotificationChannelId")
                         .IsUnique();
 
-                    b.ToTable("NotificationUser", "notifications", t =>
-                        {
-                            t.HasComment("Users who should be notified about an event");
-                        });
+                    b.ToTable("NotificationUser", "notifications");
                 });
 
             modelBuilder.Entity("Oip.Notifications.Data.Entities.UserNotificationPreferenceEntity", b =>

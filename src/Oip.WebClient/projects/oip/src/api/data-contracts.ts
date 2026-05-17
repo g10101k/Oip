@@ -11,6 +11,10 @@ export interface ApiExceptionResponse {
   stackTrace?: string | null;
 }
 
+export interface CustomUserNotify {
+  username?: string | null;
+}
+
 export type CustomerModuleSettings = object;
 
 export interface DashboardSettings {
