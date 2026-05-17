@@ -11,6 +11,16 @@ public class OipServicesSettings
     public string Oip { get; set; } = "https://localhost:5002";
 
     /// <summary>
+    /// URL endpoint for the OIP applications registry service
+    /// </summary>
+    public string OipApplications { get; set; } = "https://localhost:5008";
+
+    /// <summary>
+    /// URL endpoint for the OIP RTDS service
+    /// </summary>
+    public string OipRtds { get; set; } = "https://localhost:5003";
+
+    /// <summary>
     /// URL endpoint for the OIP users service
     /// </summary>
     public string OipUsers { get; set; } = "https://localhost:5005";

@@ -13,6 +13,16 @@ export interface ApiExceptionResponse {
   stackTrace?: string | null;
 }
 
+export interface ApplicationRegistryItemDto {
+  code?: string | null;
+  displayName?: string | null;
+  baseUrl?: string | null;
+  apiBaseUrl?: string | null;
+  icon?: string | null;
+  order?: number;
+  isCurrent?: boolean;
+}
+
 export interface AuthCsrfTokenResponse {
   token?: string | null;
   headerName?: string | null;

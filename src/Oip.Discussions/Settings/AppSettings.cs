@@ -12,6 +12,9 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public OipServicesSettings Services { get; set; } = new();
 
     /// <inheritdoc />
+    public ApplicationRegistrySettings ApplicationRegistry { get; set; } = new();
+
+    /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();
 
     /// <inheritdoc />

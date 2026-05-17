@@ -14,6 +14,12 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     OipServicesSettings Services { get; set; }
 
     /// <summary>
+    /// Frontend applications registry.
+    /// </summary>
+    [NotSaveToDb]
+    ApplicationRegistrySettings ApplicationRegistry { get; set; }
+
+    /// <summary>
     /// Collection of OpenAPI specification configurations for the application
     /// </summary>
     [NotSaveToDb]

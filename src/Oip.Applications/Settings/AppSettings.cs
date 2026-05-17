@@ -1,22 +1,21 @@
 using Oip.Base.Settings;
-using Oip.Rtds.Data;
 using Oip.Settings;
 
-namespace Oip.Rtds.Settings;
+namespace Oip.Applications.Settings;
 
-/// <inheritdoc cref="IBaseOipModuleAppSettings"/>
-public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings, IRtdsAppSettings
+/// <summary>
+/// Application registry service settings.
+/// </summary>
+public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
 {
-    /// <summary>
-    /// Gets or sets the connection string for the RTD service
-    /// </summary>
-    public string RtsConnectionString { get; set; } = null!;
-
     /// <inheritdoc />
     public OipServicesSettings Services { get; set; } = new();
 
     /// <inheritdoc />
-    public ApplicationRegistrySettings ApplicationRegistry { get; set; } = new() { CurrentApplicationCode = "oip-rtds" };
+    public ApplicationRegistrySettings ApplicationRegistry { get; set; } = new()
+    {
+        CurrentApplicationCode = "oip-applications"
+    };
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();

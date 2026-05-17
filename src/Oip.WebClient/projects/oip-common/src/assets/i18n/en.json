@@ -83,7 +83,8 @@
     "logoutConfirmMessage": "Are you sure you want to logout?",
     "logoutConfirmCancel": "Cancel",
     "logoutConfirmAccept": "Logout",
-    "profile": "Profile"
+    "profile": "Profile",
+    "applications": "Applications"
   },
   "userNotifications": {
     "title": "Notifications",
