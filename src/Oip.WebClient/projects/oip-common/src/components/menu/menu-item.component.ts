@@ -17,6 +17,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { MenuApi } from '../../api/menu.api';
 import { ChangeOrderParams, DeleteModuleInstanceParams, ModuleInstanceDto } from '../../api/data-contracts';
+import { SecurityService } from '../../services/security.service';
 
 interface MenuItemComponentTranslation {
   delete: string;
@@ -134,6 +135,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly msgService = inject(MsgService);
   private readonly menuDataService = inject(MenuApi);
+  private readonly securityService = inject(SecurityService);
 
   @Input() item: ContextMenuItemDto;
   @Input() index!: number;
@@ -249,6 +251,10 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   }
 
   onContextMenu($event: MouseEvent, item: any) {
+    if (!this.securityService.isAdmin()) {
+      return;
+    }
+
     $event.stopPropagation();
     $event.preventDefault();
 
