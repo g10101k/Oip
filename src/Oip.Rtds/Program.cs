@@ -29,7 +29,7 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+            builder.Services.GenerateWebClientStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddSingleton(settings);
             builder.Services.AddScoped<UserService>();
