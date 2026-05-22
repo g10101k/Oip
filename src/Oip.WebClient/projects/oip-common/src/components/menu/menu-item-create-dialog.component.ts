@@ -100,7 +100,7 @@ type PrimeIconOption = {
         <p-button
           id="oip-menu-item-create-save"
           label="{{ 'menuItemCreateDialogComponent.save' | translate }}"
-          [disabled]="saving"
+          [disabled]="!canSave"
           [loading]="saving"
           (click)="save()" />
       </div>
@@ -126,6 +126,10 @@ export class MenuItemCreateDialogComponent implements OnInit {
   selectIcon: string = 'pi pi-box';
   saving = false;
 
+  get canSave(): boolean {
+    return !this.saving && !!this.selectModule;
+  }
+
   async ngOnInit() {
     this.modules = await this.menu.getModules();
   }
@@ -137,6 +141,10 @@ export class MenuItemCreateDialogComponent implements OnInit {
 
   async save() {
     if (this.saving) {
+      return;
+    }
+
+    if (!this.selectModule) {
       return;
     }
 
@@ -153,7 +161,7 @@ export class MenuItemCreateDialogComponent implements OnInit {
       await this.menuService.loadMenu();
       this.hide();
     } catch (error) {
-      this.msgService.error(error);
+      this.msgService.errorFromException(error, 'Unexpected error');
     } finally {
       this.saving = false;
     }

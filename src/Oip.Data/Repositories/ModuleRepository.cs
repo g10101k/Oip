@@ -322,8 +322,42 @@ public class ModuleRepository(OipModuleContext db)
         await db.ModuleInstances.Where(m => m.ParentId == instance.ParentId && m.Order > instance.Order)
             .ForEachAsync(m => m.Order -= 1);
 
-        db.ModuleInstances.Remove(instance);
+        var idsToDelete = await GetModuleInstanceTreeIds(id);
+        var securitiesToDelete = await db.ModuleInstanceSecurities
+            .Where(s => idsToDelete.Contains(s.ModuleInstanceId))
+            .ToListAsync();
+        var instancesToDelete = await db.ModuleInstances
+            .Where(m => idsToDelete.Contains(m.ModuleInstanceId))
+            .ToListAsync();
+
+        db.ModuleInstanceSecurities.RemoveRange(securitiesToDelete);
+        db.ModuleInstances.RemoveRange(instancesToDelete);
         await db.SaveChangesAsync();
+    }
+
+    private async Task<HashSet<int>> GetModuleInstanceTreeIds(int rootId)
+    {
+        var moduleInstances = await db.ModuleInstances
+            .Select(x => new { x.ModuleInstanceId, x.ParentId })
+            .ToListAsync();
+        var childrenByParentId = moduleInstances.ToLookup(x => x.ParentId);
+        var idsToDelete = new HashSet<int> { rootId };
+        var queue = new Queue<int>();
+        queue.Enqueue(rootId);
+
+        while (queue.Count > 0)
+        {
+            var parentId = queue.Dequeue();
+            foreach (var childId in childrenByParentId[parentId].Select(x => x.ModuleInstanceId))
+            {
+                if (idsToDelete.Add(childId))
+                {
+                    queue.Enqueue(childId);
+                }
+            }
+        }
+
+        return idsToDelete;
     }
 
     /// <summary>

@@ -48,8 +48,8 @@ import { MenuApi } from '../../api/menu.api';
         }
       </ul>
     </div>
-    <p-contextMenu [target]="empty"/>
     @if (securityService.isAdmin()) {
+      <p-contextMenu [target]="empty"/>
       <menu-item-create-dialog/>
       <menu-item-edit-dialog/>
     }`
@@ -71,6 +71,10 @@ export class MenuComponent implements OnInit {
   }
 
   protected onContextMenu($event: MouseEvent) {
+    if (!this.securityService.isAdmin()) {
+      return;
+    }
+
     this.menuService.contextMenuItem = null;
     this.contextMenu.model = [
       {
