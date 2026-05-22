@@ -10,7 +10,7 @@ import {
   UserService,
   langIntercept,
   SecurityService,
-  BffSecurityService
+  BffSecurityService, provideAppThemes, UserProfileApi
 } from 'oip-common';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { MessageService } from 'primeng/api';
@@ -18,6 +18,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { RtdsMetaDataContextMigrationModule } from './api/RtdsMetaDataContextMigrationModule';
 import { TagManagementModule } from './api/TagManagementModule';
+import { appTheme } from "../../oip/src/app.theme";
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) =>
   new TranslateHttpLoader(http);
@@ -25,8 +26,10 @@ const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: Http
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(withInterceptors([langIntercept]), withFetch()),
+    provideAppThemes(appTheme, { mode: 'replaceDefaults' }),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: SecurityService, useClass: BffSecurityService },
+    UserProfileApi,
     AuthGuardService,
     MessageService,
     UserService,

@@ -26,15 +26,29 @@ public class ApplicationSelfRegistrationStartupTask(
             return;
         }
 
-        await registryService.RegisterApplicationAsync(new ApplicationRegistryItemDto
+        try
         {
-            Code = appSettings.Application.Code,
-            DisplayName = appSettings.Application.DisplayName,
-            BaseUrl = appSettings.Application.BaseUrl,
-            ApiBaseUrl = appSettings.Application.ApiBaseUrl,
-            Icon = appSettings.Application.Icon,
-            Order = appSettings.Application.Order,
-            Enabled = appSettings.Application.Enabled
-        }, cancellationToken);
+            await registryService.RegisterApplicationAsync(new ApplicationRegistryItemDto
+            {
+                Code = appSettings.Application.Code,
+                DisplayName = appSettings.Application.DisplayName,
+                BaseUrl = appSettings.Application.BaseUrl,
+                ApiBaseUrl = appSettings.Application.ApiBaseUrl,
+                Icon = appSettings.Application.Icon,
+                Order = appSettings.Application.Order,
+                Enabled = appSettings.Application.Enabled
+            }, cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            logger.LogWarning(
+                exception,
+                "Application self-registration failed for {ApplicationCode}. Startup will continue.",
+                appSettings.Application.Code);
+        }
     }
 }

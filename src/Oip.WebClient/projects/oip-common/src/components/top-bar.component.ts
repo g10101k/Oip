@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ConfirmationService, MenuItem } from 'primeng/api';
+import { Component, inject } from '@angular/core';
+import { ConfirmationService } from 'primeng/api';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
@@ -15,10 +15,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LogoService } from '../services/logo.service';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { UserNotificationsComponent } from './user-notifications.component';
-import { MenuModule } from 'primeng/menu';
-import { ApplicationsApi } from '../api/applications.api';
-import { ApplicationRegistryItemDto } from '../api/data-contracts'
-import { ApplicationRegistryService } from '../services/application-registry.service';
+import { AppTopbarApplicationSwitcherComponent } from './top-bar-application-switcher.component';
 
 @Component({
   selector: 'app-topbar',
@@ -36,7 +33,7 @@ import { ApplicationRegistryService } from '../services/application-registry.ser
     ConfirmDialog,
     UserNotificationsComponent,
     TranslatePipe,
-    MenuModule
+    AppTopbarApplicationSwitcherComponent
   ],
   template: `
     <div class="layout-topbar">
@@ -66,23 +63,8 @@ import { ApplicationRegistryService } from '../services/application-registry.ser
       }
       <div class="layout-topbar-actions">
         <div class="layout-config-menu">
+          <app-topbar-application-switcher/>
           <app-user-notifications/>
-          @if (applicationRegistryService.applications.length > 1) {
-            <p-button
-              class="layout-topbar-action"
-              id="oip-app-topbar-application-switcher-button"
-              severity="secondary"
-              type="button"
-              [rounded]="true"
-              [text]="true"
-              (click)="applicationMenu.toggle($event)">
-              <i [ngClass]="applicationRegistryService.currentApplication?.icon || 'pi pi-th-large'"></i>
-              <span class="ml-2 hidden md:inline">
-              {{ applicationRegistryService.currentApplication?.displayName || ('topbar.applications' | translate) }}
-            </span>
-            </p-button>
-            <p-menu #applicationMenu [model]="applicationMenuItems" [popup]="true"/>
-          }
           <p-button
             class="layout-topbar-action"
             id="oip-app-topbar-theme-button"
@@ -153,30 +135,16 @@ import { ApplicationRegistryService } from '../services/application-registry.ser
         </div>
       </div>
     </div>`,
-  providers: [ConfirmationService, ApplicationsApi, ApplicationRegistryService]
+  providers: [ConfirmationService]
 })
-export class AppTopbar implements OnInit {
-  items!: MenuItem[];
-  applicationMenuItems: MenuItem[] = [];
+export class AppTopbar {
   securityService = inject(SecurityService);
   topBarService = inject(TopBarService);
   userService = inject(UserService);
   layoutService = inject(LayoutService);
   logoService = inject(LogoService);
-  applicationRegistryService = inject(ApplicationRegistryService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translateService = inject(TranslateService);
-
-  async ngOnInit(): Promise<void> {
-    try {
-      await this.applicationRegistryService.loadApplications();
-      this.applicationMenuItems = this.applicationRegistryService.applications.map((application) =>
-        this.createApplicationMenuItem(application)
-      );
-    } catch {
-      this.applicationMenuItems = [];
-    }
-  }
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({
@@ -210,15 +178,5 @@ export class AppTopbar implements OnInit {
         this.securityService.logout();
       }
     });
-  }
-
-  private createApplicationMenuItem(application: ApplicationRegistryItemDto): MenuItem {
-    return {
-      id: `oip-app-switcher-${application.code}`,
-      label: application.displayName ?? '',
-      icon: application.icon ?? undefined,
-      disabled: application.isCurrent,
-      command: () => this.applicationRegistryService.openApplication(application)
-    };
   }
 }

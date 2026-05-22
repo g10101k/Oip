@@ -19,6 +19,7 @@ export { AppFloatingConfiguratorComponent } from './components/app-floating-conf
 export { DiscussionComponent } from './components/discussion.component';
 export { IframeModuleComponent } from './components/iframe-module.component';
 export { UserNotificationsComponent } from './components/user-notifications.component';
+export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher.component';
 
 // DTOs
 export { TopBarDto } from './dtos/top-bar.dto';

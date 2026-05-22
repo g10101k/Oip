@@ -10,7 +10,7 @@ export class ApplicationRegistryService {
   currentApplication: ApplicationRegistryItemDto | null = null;
 
   async loadApplications(): Promise<void> {
-    this.applications = await this.applicationsApi.get();
+    this.applications = await this.applicationsApi.getApplicationRegistryItems();
     this.currentApplication = this.applications.find((application) => application.isCurrent) ?? null;
   }
 

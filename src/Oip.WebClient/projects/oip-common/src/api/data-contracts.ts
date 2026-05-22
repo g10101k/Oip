@@ -20,6 +20,7 @@ export interface ApplicationRegistryItemDto {
   apiBaseUrl?: string | null;
   icon?: string | null;
   order?: number;
+  enabled?: boolean;
   isCurrent?: boolean;
 }
 
@@ -109,6 +110,18 @@ export interface ModuleInstanceDto {
 export interface ModuleSecurityDto {
   right: string | null;
   role: string | null;
+}
+
+export interface GetApplicationRegistryItemByCodeParams {
+  code: string;
+}
+
+export interface UpdateApplicationRegistryItemParams {
+  code: string;
+}
+
+export interface DeleteApplicationRegistryItemParams {
+  code: string;
 }
 
 export interface GetModuleInstanceSettingsParams {
