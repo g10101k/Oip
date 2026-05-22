@@ -58,9 +58,16 @@ public class MenuController(ModuleRepository moduleRepository, UserService userS
     [HttpPost("add-module-instance")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task AddModuleInstance(AddModuleInstanceDto addModuleInstanceDto)
     {
+        if (addModuleInstanceDto.ModuleId <= 0)
+        {
+            throw new ApiException("Invalid menu item", "Menu item type is required.",
+                StatusCodes.Status400BadRequest);
+        }
+
         await moduleRepository.AddModuleInstance(addModuleInstanceDto);
     }
 
