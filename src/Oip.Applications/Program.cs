@@ -1,10 +1,14 @@
 using NLog;
 using NLog.Web;
+using Oip.Applications.Data;
+using Oip.Applications.Extensions;
+using Oip.Applications.Services;
 using Oip.Applications.Settings;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
+using Oip.Data.Extensions;
 
 namespace Oip.Applications;
 
@@ -21,10 +25,13 @@ internal static class Program
             builder.AddNlog();
             builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
+            builder.Services.AddApplicationsModuleLocal(settings);
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+            builder.Services.AddGrpc();
+            if (settings.OpenApi.Any(x => !string.IsNullOrWhiteSpace(x.GenerateCommand) && x.Publish))
+                builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.AddControllersAndView();
@@ -42,9 +49,12 @@ internal static class Program
             app.UseOipCsrfProtection();
             app.UseAuthorization();
             app.UseCors(options => options.AllowAnyOrigin());
+            app.MapGrpcService<GrpcApplicationRegistryService>();
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapOpenTelemetry(settings);
+
+            app.MigrateDatabase<ApplicationRegistryDbContext>();
 
             app.Run();
         }

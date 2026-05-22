@@ -12,6 +12,17 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public OipServicesSettings Services { get; set; } = new();
 
     /// <inheritdoc />
+    public ApplicationSettings Application { get; set; } = new()
+    {
+        Code = "oip",
+        DisplayName = "OIP",
+        BaseUrl = "https://localhost:50002",
+        ApiBaseUrl = "https://localhost:5002",
+        Icon = "pi pi-home",
+        Order = 10
+    };
+
+    /// <inheritdoc />
     public ApplicationRegistrySettings ApplicationRegistry { get; set; } = new();
 
     /// <inheritdoc />

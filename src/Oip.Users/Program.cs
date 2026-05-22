@@ -1,5 +1,6 @@
 using NLog;
 using NLog.Web;
+using Oip.Applications.Base;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
@@ -35,13 +36,13 @@ internal static class Program
             builder.AddOpenApi(settings);
             builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
+            builder.Services.AddApplicationsModuleRemote(settings);
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
             builder.Services.AddSingleton(settings);
             builder.Services.AddCors();
             builder.AddControllersAndView();
             builder.AddLocalization();
-            builder.Services.AddStartupRunner();
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddUsersModuleLocal(settings);
 

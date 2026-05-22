@@ -30,6 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Oip.Applications.Base\Oip.Applications.Base.csproj" />
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
         <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
         <ProjectReference Include="..\Oip.Users\Oip.Users.csproj" />

@@ -14,6 +14,12 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     OipServicesSettings Services { get; set; }
 
     /// <summary>
+    /// Current service frontend application passport.
+    /// </summary>
+    [NotSaveToDb]
+    ApplicationSettings Application { get; set; }
+
+    /// <summary>
     /// Frontend applications registry.
     /// </summary>
     [NotSaveToDb]

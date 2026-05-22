@@ -12,6 +12,18 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public OipServicesSettings Services { get; set; } = new();
 
     /// <inheritdoc />
+    public ApplicationSettings Application { get; set; } = new()
+    {
+        Code = "oip-discussions",
+        DisplayName = "OIP.Discussions",
+        BaseUrl = "https://localhost:50002",
+        ApiBaseUrl = "https://localhost:5006",
+        Icon = "pi pi-comments",
+        Order = 60,
+        Enabled = false
+    };
+
+    /// <inheritdoc />
     public ApplicationRegistrySettings ApplicationRegistry { get; set; } = new();
 
     /// <inheritdoc />

@@ -1,5 +1,6 @@
 using NLog;
 using NLog.Web;
+using Oip.Applications.Base;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
@@ -35,6 +36,7 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
+            builder.Services.AddApplicationsModuleRemote(settings);
             builder.Services.AddUsersModuleRemote(settings);
             builder.Services.AddSingleton<CryptService>();
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();

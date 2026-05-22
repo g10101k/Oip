@@ -23,6 +23,7 @@ public class ProxySettingsController(IBaseOipModuleAppSettings appSettings) : Co
             Targets = new
             {
                 Main = appSettings.Services.Oip,
+                Applications = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipApplications,
                 Users = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipUsers,
                 Discussion = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipDiscussions,
                 Notification = appSettings.IsStandalone
