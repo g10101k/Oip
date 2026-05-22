@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\Common.props" />
+
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Applications registry contracts for OIP template</Title>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include=".\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Google.Api.CommonProtos" Version="2.17.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.33.2" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
+        <PackageReference Include="Grpc.Net.ClientFactory" Version="2.76.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.76.0" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="Protos\application_registry_service.proto" GrpcServices="Client">
+            <Generator>MSBuild:Compile</Generator>
+            <AdditionalImportDirs>$(NuGetPackageRoot)\google.api.commonprotos\2.17.0\content\protos\</AdditionalImportDirs>
+        </Protobuf>
+
+        <Protobuf Include="Protos\application_registry_service.proto" GrpcServices="GrpcServices">
+            <Generator>MSBuild:Compile</Generator>
+            <AdditionalImportDirs>$(NuGetPackageRoot)\google.api.commonprotos\2.17.0\content\protos\</AdditionalImportDirs>
+        </Protobuf>
+    </ItemGroup>
+</Project>

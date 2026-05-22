@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+option csharp_namespace = "Oip.Applications.Base.Grpc";
+
+package oip.applications;
+
+import "google/protobuf/empty.proto";
+
+service GrpcApplicationRegistryService {
+  rpc RegisterApplication (RegisterApplicationRequest) returns (ApplicationRegistryItemResponse);
+  rpc GetApplicationRegistryItems (GetApplicationRegistryItemsRequest) returns (ApplicationRegistryItemsResponse);
+  rpc GetApplicationRegistryItemByCode (GetApplicationRegistryItemByCodeRequest) returns (ApplicationRegistryItemResponse);
+  rpc CreateApplicationRegistryItem (CreateApplicationRegistryItemRequest) returns (ApplicationRegistryItemResponse);
+  rpc UpdateApplicationRegistryItem (UpdateApplicationRegistryItemRequest) returns (ApplicationRegistryItemResponse);
+  rpc DeleteApplicationRegistryItem (DeleteApplicationRegistryItemRequest) returns (google.protobuf.Empty);
+}
+
+message ApplicationRegistryItem {
+  string code = 1;
+  string display_name = 2;
+  string base_url = 3;
+  string api_base_url = 4;
+  string icon = 5;
+  int32 order = 6;
+  bool enabled = 7;
+  bool is_current = 8;
+}
+
+message RegisterApplicationRequest {
+  ApplicationRegistryItem application = 1;
+}
+
+message GetApplicationRegistryItemsRequest {
+}
+
+message GetApplicationRegistryItemByCodeRequest {
+  string code = 1;
+}
+
+message CreateApplicationRegistryItemRequest {
+  ApplicationRegistryItem application = 1;
+}
+
+message UpdateApplicationRegistryItemRequest {
+  string code = 1;
+  ApplicationRegistryItem application = 2;
+}
+
+message DeleteApplicationRegistryItemRequest {
+  string code = 1;
+}
+
+message ApplicationRegistryItemResponse {
+  ApplicationRegistryItem application = 1;
+}
+
+message ApplicationRegistryItemsResponse {
+  repeated ApplicationRegistryItem applications = 1;
+}
