@@ -34,7 +34,9 @@ export class MenuService {
    */
   onMenuStateChange(event: MenuChangeEvent): void {
     this.menuSource.next(event);
-    this.titleService.setTitle(event.item.label);
+    if (!event.item.items?.length) {
+      this.titleService.setTitle(event.item.label);
+    }
   }
 
   reset() {
