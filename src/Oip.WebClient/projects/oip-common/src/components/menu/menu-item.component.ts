@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, HostBinding, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLinkActive, RouterLink } from '@angular/router';
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { LayoutService } from '../../services/app.layout.service';
@@ -93,7 +92,7 @@ interface MenuItemComponentTranslation {
       }
 
       @if (item.items && item.visible !== false) {
-        <ul [@children]="submenuAnimation">
+        <ul class="layout-submenu" [class.layout-submenu-expanded]="isSubmenuExpanded">
           @for (child of item.items; track child; let i = $index) {
             <li
               app-menuitem
@@ -109,23 +108,6 @@ interface MenuItemComponentTranslation {
       }
     </ng-container>
   `,
-  animations: [
-    trigger('children', [
-      state(
-        'collapsed',
-        style({
-          height: '0'
-        })
-      ),
-      state(
-        'expanded',
-        style({
-          height: '*'
-        })
-      ),
-      transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
-    ])
-  ],
   imports: [RippleModule, NgClass, RouterLinkActive, RouterLink, ContextMenuModule, ConfirmDialog],
   providers: [ConfirmationService]
 })
@@ -159,10 +141,8 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.menuService.menuSource$.subscribe((value) => {
         Promise.resolve(null).then(() => {
-          if (value.routeEvent) {
-            this.active = value.key === this.key || value.key.startsWith(this.key + '-');
-          } else if (value.key !== this.key && !value.key.startsWith(this.key + '-')) {
-            this.active = false;
+          if (value.routeEvent && (value.key === this.key || value.key.startsWith(this.key + '-'))) {
+            this.active = true;
           }
         });
       })
@@ -233,8 +213,8 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     this.menuService.onMenuStateChange({ key: this.key, item: this.item });
   }
 
-  get submenuAnimation() {
-    return this.root || this.active ? 'expanded' : 'collapsed';
+  get isSubmenuExpanded() {
+    return this.root || this.active;
   }
 
   @HostBinding('class.active-menuitem')
