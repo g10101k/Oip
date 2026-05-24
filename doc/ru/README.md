@@ -32,6 +32,7 @@
 * [Локализация](./L10n.md)
 * [Генерация клиентов web api](./SwaggerWebClientGenerator.md)
 * [Режим standalone & distributed](./StandaloneAndDistributedMode.md)
+* [Безопасность](./Security.md)
 * [Управление темами во frontend](./ThemeManagement.md)
 
 # Известные проблемы

@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, HostBinding, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLinkActive, RouterLink } from '@angular/router';
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { LayoutService } from '../../services/app.layout.service';
@@ -16,7 +15,8 @@ import { ContextMenuItemDto } from '../../dtos/context-menu-item.dto';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { MenuApi } from '../../api/menu.api';
-import { ChangeOrderParams, DeleteModuleInstanceParams } from '../../api/data-contracts';
+import { ChangeOrderParams, DeleteModuleInstanceParams, ModuleInstanceDto } from '../../api/data-contracts';
+import { SecurityService } from '../../services/security.service';
 
 interface MenuItemComponentTranslation {
   delete: string;
@@ -49,7 +49,8 @@ interface MenuItemComponentTranslation {
           [attr.href]="item.url"
           [attr.target]="item.target"
           [ngClass]="item.class"
-          (click)="itemClick($event)">
+          (click)="itemClick($event)"
+          (contextmenu)="onContextMenu($event, item)">
           <i class="layout-menuitem-icon" [ngClass]="item.icon"></i>
           <span class="layout-menuitem-text">{{ item.label }}</span>
           @if (item.items) {
@@ -91,7 +92,7 @@ interface MenuItemComponentTranslation {
       }
 
       @if (item.items && item.visible !== false) {
-        <ul [@children]="submenuAnimation" (contextmenu)="onContextMenu($event, item)">
+        <ul class="layout-submenu" [class.layout-submenu-expanded]="isSubmenuExpanded">
           @for (child of item.items; track child; let i = $index) {
             <li
               app-menuitem
@@ -107,23 +108,6 @@ interface MenuItemComponentTranslation {
       }
     </ng-container>
   `,
-  animations: [
-    trigger('children', [
-      state(
-        'collapsed',
-        style({
-          height: '0'
-        })
-      ),
-      state(
-        'expanded',
-        style({
-          height: '*'
-        })
-      ),
-      transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
-    ])
-  ],
   imports: [RippleModule, NgClass, RouterLinkActive, RouterLink, ContextMenuModule, ConfirmDialog],
   providers: [ConfirmationService]
 })
@@ -133,6 +117,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly msgService = inject(MsgService);
   private readonly menuDataService = inject(MenuApi);
+  private readonly securityService = inject(SecurityService);
 
   @Input() item: ContextMenuItemDto;
   @Input() index!: number;
@@ -156,10 +141,8 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.menuService.menuSource$.subscribe((value) => {
         Promise.resolve(null).then(() => {
-          if (value.routeEvent) {
-            this.active = value.key === this.key || value.key.startsWith(this.key + '-');
-          } else if (value.key !== this.key && !value.key.startsWith(this.key + '-')) {
-            this.active = false;
+          if (value.routeEvent && (value.key === this.key || value.key.startsWith(this.key + '-'))) {
+            this.active = true;
           }
         });
       })
@@ -230,8 +213,8 @@ export class MenuItemComponent implements OnInit, OnDestroy {
     this.menuService.onMenuStateChange({ key: this.key, item: this.item });
   }
 
-  get submenuAnimation() {
-    return this.root || this.active ? 'expanded' : 'collapsed';
+  get isSubmenuExpanded() {
+    return this.root || this.active;
   }
 
   @HostBinding('class.active-menuitem')
@@ -248,6 +231,13 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   }
 
   onContextMenu($event: MouseEvent, item: any) {
+    if (!this.securityService.isAdmin()) {
+      return;
+    }
+
+    $event.stopPropagation();
+    $event.preventDefault();
+
     this.menuService.contextMenuItem = item;
     this.contextMenu.model = [
       {
@@ -380,18 +370,35 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   hasVisiblePrev(currentItem: any): boolean {
     const items = this.getItems(currentItem);
     const currentIndex = items.findIndex((item) => item.moduleInstanceId == currentItem.moduleInstanceId);
-    return currentIndex > 0;
+    return this.findPrevVisibleItem(items, currentIndex) !== -1;
   }
 
-  getItems(currentItem: any) {
-    return !currentItem.parentId
-      ? this.menuService.menu
-      : this.menuService.menu.find((m) => m.moduleInstanceId == currentItem.parentId).items;
+  private getItems(currentItem: any): ModuleInstanceDto[] {
+    if (!currentItem.parentId) {
+      return this.menuService.menu;
+    }
+
+    return this.findItemByModuleInstanceId(this.menuService.menu, currentItem.parentId)?.items ?? [];
+  }
+
+  private findItemByModuleInstanceId(items: ModuleInstanceDto[], moduleInstanceId: number): ModuleInstanceDto | null {
+    for (const item of items) {
+      if (item.moduleInstanceId == moduleInstanceId) {
+        return item;
+      }
+
+      const foundItem = this.findItemByModuleInstanceId(item.items ?? [], moduleInstanceId);
+      if (foundItem) {
+        return foundItem;
+      }
+    }
+
+    return null;
   }
 
   hasVisibleNext(currentItem: any): boolean {
     const items = this.getItems(currentItem);
     const currentIndex = items.findIndex((item) => item.moduleInstanceId == currentItem.moduleInstanceId);
-    return currentIndex < items.length - 1;
+    return this.findNextVisibleIndex(items, currentIndex) !== -1;
   }
 }
