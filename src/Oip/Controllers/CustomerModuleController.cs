@@ -24,6 +24,8 @@ public class CustomerModuleController(
     ModuleRepository moduleRepository)
     : BaseModuleController<CustomerModuleSettings>(moduleRepository)
 {
+    private const string ViewFinancialsRight = "view-financials";
+
     /// <summary>
     /// Retrieves a filtered page of customers for the customer module table.
     /// </summary>
@@ -179,7 +181,8 @@ public class CustomerModuleController(
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         if (customer is null)
-            throw new ApiException("Customer not found", $"Customer with id {id} was not found.", StatusCodes.Status404NotFound);
+            throw new ApiException("Customer not found", $"Customer with id {id} was not found.",
+                StatusCodes.Status404NotFound);
 
         await BuildCustomerAsync(customer, request, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -203,7 +206,8 @@ public class CustomerModuleController(
     {
         var customer = await context.Customers.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (customer is null)
-            throw new ApiException("Customer not found", $"Customer with id {id} was not found.", StatusCodes.Status404NotFound);
+            throw new ApiException("Customer not found", $"Customer with id {id} was not found.",
+                StatusCodes.Status404NotFound);
 
         context.Customers.Remove(customer);
         await context.SaveChangesAsync(cancellationToken);
@@ -241,12 +245,12 @@ public class CustomerModuleController(
             throw new ApiException("Invalid customer data", "Status is required.", StatusCodes.Status400BadRequest);
 
         var category = await context.Categories.FirstOrDefaultAsync(x => x.Name == categoryName, cancellationToken)
-            ?? new DemoCustomerCategory { Name = categoryName };
+                       ?? new DemoCustomerCategory { Name = categoryName };
         if (category.Id == 0)
             context.Categories.Add(category);
 
         var country = await context.Countries.FirstOrDefaultAsync(x => x.Name == countryName, cancellationToken)
-            ?? new DemoCountry { Name = countryName };
+                      ?? new DemoCountry { Name = countryName };
         if (country.Id == 0)
             context.Countries.Add(country);
 
@@ -288,7 +292,7 @@ public class CustomerModuleController(
             customer.CreatedAt,
             customer.Orders.Count);
     }
-    
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -318,6 +322,13 @@ public class CustomerModuleController(
                 Description = Resources.CustomerModuleController_GetModuleRights_Can_delete_customer_data,
                 Roles = [SecurityConstants.AdminRole]
             },
+            new()
+            {
+                Code = ViewFinancialsRight,
+                Name = "View financials",
+                Description = "Can view customer lifetime value",
+                Roles = [SecurityConstants.AdminRole]
+            }
         };
     }
 }

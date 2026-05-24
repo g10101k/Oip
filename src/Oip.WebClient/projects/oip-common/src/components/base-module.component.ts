@@ -27,9 +27,11 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   private static readonly editRight = 'edit';
   private static readonly deleteRight = 'delete';
 
-  private isInitialized = false;
-  private moduleInstanceReloadPromise: Promise<void> = Promise.resolve();
-  private rightsSubscription?: Subscription;
+  protected isInitialized = false;
+  protected moduleInstanceReloadPromise: Promise<void> = Promise.resolve();
+  protected rightsSubscription?: Subscription;
+  protected securityRoles: string[] = [];
+  protected securitySettings: SecurityDto[] = [];
   protected readonly destroyRef = inject(DestroyRef);
   protected readonly securityService = inject(SecurityService);
   protected readonly httpClient = inject(HttpClient);
@@ -189,6 +191,13 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    */
   public t(key: string | string[], interpolateParams?: InterpolationParameters): Translation | TranslationObject {
     return this.translateService.instant(key, interpolateParams);
+  }
+
+  /**
+   * Checks whether the current user has the specified security right.
+   */
+  public hasRight(code: string): boolean {
+    return this.hasSecurityRight(this.securityRoles, this.securitySettings, code);
   }
 
   /**
@@ -355,9 +364,13 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     this.canEdit = false;
     this.canDelete = false;
     this.securityRightsLoaded = false;
+    this.securityRoles = [];
+    this.securitySettings = [];
   }
 
   private updateRightsState(roles: string[], securitySettings: SecurityDto[]): void {
+    this.securityRoles = roles;
+    this.securitySettings = securitySettings;
     this.canRead = this.hasSecurityRight(roles, securitySettings, BaseModuleComponent.readRight);
     this.canEdit = this.hasSecurityRight(roles, securitySettings, BaseModuleComponent.editRight);
     this.canDelete = this.hasSecurityRight(roles, securitySettings, BaseModuleComponent.deleteRight);

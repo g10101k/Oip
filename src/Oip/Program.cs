@@ -1,9 +1,6 @@
 using NLog;
 using NLog.Web;
 using Microsoft.EntityFrameworkCore;
-using Oip.Applications.Base;
-using Oip.Applications.Data;
-using Oip.Applications.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
@@ -37,8 +34,7 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
-            if (settings.OpenApi.Any(x => !string.IsNullOrWhiteSpace(x.GenerateCommand)))
-                builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+            builder.Services.GenerateWebClientStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.AddControllersAndView();
@@ -47,20 +43,17 @@ internal static class Program
 
             if (settings.IsStandalone)
             {
-                builder.Services.AddApplicationsModuleLocal(settings);
-
                 builder.Services.AddUsersModuleLocal(settings);
 
                 builder.Services.AddDiscussionsModuleLocal(settings);
 
                 builder.Services.AddNotificationsModuleLocal(settings);
-
+                
                 builder.Services.AddSignalR();
                 builder.Services.AddGrpc();
             }
             else
             {
-                builder.Services.AddApplicationsModuleRemote(settings);
                 builder.Services.AddUsersModuleRemote(settings);
             }
 
@@ -82,7 +75,6 @@ internal static class Program
             app.MapOpenTelemetry(settings);
 
             app.MigrateOipModuleDatabase();
-            app.MigrateDatabase<ApplicationRegistryDbContext>();
             app.MigrateDemoCustomerTableContext();
 
             if (settings.IsStandalone)
