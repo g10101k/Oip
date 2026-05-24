@@ -1,0 +1,41 @@
+{
+  "applications": {
+    "title": "Приложения",
+    "subtitle": "Управление реестром фронтенд-приложений",
+    "searchPlaceholder": "Поиск по приложениям",
+    "search": "Найти",
+    "clear": "Очистить",
+    "add": "Добавить",
+    "refreshTooltip": "Обновить",
+    "empty": "Приложения не найдены",
+    "table": {
+      "code": "Код",
+      "displayName": "Название",
+      "baseUrl": "Base URL",
+      "apiBaseUrl": "API Base URL",
+      "icon": "Иконка",
+      "order": "Порядок",
+      "enabled": "Включено",
+      "current": "Текущее",
+      "actions": "Действия",
+      "yes": "Да",
+      "no": "Нет",
+      "editTooltip": "Редактировать",
+      "deleteTooltip": "Удалить",
+      "saveTooltip": "Сохранить",
+      "cancelTooltip": "Отменить"
+    },
+    "confirm": {
+      "header": "Внимание",
+      "message": "Вы уверены, что хотите удалить приложение {{displayName}}?",
+      "cancel": "Отмена",
+      "delete": "Удалить"
+    },
+    "messages": {
+      "requiredFields": "Заполните код, название и Base URL",
+      "createSuccess": "Приложение создано",
+      "updateSuccess": "Приложение обновлено",
+      "deleteSuccess": "Приложение удалено"
+    }
+  }
+}

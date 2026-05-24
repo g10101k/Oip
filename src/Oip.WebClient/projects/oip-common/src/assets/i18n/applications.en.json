@@ -1,0 +1,41 @@
+{
+  "applications": {
+    "title": "Applications",
+    "subtitle": "Manage the frontend application registry",
+    "searchPlaceholder": "Search applications",
+    "search": "Search",
+    "clear": "Clear",
+    "add": "Add",
+    "refreshTooltip": "Refresh",
+    "empty": "No applications found",
+    "table": {
+      "code": "Code",
+      "displayName": "Name",
+      "baseUrl": "Base URL",
+      "apiBaseUrl": "API Base URL",
+      "icon": "Icon",
+      "order": "Order",
+      "enabled": "Enabled",
+      "current": "Current",
+      "actions": "Actions",
+      "yes": "Yes",
+      "no": "No",
+      "editTooltip": "Edit",
+      "deleteTooltip": "Delete",
+      "saveTooltip": "Save",
+      "cancelTooltip": "Cancel"
+    },
+    "confirm": {
+      "header": "Warning",
+      "message": "Are you sure you want to delete application {{displayName}}?",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "messages": {
+      "requiredFields": "Fill code, name and Base URL",
+      "createSuccess": "Application created",
+      "updateSuccess": "Application updated",
+      "deleteSuccess": "Application deleted"
+    }
+  }
+}
