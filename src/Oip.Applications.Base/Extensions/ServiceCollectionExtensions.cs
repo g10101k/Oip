@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Oip.Applications.Base;
 using Oip.Applications.Base.Grpc;
@@ -36,14 +37,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationsData(this IServiceCollection services,
         IBaseOipModuleAppSettings settings)
     {
-        Console.WriteLine("AddApplicationsData");
-
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
         switch (connectionModel.Provider)
         {
             case XpoProvider.Postgres:
-                Console.WriteLine("Postgres");
-
                 services.AddDbContext<ApplicationRegistryDbContext>(option =>
                 {
                     option.UseNpgsql(connectionModel.NormalizeConnectionString,

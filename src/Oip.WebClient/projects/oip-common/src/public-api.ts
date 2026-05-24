@@ -14,6 +14,7 @@ export { ProfileComponent } from './components/profile.component';
 export { ConfigComponent } from './components/config.component';
 export { DbMigrationComponent } from './components/db-migration.component';
 export { AppModulesComponent } from './components/app-modules.component';
+export { ApplicationsComponent } from './components/applications.component';
 export { AppConfiguratorComponent } from './components/app-configurator.component';
 export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator.component';
 export { DiscussionComponent } from './components/discussion.component';

@@ -1,6 +1,7 @@
 {
   "config": {
     "all": "All",
+    "applicationManagement": "Application management",
     "dateFormat": "Date format",
     "dateTimeFormat": "Date and time format:",
     "goTo": "Go to",

@@ -59,6 +59,11 @@ export const appRoutes: Routes = [
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
+        path: 'applications',
+        loadComponent: () => import('oip-common').then((m) => m.ApplicationsComponent),
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
+      },
+      {
         path: 'iframe-module/:id',
         loadComponent: () => import('oip-common').then((m) => m.IframeModuleComponent),
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]

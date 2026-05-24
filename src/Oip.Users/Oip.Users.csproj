@@ -70,4 +70,9 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="SwaggerFiles\swagger-base.json" />
+      <_ContentIncludedByDefault Remove="SwaggerFiles\swagger-users.json" />
+    </ItemGroup>
+
 </Project>

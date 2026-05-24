@@ -30,8 +30,7 @@ internal static class Program
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
             builder.Services.AddGrpc();
-            if (settings.OpenApi.Any(x => !string.IsNullOrWhiteSpace(x.GenerateCommand) && x.Publish))
-                builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+            builder.Services.GenerateWebClientStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.AddControllersAndView();
@@ -39,7 +38,6 @@ internal static class Program
             builder.AddOpenTelemetry(settings);
 
             var app = builder.Build();
-
             app.AddRequestLocalization();
             app.AddExceptionHandler();
             app.MapDefaultEndpoints();

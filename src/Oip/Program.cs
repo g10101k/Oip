@@ -1,6 +1,7 @@
 using NLog;
 using NLog.Web;
 using Microsoft.EntityFrameworkCore;
+using Oip.Applications.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
@@ -49,6 +50,7 @@ internal static class Program
 
                 builder.Services.AddNotificationsModuleLocal(settings);
                 
+                builder.Services.AddApplicationsModuleLocal(settings);
                 builder.Services.AddSignalR();
                 builder.Services.AddGrpc();
             }
@@ -82,6 +84,7 @@ internal static class Program
                 app.AddUserModuleLocal();
                 app.AddDiscussionsModuleLocal();
                 app.AddNotificationsModuleLocal();
+                
             }
 
             app.Run();

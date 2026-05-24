@@ -1,5 +1,6 @@
 using NLog;
 using NLog.Web;
+using Oip.Applications.Base;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;

@@ -108,6 +108,14 @@ import { TranslatePipe } from '@ngx-translate/core';
               <label for="oip-app-config-admin-mode">{{ 'config.moduleManagement' | translate }}</label>
               <p-button icon="pi pi-cog" label="{{ 'config.goTo' | translate }}" routerLink="/modules" />
             </div>
+            <div class="flex items-center gap-2">
+              <label for="oip-app-config-applications-link">{{ 'config.applicationManagement' | translate }}</label>
+              <p-button
+                icon="pi pi-th-large"
+                id="oip-app-config-applications-link"
+                label="{{ 'config.goTo' | translate }}"
+                routerLink="/applications" />
+            </div>
           </div>
         </div>
       }

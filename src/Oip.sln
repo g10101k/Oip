@@ -37,7 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Rtds.Test", "Oip.Rtds.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Api", "Oip.Api\Oip.Api.csproj", "{2B2D44E7-233C-4741-89FA-24A6DD8CBD1E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notification", "Notification", "{F9B5836C-52BF-4EF8-8F40-C160708345D8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notifications", "Notifications", "{F9B5836C-52BF-4EF8-8F40-C160708345D8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Notifications", "Oip.Notifications\Oip.Notifications.csproj", "{82F5F996-BA7F-4DD9-A241-7166BED2ACDD}"
 EndProject
@@ -45,7 +45,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Notifications.Base", "O
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Users.Base", "Oip.Users.Base\Oip.Users.Base.csproj", "{AC6FCD09-4083-45F9-9091-5B3E75D1B391}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Discussion", "Discussion", "{411AF1A6-3FF9-4E9B-97C3-1C80534FF79B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Discussions", "Discussions", "{411AF1A6-3FF9-4E9B-97C3-1C80534FF79B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Discussions", "Oip.Discussions\Oip.Discussions.csproj", "{C878F77A-FD63-4222-B9F7-8FE7CD2FC143}"
 EndProject
@@ -56,6 +56,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Applications", "Oip.Applications\Oip.Applications.csproj", "{37E77D96-2C58-43D5-A83A-42C9A53EDFDF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Applications.Base", "Oip.Applications.Base\Oip.Applications.Base.csproj", "{E3990251-9FD7-45E4-BC8D-F0985550B5BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{E90979BA-216B-4BB6-9DB9-2C86B9FE1D06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -345,5 +347,7 @@ Global
 		{C878F77A-FD63-4222-B9F7-8FE7CD2FC143} = {411AF1A6-3FF9-4E9B-97C3-1C80534FF79B}
 		{365E70E6-7795-481E-AAF3-026A8C240668} = {20FB5A06-4C4F-4EA3-BC3B-9975A648AE31}
 		{C4481569-8AE4-4D0B-A743-F4C9A67FCA87} = {20FB5A06-4C4F-4EA3-BC3B-9975A648AE31}
+		{37E77D96-2C58-43D5-A83A-42C9A53EDFDF} = {E90979BA-216B-4BB6-9DB9-2C86B9FE1D06}
+		{E3990251-9FD7-45E4-BC8D-F0985550B5BD} = {E90979BA-216B-4BB6-9DB9-2C86B9FE1D06}
 	EndGlobalSection
 EndGlobal
