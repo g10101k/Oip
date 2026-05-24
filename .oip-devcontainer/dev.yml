@@ -1,4 +1,34 @@
 services:
+  oip-users:
+    build:
+      context: ../src
+      dockerfile: ./Oip.Users/Dockerfile
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./https:/https:ro
+    environment:
+      TZ: Europe/Moscow
+      ConnectionString: XpoProvider=Postgres;Server=postgres;Database=oip-users;uid=postgres;pwd=postgres;
+      SecurityService:BaseUrl: https://localhost:8443/
+      SecurityService:DockerUrl: https://keycloak:8443/
+      SecurityService:AuthTicketStore:RedisConnectionString: redis:6379
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:5005
+      ASPNETCORE_Kestrel__Endpoints__Https__Url: https://+:5005
+      ASPNETCORE_Kestrel__Certificates__Default__Password: P@ssw0rd
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/oip.pfx
+    networks:
+      - backend-network
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
   
   postgres:
     image: postgres:16.3
