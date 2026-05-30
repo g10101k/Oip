@@ -13,10 +13,6 @@ namespace Oip.Applications.Controllers;
 [ApiController]
 [Route("api/applications")]
 [ApiExplorerSettings(GroupName = "base")]
-[ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
-[ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
-[ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
-[ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
 public class ApplicationsController(IApplicationRegistryService registryService) : ControllerBase
 {
     /// <summary>
@@ -24,6 +20,8 @@ public class ApplicationsController(IApplicationRegistryService registryService)
     /// </summary>
     [Authorize]
     [HttpGet("get-application-registry-items")]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<IReadOnlyList<ApplicationRegistryItemDto>>(StatusCodes.Status200OK)]
     public Task<IReadOnlyList<ApplicationRegistryItemDto>> GetApplicationRegistryItems(
         CancellationToken cancellationToken = default)
     {
@@ -35,6 +33,7 @@ public class ApplicationsController(IApplicationRegistryService registryService)
     /// </summary>
     [Authorize]
     [HttpGet("get-application-registry-item-by-code/{code}")]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public Task<ApplicationRegistryItemDto> GetApplicationRegistryItemByCode(
         string code,
         CancellationToken cancellationToken = default)
@@ -47,6 +46,7 @@ public class ApplicationsController(IApplicationRegistryService registryService)
     /// </summary>
     [Authorize]
     [HttpPost("create-application-registry-item")]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public Task<ApplicationRegistryItemDto> CreateApplicationRegistryItem(
         [FromBody] ApplicationRegistryItemDto application,
         CancellationToken cancellationToken = default)
@@ -59,6 +59,7 @@ public class ApplicationsController(IApplicationRegistryService registryService)
     /// </summary>
     [Authorize]
     [HttpPut("update-application-registry-item/{code}")]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public Task<ApplicationRegistryItemDto> UpdateApplicationRegistryItem(
         string code,
         [FromBody] ApplicationRegistryItemDto application,
@@ -72,6 +73,7 @@ public class ApplicationsController(IApplicationRegistryService registryService)
     /// </summary>
     [Authorize]
     [HttpDelete("delete-application-registry-item/{code}")]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteApplicationRegistryItem(
         string code,
         CancellationToken cancellationToken = default)

@@ -244,6 +244,8 @@ public static class OipModuleApplication
     public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder,
         IBaseOipModuleAppSettings settings)
     {
+        builder.Services.AddDataProtection()
+            .SetApplicationName("OIP");
         builder.Services.AddAuthenticationTicketStore(settings.SecurityService.AuthTicketStore);
         builder.Services.AddAntiforgery(options =>
         {
@@ -262,13 +264,7 @@ public static class OipModuleApplication
             })
             .AddPolicyScheme(DefaultAuthenticationScheme, DefaultAuthenticationScheme, options =>
             {
-                options.ForwardDefaultSelector = context =>
-                {
-                    var authorization = context.Request.Headers.Authorization.ToString();
-                    return authorization.StartsWith($"{Bearer} ", StringComparison.OrdinalIgnoreCase)
-                        ? JwtBearerDefaults.AuthenticationScheme
-                        : CookieAuthenticationScheme;
-                };
+                options.ForwardDefaultSelector = SelectDefaultAuthenticationScheme;
                 options.ForwardChallenge = CookieAuthenticationScheme;
             })
             .AddCookie(CookieAuthenticationScheme, options =>
@@ -443,9 +439,7 @@ public static class OipModuleApplication
         builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
         builder.Services.AddAuthorization(options =>
         {
-            options.DefaultPolicy = new AuthorizationPolicyBuilder(
-                    CookieAuthenticationScheme,
-                    JwtBearerDefaults.AuthenticationScheme)
+            options.DefaultPolicy = new AuthorizationPolicyBuilder(DefaultAuthenticationScheme)
                 .RequireAuthenticatedUser()
                 .Build();
         });
@@ -457,6 +451,19 @@ public static class OipModuleApplication
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<KeycloakService>();
         return builder;
+    }
+
+    private static string SelectDefaultAuthenticationScheme(HttpContext context)
+    {
+        var authorization = context.Request.Headers.Authorization.ToString();
+        if (authorization.StartsWith($"{Bearer} ", StringComparison.OrdinalIgnoreCase))
+            return JwtBearerDefaults.AuthenticationScheme;
+
+        if (context.Request.Path.StartsWithSegments("/hubs") &&
+            !string.IsNullOrEmpty(context.Request.Query["access_token"]))
+            return JwtBearerDefaults.AuthenticationScheme;
+
+        return CookieAuthenticationScheme;
     }
 
     private static IServiceCollection AddAuthenticationTicketStore(
