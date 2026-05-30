@@ -17,10 +17,11 @@ export class ApplicationsApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   getApplicationRegistryItems = (params: RequestParams = {}) =>
-    this.request<any, ApiExceptionResponse>({
+    this.request<ApplicationRegistryItemDto[], ApiExceptionResponse>({
       path: `/api/applications/get-application-registry-items`,
       method: "GET",
       secure: true,
+      format: "json",
       ...params,
     });
   getApplicationRegistryItemByCode = (
