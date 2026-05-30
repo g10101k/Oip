@@ -4,6 +4,8 @@ services:
       context: ../src
       dockerfile: ./Oip/Dockerfile
       args: [ '--force-recreate' ]
+      additional_contexts:
+        oip-dev-https: ./https
     ports:
       - "50000:50000"
     volumes:

@@ -12,5 +12,7 @@ RUN dotnet publish "./Oip.Users/Oip.Users.csproj" -c $BUILD_CONFIGURATION -o /ap
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 EXPOSE 5005
+COPY --from=oip-dev-https dev-ca.crt /usr/local/share/ca-certificates/oip-dev-ca.crt
+RUN update-ca-certificates
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Oip.Users.dll"]

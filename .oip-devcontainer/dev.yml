@@ -3,6 +3,8 @@ services:
     build:
       context: ../src
       dockerfile: ./Oip.Users/Dockerfile
+      additional_contexts:
+        oip-dev-https: ./https
     ports:
       - "5005:5005"
     volumes:
@@ -32,6 +34,8 @@ services:
     build:
       context: ../src
       dockerfile: ./Oip.Applications/Dockerfile
+      additional_contexts:
+        oip-dev-https: ./https
     ports:
       - "5008:5008"
     volumes:
