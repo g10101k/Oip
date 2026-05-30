@@ -8,6 +8,10 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <None Include="..\.dockerignore">
+          <DependentUpon>Dockerfile</DependentUpon>
+          <Link>.dockerignore</Link>
+        </None>
         <None Include=".\README.md" Pack="true" PackagePath="\"/>
         <Content Update="appsettings*.json" Pack="false" />
         <Content Update="SwaggerFiles\swagger*.json" Pack="false" />
@@ -70,9 +74,5 @@
         </None>
     </ItemGroup>
 
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="SwaggerFiles\swagger-base.json" />
-      <_ContentIncludedByDefault Remove="SwaggerFiles\swagger-users.json" />
-    </ItemGroup>
 
 </Project>

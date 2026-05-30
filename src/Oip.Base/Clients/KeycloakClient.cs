@@ -84,16 +84,17 @@ public sealed class KeycloakClient : HttpClient
             var objectResponse =
                 await ReadObjectResponseAsync<AuthResponse>(response, cancellationToken)
                     .ConfigureAwait(false);
-            objectResponse.Object?.ExpiresOn = DateTime.UtcNow.AddSeconds(objectResponse.Object.ExpiresIn);
-            _authResponse = objectResponse.Object;
-            if (objectResponse.Object == null)
+            var authResponse = objectResponse.Object;
+            if (authResponse == null)
             {
                 throw new ApiException("Response was null which was not expected.", response.StatusCode,
                     objectResponse.Text,
                     headers, null);
             }
 
-            return objectResponse.Object;
+            authResponse.ExpiresOn = DateTimeOffset.UtcNow.AddSeconds(authResponse.ExpiresIn);
+            _authResponse = authResponse;
+            return authResponse;
         }
         else
         {

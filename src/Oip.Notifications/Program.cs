@@ -39,7 +39,6 @@ internal static class Program
             builder.Services.AddApplicationsModuleRemote(settings);
             builder.Services.AddUsersModuleRemote(settings);
             builder.Services.AddSingleton<CryptService>();
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddNotificationsModuleRemote(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
@@ -65,9 +64,8 @@ internal static class Program
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
-            app.MapNotificationsModule();
             app.MapOpenTelemetry(settings);
-            app.MigrateNotificationDatabase();
+            app.AddNotificationsModuleLocal();
             app.Run();
         }
         catch (Exception e)

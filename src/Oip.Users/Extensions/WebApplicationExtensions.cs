@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Oip.Data.Extensions;
 using Oip.Users.Contexts;
 
 namespace Oip.Users.Extensions;
@@ -21,9 +22,6 @@ public static class WebApplicationExtensions
     /// </summary>
     public static void MigrateUserDatabase(this WebApplication app)
     {
-        using var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        var context = serviceScope.ServiceProvider.GetService<UserContext>()
-                      ?? throw new InvalidOperationException();
-        context.Database.Migrate();
+        app.MigrateDatabase<UserContext>();
     }
 }

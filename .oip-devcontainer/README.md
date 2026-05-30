@@ -5,9 +5,17 @@
 To generate certificates use:
 
 ````shell
-dotnet dev-certs https -ep ./https/oip.pfx -p P@ssw0rd
-dotnet dev-certs https -ep ./https/oip.pem --format Pem --no-password 
-dotnet dev-certs https --trust
+cd .oip-devcontainer
+
+mkdir -p https
+
+openssl req -x509 -sha256 -days 3560 -nodes -newkey rsa:2048 -subj "/CN=developer-ca/C=oi/L=oip" -keyout ./https/dev-ca.key -out ./https/dev-ca.crt 
+
+openssl genrsa -out ./https/oip.key 2048
+openssl req -new -key ./https/oip.key -out ./https/oip.csr -config oip.conf
+
+openssl x509 -req -in ./https/oip.csr -CA ./https/dev-ca.crt -CAkey ./https/dev-ca.key -CAcreateserial -out ./https/oip.pem -days 3650 -sha256 -extfile oip.conf -extensions req_ext
+openssl pkcs12 -export -out ./https/oip.pfx -inkey ./https/oip.key -in ./https/oip.pem -passout pass:P@ssw0rd
 ````
 
 ## Development Container Startup

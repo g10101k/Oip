@@ -450,7 +450,10 @@ public static class OipModuleApplication
                 .Build();
         });
         builder.Services.AddHttpClient<KeycloakClient>(x =>
-            x.BaseAddress = new Uri(settings.SecurityService.BaseUrl));
+                x.BaseAddress = new Uri(settings.SecurityService.DockerUrl ?? settings.SecurityService.BaseUrl))
+            .ConfigurePrimaryHttpMessageHandler(() => builder.Environment.IsDevelopment()
+                ? CreateDevelopmentHttpClientHandler()
+                : new HttpClientHandler());
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<KeycloakService>();
         return builder;

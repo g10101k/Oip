@@ -37,8 +37,6 @@ internal static class Program
             builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddApplicationsModuleRemote(settings);
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
-            builder.Services.AddStartupRunner();
             builder.Services.AddSingleton(settings);
             builder.Services.AddCors();
             builder.AddControllersAndView();
