@@ -13,27 +13,7 @@ public class ApplicationRegistrySettings
     /// <summary>
     /// Registered frontend applications.
     /// </summary>
-    public List<ApplicationRegistryItemSettings> Applications { get; set; } =
-    [
-        new()
-        {
-            Code = "oip",
-            DisplayName = "OIP",
-            BaseUrl = "https://localhost:50002",
-            ApiBaseUrl = "https://localhost:5002",
-            Icon = "pi pi-home",
-            Order = 10
-        },
-        new()
-        {
-            Code = "oip-rtds",
-            DisplayName = "OIP.Rtds",
-            BaseUrl = "https://localhost:50003",
-            ApiBaseUrl = "https://localhost:5003",
-            Icon = "pi pi-database",
-            Order = 20
-        }
-    ];
+    public List<ApplicationRegistryItemSettings> Applications { get; set; } = [];
 }
 
 /// <summary>
@@ -75,6 +55,11 @@ public class ApplicationSettings
     /// Indicates whether application should be returned to frontend.
     /// </summary>
     public bool Enabled { get; set; } = true;
+    
+    /// <summary>
+    /// Type of service
+    /// </summary>
+    public ServiceType ServiceType { get; set; } = ServiceType.Service;
 }
 
 /// <summary>
@@ -116,4 +101,24 @@ public class ApplicationRegistryItemSettings
     /// Indicates whether application should be returned to frontend.
     /// </summary>
     public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Type of service
+    /// </summary>
+    public ServiceType ServiceType { get; set; } = ServiceType.Service;
+}
+
+/// <summary>
+/// Type of service
+/// </summary>
+public enum ServiceType
+{
+    /// <summary>
+    /// Service api only
+    /// </summary>
+    Service,
+    /// <summary>
+    /// Application with UI
+    /// </summary>
+    Application
 }

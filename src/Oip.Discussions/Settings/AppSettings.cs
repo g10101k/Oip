@@ -40,4 +40,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public bool IsStandalone { get; set; } = false;
+
+    /// <inheritdoc />
+    public DataProtectionSettings DataProtection { get; set; } = new();
 }

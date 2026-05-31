@@ -1,11 +1,11 @@
 using NLog;
 using NLog.Web;
 using Microsoft.EntityFrameworkCore;
+using Oip.Applications.Base;
 using Oip.Applications.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
-using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
 using Oip.Discussions.Extensions;
 using Oip.Notifications.Extensions;
@@ -45,11 +45,8 @@ internal static class Program
             if (settings.IsStandalone)
             {
                 builder.Services.AddUsersModuleLocal(settings);
-
                 builder.Services.AddDiscussionsModuleLocal(settings);
-
                 builder.Services.AddNotificationsModuleLocal(settings);
-                
                 builder.Services.AddApplicationsModuleLocal(settings);
                 builder.Services.AddSignalR();
                 builder.Services.AddGrpc();
@@ -57,6 +54,7 @@ internal static class Program
             else
             {
                 builder.Services.AddUsersModuleRemote(settings);
+                builder.Services.AddApplicationsModuleRemote(settings);
             }
 
             var app = builder.Build();
@@ -84,7 +82,6 @@ internal static class Program
                 app.AddUserModuleLocal();
                 app.AddDiscussionsModuleLocal();
                 app.AddNotificationsModuleLocal();
-                
             }
 
             app.Run();

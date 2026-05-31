@@ -9,12 +9,10 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -316,7 +314,8 @@ public static class OipModuleApplication
                 options.ProtocolValidator = new OipOpenIdConnectProtocolValidator();
                 options.Scope.Clear();
                 options.Scope.Add(OpenIdConnectScope.OpenId);
-                foreach (var scope in settings.SecurityService.Front.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                foreach (var scope in settings.SecurityService.Front.Scope.Split(' ',
+                             StringSplitOptions.RemoveEmptyEntries))
                     if (!options.Scope.Contains(scope))
                         options.Scope.Add(scope);
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -330,6 +329,7 @@ public static class OipModuleApplication
                 {
                     options.BackchannelHttpHandler = CreateDevelopmentHttpClientHandler();
                 }
+
                 options.CorrelationCookie.SameSite = SameSiteMode.None;
                 options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.NonceCookie.SameSite = SameSiteMode.None;
@@ -472,10 +472,7 @@ public static class OipModuleApplication
     {
         if (!string.IsNullOrWhiteSpace(settings.RedisConnectionString))
         {
-            services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = settings.RedisConnectionString;
-            });
+            services.AddStackExchangeRedisCache(options => { options.Configuration = settings.RedisConnectionString; });
             services.AddSingleton<ITicketStore>(provider => new DistributedAuthenticationTicketStore(
                 provider.GetRequiredService<IDistributedCache>(),
                 provider.GetRequiredService<IDataProtectionProvider>(),
@@ -585,7 +582,8 @@ public static class OipModuleApplication
         return context.User.Identity?.IsAuthenticated == true;
     }
 
-    private static async Task WriteAuthenticationError(HttpContext context, int statusCode, string title, string message)
+    private static async Task WriteAuthenticationError(HttpContext context, int statusCode, string title,
+        string message)
     {
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
@@ -723,73 +721,73 @@ public static class OipModuleApplication
             return;
         app.UseSwagger();
         app.MapGet("/swagger/oip-csrf.js", () => Results.Text("""
-            (function() {
-                const originalFetch = window.fetch.bind(window);
-                const unsafeMethods = new Set(["POST", "PUT", "PATCH", "DELETE"]);
-                const csrfTokenUrl = "/api/security/get-auth-csrf-token";
+                                                              (function() {
+                                                                  const originalFetch = window.fetch.bind(window);
+                                                                  const unsafeMethods = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+                                                                  const csrfTokenUrl = "/api/security/get-auth-csrf-token";
 
-                function getUrl(input) {
-                    return new URL(input instanceof Request ? input.url : input, window.location.origin);
-                }
+                                                                  function getUrl(input) {
+                                                                      return new URL(input instanceof Request ? input.url : input, window.location.origin);
+                                                                  }
 
-                function getMethod(input, init) {
-                    return ((init && init.method) || (input instanceof Request && input.method) || "GET").toUpperCase();
-                }
+                                                                  function getMethod(input, init) {
+                                                                      return ((init && init.method) || (input instanceof Request && input.method) || "GET").toUpperCase();
+                                                                  }
 
-                function requiresCsrf(input, init) {
-                    const method = getMethod(input, init);
-                    if (!unsafeMethods.has(method)) {
-                        return false;
-                    }
+                                                                  function requiresCsrf(input, init) {
+                                                                      const method = getMethod(input, init);
+                                                                      if (!unsafeMethods.has(method)) {
+                                                                          return false;
+                                                                      }
 
-                    const url = getUrl(input);
-                    return url.pathname.startsWith("/api") &&
-                        !url.pathname.includes("/api/security/create-auth-session") &&
-                        !url.pathname.includes(csrfTokenUrl);
-                }
+                                                                      const url = getUrl(input);
+                                                                      return url.pathname.startsWith("/api") &&
+                                                                          !url.pathname.includes("/api/security/create-auth-session") &&
+                                                                          !url.pathname.includes(csrfTokenUrl);
+                                                                  }
 
-                function appendCsrfHeader(input, init, csrfToken) {
-                    if (!csrfToken || !csrfToken.token) {
-                        return originalFetch(input, init);
-                    }
+                                                                  function appendCsrfHeader(input, init, csrfToken) {
+                                                                      if (!csrfToken || !csrfToken.token) {
+                                                                          return originalFetch(input, init);
+                                                                      }
 
-                    const nextInit = Object.assign({}, init);
-                    const headers = new Headers(
-                        nextInit.headers || (input instanceof Request ? input.headers : undefined)
-                    );
+                                                                      const nextInit = Object.assign({}, init);
+                                                                      const headers = new Headers(
+                                                                          nextInit.headers || (input instanceof Request ? input.headers : undefined)
+                                                                      );
 
-                    headers.set(csrfToken.headerName || "X-CSRF-TOKEN", csrfToken.token);
-                    nextInit.headers = headers;
+                                                                      headers.set(csrfToken.headerName || "X-CSRF-TOKEN", csrfToken.token);
+                                                                      nextInit.headers = headers;
 
-                    return originalFetch(input, nextInit);
-                }
+                                                                      return originalFetch(input, nextInit);
+                                                                  }
 
-                window.fetch = function(input, init) {
-                    if (!requiresCsrf(input, init)) {
-                        return originalFetch(input, init);
-                    }
+                                                                  window.fetch = function(input, init) {
+                                                                      if (!requiresCsrf(input, init)) {
+                                                                          return originalFetch(input, init);
+                                                                      }
 
-                    return originalFetch(csrfTokenUrl, {
-                        method: "GET",
-                        credentials: "same-origin",
-                        headers: { "Accept": "application/json" }
-                    })
-                        .then(function(response) {
-                            if (!response.ok) {
-                                return originalFetch(input, init);
-                            }
+                                                                      return originalFetch(csrfTokenUrl, {
+                                                                          method: "GET",
+                                                                          credentials: "same-origin",
+                                                                          headers: { "Accept": "application/json" }
+                                                                      })
+                                                                          .then(function(response) {
+                                                                              if (!response.ok) {
+                                                                                  return originalFetch(input, init);
+                                                                              }
 
-                            return response.json()
-                                .then(function(csrfToken) {
-                                    return appendCsrfHeader(input, init, csrfToken);
-                                });
-                        })
-                        .catch(function() {
-                            return originalFetch(input, init);
-                        });
-                };
-            })();
-            """, "application/javascript"));
+                                                                              return response.json()
+                                                                                  .then(function(csrfToken) {
+                                                                                      return appendCsrfHeader(input, init, csrfToken);
+                                                                                  });
+                                                                          })
+                                                                          .catch(function() {
+                                                                              return originalFetch(input, init);
+                                                                          });
+                                                                  };
+                                                              })();
+                                                              """, "application/javascript"));
         app.UseSwaggerUI(swaggerUiOptions =>
         {
             swaggerUiOptions.EnableTryItOutByDefault();
@@ -838,16 +836,18 @@ public static class OipModuleApplication
     }
 
     /// <summary>
-    /// Configures data protection services for a given DbContext
+    /// Configures data protection services
     /// </summary>
-    /// <typeparam name="TContext">The DbContext to use for persisting data protection keys</typeparam>
-    public static void AddDataProtection<TContext>(this IServiceCollection services)
-        where TContext : DbContext, IDataProtectionKeyContext
+    public static void AddOipDataProtection(this IServiceCollection services, IBaseOipModuleAppSettings baseSettings)
     {
-        services.AddDataProtection()
-            .SetApplicationName("OIP")
-            .PersistKeysToDbContext<TContext>()
-            .SetDefaultKeyLifetime(TimeSpan.FromDays(36500));
+        var settings = baseSettings.DataProtection;
+
+        var dataProtectionBuilder = services.AddDataProtection()
+            .SetApplicationName(settings.ApplicationName);
+        if (settings.PersistKeysToFileSystemPath is not null)
+            dataProtectionBuilder.PersistKeysToFileSystem(new DirectoryInfo(settings.PersistKeysToFileSystemPath));
+        dataProtectionBuilder.SetDefaultKeyLifetime(TimeSpan.FromDays(settings.DefaultKeyLifetimeInDay));
+        
         services.AddScoped<CryptService>();
     }
 }

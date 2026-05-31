@@ -29,7 +29,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddNotificationsModuleCore(settings);
         services.TryAddScoped<INotificationServiceClient, LocalNotificationServiceClient>();
-        services.AddDataProtection<NotificationsDbContext>();
+        services.AddOipDataProtection(settings);
         services.TryAddActivatedSingleton<CryptService>();
         return services;
     }

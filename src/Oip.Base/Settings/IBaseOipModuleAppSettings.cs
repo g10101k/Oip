@@ -54,4 +54,10 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     [NotSaveToDb]
     bool IsStandalone { get; set; }
+
+    /// <summary>
+    /// DataProtection settings
+    /// </summary>
+    [NotSaveToDb] 
+    DataProtectionSettings DataProtection { get; set; }
 }

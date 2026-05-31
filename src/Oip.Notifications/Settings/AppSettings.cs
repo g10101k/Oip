@@ -18,7 +18,8 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
         ApiBaseUrl = "https://localhost:5007",
         Icon = "pi pi-bell",
         Order = 50,
-        Enabled = false
+        Enabled = false,
+        ServiceType = ServiceType.Service
     };
 
     /// <inheritdoc />
@@ -32,13 +33,16 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public SecurityServiceSettings SecurityService { get; set; } = new();
-    
+
     /// <inheritdoc />
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
     /// <inheritdoc />
     public bool IsStandalone { get; set; } = false;
-    
+
+    /// <inheritdoc />
+    public DataProtectionSettings DataProtection { get; set; } = new();
+
     /// <summary>
     /// Represents synchronization options for the application.
     /// </summary>

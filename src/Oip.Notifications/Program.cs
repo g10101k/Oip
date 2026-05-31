@@ -5,8 +5,6 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
-using Oip.Base.StartupTasks;
-using Oip.Notifications.Data.Contexts;
 using Oip.Notifications.Extensions;
 using Oip.Notifications.Settings;
 using Oip.Users.Extensions;
@@ -38,6 +36,7 @@ internal static class Program
             builder.AddOpenApi(settings);
             builder.Services.AddApplicationsModuleRemote(settings);
             builder.Services.AddUsersModuleRemote(settings);
+            
             builder.Services.AddSingleton<CryptService>();
             builder.Services.AddNotificationsModuleRemote(settings);
             builder.Services.AddStartupRunner();
@@ -46,7 +45,7 @@ internal static class Program
             builder.Services.AddGrpcSwagger();
             builder.AddControllersAndView();
             builder.AddLocalization();
-            builder.Services.AddDataProtection<NotificationsDbContext>();
+            builder.Services.AddOipDataProtection(settings);
             builder.Services.AddSignalR();
             builder.AddOpenTelemetry(settings);
 

@@ -27,7 +27,8 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     };
 
     /// <inheritdoc />
-    public ApplicationRegistrySettings ApplicationRegistry { get; set; } = new() { CurrentApplicationCode = "oip-rtds" };
+    public ApplicationRegistrySettings ApplicationRegistry { get; set; } =
+        new() { CurrentApplicationCode = "oip-rtds" };
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();
@@ -43,4 +44,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public bool IsStandalone { get; set; } = false;
+
+    /// <inheritdoc />
+    public DataProtectionSettings DataProtection { get; set; } = new();
 }
