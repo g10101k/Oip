@@ -12,9 +12,10 @@ services:
     environment:
       TZ: Europe/Moscow
       ConnectionString: XpoProvider=Postgres;Server=postgres;Database=oip-users;uid=postgres;pwd=postgres;
+      Services:OipApplications: https://oip-applications:5008
       SecurityService:BaseUrl: https://localhost:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
-      SecurityService:AuthTicketStore:RedisConnectionString: redis:6379
+      SecurityService:AuthTicketStore:RedisConnectionString: redis:6379,password=${REDIS_PASSWORD:-P@ssw0rd},defaultDatabase=0
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://0.0.0.0:5005
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:5005
@@ -45,7 +46,7 @@ services:
       ConnectionString: XpoProvider=Postgres;Server=postgres;Database=oip-application;uid=postgres;pwd=postgres;
       SecurityService:BaseUrl: https://localhost:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
-      SecurityService:AuthTicketStore:RedisConnectionString: redis:6379
+      SecurityService:AuthTicketStore:RedisConnectionString: redis:6379,password=${REDIS_PASSWORD:-P@ssw0rd},defaultDatabase=0
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://0.0.0.0:5008
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:5008
@@ -136,6 +137,7 @@ services:
       - "8025:8025"
     restart: unless-stopped
 
+
   redis:
     image: redis:7-alpine
     ports:
@@ -143,9 +145,11 @@ services:
     restart: unless-stopped
     volumes:
       - redis-data:/data
-
+    command: redis-server --requirepass ${REDIS_PASSWORD:-P@ssw0rd}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-P@ssw0rd}
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-P@ssw0rd}", "ping" ]
       interval: 5s
       timeout: 5s
       retries: 10
