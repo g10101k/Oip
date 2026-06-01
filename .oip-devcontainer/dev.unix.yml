@@ -1,0 +1,12 @@
+services:
+  oip-users:
+    volumes:
+      - ${HOME}/.aspnet/DataProtection-Keys:/PersistKeys
+
+  oip-applications:
+    volumes:
+      - ${HOME}/.aspnet/DataProtection-Keys:/PersistKeys
+
+  oip-notifications:
+    volumes:
+      - ${HOME}/.aspnet/DataProtection-Keys:/PersistKeys

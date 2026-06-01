@@ -15,8 +15,8 @@
 1. Установите .NET 8.0 SDK https://dotnet.microsoft.com/en-us/download/dotnet/8.0;
 2. Установите последнюю LTS версию Node.js https://nodejs.org/en;
 3. Установите Docker Desktop https://www.docker.com/get-started;
-4. Перейдите в каталог `.devcontainer`;
-5. При необходимости сгенерируйте сертификаты по инструкции из `.devcontainer/README.md`;
+4. Перейдите в каталог `.oip-devcontainer`;
+5. При необходимости сгенерируйте сертификаты по инструкции из `.oip-devcontainer/README.md`;
 6. Запустите инфраструктуру разработки `docker compose -f dev.yml up -d`;
 7. Для входа используйте логин `admin` / `P@ssw0rd`;
 8. Теперь можно выполнить вход с этим пользователем на портал;

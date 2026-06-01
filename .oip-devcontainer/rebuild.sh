@@ -1,1 +1,1 @@
-docker compose -f dev.yml  up --build --force-recreate -d oip-users oip-applications
+docker compose -f dev.yml --profile distributed up --build --force-recreate -d oip-users oip-applications oip-notifications
