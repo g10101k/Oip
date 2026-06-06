@@ -50,5 +50,10 @@
             <AdditionalImportDirs>$(NuGetPackageRoot)\google.api.commonprotos\2.17.0\content\protos\</AdditionalImportDirs>
         </Protobuf>
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
+      <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
+    </ItemGroup>
     
 </Project>

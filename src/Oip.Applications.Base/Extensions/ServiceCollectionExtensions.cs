@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Oip.Applications.Base;
+using Oip.Applications.Base.StartupTasks;
 using Oip.Applications.Data;
 using Oip.Applications.Services;
-using Oip.Applications.Base.StartupTasks;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
+using GrpcApplicationRegistryService = Oip.Applications.Base.Grpc.GrpcApplicationRegistryService;
 
-namespace Oip.Applications.Extensions;
+namespace Oip.Applications.Base.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring application registry services.
@@ -71,6 +71,21 @@ public static class ServiceCollectionExtensions
                 break;
         }
 
+        return services;
+    }
+    
+    /// <summary>
+    /// Registers the remote application registry implementation.
+    /// </summary>
+    public static IServiceCollection AddApplicationsModuleRemote(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
+    {
+        services.AddGrpcClient<GrpcApplicationRegistryService.GrpcApplicationRegistryServiceClient>(options =>
+        {
+            options.Address = new Uri(settings.Services.OipApplications);
+        });
+        services.TryAddScoped<IApplicationRegistryService, GrpcApplicationRegistryServiceClientAdapter>();
+        services.AddStartupTask<ApplicationSelfRegistrationStartupTask>();
         return services;
     }
 }

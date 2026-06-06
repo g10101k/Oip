@@ -2,7 +2,7 @@ using NLog;
 using NLog.Web;
 using Microsoft.EntityFrameworkCore;
 using Oip.Applications.Base;
-using Oip.Applications.Extensions;
+using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
@@ -13,6 +13,7 @@ using Oip.Settings;
 using Oip.Users.Extensions;
 using Oip.Demo.TableQueryDemo;
 using Oip.Extensions;
+using ServiceCollectionExtensions = Oip.Applications.Base.Extensions.ServiceCollectionExtensions;
 
 namespace Oip;
 
@@ -55,6 +56,7 @@ internal static class Program
             {
                 builder.Services.AddUsersModuleRemote(settings);
                 builder.Services.AddApplicationsModuleRemote(settings);
+                builder.Services.AddNotificationsModuleRemote(settings);
             }
 
             var app = builder.Build();
@@ -79,6 +81,7 @@ internal static class Program
 
             if (settings.IsStandalone)
             {
+                app.UseOipApplications();
                 app.AddUserModuleLocal();
                 app.AddDiscussionsModuleLocal();
                 app.AddNotificationsModuleLocal();

@@ -19,9 +19,12 @@ public class UserCacheRepository(
     IServiceScopeFactory scopeFactory,
     IServiceProvider serviceProvider,
     ILogger<UserCacheRepository> logger)
-    : IPeriodicalService
+    : IPeriodicalService, IUserCacheRepository
 {
-    public readonly ConcurrentDictionary<int, User> Users = new();
+    private readonly ConcurrentDictionary<int, UserCacheDto> _users = new();
+
+    public IReadOnlyDictionary<int, UserCacheDto> Users => _users;
+
     public int Interval => 360;
 
     private bool SubscribeActionStarted { get; set; }
@@ -42,8 +45,8 @@ public class UserCacheRepository(
 
                 foreach (var user in response.Users)
                 {
-                    var grpcUser = MapToGrpcUser(user);
-                    Users.AddOrUpdate(grpcUser.UserId, grpcUser, (key, oldValue) => grpcUser);
+                    var cachedUser = MapToCachedUser(user);
+                    _users.AddOrUpdate(cachedUser.UserId, cachedUser, (key, oldValue) => cachedUser);
                 }
             }
             catch (Exception e)
@@ -101,33 +104,31 @@ public class UserCacheRepository(
 
     private void ProcessEventMessage(UserChangeEvent eventMessage)
     {
-        Users.AddOrUpdate(eventMessage.User.UserId, eventMessage.User, (i, user) => user);
+        var cachedUser = MapToCachedUser(eventMessage.User);
+        _users.AddOrUpdate(cachedUser.UserId, cachedUser, (i, user) => user);
         logger.LogDebug("{json}", JsonConvert.SerializeObject(eventMessage));
     }
 
-    private static User MapToGrpcUser(UserDto user)
+    private static UserCacheDto MapToCachedUser(UserDto user)
     {
-        return new User
-        {
-            UserId = user.UserId,
-            KeycloakId = user.KeycloakId,
-            Email = user.Email,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            IsActive = user.IsActive,
-            CreatedAt = Timestamp.FromDateTimeOffset(user.CreatedAt),
-            UpdatedAt = Timestamp.FromDateTimeOffset(user.UpdatedAt),
-            LastSyncedAt = user.LastSyncedAt.HasValue ? Timestamp.FromDateTimeOffset(user.LastSyncedAt.Value) : null,
-            Photo = user.Photo != null
-                ? Google.Protobuf.ByteString.CopyFrom(user.Photo)
-                : Google.Protobuf.ByteString.Empty,
-            Settings = user.Settings,
-            Phone = user.Phone
-        };
+        return new UserCacheDto(
+            user.UserId,
+            user.KeycloakId,
+            user.Email,
+            user.Phone);
     }
 
-    public User? GetUserByKeycloakUserId(string key)
+    private static UserCacheDto MapToCachedUser(User user)
     {
-        return Users.Values.FirstOrDefault(x => x.KeycloakId == key);
+        return new UserCacheDto(
+            user.UserId,
+            user.KeycloakId,
+            user.Email,
+            user.Phone);
+    }
+
+    public UserCacheDto? GetUserByKeycloakUserId(string key)
+    {
+        return _users.Values.FirstOrDefault(x => x.KeycloakId == key);
     }
 }
