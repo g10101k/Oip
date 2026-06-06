@@ -4,7 +4,6 @@
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>Applications registry contracts for OIP template</Title>
-        <NoWarn>$(NoWarn);CS1591</NoWarn>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>

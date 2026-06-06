@@ -2,10 +2,16 @@
     <Import Project="..\Common.props"/>
 
     <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Discussion contracts for OIP template</Title>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    <ItemGroup>
+        <None Include=".\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22"/>
         <PackageReference Include="NLog" Version="5.3.4"/>
@@ -17,6 +23,6 @@
     <ItemGroup>
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
         <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
-        <ProjectReference Include="..\Oip.Users\Oip.Users.csproj" />
+        <ProjectReference Include="..\Oip.Users.Base\Oip.Users.Base.csproj" />
     </ItemGroup>
 </Project>
