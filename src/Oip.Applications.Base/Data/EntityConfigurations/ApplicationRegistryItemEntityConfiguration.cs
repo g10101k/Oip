@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Oip.Data.Extensions;
 
-namespace Oip.Applications.Data.EntityConfigurations;
+namespace Oip.Applications.Base.Data.EntityConfigurations;
 
 /// <summary>
 /// Configures database mapping for application registry items.

@@ -1,7 +1,7 @@
 using Oip.Base.Settings;
 using Oip.Settings;
 
-namespace Oip.Applications.Settings;
+namespace Oip.Applications.Base.Settings;
 
 /// <summary>
 /// Application registry service settings.

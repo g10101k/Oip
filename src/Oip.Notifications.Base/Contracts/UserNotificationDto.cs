@@ -1,6 +1,4 @@
-using Oip.Notifications.Base;
-
-namespace Oip.Notifications.Contracts;
+namespace Oip.Notifications.Base.Contracts;
 
 /// <summary>
 /// User notification for displaying in the portal.

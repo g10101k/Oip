@@ -3,18 +3,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Oip.Base.Runtime;
+using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Notifications.Base;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
-using Oip.Users.Base;
-using Oip.Users.Contexts;
-using Oip.Users.Notifications;
-using Oip.Users.Repositories;
-using Oip.Users.Services;
+using Oip.Users.Base.Contexts;
+using Oip.Users.Base.Data.Repositories;
+using Oip.Users.Base.Notifications;
+using Oip.Users.Base.Services;
 using IUserCacheRepository = Oip.Base.Services.IUserCacheRepository;
+using UserService = Oip.Users.Base.Services.UserService;
 
-namespace Oip.Users.Extensions;
+namespace Oip.Users.Base.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring users module services.

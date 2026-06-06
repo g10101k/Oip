@@ -1,4 +1,4 @@
-namespace Oip.Applications.Data;
+namespace Oip.Applications.Base.Data;
 
 /// <summary>
 /// Persisted frontend application registry item.

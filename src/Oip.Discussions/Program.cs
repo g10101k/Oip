@@ -1,14 +1,14 @@
 using NLog;
 using NLog.Web;
-using Oip.Applications.Base;
+using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
-using Oip.Discussions.Extensions;
-using Oip.Discussions.Settings;
-using Oip.Users.Extensions;
+using Oip.Discussions.Base.Extensions;
+using Oip.Discussions.Base.Settings;
+using Oip.Users.Base.Extensions;
 
 namespace Oip.Discussions;
 

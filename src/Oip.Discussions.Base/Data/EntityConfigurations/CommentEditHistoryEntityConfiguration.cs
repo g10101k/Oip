@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Oip.Data.Extensions;
 
-namespace Oip.Discussions.Data.EntityConfigurations;
+namespace Oip.Discussions.Base.Data.EntityConfigurations;
 
 /// <summary>
 /// Configuration for the CommentEditHistoryEntity database mapping.

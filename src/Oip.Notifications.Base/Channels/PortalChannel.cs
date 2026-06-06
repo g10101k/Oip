@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
-using Oip.Notifications.Base;
-using Oip.Notifications.Hubs;
+using Oip.Notifications.Base.Hubs;
 
-namespace Oip.Notifications.Channels;
+namespace Oip.Notifications.Base.Channels;
 
 public class PortalChannel(IHubContext<NotificationHub> notificationHub) : INotificationChannel
 {

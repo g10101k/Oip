@@ -2,12 +2,12 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Exceptions;
-using Oip.Discussions.Contracts;
-using Oip.Discussions.Data;
-using Oip.Users.Base;
+using Oip.Base.Services;
+using Oip.Discussions.Base.Contracts;
+using Oip.Discussions.Base.Data;
 using BaseUserService = Oip.Base.Services.UserService;
 
-namespace Oip.Discussions.Services;
+namespace Oip.Discussions.Base.Services;
 
 /// <summary>
 /// Business logic for entity comments.

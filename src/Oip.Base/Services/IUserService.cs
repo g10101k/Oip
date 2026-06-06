@@ -1,4 +1,4 @@
-namespace Oip.Users.Base;
+namespace Oip.Base.Services;
 
 /// <summary>
 /// Service for managing and retrieving user information in a transport-agnostic way

@@ -5,16 +5,15 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
-using Oip.Notifications.Base;
-using Oip.Notifications.Data.Contexts;
-using Oip.Notifications.Data.Repositories;
-using Oip.Notifications.Hubs;
-using Oip.Notifications.Services;
-using Oip.Notifications.Startups;
+using Oip.Notifications.Base.Data.Contexts;
+using Oip.Notifications.Base.Data.Repositories;
+using Oip.Notifications.Base.Hubs;
+using Oip.Notifications.Base.Services;
+using Oip.Notifications.Base.Startups;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 
-namespace Oip.Notifications.Extensions;
+namespace Oip.Notifications.Base.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring notifications module services.

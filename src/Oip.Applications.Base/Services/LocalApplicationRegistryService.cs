@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Http;
-using Oip.Applications.Base;
 using Oip.Applications.Base.Contracts;
-using Oip.Applications.Data;
+using Oip.Applications.Base.Data;
 using Oip.Base.Exceptions;
 using Oip.Base.Settings;
 
-namespace Oip.Applications.Services;
+namespace Oip.Applications.Base.Services;
 
 /// <summary>
 /// Local application registry implementation backed by EF storage.

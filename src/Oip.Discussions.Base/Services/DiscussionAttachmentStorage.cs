@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
-namespace Oip.Discussions.Services;
+namespace Oip.Discussions.Base.Services;
 
 /// <summary>
 /// Saved attachment metadata.

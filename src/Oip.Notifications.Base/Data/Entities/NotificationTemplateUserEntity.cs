@@ -1,4 +1,4 @@
-namespace Oip.Notifications.Data.Entities;
+namespace Oip.Notifications.Base.Data.Entities;
 
 /// <summary>
 /// Mapping between a notification template and a user

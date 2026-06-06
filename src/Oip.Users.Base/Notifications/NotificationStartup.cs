@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 using Oip.Base.Runtime;
 using Oip.Notifications.Base;
 
-namespace Oip.Users.Notifications;
+namespace Oip.Users.Base.Notifications;
 
 /// <summary>
 /// NotificationStartup is an IStartupTask that registers notification types with a gRPC notification service during application startup

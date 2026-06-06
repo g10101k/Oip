@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Applications.Data.Migrations.SqlServer
+namespace Oip.Applications.Base.Data.Migrations.SqlServer
 {
     /// <inheritdoc />
     public partial class InitialApplicationRegistry_SqlServer : Migration

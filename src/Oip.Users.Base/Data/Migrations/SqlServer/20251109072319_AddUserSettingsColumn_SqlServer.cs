@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Users.Migrations.SqlServer
+namespace Oip.Users.Base.Data.Migrations.SqlServer
 {
     /// <inheritdoc />
     public partial class AddUserSettingsColumn_SqlServer : Migration

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Data.Repositories;
 
-namespace Oip.Applications.Data;
+namespace Oip.Applications.Base.Data;
 
 /// <summary>
 /// Repository for application registry items.

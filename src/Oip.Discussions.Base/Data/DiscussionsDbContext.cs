@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Oip.Data.Contexts;
 using Oip.Data.Extensions;
-using Oip.Discussions.Data.EntityConfigurations;
+using Oip.Discussions.Base.Data.EntityConfigurations;
 
-namespace Oip.Discussions.Data;
+namespace Oip.Discussions.Base.Data;
 
 /// <summary>
 /// Database context for managing discussions data including comments, attachments, reactions, mentions, and edit history.

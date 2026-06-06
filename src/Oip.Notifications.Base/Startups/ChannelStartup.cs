@@ -1,9 +1,9 @@
 using Oip.Base.Runtime;
-using Oip.Notifications.Data.Entities;
-using Oip.Notifications.Data.Repositories;
-using Oip.Notifications.Services;
+using Oip.Notifications.Base.Data.Entities;
+using Oip.Notifications.Base.Data.Repositories;
+using Oip.Notifications.Base.Services;
 
-namespace Oip.Notifications.Startups;
+namespace Oip.Notifications.Base.Startups;
 
 /// <summary>
 /// Initializes notification channels by creating or skipping entries in the repository based on the available channels

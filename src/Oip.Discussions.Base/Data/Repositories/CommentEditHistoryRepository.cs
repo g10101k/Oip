@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Data.Repositories;
 
-namespace Oip.Discussions.Data.Repositories;
+namespace Oip.Discussions.Base.Data.Repositories;
 
 /// <summary>
 /// Repository for managing CommentEditHistoryEntity entities

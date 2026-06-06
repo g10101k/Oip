@@ -1,6 +1,4 @@
-using Oip.Notifications.Base;
-
-namespace Oip.Notifications.Data.Entities;
+namespace Oip.Notifications.Base.Data.Entities;
 
 /// <summary>
 /// Notification template for different channels

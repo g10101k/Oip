@@ -1,4 +1,4 @@
-namespace Oip.Notifications.Data.Enums;
+namespace Oip.Notifications.Base.Data.Enums;
 
 /// <summary>
 /// Delivery status values

@@ -72,7 +72,6 @@ public class OipModuleContext : DbContext
         modelBuilder.ApplyConfiguration(new ModuleInstanceEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new ModuleInstanceSecurityEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new ModuleSecurityEntityConfiguration(Database, _designTime));
-        modelBuilder.ApplyConfiguration(new UserEntityConfiguration(Database, _designTime));
 
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }

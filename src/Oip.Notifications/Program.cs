@@ -1,13 +1,14 @@
 using NLog;
 using NLog.Web;
 using Oip.Applications.Base;
+using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
-using Oip.Notifications.Extensions;
-using Oip.Notifications.Settings;
-using Oip.Users.Extensions;
+using Oip.Notifications.Base.Extensions;
+using Oip.Notifications.Base.Settings;
+using Oip.Users.Base.Extensions;
 
 namespace Oip.Notifications;
 

@@ -7,12 +7,12 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Data.Extensions;
-using Oip.Discussions.Extensions;
-using Oip.Notifications.Extensions;
 using Oip.Settings;
-using Oip.Users.Extensions;
 using Oip.Demo.TableQueryDemo;
+using Oip.Discussions.Base.Extensions;
 using Oip.Extensions;
+using Oip.Notifications.Base.Extensions;
+using Oip.Users.Base.Extensions;
 using ServiceCollectionExtensions = Oip.Applications.Base.Extensions.ServiceCollectionExtensions;
 
 namespace Oip;

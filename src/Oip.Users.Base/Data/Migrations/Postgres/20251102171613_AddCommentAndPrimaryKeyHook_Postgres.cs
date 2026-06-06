@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
+
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-#nullable disable
-
-namespace Oip.Users.Migrations.Postgres
+namespace Oip.Users.Base.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class AddCommentAndPrimaryKeyHook_Postgres : Migration

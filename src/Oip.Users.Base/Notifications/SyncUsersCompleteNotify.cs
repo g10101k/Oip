@@ -1,4 +1,4 @@
-namespace Oip.Users.Notifications;
+namespace Oip.Users.Base.Notifications;
 
 /// <summary>Notification indicating the completion of a user synchronization process, including the number of users processed and the time frame</summary>
 /// <param name="Count">The number of users that were synchronized</param>

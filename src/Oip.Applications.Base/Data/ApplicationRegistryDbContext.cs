@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Oip.Applications.Data.EntityConfigurations;
+using Oip.Applications.Base.Data.EntityConfigurations;
 using Oip.Data.Contexts;
 using Oip.Data.Extensions;
 
-namespace Oip.Applications.Data;
+namespace Oip.Applications.Base.Data;
 
 /// <summary>
 /// Database context for the application registry.

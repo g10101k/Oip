@@ -3,9 +3,8 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Services;
-using Oip.Notifications.Base;
 
-namespace Oip.Notifications.Services;
+namespace Oip.Notifications.Base.Services;
 
 /// <summary>
 /// Provides channel-based notification functionality by dynamically discovering and managing notification channel

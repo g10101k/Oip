@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Oip.Data.Contexts;
 using Oip.Data.Extensions;
-using Oip.Users.Entities;
-using Oip.Users.EntityConfigurations;
+using Oip.Users.Base.Data.Entities;
+using Oip.Users.Base.Data.EntityConfigurations;
 
-namespace Oip.Users.Contexts;
+namespace Oip.Users.Base.Contexts;
 
 /// <summary>
 /// Represents the database context for user-related entities.
@@ -66,7 +66,7 @@ public class UserContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfiguration(new UserEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration<UserEntity>(new UserEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }
 

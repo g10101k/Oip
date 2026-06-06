@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
+
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-#nullable disable
-
-namespace Oip.Notifications.Migrations.Postgres
+namespace Oip.Notifications.Base.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class AddChanelAndDates_Postgres : Migration

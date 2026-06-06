@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Users.Migrations.Postgres
+namespace Oip.Users.Base.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class AddUserSettingsColumn_Postgres : Migration

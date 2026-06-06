@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Notifications.Migrations.Postgres
+namespace Oip.Notifications.Base.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class AddNotificationChannelCodeColumn_Postgres : Migration

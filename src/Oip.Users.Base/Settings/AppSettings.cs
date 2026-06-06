@@ -1,7 +1,7 @@
 using Oip.Base.Settings;
 using Oip.Settings;
 
-namespace Oip.Users.Settings;
+namespace Oip.Users.Base.Settings;
 
 /// <inheritdoc cref="IBaseOipModuleAppSettings"/>
 public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings

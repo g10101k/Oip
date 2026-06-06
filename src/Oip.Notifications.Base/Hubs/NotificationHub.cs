@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Oip.Base.Services;
 
-namespace Oip.Notifications.Hubs;
+namespace Oip.Notifications.Base.Hubs;
 
 /// <summary>
 /// SignalR hub for managing real-time notification connections.

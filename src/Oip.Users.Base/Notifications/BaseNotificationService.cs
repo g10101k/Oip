@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using Oip.Notifications.Base;
 
-namespace Oip.Users.Notifications;
+namespace Oip.Users.Base.Notifications;
 
 /// <summary>
 /// BaseNotificationService is an abstract base class that implements IStatic method ExecuteAsync registers notification

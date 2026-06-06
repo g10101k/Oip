@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
-namespace Oip.Discussions.Contracts;
+namespace Oip.Discussions.Base.Contracts;
 
 /// <summary>
 /// Request for creating a new comment.

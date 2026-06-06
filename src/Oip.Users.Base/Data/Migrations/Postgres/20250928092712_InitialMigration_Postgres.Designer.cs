@@ -5,9 +5,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Oip.Users.Contexts;
+using Oip.Users.Base.Contexts;
 
-namespace Oip.Users.Migrations.Postgres
+namespace Oip.Users.Base.Data.Migrations.Postgres
 {
     [DbContext(typeof(UserContextPostgres))]
     [Migration("20250928092712_InitialMigration_Postgres")]

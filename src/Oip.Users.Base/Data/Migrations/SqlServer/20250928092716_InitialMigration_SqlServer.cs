@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Users.Migrations.SqlServer
+namespace Oip.Users.Base.Data.Migrations.SqlServer
 {
     /// <inheritdoc />
     public partial class InitialMigration_SqlServer : Migration

@@ -5,10 +5,9 @@ using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Extensions;
-using Oip.Users.Base;
-using Oip.Users.Repositories;
+using Oip.Users.Base.Data.Repositories;
 
-namespace Oip.Users.Services;
+namespace Oip.Users.Base.Services;
 
 /// <summary>
 /// Service for managing user data including subscriptions to real-time changes and retrieval of user information

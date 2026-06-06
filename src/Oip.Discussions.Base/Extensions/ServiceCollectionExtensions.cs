@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Oip.Base.Settings;
-using Oip.Discussions.Data;
-using Oip.Discussions.Data.Repositories;
-using Oip.Discussions.Services;
+using Oip.Discussions.Base.Data;
+using Oip.Discussions.Base.Data.Repositories;
+using Oip.Discussions.Base.Services;
 
-namespace Oip.Discussions.Extensions;
+namespace Oip.Discussions.Base.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring discussions module services.

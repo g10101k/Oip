@@ -1,4 +1,4 @@
-namespace Oip.Notifications.Data.Entities;
+namespace Oip.Notifications.Base.Data.Entities;
 
 /// <summary>
 /// Notification delivery history by channels

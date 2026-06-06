@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
+
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-#nullable disable
-
-namespace Oip.Applications.Data.Migrations.Postgres
+namespace Oip.Applications.Base.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class InitialApplicationRegistry_Postgres : Migration

@@ -3,13 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Clients;
 using Oip.Base.Services;
-using Oip.Users.Base;
-using Oip.Users.Entities;
-using Oip.Users.Notifications;
-using Oip.Users.Repositories;
-using Oip.Users.Settings;
+using Oip.Users.Base.Data.Entities;
+using Oip.Users.Base.Data.Repositories;
+using Oip.Users.Base.Notifications;
+using Oip.Users.Base.Settings;
 
-namespace Oip.Users.Services;
+namespace Oip.Users.Base.Services;
 
 /// <summary>
 /// Background service for synchronizing users periodically.

@@ -5,9 +5,8 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Services;
-using Oip.Notifications.Base;
 
-namespace Oip.Notifications.Channels;
+namespace Oip.Notifications.Base.Channels;
 
 /// <summary>
 /// A channel that sends notifications via SMTP email using configured mail settings and encryption services

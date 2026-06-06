@@ -1,7 +1,8 @@
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using Oip.Base.Services;
 
-namespace Oip.Users.Base;
+namespace Oip.Users.Base.Services;
 
 /// <summary>
 /// Remote implementation of IUserService that communicates via gRPC.

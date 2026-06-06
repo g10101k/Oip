@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -7,7 +6,7 @@ using Newtonsoft.Json;
 using Oip.Base.Extensions;
 using Oip.Base.Services;
 
-namespace Oip.Users.Base;
+namespace Oip.Users.Base.Data.Repositories;
 
 /// <summary>
 /// A hosted service that periodically collects and evaluates tags using a specified interval

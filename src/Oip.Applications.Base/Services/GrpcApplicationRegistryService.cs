@@ -1,9 +1,8 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Oip.Applications.Base;
 using Oip.Applications.Base.Grpc;
 
-namespace Oip.Applications.Services;
+namespace Oip.Applications.Base.Services;
 
 /// <summary>
 /// gRPC application registry service.

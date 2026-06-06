@@ -2,11 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Oip.Data.Extensions;
-using Oip.Users.Contexts;
-using Entities_UserEntity = Oip.Users.Entities.UserEntity;
-using UserEntity = Oip.Users.Entities.UserEntity;
+using Oip.Users.Base.Contexts;
+using Entities_UserEntity = Oip.Users.Base.Data.Entities.UserEntity;
 
-namespace Oip.Users.EntityConfigurations;
+namespace Oip.Users.Base.Data.EntityConfigurations;
 
 /// <summary>
 /// <inheritdoc cref="IEntityTypeConfiguration{TEntity}"/>
@@ -31,7 +30,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<Entities_UserEnt
     /// <inheritdoc/>
     /// </summary>
     /// <param name="entity"></param>
-    public void Configure(EntityTypeBuilder<UserEntity> entity)
+    public void Configure(EntityTypeBuilder<Entities_UserEntity> entity)
     {
         entity.SetTableWithSchema(_database, UserContext.SchemaName);
         entity.SetPrimaryKey(_designTime, e => e.UserId);

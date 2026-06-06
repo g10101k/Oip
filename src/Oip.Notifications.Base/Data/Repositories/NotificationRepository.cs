@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Data.Repositories;
-using Oip.Notifications.Data.Contexts;
-using Oip.Notifications.Data.Entities;
+using Oip.Notifications.Base.Data.Contexts;
+using Oip.Notifications.Base.Data.Entities;
 
-namespace Oip.Notifications.Data.Repositories;
+namespace Oip.Notifications.Base.Data.Repositories;
 
 /// <summary>
 /// Repository for managing notifications

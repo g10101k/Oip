@@ -1,4 +1,4 @@
-namespace Oip.Users.Entities;
+namespace Oip.Users.Base.Data.Entities;
 
 /// <summary>
 /// User entity

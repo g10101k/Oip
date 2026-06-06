@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Data.Dtos;
 using Oip.Data.Repositories;
-using Oip.Users.Contexts;
-using Oip.Users.Entities;
+using Oip.Users.Base.Contexts;
+using Oip.Users.Base.Data.Entities;
 
-namespace Oip.Users.Repositories;
+namespace Oip.Users.Base.Data.Repositories;
 
 /// <summary>
 /// Provides data access operations for user entities.

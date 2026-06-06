@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Exceptions;
 using Oip.Base.Services;
-using Oip.Notifications.Contracts;
-using Oip.Notifications.Data.Contexts;
-using Oip.Users.Base;
+using Oip.Notifications.Base.Contracts;
+using Oip.Notifications.Base.Data.Contexts;
 
-namespace Oip.Notifications.Controllers;
+namespace Oip.Notifications.Base.Controllers;
 
 /// <summary>
 /// Provides API endpoints for current user notifications.

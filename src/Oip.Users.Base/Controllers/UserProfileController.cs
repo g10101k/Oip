@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Oip.Base.Exceptions;
 using Oip.Base.Services;
-using Oip.Users.Repositories;
+using Oip.Users.Base.Data.Repositories;
 
-namespace Oip.Users.Controllers;
+namespace Oip.Users.Base.Controllers;
 
 /// <summary>
 /// Controller for managing user profile operations

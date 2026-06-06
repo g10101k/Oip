@@ -4,12 +4,11 @@ using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Services;
-using Oip.Notifications.Base;
-using Oip.Notifications.Data.Entities;
-using Oip.Notifications.Data.Repositories;
+using Oip.Notifications.Base.Data.Entities;
+using Oip.Notifications.Base.Data.Repositories;
 using EmptyResponse = Google.Protobuf.WellKnownTypes.Empty;
 
-namespace Oip.Notifications.Services;
+namespace Oip.Notifications.Base.Services;
 
 /// <summary>
 /// Provides notification functionality by distributing messages to all registered notification channels with error handling and logging capabilities

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Notifications.Migrations.SqlServer
+namespace Oip.Notifications.Base.Data.Migrations.SqlServer
 {
     /// <inheritdoc />
     public partial class AddChanelAndDates_SqlServer : Migration

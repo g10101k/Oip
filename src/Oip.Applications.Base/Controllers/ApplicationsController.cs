@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Applications.Base;
 using Oip.Applications.Base.Contracts;
 using Oip.Base.Exceptions;
 
-namespace Oip.Applications.Controllers;
+namespace Oip.Applications.Base.Controllers;
 
 /// <summary>
 /// API controller for frontend application registry.

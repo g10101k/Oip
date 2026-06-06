@@ -1,6 +1,4 @@
-using Oip.Notifications.Base;
-
-namespace Oip.Notifications.Services;
+namespace Oip.Notifications.Base.Services;
 
 /// <summary>
 /// Calls the in-process notifications service when modules are composed in standalone mode.

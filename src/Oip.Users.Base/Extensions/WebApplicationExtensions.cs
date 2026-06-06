@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Builder;
 using Oip.Data.Extensions;
-using Oip.Users.Contexts;
+using Oip.Users.Base.Contexts;
 
-namespace Oip.Users.Extensions;
+namespace Oip.Users.Base.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring the users web application.

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Builder;
-using Oip.Data.Extensions;
-using Oip.Discussions.Data;
 using Oip.Base.Settings;
+using Oip.Data.Extensions;
+using Oip.Discussions.Base.Data;
 
-namespace Oip.Discussions.Extensions;
+namespace Oip.Discussions.Base.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring the discussions web application.

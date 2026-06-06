@@ -4,9 +4,9 @@ using Oip.Applications.Base;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Settings;
-using Oip.Users.Extensions;
-using Oip.Users.Services;
-using Oip.Users.Settings;
+using Oip.Users.Base.Extensions;
+using Oip.Users.Base.Services;
+using Oip.Users.Base.Settings;
 
 namespace Oip.Users;
 

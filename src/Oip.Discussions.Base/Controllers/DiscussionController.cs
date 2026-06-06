@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Exceptions;
-using Oip.Discussions.Contracts;
-using Oip.Discussions.Services;
+using Oip.Discussions.Base.Contracts;
+using Oip.Discussions.Base.Services;
 
-namespace Oip.Discussions.Controllers;
+namespace Oip.Discussions.Base.Controllers;
 
 /// <summary>
 /// Provides API endpoints for managing entity discussions.

@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Oip.Data.Contexts;
 using Oip.Data.EntityConfigurations;
 using Oip.Data.Extensions;
-using Oip.Notifications.Data.Entities;
-using Oip.Notifications.Data.EntityConfigurations;
+using Oip.Notifications.Base.Data.Entities;
+using Oip.Notifications.Base.Data.EntityConfigurations;
 
-namespace Oip.Notifications.Data.Contexts;
+namespace Oip.Notifications.Base.Data.Contexts;
 
 /// <summary>
 /// Database context for notification entities

@@ -1,5 +1,5 @@
 using Oip.Base.Settings;
-using Oip.Users.Settings;
+using Oip.Users.Base.Settings;
 
 namespace Oip.Settings;
 

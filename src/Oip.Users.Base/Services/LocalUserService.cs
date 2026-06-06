@@ -1,8 +1,8 @@
-using Oip.Users.Base;
-using Oip.Users.Repositories;
-using Oip.Users.Entities;
+using Oip.Base.Services;
+using Oip.Users.Base.Data.Entities;
+using Oip.Users.Base.Data.Repositories;
 
-namespace Oip.Users.Services;
+namespace Oip.Users.Base.Services;
 
 /// <summary>
 /// Local implementation of IUserService that accesses the database directly.

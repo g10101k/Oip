@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Oip.Data.Extensions;
-using Oip.Notifications.Data.Contexts;
-using Oip.Notifications.Data.Entities;
+using Oip.Notifications.Base.Data.Contexts;
+using Oip.Notifications.Base.Data.Entities;
 
-namespace Oip.Notifications.Data.EntityConfigurations;
+namespace Oip.Notifications.Base.Data.EntityConfigurations;
 
 /// <summary>
 /// Configures database mapping for NotificationEntity

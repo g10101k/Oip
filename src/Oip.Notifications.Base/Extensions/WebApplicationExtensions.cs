@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Oip.Notifications.Data.Contexts;
-using Oip.Notifications.Hubs;
-using Oip.Notifications.Services;
+using Oip.Notifications.Base.Data.Contexts;
+using Oip.Notifications.Base.Hubs;
+using Oip.Notifications.Base.Services;
 
-namespace Oip.Notifications.Extensions;
+namespace Oip.Notifications.Base.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring the notifications web application.

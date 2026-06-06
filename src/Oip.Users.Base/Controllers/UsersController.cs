@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oip.Data.Constants;
-using Oip.Users.Entities;
-using Oip.Users.Notifications;
-using Oip.Users.Repositories;
-using Oip.Users.Services;
+using Oip.Users.Base.Data.Entities;
+using Oip.Users.Base.Data.Repositories;
+using Oip.Users.Base.Notifications;
+using Oip.Users.Base.Services;
 
-namespace Oip.Users.Controllers;
+namespace Oip.Users.Base.Controllers;
 
 /// <summary>
 /// Controller for managing user entities
