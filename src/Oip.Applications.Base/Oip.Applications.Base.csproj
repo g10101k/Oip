@@ -21,6 +21,7 @@
         <PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
         <PackageReference Include="Grpc.Net.ClientFactory" Version="2.76.0" />
         <PackageReference Include="Grpc.Tools" Version="2.76.0" PrivateAssets="All" />
+        <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
     </ItemGroup>
 
     <ItemGroup>
