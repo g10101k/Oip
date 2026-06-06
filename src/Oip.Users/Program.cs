@@ -1,9 +1,11 @@
 using NLog;
 using NLog.Web;
+using Oip.Api.Controllers;
 using Oip.Applications.Base;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Settings;
+using Oip.Users.Base.Controllers;
 using Oip.Users.Base.Extensions;
 using Oip.Users.Base.Services;
 using Oip.Users.Base.Settings;
@@ -39,6 +41,11 @@ internal static class Program
             builder.Services.AddSingleton(settings);
             builder.Services.AddCors();
             builder.AddControllersAndView();
+            builder.Services
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>()
+                .AddController<UserProfileController>()
+                .AddController<UsersController>();
             builder.AddLocalization();
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddUsersModuleLocal(settings);

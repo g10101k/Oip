@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -99,13 +100,24 @@ public static class OipModuleApplication
     /// <returns>The modified WebApplicationBuilder instance</returns>
     public static WebApplicationBuilder AddControllersAndView(this WebApplicationBuilder builder)
     {
+        var explicitControllerRegistry = ExplicitControllerRegistrationExtensions.GetOrCreateRegistry(builder.Services);
         builder.Services.AddControllers().AddJsonOptions(option =>
         {
             option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-        builder.Services.AddMvc().AddJsonOptions(options =>
+        var mvcBuilder = builder.Services.AddMvc().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        });
+        mvcBuilder.ConfigureApplicationPartManager(partManager =>
+        {
+            for (var i = partManager.FeatureProviders.Count - 1; i >= 0; i--)
+            {
+                if (partManager.FeatureProviders[i] is ControllerFeatureProvider)
+                    partManager.FeatureProviders.RemoveAt(i);
+            }
+
+            partManager.FeatureProviders.Add(new ExplicitControllerFeatureProvider(explicitControllerRegistry));
         });
         return builder;
     }

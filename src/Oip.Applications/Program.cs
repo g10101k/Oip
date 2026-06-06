@@ -1,5 +1,7 @@
 using NLog;
 using NLog.Web;
+using Oip.Api.Controllers;
+using Oip.Applications.Base.Controllers;
 using Oip.Applications.Base.Data;
 using Oip.Applications.Base.Extensions;
 using Oip.Applications.Base.Services;
@@ -34,6 +36,10 @@ internal static class Program
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.AddControllersAndView();
+            builder.Services
+                .AddController<ApplicationsController>()
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>();
             builder.AddLocalization();
             builder.AddOpenTelemetry(settings);
 

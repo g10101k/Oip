@@ -1,11 +1,13 @@
 using NLog;
 using NLog.Web;
+using Oip.Api.Controllers;
 using Oip.Applications.Base;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
+using Oip.Notifications.Base.Controllers;
 using Oip.Notifications.Base.Extensions;
 using Oip.Notifications.Base.Settings;
 using Oip.Users.Base.Extensions;
@@ -45,6 +47,11 @@ internal static class Program
             builder.Services.AddGrpc().AddJsonTranscoding();
             builder.Services.AddGrpcSwagger();
             builder.AddControllersAndView();
+            builder.Services
+                .AddController<CryptController>()
+                .AddController<NotificationController>()
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>();
             builder.AddLocalization();
             builder.Services.AddOipDataProtection(settings);
             builder.Services.AddSignalR();

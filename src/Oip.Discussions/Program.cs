@@ -1,11 +1,13 @@
 using NLog;
 using NLog.Web;
+using Oip.Api.Controllers;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
+using Oip.Discussions.Base.Controllers;
 using Oip.Discussions.Base.Extensions;
 using Oip.Discussions.Base.Settings;
 using Oip.Users.Base.Extensions;
@@ -44,6 +46,14 @@ internal static class Program
             builder.Services.AddUsersModuleRemote(settings);
             builder.Services.AddDiscussionsModuleRemote(settings);
             builder.AddControllersAndView();
+            builder.Services
+                .AddController<DiscussionController>()
+                .AddController<FolderModuleController>()
+                .AddController<IframeModuleController>()
+                .AddController<MenuController>()
+                .AddController<ModuleController>()
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>();
             builder.AddLocalization();
 
             var app = builder.Build();

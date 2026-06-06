@@ -1,17 +1,23 @@
 using NLog;
 using NLog.Web;
 using Microsoft.EntityFrameworkCore;
+using Oip.Api.Controllers;
 using Oip.Applications.Base;
+using Oip.Applications.Base.Controllers;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
+using Oip.Controllers;
 using Oip.Data.Extensions;
 using Oip.Settings;
 using Oip.Demo.TableQueryDemo;
+using Oip.Discussions.Base.Controllers;
 using Oip.Discussions.Base.Extensions;
 using Oip.Extensions;
+using Oip.Notifications.Base.Controllers;
 using Oip.Notifications.Base.Extensions;
+using Oip.Users.Base.Controllers;
 using Oip.Users.Base.Extensions;
 using ServiceCollectionExtensions = Oip.Applications.Base.Extensions.ServiceCollectionExtensions;
 
@@ -39,7 +45,9 @@ internal static class Program
             builder.Services.GenerateWebClientStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
+            builder.Services.AddOipDataProtection(settings);
             builder.AddControllersAndView();
+            
             builder.AddLocalization();
             builder.AddOpenTelemetry(settings);
 
@@ -49,6 +57,11 @@ internal static class Program
                 builder.Services.AddDiscussionsModuleLocal(settings);
                 builder.Services.AddNotificationsModuleLocal(settings);
                 builder.Services.AddApplicationsModuleLocal(settings);
+                builder.Services
+                    .AddController<DiscussionController>()
+                    .AddController<NotificationController>()
+                    .AddController<UserProfileController>()
+                    .AddController<UsersController>();
                 builder.Services.AddSignalR();
                 builder.Services.AddGrpc();
             }
@@ -59,6 +72,19 @@ internal static class Program
                 builder.Services.AddNotificationsModuleRemote(settings);
             }
 
+            builder.Services
+                .AddController<CryptController>()
+                .AddController<FolderModuleController>()
+                .AddController<IframeModuleController>()
+                .AddController<MenuController>()
+                .AddController<ModuleController>()
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>()
+                .AddController<ApplicationsController>()
+                .AddController<CustomerModuleController>()
+                .AddController<DashboardModuleController>()
+                .AddController<WeatherForecastModuleController>();
+            
             var app = builder.Build();
 
             app.AddRequestLocalization();
