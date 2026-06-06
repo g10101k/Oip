@@ -1,5 +1,4 @@
 using Oip.Base.Services;
-using Oip.Users.Base.Data.Entities;
 using Oip.Users.Base.Data.Repositories;
 
 namespace Oip.Users.Base.Services;
@@ -15,7 +14,7 @@ public class LocalUserService(UserRepository userRepository) : IUserService
     {
         var result = await userRepository.GetAllUsersAsync(pageNumber, pageSize);
         
-        var users = result.Results.Select(MapToDto).ToList();
+        var users = result.Results.Select(x => x.ToDto()).ToList();
         
         return new UserPagedResult(
             Users: users,
@@ -29,21 +28,21 @@ public class LocalUserService(UserRepository userRepository) : IUserService
     public async Task<UserDto?> GetUserByIdAsync(int userId, CancellationToken cancellationToken = default)
     {
         var user = await userRepository.GetByIdAsync(userId, cancellationToken);
-        return user == null ? null : MapToDto(user);
+        return user == null ? null : user.ToDto();
     }
 
     /// <inheritdoc />
     public async Task<UserDto?> GetUserByKeycloakIdAsync(string keycloakId, CancellationToken cancellationToken = default)
     {
         var user = await userRepository.GetByKeycloakIdAsync(keycloakId);
-        return user == null ? null : MapToDto(user);
+        return user == null ? null : user.ToDto();
     }
 
     /// <inheritdoc />
     public async Task<UserDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         var user = await userRepository.GetByEmailAsync(email, cancellationToken);
-        return user == null ? null : MapToDto(user);
+        return user == null ? null : user.ToDto();
     }
 
     /// <inheritdoc />
@@ -52,7 +51,7 @@ public class LocalUserService(UserRepository userRepository) : IUserService
         CancellationToken cancellationToken = default)
     {
         var users = await userRepository.GetByIdsAsync(userIds, cancellationToken);
-        return users.Select(MapToDto).ToList();
+        return users.Select(x => x.ToDto()).ToList();
     }
 
     /// <inheritdoc />
@@ -61,23 +60,6 @@ public class LocalUserService(UserRepository userRepository) : IUserService
         CancellationToken cancellationToken = default)
     {
         var users = await userRepository.SearchAsync(searchTerm);
-        return users.Select(MapToDto).ToList();
-    }
-
-    private static UserDto MapToDto(UserEntity entity)
-    {
-        return new UserDto(
-            UserId: entity.UserId,
-            KeycloakId: entity.KeycloakId,
-            Email: entity.Email,
-            FirstName: entity.FirstName,
-            LastName: entity.LastName,
-            IsActive: entity.IsActive,
-            CreatedAt: entity.CreatedAt,
-            UpdatedAt: entity.UpdatedAt,
-            LastSyncedAt: entity.LastSyncedAt,
-            Photo: entity.Photo,
-            Settings: entity.Settings
-        );
+        return users.Select(x => x.ToDto()).ToList();
     }
 }

@@ -24,7 +24,7 @@ public class RemoteUserService(GrpcUserService.GrpcUserServiceClient client, ILo
         {
             var response = await client.GetAllUsersAsync(request, cancellationToken: cancellationToken);
 
-            var users = response.Users.Select(MapFromGrpc).ToList();
+            var users = response.Users.Select(x => x.ToDto()).ToList();
 
             return new UserPagedResult(
                 Users: users,
@@ -94,24 +94,6 @@ public class RemoteUserService(GrpcUserService.GrpcUserServiceClient client, ILo
             .ToList();
     }
 
-    private static UserDto MapFromGrpc(User grpcUser)
-    {
-        return new UserDto(
-            UserId: grpcUser.UserId,
-            KeycloakId: grpcUser.KeycloakId,
-            Email: grpcUser.Email,
-            FirstName: grpcUser.FirstName,
-            LastName: grpcUser.LastName,
-            IsActive: grpcUser.IsActive,
-            CreatedAt: grpcUser.CreatedAt.ToDateTimeOffset(),
-            UpdatedAt: grpcUser.UpdatedAt.ToDateTimeOffset(),
-            LastSyncedAt: grpcUser.LastSyncedAt?.ToDateTimeOffset(),
-            Photo: grpcUser.Photo.ToByteArray(),
-            Settings: grpcUser.Settings,
-            Phone: grpcUser.Phone
-        );
-    }
-
     private async Task<List<UserDto>> GetAllUsersSnapshotAsync(CancellationToken cancellationToken)
     {
         try
@@ -128,7 +110,7 @@ public class RemoteUserService(GrpcUserService.GrpcUserServiceClient client, ILo
                     PageToken = pageToken
                 }, cancellationToken: cancellationToken);
 
-                results.AddRange(response.Users.Select(MapFromGrpc));
+                results.AddRange(response.Users.Select(x => x.ToDto()));
                 if (string.IsNullOrWhiteSpace(response.NextPageToken))
                 {
                     break;

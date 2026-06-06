@@ -1,6 +1,4 @@
 using System.Collections.Concurrent;
-using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -72,21 +70,7 @@ public class UserService(IServiceScopeFactory scopeFactory, ILogger<UserService>
             // Get users from repository with pagination
             var res = await repository.GetAllUsersAsync(pageNumber, pageSize);
 
-            // Convert domain users to gRPC users
-            var grpcUsers = res.Results.Select(user => new User
-            {
-                UserId = user.UserId,
-                KeycloakId = user.KeycloakId,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                IsActive = user.IsActive,
-                CreatedAt = user.CreatedAt.ToTimestamp(),
-                UpdatedAt = user.UpdatedAt.ToTimestamp(),
-                LastSyncedAt = user.LastSyncedAt.ToTimestamp() ?? null,
-                Photo = user.Photo != null ? ByteString.CopyFrom(user.Photo) : ByteString.Empty,
-                Settings = user.Settings
-            }).ToList();
+            var grpcUsers = res.Results.Select(user => user.ToGrpc()).ToList();
 
             // Calculate next page token
             var nextPageToken = string.Empty;

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Oip.Base.Extensions;
 using Oip.Base.Services;
+using Oip.Users.Base;
 
 namespace Oip.Users.Base.Data.Repositories;
 
@@ -44,7 +45,7 @@ public class UserCacheRepository(
 
                 foreach (var user in response.Users)
                 {
-                    var cachedUser = MapToCachedUser(user);
+                    var cachedUser = user.ToCacheDto();
                     _users.AddOrUpdate(cachedUser.UserId, cachedUser, (key, oldValue) => cachedUser);
                 }
             }
@@ -103,27 +104,9 @@ public class UserCacheRepository(
 
     private void ProcessEventMessage(UserChangeEvent eventMessage)
     {
-        var cachedUser = MapToCachedUser(eventMessage.User);
+        var cachedUser = eventMessage.User.ToCacheDto();
         _users.AddOrUpdate(cachedUser.UserId, cachedUser, (i, user) => user);
         logger.LogDebug("{json}", JsonConvert.SerializeObject(eventMessage));
-    }
-
-    private static UserCacheDto MapToCachedUser(UserDto user)
-    {
-        return new UserCacheDto(
-            user.UserId,
-            user.KeycloakId,
-            user.Email,
-            user.Phone);
-    }
-
-    private static UserCacheDto MapToCachedUser(User user)
-    {
-        return new UserCacheDto(
-            user.UserId,
-            user.KeycloakId,
-            user.Email,
-            user.Phone);
     }
 
     public UserCacheDto? GetUserByKeycloakUserId(string key)
