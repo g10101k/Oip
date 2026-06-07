@@ -11,7 +11,7 @@ namespace Oip.Applications.Base.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/applications")]
-[ApiExplorerSettings(GroupName = "base")]
+[ApiExplorerSettings(GroupName = "applications")]
 public class ApplicationsController(IApplicationRegistryService registryService) : ControllerBase
 {
     /// <summary>

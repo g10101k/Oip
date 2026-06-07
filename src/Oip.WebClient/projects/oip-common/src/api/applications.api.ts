@@ -9,7 +9,7 @@ import {
   DeleteApplicationRegistryItemParams,
   GetApplicationRegistryItemByCodeParams,
   UpdateApplicationRegistryItemParams,
-} from "./data-contracts";
+} from "./applications-data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
 @Injectable()

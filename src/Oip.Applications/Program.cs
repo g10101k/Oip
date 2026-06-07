@@ -38,7 +38,6 @@ internal static class Program
             builder.AddControllersAndView();
             builder.Services
                 .AddController<ApplicationsController>()
-                .AddController<ProxySettingsController>()
                 .AddController<SecurityController>();
             builder.AddLocalization();
             builder.AddOpenTelemetry(settings);

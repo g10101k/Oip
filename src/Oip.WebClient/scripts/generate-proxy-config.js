@@ -7,11 +7,8 @@ const projectRoot = path.resolve(__dirname, '..');
 const outputDirectory = path.join(projectRoot, 'obj');
 const outputFilePath = path.join(outputDirectory, 'proxy.generated.json');
 
-const defaultTarget = process.env.ASPNETCORE_HTTPS_PORT
-  ? `https://localhost:${process.env.ASPNETCORE_HTTPS_PORT}`
-  : process.env.ASPNETCORE_URLS
-    ? process.env.ASPNETCORE_URLS.split(';')[0]
-    : 'https://localhost:5002';
+const defaultTarget = process.env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${process.env.ASPNETCORE_HTTPS_PORT}`
+  : process.env.ASPNETCORE_URLS ? process.env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:5002';
 
 function createKeepAliveProxy(context, target) {
   return {
@@ -35,96 +32,73 @@ function createWsProxy(context, target) {
   };
 }
 
-function createProxyConfig(targets, appMode) {
-  const normalizedTargets = {
-    main: targets.main || defaultTarget,
-    users: targets.users || process.env.OIP_USERS_TARGET || 'https://localhost:5005',
-    discussion: targets.discussion || process.env.OIP_DISCUSSION_TARGET || 'https://localhost:5006',
-    notification: targets.notification || process.env.OIP_NOTIFICATION_TARGET || 'https://localhost:5007'
-  };
-
-  const standaloneProxy = [
-    createWsProxy(
-      [
-        '/hubs/notification'
-      ],
-      normalizedTargets.main
-    ),
-    createKeepAliveProxy(
-      [
-        '/api',
-        '/signin-oidc',
-        '/signout-callback-oidc',
-        '/signout-oidc',
-        '/swagger',
-        '/health',
-        '/metrics'
-      ],
-      normalizedTargets.main
-    )
-  ];
-
-  const distributedProxy = [
-    createKeepAliveProxy(
-      [
-        '/api/users',
-        '/api/user-profile'
-      ],
-      normalizedTargets.users
-    ),
-    createWsProxy(
-      [
-        '/hubs/notification'
-      ],
-      normalizedTargets.notification
-    ),
-    createWsProxy(
-      [
-        '/api/discussion'
-      ],
-      normalizedTargets.discussion
-    ),
-    createKeepAliveProxy(
-      [
-        '/api',
-        '/signin-oidc',
-        '/signout-callback-oidc',
-        '/signout-oidc',
-        '/swagger',
-        '/health',
-        '/metrics'
-      ],
-      normalizedTargets.main
-    )
-  ];
-
-  return appMode === 'distributed' ? distributedProxy : standaloneProxy;
-}
-
-function getAppMode(targets) {
-  if (process.env.OIP_APP_MODE) {
-    return process.env.OIP_APP_MODE === 'distributed' ? 'distributed' : 'standalone';
+function createProxyConfig(configFromApi) {
+  if (configFromApi.standalone) {
+    return [
+      createWsProxy(
+        [
+          '/hubs/notification'
+        ],
+        configFromApi.targets.main
+      ),
+      createKeepAliveProxy(
+        [
+          '/api',
+          '/signin-oidc',
+          '/signout-callback-oidc',
+          '/signout-oidc',
+          '/swagger',
+          '/health',
+          '/metrics'
+        ],
+        configFromApi.targets.main
+      )
+    ];
+  } else {
+    return [
+      createKeepAliveProxy(
+        [
+          '/api/users',
+          '/api/user-profile'
+        ],
+        configFromApi.targets.users
+      ),
+      createWsProxy(
+        [
+          '/hubs/notification',
+          '/api/notification'
+        ],
+        configFromApi.targets.notification
+      ),
+      createWsProxy(
+        [
+          '/api/discussion'
+        ],
+        configFromApi.targets.discussion
+      ),
+      createWsProxy(
+        [
+          '/api/applications'
+        ],
+        configFromApi.targets.applications
+      ),
+      createKeepAliveProxy(
+        [
+          '/api',
+          '/signin-oidc',
+          '/signout-callback-oidc',
+          '/signout-oidc',
+          '/swagger',
+          '/health',
+          '/metrics'
+        ],
+        configFromApi.targets.main
+      )
+    ];
   }
-
-  return targets.main === targets.users
-  && targets.main === targets.discussion
-  && targets.main === targets.notification
-    ? 'standalone'
-    : 'distributed';
 }
 
-function getTargetsFromApiResponse(apiResponse) {
-  const targets = apiResponse?.targets || apiResponse?.Targets || {};
-
-  return {
-    main: targets.main || targets.Main || defaultTarget,
-    users: targets.users || targets.Users,
-    discussion: targets.discussion || targets.Discussion,
-    notification: targets.notification || targets.Notification
-  };
-}
-
-async function loadTargetsFromApi() {
+async function loadProxyConfigFromApi() {
   let lastError;
 
   for (let attempt = 1; attempt <= 10; attempt += 1) {
@@ -137,7 +111,7 @@ async function loadTargetsFromApi() {
         throw new Error(`Proxy settings request failed with status ${response.status}`);
       }
 
-      return getTargetsFromApiResponse(await response.json());
+      return await response.json()
     } catch (error) {
       lastError = error;
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -148,31 +122,15 @@ async function loadTargetsFromApi() {
 }
 
 function writeConfig(config) {
-  fs.mkdirSync(outputDirectory, { recursive: true });
+  fs.mkdirSync(outputDirectory, {recursive: true});
   fs.writeFileSync(outputFilePath, JSON.stringify(config, null, 2));
 }
 
 async function main() {
-  try {
-    const targets = await loadTargetsFromApi();
-    const appMode = getAppMode(targets);
-    const proxyConfig = createProxyConfig(targets, appMode);
-
-    writeConfig(proxyConfig);
-    console.log(`Proxy config generated from API: ${outputFilePath}`);
-  } catch (error) {
-    const fallbackMode = process.env.OIP_APP_MODE
-      ? (process.env.OIP_APP_MODE === 'distributed' ? 'distributed' : 'standalone')
-      : 'distributed';
-    const fallbackConfig = createProxyConfig({}, fallbackMode);
-
-    writeConfig(fallbackConfig);
-    console.warn('Failed to fetch proxy config from API, fallback config was generated instead.');
-    console.warn(error instanceof Error ? error.message : error);
-    if (error && typeof error === 'object' && 'cause' in error) {
-      console.warn(error.cause);
-    }
-  }
+  const targets = await loadProxyConfigFromApi();
+  const proxyConfig = createProxyConfig(targets)
+  writeConfig(proxyConfig);
+  console.log(`Proxy config generated from API: ${outputFilePath}`);
 }
 
 main().catch(error => {

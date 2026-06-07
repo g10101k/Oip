@@ -54,7 +54,7 @@ export interface TableQueryRequest {
   sortField?: string | null;
   sortOrder?: number;
   globalFilter?: string | null;
-  filters?: Record<string, any>;
+  filters?: Record<string, any> | null;
 }
 
 export interface WeatherForecastResponse {
