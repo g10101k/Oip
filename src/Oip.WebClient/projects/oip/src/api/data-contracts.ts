@@ -11,6 +11,10 @@ export interface ApiExceptionResponse {
   stackTrace?: string | null;
 }
 
+export interface CustomUserNotify {
+  username?: string | null;
+}
+
 export type CustomerModuleSettings = object;
 
 export interface DashboardSettings {
@@ -48,6 +52,10 @@ export interface SaveDemoCustomerRequest {
   lifetimeValue?: number;
 }
 
+export interface SyncUserRequest {
+  keycloakUserId?: string | null;
+}
+
 export interface TableQueryRequest {
   first?: number;
   rows?: number;
@@ -55,6 +63,20 @@ export interface TableQueryRequest {
   sortOrder?: number;
   globalFilter?: string | null;
   filters?: Record<string, any> | null;
+}
+
+export interface UserEntity {
+  userId?: number;
+  keycloakId?: string | null;
+  email: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  lastSyncedAt?: Date;
+  photo?: Blob | null;
+  settings?: string | null;
 }
 
 export interface WeatherForecastResponse {
@@ -82,6 +104,23 @@ export interface GetModuleInstanceSettingsParams {
 
 export interface DashboardGetModuleInstanceSettingsParams {
   id?: number;
+}
+
+export interface GetAllUsersParams {
+  skip?: number;
+  take?: number;
+}
+
+export interface GetUserParams {
+  id?: number;
+}
+
+export interface GetUserByKeycloakIdParams {
+  keycloakId?: string;
+}
+
+export interface SearchUserParams {
+  term?: string;
 }
 
 export interface GetWeatherForecastParams {
