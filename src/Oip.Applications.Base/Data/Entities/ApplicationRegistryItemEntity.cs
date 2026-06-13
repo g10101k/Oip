@@ -28,9 +28,9 @@ public class ApplicationRegistryItemEntity
     public string BaseUrl { get; set; } = string.Empty;
 
     /// <summary>
-    /// Backend API URL.
+    /// Internal base URL.
     /// </summary>
-    public string ApiBaseUrl { get; set; } = string.Empty;
+    public string InternalBaseUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// PrimeIcons CSS class.

@@ -28,7 +28,7 @@ public class ApplicationRegistryItemEntityConfiguration(DatabaseFacade database)
         builder.Property(e => e.BaseUrl)
             .IsRequired()
             .HasMaxLength(2048);
-        builder.Property(e => e.ApiBaseUrl)
+        builder.Property(e => e.InternalBaseUrl)
             .IsRequired()
             .HasMaxLength(2048);
         builder.Property(e => e.Icon)

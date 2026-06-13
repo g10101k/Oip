@@ -57,7 +57,7 @@ public class ApplicationSelfRegistrationStartupTaskTests
             Code = "test-app",
             DisplayName = "Test App",
             BaseUrl = "https://localhost:50001",
-            ApiBaseUrl = "https://localhost:5001",
+            InternalBaseUrl = "https://localhost:5001",
             Icon = "pi pi-test",
             Order = 10,
             Enabled = true

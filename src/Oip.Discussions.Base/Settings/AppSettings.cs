@@ -17,10 +17,11 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
         Code = "oip-discussions",
         DisplayName = "OIP.Discussions",
         BaseUrl = "https://localhost:50002",
-        ApiBaseUrl = "https://localhost:5006",
+        InternalBaseUrl = "https://localhost:5006",
         Icon = "pi pi-comments",
         Order = 60,
-        Enabled = false
+        Enabled = false,
+        ServiceType = ServiceType.Service
     };
 
     /// <inheritdoc />

@@ -15,7 +15,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
         Code = "oip-notifications",
         DisplayName = "OIP.Notifications",
         BaseUrl = "https://localhost:50002",
-        ApiBaseUrl = "https://localhost:5007",
+        InternalBaseUrl = "https://localhost:5007",
         Icon = "pi pi-bell",
         Order = 50,
         Enabled = false,

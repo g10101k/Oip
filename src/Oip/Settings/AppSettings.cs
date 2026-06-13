@@ -17,9 +17,10 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
         Code = "oip",
         DisplayName = "OIP",
         BaseUrl = "https://localhost:50002",
-        ApiBaseUrl = "https://localhost:5002",
+        InternalBaseUrl = "https://localhost:5002",
         Icon = "pi pi-home",
-        Order = 10
+        Order = 10,
+        ServiceType = ServiceType.Application
     };
 
     /// <inheritdoc />

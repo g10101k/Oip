@@ -34,6 +34,10 @@ Location: Oip.Base/Exceptions/ApiExceptionResponse.cs
 
 # Codex Instructions
 
+## Entity Framework Migrations
+
+When working on EF Core models, DbContext configuration, entity mappings use `dotnet ef migrations add` command for the responsible project/context.
+
 ## ASP.NET Web API Client Generation
 
 This repository uses ASP.NET `dotnet run` to generate Angular Web API clients.

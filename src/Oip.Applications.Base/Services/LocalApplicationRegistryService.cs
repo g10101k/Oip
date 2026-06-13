@@ -109,7 +109,7 @@ public class LocalApplicationRegistryService(
             Code = entity.Code,
             DisplayName = entity.DisplayName,
             BaseUrl = NormalizeUrl(entity.BaseUrl),
-            ApiBaseUrl = NormalizeUrl(entity.ApiBaseUrl),
+            InternalBaseUrl = NormalizeUrl(entity.InternalBaseUrl),
             Icon = entity.Icon,
             Order = entity.Order,
             Enabled = entity.Enabled,
@@ -130,7 +130,7 @@ public class LocalApplicationRegistryService(
         entity.Code = application.Code.Trim();
         entity.DisplayName = application.DisplayName.Trim();
         entity.BaseUrl = NormalizeUrl(application.BaseUrl);
-        entity.ApiBaseUrl = NormalizeUrl(application.ApiBaseUrl);
+        entity.InternalBaseUrl = NormalizeUrl(application.InternalBaseUrl);
         entity.Icon = string.IsNullOrWhiteSpace(application.Icon) ? "pi pi-circle" : application.Icon.Trim();
         entity.Order = application.Order;
         entity.Enabled = application.Enabled;
@@ -157,10 +157,10 @@ public class LocalApplicationRegistryService(
                 "Application registry item base URL must be specified.",
                 StatusCodes.Status400BadRequest);
 
-        if (string.IsNullOrWhiteSpace(application.ApiBaseUrl))
+        if (string.IsNullOrWhiteSpace(application.InternalBaseUrl))
             throw new ApiException(
-                "Application API base URL is required",
-                "Application registry item API base URL must be specified.",
+                "Application Internal base URL is required",
+                "Application registry item Internal base URL must be specified.",
                 StatusCodes.Status400BadRequest);
     }
 

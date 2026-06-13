@@ -22,7 +22,7 @@ interface ApplicationEditModel {
   code: string;
   displayName: string;
   baseUrl: string;
-  apiBaseUrl: string;
+  internalBaseUrl: string;
   icon: string;
   order: number;
   enabled: boolean;
@@ -126,9 +126,9 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                 {{ 'applications.table.baseUrl' | translate }}
                 <p-sortIcon field="baseUrl"></p-sortIcon>
               </th>
-              <th pSortableColumn="apiBaseUrl">
-                {{ 'applications.table.apiBaseUrl' | translate }}
-                <p-sortIcon field="apiBaseUrl"></p-sortIcon>
+              <th pSortableColumn="internalBaseUrl">
+                {{ 'applications.table.internalBaseUrl' | translate }}
+                <p-sortIcon field="internalBaseUrl"></p-sortIcon>
               </th>
               <th pSortableColumn="icon">
                 {{ 'applications.table.icon' | translate }}
@@ -177,9 +177,9 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
               </td>
               <td>
                 @if (application._isEditing && application._editModel; as editModel) {
-                  <input class="w-full min-w-56" pInputText [(ngModel)]="editModel.apiBaseUrl" />
+                  <input class="w-full min-w-56" pInputText [(ngModel)]="editModel.internalBaseUrl" />
                 } @else {
-                  <span class="break-all">{{ application.apiBaseUrl }}</span>
+                  <span class="break-all">{{ application.internalBaseUrl }}</span>
                 }
               </td>
               <td>
@@ -284,7 +284,7 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
   `
 })
 export class ApplicationsComponent implements OnInit {
-  protected readonly globalFilterFields = ['code', 'displayName', 'baseUrl', 'apiBaseUrl', 'icon', 'serviceType'];
+  protected readonly globalFilterFields = ['code', 'displayName', 'baseUrl', 'internalBaseUrl', 'icon', 'serviceType'];
   protected get serviceTypeOptions(): {
     label: string;
     value: NonNullable<ApplicationRegistryItemDto['serviceType']>;
@@ -357,7 +357,7 @@ export class ApplicationsComponent implements OnInit {
       code: '',
       displayName: '',
       baseUrl: '',
-      apiBaseUrl: '',
+      internalBaseUrl: '',
       icon: 'pi pi-th-large',
       order: this.getNextOrder(),
       enabled: true,
@@ -469,7 +469,7 @@ export class ApplicationsComponent implements OnInit {
       code: application?.code ?? '',
       displayName: application?.displayName ?? '',
       baseUrl: application?.baseUrl ?? '',
-      apiBaseUrl: application?.apiBaseUrl ?? '',
+      internalBaseUrl: application?.internalBaseUrl ?? '',
       icon: application?.icon ?? 'pi pi-th-large',
       order: application?.order ?? 0,
       enabled: application?.enabled ?? true,
@@ -482,7 +482,7 @@ export class ApplicationsComponent implements OnInit {
       code: model.code.trim(),
       displayName: model.displayName.trim(),
       baseUrl: model.baseUrl.trim(),
-      apiBaseUrl: model.apiBaseUrl.trim(),
+      internalBaseUrl: model.internalBaseUrl.trim(),
       icon: model.icon.trim(),
       order: Number(model.order) || 0,
       enabled: model.enabled,

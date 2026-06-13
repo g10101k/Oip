@@ -12,7 +12,7 @@
       "code": "Code",
       "displayName": "Name",
       "baseUrl": "Base URL",
-      "apiBaseUrl": "API Base URL",
+      "internalBaseUrl": "Internal Base URL",
       "icon": "Icon",
       "order": "Order",
       "enabled": "Enabled",

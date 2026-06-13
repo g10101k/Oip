@@ -14,7 +14,7 @@ export interface ApplicationRegistryItemDto {
   code?: string | null;
   displayName?: string | null;
   baseUrl?: string | null;
-  apiBaseUrl?: string | null;
+  internalBaseUrl?: string | null;
   icon?: string | null;
   order?: number;
   enabled?: boolean;

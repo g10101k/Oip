@@ -19,7 +19,7 @@ message ApplicationRegistryItem {
   string code = 1;
   string display_name = 2;
   string base_url = 3;
-  string api_base_url = 4;
+  string internal_base_url = 4;
   string icon = 5;
   int32 order = 6;
   bool enabled = 7;

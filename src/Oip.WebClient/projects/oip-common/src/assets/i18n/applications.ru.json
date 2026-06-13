@@ -12,7 +12,7 @@
       "code": "Код",
       "displayName": "Название",
       "baseUrl": "Base URL",
-      "apiBaseUrl": "API Base URL",
+      "internalBaseUrl": "Internal Base URL",
       "icon": "Иконка",
       "order": "Порядок",
       "enabled": "Включено",

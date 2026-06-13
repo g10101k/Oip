@@ -17,10 +17,11 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
         Code = "oip-applications",
         DisplayName = "OIP.Applications",
         BaseUrl = "https://localhost:50002",
-        ApiBaseUrl = "https://localhost:5008",
+        InternalBaseUrl = "https://localhost:5008",
         Icon = "pi pi-th-large",
         Order = 30,
-        Enabled = false
+        Enabled = false,
+        ServiceType = ServiceType.Service
     };
 
     /// <inheritdoc />

@@ -33,7 +33,7 @@ public class ApplicationSelfRegistrationStartupTask(
                 Code = appSettings.Application.Code,
                 DisplayName = appSettings.Application.DisplayName,
                 BaseUrl = appSettings.Application.BaseUrl,
-                ApiBaseUrl = appSettings.Application.ApiBaseUrl,
+                InternalBaseUrl = appSettings.Application.InternalBaseUrl,
                 Icon = appSettings.Application.Icon,
                 Order = appSettings.Application.Order,
                 Enabled = appSettings.Application.Enabled,

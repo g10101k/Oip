@@ -21,9 +21,10 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
         Code = "oip-rtds",
         DisplayName = "OIP.Rtds",
         BaseUrl = "https://localhost:50003",
-        ApiBaseUrl = "https://localhost:5003",
+        InternalBaseUrl = "https://localhost:5003",
         Icon = "pi pi-database",
-        Order = 20
+        Order = 20,
+        ServiceType = ServiceType.Application
     };
 
     /// <inheritdoc />
