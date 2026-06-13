@@ -30,7 +30,7 @@ export { NoSettingsDto } from './dtos/no-settings.dto';
 
 // Services
 export { TopBarService } from './services/top-bar.service';
-export { AuthCsrfToken, BffSecurityService, SecurityService, KeycloakSecurityService } from './services/security.service';
+export { AuthCsrfToken, BffSecurityService, SecurityService } from './services/security.service';
 export { MsgService } from './services/msg.service';
 export { AuthGuardService } from './services/auth-guard.service';
 export { AppConfig, LayoutService } from './services/app.layout.service';
@@ -60,7 +60,7 @@ export { FolderModuleApi } from './api/folder-module.api';
 export { IframeModuleApi } from './api/iframe-module.api';
 export { SecurityApi } from './api/security.api';
 export { ApplicationsApi } from './api/applications.api';
-import { ApplicationRegistryItemDto } from './api/data-contracts'
+import { ApplicationRegistryItemDto } from './api/applications-data-contracts'
 export { UserProfileApi } from './api/user-profile.api';
 export { convertToPrimeNgDateFormat } from './helpers/date.helper'
 export { NotificationApi } from './api/notification.api';

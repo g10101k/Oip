@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ApplicationsApi } from '../api/applications.api';
-import { ApplicationRegistryItemDto } from '../api/data-contracts'
+import { ApplicationRegistryItemDto } from '../api/applications-data-contracts'
 
 @Injectable()
 export class ApplicationRegistryService {

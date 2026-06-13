@@ -5,7 +5,7 @@ import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 import { ApplicationsApi } from '../api/applications.api';
-import { ApplicationRegistryItemDto } from '../api/data-contracts';
+import { ApplicationRegistryItemDto } from '../api/applications-data-contracts';
 import { ApplicationRegistryService } from '../services/application-registry.service';
 
 @Component({

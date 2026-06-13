@@ -12,7 +12,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
 import { firstValueFrom } from 'rxjs';
 import { ApplicationsApi } from '../api/applications.api';
-import { ApplicationRegistryItemDto } from '../api/data-contracts';
+import { ApplicationRegistryItemDto } from '../api/applications-data-contracts';
 import { AppTitleService } from '../services/app-title.service';
 import { L10nService } from '../services/l10n.service';
 import { MsgService } from '../services/msg.service';
