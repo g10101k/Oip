@@ -1,3 +1,5 @@
+using Oip.Base.Settings;
+
 namespace Oip.Applications.Base.Contracts;
 
 /// <summary>
@@ -39,6 +41,11 @@ public class ApplicationRegistryItemDto
     /// Indicates whether application should be returned to frontend.
     /// </summary>
     public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Type of service.
+    /// </summary>
+    public ServiceType ServiceType { get; set; } = ServiceType.Service;
 
     /// <summary>
     /// Indicates whether this application is current.

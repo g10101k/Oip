@@ -16,6 +16,7 @@
       "icon": "Icon",
       "order": "Order",
       "enabled": "Enabled",
+      "serviceType": "Service type",
       "current": "Current",
       "actions": "Actions",
       "yes": "Yes",
@@ -24,6 +25,10 @@
       "deleteTooltip": "Delete",
       "saveTooltip": "Save",
       "cancelTooltip": "Cancel"
+    },
+    "serviceTypes": {
+      "service": "Service",
+      "application": "Application"
     },
     "confirm": {
       "header": "Warning",

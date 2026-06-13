@@ -5,6 +5,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { InputText } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
@@ -12,7 +13,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
 import { firstValueFrom } from 'rxjs';
 import { ApplicationsApi } from '../api/applications.api';
-import { ApplicationRegistryItemDto } from '../api/applications-data-contracts';
+import { ApplicationRegistryItemDto, ServiceType } from '../api/applications-data-contracts';
 import { AppTitleService } from '../services/app-title.service';
 import { L10nService } from '../services/l10n.service';
 import { MsgService } from '../services/msg.service';
@@ -25,6 +26,7 @@ interface ApplicationEditModel {
   icon: string;
   order: number;
   enabled: boolean;
+  serviceType: NonNullable<ApplicationRegistryItemDto['serviceType']>;
 }
 
 interface ApplicationTableItem extends ApplicationRegistryItemDto {
@@ -44,6 +46,7 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
     ConfirmDialog,
     TranslatePipe,
     InputText,
+    SelectModule,
     ToggleSwitchModule
   ],
   providers: [ApplicationsApi, ConfirmationService],
@@ -136,6 +139,10 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                 <p-sortIcon field="order"></p-sortIcon>
               </th>
               <th class="text-center">{{ 'applications.table.enabled' | translate }}</th>
+              <th pSortableColumn="serviceType">
+                {{ 'applications.table.serviceType' | translate }}
+                <p-sortIcon field="serviceType"></p-sortIcon>
+              </th>
               <th class="text-center">{{ 'applications.table.current' | translate }}</th>
               <th class="text-center min-w-36">{{ 'applications.table.actions' | translate }}</th>
             </tr>
@@ -200,7 +207,20 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                     [severity]="application.enabled ? 'success' : 'danger'"
                     [value]="
                       (application.enabled ? 'applications.table.yes' : 'applications.table.no') | translate
-                    "></p-tag>
+                  "></p-tag>
+                }
+              </td>
+              <td>
+                @if (application._isEditing && application._editModel; as editModel) {
+                  <p-select
+                    class="w-full min-w-36"
+                    optionLabel="label"
+                    optionValue="value"
+                    appendTo="body"
+                    [options]="serviceTypeOptions"
+                    [(ngModel)]="editModel.serviceType"></p-select>
+                } @else {
+                  {{ serviceTypeLabel(application.serviceType) }}
                 }
               </td>
               <td class="text-center">
@@ -253,7 +273,7 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="9" class="py-8 text-center text-surface-500">
+              <td colspan="10" class="py-8 text-center text-surface-500">
                 {{ 'applications.empty' | translate }}
               </td>
             </tr>
@@ -264,7 +284,22 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
   `
 })
 export class ApplicationsComponent implements OnInit {
-  protected readonly globalFilterFields = ['code', 'displayName', 'baseUrl', 'apiBaseUrl', 'icon'];
+  protected readonly globalFilterFields = ['code', 'displayName', 'baseUrl', 'apiBaseUrl', 'icon', 'serviceType'];
+  protected get serviceTypeOptions(): {
+    label: string;
+    value: NonNullable<ApplicationRegistryItemDto['serviceType']>;
+  }[] {
+    return [
+      {
+        label: this.t('applications.serviceTypes.service'),
+        value: ServiceType.Service
+      },
+      {
+        label: this.t('applications.serviceTypes.application'),
+        value: ServiceType.Application
+      }
+    ];
+  }
   protected applications: ApplicationTableItem[] = [];
   protected visibleApplications: ApplicationTableItem[] = [];
   protected globalFilter = '';
@@ -326,6 +361,7 @@ export class ApplicationsComponent implements OnInit {
       icon: 'pi pi-th-large',
       order: this.getNextOrder(),
       enabled: true,
+      serviceType: ServiceType.Service,
       isCurrent: false,
       _isNew: true,
       _isEditing: true,
@@ -436,7 +472,8 @@ export class ApplicationsComponent implements OnInit {
       apiBaseUrl: application?.apiBaseUrl ?? '',
       icon: application?.icon ?? 'pi pi-th-large',
       order: application?.order ?? 0,
-      enabled: application?.enabled ?? true
+      enabled: application?.enabled ?? true,
+      serviceType: application?.serviceType ?? ServiceType.Service
     };
   }
 
@@ -448,8 +485,17 @@ export class ApplicationsComponent implements OnInit {
       apiBaseUrl: model.apiBaseUrl.trim(),
       icon: model.icon.trim(),
       order: Number(model.order) || 0,
-      enabled: model.enabled
+      enabled: model.enabled,
+      serviceType: model.serviceType
     };
+  }
+
+  protected serviceTypeLabel(serviceType: ApplicationRegistryItemDto['serviceType']): string {
+    return this.t(
+      serviceType === ServiceType.Application
+        ? 'applications.serviceTypes.application'
+        : 'applications.serviceTypes.service'
+    );
   }
 
   private cancelAllEdits(exceptApplication?: ApplicationTableItem): void {

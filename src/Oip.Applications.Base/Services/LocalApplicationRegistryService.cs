@@ -113,6 +113,7 @@ public class LocalApplicationRegistryService(
             Icon = entity.Icon,
             Order = entity.Order,
             Enabled = entity.Enabled,
+            ServiceType = entity.ServiceType,
             IsCurrent = string.Equals(entity.Code, appSettings.Application.Code, StringComparison.OrdinalIgnoreCase)
         };
     }
@@ -133,6 +134,7 @@ public class LocalApplicationRegistryService(
         entity.Icon = string.IsNullOrWhiteSpace(application.Icon) ? "pi pi-circle" : application.Icon.Trim();
         entity.Order = application.Order;
         entity.Enabled = application.Enabled;
+        entity.ServiceType = application.ServiceType;
     }
 
     private static void Validate(ApplicationRegistryItemDto application)

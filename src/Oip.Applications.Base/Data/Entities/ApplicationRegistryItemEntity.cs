@@ -1,3 +1,5 @@
+using Oip.Base.Settings;
+
 namespace Oip.Applications.Base.Data;
 
 /// <summary>
@@ -44,4 +46,9 @@ public class ApplicationRegistryItemEntity
     /// Indicates whether application should be returned to frontend.
     /// </summary>
     public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Type of service.
+    /// </summary>
+    public ServiceType ServiceType { get; set; } = ServiceType.Service;
 }

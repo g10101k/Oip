@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Oip.Applications.Base.Data;
-using Oip.Applications.Data;
 
 namespace Oip.Applications.Base.Extensions;
 

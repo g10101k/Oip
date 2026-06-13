@@ -24,6 +24,12 @@ message ApplicationRegistryItem {
   int32 order = 6;
   bool enabled = 7;
   bool is_current = 8;
+  ServiceType service_type = 9;
+}
+
+enum ServiceType {
+  SERVICE_TYPE_SERVICE = 0;
+  SERVICE_TYPE_APPLICATION = 1;
 }
 
 message RegisterApplicationRequest {

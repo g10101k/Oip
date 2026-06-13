@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Oip.Applications.Base.Data;
 using Oip.Applications.Base.Services;
 using Oip.Applications.Base.StartupTasks;
-using Oip.Applications.Data;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Settings.Enums;

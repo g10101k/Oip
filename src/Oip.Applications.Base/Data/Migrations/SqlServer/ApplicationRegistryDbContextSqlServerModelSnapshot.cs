@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oip.Applications.Base.Data;
-using Oip.Applications.Data;
 
 #nullable disable
 
@@ -22,7 +21,7 @@ namespace Oip.Applications.Data.Migrations.SqlServer
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Oip.Applications.Data.ApplicationRegistryItemEntity", b =>
+            modelBuilder.Entity("Oip.Applications.Base.Data.ApplicationRegistryItemEntity", b =>
                 {
                     b.Property<long>("ApplicationRegistryItemId")
                         .ValueGeneratedOnAdd()
@@ -70,6 +69,12 @@ namespace Oip.Applications.Data.Migrations.SqlServer
                     b.Property<int>("Order")
                         .HasColumnType("int")
                         .HasComment("Display order.");
+
+                    b.Property<int>("ServiceType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasComment("Type of service.");
 
                     b.HasKey("ApplicationRegistryItemId");
 

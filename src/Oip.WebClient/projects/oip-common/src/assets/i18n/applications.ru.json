@@ -16,6 +16,7 @@
       "icon": "Иконка",
       "order": "Порядок",
       "enabled": "Включено",
+      "serviceType": "Тип сервиса",
       "current": "Текущее",
       "actions": "Действия",
       "yes": "Да",
@@ -24,6 +25,10 @@
       "deleteTooltip": "Удалить",
       "saveTooltip": "Сохранить",
       "cancelTooltip": "Отменить"
+    },
+    "serviceTypes": {
+      "service": "Сервис",
+      "application": "Приложение"
     },
     "confirm": {
       "header": "Внимание",

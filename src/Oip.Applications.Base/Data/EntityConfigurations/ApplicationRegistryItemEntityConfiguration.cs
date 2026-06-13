@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Oip.Base.Settings;
 using Oip.Data.Extensions;
 
 namespace Oip.Applications.Base.Data.EntityConfigurations;
@@ -38,6 +39,9 @@ public class ApplicationRegistryItemEntityConfiguration(DatabaseFacade database)
         builder.Property(e => e.Enabled)
             .IsRequired()
             .HasDefaultValue(true);
+        builder.Property(e => e.ServiceType)
+            .IsRequired()
+            .HasDefaultValue(ServiceType.Service);
         builder.HasIndex(e => e.Code)
             .IsUnique();
     }

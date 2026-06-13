@@ -1,3 +1,8 @@
+export enum ServiceType {
+  Service = "Service",
+  Application = "Application",
+}
+
 export interface ApiExceptionResponse {
   title?: string | null;
   message?: string | null;
@@ -13,6 +18,7 @@ export interface ApplicationRegistryItemDto {
   icon?: string | null;
   order?: number;
   enabled?: boolean;
+  serviceType?: ServiceType;
   isCurrent?: boolean;
 }
 

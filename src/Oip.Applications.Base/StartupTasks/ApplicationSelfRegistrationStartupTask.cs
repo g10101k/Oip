@@ -36,7 +36,8 @@ public class ApplicationSelfRegistrationStartupTask(
                 ApiBaseUrl = appSettings.Application.ApiBaseUrl,
                 Icon = appSettings.Application.Icon,
                 Order = appSettings.Application.Order,
-                Enabled = appSettings.Application.Enabled
+                Enabled = appSettings.Application.Enabled,
+                ServiceType = appSettings.Application.ServiceType
             }, cancellationToken);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
