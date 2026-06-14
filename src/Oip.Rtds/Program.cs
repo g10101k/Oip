@@ -1,10 +1,13 @@
 using NLog;
 using NLog.Web;
+using Oip.Api.Controllers;
+using Oip.Applications.Base;
+using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
-using Oip.Base.StartupTasks;
+using Oip.Rtds.Controllers;
 using Oip.Rtds.Data;
 using Oip.Rtds.Data.Extensions;
 using Oip.Rtds.HostedService;
@@ -29,12 +32,22 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+            builder.Services.AddApplicationsModuleRemote(settings);
+            builder.Services.GenerateWebClientStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddSingleton(settings);
             builder.Services.AddScoped<UserService>();
             builder.Services.AddCors();
             builder.AddControllersAndView();
+            builder.Services
+                .AddController<FolderModuleController>()
+                .AddController<IframeModuleController>()
+                .AddController<MenuController>()
+                .AddController<ModuleController>()
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>()
+                .AddController<RtdsMetaDataContextMigrationModuleController>()
+                .AddController<TagManagementModuleController>();
             builder.AddLocalization();
             builder.Services.AddGrpc();
             builder.Services.AddSingleton<RtdsService>();
@@ -52,6 +65,7 @@ internal static class Program
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
+            app.UseOipCsrfProtection();
             app.UseAuthorization();
             app.UseCors(options => options.AllowAnyOrigin());
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");

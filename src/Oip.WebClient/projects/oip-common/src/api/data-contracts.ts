@@ -19,6 +19,19 @@ export interface ApiExceptionResponse {
   stackTrace?: string | null;
 }
 
+export interface AuthCsrfTokenResponse {
+  token?: string | null;
+  headerName?: string | null;
+}
+
+export interface AuthSessionResponse {
+  isAuthenticated?: boolean;
+  userName?: string | null;
+  displayName?: string | null;
+  email?: string | null;
+  roles?: string[] | null;
+}
+
 export interface CryptRequest {
   message?: string | null;
 }
@@ -40,17 +53,6 @@ export interface ExistModuleDto {
 
 export interface FolderModuleSettings {
   html?: string | null;
-}
-
-export interface GetKeycloakClientSettingsResponse {
-  authority?: string | null;
-  clientId?: string | null;
-  scope?: string | null;
-  responseType?: string | null;
-  useRefreshToken?: boolean;
-  silentRenew?: boolean;
-  logLevel?: number;
-  secureRoutes?: string[] | null;
 }
 
 export interface IframeModuleSettings {

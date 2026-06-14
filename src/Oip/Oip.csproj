@@ -23,12 +23,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Oip.Api\Oip.Api.csproj"/>
+        <ProjectReference Include="..\Oip.Applications.Base\Oip.Applications.Base.csproj"/>
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
-        <ProjectReference Include="..\Oip.Data\Oip.Data.csproj"/>
-        <ProjectReference Include="..\Oip.Users\Oip.Users.csproj"/>
-        <ProjectReference Include="..\Oip.Discussions\Oip.Discussions.csproj"/>
-        <ProjectReference Include="..\Oip.Notifications\Oip.Notifications.csproj"/>
+        <ProjectReference Include="..\Oip.Discussions.Base\Oip.Discussions.Base.csproj" />
+        <ProjectReference Include="..\Oip.Notifications.Base\Oip.Notifications.Base.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -74,7 +72,7 @@
     <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition=" '$(UseAppHost)' != 'false'  ">
         <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
         <Exec WorkingDirectory="$(SpaRoot)" Command="npm install"/>
-        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build"/>
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build:oip"/>
 
         <!-- Include the newly-built files in the publish output -->
         <ItemGroup>

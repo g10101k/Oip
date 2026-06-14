@@ -72,7 +72,9 @@ let config = {
   primitiveTypeConstructs: (constructs) => ({
     ...constructs,
     string: {
-      "date-time": "Date"
+      "date-time": "Date",
+      binary: "Blob",
+      byte: "Blob"
     }
   }),
   hooks: {
@@ -80,8 +82,28 @@ let config = {
     onCreateRequestParams: (rawType) => {},
     onCreateRoute: (routeData) => {},
     onCreateRouteName: (routeNameInfo, rawRouteInfo) => {
-      if (routeNameInfo.usage.startsWith(rawRouteInfo.moduleName)) {
-        const str = routeNameInfo.usage.substring(rawRouteInfo.moduleName.length);
+      const route = rawRouteInfo.route || rawRouteInfo.path || "<unknown route>";
+      const method = rawRouteInfo.method || rawRouteInfo.requestMethod || "<unknown method>";
+      const tags = Array.isArray(rawRouteInfo.tags) ? rawRouteInfo.tags.join(", ") : (rawRouteInfo.tags || "<none>");
+      const moduleName = rawRouteInfo.moduleName;
+
+      if (!moduleName) {
+        throw new Error(
+          `Invalid API route name for ${method.toUpperCase()} ${route}. Missing moduleName. Tags: ${tags}. ` +
+            "Add a controller tag/module name or provide explicit operationId.",
+        );
+      }
+
+      if (routeNameInfo.usage === moduleName) {
+        throw new Error(
+          `Invalid API route name for ${method.toUpperCase()} ${route}. Generated usage "${routeNameInfo.usage}" ` +
+            `equals moduleName "${moduleName}". Add an action segment in controller route, ` +
+            `e.g. [HttpGet("get-${moduleName}")], or provide explicit operationId.`,
+        );
+      }
+
+      if (routeNameInfo.usage.startsWith(moduleName)) {
+        const str = routeNameInfo.usage.substring(moduleName.length);
         routeNameInfo.usage = str[0].toLowerCase() + str.slice(1);
         routeNameInfo.original = routeNameInfo.usage;
       }

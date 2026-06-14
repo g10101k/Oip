@@ -1,0 +1,18 @@
+services:
+  oip-users:
+    volumes:
+      - type: bind
+        source: ${LOCALAPPDATA}/ASP.NET/DataProtection-Keys
+        target: /PersistKeys
+
+  oip-applications:
+    volumes:
+      - type: bind
+        source: ${LOCALAPPDATA}/ASP.NET/DataProtection-Keys
+        target: /PersistKeys
+
+  oip-notifications:
+    volumes:
+      - type: bind
+        source: ${LOCALAPPDATA}/ASP.NET/DataProtection-Keys
+        target: /PersistKeys

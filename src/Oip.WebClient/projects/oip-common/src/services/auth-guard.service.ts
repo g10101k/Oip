@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { Router, UrlTree } from '@angular/router';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { Observable, combineLatest, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { SecurityService } from './security.service';
 
 /**
@@ -12,46 +11,25 @@ import { SecurityService } from './security.service';
 @Injectable()
 export class AuthGuardService {
   private readonly oidcSecurityService = inject(SecurityService);
-  private readonly router = inject(Router);
 
   /**
    * Checks whether the route can be activated.
    * - Returns `true` if the user is authenticated and the token is valid.
    * - Attempts to refresh the token if expired.
-   * - Redirects to `/unauthorized` if not authenticated or refresh fails.
+   * - Starts the authorization flow if not authenticated or refresh fails.
    *
-   * @returns {Observable<boolean | UrlTree>} A stream resolving to true (allow), or UrlTree (redirect).
+   * @returns {Observable<boolean>} A stream resolving to true (allow), or false after starting authorization.
    */
-  canActivate(): Observable<boolean | UrlTree> {
-    return combineLatest([this.oidcSecurityService.isAuthenticated(), this.oidcSecurityService.isTokenExpired()]).pipe(
-      switchMap(([authenticated, tokenExpired]) => {
-        if (!authenticated) {
-          return of(this.router.parseUrl('/unauthorized'));
-        }
-        if (!tokenExpired) {
-          return of(true);
+  canActivate(returnUrl = '/'): Observable<boolean> {
+    this.oidcSecurityService.auth();
+    return this.oidcSecurityService.isAuthenticated().pipe(
+      map((authenticated) => {
+        if (authenticated) {
+          return true;
         }
 
-        // Token is expired; attempt to refresh
-        return this.tryRefreshToken();
-      })
-    );
-  }
-
-  /**
-   * Attempts to refresh the session using the refresh token.
-   * If successful, allows route activation; otherwise, redirects to `/unauthorized`.
-   *
-   * @returns {boolean | UrlTree} A stream resolving to true or redirect UrlTree.
-   */
-  tryRefreshToken(): Observable<boolean | UrlTree> {
-    return this.oidcSecurityService.forceRefreshSession().pipe(
-      map((refreshSuccess) => {
-        return refreshSuccess ? true : this.router.parseUrl('/unauthorized');
-      }),
-      catchError((err) => {
-        console.warn(err);
-        return of(this.router.parseUrl('/unauthorized'));
+        this.oidcSecurityService.authorize(returnUrl);
+        return false;
       })
     );
   }

@@ -1,22 +1,25 @@
 using NLog;
 using NLog.Web;
 using Microsoft.EntityFrameworkCore;
+using Oip.Api.Controllers;
+using Oip.Applications.Base;
+using Oip.Applications.Base.Controllers;
+using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
-using Oip.Base.Services;
-using Oip.Base.StartupTasks;
+using Oip.Controllers;
 using Oip.Data.Extensions;
-using Oip.Discussions.Extensions;
-using Oip.Notifications.Data.Contexts;
-using Oip.Notifications.Extensions;
 using Oip.Settings;
-using Oip.Users.Notifications;
-using Oip.Users.Services;
-using Oip.Users.Extensions;
 using Oip.Demo.TableQueryDemo;
+using Oip.Discussions.Base.Controllers;
+using Oip.Discussions.Base.Extensions;
 using Oip.Extensions;
-using GrpcUserServiceImpl = Oip.Users.Services.UserService;
+using Oip.Notifications.Base.Controllers;
+using Oip.Notifications.Base.Extensions;
+using Oip.Users.Base.Controllers;
+using Oip.Users.Base.Extensions;
+using ServiceCollectionExtensions = Oip.Applications.Base.Extensions.ServiceCollectionExtensions;
 
 namespace Oip;
 
@@ -39,37 +42,51 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+            builder.Services.GenerateWebClientStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddHttpClient();
             builder.Services.AddCors();
+            builder.Services.AddOipDataProtection(settings);
             builder.AddControllersAndView();
+            
             builder.AddLocalization();
             builder.AddOpenTelemetry(settings);
 
             if (settings.IsStandalone)
             {
                 builder.Services.AddUsersModuleLocal(settings);
-                builder.Services.AddScoped<GrpcUserServiceImpl>();
-                builder.Services.AddScoped<UserSyncService>();
-                builder.Services.AddSingleton<INotificationPublisher, NoOpNotificationPublisher>();
-
                 builder.Services.AddDiscussionsModuleLocal(settings);
-
                 builder.Services.AddNotificationsModuleLocal(settings);
-                builder.Services.AddDataProtection<NotificationsDbContext>();
+                builder.Services.AddApplicationsModuleLocal(settings);
+                builder.Services
+                    .AddController<DiscussionController>()
+                    .AddController<NotificationController>()
+                    .AddController<UserProfileController>()
+                    .AddController<UsersController>();
                 builder.Services.AddSignalR();
-                builder.Services.AddGrpc().AddJsonTranscoding();
-                builder.Services.AddGrpcSwagger();
-                builder.Services.AddSingleton<CryptService>();
+                builder.Services.AddGrpc();
             }
             else
             {
                 builder.Services.AddUsersModuleRemote(settings);
+                builder.Services.AddApplicationsModuleRemote(settings);
+                builder.Services.AddNotificationsModuleRemote(settings);
             }
 
+            builder.Services
+                .AddController<CryptController>()
+                .AddController<FolderModuleController>()
+                .AddController<IframeModuleController>()
+                .AddController<MenuController>()
+                .AddController<ModuleController>()
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>()
+                .AddController<ApplicationsController>()
+                .AddController<CustomerModuleController>()
+                .AddController<DashboardModuleController>()
+                .AddController<WeatherForecastModuleController>();
+            
             var app = builder.Build();
-
 
             app.AddRequestLocalization();
             app.AddExceptionHandler();
@@ -78,6 +95,7 @@ internal static class Program
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
+            app.UseOipCsrfProtection();
             app.UseAuthorization();
             app.UseCors(options => options.AllowAnyOrigin());
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
@@ -90,10 +108,10 @@ internal static class Program
 
             if (settings.IsStandalone)
             {
-                app.MigrateUserDatabase();
-                app.AddDiscussions(settings);
-                app.MigrateNotificationDatabase();
-                app.MapNotificationsModule();
+                app.UseOipApplications();
+                app.AddUserModuleLocal();
+                app.AddDiscussionsModuleLocal();
+                app.AddNotificationsModuleLocal();
             }
 
             app.Run();

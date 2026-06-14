@@ -1,14 +1,16 @@
 using NLog;
 using NLog.Web;
+using Oip.Api.Controllers;
+using Oip.Applications.Base;
+using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
-using Oip.Base.StartupTasks;
-using Oip.Notifications.Data.Contexts;
-using Oip.Notifications.Extensions;
-using Oip.Notifications.Settings;
-using Oip.Users.Extensions;
+using Oip.Notifications.Base.Controllers;
+using Oip.Notifications.Base.Extensions;
+using Oip.Notifications.Base.Settings;
+using Oip.Users.Base.Extensions;
 
 namespace Oip.Notifications;
 
@@ -35,17 +37,23 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
+            builder.Services.AddApplicationsModuleRemote(settings);
             builder.Services.AddUsersModuleRemote(settings);
+            
             builder.Services.AddSingleton<CryptService>();
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddNotificationsModuleRemote(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.Services.AddGrpc().AddJsonTranscoding();
             builder.Services.AddGrpcSwagger();
             builder.AddControllersAndView();
+            builder.Services
+                .AddController<CryptController>()
+                .AddController<NotificationController>()
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>();
             builder.AddLocalization();
-            builder.Services.AddDataProtection<NotificationsDbContext>();
+            builder.Services.AddOipDataProtection(settings);
             builder.Services.AddSignalR();
             builder.AddOpenTelemetry(settings);
 
@@ -57,14 +65,14 @@ internal static class Program
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
+            app.UseOipCsrfProtection();
             app.UseAuthorization();
             app.UseCors(options => options.AllowAnyOrigin());
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
-            app.MapNotificationsModule();
             app.MapOpenTelemetry(settings);
-            app.MigrateNotificationDatabase();
+            app.AddNotificationsModuleLocal();
             app.Run();
         }
         catch (Exception e)

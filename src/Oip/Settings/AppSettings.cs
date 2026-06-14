@@ -1,4 +1,5 @@
 using Oip.Base.Settings;
+using Oip.Users.Base.Settings;
 
 namespace Oip.Settings;
 
@@ -11,6 +12,21 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public OipServicesSettings Services { get; set; } = new();
 
     /// <inheritdoc />
+    public ApplicationSettings Application { get; set; } = new()
+    {
+        Code = "oip",
+        DisplayName = "OIP",
+        BaseUrl = "https://localhost:50002",
+        InternalBaseUrl = "https://localhost:5002",
+        Icon = "pi pi-home",
+        Order = 10,
+        ServiceType = ServiceType.Application
+    };
+
+    /// <inheritdoc />
+    public ApplicationRegistrySettings ApplicationRegistry { get; set; } = new();
+
+    /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();
 
     /// <inheritdoc />
@@ -21,7 +37,15 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
-
+    
     /// <inheritdoc />
     public bool IsStandalone { get; set; } = false;
+
+    /// <inheritdoc />
+    public DataProtectionSettings DataProtection { get; set; } = new();
+
+    /// <summary>
+    /// User synchronization option
+    /// </summary>
+    public UserSyncOptions UserSyncOptions { get; set; } = new();
 }

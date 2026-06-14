@@ -4,6 +4,11 @@
 
 Try to use Tailwind for layout.
 
+
+## oip-common
+
+If oip-common change need execute npm start publish:local
+
 ---
 
 # Backend (C# / ASP.NET Controllers)
@@ -28,6 +33,10 @@ Location: Oip.Base/Exceptions/ApiExceptionResponse.cs
 
 
 # Codex Instructions
+
+## Entity Framework Migrations
+
+When working on EF Core models, DbContext configuration, entity mappings use `dotnet ef migrations add` command for the responsible project/context.
 
 ## ASP.NET Web API Client Generation
 

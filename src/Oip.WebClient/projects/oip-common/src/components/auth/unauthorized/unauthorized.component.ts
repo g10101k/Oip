@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { LogoComponent } from '../../logo.component';
-import { SecurityService } from '../../../services/security.service';
+import { BffSecurityService, SecurityService } from '../../../services/security.service';
 import { AppFloatingConfiguratorComponent } from '../../app-floating-configurator.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -30,7 +31,7 @@ import { TranslatePipe } from '@ngx-translate/core';
                 id="oip-unauthorized-error-sign-in-button"
                 label="{{ 'unauthorized.signIn' | translate }}"
                 styleClass="w-full"
-                (click)="securityService.authorize()"></p-button>
+                (click)="signIn()"></p-button>
             </div>
           </div>
         </div>
@@ -46,6 +47,22 @@ import { TranslatePipe } from '@ngx-translate/core';
     TranslatePipe
   ]
 })
-export class UnauthorizedComponent {
+export class UnauthorizedComponent implements OnInit {
   protected readonly securityService = inject(SecurityService);
+  private readonly route = inject(ActivatedRoute);
+
+  ngOnInit(): void {
+    const returnUrl = sessionStorage.getItem(BffSecurityService.authorizeAfterLogoutReturnUrlKey);
+    if (!returnUrl) {
+      return;
+    }
+
+    sessionStorage.removeItem(BffSecurityService.authorizeAfterLogoutReturnUrlKey);
+    this.securityService.authorize(returnUrl);
+  }
+
+  protected signIn(): void {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
+    this.securityService.authorize(returnUrl);
+  }
 }

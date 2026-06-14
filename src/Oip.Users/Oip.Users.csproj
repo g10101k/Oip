@@ -1,18 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-    <Import Project="..\Common.props" />
-
-    <PropertyGroup>
-        <IsPackable>true</IsPackable>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Title>User library for OIP template</Title>
-    </PropertyGroup>
-    
-    <ItemGroup>
-        <None Include=".\README.md" Pack="true" PackagePath="\"/>
-        <Content Update="appsettings*.json" Pack="false" />
-        <Content Update="SwaggerFiles\swagger*.json" Pack="false" />
-    </ItemGroup>
-    
+    <Import Project="..\Common.props"/>
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
@@ -25,27 +12,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
-        <PackageReference Include="NLog" Version="5.3.4" />
-        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
-        <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
-        <PackageReference Include="Google.Protobuf" Version="3.33.2" />
-        <PackageReference Include="Grpc.Tools" Version="2.76.0" PrivateAssets="All" />
-        <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4"/>
+        <PackageReference Include="NLog" Version="5.3.4"/>
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
+        <PackageReference Include="Grpc.AspNetCore" Version="2.76.0"/>
+        <PackageReference Include="Google.Protobuf" Version="3.33.2"/>
+        <PackageReference Include="Grpc.Tools" Version="2.76.0" PrivateAssets="All"/>
+        <PackageReference Include="Riok.Mapperly" Version="4.2.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Oip.Api\Oip.Api.csproj" />
-        <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
-        <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
-        <ProjectReference Include="..\Oip.Notifications.Base\Oip.Notifications.Base.csproj" />
-        <ProjectReference Include="..\Oip.Users.Base\Oip.Users.Base.csproj" />
+        <ProjectReference Include="..\Oip.Applications.Base\Oip.Applications.Base.csproj"/>
+        <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
+        <ProjectReference Include="..\Oip.Notifications.Base\Oip.Notifications.Base.csproj"/>
+        <ProjectReference Include="..\Oip.Users.Base\Oip.Users.Base.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -68,5 +54,6 @@
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+
 
 </Project>

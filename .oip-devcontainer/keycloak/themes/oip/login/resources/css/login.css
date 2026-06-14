@@ -1,0 +1,360 @@
+:root {
+  --oip-primary: #ef4444;
+  --oip-primary-hover: #dc2626;
+  --oip-surface-page: #f4f4f5;
+  --oip-surface-card: #ffffff;
+  --oip-surface-muted: #71717a;
+  --oip-text: #3f3f46;
+  --oip-border: #e5e7eb;
+  --oip-danger: #dc2626;
+  --oip-success: #16a34a;
+  --oip-warning: #d97706;
+  --oip-info: #2563eb;
+  --oip-focus: rgba(239, 68, 68, 0.22);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--oip-surface-page);
+  color: var(--oip-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a {
+  color: var(--oip-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--oip-primary-hover);
+}
+
+.oip-login-page {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  min-width: 100vw;
+  overflow: hidden;
+  padding: 24px;
+}
+
+.oip-login-shell {
+  background: linear-gradient(180deg, var(--oip-primary) 10%, rgba(33, 150, 243, 0) 30%);
+  border-radius: 56px;
+  max-width: 100%;
+  padding: 0.3rem;
+  width: min(100%, 600px);
+}
+
+.oip-login-card {
+  background: var(--oip-surface-card);
+  border-radius: 53px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
+  padding: 72px 80px;
+  width: 100%;
+}
+
+.oip-login-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.oip-login-logo {
+  display: block;
+  height: auto;
+  margin: 0 auto 32px;
+  width: 64px;
+}
+
+.primary-logo-color {
+  fill: var(--oip-primary);
+}
+
+.secondary-logo-color {
+  fill: var(--oip-primary-hover);
+}
+
+.oip-login-header h1 {
+  color: var(--oip-text);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+
+.oip-login-header p {
+  color: var(--oip-surface-muted);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.oip-alert {
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.45;
+  margin-bottom: 24px;
+  padding: 12px 14px;
+}
+
+.oip-alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: var(--oip-danger);
+}
+
+.oip-alert-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: var(--oip-success);
+}
+
+.oip-alert-warning {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: var(--oip-warning);
+}
+
+.oip-alert-info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: var(--oip-info);
+}
+
+.oip-login-form {
+  display: grid;
+  gap: 26px;
+}
+
+.oip-field {
+  display: grid;
+  gap: 8px;
+}
+
+.oip-field label {
+  color: var(--oip-text);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.oip-field input {
+  background: #ffffff;
+  border: 1px solid var(--oip-border);
+  border-radius: 6px;
+  color: var(--oip-text);
+  font: inherit;
+  height: 48px;
+  outline: none;
+  padding: 0 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.oip-field input::placeholder {
+  color: #94a3b8;
+}
+
+.oip-field input:focus {
+  border-color: var(--oip-primary);
+  box-shadow: 0 0 0 3px var(--oip-focus);
+}
+
+.oip-field input[aria-invalid="true"] {
+  border-color: var(--oip-danger);
+}
+
+.oip-field-error {
+  color: var(--oip-danger);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.oip-password-field {
+  position: relative;
+}
+
+.oip-password-field input {
+  padding-right: 72px;
+}
+
+.oip-password-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--oip-primary);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  height: 100%;
+  padding: 0 14px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.oip-password-toggle:hover {
+  color: var(--oip-primary-hover);
+}
+
+.oip-login-options {
+  align-items: center;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  min-height: 24px;
+}
+
+.oip-checkbox {
+  align-items: center;
+  color: var(--oip-text);
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px;
+  line-height: 1.4;
+}
+
+.oip-checkbox input {
+  accent-color: var(--oip-primary);
+  height: 18px;
+  margin: 0;
+  width: 18px;
+}
+
+.oip-submit,
+.oip-social-link {
+  align-items: center;
+  border-radius: 6px;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 700;
+  height: 48px;
+  justify-content: center;
+  min-width: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.oip-submit {
+  background: var(--oip-primary);
+  border: 1px solid var(--oip-primary);
+  color: #ffffff;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.oip-submit:hover {
+  background: var(--oip-primary-hover);
+  border-color: var(--oip-primary-hover);
+}
+
+.oip-submit:focus,
+.oip-social-link:focus,
+.oip-password-toggle:focus {
+  box-shadow: 0 0 0 3px var(--oip-focus);
+  outline: none;
+}
+
+.oip-social {
+  margin-top: 28px;
+}
+
+.oip-divider {
+  align-items: center;
+  color: var(--oip-surface-muted);
+  display: flex;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 12px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.oip-divider::before,
+.oip-divider::after {
+  background: var(--oip-border);
+  content: "";
+  flex: 1;
+  height: 1px;
+}
+
+.oip-social-list {
+  display: grid;
+  gap: 10px;
+}
+
+.oip-social-link {
+  background: #ffffff;
+  border: 1px solid var(--oip-border);
+  color: var(--oip-text);
+  gap: 8px;
+}
+
+.oip-social-link:hover {
+  background: #f8fafc;
+  color: var(--oip-text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --oip-surface-page: #09090b;
+    --oip-surface-card: #18181b;
+    --oip-surface-muted: #a1a1aa;
+    --oip-text: #fafafa;
+    --oip-border: #3f3f46;
+    color-scheme: dark;
+  }
+
+  .oip-field input,
+  .oip-social-link {
+    background: #18181b;
+  }
+
+  .oip-social-link:hover {
+    background: #27272a;
+  }
+}
+
+@media (max-width: 640px) {
+  .oip-login-page {
+    padding: 16px;
+  }
+
+  .oip-login-shell {
+    border-radius: 32px;
+  }
+
+  .oip-login-card {
+    border-radius: 29px;
+    padding: 48px 24px;
+  }
+
+  .oip-login-header h1 {
+    font-size: 26px;
+  }
+
+  .oip-field label {
+    font-size: 18px;
+  }
+
+  .oip-login-options {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}

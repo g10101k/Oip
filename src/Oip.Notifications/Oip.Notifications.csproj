@@ -1,17 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
     <Import Project="..\Common.props" />
-
-    <PropertyGroup>
-        <IsPackable>true</IsPackable>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Title>Notification library for OIP template</Title>
-    </PropertyGroup>
-    
-    <ItemGroup>
-        <None Include=".\README.md" Pack="true" PackagePath="\" />
-        <Content Update="appsettings*.json" Pack="false" />
-        <Content Update="SwaggerFiles\swagger*.json" Pack="false" />
-    </ItemGroup>
     
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -44,12 +32,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Oip.Api\Oip.Api.csproj" />
+        <ProjectReference Include="..\Oip.Applications.Base\Oip.Applications.Base.csproj" />
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
-        <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
         <ProjectReference Include="..\Oip.Notifications.Base\Oip.Notifications.Base.csproj" />
         <ProjectReference Include="..\Oip.Users.Base\Oip.Users.Base.csproj" />
-        <ProjectReference Include="..\Oip.Users\Oip.Users.csproj" />
     </ItemGroup>
 
     <ItemGroup>

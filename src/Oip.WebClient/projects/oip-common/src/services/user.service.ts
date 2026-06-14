@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { SecurityService } from './security.service';
-import { BaseDataService } from './base-data.service';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { UserProfileApi } from '../api/user-profile.api';
 
 /**
  * UserService is responsible for retrieving and handling user-related data,
@@ -10,7 +10,7 @@ import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 @Injectable()
 export class UserService {
   private readonly securityService = inject(SecurityService);
-  private readonly baseDataService = inject(BaseDataService);
+  private readonly userProfileApi = inject(UserProfileApi);
   private requestedPhotoEmail: string | null = null;
 
   constructor() {
@@ -44,13 +44,20 @@ export class UserService {
     const data = this.securityService.getCurrentUser();
     const givenNameInitial = data?.given_name?.trim()?.[0];
     const familyNameInitial = data?.family_name?.trim()?.[0];
+    const displayNameInitials = this.getInitials(data?.displayName ?? data?.name ?? data?.userName ?? data?.preferred_username);
 
-    return `${givenNameInitial ?? ''}${familyNameInitial ?? ''}`.toUpperCase();
+    return `${givenNameInitial ?? ''}${familyNameInitial ?? ''}`.toUpperCase() || displayNameInitials;
   }
 
   get userName(): string {
     const data = this.securityService.getCurrentUser();
-    return [data?.given_name, data?.family_name].filter(Boolean).join(' ');
+    return [data?.given_name, data?.family_name].filter(Boolean).join(' ')
+      || data?.displayName
+      || data?.name
+      || data?.userName
+      || data?.preferred_username
+      || data?.email
+      || '';
   }
 
   /**
@@ -70,10 +77,7 @@ export class UserService {
 
     this.requestedPhotoEmail = email;
 
-    const url = this.baseDataService.buildUrl(
-      `api/user-profile/get-user-photo?email=${email}`
-    );
-    this.baseDataService.getBlob(url).then(
+    this.userProfileApi.getUserPhoto({ email }, { format: 'blob' }).then(
       (data) => {
         this.createImageFromBlob(data as Blob);
         this.photoLoaded = true;
@@ -102,5 +106,16 @@ export class UserService {
     if (image) {
       reader.readAsDataURL(image);
     }
+  }
+
+  private getInitials(value?: string): string {
+    return value
+      ?.trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase() ?? '';
   }
 }

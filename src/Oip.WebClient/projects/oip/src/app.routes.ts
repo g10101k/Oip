@@ -6,12 +6,12 @@ export const appRoutes: Routes = [
   {
     path: '',
     component: AppLayoutComponent,
-    canActivate: [() => inject(AuthGuardService).canActivate()],
+    canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)],
     children: [
       {
         path: 'dashboard/:id',
         loadComponent: () => import('./app/components/dashboard/dashboard.component').then((m) => m.DashboardComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'weather-forecast-module/:id',
@@ -19,7 +19,7 @@ export const appRoutes: Routes = [
           import('./app/components/weather-forecast-module/weather-forecast-module.component').then(
             (m) => m.WeatherForecastModuleComponent
           ),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'customer-module/:id',
@@ -27,12 +27,12 @@ export const appRoutes: Routes = [
           import('./app/components/customer-module/customer-module.component').then(
             (m) => m.CustomerModuleComponent
           ),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'discussion/:id',
         loadComponent: () => import('oip-common').then((m) => m.DiscussionComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'error',
@@ -41,32 +41,37 @@ export const appRoutes: Routes = [
       {
         path: 'profile',
         loadComponent: () => import('oip-common').then((m) => m.ProfileComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'config',
         loadComponent: () => import('oip-common').then((m) => m.ConfigComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'db-migration/:id',
         loadComponent: () => import('oip-common').then((m) => m.DbMigrationComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'modules',
         loadComponent: () => import('oip-common').then((m) => m.AppModulesComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
+      },
+      {
+        path: 'applications',
+        loadComponent: () => import('oip-common').then((m) => m.ApplicationsComponent),
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'iframe-module/:id',
         loadComponent: () => import('oip-common').then((m) => m.IframeModuleComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
         path: 'extensions/:extensionKey/:id',
         loadComponent: () => import('oip-common').then((m) => m.ExtensionModuleHostComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       }
     ]
   },

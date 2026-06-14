@@ -419,10 +419,14 @@ message NotificationUser {
   int32 user_id = 4;
   string subject = 5;
   string message = 6;
+  optional int32 notification_channel_id = 7;
+  optional string sent_at = 8;
+  optional string delivered_at = 9;
+  optional string read_at = 10;
 }
 
 message CreateNotificationRequest {
-  int32 notification_type_id = 1;
+  string notification_type = 1;
   optional string data_json = 3;
 }
 

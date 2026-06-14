@@ -45,7 +45,7 @@ public class WeatherForecastModuleController(ModuleRepository moduleRepository)
     public IActionResult Get(int dayCount)
     {
         if (new Random().Next(0, 4) == 0)
-            throw new ApiException("Error!", "Random exception", 3535);
+            throw new ApiException("Error!", "Random exception");
 
         return Ok(Enumerable.Range(1, dayCount).Select(index => new WeatherForecastResponse
             {

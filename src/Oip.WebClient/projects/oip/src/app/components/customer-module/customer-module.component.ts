@@ -55,7 +55,7 @@ interface SelectOption<TValue = string> {
       <div class="card space-y-4">
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h5 class="mb-1">{{ title }}</h5>
+            <h5 class="mb-1"><i class="fa-duotone fa-solid fa-user"></i> {{ title }} </h5>
             <p class="m-0 text-surface-500">{{ 'customer-module.content.subtitle' | translate }}</p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row">
@@ -133,11 +133,13 @@ interface SelectOption<TValue = string> {
                 <p-sortIcon field="creditScore"/>
                 <p-columnFilter display="menu" field="creditScore" type="numeric"/>
               </th>
-              <th pSortableColumn="lifetimeValue">
-                {{ 'customer-module.content.table.lifetimeValue' | translate }}
-                <p-sortIcon field="lifetimeValue"/>
-                <p-columnFilter display="menu" field="lifetimeValue" type="numeric"/>
-              </th>
+              @if (hasRight(viewFinancialsRight)) {
+                <th pSortableColumn="lifetimeValue">
+                  {{ 'customer-module.content.table.lifetimeValue' | translate }}
+                  <p-sortIcon field="lifetimeValue"/>
+                  <p-columnFilter display="menu" field="lifetimeValue" type="numeric"/>
+                </th>
+              }
               <th pSortableColumn="createdAt">
                 {{ 'customer-module.content.table.createdAt' | translate }}
                 <p-sortIcon field="createdAt"/>
@@ -218,14 +220,16 @@ interface SelectOption<TValue = string> {
                   <span class="block text-right tabular-nums">{{ customer.creditScore }}</span>
                 }
               </td>
-              <td>
-                @if (customer._isEditing && customer._editModel; as editModel) {
-                  <input pInputText type="number" class="w-full min-w-32 text-right"
-                         [(ngModel)]="editModel.lifetimeValue"/>
-                } @else {
-                  <span class="block text-right tabular-nums">{{ customer.lifetimeValue | number: '1.2-2' }}</span>
-                }
-              </td>
+              @if (hasRight(viewFinancialsRight)) {
+                <td>
+                  @if (customer._isEditing && customer._editModel; as editModel) {
+                    <input pInputText type="number" class="w-full min-w-32 text-right"
+                           [(ngModel)]="editModel.lifetimeValue"/>
+                  } @else {
+                    <span class="block text-right tabular-nums">{{ customer.lifetimeValue | number: '1.2-2' }}</span>
+                  }
+                </td>
+              }
               <td>{{ customer.createdAt | date: layoutService.dateTimeFormat() }}</td>
               <td class="text-center">
                 <span
@@ -269,7 +273,7 @@ interface SelectOption<TValue = string> {
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="10" class="py-8 text-center text-surface-500">
+              <td [attr.colspan]="hasRight(viewFinancialsRight) ? 10 : 9" class="py-8 text-center text-surface-500">
                 {{ 'customer-module.content.empty' | translate }}
               </td>
             </tr>
@@ -308,6 +312,7 @@ export class CustomerModuleComponent
 
   protected readonly dataService = inject(CustomerModuleApi);
 
+  protected readonly viewFinancialsRight = 'view-financials';
   protected readonly globalFilterFields = ['fullName', 'email', 'categoryName', 'countryName'];
   protected readonly statusOptions: SelectOption<DemoCustomerStatus>[] = Object.values(DemoCustomerStatus).map((status) => ({
     label: status,

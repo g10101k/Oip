@@ -14,29 +14,4 @@ public class FrontSecuritySettings
     /// Scope
     /// </summary>
     public string Scope { get; set; } = null!;
-
-    /// <summary>
-    /// Response type
-    /// </summary>
-    public string ResponseType { get; set; } = null!;
-
-    /// <summary>
-    /// Silent renew
-    /// </summary>
-    public bool SilentRenew { get; set; }
-
-    /// <summary>
-    /// Use refresh token
-    /// </summary>
-    public bool UseRefreshToken { get; set; }
-
-    /// <summary>
-    /// Log level
-    /// </summary>
-    public int LogLevel { get; set; }
-
-    /// <summary>
-    /// Urls with auth
-    /// </summary>
-    public List<string> SecureRoutes { get; set; } = new();
 }

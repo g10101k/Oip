@@ -79,7 +79,19 @@
   },
   "topbar": {
     "logout": "Выход",
-    "profile": "Профиль"
+    "logoutConfirmHeader": "Выход",
+    "logoutConfirmMessage": "Вы уверены, что хотите выйти?",
+    "logoutConfirmCancel": "Отмена",
+    "logoutConfirmAccept": "Выйти",
+    "profile": "Профиль",
+    "applications": "Приложения"
+  },
+  "userNotifications": {
+    "title": "Оповещения",
+    "empty": "Непрочитанных оповещений нет",
+    "refresh": "Обновить",
+    "markAsRead": "Прочитано",
+    "markedAsRead": "Оповещение отмечено прочитанным"
   },
   "discussionComponent": {
     "writeCommentPlaceholder": "Напишите комментарий. Используйте @email или @first.last для упоминаний.",

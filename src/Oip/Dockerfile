@@ -21,6 +21,8 @@ EXPOSE 50000
 
 FROM base AS final
 WORKDIR /app
+COPY --from=oip-dev-https dev-ca.crt /usr/local/share/ca-certificates/oip-dev-ca.crt
+RUN update-ca-certificates
 COPY --from=publish /app/publish .
 COPY --from=angular-build /src/Oip.WebClient/dist/oip ./wwwroot
 ENTRYPOINT ["dotnet", "Oip.dll" ]

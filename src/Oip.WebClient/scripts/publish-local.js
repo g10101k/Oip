@@ -1,20 +1,29 @@
 #!/usr/bin/env node
 
-const {execSync} = require('child_process');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const {execFileSync} = require('child_process');
+const {runNpm, runNpx} = require('./script-utils');
 
 console.log('🚀 Starting oip-common library publication...');
 
+function getCommand(command) {
+  return process.platform === 'win32' ? `${command}.cmd` : command;
+}
+
 try {
   // 0. Increment version
-  let commonPath = path.join(__dirname, '../projects/oip-common');
   let distPath = path.join(__dirname, '../dist/oip-common');
-  execSync(`rm -rf ${distPath}`);
+  let nodeModulesPath = path.join(__dirname, '../node_modules/oip-common');
+  let angularCachePath = path.join(__dirname, '../.angular/cache');
+
+  console.log('🧹 Delete previous dist...');
+  fs.rmSync(distPath, {recursive: true, force: true});
 
   // 1. Build the library
   console.log('📦 Building library...');
-  execSync('ng build oip-common', {stdio: 'inherit'});
+  runNpx(['ng', 'build', 'oip-common']);
 
   // 2. Navigate to dist directory
   if (!fs.existsSync(distPath)) {
@@ -22,10 +31,28 @@ try {
   }
 
   console.log('🧹 Delete oip-common library...!');
-  execSync('rm -rf ./node_modules/oip-common', {stdio: 'inherit'});
+  fs.rmSync(nodeModulesPath, {recursive: true, force: true});
+
+  console.log('🧹 Delete Angular cache...!');
+  fs.rmSync(angularCachePath, {recursive: true, force: true});
+
+  console.log('📦 Pack oip-common library...!');
+  const packDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'oip-common-local-'));
+  const npmEnv = {
+    ...process.env,
+    npm_config_cache: path.join(packDirectory, '.npm-cache')
+  };
+  const packageFileName = execFileSync(getCommand('npm'), ['pack', '--pack-destination', packDirectory], {
+    cwd: distPath,
+    env: npmEnv,
+    encoding: 'utf8'
+  }).trim();
+  const packagePath = path.join(packDirectory, packageFileName);
 
   console.log('🪃 Install oip-common library...!');
-  execSync(`npm i ${distPath} --no-save`);
+  runNpm(['i', packagePath, '--no-save', '--force'], {env: npmEnv});
+
+  fs.rmSync(packDirectory, {recursive: true, force: true});
 
   console.log('⛳  Publication completed successfully!');
 } catch (error) {

@@ -7,7 +7,7 @@ export const environment = {
   useAuthentication: true,
   frontend: {
     appMode: 'standalone',
-    apiBaseUrl: '',
+    internalBaseUrl: '',
     notificationHubUrl: ''
   }
 };

@@ -89,7 +89,7 @@
             "publicHost": "https://localhost:50002",
             "port": 50002,
             "headers": {
-              "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50001 https://localhost:5008 https://localhost:50008 https://localhost:5010;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
+              "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50001 https://localhost:50002 https://localhost:5008 https://localhost:50008 https://localhost:5010;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
               "Access-Control-Allow-Origin": "*",
               "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
             },

@@ -1,13 +1,16 @@
 using NLog;
 using NLog.Web;
+using Oip.Api.Controllers;
+using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
 using Oip.Data.Extensions;
-using Oip.Discussions.Extensions;
-using Oip.Discussions.Settings;
-using Oip.Users.Extensions;
+using Oip.Discussions.Base.Controllers;
+using Oip.Discussions.Base.Extensions;
+using Oip.Discussions.Base.Settings;
+using Oip.Users.Base.Extensions;
 
 namespace Oip.Discussions;
 
@@ -36,12 +39,21 @@ internal static class Program
             builder.AddDefaultHealthChecks();
             builder.AddDefaultAuthentication(settings);
             builder.AddOpenApi(settings);
+            builder.Services.AddApplicationsModuleRemote(settings);
             builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.Services.AddUsersModuleRemote(settings);
             builder.Services.AddDiscussionsModuleRemote(settings);
             builder.AddControllersAndView();
+            builder.Services
+                .AddController<DiscussionController>()
+                .AddController<FolderModuleController>()
+                .AddController<IframeModuleController>()
+                .AddController<MenuController>()
+                .AddController<ModuleController>()
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>();
             builder.AddLocalization();
 
             var app = builder.Build();
@@ -52,6 +64,7 @@ internal static class Program
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
+            app.UseOipCsrfProtection();
             app.UseAuthorization();
             app.UseCors(options => options.AllowAnyOrigin());
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
