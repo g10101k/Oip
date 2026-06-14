@@ -25,7 +25,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
-        <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
     </ItemGroup>
 
     <ItemGroup>

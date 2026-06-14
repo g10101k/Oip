@@ -31,7 +31,6 @@
     
     <ItemGroup>
         <ProjectReference Include="..\Oip.Applications.Base\Oip.Applications.Base.csproj" />
-        <ProjectReference Include="..\Oip.Api\Oip.Api.csproj" />
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
         <ProjectReference Include="..\Oip.Rtds.Data\Oip.Rtds.Data.csproj"/>
     </ItemGroup>
