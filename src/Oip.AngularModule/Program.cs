@@ -1,6 +1,7 @@
 using NLog;
 using NLog.Web;
 using Oip.AngularModule.Settings;
+using Oip.Base.Controllers;
 using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
@@ -35,6 +36,7 @@ internal static class Program
             builder.Services.AddCors();
             builder.Services.AddOipDataProtection(settings);
             builder.AddControllersAndView();
+            builder.Services.AddController<SecurityController>();
             builder.AddLocalization();
             builder.AddOpenTelemetry(settings);
 
