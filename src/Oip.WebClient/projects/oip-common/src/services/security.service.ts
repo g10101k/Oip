@@ -58,13 +58,15 @@ export abstract class SecurityService {
 
   abstract isAdmin(): boolean;
 
-  abstract authorize(): void;
+  abstract authorize(returnUrl?: string): void;
 
   abstract payload: BehaviorSubject<any>;
 }
 
 @Injectable()
 export class BffSecurityService implements OnDestroy, SecurityService {
+  public static readonly authorizeAfterLogoutReturnUrlKey = 'oip.authorizeAfterLogoutReturnUrl';
+
   private readonly http = inject(HttpClient);
   private readonly authenticated = new BehaviorSubject<boolean | null>(null);
   private readonly currentUser = new BehaviorSubject<any>(null);
@@ -86,6 +88,8 @@ export class BffSecurityService implements OnDestroy, SecurityService {
 
   logout(): void {
     firstValueFrom(this.getCsrfToken()).then((csrfToken) => {
+      this.storeAuthorizeAfterLogoutReturnUrl();
+
       const form = this.createPostForm(this.buildUrl('api/security/delete-auth-session'));
       if (csrfToken?.token) {
         const tokenInput = document.createElement('input');
@@ -144,7 +148,10 @@ export class BffSecurityService implements OnDestroy, SecurityService {
     return this.payload.getValue()?.realm_access?.roles?.includes('admin') ?? false;
   }
 
-  authorize(): void {
+  authorize(returnUrl?: string): void {
+    const normalizedReturnUrl = this.normalizeReturnUrl(returnUrl);
+    this.replaceWithUnauthorizedUrl(normalizedReturnUrl);
+
     const form = this.createPostForm(this.buildUrl('api/security/create-auth-session'));
     document.body.appendChild(form);
     form.submit();
@@ -205,9 +212,49 @@ export class BffSecurityService implements OnDestroy, SecurityService {
     return form;
   }
 
+  private normalizeReturnUrl(returnUrl?: string): string {
+    const candidate = returnUrl?.trim();
+    if (!candidate || /[\u0000-\u001f\u007f\\]/.test(candidate)) {
+      return '/';
+    }
+
+    if (!candidate.startsWith('/') || candidate.startsWith('//')) {
+      return '/';
+    }
+
+    try {
+      const url = new URL(candidate, window.location.origin);
+      if (url.origin !== window.location.origin) {
+        return '/';
+      }
+
+      const normalizedUrl = `${url.pathname}${url.search}${url.hash}`;
+      return normalizedUrl.startsWith('/unauthorized') ? '/' : normalizedUrl;
+    } catch {
+      return '/';
+    }
+  }
+
+  private replaceWithUnauthorizedUrl(returnUrl: string): void {
+    const unauthorizedUrl = new URL('unauthorized', this.getBaseUrl());
+    unauthorizedUrl.searchParams.set('returnUrl', returnUrl);
+
+    history.replaceState(history.state, '', `${unauthorizedUrl.pathname}${unauthorizedUrl.search}`);
+  }
+
+  private storeAuthorizeAfterLogoutReturnUrl(): void {
+    sessionStorage.setItem(
+      BffSecurityService.authorizeAfterLogoutReturnUrlKey,
+      this.normalizeReturnUrl(`${window.location.pathname}${window.location.search}${window.location.hash}`)
+    );
+  }
+
   private buildUrl(path: string): string {
+    return `${this.getBaseUrl()}${path}`;
+  }
+
+  private getBaseUrl(): string {
     const baseUrl = document.getElementsByTagName('base')[0].href;
-    const normalizedBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-    return `${normalizedBase}${path}`;
+    return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
   }
 }

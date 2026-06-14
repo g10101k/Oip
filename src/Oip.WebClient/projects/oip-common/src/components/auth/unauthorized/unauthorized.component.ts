@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { LogoComponent } from '../../logo.component';
-import { SecurityService } from '../../../services/security.service';
+import { BffSecurityService, SecurityService } from '../../../services/security.service';
 import { AppFloatingConfiguratorComponent } from '../../app-floating-configurator.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -47,17 +47,22 @@ import { TranslatePipe } from '@ngx-translate/core';
     TranslatePipe
   ]
 })
-export class UnauthorizedComponent {
+export class UnauthorizedComponent implements OnInit {
   protected readonly securityService = inject(SecurityService);
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
+
+  ngOnInit(): void {
+    const returnUrl = sessionStorage.getItem(BffSecurityService.authorizeAfterLogoutReturnUrlKey);
+    if (!returnUrl) {
+      return;
+    }
+
+    sessionStorage.removeItem(BffSecurityService.authorizeAfterLogoutReturnUrlKey);
+    this.securityService.authorize(returnUrl);
+  }
 
   protected signIn(): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
-
-    this.router.navigate(['/unauthorized'], {
-      queryParams: { returnUrl },
-      replaceUrl: true
-    }).then(() => this.securityService.authorize());
+    this.securityService.authorize(returnUrl);
   }
 }
