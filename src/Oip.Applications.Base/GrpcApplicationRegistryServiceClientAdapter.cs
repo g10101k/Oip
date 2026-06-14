@@ -30,6 +30,25 @@ public class GrpcApplicationRegistryServiceClientAdapter(
         return response.Applications.Select(x => x.ToDto()).ToList();
     }
 
+    public async Task<IReadOnlyList<FrontendRemoteManifestDto>> GetFrontendModuleManifestsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var response = await client.GetFrontendModuleManifestsAsync(
+            new GetFrontendModuleManifestsRequest(),
+            cancellationToken: cancellationToken);
+        return response.Manifests.Select(x => x.ToDto()).ToList();
+    }
+
+    public async Task<FrontendRemoteManifestDto> GetFrontendModuleManifestByCodeAsync(
+        string code,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await client.GetFrontendModuleManifestByCodeAsync(
+            new GetFrontendModuleManifestByCodeRequest { Code = code },
+            cancellationToken: cancellationToken);
+        return response.Manifest.ToDto();
+    }
+
     public async Task<ApplicationRegistryItemDto> GetApplicationRegistryItemByCodeAsync(
         string code,
         CancellationToken cancellationToken = default)

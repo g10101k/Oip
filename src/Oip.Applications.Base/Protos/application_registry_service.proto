@@ -9,6 +9,8 @@ import "google/protobuf/empty.proto";
 service GrpcApplicationRegistryService {
   rpc RegisterApplication (RegisterApplicationRequest) returns (ApplicationRegistryItemResponse);
   rpc GetApplicationRegistryItems (GetApplicationRegistryItemsRequest) returns (ApplicationRegistryItemsResponse);
+  rpc GetFrontendModuleManifests (GetFrontendModuleManifestsRequest) returns (FrontendRemoteManifestsResponse);
+  rpc GetFrontendModuleManifestByCode (GetFrontendModuleManifestByCodeRequest) returns (FrontendRemoteManifestResponse);
   rpc GetApplicationRegistryItemByCode (GetApplicationRegistryItemByCodeRequest) returns (ApplicationRegistryItemResponse);
   rpc CreateApplicationRegistryItem (CreateApplicationRegistryItemRequest) returns (ApplicationRegistryItemResponse);
   rpc UpdateApplicationRegistryItem (UpdateApplicationRegistryItemRequest) returns (ApplicationRegistryItemResponse);
@@ -32,11 +34,46 @@ enum ServiceType {
   SERVICE_TYPE_APPLICATION = 1;
 }
 
+message FrontendRemoteManifest {
+  string code = 1;
+  string title = 2;
+  FrontendIntegrationType type = 3;
+  string route_path = 4;
+  string remote_entry_url = 5;
+  string remote_name = 6;
+  string exposed_module = 7;
+  FrontendRemoteEntryKind entry_kind = 8;
+  string required_shell_version = 9;
+  string required_oip_common_version = 10;
+  string angular_version = 11;
+  repeated string permissions = 12;
+  bool enabled = 13;
+}
+
+enum FrontendIntegrationType {
+  FRONTEND_INTEGRATION_TYPE_INTERNAL_ROUTE = 0;
+  FRONTEND_INTEGRATION_TYPE_IFRAME = 1;
+  FRONTEND_INTEGRATION_TYPE_FEDERATED_REMOTE = 2;
+  FRONTEND_INTEGRATION_TYPE_WEB_COMPONENT = 3;
+}
+
+enum FrontendRemoteEntryKind {
+  FRONTEND_REMOTE_ENTRY_KIND_ROUTES = 0;
+  FRONTEND_REMOTE_ENTRY_KIND_COMPONENT = 1;
+}
+
 message RegisterApplicationRequest {
   ApplicationRegistryItem application = 1;
 }
 
 message GetApplicationRegistryItemsRequest {
+}
+
+message GetFrontendModuleManifestsRequest {
+}
+
+message GetFrontendModuleManifestByCodeRequest {
+  string code = 1;
 }
 
 message GetApplicationRegistryItemByCodeRequest {
@@ -62,4 +99,12 @@ message ApplicationRegistryItemResponse {
 
 message ApplicationRegistryItemsResponse {
   repeated ApplicationRegistryItem applications = 1;
+}
+
+message FrontendRemoteManifestResponse {
+  FrontendRemoteManifest manifest = 1;
+}
+
+message FrontendRemoteManifestsResponse {
+  repeated FrontendRemoteManifest manifests = 1;
 }

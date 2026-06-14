@@ -28,6 +28,34 @@ public class ApplicationsController(IApplicationRegistryService registryService)
     }
 
     /// <summary>
+    /// Retrieves frontend module manifests available to the current user.
+    /// </summary>
+    [Authorize]
+    [HttpGet("get-frontend-module-manifests")]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<IReadOnlyList<FrontendRemoteManifestDto>>(StatusCodes.Status200OK)]
+    public Task<IReadOnlyList<FrontendRemoteManifestDto>> GetFrontendModuleManifests(
+        CancellationToken cancellationToken = default)
+    {
+        return registryService.GetFrontendModuleManifestsAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Retrieves a frontend module manifest by code.
+    /// </summary>
+    [Authorize]
+    [HttpGet("get-frontend-module-manifest-by-code/{code}")]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<FrontendRemoteManifestDto>(StatusCodes.Status200OK)]
+    public Task<FrontendRemoteManifestDto> GetFrontendModuleManifestByCode(
+        string code,
+        CancellationToken cancellationToken = default)
+    {
+        return registryService.GetFrontendModuleManifestByCodeAsync(code, cancellationToken);
+    }
+
+    /// <summary>
     /// Retrieves a registered frontend application by code.
     /// </summary>
     [Authorize]

@@ -21,6 +21,19 @@ public interface IApplicationRegistryService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Retrieves frontend module manifests available to the current user.
+    /// </summary>
+    Task<IReadOnlyList<FrontendRemoteManifestDto>> GetFrontendModuleManifestsAsync(
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves one frontend module manifest by code.
+    /// </summary>
+    Task<FrontendRemoteManifestDto> GetFrontendModuleManifestByCodeAsync(
+        string code,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Retrieves one application by code.
     /// </summary>
     Task<ApplicationRegistryItemDto> GetApplicationRegistryItemByCodeAsync(

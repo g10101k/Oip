@@ -13,4 +13,8 @@ public static partial class GrpcApplicationRegistryMapper
     public static partial ApplicationRegistryItemDto ToDto(this ApplicationRegistryItem application);
 
     public static partial ApplicationRegistryItem ToGrpc(this ApplicationRegistryItemDto application);
+
+    public static partial FrontendRemoteManifestDto ToDto(this FrontendRemoteManifest manifest);
+
+    public static partial FrontendRemoteManifest ToGrpc(this FrontendRemoteManifestDto manifest);
 }

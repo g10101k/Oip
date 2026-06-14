@@ -56,6 +56,22 @@ public class LocalApplicationRegistryService(
         return MapToDto(entity);
     }
 
+    public Task<IReadOnlyList<FrontendRemoteManifestDto>> GetFrontendModuleManifestsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult<IReadOnlyList<FrontendRemoteManifestDto>>([]);
+    }
+
+    public Task<FrontendRemoteManifestDto> GetFrontendModuleManifestByCodeAsync(
+        string code,
+        CancellationToken cancellationToken = default)
+    {
+        throw new ApiException(
+            "Frontend module manifest not found",
+            $"Frontend module manifest '{code}' was not found.",
+            StatusCodes.Status404NotFound);
+    }
+
     public async Task<ApplicationRegistryItemDto> CreateApplicationRegistryItemAsync(
         ApplicationRegistryItemDto application,
         CancellationToken cancellationToken = default)

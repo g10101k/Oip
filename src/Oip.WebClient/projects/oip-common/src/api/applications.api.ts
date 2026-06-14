@@ -7,7 +7,9 @@ import {
   ApiExceptionResponse,
   ApplicationRegistryItemDto,
   DeleteApplicationRegistryItemParams,
+  FrontendRemoteManifestDto,
   GetApplicationRegistryItemByCodeParams,
+  GetFrontendModuleManifestByCodeParams,
   UpdateApplicationRegistryItemParams,
 } from "./applications-data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
@@ -19,6 +21,25 @@ export class ApplicationsApi<
   getApplicationRegistryItems = (params: RequestParams = {}) =>
     this.request<ApplicationRegistryItemDto[], ApiExceptionResponse>({
       path: `/api/applications/get-application-registry-items`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  getFrontendModuleManifests = (params: RequestParams = {}) =>
+    this.request<FrontendRemoteManifestDto[], ApiExceptionResponse>({
+      path: `/api/applications/get-frontend-module-manifests`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  getFrontendModuleManifestByCode = (
+    { code, ...query }: GetFrontendModuleManifestByCodeParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<FrontendRemoteManifestDto, ApiExceptionResponse>({
+      path: `/api/applications/get-frontend-module-manifest-by-code/${code}`,
       method: "GET",
       secure: true,
       format: "json",

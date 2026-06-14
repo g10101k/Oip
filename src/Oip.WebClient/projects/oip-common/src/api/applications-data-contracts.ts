@@ -3,6 +3,18 @@ export enum ServiceType {
   Application = "Application",
 }
 
+export enum FrontendRemoteEntryKind {
+  Routes = "Routes",
+  Component = "Component",
+}
+
+export enum FrontendIntegrationType {
+  InternalRoute = "InternalRoute",
+  Iframe = "Iframe",
+  FederatedRemote = "FederatedRemote",
+  WebComponent = "WebComponent",
+}
+
 export interface ApiExceptionResponse {
   title?: string | null;
   message?: string | null;
@@ -20,6 +32,26 @@ export interface ApplicationRegistryItemDto {
   enabled?: boolean;
   serviceType?: ServiceType;
   isCurrent?: boolean;
+}
+
+export interface FrontendRemoteManifestDto {
+  code?: string | null;
+  title?: string | null;
+  type?: FrontendIntegrationType;
+  routePath?: string | null;
+  remoteEntryUrl?: string | null;
+  remoteName?: string | null;
+  exposedModule?: string | null;
+  entryKind?: FrontendRemoteEntryKind;
+  requiredShellVersion?: string | null;
+  requiredOipCommonVersion?: string | null;
+  angularVersion?: string | null;
+  permissions?: string[] | null;
+  enabled?: boolean;
+}
+
+export interface GetFrontendModuleManifestByCodeParams {
+  code: string;
 }
 
 export interface GetApplicationRegistryItemByCodeParams {

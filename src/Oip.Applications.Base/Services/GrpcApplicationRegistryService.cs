@@ -30,6 +30,26 @@ public class GrpcApplicationRegistryService(IApplicationRegistryService registry
         return response;
     }
 
+    public override async Task<FrontendRemoteManifestsResponse> GetFrontendModuleManifests(
+        GetFrontendModuleManifestsRequest request,
+        ServerCallContext context)
+    {
+        var manifests = await registryService.GetFrontendModuleManifestsAsync(context.CancellationToken);
+        var response = new FrontendRemoteManifestsResponse();
+        response.Manifests.AddRange(manifests.Select(x => x.ToGrpc()));
+        return response;
+    }
+
+    public override async Task<FrontendRemoteManifestResponse> GetFrontendModuleManifestByCode(
+        GetFrontendModuleManifestByCodeRequest request,
+        ServerCallContext context)
+    {
+        var result = await registryService.GetFrontendModuleManifestByCodeAsync(
+            request.Code,
+            context.CancellationToken);
+        return new FrontendRemoteManifestResponse { Manifest = result.ToGrpc() };
+    }
+
     public override async Task<ApplicationRegistryItemResponse> GetApplicationRegistryItemByCode(
         GetApplicationRegistryItemByCodeRequest request,
         ServerCallContext context)

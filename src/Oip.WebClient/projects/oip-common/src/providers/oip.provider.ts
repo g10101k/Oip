@@ -10,6 +10,7 @@ import { UserProfileApi } from '../api/user-profile.api';
 import { langIntercept } from '../intercepts/i18n-intercept.service';
 import { AuthGuardService } from '../services/auth-guard.service';
 import { NotificationService } from '../services/notification.service';
+import { OIP_SHELL_API, OipShellApiService } from '../services/oip-shell-api.service';
 import { BffSecurityService, SecurityService } from '../services/security.service';
 import { UserService } from '../services/user.service';
 
@@ -21,6 +22,7 @@ export function provideOip() {
     provideHttpClient(withInterceptors([langIntercept]), withFetch()),
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: SecurityService, useClass: BffSecurityService },
+    { provide: OIP_SHELL_API, useExisting: OipShellApiService },
     AuthGuardService,
     MessageService,
     UserService,

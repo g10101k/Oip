@@ -27,6 +27,12 @@ export { TopBarDto } from './dtos/top-bar.dto';
 export { SecurityDto } from './dtos/security.dto';
 export { PutSecurityDto } from './dtos/put-security.dto';
 export { NoSettingsDto } from './dtos/no-settings.dto';
+export {
+  FrontendIntegrationType,
+  FrontendModuleErrorState,
+  FrontendRemoteEntryKind
+} from './dtos/frontend-remote-manifest.dto';
+export type { FrontendRemoteManifestDto } from './api/applications-data-contracts';
 
 // Services
 export { TopBarService } from './services/top-bar.service';
@@ -41,6 +47,8 @@ export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './servi
 export { NotificationService } from './services/notification.service';
 export { ApplicationRegistryService } from './services/application-registry.service';
 export { TableFilterService } from './services/table-filter.service';
+export { OipModuleContext, OipModuleContextService } from './services/oip-module-context.service';
+export { OIP_SHELL_API, OipShellApi, OipShellApiService, OipToast } from './services/oip-shell-api.service';
 export {
   APP_THEME_PRESETS,
   APP_THEME_PRESETS_MERGE_MODE,
