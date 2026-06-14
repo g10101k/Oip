@@ -1,0 +1,16 @@
+{
+  "code": "oip-pilot",
+  "title": "OIP Pilot Remote",
+  "type": "FederatedRemote",
+  "routePath": "oip",
+  "remoteEntryUrl": "https://localhost:50010/remoteEntry.js",
+  "remoteName": "oip",
+  "exposedModule": "./Routes",
+  "entryKind": "Routes",
+  "requiredOipCommonVersion": "^0.4.0",
+  "requiredShellVersion": ">=1.0.1",
+  "angularVersion": "^20.0.0",
+  "permissions": [],
+  "enabled": true
+}
+

@@ -1,0 +1,10 @@
+{
+  "builders": {
+    "federated-browser": {
+      "implementation": "./src/federated-browser",
+      "schema": "./schema/browser.schema.json",
+      "description": "OIP browser builder with Module Federation remote support."
+    }
+  }
+}
+

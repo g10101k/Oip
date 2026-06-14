@@ -11,7 +11,9 @@
     "start:rtds": "run-script-os",
     "start:rtds:windows": "ng serve oip-rtds --port 50003 --ssl --ssl-cert \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem\" --ssl-key \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.key\"",
     "start:rtds:default": "ng serve oip-rtds --port 50003 --ssl --ssl-cert $HOME/.aspnet/https/${npm_package_name}.pem --ssl-key $HOME/.aspnet/https/${npm_package_name}.key",
+    "start:oip-remote": "ng serve oip --target serve-remote",
     "build:oip": "ng build oip",
+    "build:oip:remote": "ng run oip:build-remote",
     "build:oip-rtds": "ng build oip-rtds",
     "build:oip-common": "ng build oip-common",
     "version:minor": "node scripts/bump-minor-version.js",
@@ -74,6 +76,7 @@
     "swagger-typescript-api": "^13.3.1",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.8.3",
-    "typescript-eslint": "8.44.1"
+    "typescript-eslint": "8.44.1",
+    "oip-builders": "file:tools/oip-builders"
   }
 }
