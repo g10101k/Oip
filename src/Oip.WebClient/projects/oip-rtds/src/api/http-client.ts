@@ -222,10 +222,24 @@ export class HttpClient<SecurityDataType = unknown> {
         this.abortControllers.delete(cancelToken);
       }
 
-      if (!response.ok) throw data;
+      if (!response.ok) {
+        this.authorizeOnUnauthorized(response, path);
+        throw data;
+      }
+
       return data.data;
     });
   };
+
+  private authorizeOnUnauthorized(response: Response, path: string): void {
+    if (response.status !== 401 || path.includes('/api/security/create-auth-session')) {
+      return;
+    }
+
+    this.securityService.authorize(
+      `${window.location.pathname}${window.location.search}${window.location.hash}`,
+    );
+  }
 
   private async getCsrfRequestParams(method: string | undefined, path: string): Promise<RequestParams> {
     if (!method || !['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {

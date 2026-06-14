@@ -1,5 +1,4 @@
 import { inject, Injectable } from '@angular/core';
-import { Router, UrlTree } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { SecurityService } from './security.service';
@@ -12,26 +11,26 @@ import { SecurityService } from './security.service';
 @Injectable()
 export class AuthGuardService {
   private readonly oidcSecurityService = inject(SecurityService);
-  private readonly router = inject(Router);
 
   /**
    * Checks whether the route can be activated.
    * - Returns `true` if the user is authenticated and the token is valid.
    * - Attempts to refresh the token if expired.
-   * - Redirects to `/unauthorized` if not authenticated or refresh fails.
+   * - Starts the authorization flow if not authenticated or refresh fails.
    *
-   * @returns {Observable<boolean | UrlTree>} A stream resolving to true (allow), or UrlTree (redirect).
+   * @returns {Observable<boolean>} A stream resolving to true (allow), or false after starting authorization.
    */
-  canActivate(returnUrl = '/'): Observable<boolean | UrlTree> {
+  canActivate(returnUrl = '/'): Observable<boolean> {
     this.oidcSecurityService.auth();
     return this.oidcSecurityService.isAuthenticated().pipe(
-      map((authenticated) => authenticated
-        ? true
-        : this.router.createUrlTree(['/unauthorized'], { queryParams: { returnUrl: this.getReturnUrl(returnUrl) } }))
-    );
-  }
+      map((authenticated) => {
+        if (authenticated) {
+          return true;
+        }
 
-  private getReturnUrl(returnUrl: string): string {
-    return returnUrl.startsWith('/unauthorized') ? '/' : returnUrl;
+        this.oidcSecurityService.authorize(returnUrl);
+        return false;
+      })
+    );
   }
 }
