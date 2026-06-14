@@ -1,38 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-    <Import Project="..\Common.props" />
+    <Import Project="..\Common.props"/>
 
-    <PropertyGroup>
-        <IsPackable>true</IsPackable>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Title>Discussion library for OIP template</Title>
-    </PropertyGroup>
-    
-    <ItemGroup>
-        <None Include=".\README.md" Pack="true" PackagePath="\" />
-        <Content Update="appsettings*.json" Pack="false" />
-        <Content Update="SwaggerFiles\swagger*.json" Pack="false" />
-    </ItemGroup>
-    
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22"/>
         <PackageReference Include="NLog" Version="5.3.4"/>
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
-        <PackageReference Include="Oip.Settings" Version="1.3.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
+        <PackageReference Include="Oip.Settings" Version="1.3.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Oip.Base\Oip.Base.csproj" />
-        <ProjectReference Include="..\Oip.Data\Oip.Data.csproj" />
-        <ProjectReference Include="..\Oip.Users\Oip.Users.csproj" />
+        <ProjectReference Include="..\Oip.Applications.Base\Oip.Applications.Base.csproj"/>
+        <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
+        <ProjectReference Include="..\Oip.Discussions.Base\Oip.Discussions.Base.csproj"/>
+        <ProjectReference Include="..\Oip.Users\Oip.Users.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -32,6 +32,11 @@ export const appRoutes: Routes = [
         path: 'config',
         loadComponent: () => import('oip-common').then((m) => m.ConfigComponent),
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
+      },
+      {
+        path: 'applications',
+        loadComponent: () => import('oip-common').then((m) => m.ApplicationsComponent),
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       }
     ]
   },

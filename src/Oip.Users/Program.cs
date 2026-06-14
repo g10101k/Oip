@@ -1,12 +1,14 @@
 using NLog;
 using NLog.Web;
+using Oip.Api.Controllers;
+using Oip.Applications.Base;
+using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
-using Oip.Base.Runtime;
 using Oip.Base.Settings;
-using Oip.Base.StartupTasks;
-using Oip.Users.Extensions;
-using Oip.Users.Services;
-using Oip.Users.Settings;
+using Oip.Users.Base.Controllers;
+using Oip.Users.Base.Extensions;
+using Oip.Users.Base.Services;
+using Oip.Users.Base.Settings;
 
 namespace Oip.Users;
 
@@ -18,16 +20,16 @@ internal static class Program
         try
         {
             var settings = AppSettings.Initialize(args, false, true);
-            
+
             // Check if running in standalone mode (should only run as microservice)
             if (settings.IsStandalone)
             {
                 logger.Warn("Oip.Users service is configured to run in Standalone mode. " +
-                          "This service should only run in Microservices mode. " +
-                          "Consider running the main Oip application instead.");
+                            "This service should only run in Microservices mode. " +
+                            "Consider running the main Oip application instead.");
                 return;
             }
-            
+
             var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
             builder.AddNlog();
             builder.AddDefaultHealthChecks();
@@ -35,13 +37,16 @@ internal static class Program
             builder.AddOpenApi(settings);
             builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
-            builder.Services.AddStartupRunner();
+            builder.Services.AddApplicationsModuleRemote(settings);
             builder.Services.AddSingleton(settings);
             builder.Services.AddCors();
             builder.AddControllersAndView();
+            builder.Services
+                .AddController<ProxySettingsController>()
+                .AddController<SecurityController>()
+                .AddController<UserProfileController>()
+                .AddController<UsersController>();
             builder.AddLocalization();
-            builder.Services.AddStartupRunner();
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddUsersModuleLocal(settings);
 

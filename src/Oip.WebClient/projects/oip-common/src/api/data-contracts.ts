@@ -49,17 +49,6 @@ export interface FolderModuleSettings {
   html?: string | null;
 }
 
-export interface GetKeycloakClientSettingsResponse {
-  authority?: string | null;
-  clientId?: string | null;
-  scope?: string | null;
-  responseType?: string | null;
-  useRefreshToken?: boolean;
-  silentRenew?: boolean;
-  logLevel?: number;
-  secureRoutes?: string[] | null;
-}
-
 export interface IframeModuleSettings {
   url?: string | null;
 }

@@ -16,6 +16,22 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public OipServicesSettings Services { get; set; } = new();
 
     /// <inheritdoc />
+    public ApplicationSettings Application { get; set; } = new()
+    {
+        Code = "oip-rtds",
+        DisplayName = "OIP.Rtds",
+        BaseUrl = "https://localhost:50003",
+        InternalBaseUrl = "https://localhost:5003",
+        Icon = "pi pi-database",
+        Order = 20,
+        ServiceType = ServiceType.Application
+    };
+
+    /// <inheritdoc />
+    public ApplicationRegistrySettings ApplicationRegistry { get; set; } =
+        new() { CurrentApplicationCode = "oip-rtds" };
+
+    /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();
 
     /// <inheritdoc />
@@ -29,4 +45,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public bool IsStandalone { get; set; } = false;
+
+    /// <inheritdoc />
+    public DataProtectionSettings DataProtection { get; set; } = new();
 }

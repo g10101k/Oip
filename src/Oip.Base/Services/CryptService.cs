@@ -17,9 +17,7 @@ public class CryptService(IDataProtectionProvider dataProtectionProvider)
     /// <exception cref="ArgumentNullException"></exception>
     public string Protect(string? message)
     {
-        if (message is null)
-            throw new ArgumentNullException(nameof(message));
-        return _dataProtector.Protect(message);
+        return message is null ? throw new ArgumentNullException(nameof(message)) : _dataProtector.Protect(message);
     }
 
     /// <summary>
@@ -30,8 +28,6 @@ public class CryptService(IDataProtectionProvider dataProtectionProvider)
     /// <exception cref="ArgumentNullException"></exception>
     public string Unprotect(string? message)
     {
-        if (message is null)
-            throw new ArgumentNullException(nameof(message));
-        return _dataProtector.Unprotect(message);
+        return message is null ? throw new ArgumentNullException(nameof(message)) : _dataProtector.Unprotect(message);
     }
 }

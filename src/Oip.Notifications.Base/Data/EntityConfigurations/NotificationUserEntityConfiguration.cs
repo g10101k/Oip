@@ -1,0 +1,53 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Oip.Data.Extensions;
+using Oip.Notifications.Base.Data.Contexts;
+using Oip.Notifications.Base.Data.Entities;
+
+namespace Oip.Notifications.Base.Data.EntityConfigurations;
+
+/// <summary>
+/// Configures database mapping for NotificationUserEntity
+/// </summary>
+/// <param name="database">The database facade</param>
+public class NotificationUserEntityConfiguration(DatabaseFacade database)
+    : IEntityTypeConfiguration<NotificationUserEntity>
+{
+    /// <inheritdoc />
+    public void Configure(EntityTypeBuilder<NotificationUserEntity> builder)
+    {
+        // Set table with schema for notifications
+        builder.SetTableWithSchema(database, NotificationsDbContext.SchemaName);
+        builder.HasKey(e => e.NotificationUserId);
+        builder.Property(e => e.NotificationUserId)
+            .ValueGeneratedOnAdd();
+        builder.Property(e => e.Subject)
+            .IsRequired()
+            .HasMaxLength(200);
+        builder.Property(e => e.Message)
+            .IsRequired();
+        builder.Property(e => e.NotificationChannelId);
+        builder.Property(e => e.SentAt);
+        builder.Property(e => e.DeliveredAt);
+        builder.Property(e => e.ReadAt);
+        // Indexes
+        builder.HasIndex(e => e.NotificationId);
+        builder.HasIndex(e => e.UserId);
+        builder.HasIndex(e => e.NotificationChannelId);
+        builder.HasIndex(e => e.SentAt);
+        builder.HasIndex(e => e.DeliveredAt);
+        builder.HasIndex(e => e.ReadAt);
+        builder.HasIndex(e => new { e.NotificationId, e.UserId, e.NotificationChannelId })
+            .IsUnique();
+        // Relationships
+        builder.HasOne(e => e.Notification)
+            .WithMany(n => n.NotificationUsers)
+            .HasForeignKey(e => e.NotificationId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(e => e.Deliveries)
+            .WithOne(d => d.NotificationUser)
+            .HasForeignKey(d => d.NotificationUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}

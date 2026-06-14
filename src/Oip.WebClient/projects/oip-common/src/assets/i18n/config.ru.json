@@ -1,6 +1,7 @@
 {
   "config": {
     "all": "Все",
+    "applicationManagement": "Управление приложениями",
     "dateFormat": "Формат даты",
     "dateTimeFormat": "Формат даты и времени:",
     "goTo": "Перейти",

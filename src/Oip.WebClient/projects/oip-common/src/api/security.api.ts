@@ -7,7 +7,6 @@ import {
   ApiExceptionResponse,
   AuthCsrfTokenResponse,
   AuthSessionResponse,
-  GetKeycloakClientSettingsResponse,
 } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
@@ -40,14 +39,6 @@ export class SecurityApi<
   getAuthCsrfToken = (params: RequestParams = {}) =>
     this.request<AuthCsrfTokenResponse, ApiExceptionResponse>({
       path: `/api/security/get-auth-csrf-token`,
-      method: "GET",
-      secure: true,
-      format: "json",
-      ...params,
-    });
-  getKeycloakClientSettings = (params: RequestParams = {}) =>
-    this.request<GetKeycloakClientSettingsResponse, ApiExceptionResponse>({
-      path: `/api/security/get-keycloak-client-settings`,
       method: "GET",
       secure: true,
       format: "json",

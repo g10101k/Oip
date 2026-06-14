@@ -83,7 +83,8 @@
     "logoutConfirmMessage": "Вы уверены, что хотите выйти?",
     "logoutConfirmCancel": "Отмена",
     "logoutConfirmAccept": "Выйти",
-    "profile": "Профиль"
+    "profile": "Профиль",
+    "applications": "Приложения"
   },
   "userNotifications": {
     "title": "Оповещения",
