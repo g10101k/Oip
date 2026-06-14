@@ -195,6 +195,12 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
 
       this.activeTabId = this.getCurrentActiveTabId();
       this.hostChangeDetectorRef.detectChanges();
+
+      if (this.showContent) {
+        this.queueRenderExtension();
+      } else {
+        this.destroyExtensionElement();
+      }
     });
   }
 
