@@ -53,7 +53,6 @@
     "@angular/cli": "^20.3.3",
     "@angular/compiler-cli": "^20.3.2",
     "@types/jasmine": "~5.1.9",
-    "@vendure/ngx-translate-extract": "^10.1.0",
     "angular-eslint": "20.3.0",
     "argparse": "^2.0.1",
     "autoprefixer": "^10.4.20",

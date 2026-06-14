@@ -18,6 +18,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { Button } from 'primeng/button';
 import { BaseModuleComponent } from './base-module.component';
 import { SecurityComponent } from './security.component';
+import { TopBarService } from '../services/top-bar.service';
 import { ExtensionLoaderService } from '../extension-host/extension-loader.service';
 import { OIP_EXTENSION_EVENTS, emitOipContextChange } from '../extension-host/extension-host.events';
 import { ExtensionModulesApi } from '../api/extension-modules.api';
@@ -109,10 +110,24 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
 
   constructor() {
     super();
-    this.subscriptions.push(this.topBarService.activeId$.subscribe(() => this.queueActiveTabSync()));
+    this.subscriptions.push(
+      this.topBarService.activeId$.subscribe((activeId) => {
+        console.debug('[OIP extension-host] activeId$ received', JSON.stringify({
+          activeId,
+          currentHostTab: this.activeTabId,
+          resolvedServiceTab: this.getCurrentActiveTabId()
+        }));
+        this.queueActiveTabSync();
+      })
+    );
   }
 
   protected override async onModuleInstanceChange(): Promise<void> {
+    console.debug('[OIP extension-host] module instance change', JSON.stringify({
+      id: this.id,
+      extensionKey: this.extensionKey,
+      activeTabId: this.activeTabId
+    }));
     await this.loadExtensionMetadata();
     await this.renderExtension();
   }
@@ -128,12 +143,20 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   }
 
   async reloadExtension(): Promise<void> {
+    console.debug('[OIP extension-host] reloadExtension', JSON.stringify({
+      id: this.id,
+      extensionKey: this.extensionKey,
+      activeTabId: this.activeTabId
+    }));
     this.loadError = null;
     await this.loadExtensionMetadata();
     await this.renderExtension();
   }
 
   private async loadExtensionMetadata(): Promise<void> {
+    console.debug('[OIP extension-host] loadExtensionMetadata start', JSON.stringify({
+      extensionKey: this.extensionKey
+    }));
     if (!this.extensionKey) {
       this.loadError = 'Extension key is missing.';
       return;
@@ -142,10 +165,22 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
     this.extensionMetadata = await this.extensionModulesApi.getExtensionModuleByKey({
       extensionKey: this.extensionKey
     }) as unknown as OipExtensionModuleMetadata;
+    console.debug('[OIP extension-host] loadExtensionMetadata complete', JSON.stringify({
+      extensionKey: this.extensionMetadata.extensionKey,
+      loadType: this.extensionMetadata.loadType
+    }));
   }
 
   private async renderExtension(): Promise<void> {
+    console.debug('[OIP extension-host] renderExtension start', JSON.stringify({
+      destroyed: this.destroyed,
+      hasContainer: !!this.container,
+      hasMetadata: !!this.extensionMetadata,
+      activeTabId: this.activeTabId,
+      showContent: this.showContent
+    }));
     if (this.destroyed || !this.container || !this.extensionMetadata || !this.showContent) {
+      console.debug('[OIP extension-host] renderExtension skipped');
       return;
     }
 
@@ -166,9 +201,13 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
 
   private queueRenderExtension(): void {
     if (this.renderQueued) {
+      console.debug('[OIP extension-host] queueRenderExtension skipped: already queued');
       return;
     }
 
+    console.debug('[OIP extension-host] queueRenderExtension queued', JSON.stringify({
+      activeTabId: this.activeTabId
+    }));
     this.renderQueued = true;
     queueMicrotask(() => {
       this.renderQueued = false;
@@ -182,6 +221,11 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
 
   private queueActiveTabSync(): void {
     const nextActiveTabId = this.getCurrentActiveTabId();
+    console.debug('[OIP extension-host] queueActiveTabSync request', JSON.stringify({
+      currentHostTab: this.activeTabId,
+      nextActiveTabId,
+      alreadyQueued: this.activeTabSyncQueued
+    }));
     if (this.activeTabId === nextActiveTabId || this.activeTabSyncQueued) {
       return;
     }
@@ -194,6 +238,12 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
       }
 
       this.activeTabId = this.getCurrentActiveTabId();
+      console.debug('[OIP extension-host] active tab synced', JSON.stringify({
+        activeTabId: this.activeTabId,
+        showContent: this.showContent,
+        showSettings: this.showSettings,
+        showSecurity: this.showSecurity
+      }));
       this.hostChangeDetectorRef.detectChanges();
 
       if (this.showContent) {
@@ -289,6 +339,11 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   }
 
   private destroyExtensionElement(): void {
+    console.debug('[OIP extension-host] destroyExtensionElement', JSON.stringify({
+      hasExtensionElement: !!this.extensionElement,
+      hasExtensionComponent: !!this.extensionComponent,
+      listeners: this.removeListeners.length
+    }));
     this.removeListeners.forEach((remove) => remove());
     this.removeListeners = [];
     this.extensionComponent?.destroy();
@@ -319,8 +374,18 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
       throw new Error(`Remote component '${componentName}' was not exported by '${exposedModule}'.`);
     }
 
+    const extensionInjector = Injector.create({
+      providers: [
+        {
+          provide: TopBarService,
+          useClass: TopBarService
+        }
+      ],
+      parent: this.injector
+    });
+
     this.extensionComponent = this.viewContainer.createComponent(component, {
-      injector: this.injector,
+      injector: extensionInjector,
       environmentInjector: this.environmentInjector
     });
   }

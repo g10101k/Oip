@@ -50,10 +50,13 @@ import { AppTopbarApplicationSwitcherComponent } from './top-bar-application-swi
       </div>
 
       @if (securityService.isAdmin() && topBarService.topBarItems.length > 0) {
-        <p-tabs class="layout-topbar-tabs ml-2" [(value)]="topBarService.activeId">
+        <p-tabs
+          class="layout-topbar-tabs ml-2"
+          [value]="topBarService.activeId"
+          (valueChange)="onActiveTabChange($event)">
           <p-tablist>
             @for (tab of topBarService.availableTopBarItems; track tab.id) {
-              <p-tab id="oip-app-topbar-tab-{{ tab.id }}" [value]="tab.id">
+              <p-tab id="oip-app-topbar-tab-{{ tab.id }}" [value]="tab.id" (click)="onTabClick(tab.id)">
                 <i class="pi {{ tab.icon }}"></i>
                 <span class="ml-2">{{ tab.caption }}</span>
               </p-tab>
@@ -145,6 +148,23 @@ export class AppTopbar {
   logoService = inject(LogoService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translateService = inject(TranslateService);
+
+  onActiveTabChange(value: string | number | undefined) {
+    const nextActiveId = value == null ? undefined : String(value);
+    console.debug('[OIP topbar] p-tabs valueChange', JSON.stringify({
+      rawValue: value,
+      nextActiveId,
+      previousActiveId: this.topBarService.activeId
+    }));
+    this.topBarService.activeId = nextActiveId;
+  }
+
+  onTabClick(tabId: string) {
+    console.debug('[OIP topbar] p-tab click', JSON.stringify({
+      tabId,
+      activeIdBeforeClick: this.topBarService.activeId
+    }));
+  }
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({
