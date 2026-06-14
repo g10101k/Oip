@@ -144,12 +144,15 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD:-P@ssw0rd}
       KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/data/cert/oip.pem
       KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/data/cert/oip.key
+      KC_SPI_THEME_CACHE_THEMES: false
+      KC_SPI_THEME_CACHE_TEMPLATES: false
     ports:
       - "8080:8080"
       - "8443:8443"
       - "9000:9000"
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
+      - ./keycloak/themes:/opt/keycloak/themes:ro
       - ./https:/opt/keycloak/data/cert/:ro
     depends_on:
       postgres:
@@ -184,7 +187,6 @@ services:
       - "1025:1025"
       - "8025:8025"
     restart: unless-stopped
-
 
   redis:
     image: redis:7-alpine
