@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -30,6 +31,7 @@ using Oip.Base.Clients;
 using Oip.Base.Exceptions;
 using Oip.Base.Helpers;
 using Oip.Base.Middlewares;
+using Oip.Base.Providers;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
@@ -859,7 +861,17 @@ public static class OipModuleApplication
         if (settings.PersistKeysToFileSystemPath is not null)
             dataProtectionBuilder.PersistKeysToFileSystem(new DirectoryInfo(settings.PersistKeysToFileSystemPath));
         dataProtectionBuilder.SetDefaultKeyLifetime(TimeSpan.FromDays(settings.DefaultKeyLifetimeInDay));
-        
+
         services.AddScoped<CryptService>();
+    }
+
+    /// <summary>
+    /// Adds the OIP CORS policy provider to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection to add the service to.</param>
+    /// <param name="baseSettings">The base OIP module application settings.</param>
+    public static void AddOipCors(this IServiceCollection services, IBaseOipModuleAppSettings baseSettings)
+    {
+        services.AddSingleton<ICorsPolicyProvider>(new CorsPolicyProvider(baseSettings.Cors));
     }
 }

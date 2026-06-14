@@ -42,6 +42,7 @@ function createFallbackConfig() {
     ),
     createKeepAliveProxy(
       [
+        '/manifest.json',
         '/api',
         '/swagger',
         '/health',
@@ -73,6 +74,7 @@ function createFallbackConfig() {
     ),
     createKeepAliveProxy(
       [
+        '/manifest.json',
         '/api',
         '/swagger',
         '/health',

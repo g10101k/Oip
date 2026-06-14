@@ -47,6 +47,8 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     /// Represents synchronization options for the application.
     /// </summary>
     public UserSyncOptions UserSyncOptions { get; set; } = new();
+    
+    public CorsSettings Cors { get; set; } = new();
 }
 
 /// <summary>

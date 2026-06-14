@@ -58,6 +58,8 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// <summary>
     /// DataProtection settings
     /// </summary>
-    [NotSaveToDb] 
+    [NotSaveToDb]
     DataProtectionSettings DataProtection { get; set; }
+
+    CorsSettings Cors { get; set; }
 }

@@ -1,10 +1,12 @@
 using NLog;
 using NLog.Web;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Oip.AngularModule.Controllers;
 using Oip.AngularModule.Settings;
 using Oip.Base.Controllers;
 using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
+using Oip.Base.Providers;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;
@@ -35,6 +37,7 @@ internal static class Program
             builder.Services.AddStartupRunner();
             builder.Services.AddHttpClient();
             builder.Services.AddCors();
+            builder.Services.AddOipCors(settings);
             builder.Services.AddOipDataProtection(settings);
             builder.AddControllersAndView();
             builder.Services
@@ -66,10 +69,10 @@ internal static class Program
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseCors();
             app.UseAuthentication();
             app.UseOipCsrfProtection();
             app.UseAuthorization();
-            app.UseCors(options => options.AllowAnyOrigin());
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapGet("/manifest.json", (HttpRequest request) =>
             {

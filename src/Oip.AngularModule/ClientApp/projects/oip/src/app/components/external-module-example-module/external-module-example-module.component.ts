@@ -76,7 +76,10 @@ import { ExternalModuleExampleModuleApi } from '../../../api/external-module-exa
 })
 export class ExternalModuleExampleModuleComponent extends BaseModuleComponent<ExternalModuleExampleModuleSettings, NoSettingsDto> {
   protected readonly dataService = inject(ExternalModuleExampleModuleApi);
-  protected readonly moduleApiRequestParams: RequestParams = { baseUrl: this.resolveModuleBackendOrigin() };
+  protected readonly moduleApiRequestParams: RequestParams = {
+    baseUrl: this.resolveModuleBackendOrigin(),
+    credentials: 'include'
+  };
   protected data?: ExternalModuleExampleDataDto;
   protected loading = false;
 

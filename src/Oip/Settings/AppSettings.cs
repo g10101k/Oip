@@ -37,7 +37,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
-    
+
     /// <inheritdoc />
     public bool IsStandalone { get; set; } = false;
 
@@ -48,4 +48,6 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     /// User synchronization option
     /// </summary>
     public UserSyncOptions UserSyncOptions { get; set; } = new();
+
+    public CorsSettings Cors { get; set; } = new();
 }

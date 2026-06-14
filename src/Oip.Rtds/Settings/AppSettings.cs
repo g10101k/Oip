@@ -48,4 +48,6 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
+    
+    public CorsSettings Cors { get; set; } = new();
 }
