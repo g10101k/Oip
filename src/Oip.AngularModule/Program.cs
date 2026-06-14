@@ -1,5 +1,6 @@
 using NLog;
 using NLog.Web;
+using Oip.AngularModule.Controllers;
 using Oip.AngularModule.Settings;
 using Oip.Base.Controllers;
 using Oip.Base.Data.Extensions;
@@ -36,7 +37,10 @@ internal static class Program
             builder.Services.AddCors();
             builder.Services.AddOipDataProtection(settings);
             builder.AddControllersAndView();
-            builder.Services.AddController<SecurityController>();
+            builder.Services
+                .AddController<ExternalModuleExampleModuleController>()
+                .AddController<FolderModuleController>()
+                .AddController<SecurityController>();
             builder.AddLocalization();
             builder.AddOpenTelemetry(settings);
 
@@ -80,7 +84,7 @@ internal static class Program
                     remoteEntryUrl = $"{origin}/remoteEntry.js",
                     exposedModule = "./ExternalModuleExampleModule",
                     componentName = "ExternalModuleExampleModuleComponent",
-                    apiBaseUrl = $"{origin}/api",
+                    apiBaseUrl = origin,
                     icon = "pi pi-th-large",
                     description = "Angular Module Federation extension loaded by the main OIP application."
                 });
