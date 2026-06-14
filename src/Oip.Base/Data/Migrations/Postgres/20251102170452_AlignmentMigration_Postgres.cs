@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Data.Migrations.Postgres
+namespace Oip.Base.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class AlignmentMigration_Postgres : Migration

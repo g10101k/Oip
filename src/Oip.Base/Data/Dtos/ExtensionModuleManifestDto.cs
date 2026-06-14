@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Oip.Data.Dtos;
+namespace Oip.Base.Data.Dtos;
 
 /// <summary>
 /// Manifest supplied by an external Web Component extension.

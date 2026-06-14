@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Oip.Data.Extensions;
+using Oip.Base.Data.Extensions;
 
-namespace Oip.Data.EntityConfigurations;
+namespace Oip.Base.Data.EntityConfigurations;
 
 /// <summary>
 /// Configures the entity for data protection keys in the database

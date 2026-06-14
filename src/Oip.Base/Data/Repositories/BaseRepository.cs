@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Oip.Data.Repositories;
+namespace Oip.Base.Data.Repositories;
 
 /// <summary>
 /// Base repository with common CRUD operations

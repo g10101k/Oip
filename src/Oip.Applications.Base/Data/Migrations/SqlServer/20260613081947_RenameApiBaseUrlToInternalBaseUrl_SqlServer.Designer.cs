@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oip.Applications.Base.Data;
+using Oip.Applications.Base.Data.Contexts;
 
 #nullable disable
 

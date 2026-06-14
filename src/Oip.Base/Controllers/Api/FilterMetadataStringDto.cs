@@ -1,4 +1,4 @@
-namespace Oip.Api.Controllers.Api;
+namespace Oip.Base.Controllers.Api;
 
 /// <summary>
 /// Filter metadata container storing string-based criteria for query operations.

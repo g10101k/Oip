@@ -5,9 +5,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Oip.Data.Contexts;
+using Oip.Base.Data.Contexts;
 
-namespace Oip.Data.Migrations.Postgres
+namespace Oip.Base.Data.Migrations.Postgres
 {
     [DbContext(typeof(OipModuleContextPostgres))]
     [Migration("20251102170452_AlignmentMigration_Postgres")]

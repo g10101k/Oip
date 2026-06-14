@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Data.Migrations.SqlServer
+namespace Oip.Base.Data.Migrations.SqlServer
 {
     /// <inheritdoc />
     public partial class AddComment : Migration

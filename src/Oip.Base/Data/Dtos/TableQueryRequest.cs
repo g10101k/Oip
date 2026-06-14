@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Oip.Data.Dtos;
+namespace Oip.Base.Data.Dtos;
 
 /// <summary>
 /// Represents a server-side table query request coming from PrimeNG p-table lazy loading.

@@ -1,6 +1,8 @@
 using Oip.Base.Settings;
+using Oip.Settings;
+using Oip.Users.Base.Settings;
 
-namespace Oip.Settings;
+namespace Oip.AngularModule.Settings;
 
 /// <summary>
 /// Application settings
@@ -9,6 +11,21 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 {
     /// <inheritdoc />
     public OipServicesSettings Services { get; set; } = new();
+
+    /// <inheritdoc />
+    public ApplicationSettings Application { get; set; } = new()
+    {
+        Code = "oip-angular-module",
+        DisplayName = "OIP Angular Module",
+        BaseUrl = "https://localhost:50008",
+        InternalBaseUrl = "https://localhost:5008",
+        Icon = "pi pi-th-large",
+        Order = 100,
+        ServiceType = ServiceType.Application
+    };
+
+    /// <inheritdoc />
+    public ApplicationRegistrySettings ApplicationRegistry { get; set; } = new();
 
     /// <inheritdoc />
     public OpenApiSettings OpenApi { get; set; } = new();
@@ -24,4 +41,10 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public bool IsStandalone { get; set; } = false;
+
+    /// <inheritdoc />
+    public DataProtectionSettings DataProtection { get; set; } = new();
+    
+    public UserSyncOptions UserSyncOptions { get; set; } = new();
+
 }

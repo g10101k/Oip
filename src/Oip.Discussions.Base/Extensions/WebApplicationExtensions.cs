@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
+using Oip.Base.Data.Extensions;
 using Oip.Base.Settings;
-using Oip.Data.Extensions;
 using Oip.Discussions.Base.Data;
 
 namespace Oip.Discussions.Base.Extensions;

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Data.Repositories;
+using Oip.Base.Data.Repositories;
 
 namespace Oip.Discussions.Base.Data.Repositories;
 

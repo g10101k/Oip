@@ -272,13 +272,15 @@ export class HttpClient<SecurityDataType = unknown> {
         this.authorizeOnUnauthorized(response, path);
         throw data;
       }
-
       return data.data;
     });
   };
 
   private authorizeOnUnauthorized(response: Response, path: string): void {
-    if (response.status !== 401 || path.includes("/api/security/create-auth-session")) {
+    if (
+      response.status !== 401 ||
+      path.includes("/api/security/create-auth-session")
+    ) {
       return;
     }
 

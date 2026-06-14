@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Api.Controllers;
+using Oip.Base.Controllers;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
-using Oip.Data.Constants;
-using Oip.Data.Repositories;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Repositories;
 

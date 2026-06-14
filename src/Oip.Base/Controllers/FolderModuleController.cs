@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Oip.Api.Controllers.Api;
+using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Repositories;
 using Oip.Base.Properties;
-using Oip.Data.Constants;
-using Oip.Data.Repositories;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// API controller for the Folder module.

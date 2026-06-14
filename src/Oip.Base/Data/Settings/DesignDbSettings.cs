@@ -1,6 +1,6 @@
 using Oip.Settings;
 
-namespace Oip.Data.Settings;
+namespace Oip.Base.Data.Settings;
 
 /// <summary>
 /// Design database settings.

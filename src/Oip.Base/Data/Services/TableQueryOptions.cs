@@ -1,4 +1,4 @@
-namespace Oip.Data.Services;
+namespace Oip.Base.Data.Services;
 
 /// <summary>
 /// Configures allowed field mappings and paging limits for server-side table queries.

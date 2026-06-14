@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
-using Oip.Data.Constants;
-using Oip.Data.Repositories;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// Base controller for managing database migrations.

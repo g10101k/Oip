@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Builder;
-using Oip.Data.Extensions;
+using Oip.Base.Data.Extensions;
 using Oip.Users.Base.Contexts;
 
 namespace Oip.Users.Base.Extensions;

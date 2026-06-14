@@ -1,15 +1,15 @@
 using NLog;
 using NLog.Web;
 using Microsoft.EntityFrameworkCore;
-using Oip.Api.Controllers;
 using Oip.Applications.Base;
 using Oip.Applications.Base.Controllers;
 using Oip.Applications.Base.Extensions;
+using Oip.Base.Controllers;
+using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Controllers;
-using Oip.Data.Extensions;
 using Oip.Settings;
 using Oip.Demo.TableQueryDemo;
 using Oip.Discussions.Base.Controllers;
@@ -84,7 +84,9 @@ internal static class Program
                 .AddController<ApplicationsController>()
                 .AddController<CustomerModuleController>()
                 .AddController<DashboardModuleController>()
-                .AddController<WeatherForecastModuleController>();
+                .AddController<WeatherForecastModuleController>()
+                .AddController<ExtensionsController>()
+                .AddController<ExtensionModulesController>();
             
             var app = builder.Build();
 

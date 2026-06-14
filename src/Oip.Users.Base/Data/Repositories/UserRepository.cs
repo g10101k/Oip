@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Data.Dtos;
-using Oip.Data.Repositories;
+using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Repositories;
 using Oip.Users.Base.Contexts;
 using Oip.Users.Base.Data.Entities;
 

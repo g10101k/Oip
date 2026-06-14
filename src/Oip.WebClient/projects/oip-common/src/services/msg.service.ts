@@ -63,16 +63,9 @@ export class MsgService {
       return validationMessage;
     }
 
-    if (
-      typeof error === 'object' &&
-      error &&
-      'error' in error &&
-      typeof error.error === 'object' &&
-      error.error &&
-      'message' in error.error &&
-      typeof error.error.message === 'string'
-    ) {
-      return error.error.message;
+    const responseError = this.getObjectProperty(error, 'error');
+    if (responseError && 'message' in responseError && typeof responseError.message === 'string') {
+      return responseError.message;
     }
 
     if (typeof error === 'object' && error && 'message' in error && typeof error.message === 'string') {

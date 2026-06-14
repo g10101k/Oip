@@ -1,6 +1,6 @@
-using Oip.Data.Entities;
+using Oip.Base.Data.Entities;
 
-namespace Oip.Data.Dtos;
+namespace Oip.Base.Data.Dtos;
 
 
 /// <summary>

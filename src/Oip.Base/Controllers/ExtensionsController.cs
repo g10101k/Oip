@@ -2,14 +2,14 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Api.Controllers.Api;
-using Oip.Api.Properties;
+using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
-using Oip.Data.Constants;
-using Oip.Data.Dtos;
-using Oip.Data.Repositories;
+using Oip.Base.Properties;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// Runtime endpoints for Web Component extension instances and API proxying.

@@ -1,18 +1,17 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Oip.Api.Controllers.Api;
-using Oip.Base.Extensions;
+using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
 using Oip.Base.Exceptions;
-using Oip.Base.Helpers;
+using Oip.Base.Extensions;
 using Oip.Base.Services;
-using Oip.Data.Constants;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// Controller responsible for managing security-related operations.

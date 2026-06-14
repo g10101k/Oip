@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Oip.Api.Controllers;
-using Oip.Api.Controllers.Api;
-using Oip.Data.Constants;
-using Oip.Data.Repositories;
+using Oip.Base.Controllers;
+using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Repositories;
 
 namespace Oip.AngularModule.Controllers;
 

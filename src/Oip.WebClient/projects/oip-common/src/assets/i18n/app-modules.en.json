@@ -22,6 +22,8 @@
     },
     "messages": {
       "deleteSuccess": "Module deleted",
+      "deleteError": "Module delete failed",
+      "registerError": "External module registration failed",
       "registerSuccess": "External module registered"
     }
   }

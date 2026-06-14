@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Oip.Applications.Base.Data;
+using Oip.Applications.Base.Data.Contexts;
+using Oip.Applications.Base.Data.Repositories;
 using Oip.Applications.Base.Services;
 using Oip.Applications.Base.StartupTasks;
 using Oip.Base.Runtime;

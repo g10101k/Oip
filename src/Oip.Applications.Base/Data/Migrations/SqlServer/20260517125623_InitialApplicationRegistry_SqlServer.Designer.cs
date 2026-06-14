@@ -5,6 +5,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Oip.Applications.Base.Data.Contexts;
 
 namespace Oip.Applications.Base.Data.Migrations.SqlServer
 {

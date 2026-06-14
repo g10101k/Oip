@@ -20,6 +20,7 @@ import { BaseModuleComponent } from './base-module.component';
 import { SecurityComponent } from './security.component';
 import { ExtensionLoaderService } from '../extension-host/extension-loader.service';
 import { OIP_EXTENSION_EVENTS, emitOipContextChange } from '../extension-host/extension-host.events';
+import { ExtensionModulesApi } from '../api/extension-modules.api';
 import {
   OipExtensionHostContext,
   OipExtensionModuleMetadata,
@@ -30,6 +31,7 @@ import {
 @Component({
   standalone: true,
   imports: [CommonModule, SecurityComponent, TranslatePipe, Button],
+  providers: [ExtensionModulesApi],
   template: `
     @if (showContent) {
       <div class="min-h-[calc(100vh-10rem)] w-full">
@@ -75,6 +77,7 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   private readonly injector = inject(Injector);
   private readonly environmentInjector = inject(EnvironmentInjector);
   private readonly hostChangeDetectorRef = inject(ChangeDetectorRef);
+  private readonly extensionModulesApi = inject(ExtensionModulesApi);
   private container?: ElementRef<HTMLElement>;
   private viewContainer?: ViewContainerRef;
   private extensionElement?: HTMLElement;
@@ -136,9 +139,9 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
       return;
     }
 
-    this.extensionMetadata = await this.baseDataService.sendRequest<OipExtensionModuleMetadata>(
-      `api/extension-modules/get-extension-module-by-key/${this.extensionKey}`
-    );
+    this.extensionMetadata = await this.extensionModulesApi.getExtensionModuleByKey({
+      extensionKey: this.extensionKey
+    }) as unknown as OipExtensionModuleMetadata;
   }
 
   private async renderExtension(): Promise<void> {
@@ -207,7 +210,7 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
     const context: OipExtensionHostContext = {
       moduleInstanceId: this.id,
       extensionKey: this.extensionMetadata.extensionKey,
-      apiBasePath: this.baseDataService.buildUrl(`api/extensions/${this.extensionMetadata.extensionKey}`),
+      apiBasePath: this.buildUrl(`api/extensions/${this.extensionMetadata.extensionKey}`),
       settings: this.settings,
       locale: this.layoutService.language(),
       theme: this.layoutService.layoutConfig(),
@@ -267,6 +270,11 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
     this.addListener(element, OIP_EXTENSION_EVENTS.error, (event) => {
       this.msgService.error((event as CustomEvent<unknown>).detail);
     });
+  }
+
+  private buildUrl(path: string): string {
+    const baseUrl = document.getElementsByTagName('base')[0]?.href ?? `${window.location.origin}/`;
+    return `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}${path}`;
   }
 
   private addListener(element: HTMLElement, eventName: string, listener: EventListener): void {

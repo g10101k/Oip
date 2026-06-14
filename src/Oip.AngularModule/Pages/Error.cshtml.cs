@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace Oip.Pages;
+namespace Oip.AngularModule.Pages;
 
 [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 public class ErrorModel : PageModel

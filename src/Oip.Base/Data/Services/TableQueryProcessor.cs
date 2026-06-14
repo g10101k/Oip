@@ -2,9 +2,9 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Oip.Data.Dtos;
+using Oip.Base.Data.Dtos;
 
-namespace Oip.Data.Services;
+namespace Oip.Base.Data.Services;
 
 /// <summary>
 /// Applies PrimeNG-style table filtering, sorting, and paging to an <see cref="IQueryable{T}"/>.

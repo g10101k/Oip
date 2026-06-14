@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Oip.Data.Contexts;
-using Oip.Data.Entities;
+using Oip.Base.Data.Contexts;
+using Oip.Base.Data.Entities;
 
-namespace Oip.Data.Extensions;
+namespace Oip.Base.Data.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring and initializing the OIP module context

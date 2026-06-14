@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Settings;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// Controller responsible for managing security-related operations,

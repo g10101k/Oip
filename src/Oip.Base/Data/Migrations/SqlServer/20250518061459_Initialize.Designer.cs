@@ -5,9 +5,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Oip.Data.Contexts;
+using Oip.Base.Data.Contexts;
 
-namespace Oip.Data.Migrations.SqlServer
+namespace Oip.Base.Data.Migrations.SqlServer
 {
     [DbContext(typeof(OipModuleContextSqlServer))]
     [Migration("20250518061459_Initialize")]

@@ -142,7 +142,11 @@ export class AppModulesComponent implements OnInit {
       await this.refreshAction();
       this.msgService.success(this.t('app-modules.messages.registerSuccess'));
     } catch (error) {
-      this.msgService.error(error);
+      this.msgService.errorFromException(
+        error,
+        this.t('app-modules.messages.registerError'),
+        this.t('app-modules.messages.registerError')
+      );
     } finally {
       this.registeringExternalModule = false;
     }
@@ -172,7 +176,11 @@ export class AppModulesComponent implements OnInit {
           await this.refreshAction();
           this.msgService.success(this.t('app-modules.messages.deleteSuccess'));
         } catch (error) {
-          this.msgService.error(error);
+          this.msgService.errorFromException(
+            error,
+            this.t('app-modules.messages.deleteError'),
+            this.t('app-modules.messages.deleteError')
+          );
         }
       }
     });

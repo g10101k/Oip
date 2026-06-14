@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Oip.Data.Migrations.Postgres
+namespace Oip.Base.Data.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class ExtensionModules_Postgres : Migration

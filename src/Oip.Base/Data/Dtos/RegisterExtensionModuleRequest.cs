@@ -1,4 +1,4 @@
-namespace Oip.Data.Dtos;
+namespace Oip.Base.Data.Dtos;
 
 /// <summary>
 /// Request to register an extension module from a manifest URL.

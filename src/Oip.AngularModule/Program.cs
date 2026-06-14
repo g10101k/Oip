@@ -1,21 +1,16 @@
 using NLog;
 using NLog.Web;
+using Oip.AngularModule.Settings;
+using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
-using Oip.Base.Services;
 using Oip.Base.StartupTasks;
-using Oip.Data.Extensions;
-using Oip.Discussions.Extensions;
-using Oip.Notifications.Data.Contexts;
-using Oip.Notifications.Extensions;
-using Oip.Settings;
-using Oip.Users.Notifications;
-using Oip.Users.Services;
-using Oip.Users.Extensions;
-using GrpcUserServiceImpl = Oip.Users.Services.UserService;
+using Oip.Discussions.Base.Extensions;
+using Oip.Notifications.Base.Extensions;
+using Oip.Users.Base.Extensions;
 
-namespace Oip;
+namespace Oip.AngularModule;
 
 internal static class Program
 {
@@ -38,6 +33,7 @@ internal static class Program
             builder.Services.AddStartupRunner();
             builder.Services.AddHttpClient();
             builder.Services.AddCors();
+            builder.Services.AddOipDataProtection(settings);
             builder.AddControllersAndView();
             builder.AddLocalization();
             builder.AddOpenTelemetry(settings);
@@ -45,18 +41,10 @@ internal static class Program
             if (settings.IsStandalone)
             {
                 builder.Services.AddUsersModuleLocal(settings);
-                builder.Services.AddScoped<GrpcUserServiceImpl>();
-                builder.Services.AddScoped<UserSyncService>();
-                builder.Services.AddSingleton<INotificationPublisher, NoOpNotificationPublisher>();
-
                 builder.Services.AddDiscussionsModuleLocal(settings);
-
                 builder.Services.AddNotificationsModuleLocal(settings);
-                builder.Services.AddDataProtection<NotificationsDbContext>();
                 builder.Services.AddSignalR();
-                builder.Services.AddGrpc().AddJsonTranscoding();
-                builder.Services.AddGrpcSwagger();
-                builder.Services.AddSingleton<CryptService>();
+                builder.Services.AddGrpc();
             }
             else
             {
@@ -73,6 +61,7 @@ internal static class Program
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
+            app.UseOipCsrfProtection();
             app.UseAuthorization();
             app.UseCors(options => options.AllowAnyOrigin());
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
@@ -102,10 +91,9 @@ internal static class Program
 
             if (settings.IsStandalone)
             {
-                app.MigrateUserDatabase();
-                app.AddDiscussions(settings);
-                app.MigrateNotificationDatabase();
-                app.MapNotificationsModule();
+                app.AddUserModuleLocal();
+                app.AddDiscussionsModuleLocal();
+                app.AddNotificationsModuleLocal();
             }
 
             app.Run();

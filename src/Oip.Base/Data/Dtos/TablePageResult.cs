@@ -1,4 +1,4 @@
-namespace Oip.Data.Dtos;
+namespace Oip.Base.Data.Dtos;
 
 /// <summary>
 /// Standard response for server-side table data requests.

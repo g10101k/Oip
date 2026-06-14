@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Oip.Api.Controllers;
-using Oip.Api.Controllers.Api;
+using Oip.Base.Controllers;
+using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Repositories;
+using Oip.Base.Data.Services;
 using Oip.Base.Exceptions;
-using Oip.Data.Constants;
-using Oip.Data.Dtos;
-using Oip.Data.Repositories;
-using Oip.Data.Services;
 using Oip.Demo.TableQueryDemo;
 using Oip.Properties;
 

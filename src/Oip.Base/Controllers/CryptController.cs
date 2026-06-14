@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Exceptions;
 using Oip.Base.Services;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// Controller for managing weather forecast data.

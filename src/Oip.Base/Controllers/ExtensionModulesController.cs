@@ -3,13 +3,13 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Entities;
+using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
-using Oip.Data.Constants;
-using Oip.Data.Dtos;
-using Oip.Data.Entities;
-using Oip.Data.Repositories;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// API controller for managing runtime extension modules.

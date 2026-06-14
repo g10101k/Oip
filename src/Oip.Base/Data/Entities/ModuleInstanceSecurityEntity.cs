@@ -1,4 +1,4 @@
-namespace Oip.Data.Entities;
+namespace Oip.Base.Data.Entities;
 
 /// <summary>
 /// Module instance security entity

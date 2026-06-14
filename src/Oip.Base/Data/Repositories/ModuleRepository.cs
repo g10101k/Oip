@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Data.Contexts;
-using Oip.Data.Dtos;
-using Oip.Data.Entities;
-using Oip.Data.Extensions;
+using Oip.Base.Data.Contexts;
+using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Entities;
+using Oip.Base.Data.Extensions;
 
-namespace Oip.Data.Repositories;
+namespace Oip.Base.Data.Repositories;
 
 /// <summary>
 /// Provides methods to manage modules and their instances, including CRUD operations and security settings.
@@ -282,8 +282,8 @@ public class ModuleRepository(OipModuleContext db)
                     Role = x.Role
                 })
             };
-
-        return await query.AsNoTracking().FirstOrDefaultAsync();
+        var result = await query.AsNoTracking().FirstOrDefaultAsync();
+        return result;
     }
 
     /// <summary>
