@@ -4,11 +4,6 @@
 
 Try to use Tailwind for layout.
 
-
-## oip-common
-
-If oip-common change need execute npm start publish:local
-
 ---
 
 # Backend (C# / ASP.NET Controllers)
