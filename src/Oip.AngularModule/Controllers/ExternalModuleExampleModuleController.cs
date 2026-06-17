@@ -59,6 +59,7 @@ public class ExternalModuleExampleModuleController(ModuleRepository moduleReposi
 /// </summary>
 public class ExternalModuleExampleModuleSettings
 {
+    public int DayCount { get; set; } = 7;
 }
 
 /// <summary>

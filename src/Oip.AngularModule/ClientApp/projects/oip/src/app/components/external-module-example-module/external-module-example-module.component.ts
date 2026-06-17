@@ -1,12 +1,28 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { BaseModuleComponent, NoSettingsDto, RequestParams, SecurityComponent } from 'oip-common';
+import { ChangeDetectorRef, Component, ElementRef, inject } from '@angular/core';
+import {
+  BaseModuleComponent,
+  NoSettingsDto,
+  RequestParams,
+  SecurityComponent
+} from 'oip-common';
 import { ExternalModuleExampleDataDto, ExternalModuleExampleModuleSettings } from '../../../api/data-contracts';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ExternalModuleExampleModuleApi } from '../../../api/external-module-example-module.api';
+
+interface OipExtensionHostContext {
+  activeTabId?: string;
+  settings?: unknown;
+}
+
+type ExtensionHostElement = HTMLElement & {
+  oipContext?: OipExtensionHostContext;
+};
+
+const contextChangeEventName = 'oip:context-change';
 
 @Component({
   selector: 'app-external-module-example-module',
@@ -56,7 +72,7 @@ import { ExternalModuleExampleModuleApi } from '../../../api/external-module-exa
                 {{ 'external-module-example-module.settings.dayCount' | translate }}
               </label>
               <div class="col-span-12 md:col-span-10">
-                <input id="dayCount" pInputText type="text" [(ngModel)]="settings"/>
+                <input id="dayCount" pInputText type="number" min="1" [(ngModel)]="settings.dayCount"/>
               </div>
             </div>
             <div class="flex justify-end">
@@ -76,12 +92,42 @@ import { ExternalModuleExampleModuleApi } from '../../../api/external-module-exa
 })
 export class ExternalModuleExampleModuleComponent extends BaseModuleComponent<ExternalModuleExampleModuleSettings, NoSettingsDto> {
   protected readonly dataService = inject(ExternalModuleExampleModuleApi);
+  private readonly hostElement = inject(ElementRef<ExtensionHostElement>);
+  private readonly moduleChangeDetectorRef = inject(ChangeDetectorRef);
   protected readonly moduleApiRequestParams: RequestParams = {
     baseUrl: this.resolveModuleBackendOrigin(),
     credentials: 'include'
   };
   protected data?: ExternalModuleExampleDataDto;
   protected loading = false;
+  private hostActiveTabId?: string;
+
+  override get isContent(): boolean {
+    return this.isHostTabActive('content') ?? super.isContent;
+  }
+
+  override get isSettings(): boolean {
+    return this.isHostTabActive('settings') ?? super.isSettings;
+  }
+
+  override get isSecurity(): boolean {
+    return this.isHostTabActive('security') ?? super.isSecurity;
+  }
+
+  override async ngOnInit(): Promise<void> {
+    this.applyDefaultSettings();
+    this.applyHostContext(this.hostElement.nativeElement.oipContext);
+    this.hostElement.nativeElement.addEventListener(contextChangeEventName, this.onHostContextChange);
+
+    await super.ngOnInit();
+    this.applyDefaultSettings();
+    this.applyHostContext(this.hostElement.nativeElement.oipContext);
+  }
+
+  override ngOnDestroy(): void {
+    this.hostElement.nativeElement.removeEventListener(contextChangeEventName, this.onHostContextChange);
+    super.ngOnDestroy();
+  }
 
   protected override async onModuleInstanceChange(): Promise<void> {
     this.loading = true;
@@ -95,6 +141,35 @@ export class ExternalModuleExampleModuleComponent extends BaseModuleComponent<Ex
     } finally {
       this.loading = false;
     }
+  }
+
+  private readonly onHostContextChange = (event: Event): void => {
+    this.applyHostContext((event as CustomEvent<OipExtensionHostContext>).detail);
+    this.moduleChangeDetectorRef.detectChanges();
+  };
+
+  private applyHostContext(context: OipExtensionHostContext | undefined): void {
+    if (!context) {
+      return;
+    }
+
+    this.hostActiveTabId = context.activeTabId;
+    this.settings = {
+      ...this.settings,
+      ...(context.settings as ExternalModuleExampleModuleSettings | undefined)
+    };
+    this.applyDefaultSettings();
+  }
+
+  private applyDefaultSettings(): void {
+    this.settings = {
+      dayCount: 7,
+      ...this.settings
+    };
+  }
+
+  private isHostTabActive(tabId: string): boolean | undefined {
+    return this.hostActiveTabId ? this.hostActiveTabId === tabId : undefined;
   }
 
   private resolveModuleBackendOrigin(): string {

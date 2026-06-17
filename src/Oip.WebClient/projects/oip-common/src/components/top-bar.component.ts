@@ -56,7 +56,7 @@ import { AppTopbarApplicationSwitcherComponent } from './top-bar-application-swi
           (valueChange)="onActiveTabChange($event)">
           <p-tablist>
             @for (tab of topBarService.availableTopBarItems; track tab.id) {
-              <p-tab id="oip-app-topbar-tab-{{ tab.id }}" [value]="tab.id" (click)="onTabClick(tab.id)">
+              <p-tab id="oip-app-topbar-tab-{{ tab.id }}" [value]="tab.id">
                 <i class="pi {{ tab.icon }}"></i>
                 <span class="ml-2">{{ tab.caption }}</span>
               </p-tab>
@@ -151,19 +151,7 @@ export class AppTopbar {
 
   onActiveTabChange(value: string | number | undefined) {
     const nextActiveId = value == null ? undefined : String(value);
-    console.debug('[OIP topbar] p-tabs valueChange', JSON.stringify({
-      rawValue: value,
-      nextActiveId,
-      previousActiveId: this.topBarService.activeId
-    }));
     this.topBarService.activeId = nextActiveId;
-  }
-
-  onTabClick(tabId: string) {
-    console.debug('[OIP topbar] p-tab click', JSON.stringify({
-      tabId,
-      activeIdBeforeClick: this.topBarService.activeId
-    }));
   }
 
   toggleDarkMode() {

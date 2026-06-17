@@ -18,7 +18,6 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { Button } from 'primeng/button';
 import { BaseModuleComponent } from './base-module.component';
 import { SecurityComponent } from './security.component';
-import { TopBarService } from '../services/top-bar.service';
 import { ExtensionLoaderService } from '../extension-host/extension-loader.service';
 import { OIP_EXTENSION_EVENTS, emitOipContextChange } from '../extension-host/extension-host.events';
 import { ExtensionModulesApi } from '../api/extension-modules.api';
@@ -28,6 +27,191 @@ import {
   OipExtensionNavigateEvent,
   OipExtensionNotifyEvent
 } from '../extension-host/extension-host.types';
+
+@Component({
+  standalone: true,
+  imports: [CommonModule, Button],
+  providers: [ExtensionModulesApi],
+  template: `
+    @if (loadError) {
+      <div class="card flex flex-col gap-4">
+        <div class="font-semibold text-xl">{{ loadError }}</div>
+        <p-button icon="pi pi-refresh" label="Retry" (onClick)="reloadExtension()"></p-button>
+      </div>
+    } @else {
+      <ng-container #extensionContainer></ng-container>
+    }
+  `
+})
+export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, unknown> implements OnDestroy {
+  @ViewChild('extensionContainer', {read: ViewContainerRef})
+  private set extensionViewContainer(viewContainer: ViewContainerRef | undefined) {
+    this.viewContainer = viewContainer;
+    this.queueRenderExtension();
+  }
+
+  private readonly injector = inject(Injector);
+  private readonly environmentInjector = inject(EnvironmentInjector);
+  private readonly extensionModulesApi = inject(ExtensionModulesApi);
+  private viewContainer?: ViewContainerRef;
+  private extensionComponent?: ComponentRef<unknown>;
+  private extensionElement?: HTMLElement;
+  private extensionMetadata?: OipExtensionModuleMetadata;
+  private renderQueued = false;
+  private destroyed = false;
+
+  protected loadError: string | null = null;
+
+  private get extensionKey(): string {
+    return this.route.snapshot.paramMap.get('extensionKey') ?? '';
+  }
+
+  constructor() {
+    super();
+    this.subscriptions.push(
+      this.topBarService.activeId$.subscribe(() => {
+        this.updateExtensionContext();
+      })
+    );
+  }
+
+  async reloadExtension(): Promise<void> {
+    this.loadError = null;
+    this.extensionMetadata = undefined;
+    await this.loadExtensionMetadata();
+    await this.renderExtension();
+  }
+
+  protected override async onModuleInstanceChange(): Promise<void> {
+    await this.loadExtensionMetadata();
+    await this.renderExtension();
+  }
+
+  protected override onSecurityRightsChange(): void {
+    this.updateExtensionContext();
+  }
+
+  override ngOnDestroy(): void {
+    this.destroyed = true;
+    this.destroyExtensionComponent();
+    super.ngOnDestroy();
+  }
+
+  private async loadExtensionMetadata(): Promise<void> {
+    if (this.extensionMetadata) {
+      return;
+    }
+
+    if (!this.extensionKey) {
+      this.loadError = 'Extension key is missing.';
+      return;
+    }
+
+    this.extensionMetadata = await this.extensionModulesApi.getExtensionModuleByKey({
+      extensionKey: this.extensionKey
+    }) as unknown as OipExtensionModuleMetadata;
+  }
+
+  private async renderExtension(): Promise<void> {
+    if (this.destroyed || !this.viewContainer) {
+      return;
+    }
+
+    try {
+      this.loadError = null;
+      await this.loadExtensionMetadata();
+      if (!this.extensionMetadata) {
+        return;
+      }
+
+      this.destroyExtensionComponent();
+
+      if (this.extensionMetadata.loadType === 'moduleFederation') {
+        await this.renderFederatedExtension(this.extensionMetadata);
+      } else {
+        this.extensionComponent = this.viewContainer.createComponent(CustomElementExtensionModuleHostComponent, {
+          injector: this.injector,
+          environmentInjector: this.environmentInjector
+        });
+      }
+    } catch (error) {
+      this.loadError = error instanceof Error ? error.message : 'Extension could not be loaded.';
+      console.error(error);
+    }
+  }
+
+  private queueRenderExtension(): void {
+    if (this.renderQueued) {
+      return;
+    }
+    this.renderQueued = true;
+    queueMicrotask(() => {
+      this.renderQueued = false;
+      void this.renderExtension();
+    });
+  }
+
+  private destroyExtensionComponent(): void {
+    this.extensionComponent?.destroy();
+    this.extensionComponent = undefined;
+    this.extensionElement = undefined;
+    this.viewContainer?.clear();
+  }
+
+  private async renderFederatedExtension(metadata: OipExtensionModuleMetadata): Promise<void> {
+    const {remoteEntryUrl, exposedModule, componentName} = metadata;
+    if (!remoteEntryUrl || !exposedModule || !componentName) {
+      this.loadError = 'Module Federation extension metadata is incomplete.';
+      return;
+    }
+
+    const remoteModule = await loadRemoteModule<Record<string, Type<unknown>>>({
+      type: 'module',
+      remoteEntry: remoteEntryUrl,
+      exposedModule
+    });
+    const component = remoteModule[componentName];
+    if (!component) {
+      throw new Error(`Remote component '${componentName}' was not exported by '${exposedModule}'.`);
+    }
+
+    this.extensionComponent = this.viewContainer?.createComponent(component, {
+      environmentInjector: this.environmentInjector
+    });
+    this.extensionElement = this.extensionComponent?.location.nativeElement as HTMLElement | undefined;
+    this.updateExtensionContext();
+  }
+
+  private updateExtensionContext(): void {
+    if (!this.extensionElement || !this.extensionMetadata?.extensionKey) {
+      return;
+    }
+
+    const context: OipExtensionHostContext = {
+      moduleInstanceId: this.id,
+      extensionKey: this.extensionMetadata.extensionKey,
+      apiBasePath: this.buildUrl(`api/extensions/${this.extensionMetadata.extensionKey}`),
+      settings: this.settings,
+      locale: this.layoutService.language(),
+      theme: this.layoutService.layoutConfig(),
+      user: this.securityService.getCurrentUser(),
+      activeTabId: this.topBarService.activeId ?? 'content',
+      permissions: {
+        canRead: this.canRead,
+        canEdit: this.canEdit,
+        canDelete: this.canDelete
+      }
+    };
+
+    Object.assign(this.extensionElement, {oipContext: context});
+    emitOipContextChange(this.extensionElement, context);
+  }
+
+  private buildUrl(path: string): string {
+    const baseUrl = document.getElementsByTagName('base')[0]?.href ?? `${window.location.origin}/`;
+    return `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}${path}`;
+  }
+}
 
 @Component({
   standalone: true,
@@ -59,7 +243,7 @@ import {
     }
   `
 })
-export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, unknown>
+export class CustomElementExtensionModuleHostComponent extends BaseModuleComponent<unknown, unknown>
   implements OnDestroy {
   @ViewChild('extensionContainer')
   private set extensionContainer(element: ElementRef<HTMLElement> | undefined) {
@@ -67,22 +251,12 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
     this.queueRenderExtension();
   }
 
-  @ViewChild('extensionContainer', {read: ViewContainerRef})
-  private set extensionViewContainer(viewContainer: ViewContainerRef | undefined) {
-    this.viewContainer = viewContainer;
-    this.queueRenderExtension();
-  }
-
   private readonly extensionLoader = inject(ExtensionLoaderService);
   private readonly router = inject(Router);
-  private readonly injector = inject(Injector);
-  private readonly environmentInjector = inject(EnvironmentInjector);
   private readonly hostChangeDetectorRef = inject(ChangeDetectorRef);
   private readonly extensionModulesApi = inject(ExtensionModulesApi);
   private container?: ElementRef<HTMLElement>;
-  private viewContainer?: ViewContainerRef;
   private extensionElement?: HTMLElement;
-  private extensionComponent?: ComponentRef<unknown>;
   private extensionMetadata?: OipExtensionModuleMetadata;
   private removeListeners: Array<() => void> = [];
   private renderQueued = false;
@@ -111,23 +285,13 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   constructor() {
     super();
     this.subscriptions.push(
-      this.topBarService.activeId$.subscribe((activeId) => {
-        console.debug('[OIP extension-host] activeId$ received', JSON.stringify({
-          activeId,
-          currentHostTab: this.activeTabId,
-          resolvedServiceTab: this.getCurrentActiveTabId()
-        }));
+      this.topBarService.activeId$.subscribe(() => {
         this.queueActiveTabSync();
       })
     );
   }
 
   protected override async onModuleInstanceChange(): Promise<void> {
-    console.debug('[OIP extension-host] module instance change', JSON.stringify({
-      id: this.id,
-      extensionKey: this.extensionKey,
-      activeTabId: this.activeTabId
-    }));
     await this.loadExtensionMetadata();
     await this.renderExtension();
   }
@@ -143,20 +307,17 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   }
 
   async reloadExtension(): Promise<void> {
-    console.debug('[OIP extension-host] reloadExtension', JSON.stringify({
-      id: this.id,
-      extensionKey: this.extensionKey,
-      activeTabId: this.activeTabId
-    }));
     this.loadError = null;
+    this.extensionMetadata = undefined;
     await this.loadExtensionMetadata();
     await this.renderExtension();
   }
 
   private async loadExtensionMetadata(): Promise<void> {
-    console.debug('[OIP extension-host] loadExtensionMetadata start', JSON.stringify({
-      extensionKey: this.extensionKey
-    }));
+    if (this.extensionMetadata) {
+      return;
+    }
+
     if (!this.extensionKey) {
       this.loadError = 'Extension key is missing.';
       return;
@@ -165,34 +326,17 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
     this.extensionMetadata = await this.extensionModulesApi.getExtensionModuleByKey({
       extensionKey: this.extensionKey
     }) as unknown as OipExtensionModuleMetadata;
-    console.debug('[OIP extension-host] loadExtensionMetadata complete', JSON.stringify({
-      extensionKey: this.extensionMetadata.extensionKey,
-      loadType: this.extensionMetadata.loadType
-    }));
   }
 
   private async renderExtension(): Promise<void> {
-    console.debug('[OIP extension-host] renderExtension start', JSON.stringify({
-      destroyed: this.destroyed,
-      hasContainer: !!this.container,
-      hasMetadata: !!this.extensionMetadata,
-      activeTabId: this.activeTabId,
-      showContent: this.showContent
-    }));
     if (this.destroyed || !this.container || !this.extensionMetadata || !this.showContent) {
-      console.debug('[OIP extension-host] renderExtension skipped');
       return;
     }
 
     try {
       this.loadError = null;
       this.destroyExtensionElement();
-
-      if (this.extensionMetadata.loadType === 'moduleFederation') {
-        await this.renderFederatedExtension(this.extensionMetadata);
-      } else {
-        await this.renderCustomElementExtension(this.extensionMetadata);
-      }
+      await this.renderCustomElementExtension(this.extensionMetadata);
     } catch (error) {
       this.loadError = error instanceof Error ? error.message : 'Extension could not be loaded.';
       this.msgService.error(error);
@@ -201,13 +345,8 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
 
   private queueRenderExtension(): void {
     if (this.renderQueued) {
-      console.debug('[OIP extension-host] queueRenderExtension skipped: already queued');
       return;
     }
-
-    console.debug('[OIP extension-host] queueRenderExtension queued', JSON.stringify({
-      activeTabId: this.activeTabId
-    }));
     this.renderQueued = true;
     queueMicrotask(() => {
       this.renderQueued = false;
@@ -221,11 +360,6 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
 
   private queueActiveTabSync(): void {
     const nextActiveTabId = this.getCurrentActiveTabId();
-    console.debug('[OIP extension-host] queueActiveTabSync request', JSON.stringify({
-      currentHostTab: this.activeTabId,
-      nextActiveTabId,
-      alreadyQueued: this.activeTabSyncQueued
-    }));
     if (this.activeTabId === nextActiveTabId || this.activeTabSyncQueued) {
       return;
     }
@@ -238,12 +372,6 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
       }
 
       this.activeTabId = this.getCurrentActiveTabId();
-      console.debug('[OIP extension-host] active tab synced', JSON.stringify({
-        activeTabId: this.activeTabId,
-        showContent: this.showContent,
-        showSettings: this.showSettings,
-        showSecurity: this.showSecurity
-      }));
       this.hostChangeDetectorRef.detectChanges();
 
       if (this.showContent) {
@@ -271,6 +399,7 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
       locale: this.layoutService.language(),
       theme: this.layoutService.layoutConfig(),
       user: this.securityService.getCurrentUser(),
+      activeTabId: this.topBarService.activeId ?? 'content',
       permissions: {
         canRead: this.canRead,
         canEdit: this.canEdit,
@@ -339,55 +468,10 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   }
 
   private destroyExtensionElement(): void {
-    console.debug('[OIP extension-host] destroyExtensionElement', JSON.stringify({
-      hasExtensionElement: !!this.extensionElement,
-      hasExtensionComponent: !!this.extensionComponent,
-      listeners: this.removeListeners.length
-    }));
     this.removeListeners.forEach((remove) => remove());
     this.removeListeners = [];
-    this.extensionComponent?.destroy();
-    this.extensionComponent = undefined;
-    this.viewContainer?.clear();
     this.extensionElement?.remove();
     this.extensionElement = undefined;
-  }
-
-  private async renderFederatedExtension(metadata: OipExtensionModuleMetadata): Promise<void> {
-    if (!this.viewContainer) {
-      return;
-    }
-
-    const {remoteEntryUrl, exposedModule, componentName} = metadata;
-    if (!remoteEntryUrl || !exposedModule || !componentName) {
-      this.loadError = 'Module Federation extension metadata is incomplete.';
-      return;
-    }
-
-    const remoteModule = await loadRemoteModule<Record<string, Type<unknown>>>({
-      type: 'module',
-      remoteEntry: remoteEntryUrl,
-      exposedModule
-    });
-    const component = remoteModule[componentName];
-    if (!component) {
-      throw new Error(`Remote component '${componentName}' was not exported by '${exposedModule}'.`);
-    }
-
-    const extensionInjector = Injector.create({
-      providers: [
-        {
-          provide: TopBarService,
-          useClass: TopBarService
-        }
-      ],
-      parent: this.injector
-    });
-
-    this.extensionComponent = this.viewContainer.createComponent(component, {
-      injector: extensionInjector,
-      environmentInjector: this.environmentInjector
-    });
   }
 
   private async renderCustomElementExtension(metadata: OipExtensionModuleMetadata): Promise<void> {
@@ -399,7 +483,6 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
 
     await this.extensionLoader.loadScript(scriptUrl);
     await customElements.whenDefined(elementName);
-
     const element = document.createElement(elementName);
     this.extensionElement = element;
     this.attachListeners(element);

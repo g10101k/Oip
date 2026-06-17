@@ -43,6 +43,7 @@ export interface OipExtensionHostContext {
   locale?: string;
   theme?: unknown;
   user?: unknown;
+  activeTabId?: string;
   permissions: {
     canRead: boolean;
     canEdit: boolean;

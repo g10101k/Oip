@@ -239,12 +239,6 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * to the ID of the first top bar item (if available).
    */
   ngOnDestroy() {
-    console.debug('[OIP base-module] ngOnDestroy reset topbar', JSON.stringify({
-      moduleId: this.id,
-      controller: this.controller,
-      currentActiveId: this.topBarService.activeId,
-      nextActiveId: this.topBarItems[0].id
-    }));
     this.topBarService.setTopBarItems([]);
     this.topBarService.activeId = this.topBarItems[0].id;
     this.rightsSubscription?.unsubscribe();
@@ -267,12 +261,6 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     );
 
     this.topBarService.setTopBarItems(this.topBarItems);
-    console.debug('[OIP base-module] ngOnInit set initial topbar activeId', JSON.stringify({
-      moduleId: this.id,
-      controller: this.controller,
-      nextActiveId: this.topBarItems[0].id,
-      items: this.topBarItems.map((item) => item.id)
-    }));
     this.topBarService.activeId = this.topBarItems[0].id;
 
     this.isInitialized = true;

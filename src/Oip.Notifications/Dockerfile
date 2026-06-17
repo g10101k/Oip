@@ -12,7 +12,7 @@ RUN dotnet publish "./Oip.Notifications/Oip.Notifications.csproj" -c $BUILD_CONF
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 EXPOSE 5007
-COPY --from=oip-dev-https dev-ca.crt /usr/local/share/ca-certificates/oip-dev-ca.crt
+COPY --from=oip-dev-https oip-dev-ca.crt /usr/local/share/ca-certificates/oip-dev-ca.crt
 RUN update-ca-certificates
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Oip.Notifications.dll"]

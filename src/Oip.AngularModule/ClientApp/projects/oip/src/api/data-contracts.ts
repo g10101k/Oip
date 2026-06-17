@@ -11,7 +11,9 @@ export interface ExternalModuleExampleDataDto {
   items?: string[] | null;
 }
 
-export type ExternalModuleExampleModuleSettings = object;
+export interface ExternalModuleExampleModuleSettings {
+  dayCount?: number;
+}
 
 export interface GetModuleInstanceSettingsParams {
   id?: number;

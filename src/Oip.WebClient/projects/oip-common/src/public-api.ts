@@ -19,7 +19,10 @@ export { AppConfiguratorComponent } from './components/app-configurator.componen
 export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator.component';
 export { DiscussionComponent } from './components/discussion.component';
 export { IframeModuleComponent } from './components/iframe-module.component';
-export { ExtensionModuleHostComponent } from './components/extension-module-host.component';
+export {
+  CustomElementExtensionModuleHostComponent,
+  ExtensionModuleHostComponent
+} from './components/extension-module-host.component';
 export { UserNotificationsComponent } from './components/user-notifications.component';
 export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher.component';
 
