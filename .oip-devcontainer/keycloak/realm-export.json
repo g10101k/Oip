@@ -1867,9 +1867,9 @@
   },
   "smtpServer": {},
   "loginTheme": "oip",
-  "accountTheme": "",
-  "adminTheme": "",
-  "emailTheme": "",
+  "accountTheme": "oip",
+  "adminTheme": "oip",
+  "emailTheme": "oip",
   "eventsEnabled": false,
   "eventsListeners": [
     "jboss-logging"
