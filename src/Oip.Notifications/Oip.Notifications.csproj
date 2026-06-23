@@ -54,9 +54,10 @@
     </ItemGroup>
     
     <ItemGroup>
-        <None Include="appsettings.Development.json">
+        <Content Update="appsettings.Development.json">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-        </None>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
     
 </Project>

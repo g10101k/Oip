@@ -1,11 +1,12 @@
+ARG BUILD_PLATFORM=linux/amd64
 FROM node:22-alpine AS angular-build
 WORKDIR /src
 COPY . .
 WORKDIR /src/Oip.WebClient
 RUN npm install
-RUN npm run build
+RUN npm run build:oip
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM --platform=$BUILD_PLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY . .
@@ -17,7 +18,7 @@ RUN dotnet publish "./Oip/Oip.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0  AS base
 WORKDIR /app
-EXPOSE 50000
+EXPOSE 50002
 
 FROM base AS final
 WORKDIR /app

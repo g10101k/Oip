@@ -322,7 +322,7 @@ public static class OipModuleApplication
                 options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
                 options.UsePkce = true;
                 options.SaveTokens = true;
-                options.GetClaimsFromUserInfoEndpoint = true;
+                options.GetClaimsFromUserInfoEndpoint = false;
                 options.ProtocolValidator = new OipOpenIdConnectProtocolValidator();
                 options.Scope.Clear();
                 options.Scope.Add(OpenIdConnectScope.OpenId);
