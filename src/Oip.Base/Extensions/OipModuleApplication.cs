@@ -12,8 +12,10 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -62,6 +64,7 @@ public static class OipModuleApplication
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
         builder.AddDefaultHealthChecks();
+        builder.AddOipForwardedHeaders(settings);
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
         builder.Services.AddControllersWithViews();
@@ -80,6 +83,7 @@ public static class OipModuleApplication
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
         builder.AddNlog();
         builder.AddDefaultHealthChecks();
+        builder.AddOipForwardedHeaders(settings);
         builder.AddDefaultAuthentication(settings);
         builder.AddOpenApi(settings);
         builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
@@ -243,6 +247,70 @@ public static class OipModuleApplication
                     .AddAspNetCoreInstrumentation()
                     .AddRuntimeInstrumentation()
                     .AddPrometheusExporter());
+    }
+
+    /// <summary>
+    /// Configures forwarded headers support from the ReverseProxy configuration section.
+    /// </summary>
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    /// <returns>The configured web application builder.</returns>
+    public static WebApplicationBuilder AddOipForwardedHeaders(this WebApplicationBuilder builder)
+    {
+        var settings = builder.Configuration.GetSection("ReverseProxy").Get<ReverseProxySettings>() ?? new();
+        return builder.AddOipForwardedHeaders(settings);
+    }
+
+    /// <summary>
+    /// Configures forwarded headers support.
+    /// </summary>
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    /// <param name="settings">The base Oip module application settings.</param>
+    /// <returns>The configured web application builder.</returns>
+    public static WebApplicationBuilder AddOipForwardedHeaders(this WebApplicationBuilder builder,
+        IBaseOipModuleAppSettings settings)
+    {
+        return builder.AddOipForwardedHeaders(settings.ReverseProxy);
+    }
+
+    private static WebApplicationBuilder AddOipForwardedHeaders(this WebApplicationBuilder builder,
+        ReverseProxySettings settings)
+    {
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            if (!settings.Enabled)
+            {
+                options.ForwardedHeaders = ForwardedHeaders.None;
+                return;
+            }
+
+            options.ForwardedHeaders =
+                ForwardedHeaders.XForwardedFor |
+                ForwardedHeaders.XForwardedProto |
+                ForwardedHeaders.XForwardedHost;
+
+            options.ForwardLimit = Math.Max(1, settings.ForwardLimit);
+
+            if (settings.TrustAllProxies)
+            {
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+                return;
+            }
+
+            foreach (var proxy in settings.KnownProxies)
+            {
+                if (IPAddress.TryParse(proxy, out var address))
+                    options.KnownProxies.Add(address);
+            }
+
+            foreach (var network in settings.KnownNetworks)
+            {
+                if (TryParseKnownNetwork(network, out var knownNetwork))
+                    options.KnownNetworks.Add(knownNetwork);
+            }
+        });
+
+        return builder;
     }
 
     /// <summary>
@@ -613,6 +681,7 @@ public static class OipModuleApplication
     public static WebApplication BuildApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
     {
         var app = builder.Build();
+        app.UseOipForwardedHeaders();
         app.AddRequestLocalization();
         app.AddExceptionHandler();
         app.MapDefaultEndpoints();
@@ -628,6 +697,37 @@ public static class OipModuleApplication
         app.MapFallbackToFile("index.html");
 
         return app;
+    }
+
+    /// <summary>
+    /// Enables forwarded headers middleware.
+    /// </summary>
+    /// <param name="app">The application builder</param>
+    /// <returns>The application builder</returns>
+    public static WebApplication UseOipForwardedHeaders(this WebApplication app)
+    {
+        app.UseForwardedHeaders();
+        return app;
+    }
+
+    private static bool TryParseKnownNetwork(string value, out Microsoft.AspNetCore.HttpOverrides.IPNetwork network)
+    {
+        network = null!;
+        var parts = value.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length != 2 ||
+            !IPAddress.TryParse(parts[0], out var prefix) ||
+            !int.TryParse(parts[1], out var prefixLength))
+            return false;
+
+        try
+        {
+            network = new Microsoft.AspNetCore.HttpOverrides.IPNetwork(prefix, prefixLength);
+            return true;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return false;
+        }
     }
 
     /// <summary>

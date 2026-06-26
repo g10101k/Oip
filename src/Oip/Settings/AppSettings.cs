@@ -44,6 +44,9 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
 
+    /// <inheritdoc />
+    public ReverseProxySettings ReverseProxy { get; set; } = new();
+
     /// <summary>
     /// User synchronization option
     /// </summary>

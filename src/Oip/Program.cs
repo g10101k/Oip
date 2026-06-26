@@ -46,6 +46,7 @@ internal static class Program
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
             builder.Services.AddOipDataProtection(settings);
+            builder.AddOipForwardedHeaders(settings);
             builder.AddControllersAndView();
             
             builder.AddLocalization();
@@ -87,6 +88,7 @@ internal static class Program
             
             var app = builder.Build();
 
+            app.UseOipForwardedHeaders();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
             app.MapDefaultEndpoints();

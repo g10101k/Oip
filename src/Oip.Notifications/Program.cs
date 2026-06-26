@@ -46,6 +46,7 @@ internal static class Program
             builder.Services.AddCors();
             builder.Services.AddGrpc().AddJsonTranscoding();
             builder.Services.AddGrpcSwagger();
+            builder.AddOipForwardedHeaders(settings);
             builder.AddControllersAndView();
             builder.Services
                 .AddController<CryptController>()
@@ -58,6 +59,7 @@ internal static class Program
             builder.AddOpenTelemetry(settings);
 
             var app = builder.Build();
+            app.UseOipForwardedHeaders();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
             app.MapDefaultEndpoints();
