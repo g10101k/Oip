@@ -60,4 +60,10 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     [NotSaveToDb] 
     DataProtectionSettings DataProtection { get; set; }
+
+    /// <summary>
+    /// Reverse proxy forwarded headers settings.
+    /// </summary>
+    [NotSaveToDb]
+    ReverseProxySettings ReverseProxy { get; set; }
 }

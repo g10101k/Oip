@@ -34,6 +34,7 @@ internal static class Program
             builder.Services.GenerateWebClientStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddCors();
+            builder.AddOipForwardedHeaders(settings);
             builder.AddControllersAndView();
             builder.Services
                 .AddController<ApplicationsController>()
@@ -42,6 +43,7 @@ internal static class Program
             builder.AddOpenTelemetry(settings);
 
             var app = builder.Build();
+            app.UseOipForwardedHeaders();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
             app.MapDefaultEndpoints();
