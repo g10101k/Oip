@@ -66,6 +66,9 @@ enum EventType {
 
 // User data representation in gRPC
 message User {
+  reserved 10;
+  reserved "photo";
+
   // Internal unique user identifier
   int32 user_id = 1;
   // External Keycloak identifier
@@ -84,8 +87,6 @@ message User {
   google.protobuf.Timestamp updated_at = 8;
   // Timestamp of last sync with external system
   google.protobuf.Timestamp last_synced_at = 9;
-  // Optional field for profile photo (binary data)
-  bytes photo = 10;
   // Optional field for user settings (likely JSON)
   string settings = 11;
   // Phone

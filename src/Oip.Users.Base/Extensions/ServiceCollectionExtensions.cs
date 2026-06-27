@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Minio;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
@@ -12,6 +13,7 @@ using Oip.Users.Base.Contexts;
 using Oip.Users.Base.Data.Repositories;
 using Oip.Users.Base.Notifications;
 using Oip.Users.Base.Services;
+using Oip.Users.Base.Settings;
 using Oip.Users.Base.StartupTasks;
 using IUserCacheRepository = Oip.Base.Services.IUserCacheRepository;
 using UserService = Oip.Users.Base.Services.UserService;
@@ -50,6 +52,7 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<UserRepository>();
         services.TryAddScoped<IUserService, LocalUserService>();
         services.TryAddScoped<UserService>();
+        services.AddUserPhotoStorage();
         services.TryAddScoped<KeycloakSyncService>();
         services.AddUserCacheRepository();
         services.AddStartupTask<KeycloakSyncStartupTask>();
@@ -85,6 +88,27 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<UserCacheRepository>();
         services.TryAddSingleton<IUserCacheRepository>(sp => sp.GetRequiredService<UserCacheRepository>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, UserCacheRepositoryHostedService>());
+        return services;
+    }
+
+    private static IServiceCollection AddUserPhotoStorage(this IServiceCollection services)
+    {
+        services.AddOptions<UserPhotoStorageSettings>().BindConfiguration("UserPhotoStorage");
+        services.TryAddSingleton<IMinioClient>(sp =>
+        {
+            var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<UserPhotoStorageSettings>>().Value;
+            var client = new MinioClient()
+                .WithEndpoint(settings.Endpoint)
+                .WithCredentials(settings.AccessKey, settings.SecretKey);
+
+            if (settings.UseSsl)
+            {
+                client = client.WithSSL();
+            }
+
+            return client.Build();
+        });
+        services.TryAddScoped<IUserPhotoStorage, MinioUserPhotoStorage>();
         return services;
     }
 

@@ -51,9 +51,14 @@ public class UserEntity
     public DateTimeOffset LastSyncedAt { get; set; } = DateTimeOffset.UtcNow;
 
     /// <summary>
-    /// User photo
+    /// User photo object name in object storage.
     /// </summary>
-    public byte[]? Photo { get; set; }
+    public string? PhotoObjectName { get; set; }
+
+    /// <summary>
+    /// User photo content type.
+    /// </summary>
+    public string? PhotoContentType { get; set; }
 
     /// <summary>
     /// User settings in json

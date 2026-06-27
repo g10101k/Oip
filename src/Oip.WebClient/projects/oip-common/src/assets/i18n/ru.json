@@ -20,7 +20,8 @@
   },
   "profileComponent": {
     "changePhoto": "Загрузить фото",
-    "successfullyUploaded": "Загружено"
+    "successfullyUploaded": "Загружено",
+    "failedToLoadPhoto": "Не удалось загрузить фото пользователя"
   },
   "configComponent": {
     "profile": "Профиль",

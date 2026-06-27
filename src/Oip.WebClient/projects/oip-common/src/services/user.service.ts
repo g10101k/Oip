@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { SecurityService } from './security.service';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { UserProfileApi } from '../api/user-profile.api';
+import { MsgService } from './msg.service';
+import { TranslateService } from '@ngx-translate/core';
 
 /**
  * UserService is responsible for retrieving and handling user-related data,
@@ -11,14 +13,16 @@ import { UserProfileApi } from '../api/user-profile.api';
 export class UserService {
   private readonly securityService = inject(SecurityService);
   private readonly userProfileApi = inject(UserProfileApi);
-  private requestedPhotoEmail: string | null = null;
+  private readonly msgService = inject(MsgService);
+  private readonly translateService = inject(TranslateService);
+  private requestedPhotoKey: string | null = null;
 
   constructor() {
     this.securityService
       .getCurrentUser$()
       .pipe(
-        map((user) => user?.email ?? null),
-        filter((email) => !!email),
+        map((user) => this.getCurrentUserPhotoKey(user)),
+        filter((photoKey) => !!photoKey),
         distinctUntilChanged()
       )
       .subscribe(() => {
@@ -61,32 +65,39 @@ export class UserService {
   }
 
   /**
-   * Initiates an HTTP request to fetch the user's photo based on their email,
+   * Initiates an HTTP request to fetch the current user's photo,
    * and updates the `photo` and `photoLoaded` properties accordingly.
    */
   getUserPhoto(): void {
-    const email = this.securityService.getCurrentUser()?.email;
+    const photoKey = this.getCurrentUserPhotoKey(this.securityService.getCurrentUser());
 
-    if (!email) {
+    if (!photoKey) {
       return;
     }
 
-    if (this.requestedPhotoEmail === email && (this.photoLoaded || this.photo)) {
+    if (this.requestedPhotoKey === photoKey && (this.photoLoaded || this.photo)) {
       return;
     }
 
-    this.requestedPhotoEmail = email;
+    this.requestedPhotoKey = photoKey;
 
-    this.userProfileApi.getUserPhoto({ email }, { format: 'blob' }).then(
+    this.userProfileApi.getUserPhoto({ format: 'blob' }).then(
       (data) => {
         this.createImageFromBlob(data as Blob);
         this.photoLoaded = true;
       },
       (error) => {
-        console.log(error);
+        this.msgService.errorFromException(error, this.translateService.instant('profileComponent.failedToLoadPhoto'));
         this.photoLoaded = false;
       }
     );
+  }
+
+  refreshUserPhoto(): void {
+    this.requestedPhotoKey = null;
+    this.photo = null;
+    this.photoLoaded = false;
+    this.getUserPhoto();
   }
 
   /**
@@ -117,5 +128,14 @@ export class UserService {
       .map((part) => part[0])
       .join('')
       .toUpperCase() ?? '';
+  }
+
+  private getCurrentUserPhotoKey(user: any): string | null {
+    return user?.sub
+      || user?.userName
+      || user?.preferred_username
+      || user?.displayName
+      || user?.name
+      || null;
   }
 }

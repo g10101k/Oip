@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oip.Users.Base.Contexts;
 
 #nullable disable
 
-namespace Oip.Users.Data.Migrations.SqlServer
+namespace Oip.Users.Base.Data.Migrations.SqlServer
 {
     [DbContext(typeof(UserContextSqlServer))]
-    partial class UserContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20260627085002_AddUserPhotoObjectStorage_SqlServer")]
+    partial class AddUserPhotoObjectStorage_SqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,6 +62,10 @@ namespace Oip.Users.Data.Migrations.SqlServer
                     b.Property<DateTimeOffset>("LastSyncedAt")
                         .HasColumnType("datetimeoffset")
                         .HasComment("Last synchronization date and time");
+
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("varbinary(max)")
+                        .HasComment("User photo");
 
                     b.Property<string>("PhotoContentType")
                         .HasMaxLength(128)

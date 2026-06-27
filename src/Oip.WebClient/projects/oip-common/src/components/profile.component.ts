@@ -5,11 +5,12 @@ import { AvatarModule } from 'primeng/avatar';
 import { MsgService } from '../services/msg.service';
 import { UserService } from '../services/user.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { UserProfileApi } from '../api/user-profile.api';
 
 @Component({
   selector: 'user-profile',
   standalone: true,
-  imports: [FileUploadModule, ImageModule, ImageModule, FileUploadModule, ImageModule, AvatarModule, TranslatePipe],
+  imports: [FileUploadModule, ImageModule, AvatarModule, TranslatePipe],
   template: `
     <p-avatar
       class="mr-2"
@@ -26,10 +27,9 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
         maxFileSize="1000000"
         mode="basic"
         name="files"
-        url="/api/user-profile/post-user-photo"
-        withCredentials="true"
+        [customUpload]="true"
         [auto]="true"
-        (onUpload)="onBasicUploadAuto($event)" />
+        (uploadHandler)="uploadPhoto($event)" />
     </div>
   `
 })
@@ -37,8 +37,20 @@ export class ProfileComponent {
   readonly userService = inject(UserService);
   readonly msgService = inject(MsgService);
   readonly translateService = inject(TranslateService);
+  readonly userProfileApi = inject(UserProfileApi);
 
-  onBasicUploadAuto($event) {
-    this.msgService.success(this.translateService.instant('profileComponent.successfullyUploaded'));
+  async uploadPhoto(event: any): Promise<void> {
+    const file = event.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      await this.userProfileApi.postUserPhoto({ files: file });
+      this.userService.refreshUserPhoto();
+      this.msgService.success(this.translateService.instant('profileComponent.successfullyUploaded'));
+    } catch (error) {
+      this.msgService.error(error);
+    }
   }
 }
