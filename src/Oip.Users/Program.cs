@@ -46,6 +46,7 @@ internal static class Program
                 .AddController<ProxySettingsController>()
                 .AddController<SecurityController>()
                 .AddController<UserProfileController>()
+                .AddController<KeycloakEventsController>()
                 .AddController<UsersController>();
             builder.AddLocalization();
             builder.Services.AddSettingsToDependencyInjection(settings);

@@ -60,6 +60,7 @@ internal static class Program
                 builder.Services.AddApplicationsModuleLocal(settings);
                 builder.Services
                     .AddController<DiscussionController>()
+                    .AddController<KeycloakEventsController>()
                     .AddController<NotificationController>()
                     .AddController<UserProfileController>()
                     .AddController<UsersController>();
