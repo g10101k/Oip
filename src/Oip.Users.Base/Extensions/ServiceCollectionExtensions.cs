@@ -12,6 +12,7 @@ using Oip.Users.Base.Contexts;
 using Oip.Users.Base.Data.Repositories;
 using Oip.Users.Base.Notifications;
 using Oip.Users.Base.Services;
+using Oip.Users.Base.StartupTasks;
 using IUserCacheRepository = Oip.Base.Services.IUserCacheRepository;
 using UserService = Oip.Users.Base.Services.UserService;
 
@@ -49,9 +50,9 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<UserRepository>();
         services.TryAddScoped<IUserService, LocalUserService>();
         services.TryAddScoped<UserService>();
-        services.TryAddScoped<UserSyncService>();
+        services.TryAddScoped<KeycloakSyncService>();
         services.AddUserCacheRepository();
-        services.AddHostedService<KeycloakSyncBackgroundService>();
+        services.AddStartupTask<KeycloakSyncStartupTask>();
 
         if (settings.IsStandalone)
         {

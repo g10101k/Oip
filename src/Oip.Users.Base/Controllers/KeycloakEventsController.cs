@@ -18,7 +18,7 @@ namespace Oip.Users.Base.Controllers;
 [ApiExplorerSettings(IgnoreApi = true)]
 [Route("api/keycloak-events")]
 public class KeycloakEventsController(
-    UserSyncService userSyncService,
+    KeycloakSyncService keycloakSyncService,
     UserSyncOptions options,
     ILogger<KeycloakEventsController> logger) : ControllerBase
 {
@@ -65,7 +65,7 @@ public class KeycloakEventsController(
         {
             if (TryGetUserDeleteEventId(document.RootElement, out var deletedUserId))
             {
-                await userSyncService.DeactivateUserFromKeycloak(deletedUserId);
+                await keycloakSyncService.DeactivateUserFromKeycloak(deletedUserId);
                 return Ok();
             }
 
@@ -75,7 +75,7 @@ public class KeycloakEventsController(
                 return Ok();
             }
 
-            await userSyncService.SyncUserFromKeycloak(keycloakUserId);
+            await keycloakSyncService.SyncUserFromKeycloak(keycloakUserId);
             return Ok();
         }
     }

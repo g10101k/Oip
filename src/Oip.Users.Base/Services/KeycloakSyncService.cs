@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using Google.Protobuf.WellKnownTypes;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Clients;
 using Oip.Base.Services;
@@ -12,33 +11,18 @@ using Oip.Users.Base.Settings;
 namespace Oip.Users.Base.Services;
 
 /// <summary>
-/// Background service for synchronizing users periodically.
-/// </summary>
-public class KeycloakSyncBackgroundService(ILogger<UserSyncService> logger, IServiceScopeFactory scopeFactory)
-    : PeriodicBackgroundService<UserSyncService>(scopeFactory, logger);
-
-/// <summary>
 /// Service responsible for synchronizing user data between Keycloak and the local database.
 /// </summary>
-public class UserSyncService(
+public class KeycloakSyncService(
     KeycloakService keycloakService,
     UserRepository userRepository,
     UserService userService,
     INotificationPublisher notificationPublisher,
     UserSyncOptions userSyncOptions,
-    ILogger<UserSyncService> logger) : IPeriodicalService
+    ILogger<KeycloakSyncService> logger)
 {
     private static readonly ConcurrentDictionary<string, SemaphoreSlim> SyncLocks =
         new(StringComparer.OrdinalIgnoreCase);
-
-    /// <inheritdoc />
-    public int Interval => userSyncOptions.IntervalSeconds;
-
-    /// <inheritdoc />
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
-    {
-        await SyncAllUsersAsync();
-    }
 
     /// <summary>
     /// Synchronizes a user from Keycloak to the local database.
@@ -212,7 +196,7 @@ public class UserSyncService(
     /// Synchronizes all users from Keycloak to the local database.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task SyncAllUsersAsync()
+    public async Task SyncAllUsersAsync(CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Starting full user synchronization");
         var startTime = DateTimeOffset.UtcNow;
@@ -223,12 +207,14 @@ public class UserSyncService(
 
         for (int i = 0; i < batches; i++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var offset = i * userSyncOptions.BatchSize;
             var syncedCount = await SyncUsersBatchAsync(offset, userSyncOptions.BatchSize);
             logger.LogInformation("Batch {BatchNumber}: Synced {SyncedCount} users", i + 1, syncedCount);
 
             // Small delay to avoid overwhelming Keycloak
-            await Task.Delay(1000);
+            await Task.Delay(1000, cancellationToken);
         }
 
         var endTime = DateTimeOffset.UtcNow;
