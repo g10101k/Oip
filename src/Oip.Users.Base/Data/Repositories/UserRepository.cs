@@ -66,6 +66,18 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     }
 
     /// <summary>
+    /// Gets active user entities that are linked to Keycloak.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains active Keycloak-linked users.</returns>
+    public async Task<List<UserEntity>> GetActiveKeycloakUsersAsync(CancellationToken cancellationToken = default)
+    {
+        return await context.Users
+            .Where(u => u.IsActive && u.KeycloakId != string.Empty)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// Asynchronously searches for user entities based on a search term.
     /// </summary>
     /// <param name="searchTerm">The term to search for in email, first name, or last name.</param>

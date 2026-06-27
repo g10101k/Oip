@@ -72,27 +72,7 @@ public class KeycloakSyncService(
             return;
         }
 
-        existingUser.IsActive = false;
-        existingUser.UpdatedAt = DateTimeOffset.UtcNow;
-        existingUser.LastSyncedAt = DateTimeOffset.UtcNow;
-        await userRepository.UpdateAsync(existingUser);
-        await userService.PublishUserEvent(new UserChangeEvent()
-        {
-            User = new User()
-            {
-                KeycloakId = existingUser.KeycloakId,
-                Email = existingUser.Email,
-                FirstName = existingUser.FirstName,
-                LastName = existingUser.LastName,
-                UserId = existingUser.UserId,
-                IsActive = existingUser.IsActive,
-                CreatedAt = existingUser.CreatedAt.ToTimestamp(),
-                UpdatedAt = existingUser.UpdatedAt.ToTimestamp(),
-                LastSyncedAt = existingUser.LastSyncedAt.ToTimestamp(),
-            },
-            EventTime = DateTimeOffset.Now.ToTimestamp(),
-            EventType = EventType.UserDeactivated
-        });
+        await DeactivateUserAsync(existingUser);
 
         logger.LogInformation("Deactivated user for deleted Keycloak ID {KeycloakUserId}", keycloakUserId);
     }
@@ -202,6 +182,7 @@ public class KeycloakSyncService(
         var startTime = DateTimeOffset.UtcNow;
         var totalUsers = await keycloakService.GetUsersCountAsync();
         var batches = (int)Math.Ceiling((double)totalUsers / userSyncOptions.BatchSize);
+        var syncedKeycloakIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         logger.LogInformation("Synchronizing {TotalUsers} users in {Batches} batches", totalUsers, batches);
 
@@ -210,15 +191,19 @@ public class KeycloakSyncService(
             cancellationToken.ThrowIfCancellationRequested();
 
             var offset = i * userSyncOptions.BatchSize;
-            var syncedCount = await SyncUsersBatchAsync(offset, userSyncOptions.BatchSize);
+            var syncedCount = await SyncUsersBatchAsync(offset, userSyncOptions.BatchSize, syncedKeycloakIds);
             logger.LogInformation("Batch {BatchNumber}: Synced {SyncedCount} users", i + 1, syncedCount);
 
             // Small delay to avoid overwhelming Keycloak
             await Task.Delay(1000, cancellationToken);
         }
 
+        var deactivatedCount = await DeactivateUsersMissingFromKeycloakAsync(syncedKeycloakIds, cancellationToken);
+
         var endTime = DateTimeOffset.UtcNow;
-        logger.LogInformation("Full user synchronization completed");
+        logger.LogInformation(
+            "Full user synchronization completed. Deactivated {DeactivatedCount} users missing from Keycloak",
+            deactivatedCount);
         await notificationPublisher.Notify(new SyncUsersCompleteNotify(totalUsers, startTime, endTime));
     }
 
@@ -228,7 +213,10 @@ public class KeycloakSyncService(
     /// <param name="offset">The offset for retrieving users from Keycloak.</param>
     /// <param name="limit">The maximum number of users to retrieve in this batch.</param>
     /// <returns>The number of users successfully synchronized in this batch.</returns>
-    private async Task<int> SyncUsersBatchAsync(int offset = 0, int limit = 100)
+    private async Task<int> SyncUsersBatchAsync(
+        int offset,
+        int limit,
+        ISet<string> syncedKeycloakIds)
     {
         var keycloakUsers = await keycloakService.GetUsersAsync(offset, limit);
         var syncedCount = 0;
@@ -236,6 +224,7 @@ public class KeycloakSyncService(
         foreach (var keycloakUser in keycloakUsers)
         {
             if (keycloakUser.Id == null) continue;
+            syncedKeycloakIds.Add(keycloakUser.Id);
 
             try
             {
@@ -249,5 +238,58 @@ public class KeycloakSyncService(
         }
 
         return syncedCount;
+    }
+
+    private async Task<int> DeactivateUsersMissingFromKeycloakAsync(
+        ISet<string> syncedKeycloakIds,
+        CancellationToken cancellationToken)
+    {
+        var localActiveUsers = await userRepository.GetActiveKeycloakUsersAsync(cancellationToken);
+        var deactivatedCount = 0;
+
+        foreach (var localUser in localActiveUsers)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (syncedKeycloakIds.Contains(localUser.KeycloakId))
+            {
+                continue;
+            }
+
+            await DeactivateUserAsync(localUser);
+            deactivatedCount++;
+
+            logger.LogInformation(
+                "Deactivated local user {UserId} because Keycloak ID {KeycloakUserId} was not found during full sync",
+                localUser.UserId,
+                localUser.KeycloakId);
+        }
+
+        return deactivatedCount;
+    }
+
+    private async Task DeactivateUserAsync(UserEntity user)
+    {
+        user.IsActive = false;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+        user.LastSyncedAt = DateTimeOffset.UtcNow;
+        await userRepository.UpdateAsync(user);
+        await userService.PublishUserEvent(new UserChangeEvent()
+        {
+            User = new User()
+            {
+                KeycloakId = user.KeycloakId,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserId = user.UserId,
+                IsActive = user.IsActive,
+                CreatedAt = user.CreatedAt.ToTimestamp(),
+                UpdatedAt = user.UpdatedAt.ToTimestamp(),
+                LastSyncedAt = user.LastSyncedAt.ToTimestamp(),
+            },
+            EventTime = DateTimeOffset.Now.ToTimestamp(),
+            EventType = EventType.UserDeactivated
+        });
     }
 }
