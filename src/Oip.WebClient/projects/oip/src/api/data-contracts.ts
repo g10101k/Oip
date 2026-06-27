@@ -62,7 +62,7 @@ export interface TableQueryRequest {
   sortField?: string | null;
   sortOrder?: number;
   globalFilter?: string | null;
-  filters?: Record<string, any> | null;
+  filters?: Record<string, any>;
 }
 
 export interface UserEntity {
@@ -75,7 +75,8 @@ export interface UserEntity {
   createdAt?: Date;
   updatedAt?: Date;
   lastSyncedAt?: Date;
-  photo?: Blob | null;
+  photoObjectName?: string | null;
+  photoContentType?: string | null;
   settings?: string | null;
 }
 

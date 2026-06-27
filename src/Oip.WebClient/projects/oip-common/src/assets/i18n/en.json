@@ -20,7 +20,8 @@
   },
   "profileComponent": {
     "changePhoto": "Upload Photo",
-    "successfullyUploaded": "Uploaded successfully"
+    "successfullyUploaded": "Uploaded successfully",
+    "failedToLoadPhoto": "Failed to load user photo"
   },
   "configComponent": {
     "profile": "Profile",

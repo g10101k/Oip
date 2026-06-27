@@ -800,6 +800,11 @@ public static class OipModuleApplication
                 var error = context.Features.Get<IExceptionHandlerFeature>();
                 if (error != null)
                 {
+                    var logger = app.Services
+                        .GetRequiredService<ILoggerFactory>()
+                        .CreateLogger("Oip.ExceptionHandler");
+                    logger.LogError(error.Error, "Unhandled exception while processing {Path}.", context.Request.Path);
+
                     ApiExceptionResponse response;
                     if (error.Error is ApiException oipException)
                     {

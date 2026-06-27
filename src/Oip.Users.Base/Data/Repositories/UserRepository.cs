@@ -140,20 +140,6 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     }
 
     /// <summary>
-    /// Get user by email
-    /// </summary>
-    /// <param name="email"></param>
-    /// <returns></returns>
-    public GetUserDto? GetUserByEmail(string email)
-    {
-        var user = context.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefault();
-        if (user == null)
-            return null;
-        else
-            return new GetUserDto(user.UserId, user.Email, user.Photo);
-    }
-
-    /// <summary>
     /// Gets a user entity by e-mail.
     /// </summary>
     public async Task<UserEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
@@ -161,6 +147,62 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
         return await context.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets a tracked user entity by e-mail.
+    /// </summary>
+    public async Task<UserEntity?> GetTrackedByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await context.Users
+            .FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets a tracked user entity by identifier.
+    /// </summary>
+    public async Task<UserEntity?> GetTrackedByIdAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        return await context.Users
+            .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets an existing user by e-mail or creates a minimal profile for the current authenticated user.
+    /// </summary>
+    public async Task<UserEntity> GetOrCreateByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        var user = await GetTrackedByEmailAsync(email, cancellationToken);
+        if (user != null)
+        {
+            return user;
+        }
+
+        user = new UserEntity
+        {
+            Email = email,
+            Settings = string.Empty
+        };
+        context.Users.Add(user);
+        await context.SaveChangesAsync(cancellationToken);
+        return user;
+    }
+
+    /// <summary>
+    /// Updates user photo storage metadata.
+    /// </summary>
+    public async Task UpdateUserPhotoMetadataAsync(
+        int userId,
+        string objectName,
+        string contentType,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await GetTrackedByIdAsync(userId, cancellationToken) ??
+                   throw new InvalidOperationException($"User with id: {userId} - not found");
+
+        user.PhotoObjectName = objectName;
+        user.PhotoContentType = contentType;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -188,31 +230,6 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     public string GetUserSettings(string email)
     {
         return context.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefault()?.Settings ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Update user photo
-    /// </summary>
-    /// <param name="email"></param>
-    /// <param name="photo"></param>
-    public void UpsertUserPhoto(string email, byte[] photo)
-    {
-        var user = context.Users.FirstOrDefault(x => x.Email == email);
-        if (user == null)
-        {
-            user = new UserEntity()
-            {
-                Email = email,
-                Photo = photo
-            };
-            context.Users.Add(user);
-        }
-        else
-        {
-            user.Photo = photo;
-        }
-
-        context.SaveChanges();
     }
 
     /// <summary>

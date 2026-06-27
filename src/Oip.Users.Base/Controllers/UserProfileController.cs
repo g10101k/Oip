@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Oip.Base.Exceptions;
-using Oip.Base.Services;
 using Oip.Users.Base.Data.Repositories;
+using Oip.Users.Base.Services;
+using CurrentUserService = Oip.Base.Services.UserService;
 
 namespace Oip.Users.Base.Controllers;
 
@@ -14,49 +15,91 @@ namespace Oip.Users.Base.Controllers;
 [ApiController]
 [Route("api/user-profile")]
 [ApiExplorerSettings(GroupName = "users")]
-public class UserProfileController(UserService userService, UserRepository userRepository) : ControllerBase
+public class UserProfileController(
+    CurrentUserService userService,
+    UserRepository userRepository,
+    IUserPhotoStorage userPhotoStorage) : ControllerBase
 {
     /// <summary>
-    /// Gets user photo by email address
+    /// Gets current user photo.
     /// </summary>
-    /// <param name="email">User's email address</param>
-    /// <returns>User photo as JPEG image or NotFound result</returns>
+    /// <returns>User photo image or not found response.</returns>
     [Authorize, HttpGet("get-user-photo")]
-    [Produces("image/jpeg")]
-    [ProducesResponseType<FileContentResult>(StatusCodes.Status200OK)]
+    [Produces("image/jpeg", "image/png", "image/gif", "image/webp")]
+    [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
-    public IActionResult GetUserPhoto(string email)
+    public async Task<IActionResult> GetUserPhoto(CancellationToken cancellationToken)
     {
-        var userDto = userRepository.GetUserByEmail(email);
-        if (userDto?.Photo != null)
-            return new FileContentResult(userDto.Photo, "image/jpeg");
-        return new NotFoundResult();
+        var email = userService.GetUserEmail();
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user email is not available.",
+                StatusCodes.Status401Unauthorized));
+        }
+
+        var user = await userRepository.GetByEmailAsync(email, cancellationToken);
+        return await GetUserPhotoResultAsync(user, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets user photo by user identifier.
+    /// </summary>
+    /// <param name="userId">User identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>User photo image or not found response.</returns>
+    [Authorize, HttpGet("get-user-photo-by-id/{userId:int}")]
+    [Produces("image/jpeg", "image/png", "image/gif", "image/webp")]
+    [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetUserPhotoById(int userId, CancellationToken cancellationToken)
+    {
+        var user = await userRepository.GetByIdAsync(userId);
+        return await GetUserPhotoResultAsync(user, cancellationToken);
     }
 
     /// <summary>
     /// Uploads user photo
     /// </summary>
     /// <param name="files">Photo file to upload</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>OK result</returns>
     [Authorize, HttpPost("post-user-photo")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> OnPostUploadAsync(IFormFile files)
+    public async Task<IActionResult> OnPostUploadAsync(IFormFile? files, CancellationToken cancellationToken)
     {
-        await using var stream = files.OpenReadStream();
-        var buffer = new byte[16 * 1024];
-        using var ms = new MemoryStream();
-        int read;
-        while ((read = await stream.ReadAsync(buffer)) > 0)
+        if (files == null || files.Length == 0)
         {
-            await ms.WriteAsync(buffer.AsMemory(0, read), CancellationToken.None);
+            return BadRequest(new ApiExceptionResponse("Invalid photo", "Photo file is required.",
+                StatusCodes.Status400BadRequest));
         }
 
-        userRepository.UpsertUserPhoto(userService.GetUserEmail()!, ms.ToArray());
+        if (!files.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new ApiExceptionResponse("Invalid photo", "Only image files are allowed.",
+                StatusCodes.Status400BadRequest));
+        }
+
+        var email = userService.GetUserEmail();
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user email is not available.",
+                StatusCodes.Status401Unauthorized));
+        }
+
+        var user = await userRepository.GetOrCreateByEmailAsync(email, cancellationToken);
+        var storedPhoto = await userPhotoStorage.SaveAsync(user.UserId, files, cancellationToken);
+        await userRepository.UpdateUserPhotoMetadataAsync(
+            user.UserId,
+            storedPhoto.ObjectName,
+            storedPhoto.ContentType,
+            cancellationToken);
 
         return Ok();
     }
@@ -89,6 +132,29 @@ public class UserProfileController(UserService userService, UserRepository userR
     {
         var json = JsonConvert.SerializeObject(settings);
         await userRepository.UpdateUserSettings(userService.GetUserEmail()!, json);
+    }
+
+    private async Task<IActionResult> GetUserPhotoResultAsync(
+        Data.Entities.UserEntity? user,
+        CancellationToken cancellationToken)
+    {
+        if (user == null)
+        {
+            return NotFound(new ApiExceptionResponse("Photo not found", "User photo was not found.",
+                StatusCodes.Status404NotFound));
+        }
+
+        if (!string.IsNullOrWhiteSpace(user.PhotoObjectName))
+        {
+            var content = await userPhotoStorage.OpenReadAsync(
+                user.PhotoObjectName,
+                user.PhotoContentType ?? "image/jpeg",
+                cancellationToken);
+            return File(content.Content, content.ContentType);
+        }
+
+        return NotFound(new ApiExceptionResponse("Photo not found", "User photo was not found.",
+            StatusCodes.Status404NotFound));
     }
 }
 

@@ -30,6 +30,7 @@
         <PackageReference Include="Google.Api.CommonProtos" Version="2.17.0" />
         <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
         <PackageReference Include="Grpc.Tools" Version="2.76.0" PrivateAssets="All" />
+        <PackageReference Include="Minio" Version="6.0.3" />
         <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
     </ItemGroup>
