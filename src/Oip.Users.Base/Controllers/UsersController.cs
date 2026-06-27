@@ -17,7 +17,7 @@ namespace Oip.Users.Base.Controllers;
 [Route("api/users")]
 public class UsersController(
     UserRepository userRepository,
-    UserSyncService userSyncService,
+    KeycloakSyncService keycloakSyncService,
     IServiceScopeFactory scopeFactory,
     INotificationPublisher notificationPublisher,
     ILogger<UsersController> logger)
@@ -103,7 +103,7 @@ public class UsersController(
     {
         try
         {
-            await userSyncService.SyncUserFromKeycloak(request.KeycloakUserId);
+            await keycloakSyncService.SyncUserFromKeycloak(request.KeycloakUserId);
             return Accepted();
         }
         catch (Exception ex)
@@ -128,7 +128,7 @@ public class UsersController(
                 try
                 {
                     using var scope = scopeFactory.CreateScope();
-                    var scopedUserSyncService = scope.ServiceProvider.GetRequiredService<UserSyncService>();
+                    var scopedUserSyncService = scope.ServiceProvider.GetRequiredService<KeycloakSyncService>();
                     await scopedUserSyncService.SyncAllUsersAsync();
                 }
                 catch (Exception ex)

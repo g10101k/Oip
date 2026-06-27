@@ -60,10 +60,15 @@ public class UserSyncOptions
     /// <summary>
     /// Gets or sets the synchronization interval in seconds.
     /// </summary>
-    public int IntervalSeconds { get; set; } = 300;
+    public int IntervalSeconds { get; set; } = int.MaxValue;
 
     /// <summary>
     /// Gets or sets the batch size for synchronization operations.
     /// </summary>
     public int BatchSize { get; set; } = 100;
+    
+    /// <summary>
+    /// The shared secret used to validate the X-Keycloak-Signature HMAC header.
+    /// </summary>
+    public string SharedSecret { get; set; } = string.Empty;
 }
