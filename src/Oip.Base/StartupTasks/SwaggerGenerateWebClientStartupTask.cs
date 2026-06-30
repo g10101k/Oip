@@ -22,6 +22,7 @@ public class SwaggerGenerateWebClientStartupTask(
     ISwaggerProvider swaggerProvider,
     IWebHostEnvironment environment,
     ILogger<SwaggerGenerateWebClientStartupTask> logger,
+    IHostApplicationLifetime lifetime,
     IBaseOipModuleAppSettings settings) : IStartupTask
 {
     /// <inheritdoc />
@@ -30,8 +31,6 @@ public class SwaggerGenerateWebClientStartupTask(
     /// <inheritdoc />
     public async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
-        if (!environment.IsDevelopment())
-            return;
         try
         {
             logger.LogDebug("Checking for Swagger changes...");
@@ -69,6 +68,7 @@ public class SwaggerGenerateWebClientStartupTask(
         finally
         {
             logger.LogInformation("Swagger generation complete");
+            lifetime.StopApplication();
         }
     }
 
@@ -195,3 +195,5 @@ public class SwaggerGenerateWebClientStartupTask(
         File.Delete(tempFilePath);
     }
 }
+
+public class FinallyWebClientGeneration : Exception;

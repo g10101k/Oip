@@ -2,7 +2,6 @@ using NLog;
 using NLog.Web;
 using Microsoft.EntityFrameworkCore;
 using Oip.Api.Controllers;
-using Oip.Applications.Base;
 using Oip.Applications.Base.Controllers;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
@@ -19,7 +18,6 @@ using Oip.Notifications.Base.Controllers;
 using Oip.Notifications.Base.Extensions;
 using Oip.Users.Base.Controllers;
 using Oip.Users.Base.Extensions;
-using ServiceCollectionExtensions = Oip.Applications.Base.Extensions.ServiceCollectionExtensions;
 
 namespace Oip;
 
@@ -48,7 +46,7 @@ internal static class Program
             builder.Services.AddOipDataProtection(settings);
             builder.AddOipForwardedHeaders(settings);
             builder.AddControllersAndView();
-            
+
             builder.AddLocalization();
             builder.AddOpenTelemetry(settings);
 
@@ -86,7 +84,7 @@ internal static class Program
                 .AddController<CustomerModuleController>()
                 .AddController<DashboardModuleController>()
                 .AddController<WeatherForecastModuleController>();
-            
+
             var app = builder.Build();
 
             app.UseOipForwardedHeaders();
@@ -117,6 +115,10 @@ internal static class Program
             }
 
             app.Run();
+        }
+        catch (OperationCanceledException)
+        {
+            logger.Info("Application execution cancelled, see logs for details.");
         }
         catch (Exception e)
         {

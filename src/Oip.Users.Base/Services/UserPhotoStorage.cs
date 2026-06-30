@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
 using Oip.Users.Base.Settings;

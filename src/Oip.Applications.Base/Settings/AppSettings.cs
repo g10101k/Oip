@@ -50,4 +50,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public ReverseProxySettings ReverseProxy { get; set; } = new();
+
+    /// <inheritdoc />
+    public bool GenerateWebClient { get; set; }
 }
