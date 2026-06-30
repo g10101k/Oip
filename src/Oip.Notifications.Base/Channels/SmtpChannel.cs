@@ -236,11 +236,8 @@ internal class SmtpSettings
     public bool SmtpAuthenticationEnabled { get; set; } = true;
     public string SmtpUser { get; set; } = string.Empty;
     public string SmtpPassword { get; set; } = string.Empty;
-    public bool IsEnable { get; set; } = true;
+    public bool IsEnable { get; set; }
 
-    /// <summary>
-    /// Брать из настроек канала
-    /// </summary>
     public int RetryCount { get; set; } = 5;
 
     public int ProcessingIntervalMs { get; set; } = 100;

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Oip.Base.Extensions;
 using Oip.Base.Services;
-using Oip.Users.Base;
 
 namespace Oip.Users.Base.Data.Repositories;
 

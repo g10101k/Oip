@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
     public static void GenerateWebClientStartupTask(this IServiceCollection serviceCollection,
         IBaseOipModuleAppSettings settings)
     {
-        if (settings.OpenApi.Any(x => !string.IsNullOrWhiteSpace(x.GenerateCommand) && x.Publish))
+        if (settings.GenerateWebClient)
             serviceCollection.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
     }
 }

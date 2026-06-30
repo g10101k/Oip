@@ -15,6 +15,7 @@ public class SwaggerGenerateWebClientStartupTaskTests
     private string _contentRootPath;
     private Mock<ISwaggerProvider> _swaggerProviderMock;
     private Mock<IWebHostEnvironment> _environmentMock;
+    private Mock<IHostApplicationLifetime> _lifetimeMock;
     private Mock<IBaseOipModuleAppSettings> _settingsMock;
     private OpenApiItem _openApiItem;
     private OpenApiDocument _swaggerDocument;
@@ -48,6 +49,8 @@ public class SwaggerGenerateWebClientStartupTaskTests
         _environmentMock = new Mock<IWebHostEnvironment>();
         _environmentMock.Setup(x => x.EnvironmentName).Returns(Environments.Development);
         _environmentMock.Setup(x => x.ContentRootPath).Returns(_contentRootPath);
+
+        _lifetimeMock = new Mock<IHostApplicationLifetime>();
 
         _settingsMock = new Mock<IBaseOipModuleAppSettings>();
         _settingsMock.Setup(x => x.OpenApi).Returns(new OpenApiSettings { _openApiItem });
@@ -124,6 +127,7 @@ public class SwaggerGenerateWebClientStartupTaskTests
             _swaggerProviderMock.Object,
             _environmentMock.Object,
             _settingsMock.Object,
+            _lifetimeMock.Object,
             throwOnGenerate);
     }
 
@@ -136,10 +140,12 @@ public class SwaggerGenerateWebClientStartupTaskTests
         ISwaggerProvider swaggerProvider,
         IWebHostEnvironment environment,
         IBaseOipModuleAppSettings settings,
+        IHostApplicationLifetime lifetime,
         bool throwOnGenerate) : SwaggerGenerateWebClientStartupTask(
         swaggerProvider,
         environment,
         NullLogger<SwaggerGenerateWebClientStartupTask>.Instance,
+        lifetime,
         settings)
     {
         public int GenerateCallCount { get; private set; }

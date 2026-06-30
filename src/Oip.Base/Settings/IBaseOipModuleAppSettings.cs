@@ -58,7 +58,7 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// <summary>
     /// DataProtection settings
     /// </summary>
-    [NotSaveToDb] 
+    [NotSaveToDb]
     DataProtectionSettings DataProtection { get; set; }
 
     /// <summary>
@@ -66,4 +66,10 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     [NotSaveToDb]
     ReverseProxySettings ReverseProxy { get; set; }
+
+    /// <summary>
+    /// Generate web client
+    /// </summary>
+    [NotSaveToDb]
+    bool GenerateWebClient { get; set; }
 }
