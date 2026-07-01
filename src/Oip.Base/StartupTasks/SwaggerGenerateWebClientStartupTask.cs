@@ -14,10 +14,6 @@ namespace Oip.Base.StartupTasks;
 /// <summary>
 /// Service responsible for executing tasks during application startup, specifically related to Swagger configuration.
 /// </summary>
-/// <param name="swaggerProvider">The Swagger provider.</param>
-/// <param name="environment">The web host environment.</param>
-/// <param name="logger">The logger.</param>
-/// <param name="settings">The application settings.</param>
 public class SwaggerGenerateWebClientStartupTask(
     ISwaggerProvider swaggerProvider,
     IWebHostEnvironment environment,
@@ -33,30 +29,29 @@ public class SwaggerGenerateWebClientStartupTask(
     {
         try
         {
-            logger.LogDebug("Checking for Swagger changes...");
+            logger.LogDebug("Generating Swagger clients...");
 
             foreach (var config in settings.OpenApi.Where(x => x.GenerateCommand is not null))
             {
-                string? tempPath = null;
+                string? path = null;
                 try
                 {
-                    logger.LogDebug("Checking Swagger for {Name}", config.Name);
+                    logger.LogDebug("Generating Swagger for {Name}", config.Name);
                     var swaggerJson = GetSwaggerJson(config);
-                    if (!config.ForceGeneration)
-                        if (!await HasSwaggerChanged(config, swaggerJson))
-                            continue;
-                    logger.LogInformation("Swagger changed detected for {Name}. Generating client...", config.Name);
-                    tempPath = await SaveTempSwaggerFile(config, swaggerJson);
-                    await GenerateTypeScriptClient(config, tempPath, cancellationToken);
-                    await CommitSwaggerFile(config, tempPath);
+                    logger.LogInformation("Generating client for {Name}...", config.Name);
+                    path = await SaveSwaggerFile(config, swaggerJson);
+                    await GenerateTypeScriptClient(config, path, cancellationToken);
 
                     logger.LogInformation("Client generated successfully for {Name}", config.Name);
                 }
                 catch (Exception ex)
                 {
-                    DeleteTempSwaggerFile(tempPath);
                     logger.LogError(ex, "Error processing Swagger config {Name}", config.Name);
                     throw;
+                }
+                finally
+                {
+                    DeleteTempSwaggerFile(path);
                 }
             }
         }
@@ -78,17 +73,7 @@ public class SwaggerGenerateWebClientStartupTask(
         return swaggerDoc.SerializeAsJson(OpenApiSpecVersion.OpenApi3_0);
     }
 
-    private async Task<bool> HasSwaggerChanged(OpenApiItem config, string currentSwaggerJson)
-    {
-        var hashFilePath = GetHashFilePath(config);
-        if (!File.Exists(hashFilePath))
-            return true;
-
-        var storedSwaggerJson = await File.ReadAllTextAsync(hashFilePath);
-        return storedSwaggerJson != currentSwaggerJson;
-    }
-
-    private async Task<string> SaveTempSwaggerFile(OpenApiItem config, string content)
+    private async Task<string> SaveSwaggerFile(OpenApiItem config, string content)
     {
         var tempFilePath = GetTempSwaggerFilePath(config);
 
@@ -98,18 +83,6 @@ public class SwaggerGenerateWebClientStartupTask(
 
         await File.WriteAllTextAsync(tempFilePath, content);
         return tempFilePath;
-    }
-
-    private Task CommitSwaggerFile(OpenApiItem config, string tempFilePath)
-    {
-        var hashFilePath = GetHashFilePath(config);
-
-        var directory = Path.GetDirectoryName(hashFilePath);
-        if (!Directory.Exists(directory))
-            Directory.CreateDirectory(directory!);
-
-        File.Move(tempFilePath, hashFilePath, true);
-        return Task.CompletedTask;
     }
 
     protected virtual async Task GenerateTypeScriptClient(
@@ -175,15 +148,9 @@ public class SwaggerGenerateWebClientStartupTask(
         }
     }
 
-    private string GetHashFilePath(OpenApiItem config)
-    {
-        return Path.Combine(environment.ContentRootPath, "obj/SwaggerFiles",
-            $"swagger-{config.Name.ToLower()}.json");
-    }
-
     private string GetTempSwaggerFilePath(OpenApiItem config)
     {
-        return Path.Combine(environment.ContentRootPath, "obj/SwaggerFiles/tmp",
+        return Path.Combine(environment.ContentRootPath, "obj/SwaggerFiles",
             $"swagger-{config.Name.ToLower()}.json");
     }
 
@@ -195,5 +162,3 @@ public class SwaggerGenerateWebClientStartupTask(
         File.Delete(tempFilePath);
     }
 }
-
-public class FinallyWebClientGeneration : Exception;

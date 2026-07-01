@@ -3,6 +3,12 @@
 * Dotnet app start at https://localhost:5002
 * Angular client start at https://localhost:50002
 
+## Generate web api
+
+```shell
+dotnet run ./Oip.csproj --no-restore -- --GenerateWebClient=true
+```
+
 ## DbMigration
 
 For *nix system:

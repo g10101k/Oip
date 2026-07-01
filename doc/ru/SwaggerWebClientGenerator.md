@@ -2,35 +2,44 @@
 
 ## Описание
 
-`SwaggerGenerateWebClientStartupTask` автоматически проверяет Swagger-документы при старте ASP.NET Core приложения и,
-если нужно, запускает генерацию TypeScript web api клиента.
+`SwaggerGenerateWebClientStartupTask` генерирует TypeScript web api клиент из Swagger-документов при старте ASP.NET
+Core приложения.
 
-Таск работает только в режиме разработки:
+Задача запускается только когда она зарегистрирована в DI:
 
-- требуется `ASPNETCORE_ENVIRONMENT=Development`
+- в сервисах, где используется `GenerateWebClientStartupTask(settings)`, регистрация включается ключом
+  `GenerateWebClient`
 - обрабатываются только элементы `OpenApi`, у которых заполнен `GenerateCommand`
+
+После выполнения генерации задача вызывает `StopApplication()`, поэтому приложение не продолжает обычный запуск.
 
 Важно: сгенерированные frontend API файлы считаются read-only. Их нужно обновлять только через регенерацию, а не
 ручными правками.
 
+Пример запуска генерации:
+```shell
+dotnet run ./Oip.csproj --no-restore -- --GenerateWebClient=true
+```
+
 ## Как это работает
 
-При запуске приложения `ExecuteAsync()` выполняет такой сценарий:
+При запуске приложения с аргументом `GenerateWebClient`, `GenerateWebClientStartupTask` выполняет такой сценарий:
 
-1. Проверяет, что приложение запущено в `Development`.
-2. Берет все записи из `settings.OpenApi`, где указан `GenerateCommand`.
-3. Для каждой записи получает Swagger JSON через `swaggerProvider.GetSwagger(config.Name)`.
-4. Сравнивает текущий Swagger JSON с сохраненной предыдущей версией.
-5. Если Swagger изменился, либо включен `ForceGeneration`, сохраняет новый JSON и запускает внешнюю команду генерации.
+1. Берет все записи из `settings.OpenApi`, где указан `GenerateCommand`.
+2. Для каждой записи получает Swagger JSON.
+3. Сохраняет Swagger JSON в файл.
+4. Запускает внешнюю команду генерации, передавая путь к файлу через `{SwaggerJsonPath}`.
+5. Удаляет файл Swagger JSON.
 
-Если по конкретной конфигурации произошла ошибка, она логируется, но обработка остальных `OpenApi` записей продолжается.
-После завершения всегда пишется лог `Swagger generation complete`.
+Если по конкретной конфигурации произошла ошибка, она логируется, после чего ошибка пробрасывается дальше.
+После завершения всегда пишется лог `Swagger generation complete`, затем приложение останавливается через
+`StopApplication()`.
 
-## Где хранится snapshot Swagger
+## Где хранится Swagger
 
-Для сравнения изменений используется не хэш, а полный JSON Swagger-документа.
+Swagger JSON сохраняется только как временный входной файл для команды генерации.
 
-Файл сохраняется по пути:
+Файл создается по пути:
 
 ```text
 obj/SwaggerFiles/swagger-{name}.json
@@ -43,7 +52,7 @@ obj/SwaggerFiles/swagger-base.json
 obj/SwaggerFiles/swagger-v1.json
 ```
 
-Если файл еще не существует, генерация считается необходимой.
+После выполнения команды файл удаляется.
 
 ## Конфигурация `OpenApi`
 
@@ -56,9 +65,9 @@ obj/SwaggerFiles/swagger-v1.json
 - `Title` - заголовок API
 - `Description` - описание API
 - `GenerateCommand` - команда генерации web api клиента
-- `ForceGeneration` - принудительная генерация при каждом старте, даже если Swagger не изменился
+- `ForceGeneration` - устаревшее поле; 
 
-Для того чтобы контроллер попал в нужную swagger-группу, нужно использовать:
+Для того чтобы контроллер попал в нужную swagger-группу, нужно использовать атрибут:
 
 ```csharp
 [ApiExplorerSettings(GroupName = "base")]
@@ -101,7 +110,7 @@ obj/SwaggerFiles/swagger-v1.json
 
 Особенности выполнения:
 
-- перед запуском placeholder `{SwaggerJsonPath}` заменяется на путь к сохраненному Swagger JSON
+- перед запуском placeholder `{SwaggerJsonPath}` заменяется на путь к временному Swagger JSON
 - если путь содержит пробелы, он автоматически оборачивается в кавычки
 - рабочая директория процесса берется из `settings.SpaProxyServer.WorkingDirectory`
 - в окружение процесса добавляется `NODE_TLS_REJECT_UNAUTHORIZED=0`
@@ -211,19 +220,10 @@ dataContractPrefix
 Поскольку `cleanOutput: false`, старые файлы, которые больше не генерируются, автоматически не удаляются. Это важно
 учитывать при изменениях структуры API или шаблонов.
 
-## Что важно для frontend
-
-- Не нужно вручную править сгенерированные API файлы.
-- Источником правды является backend Swagger-контракт.
-- При изменении backend API нужно обновлять swagger и запускать приложение в debug/development режиме, чтобы генерация
-  выполнилась автоматически.
-- Если требуется принудительно пересобрать клиент без изменения Swagger, можно временно включить `ForceGeneration`.
-- При изменении шаблонов или правил именования в `generate-api.mjs` нужно учитывать, что output-директория не чистится
-  автоматически.
-
 ## Что устарело
 
-Документация и настройки не должны опираться на `WebClientOutputPath`.
+Документация и настройки не должны опираться на `WebClientOutputPath`, `ForceGeneration` или постоянный snapshot
+Swagger.
 
 В текущей реализации генерация управляется только через `GenerateCommand`. Именно эта команда определяет:
 

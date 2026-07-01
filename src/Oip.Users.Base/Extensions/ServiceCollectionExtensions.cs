@@ -32,7 +32,8 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The service collection.</param>
     /// <param name="settings">The application settings.</param>
     /// <returns>The updated service collection.</returns>
-    public static IServiceCollection AddUserServiceProxy(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddUserServiceProxy(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
     {
         return settings.IsStandalone
             ? services.AddUsersModuleLocal(settings)
@@ -42,7 +43,8 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers the local users module implementation.
     /// </summary>
-    public static IServiceCollection AddUsersModuleLocal(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddUsersModuleLocal(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
     {
         if (services.All(x => x.ServiceType != typeof(DbContextOptions<UserContext>)))
         {
@@ -72,7 +74,8 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers the remote users module implementation.
     /// </summary>
-    public static IServiceCollection AddUsersModuleRemote(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddUsersModuleRemote(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
     {
         services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(options =>
         {
@@ -93,10 +96,9 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddUserPhotoStorage(this IServiceCollection services)
     {
-        services.AddOptions<UserPhotoStorageSettings>().BindConfiguration("UserPhotoStorage");
         services.TryAddSingleton<IMinioClient>(sp =>
         {
-            var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<UserPhotoStorageSettings>>().Value;
+            var settings = sp.GetRequiredService<UserPhotoStorageSettings>();
             var client = new MinioClient()
                 .WithEndpoint(settings.Endpoint)
                 .WithCredentials(settings.AccessKey, settings.SecretKey);

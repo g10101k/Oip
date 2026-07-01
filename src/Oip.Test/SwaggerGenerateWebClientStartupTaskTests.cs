@@ -68,53 +68,32 @@ public class SwaggerGenerateWebClientStartupTaskTests
     }
 
     [Test]
-    public async Task ExecuteAsync_GenerationSucceeds_WritesFinalSwaggerSnapshot()
+    public async Task ExecuteAsync_GenerationSucceeds_DeletesTempSwaggerFile()
     {
         var task = CreateTask();
 
         await task.ExecuteAsync();
 
-        var finalPath = GetFinalSwaggerPath();
-        Assert.That(File.Exists(finalPath), Is.True);
-        Assert.That(File.ReadAllText(finalPath), Is.EqualTo(task.GeneratedSwaggerJsonContents.Single()));
         Assert.That(task.GeneratedSwaggerJsonPaths.Single(), Does.Contain(Path.Combine("obj", "SwaggerFiles", "tmp")));
         Assert.That(File.Exists(task.GeneratedSwaggerJsonPaths.Single()), Is.False);
     }
 
     [Test]
-    public void ExecuteAsync_GenerationFails_DoesNotUpdateFinalSwaggerSnapshotAndThrows()
+    public void ExecuteAsync_GenerationFails_DeletesTempSwaggerFileAndThrows()
     {
-        var finalPath = GetFinalSwaggerPath();
-        Directory.CreateDirectory(Path.GetDirectoryName(finalPath)!);
-        File.WriteAllText(finalPath, "old swagger");
-
         var task = CreateTask(throwOnGenerate: true);
 
         Assert.ThrowsAsync<InvalidOperationException>(() => task.ExecuteAsync());
-        Assert.That(File.ReadAllText(finalPath), Is.EqualTo("old swagger"));
         Assert.That(task.GeneratedSwaggerJsonPaths, Has.Count.EqualTo(1));
         Assert.That(File.Exists(task.GeneratedSwaggerJsonPaths.Single()), Is.False);
     }
 
     [Test]
-    public async Task ExecuteAsync_SwaggerUnchangedAndForceGenerationDisabled_DoesNotGenerateClient()
+    public async Task ExecuteAsync_RunsAgainWhenSwaggerUnchanged()
     {
         var firstRunTask = CreateTask();
         await firstRunTask.ExecuteAsync();
 
-        var secondRunTask = CreateTask();
-        await secondRunTask.ExecuteAsync();
-
-        Assert.That(secondRunTask.GenerateCallCount, Is.EqualTo(0));
-    }
-
-    [Test]
-    public async Task ExecuteAsync_SwaggerUnchangedAndForceGenerationEnabled_GeneratesClient()
-    {
-        var firstRunTask = CreateTask();
-        await firstRunTask.ExecuteAsync();
-
-        _openApiItem.ForceGeneration = true;
         var secondRunTask = CreateTask();
         await secondRunTask.ExecuteAsync();
 
@@ -129,11 +108,6 @@ public class SwaggerGenerateWebClientStartupTaskTests
             _settingsMock.Object,
             _lifetimeMock.Object,
             throwOnGenerate);
-    }
-
-    private string GetFinalSwaggerPath()
-    {
-        return Path.Combine(_contentRootPath, "obj", "SwaggerFiles", "swagger-v1.json");
     }
 
     private sealed class TestSwaggerGenerateWebClientStartupTask(
