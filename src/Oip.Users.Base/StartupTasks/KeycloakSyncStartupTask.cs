@@ -24,7 +24,7 @@ public class KeycloakSyncStartupTask(KeycloakSyncService keycloakSyncService, IL
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            throw;
+            logger.LogInformation("Keycloak user synchronization task cancelled.");
         }
         catch (Exception exception)
         {
