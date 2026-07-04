@@ -1,8 +1,7 @@
 using NLog;
 using NLog.Web;
-using Oip.Applications.Base;
+using Oip.Api.Controllers;
 using Oip.Applications.Base.Extensions;
-using Oip.Base.Controllers;
 using Oip.Base.Extensions;
 using Oip.Base.Settings;
 using Oip.Users.Base.Controllers;
@@ -40,11 +39,13 @@ internal static class Program
             builder.Services.AddApplicationsModuleRemote(settings);
             builder.Services.AddSingleton(settings);
             builder.Services.AddCors();
+            builder.AddOipForwardedHeaders(settings);
             builder.AddControllersAndView();
             builder.Services
                 .AddController<ProxySettingsController>()
                 .AddController<SecurityController>()
                 .AddController<UserProfileController>()
+                .AddController<KeycloakEventsController>()
                 .AddController<UsersController>();
             builder.AddLocalization();
             builder.Services.AddSettingsToDependencyInjection(settings);
@@ -55,6 +56,7 @@ internal static class Program
             builder.AddOpenTelemetry(settings);
 
             var app = builder.Build();
+            app.UseOipForwardedHeaders();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
             app.MapDefaultEndpoints();

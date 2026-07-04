@@ -1,0 +1,173 @@
+:root {
+  --oip-primary: #ef4444;
+  --oip-primary-hover: #dc2626;
+  --oip-surface-page: #f4f4f5;
+  --oip-surface-card: #ffffff;
+  --oip-surface-muted: #71717a;
+  --oip-text: #3f3f46;
+  --oip-border: #e5e7eb;
+  --oip-focus: rgba(239, 68, 68, 0.22);
+  --pf-global--primary-color--100: var(--oip-primary);
+  --pf-global--primary-color--200: var(--oip-primary-hover);
+  --pf-global--link--Color: var(--oip-primary);
+  --pf-global--link--Color--hover: var(--oip-primary-hover);
+  --pf-global--BackgroundColor--100: var(--oip-surface-card);
+  --pf-global--BackgroundColor--200: var(--oip-surface-page);
+  --pf-v5-global--primary-color--100: var(--oip-primary);
+  --pf-v5-global--primary-color--200: var(--oip-primary-hover);
+  --pf-v5-global--link--Color: var(--oip-primary);
+  --pf-v5-global--link--Color--hover: var(--oip-primary-hover);
+  --pf-v5-global--BackgroundColor--100: var(--oip-surface-card);
+  --pf-v5-global--BackgroundColor--200: var(--oip-surface-page);
+  color-scheme: light;
+}
+
+body {
+  background: var(--oip-surface-page);
+  color: var(--oip-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a,
+.pf-c-button.pf-m-link,
+.pf-c-button.pf-m-plain,
+.pf-v5-c-button.pf-m-link,
+.pf-v5-c-button.pf-m-plain {
+  color: var(--oip-primary);
+}
+
+a:hover,
+.pf-c-button.pf-m-link:hover,
+.pf-c-button.pf-m-plain:hover,
+.pf-v5-c-button.pf-m-link:hover,
+.pf-v5-c-button.pf-m-plain:hover {
+  color: var(--oip-primary-hover);
+}
+
+.pf-c-button.pf-m-primary,
+.pf-v5-c-button.pf-m-primary {
+  background: var(--oip-primary);
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.pf-c-button.pf-m-primary:hover,
+.pf-c-button.pf-m-primary:focus,
+.pf-c-button.pf-m-primary:active,
+.pf-v5-c-button.pf-m-primary:hover,
+.pf-v5-c-button.pf-m-primary:focus,
+.pf-v5-c-button.pf-m-primary:active {
+  background: var(--oip-primary-hover);
+}
+
+.pf-c-button.pf-m-secondary,
+.pf-v5-c-button.pf-m-secondary {
+  --pf-c-button--m-secondary--Color: var(--oip-primary);
+  --pf-c-button--m-secondary--BorderColor: var(--oip-primary);
+  --pf-v5-c-button--m-secondary--Color: var(--oip-primary);
+  --pf-v5-c-button--m-secondary--BorderColor: var(--oip-primary);
+  border-radius: 6px;
+}
+
+.pf-c-page,
+.pf-v5-c-page {
+  --pf-c-page--BackgroundColor: var(--oip-surface-page);
+  --pf-v5-c-page--BackgroundColor: var(--oip-surface-page);
+}
+
+.pf-c-page__header,
+.pf-c-masthead,
+.pf-v5-c-page__header,
+.pf-v5-c-masthead {
+  background: var(--oip-surface-card);
+  border-bottom: 1px solid var(--oip-border);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+}
+
+.pf-c-page__sidebar,
+.pf-c-nav,
+.pf-v5-c-page__sidebar,
+.pf-v5-c-nav {
+  background: #ffffff;
+}
+
+.pf-c-nav__link.pf-m-current,
+.pf-c-nav__link.pf-m-current:hover,
+.pf-c-nav__item.pf-m-current:not(.pf-m-expanded) .pf-c-nav__link,
+.pf-v5-c-nav__link.pf-m-current,
+.pf-v5-c-nav__link.pf-m-current:hover,
+.pf-v5-c-nav__item.pf-m-current:not(.pf-m-expanded) .pf-v5-c-nav__link {
+  color: var(--oip-primary);
+}
+
+.pf-c-nav__link.pf-m-current::after,
+.pf-c-nav__item.pf-m-current:not(.pf-m-expanded) .pf-c-nav__link::after,
+.pf-v5-c-nav__link.pf-m-current::after,
+.pf-v5-c-nav__item.pf-m-current:not(.pf-m-expanded) .pf-v5-c-nav__link::after {
+  border-color: var(--oip-primary);
+}
+
+.pf-c-card,
+.pf-c-page__main-section.pf-m-light,
+.pf-c-page__main-section.pf-m-default,
+.pf-v5-c-card,
+.pf-v5-c-page__main-section.pf-m-light,
+.pf-v5-c-page__main-section.pf-m-default {
+  background: var(--oip-surface-card);
+}
+
+.pf-c-card,
+.pf-v5-c-card {
+  border: 1px solid var(--oip-border);
+  border-radius: 8px;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.08);
+}
+
+.pf-c-form-control,
+.pf-c-menu-toggle,
+.pf-c-select__toggle,
+.pf-c-text-input-group,
+.pf-v5-c-form-control,
+.pf-v5-c-menu-toggle,
+.pf-v5-c-select__toggle,
+.pf-v5-c-text-input-group {
+  border-radius: 6px;
+}
+
+.pf-c-form-control:focus,
+.pf-c-form-control:focus-within,
+.pf-c-menu-toggle.pf-m-expanded,
+.pf-c-select__toggle.pf-m-expanded,
+.pf-c-text-input-group:focus-within,
+.pf-v5-c-form-control:focus,
+.pf-v5-c-form-control:focus-within,
+.pf-v5-c-menu-toggle.pf-m-expanded,
+.pf-v5-c-select__toggle.pf-m-expanded,
+.pf-v5-c-text-input-group:focus-within {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--oip-focus);
+}
+
+.pf-c-label.pf-m-blue,
+.pf-c-label.pf-m-cyan,
+.pf-c-label.pf-m-green,
+.pf-v5-c-label.pf-m-blue,
+.pf-v5-c-label.pf-m-cyan,
+.pf-v5-c-label.pf-m-green {
+  color: var(--oip-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --oip-surface-page: #09090b;
+    --oip-surface-card: #18181b;
+    --oip-surface-muted: #a1a1aa;
+    --oip-text: #fafafa;
+    --oip-border: #3f3f46;
+    --pf-global--BackgroundColor--100: var(--oip-surface-card);
+    --pf-global--BackgroundColor--200: var(--oip-surface-page);
+    --pf-v5-global--BackgroundColor--100: var(--oip-surface-card);
+    --pf-v5-global--BackgroundColor--200: var(--oip-surface-page);
+    color-scheme: dark;
+  }
+}

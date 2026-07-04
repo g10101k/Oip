@@ -23,4 +23,11 @@
         <ProjectReference Include="..\Oip.Users\Oip.Users.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Update="appsettings.Development.json">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
+
 </Project>

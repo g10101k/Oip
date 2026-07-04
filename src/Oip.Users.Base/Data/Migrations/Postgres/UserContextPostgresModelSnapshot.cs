@@ -17,12 +17,12 @@ namespace Oip.Users.Data.Migrations.Postgres
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.22")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Oip.Users.Entities.UserEntity", b =>
+            modelBuilder.Entity("Oip.Users.Base.Data.Entities.UserEntity", b =>
                 {
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -60,14 +60,20 @@ namespace Oip.Users.Data.Migrations.Postgres
                         .HasColumnType("timestamp with time zone")
                         .HasComment("Last synchronization date and time");
 
-                    b.Property<byte[]>("Photo")
-                        .HasColumnType("bytea")
-                        .HasComment("User photo");
+                    b.Property<string>("PhotoContentType")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("User photo content type.");
+
+                    b.Property<string>("PhotoObjectName")
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
+                        .HasComment("User photo object name in object storage.");
 
                     b.Property<string>("Settings")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasComment("User settings");
+                        .HasComment("User settings in json");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")

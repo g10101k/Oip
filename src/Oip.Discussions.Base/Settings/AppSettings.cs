@@ -47,4 +47,10 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     
     
     public CorsSettings Cors { get; set; } = new();
+
+    /// <inheritdoc />
+    public ReverseProxySettings ReverseProxy { get; set; } = new();
+
+    /// <inheritdoc />
+    public bool GenerateWebClient { get; set; }
 }

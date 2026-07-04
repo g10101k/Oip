@@ -5,8 +5,8 @@
         <PackageProjectUrl>https://github.com/g10101k/Oip</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/g10101k/Oip</RepositoryUrl>
-        <Copyright>2022</Copyright>
-        <Version>0.4.0</Version>
+        <Copyright>2026</Copyright>
+        <Version>0.4.3</Version>
         <AssemblyVersion>$(Version)</AssemblyVersion>
         <PackageVersion>$(Version)</PackageVersion>
         <RepositoryType>git</RepositoryType>

@@ -58,8 +58,23 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// <summary>
     /// DataProtection settings
     /// </summary>
-    [NotSaveToDb]
+    [NotSaveToDb] 
     DataProtectionSettings DataProtection { get; set; }
-
+    /// <summary>
+    /// CORS Settings
+    /// </summary>
+    [NotSaveToDb] 
     CorsSettings Cors { get; set; }
+
+    /// <summary>
+    /// Reverse proxy forwarded headers settings.
+    /// </summary>
+    [NotSaveToDb]
+    ReverseProxySettings ReverseProxy { get; set; }
+
+    /// <summary>
+    /// Generate web client
+    /// </summary>
+    [NotSaveToDb]
+    bool GenerateWebClient { get; set; }
 }

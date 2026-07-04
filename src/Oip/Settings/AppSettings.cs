@@ -44,10 +44,24 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
 
+    /// <inheritdoc />
+    public ReverseProxySettings ReverseProxy { get; set; } = new();
+
+    /// <inheritdoc />
+    public bool GenerateWebClient { get; set; }
+
     /// <summary>
     /// User synchronization option
     /// </summary>
     public UserSyncOptions UserSyncOptions { get; set; } = new();
 
+    /// <summary>
+    /// CORS Settings
+    /// </summary>
     public CorsSettings Cors { get; set; } = new();
+    
+    /// <summary>
+    /// User photo storage
+    /// </summary>
+    public UserPhotoStorageSettings UserPhotoStorage { get; set; } = new();
 }

@@ -1,5 +1,5 @@
+using System.Collections.Concurrent;
 using Google.Protobuf.WellKnownTypes;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Clients;
 using Oip.Base.Services;
@@ -11,33 +11,19 @@ using Oip.Users.Base.Settings;
 namespace Oip.Users.Base.Services;
 
 /// <summary>
-/// Background service for synchronizing users periodically.
-/// </summary>
-public class KeycloakSyncBackgroundService(
-    ILogger<UserSyncService> logger,
-    IServiceScopeFactory scopeFactory)
-    : PeriodicBackgroundService<UserSyncService>(scopeFactory, logger);
-
-/// <summary>
 /// Service responsible for synchronizing user data between Keycloak and the local database.
 /// </summary>
-public class UserSyncService(
+public class KeycloakSyncService(
     KeycloakService keycloakService,
     UserRepository userRepository,
     UserService userService,
     INotificationPublisher notificationPublisher,
     UserSyncOptions userSyncOptions,
-    ILogger<UserSyncService> logger) : IPeriodicalService
+    ILogger<KeycloakSyncService> logger)
 {
-    /// <inheritdoc />
-    public int Interval => userSyncOptions.IntervalSeconds;
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> SyncLocks =
+        new(StringComparer.OrdinalIgnoreCase);
 
-    /// <inheritdoc />
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
-    {
-        await SyncAllUsersAsync();
-    }
-    
     /// <summary>
     /// Synchronizes a user from Keycloak to the local database.
     /// </summary>
@@ -45,6 +31,9 @@ public class UserSyncService(
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task SyncUserFromKeycloak(string keycloakUserId)
     {
+        var syncLock = SyncLocks.GetOrAdd(keycloakUserId, _ => new SemaphoreSlim(1, 1));
+        await syncLock.WaitAsync();
+
         try
         {
             logger.LogInformation("Starting sync for user {KeycloakUserId}", keycloakUserId);
@@ -57,6 +46,35 @@ public class UserSyncService(
             logger.LogError(ex, "Error syncing user {KeycloakUserId}", keycloakUserId);
             throw;
         }
+        finally
+        {
+            syncLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// Marks a local user inactive after the user was removed from Keycloak.
+    /// </summary>
+    /// <param name="keycloakUserId">The ID of the user in Keycloak.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task DeactivateUserFromKeycloak(string keycloakUserId)
+    {
+        var existingUser = await userRepository.GetByKeycloakIdAsync(keycloakUserId);
+        if (existingUser == null)
+        {
+            logger.LogInformation("Ignored Keycloak delete event for unknown user {KeycloakUserId}", keycloakUserId);
+            return;
+        }
+
+        if (!existingUser.IsActive)
+        {
+            logger.LogInformation("Ignored Keycloak delete event for inactive user {KeycloakUserId}", keycloakUserId);
+            return;
+        }
+
+        await DeactivateUserAsync(existingUser);
+
+        logger.LogInformation("Deactivated user for deleted Keycloak ID {KeycloakUserId}", keycloakUserId);
     }
 
     /// <summary>
@@ -105,11 +123,21 @@ public class UserSyncService(
         }
         else
         {
-            // Update existing user
-            existingUser.Email = user.Email ?? string.Empty;
-            existingUser.FirstName = user.FirstName ?? string.Empty;
-            existingUser.LastName = user.LastName ?? string.Empty;
-            existingUser.IsActive = user.Enabled ?? false;
+            var email = user.Email ?? string.Empty;
+            var firstName = user.FirstName ?? string.Empty;
+            var lastName = user.LastName ?? string.Empty;
+            var isActive = user.Enabled ?? false;
+
+            if (!HasUserChanged(existingUser, email, firstName, lastName, isActive))
+            {
+                logger.LogInformation("Ignored unchanged Keycloak user {KeycloakUserId}", user.Id);
+                return;
+            }
+
+            existingUser.Email = email;
+            existingUser.FirstName = firstName;
+            existingUser.LastName = lastName;
+            existingUser.IsActive = isActive;
             existingUser.UpdatedAt = DateTimeOffset.UtcNow;
             existingUser.LastSyncedAt = DateTimeOffset.UtcNow;
             await userRepository.UpdateAsync(existingUser);
@@ -128,10 +156,19 @@ public class UserSyncService(
                     LastSyncedAt = existingUser.LastSyncedAt.ToTimestamp(),
                 },
                 EventTime = DateTimeOffset.Now.ToTimestamp(),
-                EventType = EventType.UserCreated
+                EventType = EventType.UserUpdated
             });
             logger.LogInformation("Updated user for Keycloak ID {KeycloakUserId}", user.Id);
         }
+    }
+
+    private static bool HasUserChanged(UserEntity existingUser, string email, string firstName, string lastName,
+        bool isActive)
+    {
+        return !string.Equals(existingUser.Email, email, StringComparison.Ordinal) ||
+               !string.Equals(existingUser.FirstName, firstName, StringComparison.Ordinal) ||
+               !string.Equals(existingUser.LastName, lastName, StringComparison.Ordinal) ||
+               existingUser.IsActive != isActive;
     }
 
 
@@ -139,27 +176,34 @@ public class UserSyncService(
     /// Synchronizes all users from Keycloak to the local database.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task SyncAllUsersAsync()
+    public async Task SyncAllUsersAsync(CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Starting full user synchronization");
         var startTime = DateTimeOffset.UtcNow;
         var totalUsers = await keycloakService.GetUsersCountAsync();
         var batches = (int)Math.Ceiling((double)totalUsers / userSyncOptions.BatchSize);
+        var syncedKeycloakIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         logger.LogInformation("Synchronizing {TotalUsers} users in {Batches} batches", totalUsers, batches);
 
         for (int i = 0; i < batches; i++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var offset = i * userSyncOptions.BatchSize;
-            var syncedCount = await SyncUsersBatchAsync(offset, userSyncOptions.BatchSize);
+            var syncedCount = await SyncUsersBatchAsync(offset, userSyncOptions.BatchSize, syncedKeycloakIds);
             logger.LogInformation("Batch {BatchNumber}: Synced {SyncedCount} users", i + 1, syncedCount);
 
             // Small delay to avoid overwhelming Keycloak
-            await Task.Delay(1000);
+            await Task.Delay(1000, cancellationToken);
         }
 
+        var deactivatedCount = await DeactivateUsersMissingFromKeycloakAsync(syncedKeycloakIds, cancellationToken);
+
         var endTime = DateTimeOffset.UtcNow;
-        logger.LogInformation("Full user synchronization completed");
+        logger.LogInformation(
+            "Full user synchronization completed. Deactivated {DeactivatedCount} users missing from Keycloak",
+            deactivatedCount);
         await notificationPublisher.Notify(new SyncUsersCompleteNotify(totalUsers, startTime, endTime));
     }
 
@@ -169,7 +213,10 @@ public class UserSyncService(
     /// <param name="offset">The offset for retrieving users from Keycloak.</param>
     /// <param name="limit">The maximum number of users to retrieve in this batch.</param>
     /// <returns>The number of users successfully synchronized in this batch.</returns>
-    private async Task<int> SyncUsersBatchAsync(int offset = 0, int limit = 100)
+    private async Task<int> SyncUsersBatchAsync(
+        int offset,
+        int limit,
+        ISet<string> syncedKeycloakIds)
     {
         var keycloakUsers = await keycloakService.GetUsersAsync(offset, limit);
         var syncedCount = 0;
@@ -177,6 +224,7 @@ public class UserSyncService(
         foreach (var keycloakUser in keycloakUsers)
         {
             if (keycloakUser.Id == null) continue;
+            syncedKeycloakIds.Add(keycloakUser.Id);
 
             try
             {
@@ -190,5 +238,58 @@ public class UserSyncService(
         }
 
         return syncedCount;
+    }
+
+    private async Task<int> DeactivateUsersMissingFromKeycloakAsync(
+        ISet<string> syncedKeycloakIds,
+        CancellationToken cancellationToken)
+    {
+        var localActiveUsers = await userRepository.GetActiveKeycloakUsersAsync(cancellationToken);
+        var deactivatedCount = 0;
+
+        foreach (var localUser in localActiveUsers)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (syncedKeycloakIds.Contains(localUser.KeycloakId))
+            {
+                continue;
+            }
+
+            await DeactivateUserAsync(localUser);
+            deactivatedCount++;
+
+            logger.LogInformation(
+                "Deactivated local user {UserId} because Keycloak ID {KeycloakUserId} was not found during full sync",
+                localUser.UserId,
+                localUser.KeycloakId);
+        }
+
+        return deactivatedCount;
+    }
+
+    private async Task DeactivateUserAsync(UserEntity user)
+    {
+        user.IsActive = false;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+        user.LastSyncedAt = DateTimeOffset.UtcNow;
+        await userRepository.UpdateAsync(user);
+        await userService.PublishUserEvent(new UserChangeEvent()
+        {
+            User = new User()
+            {
+                KeycloakId = user.KeycloakId,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserId = user.UserId,
+                IsActive = user.IsActive,
+                CreatedAt = user.CreatedAt.ToTimestamp(),
+                UpdatedAt = user.UpdatedAt.ToTimestamp(),
+                LastSyncedAt = user.LastSyncedAt.ToTimestamp(),
+            },
+            EventTime = DateTimeOffset.Now.ToTimestamp(),
+            EventType = EventType.UserDeactivated
+        });
     }
 }

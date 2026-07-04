@@ -1,8 +1,7 @@
 using NLog;
 using NLog.Web;
-using Oip.Applications.Base;
+using Oip.Api.Controllers;
 using Oip.Applications.Base.Extensions;
-using Oip.Base.Controllers;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
@@ -38,6 +37,7 @@ internal static class Program
             builder.Services.AddSingleton(settings);
             builder.Services.AddScoped<UserService>();
             builder.Services.AddCors();
+            builder.AddOipForwardedHeaders(settings);
             builder.AddControllersAndView();
             builder.Services
                 .AddController<FolderModuleController>()
@@ -58,6 +58,7 @@ internal static class Program
             builder.AddOpenTelemetry(settings);
 
             var app = builder.Build();
+            app.UseOipForwardedHeaders();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
             app.MapDefaultEndpoints();

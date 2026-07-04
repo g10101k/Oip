@@ -39,5 +39,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<Entities_UserEnt
         entity.Property(e => e.KeycloakId).HasMaxLength(36);
         entity.Property(e=>e.FirstName).HasMaxLength(255);
         entity.Property(e => e.LastName).HasMaxLength(255);
+        entity.Property(e => e.PhotoObjectName).HasMaxLength(512);
+        entity.Property(e => e.PhotoContentType).HasMaxLength(128);
     }
 }

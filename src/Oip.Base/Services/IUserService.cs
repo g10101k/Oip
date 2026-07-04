@@ -50,7 +50,6 @@ public record UserDto(
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
     DateTimeOffset? LastSyncedAt,
-    byte[]? Photo,
     string Settings,
     string Phone = ""
 );

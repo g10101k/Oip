@@ -139,19 +139,42 @@ a:hover {
   gap: 26px;
 }
 
+.oip-keycloak-form form,
+.oip-keycloak-form {
+  display: grid;
+  gap: 26px;
+}
+
+.oip-keycloak-form .form-group,
+.oip-keycloak-form .pf-c-form__group,
+.oip-keycloak-form .pf-v5-c-form__group,
+.oip-keycloak-form .kcFormGroupClass {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
 .oip-field {
   display: grid;
   gap: 8px;
 }
 
-.oip-field label {
+.oip-field label,
+.oip-keycloak-form label,
+.oip-keycloak-form .pf-c-form__label,
+.oip-keycloak-form .pf-v5-c-form__label {
   color: var(--oip-text);
   font-size: 20px;
   font-weight: 600;
   line-height: 1.3;
 }
 
-.oip-field input {
+.oip-field input,
+.oip-keycloak-form input[type="text"],
+.oip-keycloak-form input[type="email"],
+.oip-keycloak-form input[type="password"],
+.oip-keycloak-form .pf-c-form-control,
+.oip-keycloak-form .pf-v5-c-form-control {
   background: #ffffff;
   border: 1px solid var(--oip-border);
   border-radius: 6px;
@@ -164,20 +187,30 @@ a:hover {
   width: 100%;
 }
 
-.oip-field input::placeholder {
+.oip-field input::placeholder,
+.oip-keycloak-form input::placeholder {
   color: #94a3b8;
 }
 
-.oip-field input:focus {
+.oip-field input:focus,
+.oip-keycloak-form input:focus,
+.oip-keycloak-form .pf-c-form-control:focus,
+.oip-keycloak-form .pf-v5-c-form-control:focus {
   border-color: var(--oip-primary);
   box-shadow: 0 0 0 3px var(--oip-focus);
 }
 
-.oip-field input[aria-invalid="true"] {
+.oip-field input[aria-invalid="true"],
+.oip-keycloak-form input[aria-invalid="true"] {
   border-color: var(--oip-danger);
 }
 
-.oip-field-error {
+.oip-field-error,
+.oip-keycloak-form .pf-c-form__helper-text.pf-m-error,
+.oip-keycloak-form .pf-v5-c-form__helper-text.pf-m-error,
+.oip-keycloak-form .pf-c-helper-text__item.pf-m-error,
+.oip-keycloak-form .pf-v5-c-helper-text__item.pf-m-error,
+.oip-keycloak-form .kcFeedbackErrorClass {
   color: var(--oip-danger);
   font-size: 13px;
   line-height: 1.35;
@@ -237,7 +270,11 @@ a:hover {
 }
 
 .oip-submit,
-.oip-social-link {
+.oip-social-link,
+.oip-keycloak-form input[type="submit"],
+.oip-keycloak-form button[type="submit"],
+.oip-keycloak-form .pf-c-button.pf-m-primary,
+.oip-keycloak-form .pf-v5-c-button.pf-m-primary {
   align-items: center;
   border-radius: 6px;
   display: inline-flex;
@@ -250,7 +287,11 @@ a:hover {
   width: 100%;
 }
 
-.oip-submit {
+.oip-submit,
+.oip-keycloak-form input[type="submit"],
+.oip-keycloak-form button[type="submit"],
+.oip-keycloak-form .pf-c-button.pf-m-primary,
+.oip-keycloak-form .pf-v5-c-button.pf-m-primary {
   background: var(--oip-primary);
   border: 1px solid var(--oip-primary);
   color: #ffffff;
@@ -258,16 +299,55 @@ a:hover {
   margin-top: 6px;
 }
 
-.oip-submit:hover {
+.oip-submit:hover,
+.oip-keycloak-form input[type="submit"]:hover,
+.oip-keycloak-form button[type="submit"]:hover,
+.oip-keycloak-form .pf-c-button.pf-m-primary:hover,
+.oip-keycloak-form .pf-v5-c-button.pf-m-primary:hover {
   background: var(--oip-primary-hover);
   border-color: var(--oip-primary-hover);
 }
 
 .oip-submit:focus,
 .oip-social-link:focus,
-.oip-password-toggle:focus {
+.oip-password-toggle:focus,
+.oip-keycloak-form input[type="submit"]:focus,
+.oip-keycloak-form button[type="submit"]:focus,
+.oip-keycloak-form .pf-c-button:focus,
+.oip-keycloak-form .pf-v5-c-button:focus {
   box-shadow: 0 0 0 3px var(--oip-focus);
   outline: none;
+}
+
+.oip-login-info {
+  color: var(--oip-surface-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 24px;
+  text-align: center;
+}
+
+.oip-login-info p {
+  margin: 0;
+}
+
+.oip-try-another-way {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.oip-link-button {
+  background: transparent;
+  border: 0;
+  color: var(--oip-primary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0;
+}
+
+.oip-link-button:hover {
+  color: var(--oip-primary-hover);
 }
 
 .oip-social {

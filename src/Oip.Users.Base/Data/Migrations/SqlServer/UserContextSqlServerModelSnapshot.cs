@@ -17,12 +17,12 @@ namespace Oip.Users.Data.Migrations.SqlServer
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.22")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Oip.Users.Entities.UserEntity", b =>
+            modelBuilder.Entity("Oip.Users.Base.Data.Entities.UserEntity", b =>
                 {
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset")
@@ -60,14 +60,20 @@ namespace Oip.Users.Data.Migrations.SqlServer
                         .HasColumnType("datetimeoffset")
                         .HasComment("Last synchronization date and time");
 
-                    b.Property<byte[]>("Photo")
-                        .HasColumnType("varbinary(max)")
-                        .HasComment("User photo");
+                    b.Property<string>("PhotoContentType")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasComment("User photo content type.");
+
+                    b.Property<string>("PhotoObjectName")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
+                        .HasComment("User photo object name in object storage.");
 
                     b.Property<string>("Settings")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasComment("User settings");
+                        .HasComment("User settings in json");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("datetimeoffset")

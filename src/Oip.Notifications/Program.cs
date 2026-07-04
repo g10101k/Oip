@@ -1,8 +1,7 @@
 using NLog;
 using NLog.Web;
-using Oip.Applications.Base;
+using Oip.Api.Controllers;
 using Oip.Applications.Base.Extensions;
-using Oip.Base.Controllers;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
@@ -46,6 +45,7 @@ internal static class Program
             builder.Services.AddCors();
             builder.Services.AddGrpc().AddJsonTranscoding();
             builder.Services.AddGrpcSwagger();
+            builder.AddOipForwardedHeaders(settings);
             builder.AddControllersAndView();
             builder.Services
                 .AddController<CryptController>()
@@ -58,6 +58,7 @@ internal static class Program
             builder.AddOpenTelemetry(settings);
 
             var app = builder.Build();
+            app.UseOipForwardedHeaders();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
             app.MapDefaultEndpoints();

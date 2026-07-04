@@ -42,17 +42,17 @@ export class MsgService {
   }
 
   error(detail: any, summary: any = this.translate.instant('msgService.error'), life: number = this.lifetime) {
-    const validationMessage = this.extractValidationMessage(detail);
-    if (validationMessage) {
-      detail = validationMessage;
-    } else if (detail instanceof HttpErrorResponse) {
+    if (detail instanceof HttpErrorResponse) {
       summary = `Error: ${detail.status} ${detail.statusText}`;
-      detail = `${detail.name} \r\n ${detail.message}`;
+      detail = this.extractErrorMessage(detail, `${detail.name} \r\n ${detail.message}`);
+    } else {
+      detail = this.extractErrorMessage(detail, detail?.toString?.() ?? this.translate.instant('msgService.error'));
     }
+
     this.messageService.add({
       severity: 'error',
       summary: summary,
-      detail: detail.toString(),
+      detail: detail,
       life: life
     });
   }
@@ -63,9 +63,9 @@ export class MsgService {
       return validationMessage;
     }
 
-    const responseError = this.getObjectProperty(error, 'error');
-    if (responseError && 'message' in responseError && typeof responseError.message === 'string') {
-      return responseError.message;
+    const apiExceptionMessage = this.extractApiExceptionMessage(error);
+    if (apiExceptionMessage) {
+      return apiExceptionMessage;
     }
 
     if (typeof error === 'object' && error && 'message' in error && typeof error.message === 'string') {
@@ -90,6 +90,18 @@ export class MsgService {
     return messages.length > 0 ? messages.join('\n') : null;
   }
 
+  private extractApiExceptionMessage(error: unknown): string | null {
+    const responseError = this.getObjectProperty(error, 'error');
+    const message = this.getStringProperty(responseError, 'message') ?? this.getStringProperty(error, 'message');
+    const title = this.getStringProperty(responseError, 'title') ?? this.getStringProperty(error, 'title');
+
+    if (message && title) {
+      return `${title}: ${message}`;
+    }
+
+    return message ?? title;
+  }
+
   private toValidationMessages(field: string, value: unknown): string[] {
     if (Array.isArray(value)) {
       return value
@@ -111,6 +123,15 @@ export class MsgService {
 
     const value = (source as Record<string, unknown>)[property];
     return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null;
+  }
+
+  private getStringProperty(source: unknown, property: string): string | null {
+    if (typeof source !== 'object' || source === null || !(property in source)) {
+      return null;
+    }
+
+    const value = (source as Record<string, unknown>)[property];
+    return typeof value === 'string' && value.length > 0 ? value : null;
   }
 
   errorFromException(error: unknown, fallback: string, summary: string = fallback, life: number = this.lifetime) {

@@ -6,20 +6,30 @@ import { Injectable } from "@angular/core";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 import {
   ApiExceptionResponse,
-  GetUserPhotoParams,
+  GetUserPhotoByIdParams,
   PostUserPhotoPayload,
   UserSettingsDto,
-} from "./user-data-contracts";
+} from "./users-data-contracts";
 
 @Injectable()
 export class UserProfileApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
-  getUserPhoto = (query: GetUserPhotoParams, params: RequestParams = {}) =>
-    this.request<File, ApiExceptionResponse>({
+  getUserPhoto = (params: RequestParams = {}) =>
+    this.request<Blob, ApiExceptionResponse>({
       path: `/api/user-profile/get-user-photo`,
       method: "GET",
-      query: query,
+      secure: true,
+      format: "blob",
+      ...params,
+    });
+  getUserPhotoById = (
+    { userId, ...query }: GetUserPhotoByIdParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<Blob, ApiExceptionResponse>({
+      path: `/api/user-profile/get-user-photo-by-id/${userId}`,
+      method: "GET",
       secure: true,
       format: "blob",
       ...params,

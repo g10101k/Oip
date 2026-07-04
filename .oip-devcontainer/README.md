@@ -35,6 +35,23 @@ For only the backend development services, you can also use:
 ./rebuild.sh
 ````
 
+## Keycloak Events
+
+The Keycloak development image is built from `./keycloak/Dockerfile` and installs
+`io.phasetwo.keycloak:keycloak-events:0.61` for Keycloak `26.6.3`.
+
+The imported `oip` realm enables the `ext-event-http` event listener for admin events and sends them to the app running on the host:
+
+````text
+https://host.docker.internal:5002/api/keycloak-events/receive-keycloak-event
+````
+
+The webhook is signed with `X-Keycloak-Signature` using the shared secret configured in both
+`realm-export.json` and the app `KeycloakEvents:SharedSecret` setting.
+
+If the Keycloak Postgres volume already contains the realm, changing `realm-export.json` will not update it
+automatically. Update the realm attributes/listeners in the Admin UI or recreate the Keycloak database volume.
+
 ## Development Container Startup
 
 Run the commands from the `.oip-devcontainer` directory:

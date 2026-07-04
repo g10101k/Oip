@@ -36,7 +36,8 @@ public class OpenApiItem
     public string Description { get; set; } = "Add block \"OpenApi\" in appsettings.json";
     
     /// <summary>
-    /// Output path for
+    /// Command that generates a web API client from the OpenAPI document.
+    /// When specified, the application generates the client during startup and stops after generation completes.
     /// </summary>
     public string? GenerateCommand { get; set; }
 
@@ -45,9 +46,4 @@ public class OpenApiItem
     /// Use if service not use SPA
     /// </summary>
     public string? WorkingDirectory { get; set; } = null;
-
-    /// <summary>
-    /// Forces generation of the OpenAPI document, even if no changes are detected.
-    /// </summary>
-    public bool ForceGeneration { get; set; }
 }

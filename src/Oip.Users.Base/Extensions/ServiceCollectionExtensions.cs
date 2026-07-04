@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Minio;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
@@ -12,6 +13,8 @@ using Oip.Users.Base.Contexts;
 using Oip.Users.Base.Data.Repositories;
 using Oip.Users.Base.Notifications;
 using Oip.Users.Base.Services;
+using Oip.Users.Base.Settings;
+using Oip.Users.Base.StartupTasks;
 using IUserCacheRepository = Oip.Base.Services.IUserCacheRepository;
 using UserService = Oip.Users.Base.Services.UserService;
 
@@ -29,7 +32,8 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The service collection.</param>
     /// <param name="settings">The application settings.</param>
     /// <returns>The updated service collection.</returns>
-    public static IServiceCollection AddUserServiceProxy(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddUserServiceProxy(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
     {
         return settings.IsStandalone
             ? services.AddUsersModuleLocal(settings)
@@ -39,7 +43,8 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers the local users module implementation.
     /// </summary>
-    public static IServiceCollection AddUsersModuleLocal(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddUsersModuleLocal(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
     {
         if (services.All(x => x.ServiceType != typeof(DbContextOptions<UserContext>)))
         {
@@ -49,9 +54,10 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<UserRepository>();
         services.TryAddScoped<IUserService, LocalUserService>();
         services.TryAddScoped<UserService>();
-        services.TryAddScoped<UserSyncService>();
+        services.AddUserPhotoStorage();
+        services.TryAddScoped<KeycloakSyncService>();
         services.AddUserCacheRepository();
-        services.AddHostedService<KeycloakSyncBackgroundService>();
+        services.AddStartupTask<KeycloakSyncStartupTask>();
 
         if (settings.IsStandalone)
         {
@@ -68,7 +74,8 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers the remote users module implementation.
     /// </summary>
-    public static IServiceCollection AddUsersModuleRemote(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddUsersModuleRemote(this IServiceCollection services,
+        IBaseOipModuleAppSettings settings)
     {
         services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(options =>
         {
@@ -84,6 +91,26 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<UserCacheRepository>();
         services.TryAddSingleton<IUserCacheRepository>(sp => sp.GetRequiredService<UserCacheRepository>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, UserCacheRepositoryHostedService>());
+        return services;
+    }
+
+    private static IServiceCollection AddUserPhotoStorage(this IServiceCollection services)
+    {
+        services.TryAddSingleton<IMinioClient>(sp =>
+        {
+            var settings = sp.GetRequiredService<UserPhotoStorageSettings>();
+            var client = new MinioClient()
+                .WithEndpoint(settings.Endpoint)
+                .WithCredentials(settings.AccessKey, settings.SecretKey);
+
+            if (settings.UseSsl)
+            {
+                client = client.WithSSL();
+            }
+
+            return client.Build();
+        });
+        services.TryAddScoped<IUserPhotoStorage, MinioUserPhotoStorage>();
         return services;
     }
 

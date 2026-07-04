@@ -28,21 +28,21 @@ public class LocalUserService(UserRepository userRepository) : IUserService
     public async Task<UserDto?> GetUserByIdAsync(int userId, CancellationToken cancellationToken = default)
     {
         var user = await userRepository.GetByIdAsync(userId, cancellationToken);
-        return user == null ? null : user.ToDto();
+        return user?.ToDto();
     }
 
     /// <inheritdoc />
     public async Task<UserDto?> GetUserByKeycloakIdAsync(string keycloakId, CancellationToken cancellationToken = default)
     {
         var user = await userRepository.GetByKeycloakIdAsync(keycloakId);
-        return user == null ? null : user.ToDto();
+        return user?.ToDto();
     }
 
     /// <inheritdoc />
     public async Task<UserDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         var user = await userRepository.GetByEmailAsync(email, cancellationToken);
-        return user == null ? null : user.ToDto();
+        return user?.ToDto();
     }
 
     /// <inheritdoc />

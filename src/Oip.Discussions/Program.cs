@@ -45,6 +45,7 @@ internal static class Program
             builder.Services.AddCors();
             builder.Services.AddUsersModuleRemote(settings);
             builder.Services.AddDiscussionsModuleRemote(settings);
+            builder.AddOipForwardedHeaders(settings);
             builder.AddControllersAndView();
             builder.Services
                 .AddController<DiscussionController>()
@@ -57,6 +58,7 @@ internal static class Program
             builder.AddLocalization();
 
             var app = builder.Build();
+            app.UseOipForwardedHeaders();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
             app.MapDefaultEndpoints();

@@ -1867,16 +1867,17 @@
   },
   "smtpServer": {},
   "loginTheme": "oip",
-  "accountTheme": "",
-  "adminTheme": "",
-  "emailTheme": "",
+  "accountTheme": "oip",
+  "adminTheme": "oip",
+  "emailTheme": "oip",
   "eventsEnabled": false,
   "eventsListeners": [
+    "ext-event-http",
     "jboss-logging"
   ],
   "enabledEventTypes": [],
-  "adminEventsEnabled": false,
-  "adminEventsDetailsEnabled": false,
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true,
   "identityProviders": [],
   "identityProviderMappers": [],
   "components": {
@@ -2790,6 +2791,7 @@
     "parRequestUriLifespan": "60",
     "clientSessionMaxLifespan": "0",
     "frontendUrl": "",
+    "_providerConfig.ext-event-http.0": "{\"targetUri\":\"https://host.docker.internal:5002/api/keycloak-events/receive-keycloak-event\",\"sharedSecret\":\"change-me-keycloak-events\",\"retry\":true}",
     "organizationsEnabled": "false",
     "acr.loa.map": "{}"
   },
