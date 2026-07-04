@@ -90,8 +90,9 @@
             "port": 50008,
             "headers": {
               "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50008 ;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
-              "Access-Control-Allow-Origin": "*",
-              "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+              "Access-Control-Allow-Origin": "https://localhost:50002",
+              "Access-Control-Allow-Credentials": "true",
+              "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Accept-Language, X-Timezone"
             },
             "extraWebpackConfig": "projects/oip/webpack.config.js"
           }
