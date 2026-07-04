@@ -43,6 +43,7 @@ function createProxyConfig(configFromApi) {
       ),
       createKeepAliveProxy(
         [
+          '/manifest.json',
           '/api',
           '/signin-oidc',
           '/signout-callback-oidc',
@@ -84,6 +85,7 @@ function createProxyConfig(configFromApi) {
       ),
       createKeepAliveProxy(
         [
+          '/manifest.json',
           '/api',
           '/signin-oidc',
           '/signout-callback-oidc',
