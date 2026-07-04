@@ -39,8 +39,14 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     /// <inheritdoc />
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
-    
+    /// <inheritdoc />
     public CorsSettings Cors { get; set; } = new();
+
+    /// <inheritdoc />
+    public ReverseProxySettings ReverseProxy { get; set; } = new();
+
+    /// <inheritdoc />
+    public bool GenerateWebClient { get; set; }
 
     /// <inheritdoc />
     public bool IsStandalone { get; set; } = false;
