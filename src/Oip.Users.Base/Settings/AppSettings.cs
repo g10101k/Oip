@@ -53,6 +53,11 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     /// Represents synchronization options for the application.
     /// </summary>
     public UserSyncOptions UserSyncOptions { get; set; } = new();
+    
+    /// <summary>
+    /// User photo storage
+    /// </summary>
+    public UserPhotoStorageSettings UserPhotoStorage { get; set; } = new();
 }
 
 /// <summary>

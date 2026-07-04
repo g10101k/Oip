@@ -6,7 +6,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, RequestParams } from "oip-common";
 import {
   ApiExceptionResponse,
-  GetModuleInstanceSettingsParams2,
+  GetModuleInstanceSettingsParams4,
   GetWeatherForecastParams,
   WeatherForecastResponse,
   WeatherModuleSettings,
@@ -29,7 +29,7 @@ export class WeatherForecastModuleApi<
       ...params,
     });
   getModuleInstanceSettings = (
-    query: GetModuleInstanceSettingsParams2,
+    query: GetModuleInstanceSettingsParams4,
     params: RequestParams = {},
   ) =>
     this.request<WeatherModuleSettings, ApiExceptionResponse>({

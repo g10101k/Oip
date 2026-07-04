@@ -4,7 +4,7 @@
 For *nix system:
 
 ````shell
-migration_name=DeletePhotoField
+migration_name=UserExtensionFields
 dotnet ef migrations add "${migration_name}_Postgres" --verbose --project ../Oip.Users.Base/Oip.Users.Base.csproj --context UserContextPostgres --output-dir Data/Migrations/Postgres -- --ConnectionString="XpoProvider=Postgres;Host=localhost;Port=5432;Database=oip;uid=postgres;pwd=" --UseEfCoreProvider=false
 dotnet ef migrations add "${migration_name}_SqlServer" --verbose --project ../Oip.Users.Base/Oip.Users.Base.csproj --context UserContextSqlServer --output-dir Data/Migrations/SqlServer -- --ConnectionString="XpoProvider=MSSqlServer;Server=localhost;Database=oip;uid=sa;Password=" --UseEfCoreProvider=false
 ````

@@ -11,6 +11,15 @@ namespace Oip.Users.Base.Data.Repositories;
 /// </summary>
 public class UserRepository(UserContext context) : BaseRepository<UserEntity, int>(context)
 {
+    /// <inheritdoc/>
+    protected override ExtensionEntityOptions? ExtensionOptions { get; } = new()
+    {
+        Schema = UserContext.SchemaName,
+        Table = "UserExtension",
+        KeyColumn = nameof(UserExtensionEntity.UserId),
+        HasCascadeDelete = false
+    };
+
     /// <summary>
     /// Asynchronously retrieves a user entity by its Keycloak identifier.
     /// </summary>
@@ -183,9 +192,7 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
             Email = email,
             Settings = string.Empty
         };
-        context.Users.Add(user);
-        await context.SaveChangesAsync(cancellationToken);
-        return user;
+        return await AddAsync(user, cancellationToken);
     }
 
     /// <summary>

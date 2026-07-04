@@ -30,6 +30,14 @@ export const appRoutes: Routes = [
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
+        path: 'user-extension-module/:id',
+        loadComponent: () =>
+          import('./app/components/user-extension-module/user-extension-module.component').then(
+            (m) => m.UserExtensionModuleComponent
+          ),
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
+      },
+      {
         path: 'discussion/:id',
         loadComponent: () => import('oip-common').then((m) => m.DiscussionComponent),
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]

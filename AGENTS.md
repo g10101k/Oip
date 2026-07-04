@@ -1,9 +1,7 @@
 # Frontend (TypeScript, Angular, PrimeNG)
 
 ## CSS, styles and class
-
-Try to use Tailwind for layout.
-
+Use Tailwind for layout.
 
 ## oip-common
 
@@ -53,7 +51,7 @@ When working on API contracts, controllers, DTOs, OpenAPI/Swagger/NSwag configur
 Required command:
 
 ```bash
-dotnet run --configuration Debug
+dotnet run --configuration Debug -- --GenerateWebClient=true
 ```
 
 When requesting escalation, use a justification like:

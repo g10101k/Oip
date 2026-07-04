@@ -1,3 +1,12 @@
+export enum ExtensionFieldType {
+  Text = "Text",
+  Number = "Number",
+  Boolean = "Boolean",
+  Date = "Date",
+  DateTime = "DateTime",
+  Select = "Select",
+}
+
 export enum DemoCustomerStatus {
   Prospect = "Prospect",
   Active = "Active",
@@ -9,6 +18,18 @@ export interface ApiExceptionResponse {
   message?: string | null;
   statusCode?: number;
   stackTrace?: string | null;
+}
+
+export interface CreateUserExtensionFieldRequest {
+  fieldName?: string | null;
+  dbColumn?: string | null;
+  type?: ExtensionFieldType;
+  options?: ExtensionFieldOptionDto[] | null;
+  isRequired?: boolean;
+  isVisible?: boolean;
+  isSortable?: boolean;
+  isFilterable?: boolean;
+  order?: number;
 }
 
 export interface CustomUserNotify {
@@ -42,6 +63,42 @@ export interface DemoCustomerTableRowDtoTablePageResult {
   rows?: number;
 }
 
+export interface ExtensionFieldMetadataDto {
+  id?: number;
+  entityCode?: string | null;
+  tableSchema?: string | null;
+  tableName?: string | null;
+  fieldName?: string | null;
+  dbColumn?: string | null;
+  type?: ExtensionFieldType;
+  options?: ExtensionFieldOptionDto[] | null;
+  isRequired?: boolean;
+  isVisible?: boolean;
+  isSortable?: boolean;
+  isFilterable?: boolean;
+  order?: number;
+}
+
+export interface ExtensionFieldOptionDto {
+  value?: string | null;
+  label?: string | null;
+  severity?: string | null;
+}
+
+export interface ExtensionTableColumnDto {
+  field?: string | null;
+  header?: string | null;
+  type?: ExtensionFieldType;
+  isBase?: boolean;
+  isVisible?: boolean;
+  isSortable?: boolean;
+  isFilterable?: boolean;
+  order?: number;
+  width?: string | null;
+  format?: string | null;
+  options?: ExtensionFieldOptionDto[] | null;
+}
+
 export interface SaveDemoCustomerRequest {
   fullName: string;
   email: string;
@@ -65,6 +122,22 @@ export interface TableQueryRequest {
   filters?: Record<string, any> | null;
 }
 
+export interface UpdateUserExtensionFieldRequest {
+  fieldName?: string | null;
+  dbColumn?: string | null;
+  type?: ExtensionFieldType;
+  options?: ExtensionFieldOptionDto[] | null;
+  isRequired?: boolean;
+  isVisible?: boolean;
+  isSortable?: boolean;
+  isFilterable?: boolean;
+  order?: number;
+}
+
+export interface UpdateUserExtensionValuesRequest {
+  values?: Record<string, any> | null;
+}
+
 export interface UserEntity {
   userId?: number;
   keycloakId?: string | null;
@@ -78,6 +151,32 @@ export interface UserEntity {
   photoObjectName?: string | null;
   photoContentType?: string | null;
   settings?: string | null;
+  extension?: UserExtensionEntity;
+}
+
+export interface UserExtensionEntity {
+  userId?: number;
+  user?: UserEntity;
+}
+
+export type UserExtensionModuleSettings = object;
+
+export interface UserExtensionTableRowDto {
+  extensionValues?: Record<string, any> | null;
+  userId?: number;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  isActive?: boolean;
+  createdAt?: Date;
+}
+
+export interface UserExtensionTableRowDtoExtensionTablePageResult {
+  data?: UserExtensionTableRowDto[] | null;
+  total?: number;
+  first?: number;
+  rows?: number;
+  columns?: ExtensionTableColumnDto[] | null;
 }
 
 export interface WeatherForecastResponse {
@@ -107,6 +206,22 @@ export interface DashboardGetModuleInstanceSettingsParams {
   id?: number;
 }
 
+export interface UpdateUserExtensionFieldParams {
+  id: number;
+}
+
+export interface DeleteUserExtensionFieldParams {
+  id: number;
+}
+
+export interface UpdateUserExtensionValuesParams {
+  userId: number;
+}
+
+export interface GetModuleInstanceSettingsParams2 {
+  id?: number;
+}
+
 export interface GetAllUsersParams {
   skip?: number;
   take?: number;
@@ -128,6 +243,6 @@ export interface GetWeatherForecastParams {
   dayCount?: number;
 }
 
-export interface GetModuleInstanceSettingsParams2 {
+export interface GetModuleInstanceSettingsParams4 {
   id?: number;
 }

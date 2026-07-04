@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Oip.Data.Repositories;
 
@@ -11,6 +12,11 @@ namespace Oip.Data.Repositories;
 /// <param name="context">The database context</param>
 public abstract class BaseRepository<TEntity, TKey>(DbContext context) where TEntity : class
 {
+    /// <summary>
+    /// Optional physical extension table options for repositories that maintain one extension row per base row.
+    /// </summary>
+    protected virtual ExtensionEntityOptions? ExtensionOptions => null;
+
     /// <summary>
     /// Represents the set of entities in the database for a given type
     /// </summary>
@@ -58,6 +64,7 @@ public abstract class BaseRepository<TEntity, TKey>(DbContext context) where TEn
     {
         await DbSet.AddAsync(entity, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
+        await CreateExtensionRowAsync(entity, cancellationToken);
         return entity;
     }
 
@@ -83,6 +90,7 @@ public abstract class BaseRepository<TEntity, TKey>(DbContext context) where TEn
         var entity = await GetByIdAsync(id, cancellationToken);
         if (entity != null)
         {
+            await DeleteExtensionRowAsync(entity, cancellationToken);
             DbSet.Remove(entity);
             await context.SaveChangesAsync(cancellationToken);
         }
@@ -112,5 +120,72 @@ public abstract class BaseRepository<TEntity, TKey>(DbContext context) where TEn
         if (predicate == null)
             return await DbSet.CountAsync(cancellationToken);
         return await DbSet.CountAsync(predicate, cancellationToken);
+    }
+
+    private async Task CreateExtensionRowAsync(TEntity entity, CancellationToken cancellationToken)
+    {
+        var options = ExtensionOptions;
+        if (options is null)
+        {
+            return;
+        }
+
+        var keyValue = GetSinglePrimaryKeyValue(entity);
+        var sql = $"insert into {QuoteIdentifier(options.Schema)}.{QuoteIdentifier(options.Table)} " +
+                  $"({QuoteIdentifier(options.KeyColumn)}) values ({{0}})";
+
+        await context.Database.ExecuteSqlRawAsync(sql, [keyValue], cancellationToken);
+    }
+
+    private async Task DeleteExtensionRowAsync(TEntity entity, CancellationToken cancellationToken)
+    {
+        var options = ExtensionOptions;
+        if (options is null || options.HasCascadeDelete)
+        {
+            return;
+        }
+
+        var keyValue = GetSinglePrimaryKeyValue(entity);
+        var sql = $"delete from {QuoteIdentifier(options.Schema)}.{QuoteIdentifier(options.Table)} " +
+                  $"where {QuoteIdentifier(options.KeyColumn)} = {{0}}";
+
+        await context.Database.ExecuteSqlRawAsync(sql, [keyValue], cancellationToken);
+    }
+
+    private object GetSinglePrimaryKeyValue(TEntity entity)
+    {
+        var entityType = context.Model.FindEntityType(typeof(TEntity)) ??
+                         throw new InvalidOperationException($"Entity type {typeof(TEntity).Name} is not in EF model.");
+        var primaryKey = entityType.FindPrimaryKey() ??
+                         throw new InvalidOperationException($"Entity type {typeof(TEntity).Name} has no primary key.");
+
+        if (primaryKey.Properties.Count != 1)
+        {
+            throw new NotSupportedException("Extension rows are supported only for single-column primary keys.");
+        }
+
+        return ReadPrimaryKeyValue(entity, primaryKey.Properties[0]);
+    }
+
+    private object ReadPrimaryKeyValue(TEntity entity, IProperty property)
+    {
+        var propertyInfo = property.PropertyInfo ??
+                           throw new InvalidOperationException(
+                               $"Primary key property {property.Name} is not backed by a CLR property.");
+
+        return propertyInfo.GetValue(entity) ??
+               throw new InvalidOperationException($"Primary key property {property.Name} has no value.");
+    }
+
+    private string QuoteIdentifier(string identifier)
+    {
+        if (string.IsNullOrWhiteSpace(identifier) || identifier.Any(x => !char.IsLetterOrDigit(x) && x != '_'))
+        {
+            throw new InvalidOperationException($"Unsafe SQL identifier '{identifier}'.");
+        }
+
+        return context.Database.IsSqlServer()
+            ? $"[{identifier}]"
+            : $"\"{identifier}\"";
     }
 }

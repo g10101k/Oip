@@ -65,4 +65,9 @@ public class UserEntity
     /// </summary>
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string Settings { get; set; } = null!;
+
+    /// <summary>
+    /// Physical extension row for custom fields.
+    /// </summary>
+    public UserExtensionEntity? Extension { get; set; }
 }

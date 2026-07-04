@@ -52,6 +52,10 @@ public static class ServiceCollectionExtensions
         }
 
         services.TryAddScoped<UserRepository>();
+        services.TryAddScoped<ExtensionFieldValidator>();
+        services.TryAddScoped<UserExtensionDdlService>();
+        services.TryAddScoped<UserExtensionMetadataService>();
+        services.TryAddScoped<UserExtensionTableService>();
         services.TryAddScoped<IUserService, LocalUserService>();
         services.TryAddScoped<UserService>();
         services.AddUserPhotoStorage();

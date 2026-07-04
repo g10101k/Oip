@@ -61,6 +61,7 @@ internal static class Program
                     .AddController<KeycloakEventsController>()
                     .AddController<NotificationController>()
                     .AddController<UserProfileController>()
+                    .AddController<UserExtensionModuleController>()
                     .AddController<UsersController>();
                 builder.Services.AddSignalR();
                 builder.Services.AddGrpc();
@@ -83,6 +84,7 @@ internal static class Program
                 .AddController<ApplicationsController>()
                 .AddController<CustomerModuleController>()
                 .AddController<DashboardModuleController>()
+                .AddController<UserExtensionModuleController>()
                 .AddController<WeatherForecastModuleController>();
 
             var app = builder.Build();

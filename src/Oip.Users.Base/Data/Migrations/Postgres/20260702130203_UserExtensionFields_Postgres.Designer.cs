@@ -2,91 +2,94 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Users.Base.Contexts;
 
 #nullable disable
 
-namespace Oip.Users.Data.Migrations.SqlServer
+namespace Oip.Users.Base.Data.Migrations.Postgres
 {
-    [DbContext(typeof(UserContextSqlServer))]
-    partial class UserContextSqlServerModelSnapshot : ModelSnapshot
+    [DbContext(typeof(UserContextPostgres))]
+    [Migration("20260702130203_UserExtensionFields_Postgres")]
+    partial class UserExtensionFields_Postgres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.22")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Oip.Data.Entities.ExtensionFieldMetadataEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("Metadata identifier.");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DbColumn")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
+                        .HasColumnType("character varying(128)")
                         .HasComment("Physical database column name.");
 
                     b.Property<string>("EntityCode")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
+                        .HasColumnType("character varying(128)")
                         .HasComment("Base entity code, for example User.");
 
                     b.Property<string>("FieldName")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
+                        .HasColumnType("character varying(128)")
                         .HasComment("API field name.");
 
                     b.Property<bool>("IsFilterable")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasComment("Whether the field can be filtered by the table API.");
 
                     b.Property<bool>("IsRequired")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasComment("Whether a value is required.");
 
                     b.Property<bool>("IsSortable")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasComment("Whether the field can be sorted by the table API.");
 
                     b.Property<bool>("IsVisible")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasComment("Whether the field is visible by default.");
 
                     b.Property<string>("OptionsJson")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasComment("JSON-encoded list of extension field options.");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("Default display order.");
 
                     b.Property<string>("TableName")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
+                        .HasColumnType("character varying(128)")
                         .HasComment("Extension table name.");
 
                     b.Property<string>("TableSchema")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
+                        .HasColumnType("character varying(128)")
                         .HasComment("Extension table schema.");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("Field value type.");
 
                     b.HasKey("Id");
@@ -106,66 +109,66 @@ namespace Oip.Users.Data.Migrations.SqlServer
             modelBuilder.Entity("Oip.Users.Base.Data.Entities.UserEntity", b =>
                 {
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset")
+                        .HasColumnType("timestamp with time zone")
                         .HasComment("Creation date and time");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)")
+                        .HasColumnType("character varying(512)")
                         .HasComment("E-mail");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("character varying(255)")
                         .HasComment("First name");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasComment("Indicates whether the user is active");
 
                     b.Property<string>("KeycloakId")
                         .IsRequired()
                         .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)")
+                        .HasColumnType("character varying(36)")
                         .HasComment("Gets or sets the Keycloak identifier for the user.");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("character varying(255)")
                         .HasComment("Last name");
 
                     b.Property<DateTimeOffset>("LastSyncedAt")
-                        .HasColumnType("datetimeoffset")
+                        .HasColumnType("timestamp with time zone")
                         .HasComment("Last synchronization date and time");
 
                     b.Property<string>("PhotoContentType")
                         .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
+                        .HasColumnType("character varying(128)")
                         .HasComment("User photo content type.");
 
                     b.Property<string>("PhotoObjectName")
                         .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)")
+                        .HasColumnType("character varying(512)")
                         .HasComment("User photo object name in object storage.");
 
                     b.Property<string>("Settings")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasComment("User settings in json");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("datetimeoffset")
+                        .HasColumnType("timestamp with time zone")
                         .HasComment("Last update date and time");
 
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("User id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.ToTable("User", "usr", t =>
                         {
@@ -176,7 +179,7 @@ namespace Oip.Users.Data.Migrations.SqlServer
             modelBuilder.Entity("Oip.Users.Base.Data.Entities.UserExtensionEntity", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("User primary key and extension row primary key.");
 
                     b.ToTable("UserExtension", "usr", t =>

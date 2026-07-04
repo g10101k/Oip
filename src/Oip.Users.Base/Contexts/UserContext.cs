@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Oip.Data.Contexts;
+using Oip.Data.Entities;
 using Oip.Data.Extensions;
 using Oip.Users.Base.Data.Entities;
 using Oip.Users.Base.Data.EntityConfigurations;
@@ -28,6 +29,16 @@ public class UserContext : DbContext
     /// Gets the DbSet for managing user entities
     /// </summary>
     public DbSet<UserEntity> Users { get; set; }
+
+    /// <summary>
+    /// Gets the DbSet for managing physical user extension rows.
+    /// </summary>
+    public DbSet<UserExtensionEntity> UserExtensions { get; set; }
+
+    /// <summary>
+    /// Gets the DbSet for managing extension field metadata.
+    /// </summary>
+    public DbSet<ExtensionFieldMetadataEntity> ExtensionFieldMetadata { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserContext"/> class with the specified options and design time flag
@@ -66,7 +77,9 @@ public class UserContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfiguration<UserEntity>(new UserEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new UserEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new UserExtensionEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new ExtensionFieldMetadataEntityConfiguration());
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }
 

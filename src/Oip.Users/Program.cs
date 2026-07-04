@@ -46,6 +46,7 @@ internal static class Program
                 .AddController<SecurityController>()
                 .AddController<UserProfileController>()
                 .AddController<KeycloakEventsController>()
+                .AddController<UserExtensionModuleController>()
                 .AddController<UsersController>();
             builder.AddLocalization();
             builder.Services.AddSettingsToDependencyInjection(settings);

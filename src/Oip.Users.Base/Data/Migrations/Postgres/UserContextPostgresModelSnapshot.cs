@@ -22,6 +22,87 @@ namespace Oip.Users.Data.Migrations.Postgres
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Oip.Data.Entities.ExtensionFieldMetadataEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasComment("Metadata identifier.");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DbColumn")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("Physical database column name.");
+
+                    b.Property<string>("EntityCode")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("Base entity code, for example User.");
+
+                    b.Property<string>("FieldName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("API field name.");
+
+                    b.Property<bool>("IsFilterable")
+                        .HasColumnType("boolean")
+                        .HasComment("Whether the field can be filtered by the table API.");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("boolean")
+                        .HasComment("Whether a value is required.");
+
+                    b.Property<bool>("IsSortable")
+                        .HasColumnType("boolean")
+                        .HasComment("Whether the field can be sorted by the table API.");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("boolean")
+                        .HasComment("Whether the field is visible by default.");
+
+                    b.Property<string>("OptionsJson")
+                        .HasColumnType("text")
+                        .HasComment("JSON-encoded list of extension field options.");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer")
+                        .HasComment("Default display order.");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("Extension table name.");
+
+                    b.Property<string>("TableSchema")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("Extension table schema.");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasComment("Field value type.");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntityCode", "FieldName")
+                        .IsUnique();
+
+                    b.HasIndex("TableSchema", "TableName", "DbColumn")
+                        .IsUnique();
+
+                    b.ToTable("ExtensionFieldMetadata", "usr", t =>
+                        {
+                            t.HasComment("Global metadata for a physical extension field.");
+                        });
+                });
+
             modelBuilder.Entity("Oip.Users.Base.Data.Entities.UserEntity", b =>
                 {
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -89,6 +170,18 @@ namespace Oip.Users.Data.Migrations.Postgres
                     b.ToTable("User", "usr", t =>
                         {
                             t.HasComment("User entity");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Users.Base.Data.Entities.UserExtensionEntity", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasComment("User primary key and extension row primary key.");
+
+                    b.ToTable("UserExtension", "usr", t =>
+                        {
+                            t.HasComment("Physical extension row for user-specific custom columns.");
                         });
                 });
 #pragma warning restore 612, 618
