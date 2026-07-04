@@ -20,7 +20,6 @@ export { AppFloatingConfiguratorComponent } from './components/app-floating-conf
 export { DiscussionComponent } from './components/discussion.component';
 export { IframeModuleComponent } from './components/iframe-module.component';
 export {
-  CustomElementExtensionModuleHostComponent,
   ExtensionModuleHostComponent
 } from './components/extension-module-host.component';
 export { UserNotificationsComponent } from './components/user-notifications.component';
@@ -85,3 +84,4 @@ export { ApplicationsApi } from './api/applications.api';
 export { UserProfileApi } from './api/user-profile.api';
 export { convertToPrimeNgDateFormat } from './helpers/date.helper';
 export { NotificationApi } from './api/notification.api';
+export { CustomElementExtensionModuleHostComponent } from "./components/custom-element-extension-module-host.component";
