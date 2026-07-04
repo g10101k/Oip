@@ -27,7 +27,6 @@ app.MapGet("/manifest.json", (HttpRequest request) =>
         key = "oip-module-example",
         name = "OIP Module Example",
         version = "1.0.0",
-        routePath = "extensions/oip-module-example",
         elementName = "oip-module-example",
         scriptUrl = $"{origin}/modules/oip-module-example.js",
         apiBaseUrl = $"{origin}",

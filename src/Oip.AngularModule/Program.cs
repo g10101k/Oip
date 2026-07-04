@@ -79,10 +79,9 @@ internal static class Program
                 var origin = $"{request.Scheme}://{request.Host}";
                 return Results.Json(new
                 {
-                    key = "oip-angular-module",
+                    key = "external-module-example-module",
                     name = "OIP Angular Module",
                     version = "1.0.0",
-                    routePath = "extensions/oip-angular-module",
                     loadType = "moduleFederation",
                     remoteEntryUrl = $"{origin}/remoteEntry.js",
                     exposedModule = "./ExternalModuleExampleModule",

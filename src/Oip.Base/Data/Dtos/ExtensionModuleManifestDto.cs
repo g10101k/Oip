@@ -33,11 +33,6 @@ public class ExtensionModuleManifestDto
     public string Version { get; set; } = null!;
 
     /// <summary>
-    /// Route path used inside OIP.
-    /// </summary>
-    public string RoutePath { get; set; } = null!;
-
-    /// <summary>
     /// Extension loader type.
     /// </summary>
     public string LoadType { get; set; } = CustomElementLoadType;

@@ -164,7 +164,6 @@ public class ExtensionModulesController(ModuleRepository moduleRepository, IHttp
         RequireValue(manifest.Key, "key");
         RequireValue(manifest.Name, "name");
         RequireValue(manifest.Version, "version");
-        RequireValue(manifest.RoutePath, "routePath");
         RequireValue(manifest.ApiBaseUrl, "apiBaseUrl");
 
         var loadType = string.IsNullOrWhiteSpace(manifest.LoadType)

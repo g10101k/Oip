@@ -2,7 +2,6 @@ export interface OipExtensionManifest {
   key: string;
   name: string;
   version: string;
-  routePath: string;
   loadType?: OipExtensionLoadType;
   elementName?: string | null;
   scriptUrl?: string | null;
