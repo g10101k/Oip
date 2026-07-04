@@ -34,6 +34,44 @@ export class L10nService {
   }
 
   /**
+   * Loads translations from an explicit asset URL and merges them into the active language dictionary.
+   * Use this for extension modules whose assets are hosted outside the shell application.
+   */
+  public loadTranslationsFromUrl(namespace: string, url: string, lang?: string): Observable<unknown> {
+    const selectedLang = lang || this.translateService.currentLang || this.layoutService.language() || 'en';
+    const key = `${namespace}.${selectedLang}.${url}`;
+    if (this.loadedTranslations.has(key)) {
+      return of(null);
+    }
+
+    const loading = this.loadingTranslations.get(key);
+    if (loading) {
+      return loading;
+    }
+
+    const request = this.httpClient.get(url).pipe(
+      tap((translations) => {
+        const current = this.translateService.translations[selectedLang] || {};
+        this.translateService.setTranslation(selectedLang, { ...current, ...translations }, true);
+        this.loadedTranslations.add(key);
+        this.loadingTranslations.delete(key);
+      }),
+      shareReplay(1)
+    );
+
+    this.loadingTranslations.set(key, request);
+    request.subscribe({
+      error: (e) => {
+        this.loadingTranslations.delete(key);
+        console.error(`No translations found for ${namespace}.${selectedLang}.json at ${url}`);
+        console.error(e);
+      }
+    });
+
+    return request;
+  }
+
+  /**
    * Gets the translated value of a key (or an array of keys)
    * @returns the translated key, or an object of translated keys
    */
