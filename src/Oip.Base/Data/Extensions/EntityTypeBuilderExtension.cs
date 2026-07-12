@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Oip.Data.Contexts;
+using Oip.Base.Data.Contexts;
 
-namespace Oip.Data.Extensions;
+namespace Oip.Base.Data.Extensions;
 
 /// <summary>
 /// Entity Extension

@@ -107,7 +107,7 @@ public class FormulaManager : IDisposable
             _lock.ExitReadLock();
         }
 
-        // Если нет — компилируем
+        // If not, compile it.
         var formulasNamespace = "Oip.Rtds.Base.DynamicFormulas";
         var className = $"Formula_{id}";
         var typ = GetCsharpType(tagTypes);

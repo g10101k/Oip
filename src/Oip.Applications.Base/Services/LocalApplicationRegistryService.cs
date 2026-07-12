@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Oip.Applications.Base.Contracts;
-using Oip.Applications.Base.Data;
+using Oip.Applications.Base.Data.Entities;
+using Oip.Applications.Base.Data.Repositories;
 using Oip.Base.Exceptions;
 using Oip.Base.Settings;
 
@@ -11,7 +12,7 @@ namespace Oip.Applications.Base.Services;
 /// </summary>
 public class LocalApplicationRegistryService(
     ApplicationRegistryRepository repository,
-    IBaseOipModuleAppSettings appSettings)
+    ISettings appSettings)
     : IApplicationRegistryService
 {
     public async Task<ApplicationRegistryItemDto> RegisterApplicationAsync(

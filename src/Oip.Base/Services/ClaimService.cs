@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Http;
 namespace Oip.Base.Services;
 
 /// <summary>
-/// User service
+/// Claim service
 /// </summary>
-public class UserService(IHttpContextAccessor httpContextAccessor)
+public class ClaimService(IHttpContextAccessor httpContextAccessor)
 {
     /// <summary>
     /// Get user e-mail

@@ -1,0 +1,19 @@
+{
+  "weather-forecast-module": {
+    "title": "Прогноз погоды",
+    "content": {
+      "table": {
+        "date": "Дата",
+        "temperatureC": "Температура, C",
+        "temperatureF": "Температура, F",
+        "summary": "Описание"
+      }
+    },
+    "settings": {
+      "title": "Настройки погоды",
+      "dayCount": "Количество дней",
+      "save": "Сохранить"
+    },
+    "errorFetchingMessage": "Ошибка получения данных о погоде:"
+  }
+}

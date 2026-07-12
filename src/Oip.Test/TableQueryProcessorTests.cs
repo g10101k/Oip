@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Oip.Data.Dtos;
-using Oip.Data.Services;
+using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Services;
 using Oip.Demo.TableQueryDemo;
 
 namespace Oip.Test;

@@ -3,6 +3,7 @@ using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Clients;
 using Oip.Base.Services;
+using Oip.Notifications.Base.Services;
 using Oip.Users.Base.Data.Entities;
 using Oip.Users.Base.Data.Repositories;
 using Oip.Users.Base.Notifications;
@@ -18,7 +19,7 @@ public class KeycloakSyncService(
     UserRepository userRepository,
     UserService userService,
     INotificationPublisher notificationPublisher,
-    UserSyncOptions userSyncOptions,
+    KeycloakSyncSettings keycloakSyncSettings,
     ILogger<KeycloakSyncService> logger)
 {
     private static readonly ConcurrentDictionary<string, SemaphoreSlim> SyncLocks =
@@ -181,7 +182,7 @@ public class KeycloakSyncService(
         logger.LogInformation("Starting full user synchronization");
         var startTime = DateTimeOffset.UtcNow;
         var totalUsers = await keycloakService.GetUsersCountAsync();
-        var batches = (int)Math.Ceiling((double)totalUsers / userSyncOptions.BatchSize);
+        var batches = (int)Math.Ceiling((double)totalUsers / keycloakSyncSettings.BatchSize);
         var syncedKeycloakIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         logger.LogInformation("Synchronizing {TotalUsers} users in {Batches} batches", totalUsers, batches);
@@ -190,8 +191,8 @@ public class KeycloakSyncService(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var offset = i * userSyncOptions.BatchSize;
-            var syncedCount = await SyncUsersBatchAsync(offset, userSyncOptions.BatchSize, syncedKeycloakIds);
+            var offset = i * keycloakSyncSettings.BatchSize;
+            var syncedCount = await SyncUsersBatchAsync(offset, keycloakSyncSettings.BatchSize, syncedKeycloakIds);
             logger.LogInformation("Batch {BatchNumber}: Synced {SyncedCount} users", i + 1, syncedCount);
 
             // Small delay to avoid overwhelming Keycloak
@@ -212,11 +213,9 @@ public class KeycloakSyncService(
     /// </summary>
     /// <param name="offset">The offset for retrieving users from Keycloak.</param>
     /// <param name="limit">The maximum number of users to retrieve in this batch.</param>
+    /// <param name="syncedKeycloakIds">Synced keycloak ids</param>
     /// <returns>The number of users successfully synchronized in this batch.</returns>
-    private async Task<int> SyncUsersBatchAsync(
-        int offset,
-        int limit,
-        ISet<string> syncedKeycloakIds)
+    private async Task<int> SyncUsersBatchAsync(int offset, int limit, ISet<string> syncedKeycloakIds)
     {
         var keycloakUsers = await keycloakService.GetUsersAsync(offset, limit);
         var syncedCount = 0;
@@ -240,8 +239,7 @@ public class KeycloakSyncService(
         return syncedCount;
     }
 
-    private async Task<int> DeactivateUsersMissingFromKeycloakAsync(
-        ISet<string> syncedKeycloakIds,
+    private async Task<int> DeactivateUsersMissingFromKeycloakAsync(ISet<string> syncedKeycloakIds,
         CancellationToken cancellationToken)
     {
         var localActiveUsers = await userRepository.GetActiveKeycloakUsersAsync(cancellationToken);

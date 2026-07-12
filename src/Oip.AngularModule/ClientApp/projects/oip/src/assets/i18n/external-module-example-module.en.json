@@ -1,0 +1,17 @@
+{
+  "external-module-example-module": {
+    "title": "ExternalModuleExample Module",
+    "content": {
+      "subtitle": "ExternalModuleExample module content.",
+      "loading": "Loading data...",
+      "message": "Message",
+      "generatedAt": "Generated at"
+    },
+    "errorFetchingMessage": "Failed to load module data",
+    "settings": {
+      "title": "ExternalModuleExample Module Settings",
+      "dayCount": "Day Count",
+      "save": "Save"
+    }
+  }
+}

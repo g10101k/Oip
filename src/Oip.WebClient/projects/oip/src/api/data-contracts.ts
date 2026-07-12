@@ -62,7 +62,7 @@ export interface TableQueryRequest {
   sortField?: string | null;
   sortOrder?: number;
   globalFilter?: string | null;
-  filters?: Record<string, any> | null;
+  filters?: Record<string, any>;
 }
 
 export interface UserEntity {

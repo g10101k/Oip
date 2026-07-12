@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Settings;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// Controller responsible for managing security-related operations,
@@ -10,7 +10,7 @@ namespace Oip.Api.Controllers;
 [ApiController]
 [Route("api/proxy-settings")]
 [ApiExplorerSettings(GroupName = "ignore")]
-public class ProxySettingsController(IBaseOipModuleAppSettings appSettings) : ControllerBase
+public class ProxySettingsController(ISettings appSettings) : ControllerBase
 {
     /// <summary>
     /// Retrieves the current proxy configuration settings for the application.
@@ -20,14 +20,14 @@ public class ProxySettingsController(IBaseOipModuleAppSettings appSettings) : Co
     {
         var config = new
         {
-            Standalone = appSettings.IsStandalone,
+            Standalone = appSettings.ServiceAddingMode == AddingMode.Local,
             Targets = new
             {
                 Main = appSettings.Services.Oip,
-                Applications = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipApplications,
-                Users = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipUsers,
-                Discussion = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipDiscussions,
-                Notification = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipNotifications
+                Applications = appSettings.ServiceAddingMode == AddingMode.Local ? appSettings.Services.Oip : appSettings.Services.OipApplications,
+                Users = appSettings.ServiceAddingMode == AddingMode.Local ? appSettings.Services.Oip : appSettings.Services.OipUsers,
+                Discussion = appSettings.ServiceAddingMode == AddingMode.Local ? appSettings.Services.Oip : appSettings.Services.OipDiscussions,
+                Notification = appSettings.ServiceAddingMode == AddingMode.Local ? appSettings.Services.Oip : appSettings.Services.OipNotifications
             }
         };
 

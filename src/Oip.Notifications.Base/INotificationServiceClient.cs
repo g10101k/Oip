@@ -8,8 +8,7 @@ public interface INotificationServiceClient
     /// <summary>
     /// Creates notification types in the configured notification service.
     /// </summary>
-    Task<CreateNotificationTypesResponse> CreateNotificationTypesAsync(
-        CreateNotificationTypesRequest request,
+    Task<CreateNotificationTypesResponse> CreateNotificationTypesAsync(CreateNotificationTypesRequest request,
         CancellationToken cancellationToken = default);
 
     /// <summary>

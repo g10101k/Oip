@@ -20,7 +20,7 @@ namespace Oip.Notifications.Base.Controllers;
 public class NotificationController(
     NotificationsDbContext context,
     IUserService userDirectory,
-    UserService currentUserService) : ControllerBase
+    ClaimService currentClaimService) : ControllerBase
 {
     /// <summary>
     /// Gets notifications for the current user.
@@ -183,7 +183,7 @@ public class NotificationController(
             }
         }
 
-        var email = currentUserService.GetUserEmail();
+        var email = currentClaimService.GetUserEmail();
         if (!string.IsNullOrWhiteSpace(email))
         {
             var user = await userDirectory.GetUserByEmailAsync(email, cancellationToken);

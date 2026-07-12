@@ -4,9 +4,9 @@ using Oip.Settings.Attributes;
 namespace Oip.Base.Settings;
 
 /// <summary>
-/// Base settings for module application
+/// Base settings for instance of OIP
 /// </summary>
-public interface IBaseOipModuleAppSettings : IAppSettings
+public interface ISettings : IAppSettings
 {
     /// <summary>
     /// Collection of urls OIP services
@@ -50,16 +50,22 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     OpenTelemetrySettings OpenTelemetry { get; set; }
 
     /// <summary>
-    /// Is the application running in standalone mode?
+    /// Defines how the application participates in the OIP deployment.
     /// </summary>
     [NotSaveToDb]
-    bool IsStandalone { get; set; }
+    AddingMode ServiceAddingMode { get; set; }
 
     /// <summary>
     /// DataProtection settings
     /// </summary>
     [NotSaveToDb]
     DataProtectionSettings DataProtection { get; set; }
+
+    /// <summary>
+    /// CORS Settings
+    /// </summary>
+    [NotSaveToDb]
+    CorsSettings Cors { get; set; }
 
     /// <summary>
     /// Reverse proxy forwarded headers settings.
@@ -72,4 +78,29 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     [NotSaveToDb]
     bool GenerateWebClient { get; set; }
+}
+
+public enum AddingMode
+{
+    /// <summary>
+    /// The service is added locally:
+    /// - the data layer is added
+    /// - the business logic layer is added
+    /// - all controllers are connected without restrictions (AddController is not used)
+    /// - internal gRPC is not started.
+    /// </summary>
+    Local = 0,
+    /// <summary>
+    /// Mode for adding remote services; a gRPC client is connected for remote service calls.
+    /// Caching services are added.
+    /// </summary>
+    Remote = 1,
+    /// <summary>
+    /// The service is added locally for remote use.
+    /// - the data layer is added
+    /// - the business logic layer is added
+    /// - controllers are connected through AddController (only controllers added through AddController are active)
+    /// - gRPC is started.
+    /// </summary>
+    Service = 2
 }

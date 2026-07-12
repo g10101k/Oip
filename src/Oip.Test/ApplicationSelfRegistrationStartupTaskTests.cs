@@ -49,9 +49,9 @@ public class ApplicationSelfRegistrationStartupTaskTests
         Assert.ThrowsAsync<OperationCanceledException>(() => task.ExecuteAsync(cancellationTokenSource.Token));
     }
 
-    private static IBaseOipModuleAppSettings CreateSettings()
+    private static ISettings CreateSettings()
     {
-        var settingsMock = new Mock<IBaseOipModuleAppSettings>();
+        var settingsMock = new Mock<ISettings>();
         settingsMock.Setup(x => x.Application).Returns(new ApplicationSettings
         {
             Code = "test-app",

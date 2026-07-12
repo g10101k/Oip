@@ -2,14 +2,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Oip.Api.Controllers.Api;
-using Oip.Base.Properties;
+using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
-using Oip.Data.Constants;
-using Oip.Data.Dtos;
-using Oip.Data.Repositories;
+using Oip.Base.Properties;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// Base controller for module-specific operations.

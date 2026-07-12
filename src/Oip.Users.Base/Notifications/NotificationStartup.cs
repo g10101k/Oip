@@ -9,8 +9,8 @@ namespace Oip.Users.Base.Notifications;
 /// </summary>
 public class NotificationStartup(
     INotificationServiceClient client,
-    ILogger<BaseNotificationService> logger,
-    BaseNotificationService notificationService
+    ILogger<NotificationStartup> logger,
+    UserNotificationService notificationService
 ) : IStartupTask
 {
     /// <inheritdoc />

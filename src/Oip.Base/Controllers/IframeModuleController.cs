@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Oip.Api.Controllers.Api;
+using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Repositories;
 using Oip.Base.Properties;
-using Oip.Data.Constants;
-using Oip.Data.Repositories;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 [ApiController]
 [Authorize, Route("api/iframe-module")]

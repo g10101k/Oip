@@ -6,7 +6,7 @@ namespace Oip.Discussions.Base.Settings;
 /// <summary>
 /// Application settings
 /// </summary>
-public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
+public class AppSettings : BaseAppSettings<AppSettings>, ISettings
 {
     /// <inheritdoc />
     public OipServicesSettings Services { get; set; } = new();
@@ -40,10 +40,13 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
     /// <inheritdoc />
-    public bool IsStandalone { get; set; } = false;
+    public AddingMode ServiceAddingMode { get; set; } = AddingMode.Service;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
+
+    /// <inheritdoc />
+    public CorsSettings Cors { get; set; } = new();
 
     /// <inheritdoc />
     public ReverseProxySettings ReverseProxy { get; set; } = new();

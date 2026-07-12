@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Data.Repositories;
+using Oip.Base.Data.Repositories;
 using Oip.Notifications.Base.Data.Contexts;
 using Oip.Notifications.Base.Data.Entities;
 
@@ -61,7 +61,7 @@ public class NotificationTypeRepository(NotificationsDbContext context)
 
         if (notificationType != null)
         {
-            // Обновляем существующую запись
+            // Update the existing record.
             notificationType.Description = entity.Description;
             notificationType.Scope = entity.Scope;
             await UpdateAsync(notificationType, cancellationToken);
@@ -69,7 +69,7 @@ public class NotificationTypeRepository(NotificationsDbContext context)
         }
         else
         {
-            // Добавляем новую запись
+            // Add a new record.
             return await AddAsync(entity, cancellationToken);
         }
     }

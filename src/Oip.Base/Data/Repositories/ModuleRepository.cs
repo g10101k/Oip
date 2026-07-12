@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Data.Contexts;
-using Oip.Data.Dtos;
-using Oip.Data.Entities;
-using Oip.Data.Extensions;
+using Oip.Base.Data.Contexts;
+using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Entities;
+using Oip.Base.Data.Extensions;
 
-namespace Oip.Data.Repositories;
+namespace Oip.Base.Data.Repositories;
 
 /// <summary>
 /// Provides methods to manage modules and their instances, including CRUD operations and security settings.
@@ -28,6 +28,17 @@ public class ModuleRepository(OipModuleContext db)
                 ModuleId = module.ModuleId,
                 Settings = module.Settings,
                 Name = module.Name,
+                Kind = module.Kind,
+                ManifestUrl = module.ManifestUrl,
+                ExtensionKey = module.ExtensionKey,
+                LoadType = module.LoadType,
+                ElementName = module.ElementName,
+                ScriptUrl = module.ScriptUrl,
+                RemoteEntryUrl = module.RemoteEntryUrl,
+                ExposedModule = module.ExposedModule,
+                ComponentName = module.ComponentName,
+                ApiBaseUrl = module.ApiBaseUrl,
+                Version = module.Version,
                 ModuleSecurities = security.Select(x => new ModuleSecurityDto
                 {
                     Right = x.Right,
@@ -49,6 +60,17 @@ public class ModuleRepository(OipModuleContext db)
             {
                 Name = x.Name,
                 Settings = x.Settings,
+                Kind = x.Kind,
+                ManifestUrl = x.ManifestUrl,
+                ExtensionKey = x.ExtensionKey,
+                LoadType = x.LoadType,
+                ElementName = x.ElementName,
+                ScriptUrl = x.ScriptUrl,
+                RemoteEntryUrl = x.RemoteEntryUrl,
+                ExposedModule = x.ExposedModule,
+                ComponentName = x.ComponentName,
+                ApiBaseUrl = x.ApiBaseUrl,
+                Version = x.Version,
                 ModuleSecurities = x.ModuleSecurities.Select(xx => new ModuleSecurityEntity()
                 {
                     ModuleId = x.ModuleId,
@@ -70,8 +92,9 @@ public class ModuleRepository(OipModuleContext db)
         var loadedModules = await WebApplicationBuilderExtension.GetAllLoadedModulesAsync();
         var modulesLoadedNames = loadedModules.Select(x => x.Name.Replace("Controller", string.Empty)).ToList();
         var query = await db.ModuleInstances
-            .Include(x => x.Module).Where(x => modulesLoadedNames.Contains(x.Module.Name)) // Загружаем связанный Module
-            .Include(x => x.Securities) // Загружаем Securities (если нужно)
+            .Include(x => x.Module)
+            .Where(x => x.Module.Kind == ModuleKind.Extension || modulesLoadedNames.Contains(x.Module.Name)) // Load the related Module.
+            .Include(x => x.Securities) // Load Securities if needed.
             .Where(m => m.Securities.Any(s => s.Right == "read" && roles.Contains(s.Role)))
             .OrderBy(m => m.Order)
             .ToListAsync();
@@ -229,6 +252,114 @@ public class ModuleRepository(OipModuleContext db)
     }
 
     /// <summary>
+    /// Gets an extension module by key.
+    /// </summary>
+    /// <param name="extensionKey">Stable extension key.</param>
+    /// <returns>The module DTO.</returns>
+    public async Task<ModuleDto?> GetExtensionModuleByKey(string extensionKey)
+    {
+        var query = from module in db.Modules
+            where module.Kind == ModuleKind.Extension && module.ExtensionKey == extensionKey
+            select new ModuleDto
+            {
+                ModuleId = module.ModuleId,
+                Settings = module.Settings,
+                Name = module.Name,
+                Kind = module.Kind,
+                ManifestUrl = module.ManifestUrl,
+                ExtensionKey = module.ExtensionKey,
+                LoadType = module.LoadType,
+                ElementName = module.ElementName,
+                ScriptUrl = module.ScriptUrl,
+                RemoteEntryUrl = module.RemoteEntryUrl,
+                ExposedModule = module.ExposedModule,
+                ComponentName = module.ComponentName,
+                ApiBaseUrl = module.ApiBaseUrl,
+                Version = module.Version,
+                ModuleSecurities = module.ModuleSecurities.Select(x => new ModuleSecurityDto
+                {
+                    Right = x.Right,
+                    Role = x.Role
+                })
+            };
+        var result = await query.AsNoTracking().FirstOrDefaultAsync();
+        return result;
+    }
+
+    /// <summary>
+    /// Registers an extension module.
+    /// </summary>
+    public async Task<ModuleDto> RegisterExtensionModule(ExtensionModuleManifestDto manifest, string manifestUrl)
+    {
+        if (await db.Modules.AnyAsync(x => x.ExtensionKey == manifest.Key))
+        {
+            throw new InvalidOperationException($"Extension module with key '{manifest.Key}' already exists");
+        }
+
+        var module = new ModuleEntity
+        {
+            Name = manifest.Name,
+            Settings = manifest.SettingsSchema?.ToJsonString(),
+            RouterLink = $"/extensions/{manifest.Key}",
+            Kind = ModuleKind.Extension,
+            ManifestUrl = manifestUrl,
+            ExtensionKey = manifest.Key,
+            LoadType = manifest.LoadType,
+            ElementName = manifest.ElementName,
+            ScriptUrl = manifest.ScriptUrl,
+            RemoteEntryUrl = manifest.RemoteEntryUrl,
+            ExposedModule = manifest.ExposedModule,
+            ComponentName = manifest.ComponentName,
+            ApiBaseUrl = manifest.ApiBaseUrl,
+            Version = manifest.Version,
+            ModuleSecurities =
+            [
+                new ModuleSecurityEntity
+                {
+                    Right = "read",
+                    Role = "admin"
+                }
+            ]
+        };
+
+        db.Modules.Add(module);
+        await db.SaveChangesAsync();
+        return ToModuleDto(module);
+    }
+
+    /// <summary>
+    /// Updates an extension module.
+    /// </summary>
+    public async Task<ModuleDto> UpdateExtensionModule(int moduleId, ExtensionModuleManifestDto manifest, string manifestUrl)
+    {
+        var module = await db.Modules.FirstOrDefaultAsync(x => x.ModuleId == moduleId && x.Kind == ModuleKind.Extension)
+                     ?? throw new KeyNotFoundException($"Extension module with id {moduleId} not found");
+
+        var duplicate = await db.Modules.AnyAsync(x => x.ModuleId != moduleId && x.ExtensionKey == manifest.Key);
+        if (duplicate)
+        {
+            throw new InvalidOperationException($"Extension module with key '{manifest.Key}' already exists");
+        }
+
+        module.Name = manifest.Name;
+        module.Settings = manifest.SettingsSchema?.ToJsonString();
+        module.RouterLink = $"/extensions/{manifest.Key}";
+        module.ManifestUrl = manifestUrl;
+        module.ExtensionKey = manifest.Key;
+        module.LoadType = manifest.LoadType;
+        module.ElementName = manifest.ElementName;
+        module.ScriptUrl = manifest.ScriptUrl;
+        module.RemoteEntryUrl = manifest.RemoteEntryUrl;
+        module.ExposedModule = manifest.ExposedModule;
+        module.ComponentName = manifest.ComponentName;
+        module.ApiBaseUrl = manifest.ApiBaseUrl;
+        module.Version = manifest.Version;
+
+        await db.SaveChangesAsync();
+        return ToModuleDto(module);
+    }
+
+    /// <summary>
     /// Adds a new module instance to the system with default security settings.
     /// </summary>
     /// <param name="addModuleInstanceDto">The data transfer object containing module instance details.</param>
@@ -373,6 +504,45 @@ public class ModuleRepository(OipModuleContext db)
 
         db.Modules.Remove(module);
         await db.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Deletes an extension module by identifier.
+    /// </summary>
+    public async Task DeleteExtensionModule(int id)
+    {
+        var module = await db.Modules.FirstOrDefaultAsync(x => x.ModuleId == id && x.Kind == ModuleKind.Extension);
+        if (module == null)
+            throw new KeyNotFoundException($"Extension module with id {id} not found");
+
+        db.Modules.Remove(module);
+        await db.SaveChangesAsync();
+    }
+
+    private static ModuleDto ToModuleDto(ModuleEntity module)
+    {
+        return new ModuleDto
+        {
+            ModuleId = module.ModuleId,
+            Name = module.Name,
+            Settings = module.Settings,
+            Kind = module.Kind,
+            ManifestUrl = module.ManifestUrl,
+            ExtensionKey = module.ExtensionKey,
+            LoadType = module.LoadType,
+            ElementName = module.ElementName,
+            ScriptUrl = module.ScriptUrl,
+            RemoteEntryUrl = module.RemoteEntryUrl,
+            ExposedModule = module.ExposedModule,
+            ComponentName = module.ComponentName,
+            ApiBaseUrl = module.ApiBaseUrl,
+            Version = module.Version,
+            ModuleSecurities = module.ModuleSecurities.Select(x => new ModuleSecurityDto
+            {
+                Right = x.Right,
+                Role = x.Role
+            })
+        };
     }
 
     /// <summary>

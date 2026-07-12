@@ -19,7 +19,7 @@ public static class DataExtension
     /// <param name="services">The service collection.</param>
     /// <param name="settings">The application settings.</param>
     /// <returns>The modified service collection.</returns>
-    public static IServiceCollection AddRtdsData(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddRtdsData(this IServiceCollection services, ISettings settings)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
         switch (connectionModel.Provider)

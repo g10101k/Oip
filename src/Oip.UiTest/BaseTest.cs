@@ -113,14 +113,14 @@ internal class BaseTest
         {
             Screenshot screenshot = screenshotDriver.GetScreenshot();
 
-            // Создаем директорию для скриншотов, если её нет
+            // Create the screenshots directory if it does not exist.
             string screenshotsDir = Path.Combine(Directory.GetCurrentDirectory(), "TestScreenshots");
             if (!Directory.Exists(screenshotsDir))
             {
                 Directory.CreateDirectory(screenshotsDir);
             }
 
-            // Формируем имя файла
+            // Build the file name.
             string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             string fileName = string.IsNullOrEmpty(stepName)
                 ? $"{testName}_{timestamp}.png"

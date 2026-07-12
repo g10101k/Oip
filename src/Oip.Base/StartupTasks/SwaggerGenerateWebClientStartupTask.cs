@@ -14,12 +14,12 @@ namespace Oip.Base.StartupTasks;
 /// <summary>
 /// Service responsible for executing tasks during application startup, specifically related to Swagger configuration.
 /// </summary>
-public class SwaggerGenerateWebClientStartupTask(
+internal class SwaggerGenerateWebClientStartupTask(
     ISwaggerProvider swaggerProvider,
     IWebHostEnvironment environment,
     ILogger<SwaggerGenerateWebClientStartupTask> logger,
     IHostApplicationLifetime lifetime,
-    IBaseOipModuleAppSettings settings) : IStartupTask
+    ISettings settings) : IStartupTask
 {
     /// <inheritdoc />
     public int Order => 0;

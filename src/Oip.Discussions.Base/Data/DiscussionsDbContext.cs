@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Oip.Data.Contexts;
-using Oip.Data.Extensions;
+using Oip.Base.Data.Contexts;
+using Oip.Base.Data.Extensions;
 using Oip.Discussions.Base.Data.EntityConfigurations;
 
 namespace Oip.Discussions.Base.Data;

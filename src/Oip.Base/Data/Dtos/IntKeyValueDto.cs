@@ -1,4 +1,4 @@
-namespace Oip.Data.Dtos;
+namespace Oip.Base.Data.Dtos;
 
 /// <summary>
 /// Represents a key-value pair where the key is an integer and the value is a string.

@@ -1,12 +1,12 @@
 using NLog;
 using NLog.Web;
-using Oip.Api.Controllers;
 using Oip.Applications.Base.Extensions;
+using Oip.Base.Controllers;
 using Oip.Base.Extensions;
 using Oip.Base.Settings;
+using Oip.Notifications.Base.Extensions;
 using Oip.Users.Base.Controllers;
 using Oip.Users.Base.Extensions;
-using Oip.Users.Base.Services;
 using Oip.Users.Base.Settings;
 
 namespace Oip.Users;
@@ -20,40 +20,37 @@ internal static class Program
         {
             var settings = AppSettings.Initialize(args, false, true);
 
-            // Check if running in standalone mode (should only run as microservice)
-            if (settings.IsStandalone)
+            if (settings.ServiceAddingMode != AddingMode.Service)
             {
-                logger.Warn("Oip.Users service is configured to run in Standalone mode. " +
-                            "This service should only run in Microservices mode. " +
-                            "Consider running the main Oip application instead.");
+                logger.Warn("Oip.Users must be configured with ServiceAddingMode.Service.");
                 return;
             }
 
             var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
             builder.AddNlog();
-            builder.AddDefaultHealthChecks();
-            builder.AddDefaultAuthentication(settings);
-            builder.AddOpenApi(settings);
-            builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
+            builder.Services.AddDefaultHealthChecks();
+            builder.Services.AddDefaultAuthentication(settings);
+            builder.Services.AddOpenApi(settings);
+            builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
-            builder.Services.AddApplicationsModuleRemote(settings);
+            builder.Services.AddApplicationsService(settings);
             builder.Services.AddSingleton(settings);
-            builder.Services.AddCors();
-            builder.AddOipForwardedHeaders(settings);
-            builder.AddControllersAndView();
+            builder.Services.AddCors(settings);
+            builder.Services.AddForwardedHeaders(settings);
+            builder.Services.AddControllersAndView();
             builder.Services
                 .AddController<ProxySettingsController>()
                 .AddController<SecurityController>()
                 .AddController<UserProfileController>()
                 .AddController<KeycloakEventsController>()
                 .AddController<UsersController>();
-            builder.AddLocalization();
+            builder.Services.AddOipLocalization();
             builder.Services.AddSettingsToDependencyInjection(settings);
-            builder.Services.AddUsersModuleLocal(settings);
-
+            builder.Services.AddUserService(settings);
+            builder.Services.AddNotificationsService(settings, AddingMode.Remote);
             builder.Services.AddHttpClient();
             builder.Services.AddGrpc();
-            builder.AddOpenTelemetry(settings);
+            builder.Services.AddOpenTelemetry(settings);
 
             var app = builder.Build();
             app.UseOipForwardedHeaders();
@@ -66,12 +63,11 @@ internal static class Program
             app.UseAuthentication();
             app.UseOipCsrfProtection();
             app.UseAuthorization();
-            app.UseCors(options => options.AllowAnyOrigin());
+            app.UseCors();
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
-            app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
-            app.MapGrpcService<UserService>();
-            app.MigrateUserDatabase();
+            app.MapOpenApi(settings);
+            app.UseUsersService(settings);
             app.MapOpenTelemetry(settings);
             app.Run();
         }

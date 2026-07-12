@@ -16,7 +16,7 @@ public class SwaggerGenerateWebClientStartupTaskTests
     private Mock<ISwaggerProvider> _swaggerProviderMock;
     private Mock<IWebHostEnvironment> _environmentMock;
     private Mock<IHostApplicationLifetime> _lifetimeMock;
-    private Mock<IBaseOipModuleAppSettings> _settingsMock;
+    private Mock<ISettings> _settingsMock;
     private OpenApiItem _openApiItem;
     private OpenApiDocument _swaggerDocument;
 
@@ -52,7 +52,7 @@ public class SwaggerGenerateWebClientStartupTaskTests
 
         _lifetimeMock = new Mock<IHostApplicationLifetime>();
 
-        _settingsMock = new Mock<IBaseOipModuleAppSettings>();
+        _settingsMock = new Mock<ISettings>();
         _settingsMock.Setup(x => x.OpenApi).Returns(new OpenApiSettings { _openApiItem });
         _settingsMock.Setup(x => x.SpaProxyServer).Returns(new SpaDevelopmentServerSettings
         {
@@ -74,8 +74,9 @@ public class SwaggerGenerateWebClientStartupTaskTests
 
         await task.ExecuteAsync();
 
-        Assert.That(task.GeneratedSwaggerJsonPaths.Single(), Does.Contain(Path.Combine("obj", "SwaggerFiles", "tmp")));
-        Assert.That(File.Exists(task.GeneratedSwaggerJsonPaths.Single()), Is.False);
+        var generatedSwaggerJsonPath = task.GeneratedSwaggerJsonPaths.Single();
+        Assert.That(generatedSwaggerJsonPath, Does.EndWith(Path.Combine("obj", "SwaggerFiles", "swagger-v1.json")));
+        Assert.That(File.Exists(generatedSwaggerJsonPath), Is.False);
     }
 
     [Test]
@@ -113,7 +114,7 @@ public class SwaggerGenerateWebClientStartupTaskTests
     private sealed class TestSwaggerGenerateWebClientStartupTask(
         ISwaggerProvider swaggerProvider,
         IWebHostEnvironment environment,
-        IBaseOipModuleAppSettings settings,
+        ISettings settings,
         IHostApplicationLifetime lifetime,
         bool throwOnGenerate) : SwaggerGenerateWebClientStartupTask(
         swaggerProvider,

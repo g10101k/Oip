@@ -1,4 +1,4 @@
-using Oip.Data.Repositories;
+using Oip.Base.Data.Repositories;
 using Oip.Notifications.Base.Data.Contexts;
 using Oip.Notifications.Base.Data.Entities;
 

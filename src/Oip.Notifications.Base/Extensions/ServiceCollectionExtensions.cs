@@ -5,9 +5,9 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
+using Oip.Notifications.Base.Controllers;
 using Oip.Notifications.Base.Data.Contexts;
 using Oip.Notifications.Base.Data.Repositories;
-using Oip.Notifications.Base.Hubs;
 using Oip.Notifications.Base.Services;
 using Oip.Notifications.Base.Startups;
 using Oip.Settings.Enums;
@@ -23,36 +23,47 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers notifications for local composition.
     /// </summary>
-    public static IServiceCollection AddNotificationsModuleLocal(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddNotificationsService(this IServiceCollection services, ISettings settings,
+        AddingMode? addingMode = null)
     {
-        services.AddNotificationsModuleCore(settings);
-        services.TryAddScoped<INotificationServiceClient, LocalNotificationServiceClient>();
-        services.AddOipDataProtection(settings);
-        services.TryAddActivatedSingleton<CryptService>();
+        var mode = addingMode ?? settings.ServiceAddingMode;
+        switch (mode)
+        {
+            case AddingMode.Local:
+                services.AddNotificationData(settings);
+                services.AddLocalServices(settings);
+                services.AddSignalR();
+                services.TryAddScoped<INotificationServiceClient, LocalNotificationServiceClient>();
+                break;
+            case AddingMode.Service:
+                services.AddNotificationData(settings);
+                services.AddLocalServices(settings);
+                services.AddSignalR();
+                services.AddBaseServiceControllers()
+                    .AddController<NotificationController>();
+                services.AddGrpc();
+                break;
+            case AddingMode.Remote:
+                services.AddGrpcClient<GrpcNotificationService.GrpcNotificationServiceClient>(options =>
+                {
+                    options.Address = new Uri(settings.Services.OipNotifications);
+                });
+
+                services.TryAddScoped<INotificationServiceClient, GrpcNotificationServiceClientAdapter>();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+
         return services;
     }
 
-    /// <summary>
-    /// Registers notifications for distributed composition.
-    /// </summary>
-    public static IServiceCollection AddNotificationsModuleRemote(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddLocalServices(this IServiceCollection services, ISettings settings)
     {
-        return services.AddNotificationsModuleCore(settings);
-    }
-
-    private static IServiceCollection AddNotificationsModuleCore(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
-    {
-        if (services.All(x => x.ServiceType != typeof(DbContextOptions<NotificationsDbContext>)))
-        {
-            services.AddNotificationData(settings);
-        }
-
+        services.TryAddSingleton<CryptService>();
         services.TryAddSingleton<ChannelService>();
         services.TryAddScoped<NotificationService>();
-        services.TryAddScoped<NotificationHub>();
         services.AddStartupTask<ChannelStartup>();
         return services;
     }
@@ -60,11 +71,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Adds notification data services to the dependency injection container.
     /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <param name="settings">The application settings.</param>
-    /// <returns>The modified service collection.</returns>
-    public static IServiceCollection AddNotificationData(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddNotificationData(this IServiceCollection services, ISettings settings)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
         switch (connectionModel.Provider)
@@ -106,7 +113,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<UserNotificationPreferenceRepository>();
         services.AddScoped<NotificationRepository>();
         services.AddScoped<NotificationUserRepository>();
-        services.AddScoped<NotificationDeliveryRepository>();
 
         return services;
     }

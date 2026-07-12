@@ -1,4 +1,4 @@
-namespace Oip.Api.Controllers.Api;
+namespace Oip.Base.Controllers.Api;
 
 public sealed class AuthSessionResponse
 {

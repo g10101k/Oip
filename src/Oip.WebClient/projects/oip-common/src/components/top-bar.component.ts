@@ -50,7 +50,10 @@ import { AppTopbarApplicationSwitcherComponent } from './top-bar-application-swi
       </div>
 
       @if (securityService.isAdmin() && topBarService.topBarItems.length > 0) {
-        <p-tabs class="layout-topbar-tabs ml-2" [(value)]="topBarService.activeId">
+        <p-tabs
+          class="layout-topbar-tabs ml-2"
+          [value]="topBarService.activeId"
+          (valueChange)="onActiveTabChange($event)">
           <p-tablist>
             @for (tab of topBarService.availableTopBarItems; track tab.id) {
               <p-tab id="oip-app-topbar-tab-{{ tab.id }}" [value]="tab.id">
@@ -145,6 +148,11 @@ export class AppTopbar {
   logoService = inject(LogoService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translateService = inject(TranslateService);
+
+  onActiveTabChange(value: string | number | undefined) {
+    const nextActiveId = value == null ? undefined : String(value);
+    this.topBarService.activeId = nextActiveId;
+  }
 
   toggleDarkMode() {
     this.layoutService.layoutConfig.update((state) => ({

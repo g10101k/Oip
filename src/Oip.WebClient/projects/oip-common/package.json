@@ -1,6 +1,6 @@
 {
   "name": "oip-common",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A template for cross-platform web applications based on sakai-ng and primeNG",
   "main": "index.js",
   "keywords": [
@@ -8,7 +8,7 @@
     "template"
   ],
   "peerDependencies": {
-    "@fortawesome/fontawesome-free": "^7.2.0"
+    "@angular-architects/module-federation": "^20.0.0"
   },
   "author": "Igor Tyulyakov aka g101k",
   "license": "MIT",

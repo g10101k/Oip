@@ -1,4 +1,4 @@
-namespace Oip.Api.Controllers.Api;
+namespace Oip.Base.Controllers.Api;
 
 /// <summary>
 /// Paginated data container holding a page of results with total item count.

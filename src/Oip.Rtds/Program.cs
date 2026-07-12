@@ -1,7 +1,7 @@
 using NLog;
 using NLog.Web;
-using Oip.Api.Controllers;
 using Oip.Applications.Base.Extensions;
+using Oip.Base.Controllers;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
@@ -25,20 +25,20 @@ internal static class Program
             var settings = AppSettings.Initialize(args, false, true);
             var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
             builder.AddNlog();
-            builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
+            builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddOipModuleContext(settings.NormalizedConnectionString);
-            builder.AddDefaultHealthChecks();
-            builder.AddDefaultAuthentication(settings);
-            builder.AddOpenApi(settings);
-            builder.Services.AddApplicationsModuleRemote(settings);
+            builder.Services.AddDefaultHealthChecks();
+            builder.Services.AddDefaultAuthentication(settings);
+            builder.Services.AddOpenApi(settings);
+            builder.Services.AddApplicationsService(settings);
             builder.Services.GenerateWebClientStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddSingleton(settings);
-            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<ClaimService>();
             builder.Services.AddCors();
-            builder.AddOipForwardedHeaders(settings);
-            builder.AddControllersAndView();
+            builder.Services.AddForwardedHeaders(settings);
+            builder.Services.AddControllersAndView();
             builder.Services
                 .AddController<FolderModuleController>()
                 .AddController<IframeModuleController>()
@@ -48,14 +48,14 @@ internal static class Program
                 .AddController<SecurityController>()
                 .AddController<RtdsMetaDataContextMigrationModuleController>()
                 .AddController<TagManagementModuleController>();
-            builder.AddLocalization();
+            builder.Services.AddOipLocalization();
             builder.Services.AddGrpc();
             builder.Services.AddSingleton<RtdsService>();
             builder.Services.AddSingleton<IRtdsAppSettings>(AppSettings.Instance);
             builder.Services.AddScoped<TagService>();
             builder.Services.AddRtdsData(settings);
             builder.Services.AddHostedService<RtdsHostedService>();
-            builder.AddOpenTelemetry(settings);
+            builder.Services.AddOpenTelemetry(settings);
 
             var app = builder.Build();
             app.UseOipForwardedHeaders();

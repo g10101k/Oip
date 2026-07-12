@@ -5,7 +5,6 @@ using Oip.Base.Exceptions;
 using Oip.Base.Services;
 using Oip.Discussions.Base.Contracts;
 using Oip.Discussions.Base.Data;
-using BaseUserService = Oip.Base.Services.UserService;
 
 namespace Oip.Discussions.Base.Services;
 
@@ -15,7 +14,7 @@ namespace Oip.Discussions.Base.Services;
 public class CommentService(
     DiscussionsDbContext discussionsDbContext,
     IUserService userService,
-    BaseUserService currentUserService,
+    ClaimService currentClaimService,
     IDiscussionAttachmentStorage attachmentStorage)
 {
     private const int MaxPageSize = 100;
@@ -784,7 +783,7 @@ public class CommentService(
 
     private string? GetCurrentUserEmail()
     {
-        return currentUserService.GetUserEmail();
+        return currentClaimService.GetUserEmail();
     }
 
     private sealed record MentionToken(string Value, int Position);

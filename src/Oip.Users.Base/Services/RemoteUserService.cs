@@ -6,7 +6,7 @@ namespace Oip.Users.Base.Services;
 
 /// <summary>
 /// Remote implementation of IUserService that communicates via gRPC.
-/// Used when IsStandalone is false.
+/// Used by distributed applications.
 /// </summary>
 public class RemoteUserService(GrpcUserService.GrpcUserServiceClient client, ILogger<RemoteUserService> logger)
     : IUserService

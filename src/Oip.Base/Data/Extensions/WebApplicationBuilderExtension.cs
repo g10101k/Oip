@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Oip.Data.Contexts;
-using Oip.Data.Entities;
+using Oip.Base.Data.Contexts;
+using Oip.Base.Data.Entities;
 
-namespace Oip.Data.Extensions;
+namespace Oip.Base.Data.Extensions;
 
 /// <summary>
 /// Provides extension methods for configuring and initializing the OIP module context
@@ -71,7 +71,7 @@ public static class WebApplicationBuilderExtension
         foreach (var type in result)
         {
             var moduleName = type.Name.Replace("Controller", string.Empty);
-            RouteAttribute? attr = type.GetCustomAttribute<RouteAttribute>();
+            var attr = type.GetCustomAttribute<RouteAttribute>();
             if (attr == null) continue;
             var link = attr.Template.Replace("api", string.Empty);
             var module = moduleContext.Modules.FirstOrDefault(m => m.Name == moduleName);

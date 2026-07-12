@@ -794,7 +794,8 @@ public class NotificationService(
         try
         {
             var notificationType = await notificationTypeRepository.GetByNameAsync(request.NotificationType) ??
-                    throw new RpcException(new Status(StatusCode.NotFound, "Notification type not found"));
+                                   throw new RpcException(
+                                       new Status(StatusCode.NotFound, "Notification type not found"));
             var notification = new NotificationEntity
             {
                 NotificationTypeId = notificationType.NotificationTypeId,
@@ -857,7 +858,7 @@ public class NotificationService(
     }
 
     /// <summary>
-    /// Генерирует персонализированные сообщения для каждого пользователя на основе шаблона
+    /// Generates personalized messages for each user based on a template.
     /// </summary>
     private List<NotificationUserEntity> GenerateMessagesFromTemplateAsync(
         CreateNotificationRequest request,
@@ -865,11 +866,11 @@ public class NotificationService(
     {
         var userMessages = new List<NotificationUserEntity>();
 
-        // Используем JsonDocument для парсинга без полной десериализации
+        // Use JsonDocument for parsing without full deserialization.
         using var doc = JsonDocument.Parse(request.DataJson ?? "{}");
         var data = doc.RootElement;
 
-        // Получаем список пользователей для этого шаблона
+        // Get the list of users for this template.
         var templateUsers = template.NotificationTemplateUsers;
 
         foreach (var user in templateUsers)
@@ -898,21 +899,21 @@ public class NotificationService(
         result = result.Replace("{Date}", DateTime.UtcNow.ToString("yyyy-MM-dd"));
         result = result.Replace("{Time}", DateTime.UtcNow.ToString("HH:mm:ss"));
 
-        // Ищем все плейсхолдеры в формате {PropertyName}
+        // Find all placeholders in the {PropertyName} format.
         var matches = Regex.Matches(template, @"{(\w+)}");
 
         foreach (Match match in matches)
         {
             var propertyName = match.Groups[1].Value;
 
-            // Игнорируем системные плейсхолдеры
+            // Ignore system placeholders.
             if (propertyName.Equals("UserId", StringComparison.OrdinalIgnoreCase))
             {
                 result = result.Replace(match.Value, userId.ToString());
                 continue;
             }
 
-            // Ищем свойство в JSON
+            // Look for the property in JSON.
             if (data.TryGetProperty(propertyName, out var propertyValue) &&
                 propertyValue.ValueKind != JsonValueKind.Null)
             {

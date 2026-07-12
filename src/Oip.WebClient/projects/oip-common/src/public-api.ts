@@ -19,6 +19,9 @@ export { AppConfiguratorComponent } from './components/app-configurator.componen
 export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator.component';
 export { DiscussionComponent } from './components/discussion.component';
 export { IframeModuleComponent } from './components/iframe-module.component';
+export {
+  ExtensionModuleHostComponent
+} from './components/extension-module-host.component';
 export { UserNotificationsComponent } from './components/user-notifications.component';
 export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher.component';
 
@@ -41,6 +44,7 @@ export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './servi
 export { NotificationService } from './services/notification.service';
 export { ApplicationRegistryService } from './services/application-registry.service';
 export { TableFilterService } from './services/table-filter.service';
+export { ExtensionLoaderService } from './extension-host/extension-loader.service';
 export {
   APP_THEME_PRESETS,
   APP_THEME_PRESETS_MERGE_MODE,
@@ -56,11 +60,28 @@ export { MenuChangeEvent } from './events/menu-change.event';
 // other
 export { langIntercept } from './intercepts/i18n-intercept.service';
 export { ContentType, HttpClient, RequestParams } from './api/http-client';
+export {
+  OipExtensionHostContext,
+  OipExtensionLoadType,
+  OipExtensionManifest,
+  OipExtensionModuleMetadata,
+  OipExtensionNavigateEvent,
+  OipExtensionNotifyEvent
+} from './extension-host/extension-host.types';
+export {
+  OIP_EXTENSION_EVENTS,
+  emitOipContextChange,
+  emitOipError,
+  emitOipNavigate,
+  emitOipNotify,
+  emitOipSettingsChange,
+  emitOipTitleChange
+} from './extension-host/extension-host.events';
 export { FolderModuleApi } from './api/folder-module.api';
 export { IframeModuleApi } from './api/iframe-module.api';
 export { SecurityApi } from './api/security.api';
 export { ApplicationsApi } from './api/applications.api';
-import { ApplicationRegistryItemDto } from './api/applications-data-contracts'
 export { UserProfileApi } from './api/user-profile.api';
-export { convertToPrimeNgDateFormat } from './helpers/date.helper'
+export { convertToPrimeNgDateFormat } from './helpers/date.helper';
 export { NotificationApi } from './api/notification.api';
+export { CustomElementExtensionModuleHostComponent } from "./components/custom-element-extension-module-host.component";

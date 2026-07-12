@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
+using Oip.Base.Data.Extensions;
 using Oip.Base.Settings;
-using Oip.Data.Extensions;
 using Oip.Discussions.Base.Data;
 
 namespace Oip.Discussions.Base.Extensions;
@@ -11,20 +11,23 @@ namespace Oip.Discussions.Base.Extensions;
 public static class WebApplicationExtensions
 {
     /// <summary>
-    /// Configures the local discussions module for the current host.
+    /// Configures the discussions module for the current host.
     /// </summary>
-    public static void AddDiscussionsModuleLocal(this WebApplication app)
+    public static void UseDiscussionsService(this WebApplication app, ISettings settings)
     {
-        app.MigrateDatabase<DiscussionsDbContext>();
-    }
+        if (settings.ServiceAddingMode is AddingMode.Local or AddingMode.Service)
+        {
+            app.MigrateDatabase<DiscussionsDbContext>();
+        }
 
-    /// <summary>
-    /// Adds the discussions service to the application.
-    /// </summary>
-    /// <param name="app">The application builder.</param>
-    /// <param name="settings">The application settings.</param>
-    public static void AddDiscussions(this WebApplication app, IBaseOipModuleAppSettings settings)
-    {
-        app.MigrateDatabase<DiscussionsDbContext>();
+        switch (settings.ServiceAddingMode)
+        {
+            case AddingMode.Local:
+            case AddingMode.Service:
+            case AddingMode.Remote:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 }

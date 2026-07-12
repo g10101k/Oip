@@ -1,0 +1,17 @@
+{
+  "external-module-example-module": {
+    "title": "Модуль ExternalModuleExample",
+    "content": {
+      "subtitle": "Содержимое модуля ExternalModuleExample.",
+      "loading": "Загрузка данных...",
+      "message": "Сообщение",
+      "generatedAt": "Сформировано"
+    },
+    "errorFetchingMessage": "Не удалось загрузить данные модуля",
+    "settings": {
+      "title": "Настройки модуля ExternalModuleExample",
+      "dayCount": "Количество дней",
+      "save": "Сохранить"
+    }
+  }
+}

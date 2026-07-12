@@ -5,7 +5,7 @@ namespace Oip.Users.Base.Services;
 
 /// <summary>
 /// Local implementation of IUserService that accesses the database directly.
-/// Used when IsStandalone is true.
+/// Used by standalone applications and the distributed users service.
 /// </summary>
 public class LocalUserService(UserRepository userRepository) : IUserService
 {

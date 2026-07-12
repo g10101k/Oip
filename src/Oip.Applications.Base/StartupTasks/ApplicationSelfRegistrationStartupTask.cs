@@ -10,7 +10,7 @@ namespace Oip.Applications.Base.StartupTasks;
 /// </summary>
 public class ApplicationSelfRegistrationStartupTask(
     IApplicationRegistryService registryService,
-    IBaseOipModuleAppSettings appSettings,
+    ISettings appSettings,
     ILogger<ApplicationSelfRegistrationStartupTask> logger)
     : IStartupTask
 {

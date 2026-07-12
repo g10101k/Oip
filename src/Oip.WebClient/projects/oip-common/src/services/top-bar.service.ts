@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 import { TopBarDto } from '../dtos/top-bar.dto';
 
 @Injectable({
@@ -6,6 +7,9 @@ import { TopBarDto } from '../dtos/top-bar.dto';
 })
 export class TopBarService {
   topBarItems: TopBarDto[] = [];
+  private readonly activeIdSubject = new Subject<string | undefined>();
+
+  readonly activeId$ = this.activeIdSubject.asObservable();
 
   private _activeId: string | undefined;
 
@@ -26,7 +30,9 @@ export class TopBarService {
 
   set activeId(value: string | undefined) {
     this._activeId = value;
-    if (this.activeTopBarItem?.click) this.activeTopBarItem.click();
+    const activeTopBarItem = this.activeTopBarItem;
+    if (activeTopBarItem?.click) activeTopBarItem.click();
+    this.activeIdSubject.next(value);
   }
 
   constructor() {}
@@ -37,8 +43,10 @@ export class TopBarService {
   }
 
   checkId(id: string): boolean {
-    if (this.activeTopBarItem === undefined && id === 'content') return true;
-    if (this.activeTopBarItem === undefined) return false;
-    return this.activeTopBarItem.id == id;
+    const activeTopBarItem = this.activeTopBarItem;
+    const result = activeTopBarItem === undefined
+      ? id === 'content'
+      : activeTopBarItem.id == id;
+    return result;
   }
 }

@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Oip.Base.Data.Constants;
+using Oip.Base.Data.Dtos;
+using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
 using Oip.Base.Services;
-using Oip.Data.Constants;
-using Oip.Data.Dtos;
-using Oip.Data.Repositories;
 
-namespace Oip.Api.Controllers;
+namespace Oip.Base.Controllers;
 
 /// <summary>
 /// API controller for retrieving and managing application menus.
@@ -15,7 +15,7 @@ namespace Oip.Api.Controllers;
 [ApiController]
 [Route("api/menu")]
 [ApiExplorerSettings(GroupName = "base")]
-public class MenuController(ModuleRepository moduleRepository, UserService userService) : ControllerBase
+public class MenuController(ModuleRepository moduleRepository, ClaimService claimService) : ControllerBase
 {
     /// <summary>
     /// Retrieves the menu available to the current authenticated user.
@@ -24,7 +24,7 @@ public class MenuController(ModuleRepository moduleRepository, UserService userS
     [Authorize, HttpGet("get")]
     public async Task<IEnumerable<ModuleInstanceDto>> Get()
     {
-        var menu = await moduleRepository.GetModuleForMenuAll(userService.GetUserRoles());
+        var menu = await moduleRepository.GetModuleForMenuAll(claimService.GetUserRoles());
         return menu;
     }
 

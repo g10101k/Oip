@@ -6,7 +6,7 @@ import { Injectable } from "@angular/core";
 import {
   ApiExceptionResponse,
   FolderModuleSettings,
-  GetModuleInstanceSettingsParams,
+  GetModuleInstanceSettingsParams2,
 } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
@@ -15,7 +15,7 @@ export class FolderModuleApi<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   getModuleInstanceSettings = (
-    query: GetModuleInstanceSettingsParams,
+    query: GetModuleInstanceSettingsParams2,
     params: RequestParams = {},
   ) =>
     this.request<FolderModuleSettings, ApiExceptionResponse>({

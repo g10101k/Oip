@@ -1,6 +1,6 @@
 using Oip.Base.Settings;
 
-namespace Oip.Applications.Base.Data;
+namespace Oip.Applications.Base.Data.Entities;
 
 /// <summary>
 /// Persisted frontend application registry item.

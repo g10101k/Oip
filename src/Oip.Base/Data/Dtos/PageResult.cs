@@ -1,4 +1,4 @@
-namespace Oip.Data.Dtos;
+namespace Oip.Base.Data.Dtos;
 
 /// <summary>
 /// Paged result set containing a list of items along with pagination metadata

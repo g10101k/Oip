@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Caching.Distributed;
@@ -32,6 +34,7 @@ using Oip.Base.Clients;
 using Oip.Base.Exceptions;
 using Oip.Base.Helpers;
 using Oip.Base.Middlewares;
+using Oip.Base.Providers;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
@@ -60,13 +63,13 @@ public static class OipModuleApplication
     /// <param name="settings">App settings</param>
     /// <returns></returns>
     [Obsolete("Use particle method call")]
-    public static WebApplicationBuilder CreateModuleBuilder(IBaseOipModuleAppSettings settings)
+    public static WebApplicationBuilder CreateModuleBuilder(ISettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
-        builder.AddDefaultHealthChecks();
-        builder.AddOipForwardedHeaders(settings);
-        builder.AddDefaultAuthentication(settings);
-        builder.AddOpenApi(settings);
+        builder.Services.AddDefaultHealthChecks();
+        builder.Services.AddForwardedHeaders(settings);
+        builder.Services.AddDefaultAuthentication(settings);
+        builder.Services.AddOpenApi(settings);
         builder.Services.AddControllersWithViews();
         builder.Services.AddSingleton(settings);
         return builder;
@@ -78,21 +81,21 @@ public static class OipModuleApplication
     /// <param name="settings">App settings</param>
     /// <returns></returns>
     [Obsolete("Use particle method call")]
-    public static WebApplicationBuilder CreateShellBuilder(IBaseOipModuleAppSettings settings)
+    public static WebApplicationBuilder CreateShellBuilder(ISettings settings)
     {
         var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
         builder.AddNlog();
-        builder.AddDefaultHealthChecks();
-        builder.AddOipForwardedHeaders(settings);
-        builder.AddDefaultAuthentication(settings);
-        builder.AddOpenApi(settings);
+        builder.Services.AddDefaultHealthChecks();
+        builder.Services.AddForwardedHeaders(settings);
+        builder.Services.AddDefaultAuthentication(settings);
+        builder.Services.AddOpenApi(settings);
         builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
         builder.Services.AddStartupRunner();
         builder.Services.AddSingleton(settings);
-        builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<ClaimService>();
         builder.Services.AddCors();
-        builder.AddControllersAndView();
-        builder.AddLocalization();
+        builder.Services.AddControllersAndView();
+        builder.Services.AddOipLocalization();
 
         return builder;
     }
@@ -100,29 +103,52 @@ public static class OipModuleApplication
     /// <summary>
     /// Adds controllers and configures JSON options for the application builder
     /// </summary>
-    /// <param name="builder">The WebApplicationBuilder instance</param>
-    /// <returns>The modified WebApplicationBuilder instance</returns>
-    public static WebApplicationBuilder AddControllersAndView(this WebApplicationBuilder builder)
+    /// <param name="services">The service collection</param>
+    /// <returns>The modified service collection</returns>
+    public static IServiceCollection AddControllersAndView(this IServiceCollection services)
     {
-        var explicitControllerRegistry = ExplicitControllerRegistrationExtensions.GetOrCreateRegistry(builder.Services);
-        builder.Services.AddControllers().AddJsonOptions(option =>
+        services.AddControllers().AddJsonOptions(option =>
         {
             option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-        var mvcBuilder = builder.Services.AddMvc().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        });
-        mvcBuilder.ConfigureApplicationPartManager(partManager =>
-        {
-            for (var i = partManager.FeatureProviders.Count - 1; i >= 0; i--)
-            {
-                if (partManager.FeatureProviders[i] is ControllerFeatureProvider)
-                    partManager.FeatureProviders.RemoveAt(i);
-            }
 
-            partManager.FeatureProviders.Add(new ExplicitControllerFeatureProvider(explicitControllerRegistry));
-        });
+        CommonMvcBuilderProducer(services);
+
+        return services;
+    }
+
+    /// <summary>
+    /// Used to avoid depending on the call order of AddControllersAndView and AddController.
+    /// </summary>
+    private static IMvcBuilder CommonMvcBuilderProducer(IServiceCollection services)
+    {
+        IMvcBuilder mvcBuilder;
+        var mvcBuilderHolderDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(MvcBuilderHolder));
+        if (mvcBuilderHolderDescriptor?.ImplementationInstance is MvcBuilderHolder mvcBuilderHolder)
+        {
+            mvcBuilder = mvcBuilderHolder.Builder;
+        }
+        else
+        {
+            mvcBuilder = services.AddMvc().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            });
+            services.AddSingleton(new MvcBuilderHolder(mvcBuilder));
+        }
+
+        return mvcBuilder;
+    }
+
+    /// <summary>
+    /// Adds controllers and configures JSON options for the application builder
+    /// </summary>
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    /// <returns>The modified WebApplicationBuilder instance</returns>
+    [Obsolete("Use extension for IServiceCollection")]
+    public static WebApplicationBuilder AddControllersAndView(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddControllersAndView();
         return builder;
     }
 
@@ -139,10 +165,10 @@ public static class OipModuleApplication
     /// <summary>
     /// Configures localization options for the application
     /// </summary>
-    /// <param name="builder">The WebApplicationBuilder instance</param>
-    public static void AddLocalization(this WebApplicationBuilder builder)
+    /// <param name="services">The service collection</param>
+    public static IServiceCollection AddOipLocalization(this IServiceCollection services)
     {
-        builder.Services.Configure<RequestLocalizationOptions>(options =>
+        services.Configure<RequestLocalizationOptions>(options =>
         {
             var supportedCultures = new List<CultureInfo>
             {
@@ -153,19 +179,31 @@ public static class OipModuleApplication
             options.SupportedCultures = supportedCultures;
             options.SupportedUICultures = supportedCultures;
         });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Configures localization options for the application
+    /// </summary>
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    [Obsolete("Use extension for IServiceCollection")]
+    public static void AddLocalization(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddOipLocalization();
     }
 
     /// <summary>
     /// Adds OpenAPI/Swagger support to the application builder
     /// </summary>
     /// <param name="settings">The application settings</param>
-    /// <param name="builder">The WebApplicationBuilder instance</param>
-    public static void AddOpenApi(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    /// <param name="services">The service collection</param>
+    public static IServiceCollection AddOpenApi(this IServiceCollection services, ISettings settings)
     {
         var openApiSettings = settings.OpenApi;
         if (openApiSettings.All(x => !x.Publish))
-            return;
-        builder.Services.AddSwaggerGen(options =>
+            return services;
+        services.AddSwaggerGen(options =>
         {
             var path = Path.GetDirectoryName(typeof(OipModuleApplication).Assembly.Location);
             if (path == null) return;
@@ -225,28 +263,72 @@ public static class OipModuleApplication
                 return apiDesc.GroupName == docName;
             });
         });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds OpenAPI/Swagger support to the application builder
+    /// </summary>
+    /// <param name="settings">The application settings</param>
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    [Obsolete("Use extension for IServiceCollection")]
+    public static void AddOpenApi(this WebApplicationBuilder builder, ISettings settings)
+    {
+        builder.Services.AddOpenApi(settings);
+    }
+
+    /// <summary>
+    /// Add a default liveness check to ensure app is responsive
+    /// </summary>
+    public static IServiceCollection AddDefaultHealthChecks(this IServiceCollection services)
+    {
+        services.AddHealthChecks()
+            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+
+        return services;
     }
 
     /// <summary>
     /// Add a default liveness check to ensure app is responsive
     /// </summary>
     /// <param name="builder">The WebApplicationBuilder instance</param>
+    [Obsolete("Use extension for IServiceCollection")]
     public static void AddDefaultHealthChecks(this WebApplicationBuilder builder)
     {
-        builder.Services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+        builder.Services.AddDefaultHealthChecks();
     }
 
-    /// <param name="builder">The WebApplicationBuilder instance</param>
-    /// <param name="settings">Settings</param>
-    public static void AddOpenTelemetry(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddOpenTelemetry(this IServiceCollection services,
+        ISettings settings)
     {
         if (settings.OpenTelemetry.Enable)
-            builder.Services.AddOpenTelemetry()
+            services.AddOpenTelemetry()
                 .WithMetrics(metrics => metrics
                     .AddAspNetCoreInstrumentation()
                     .AddRuntimeInstrumentation()
                     .AddPrometheusExporter());
+
+        return services;
+    }
+
+    [Obsolete("Use extension for IServiceCollection")]
+    public static void AddOpenTelemetry(this WebApplicationBuilder builder, ISettings settings)
+    {
+        builder.Services.AddOpenTelemetry(settings);
+    }
+
+    /// <summary>
+    /// Configures forwarded headers support from the ReverseProxy configuration section.
+    /// </summary>
+    /// <param name="services">The service collection</param>
+    /// <param name="configuration">The application configuration.</param>
+    /// <returns>The configured service collection.</returns>
+    public static IServiceCollection AddForwardedHeaders(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var settings = configuration.GetSection("ReverseProxy").Get<ReverseProxySettings>() ?? new();
+        return services.AddForwardedHeaders(settings);
     }
 
     /// <summary>
@@ -254,10 +336,23 @@ public static class OipModuleApplication
     /// </summary>
     /// <param name="builder">The WebApplicationBuilder instance</param>
     /// <returns>The configured web application builder.</returns>
-    public static WebApplicationBuilder AddOipForwardedHeaders(this WebApplicationBuilder builder)
+    [Obsolete("Use extension for IServiceCollection")]
+    public static WebApplicationBuilder AddForwardedHeaders(this WebApplicationBuilder builder)
     {
-        var settings = builder.Configuration.GetSection("ReverseProxy").Get<ReverseProxySettings>() ?? new();
-        return builder.AddOipForwardedHeaders(settings);
+        builder.Services.AddForwardedHeaders(builder.Configuration);
+        return builder;
+    }
+
+    /// <summary>
+    /// Configures forwarded headers support.
+    /// </summary>
+    /// <param name="services">The service collection</param>
+    /// <param name="settings">The base Oip module application settings.</param>
+    /// <returns>The configured service collection.</returns>
+    public static IServiceCollection AddForwardedHeaders(this IServiceCollection services,
+        ISettings settings)
+    {
+        return services.AddForwardedHeaders(settings.ReverseProxy);
     }
 
     /// <summary>
@@ -266,16 +361,18 @@ public static class OipModuleApplication
     /// <param name="builder">The WebApplicationBuilder instance</param>
     /// <param name="settings">The base Oip module application settings.</param>
     /// <returns>The configured web application builder.</returns>
-    public static WebApplicationBuilder AddOipForwardedHeaders(this WebApplicationBuilder builder,
-        IBaseOipModuleAppSettings settings)
+    [Obsolete("Use extension for IServiceCollection")]
+    public static WebApplicationBuilder AddForwardedHeaders(this WebApplicationBuilder builder,
+        ISettings settings)
     {
-        return builder.AddOipForwardedHeaders(settings.ReverseProxy);
+        builder.Services.AddForwardedHeaders(settings);
+        return builder;
     }
 
-    private static WebApplicationBuilder AddOipForwardedHeaders(this WebApplicationBuilder builder,
+    private static IServiceCollection AddForwardedHeaders(this IServiceCollection services,
         ReverseProxySettings settings)
     {
-        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        services.Configure<ForwardedHeadersOptions>(options =>
         {
             if (!settings.Enabled)
             {
@@ -310,22 +407,22 @@ public static class OipModuleApplication
             }
         });
 
-        return builder;
+        return services;
     }
 
     /// <summary>
     /// Configures default authentication using JWT Bearer scheme.
     /// </summary>
     /// <param name="settings">The base Oip module application settings.</param>
-    /// <param name="builder">The WebApplicationBuilder instance</param>
-    /// <returns>The configured web application builder.</returns>
-    public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder,
-        IBaseOipModuleAppSettings settings)
+    /// <param name="services">The service collection</param>
+    /// <returns>The configured service collection.</returns>
+    public static IServiceCollection AddDefaultAuthentication(this IServiceCollection services,
+        ISettings settings)
     {
-        builder.Services.AddDataProtection()
+        services.AddDataProtection()
             .SetApplicationName("OIP");
-        builder.Services.AddAuthenticationTicketStore(settings.SecurityService.AuthTicketStore);
-        builder.Services.AddAntiforgery(options =>
+        services.AddAuthenticationTicketStore(settings.SecurityService.AuthTicketStore);
+        services.AddAntiforgery(options =>
         {
             options.HeaderName = CsrfHeaderName;
             options.Cookie.Name = "__Host-OIP-CSRF";
@@ -334,7 +431,7 @@ public static class OipModuleApplication
             options.Cookie.SameSite = SameSiteMode.Lax;
         });
 
-        builder.Services.AddAuthentication(options =>
+        services.AddAuthentication(options =>
             {
                 options.DefaultScheme = DefaultAuthenticationScheme;
                 options.DefaultChallengeScheme = DefaultAuthenticationScheme;
@@ -402,10 +499,10 @@ public static class OipModuleApplication
                 {
                     ValidIssuers = CreateValidIssuers(urlWithRealm, dockerInternalUrl),
                     IssuerSigningKeyResolver = (_, _, _, _) =>
-                        GetSigningKeys(backchannelUrlWithRealm, builder.Environment.IsDevelopment()),
+                        GetSigningKeys(backchannelUrlWithRealm, settings.IsDevelopment()),
                     ClockSkew = TimeSpan.FromSeconds(settings.SecurityService.ClockSkewSeconds)
                 };
-                if (builder.Environment.IsDevelopment())
+                if (settings.IsDevelopment())
                 {
                     options.BackchannelHttpHandler = CreateDevelopmentHttpClientHandler();
                 }
@@ -480,12 +577,12 @@ public static class OipModuleApplication
                     ClockSkew = TimeSpan.FromSeconds(settings.SecurityService.ClockSkewSeconds)
                 };
 
-                if (builder.Environment.IsDevelopment())
+                if (settings.IsDevelopment())
                 {
                     options.BackchannelHttpHandler = CreateDevelopmentHttpClientHandler();
                 }
 
-                if (builder.Environment.IsDevelopment() && dockerInternalUrl is not null)
+                if (settings.IsDevelopment() && dockerInternalUrl is not null)
                 {
                     options.TokenValidationParameters.IssuerSigningKeyResolver =
                         (token, securityToken, kid, parameters) =>
@@ -516,20 +613,34 @@ public static class OipModuleApplication
                     }
                 };
             });
-        builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
-        builder.Services.AddAuthorization(options =>
+        services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
+        services.AddAuthorization(options =>
         {
             options.DefaultPolicy = new AuthorizationPolicyBuilder(DefaultAuthenticationScheme)
                 .RequireAuthenticatedUser()
                 .Build();
         });
-        builder.Services.AddHttpClient<KeycloakClient>(x =>
+        services.AddHttpClient<KeycloakClient>(x =>
                 x.BaseAddress = new Uri(settings.SecurityService.DockerUrl ?? settings.SecurityService.BaseUrl))
-            .ConfigurePrimaryHttpMessageHandler(() => builder.Environment.IsDevelopment()
+            .ConfigurePrimaryHttpMessageHandler(() => settings.IsDevelopment()
                 ? CreateDevelopmentHttpClientHandler()
                 : new HttpClientHandler());
-        builder.Services.AddScoped<UserService>();
-        builder.Services.AddScoped<KeycloakService>();
+        services.AddScoped<ClaimService>();
+        services.AddScoped<KeycloakService>();
+        return services;
+    }
+
+    /// <summary>
+    /// Configures default authentication using JWT Bearer scheme.
+    /// </summary>
+    /// <param name="settings">The base Oip module application settings.</param>
+    /// <param name="builder">The WebApplicationBuilder instance</param>
+    /// <returns>The configured web application builder.</returns>
+    [Obsolete("Use extension for IServiceCollection")]
+    public static WebApplicationBuilder AddDefaultAuthentication(this WebApplicationBuilder builder,
+        ISettings settings)
+    {
+        builder.Services.AddDefaultAuthentication(settings);
         return builder;
     }
 
@@ -678,7 +789,7 @@ public static class OipModuleApplication
     /// <param name="builder">The WebApplicationBuilder instance</param>
     /// <returns></returns>
     [Obsolete("Use particle method call")]
-    public static WebApplication BuildApp(this WebApplicationBuilder builder, IBaseOipModuleAppSettings settings)
+    public static WebApplication BuildApp(this WebApplicationBuilder builder, ISettings settings)
     {
         var app = builder.Build();
         app.UseOipForwardedHeaders();
@@ -832,7 +943,7 @@ public static class OipModuleApplication
     /// </summary>
     /// <param name="settings">The application settings</param>
     /// <param name="app">The application builder</param>
-    public static void MapOpenApi(this WebApplication app, IBaseOipModuleAppSettings settings)
+    public static void MapOpenApi(this WebApplication app, ISettings settings)
     {
         if (settings.OpenApi.All(x => !x.Publish))
             return;
@@ -924,7 +1035,7 @@ public static class OipModuleApplication
     /// </summary>
     /// <param name="settings">The application settings</param>
     /// <param name="app">The application builder</param>
-    public static void MapOpenTelemetry(this WebApplication app, IBaseOipModuleAppSettings settings)
+    public static void MapOpenTelemetry(this WebApplication app, ISettings settings)
     {
         if (settings.OpenTelemetry.Enable)
             app.MapPrometheusScrapingEndpoint();
@@ -955,16 +1066,71 @@ public static class OipModuleApplication
     /// <summary>
     /// Configures data protection services
     /// </summary>
-    public static void AddOipDataProtection(this IServiceCollection services, IBaseOipModuleAppSettings baseSettings)
+    public static void AddDataProtection(this IServiceCollection services, ISettings baseSettings)
     {
         var settings = baseSettings.DataProtection;
 
         var dataProtectionBuilder = services.AddDataProtection()
-            .SetApplicationName(settings.ApplicationName);
+            .SetApplicationName("OIP");
         if (settings.PersistKeysToFileSystemPath is not null)
             dataProtectionBuilder.PersistKeysToFileSystem(new DirectoryInfo(settings.PersistKeysToFileSystemPath));
         dataProtectionBuilder.SetDefaultKeyLifetime(TimeSpan.FromDays(settings.DefaultKeyLifetimeInDay));
-        
+
         services.AddScoped<CryptService>();
+    }
+
+    /// <summary>
+    /// Adds the OIP CORS policy provider to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection to add the service to.</param>
+    /// <param name="baseSettings">The base OIP module application settings.</param>
+    public static IServiceCollection AddCors(this IServiceCollection services, ISettings baseSettings)
+    {
+        services.AddCors()
+            .AddSingleton<ICorsPolicyProvider>(new CorsPolicyProvider(baseSettings.Cors));
+        return services;
+    }
+
+    /// <summary>
+    /// Registers a controller type that should be exposed by ASP.NET Core MVC.
+    /// </summary>
+    public static IServiceCollection AddController<TController>(this IServiceCollection services)
+        where TController : ControllerBase
+    {
+        GetOrCreateRegistry(services).Add(typeof(TController));
+        return services;
+    }
+
+    internal static ExplicitControllerRegistry GetOrCreateRegistry(IServiceCollection services)
+    {
+        var descriptor = services.FirstOrDefault(x => x.ServiceType == typeof(ExplicitControllerRegistry));
+        if (descriptor?.ImplementationInstance is ExplicitControllerRegistry existingRegistry)
+            return existingRegistry;
+
+        var newRegistry = new ExplicitControllerRegistry();
+
+        var mvcBuilder = CommonMvcBuilderProducer(services);
+
+        mvcBuilder.ConfigureApplicationPartManager(partManager =>
+        {
+            for (var i = partManager.FeatureProviders.Count - 1; i >= 0; i--)
+            {
+                if (partManager.FeatureProviders[i] is ControllerFeatureProvider)
+                    partManager.FeatureProviders.RemoveAt(i);
+            }
+
+            partManager.FeatureProviders.Add(new ExplicitControllerFeatureProvider(newRegistry));
+        });
+
+        services.AddSingleton(newRegistry);
+        return newRegistry;
+    }
+
+    internal static ExplicitControllerRegistry? GetExistingRegistry(IServiceCollection services)
+    {
+        var descriptor = services.FirstOrDefault(x =>
+            x.ServiceType == typeof(ExplicitControllerRegistry));
+
+        return descriptor?.ImplementationInstance as ExplicitControllerRegistry;
     }
 }

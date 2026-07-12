@@ -1,4 +1,4 @@
-﻿namespace Oip.Data.Entities;
+﻿namespace Oip.Base.Data.Entities;
 
 /// <summary>
 /// Module entity
@@ -25,6 +25,61 @@ public class ModuleEntity
     /// Route link to component
     /// </summary>
     public string? RouterLink { get; set; }
+
+    /// <summary>
+    /// Module delivery kind.
+    /// </summary>
+    public ModuleKind Kind { get; set; } = ModuleKind.Core;
+
+    /// <summary>
+    /// URL of the extension manifest, if this module is an extension.
+    /// </summary>
+    public string? ManifestUrl { get; set; }
+
+    /// <summary>
+    /// Stable extension key.
+    /// </summary>
+    public string? ExtensionKey { get; set; }
+
+    /// <summary>
+    /// Extension loader type.
+    /// </summary>
+    public string? LoadType { get; set; }
+
+    /// <summary>
+    /// Custom element tag name exposed by the extension bundle.
+    /// </summary>
+    public string? ElementName { get; set; }
+
+    /// <summary>
+    /// JavaScript entrypoint that registers the custom element.
+    /// </summary>
+    public string? ScriptUrl { get; set; }
+
+    /// <summary>
+    /// Module Federation remote entry URL.
+    /// </summary>
+    public string? RemoteEntryUrl { get; set; }
+
+    /// <summary>
+    /// Module Federation exposed module name.
+    /// </summary>
+    public string? ExposedModule { get; set; }
+
+    /// <summary>
+    /// Exported Angular component name.
+    /// </summary>
+    public string? ComponentName { get; set; }
+
+    /// <summary>
+    /// Backend API base URL for the extension service.
+    /// </summary>
+    public string? ApiBaseUrl { get; set; }
+
+    /// <summary>
+    /// Extension version.
+    /// </summary>
+    public string? Version { get; set; }
     
     /// <summary>
     /// Module Securities

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Data.Contexts;
-using Oip.Data.Repositories;
+using Oip.Base.Data.Contexts;
+using Oip.Base.Data.Repositories;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 
@@ -39,7 +39,7 @@ public static class ServiceCollectionExtension
         where T : DbContext
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(connectionString);
-        // Регистрируем DbContext с лямбдой конфигурации
+        // Register DbContext with a configuration lambda.
         return services.AddDbContext<T>((serviceProvider, options) =>
         {
             switch (connectionModel.Provider)

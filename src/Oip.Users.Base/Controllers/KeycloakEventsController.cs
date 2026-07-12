@@ -19,7 +19,7 @@ namespace Oip.Users.Base.Controllers;
 [Route("api/keycloak-events")]
 public class KeycloakEventsController(
     KeycloakSyncService keycloakSyncService,
-    UserSyncOptions options,
+    KeycloakSyncSettings settings,
     ILogger<KeycloakEventsController> logger) : ControllerBase
 {
     private const string SignatureHeaderName = "X-Keycloak-Signature";
@@ -82,7 +82,7 @@ public class KeycloakEventsController(
 
     private bool ValidateSignature(string body)
     {
-        if (string.IsNullOrWhiteSpace(options.SharedSecret))
+        if (string.IsNullOrWhiteSpace(settings.SharedSecret))
         {
             logger.LogWarning("Keycloak event shared secret is not configured.");
             return false;
@@ -94,7 +94,7 @@ public class KeycloakEventsController(
             return false;
         }
 
-        var expectedSignature = CalculateHmacSha256(body, options.SharedSecret);
+        var expectedSignature = CalculateHmacSha256(body, settings.SharedSecret);
         return CryptographicOperations.FixedTimeEquals(
             Encoding.UTF8.GetBytes(expectedSignature),
             Encoding.UTF8.GetBytes(signature.Trim()));

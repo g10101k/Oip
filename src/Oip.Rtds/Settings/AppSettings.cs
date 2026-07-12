@@ -4,8 +4,8 @@ using Oip.Settings;
 
 namespace Oip.Rtds.Settings;
 
-/// <inheritdoc cref="IBaseOipModuleAppSettings"/>
-public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings, IRtdsAppSettings
+/// <inheritdoc cref="ISettings"/>
+public class AppSettings : BaseAppSettings<AppSettings>, ISettings, IRtdsAppSettings
 {
     /// <summary>
     /// Gets or sets the connection string for the RTD service
@@ -44,7 +44,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
     /// <inheritdoc />
-    public bool IsStandalone { get; set; } = false;
+    public AddingMode ServiceAddingMode { get; set; } = AddingMode.Remote;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
@@ -54,4 +54,6 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
 
     /// <inheritdoc />
     public bool GenerateWebClient { get; set; }
+    
+    public CorsSettings Cors { get; set; } = new();
 }

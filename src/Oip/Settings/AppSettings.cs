@@ -6,7 +6,7 @@ namespace Oip.Settings;
 /// <summary>
 /// Application settings
 /// </summary>
-public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
+public class AppSettings : BaseAppSettings<AppSettings>, ISettings
 {
     /// <inheritdoc />
     public OipServicesSettings Services { get; set; } = new();
@@ -39,7 +39,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
     /// <inheritdoc />
-    public bool IsStandalone { get; set; } = false;
+    public AddingMode ServiceAddingMode { get; set; } = AddingMode.Local;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
@@ -51,9 +51,14 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public bool GenerateWebClient { get; set; }
 
     /// <summary>
-    /// User synchronization option
+    /// CORS Settings
     /// </summary>
-    public UserSyncOptions UserSyncOptions { get; set; } = new();
+    public CorsSettings Cors { get; set; } = new();
+
+    /// <summary>
+    /// Keycloak synchronization settings
+    /// </summary>
+    public KeycloakSyncSettings KeycloakSync { get; set; } = new();
 
     /// <summary>
     /// User photo storage

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Oip.Data.Contexts;
-using Oip.Data.Entities;
-using Oip.Data.Repositories;
+using Oip.Base.Data.Contexts;
+using Oip.Base.Data.Entities;
+using Oip.Base.Data.Repositories;
 
 namespace Oip.Test;
 

@@ -30,6 +30,7 @@
 
 * [Модули](./Modules.md)
 * [Локализация](./L10n.md)
+* [Регистрация контроллеров](./ControllerRegistration.md)
 * [Генерация клиентов web api](./SwaggerWebClientGenerator.md)
 * [Режим standalone & distributed](./StandaloneAndDistributedMode.md)
 * [Безопасность](./Security.md)
