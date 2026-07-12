@@ -20,9 +20,9 @@ internal static class Program
         {
             var settings = AppSettings.Initialize(args, false, true);
 
-            if (settings.AddingMode != AddingMode.Service)
+            if (settings.ServiceAddingMode != AddingMode.Service)
             {
-                logger.Warn("Oip.Users must be configured with StartupMode.DistributedService.");
+                logger.Warn("Oip.Users must be configured with ServiceAddingMode.Service.");
                 return;
             }
 

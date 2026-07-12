@@ -38,7 +38,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
     /// <inheritdoc />
-    public AddingMode AddingMode { get; set; } = AddingMode.Service;
+    public AddingMode ServiceAddingMode { get; set; } = AddingMode.Service;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
@@ -52,7 +52,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     /// <summary>
     /// Represents synchronization options for the application.
     /// </summary>
-    public UserSyncOptions UserSyncOptions { get; set; } = new();
+    public KeycloakSyncSettings KeycloakSyncSettings { get; set; } = new();
     
     public CorsSettings Cors { get; set; } = new();
 }
@@ -60,7 +60,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
 /// <summary>
 /// Represents synchronization options for the application.
 /// </summary>
-public class UserSyncOptions
+public class KeycloakSyncSettings
 {
     /// <summary>
     /// Gets or sets the synchronization interval in seconds.

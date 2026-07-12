@@ -17,12 +17,12 @@ public static class WebApplicationExtensions
     /// </summary>
     public static void UseApplicationsService(this WebApplication app, ISettings settings)
     {
-        if (settings.AddingMode is AddingMode.Local or AddingMode.Service)
+        if (settings.ServiceAddingMode is AddingMode.Local or AddingMode.Service)
         {
             app.MigrateApplicationsDatabase();
         }
 
-        switch (settings.AddingMode)
+        switch (settings.ServiceAddingMode)
         {
             case AddingMode.Local:
                 break;

@@ -19,7 +19,7 @@ public class KeycloakSyncService(
     UserRepository userRepository,
     UserService userService,
     INotificationPublisher notificationPublisher,
-    UserSyncOptions userSyncOptions,
+    KeycloakSyncSettings keycloakSyncSettings,
     ILogger<KeycloakSyncService> logger)
 {
     private static readonly ConcurrentDictionary<string, SemaphoreSlim> SyncLocks =
@@ -182,7 +182,7 @@ public class KeycloakSyncService(
         logger.LogInformation("Starting full user synchronization");
         var startTime = DateTimeOffset.UtcNow;
         var totalUsers = await keycloakService.GetUsersCountAsync();
-        var batches = (int)Math.Ceiling((double)totalUsers / userSyncOptions.BatchSize);
+        var batches = (int)Math.Ceiling((double)totalUsers / keycloakSyncSettings.BatchSize);
         var syncedKeycloakIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         logger.LogInformation("Synchronizing {TotalUsers} users in {Batches} batches", totalUsers, batches);
@@ -191,8 +191,8 @@ public class KeycloakSyncService(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var offset = i * userSyncOptions.BatchSize;
-            var syncedCount = await SyncUsersBatchAsync(offset, userSyncOptions.BatchSize, syncedKeycloakIds);
+            var offset = i * keycloakSyncSettings.BatchSize;
+            var syncedCount = await SyncUsersBatchAsync(offset, keycloakSyncSettings.BatchSize, syncedKeycloakIds);
             logger.LogInformation("Batch {BatchNumber}: Synced {SyncedCount} users", i + 1, syncedCount);
 
             // Small delay to avoid overwhelming Keycloak

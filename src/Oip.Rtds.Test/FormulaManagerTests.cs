@@ -71,7 +71,7 @@ public class FormulaManagerTests : IDisposable
         string err = "return 0.0;";
 
         _manager.UpdateFormulas(id1, TagTypes.Float32, val, time, err);
-        _manager.UpdateFormulas(id2, TagTypes.Float32, val, time, err); // тот же код — должен попасть в кэш
+        _manager.UpdateFormulas(id2, TagTypes.Float32, val, time, err); // Same code; it should be placed into the cache.
 
         var r1 = _manager.Evaluate(id1, 1, null, DateTimeOffset.Now);
         var r2 = _manager.Evaluate(id2, 1, null, DateTimeOffset.Now);
@@ -92,7 +92,7 @@ public class FormulaManagerTests : IDisposable
     public void CompileSingleFormula_ShouldThrow_OnCompilationError()
     {
         uint id = 5;
-        string badValueFormula = "return unknownVariable + 1;"; // ошибка компиляции
+        string badValueFormula = "return unknownVariable + 1;"; // Compilation error.
         string timeFormula = "return time;";
         string errFormula = "return 0.0;";
 
@@ -125,7 +125,7 @@ namespace Test
     [Test]
     public void EvaluateValue_ShouldCallStaticMethodCorrectly()
     {
-        // Компилируем формулу и достаём CompiledFormula напрямую
+        // Compile the formula and access CompiledFormula directly.
         uint id = 42;
         _manager.UpdateFormulas(id, TagTypes.Float32, "return value * 3;", "return time;", "return 0.5;");
         var now = DateTimeOffset.Now;
@@ -137,7 +137,7 @@ namespace Test
     [Test]
     public void EvaluateValueSinusoid()
     {
-        // Компилируем формулу и достаём CompiledFormula напрямую
+        // Compile the formula and access CompiledFormula directly.
         uint id = 43;
         _manager.UpdateFormulas(id, TagTypes.Float32, "return OipRandom.Sinusoid(60, 100);", "return time;",
             "return 0.5;");

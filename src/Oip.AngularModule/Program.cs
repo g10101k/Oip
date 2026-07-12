@@ -45,7 +45,7 @@ internal static class Program
             builder.Services.AddOpenTelemetry(settings);
             builder.Services.AddApplicationsService(settings);
 
-            if (settings.AddingMode == AddingMode.Local)
+            if (settings.ServiceAddingMode == AddingMode.Local)
             {
                 builder.Services.AddUserService(settings);
                 builder.Services.AddDiscussionsService(settings);

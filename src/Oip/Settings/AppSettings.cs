@@ -39,7 +39,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
     /// <inheritdoc />
-    public AddingMode AddingMode { get; set; } = AddingMode.Local;
+    public AddingMode ServiceAddingMode { get; set; } = AddingMode.Local;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
@@ -51,15 +51,15 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     public bool GenerateWebClient { get; set; }
 
     /// <summary>
-    /// User synchronization option
-    /// </summary>
-    public UserSyncOptions UserSyncOptions { get; set; } = new();
-
-    /// <summary>
     /// CORS Settings
     /// </summary>
     public CorsSettings Cors { get; set; } = new();
-    
+
+    /// <summary>
+    /// Keycloak synchronization settings
+    /// </summary>
+    public KeycloakSyncSettings KeycloakSync { get; set; } = new();
+
     /// <summary>
     /// User photo storage
     /// </summary>

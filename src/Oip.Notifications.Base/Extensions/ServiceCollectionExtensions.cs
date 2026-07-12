@@ -24,9 +24,9 @@ public static class ServiceCollectionExtensions
     /// Registers notifications for local composition.
     /// </summary>
     public static IServiceCollection AddNotificationsService(this IServiceCollection services, ISettings settings,
-        AddingMode? startupMode = null)
+        AddingMode? addingMode = null)
     {
-        var mode = startupMode ?? settings.AddingMode;
+        var mode = addingMode ?? settings.ServiceAddingMode;
         switch (mode)
         {
             case AddingMode.Local:

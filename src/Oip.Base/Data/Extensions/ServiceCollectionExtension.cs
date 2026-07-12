@@ -39,7 +39,7 @@ public static class ServiceCollectionExtension
         where T : DbContext
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(connectionString);
-        // Регистрируем DbContext с лямбдой конфигурации
+        // Register DbContext with a configuration lambda.
         return services.AddDbContext<T>((serviceProvider, options) =>
         {
             switch (connectionModel.Provider)

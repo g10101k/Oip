@@ -17,9 +17,9 @@ public static class ServiceCollectionExtensions
     /// Registers the discussions module services.
     /// </summary>
     public static IServiceCollection AddDiscussionsService(this IServiceCollection services, ISettings settings,
-        AddingMode? startupMode = null)
+        AddingMode? addingMode = null)
     {
-        var mode = startupMode ?? settings.AddingMode;
+        var mode = addingMode ?? settings.ServiceAddingMode;
         
         switch (mode)
         {

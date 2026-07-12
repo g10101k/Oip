@@ -44,7 +44,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings, IRtdsAppSett
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
     /// <inheritdoc />
-    public AddingMode AddingMode { get; set; } = AddingMode.Remote;
+    public AddingMode ServiceAddingMode { get; set; } = AddingMode.Remote;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();

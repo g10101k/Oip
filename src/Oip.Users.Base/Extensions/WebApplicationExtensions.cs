@@ -16,7 +16,7 @@ public static class WebApplicationExtensions
     /// </summary>
     public static void UseUsersService(this WebApplication app, ISettings settings, AddingMode? addingMode = null)
     {
-        var mode = addingMode ?? settings.AddingMode;
+        var mode = addingMode ?? settings.ServiceAddingMode;
 
         switch (mode)
         {

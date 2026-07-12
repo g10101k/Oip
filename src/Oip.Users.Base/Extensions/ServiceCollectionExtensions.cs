@@ -27,12 +27,12 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Adds the User service to the dependency injection container,
-    /// switching between Standalone, Service and Remote implementations based on StartupMode.
+    /// switching between Local, Service and Remote implementations based on ServiceAddingMode.
     /// </summary>
     public static IServiceCollection AddUserService(this IServiceCollection services, ISettings settings,
-        AddingMode? startupMode = null)
+        AddingMode? addingMode = null)
     {
-        var mode = startupMode ?? settings.AddingMode;
+        var mode = addingMode ?? settings.ServiceAddingMode;
 
         switch (mode)
         {

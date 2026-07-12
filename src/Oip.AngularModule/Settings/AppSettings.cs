@@ -49,12 +49,12 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     public bool GenerateWebClient { get; set; } = false;
 
     /// <inheritdoc />
-    public AddingMode AddingMode { get; set; } = AddingMode.Local;
+    public AddingMode ServiceAddingMode { get; set; } = AddingMode.Local;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
-
-    public UserSyncOptions UserSyncOptions { get; set; } = new();
+    
+    public KeycloakSyncSettings KeycloakSyncSettings { get; set; } = new();
 
     /// <summary>
     /// User photo storage

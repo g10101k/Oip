@@ -53,7 +53,7 @@ public interface ISettings : IAppSettings
     /// Defines how the application participates in the OIP deployment.
     /// </summary>
     [NotSaveToDb]
-    AddingMode AddingMode { get; set; }
+    AddingMode ServiceAddingMode { get; set; }
 
     /// <summary>
     /// DataProtection settings
@@ -83,24 +83,24 @@ public interface ISettings : IAppSettings
 public enum AddingMode
 {
     /// <summary>
-    /// Сервис добавляется локально:
-    /// - добавляется слой данных
-    /// - слой логики,
-    /// - подключаются все контроллеры без ограниченйи (AddController не используется),
-    /// - gRPC для внутреннего не поднимается.
+    /// The service is added locally:
+    /// - the data layer is added
+    /// - the business logic layer is added
+    /// - all controllers are connected without restrictions (AddController is not used)
+    /// - internal gRPC is not started.
     /// </summary>
     Local = 0,
     /// <summary>
-    /// Режим добавления удаленных сервисов, подключается gRPC клиент для удаленного вызова сервиса.
-    /// Добавляются сервисы кеширования.
+    /// Mode for adding remote services; a gRPC client is connected for remote service calls.
+    /// Caching services are added.
     /// </summary>
     Remote = 1,
     /// <summary>
-    /// Сервис добавляется локально для удаленного использования.
-    /// - добавляется слой данных
-    /// - слой логики,
-    /// - подключаются  контроллеры через AddController (Работают только контроллеры добавленные через AddController)
-    /// - gRPC поднимается.
+    /// The service is added locally for remote use.
+    /// - the data layer is added
+    /// - the business logic layer is added
+    /// - controllers are connected through AddController (only controllers added through AddController are active)
+    /// - gRPC is started.
     /// </summary>
     Service = 2
 }

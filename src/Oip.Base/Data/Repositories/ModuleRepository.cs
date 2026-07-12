@@ -93,8 +93,8 @@ public class ModuleRepository(OipModuleContext db)
         var modulesLoadedNames = loadedModules.Select(x => x.Name.Replace("Controller", string.Empty)).ToList();
         var query = await db.ModuleInstances
             .Include(x => x.Module)
-            .Where(x => x.Module.Kind == ModuleKind.Extension || modulesLoadedNames.Contains(x.Module.Name)) // Загружаем связанный Module
-            .Include(x => x.Securities) // Загружаем Securities (если нужно)
+            .Where(x => x.Module.Kind == ModuleKind.Extension || modulesLoadedNames.Contains(x.Module.Name)) // Load the related Module.
+            .Include(x => x.Securities) // Load Securities if needed.
             .Where(m => m.Securities.Any(s => s.Right == "read" && roles.Contains(s.Role)))
             .OrderBy(m => m.Order)
             .ToListAsync();

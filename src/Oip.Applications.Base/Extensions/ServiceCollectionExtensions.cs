@@ -24,9 +24,9 @@ public static class ServiceCollectionExtensions
     /// Registers the application registry services.
     /// </summary>
     public static IServiceCollection AddApplicationsService(this IServiceCollection services, ISettings settings,
-        AddingMode? startupMode = null)
+        AddingMode? addingMode = null)
     {
-        var mode = startupMode ?? settings.AddingMode;
+        var mode = addingMode ?? settings.ServiceAddingMode;
 
         switch (mode)
         {

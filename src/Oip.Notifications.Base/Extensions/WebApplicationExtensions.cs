@@ -18,25 +18,25 @@ public static class WebApplicationExtensions
     /// </summary>
     public static void UseNotificationsService(this WebApplication app, ISettings settings)
     {
-        if (settings.AddingMode is AddingMode.Local or AddingMode.Service)
+        if (settings.ServiceAddingMode is AddingMode.Local or AddingMode.Service)
         {
-            // Обновляем бд
+            // Update the database.
             app.MigrateNotificationDatabase();
             // SignalR
             app.MapHub<NotificationHub>("/hubs/notification");
         }
 
-        switch (settings.AddingMode)
+        switch (settings.ServiceAddingMode)
         {
             case AddingMode.Local:
-                // Регистрировать gRPC не требуется, т.к. все локально
+                // No need to register gRPC because everything is local.
                 break;
             case AddingMode.Service:
-                // gRPC
+                // Register gRPC.
                 app.MapGrpcService<NotificationService>();
                 break;
             case AddingMode.Remote:
-                // Регистрировать gRPC не требуется, т.к. сервис запущен в отдельном приложении
+                // No need to register gRPC because the service runs in a separate application.
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

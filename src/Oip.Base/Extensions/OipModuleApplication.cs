@@ -118,7 +118,7 @@ public static class OipModuleApplication
     }
 
     /// <summary>
-    /// Используется для того чтобы не зависеть от порядка вызова AddControllersAndView и AddController
+    /// Used to avoid depending on the call order of AddControllersAndView and AddController.
     /// </summary>
     private static IMvcBuilder CommonMvcBuilderProducer(IServiceCollection services)
     {
