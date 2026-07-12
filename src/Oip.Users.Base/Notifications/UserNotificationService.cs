@@ -4,9 +4,7 @@ using Oip.Notifications.Base.Services;
 
 namespace Oip.Users.Base.Notifications;
 
-
-public class BaseNotificationService(INotificationServiceClient client)
-    : INotificationPublisher
+public class UserNotificationService(INotificationServiceClient client) : INotificationPublisher
 {
     internal List<NotificationType> NotificationTypes { get; set; } =
     [

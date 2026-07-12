@@ -7,16 +7,16 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
+using Oip.Notifications.Base.Services;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 using Oip.Users.Base.Contexts;
 using Oip.Users.Base.Controllers;
 using Oip.Users.Base.Data.Repositories;
+using Oip.Users.Base.Notifications;
 using Oip.Users.Base.Services;
 using Oip.Users.Base.Settings;
 using Oip.Users.Base.StartupTasks;
-using IUserCacheRepository = Oip.Base.Services.IUserCacheRepository;
-using UserService = Oip.Users.Base.Services.UserService;
 
 namespace Oip.Users.Base.Extensions;
 
@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions
         AddingMode? addingMode = null)
     {
         var mode = addingMode ?? settings.ServiceAddingMode;
+
 
         switch (mode)
         {
@@ -60,6 +61,8 @@ public static class ServiceCollectionExtensions
             default:
                 throw new ArgumentOutOfRangeException();
         }
+        
+        services.AddUsersNotificationPublisherCore();
 
         return services;
     }
@@ -137,6 +140,14 @@ public static class ServiceCollectionExtensions
                 break;
         }
 
+        return services;
+    }
+
+    public static IServiceCollection AddUsersNotificationPublisherCore(this IServiceCollection services)
+    {
+        services.AddScoped<UserNotificationService>();
+        services.AddScoped<INotificationPublisher>(sp => sp.GetRequiredService<UserNotificationService>());
+        services.AddStartupTask<NotificationStartup>();
         return services;
     }
 }

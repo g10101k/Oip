@@ -44,7 +44,7 @@ internal static class Program
 
             builder.Services.AddOipLocalization();
             builder.Services.AddOpenTelemetry(settings);
-
+            builder.Services.AddControllersAndView();
             builder.Services.AddUserService(settings);
             builder.Services.AddDiscussionsService(settings);
             builder.Services.AddNotificationsService(settings);
@@ -67,15 +67,14 @@ internal static class Program
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
             app.MapOpenTelemetry(settings);
-
-            app.MigrateOipModuleDatabase();
-            app.MigrateDemoCustomerTableContext();
-
             app.UseApplicationsService(settings);
             app.UseUsersService(settings);
             app.UseDiscussionsService(settings);
             app.UseNotificationsService(settings);
-
+            
+            app.MigrateOipModuleDatabase();
+            app.MigrateDemoCustomerTableContext();
+            
             app.Run();
         }
         catch (OperationCanceledException)
