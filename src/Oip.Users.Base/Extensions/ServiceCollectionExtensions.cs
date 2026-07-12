@@ -3,13 +3,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Minio;
+using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Notifications.Base;
+using Oip.Notifications.Base.Services;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 using Oip.Users.Base.Contexts;
+using Oip.Users.Base.Controllers;
 using Oip.Users.Base.Data.Repositories;
 using Oip.Users.Base.Notifications;
 using Oip.Users.Base.Services;
@@ -27,30 +30,53 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Adds the User service to the dependency injection container,
-    /// switching between Local and Remote implementations based on IsStandalone.
+    /// switching between Standalone, Service and Remote implementations based on StartupMode.
     /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <param name="settings">The application settings.</param>
-    /// <returns>The updated service collection.</returns>
-    public static IServiceCollection AddUserServiceProxy(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddUserService(this IServiceCollection services,
+        ISettings settings, StartupMode? overrideMode = null)
     {
-        return settings.IsStandalone
-            ? services.AddUsersModuleLocal(settings)
-            : services.AddUsersModuleRemote(settings);
+        var mode = settings.StartupMode;
+        if (overrideMode is not null)
+            mode = overrideMode.Value;
+
+        if (mode is StartupMode.Standalone or StartupMode.Service)
+        {
+            services.AddUsersData(settings);
+            services.AddLocalServices(settings);
+        }
+
+        switch (mode)
+        {
+            case StartupMode.Standalone:
+                // Do nothing, all controllers
+                break;
+            case StartupMode.Service:
+                services
+                    .AddBaseServiceControllers()
+                    .AddController<UsersController>()
+                    .AddController<UserProfileController>();
+                services.AddGrpc();
+                break;
+            case StartupMode.Remote:
+                services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(options =>
+                {
+                    options.Address = new Uri(settings.Services.OipUsers);
+                });
+                services.TryAddScoped<IUserService, RemoteUserService>();
+                services.AddUserCacheRepository();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return services;
     }
 
     /// <summary>
-    /// Registers the local users module implementation.
+    /// Registers local users business services.
     /// </summary>
-    public static IServiceCollection AddUsersModuleLocal(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddLocalServices(this IServiceCollection services, ISettings settings)
     {
-        if (services.All(x => x.ServiceType != typeof(DbContextOptions<UserContext>)))
-        {
-            services.AddUsersData(settings);
-        }
-
         services.TryAddScoped<UserRepository>();
         services.TryAddScoped<IUserService, LocalUserService>();
         services.TryAddScoped<UserService>();
@@ -58,31 +84,6 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<KeycloakSyncService>();
         services.AddUserCacheRepository();
         services.AddStartupTask<KeycloakSyncStartupTask>();
-
-        if (settings.IsStandalone)
-        {
-            services.AddUsersNotificationPublisherCore();
-        }
-        else
-        {
-            services.AddUsersNotificationPublisherRemote(settings);
-        }
-
-        return services;
-    }
-
-    /// <summary>
-    /// Registers the remote users module implementation.
-    /// </summary>
-    public static IServiceCollection AddUsersModuleRemote(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
-    {
-        services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(options =>
-        {
-            options.Address = new Uri(settings.Services.OipUsers);
-        });
-        services.TryAddScoped<IUserService, RemoteUserService>();
-        services.AddUserCacheRepository();
         return services;
     }
 
@@ -117,10 +118,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Add user data services to the dependency injection container.
     /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <param name="settings">The application settings.</param>
-    /// <returns>The modified service collection.</returns>
-    public static IServiceCollection AddUsersData(this IServiceCollection services, IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddUsersData(this IServiceCollection services, ISettings settings)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
         switch (connectionModel.Provider)
@@ -147,33 +145,6 @@ public static class ServiceCollectionExtensions
                 break;
         }
 
-        return services;
-    }
-
-    /// <summary>
-    /// Registers the users notification publisher against the remote notifications service.
-    /// </summary>
-    public static IServiceCollection AddUsersNotificationPublisherRemote(
-        this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
-    {
-        services.AddGrpcClient<GrpcNotificationService.GrpcNotificationServiceClient>(options =>
-        {
-            options.Address = new Uri(settings.Services.OipNotifications);
-        });
-        services.AddScoped<INotificationServiceClient, GrpcNotificationServiceClientAdapter>();
-        services.AddUsersNotificationPublisherCore();
-        return services;
-    }
-
-    /// <summary>
-    /// Registers common users notification publisher services.
-    /// </summary>
-    public static IServiceCollection AddUsersNotificationPublisherCore(this IServiceCollection services)
-    {
-        services.AddScoped<BaseNotificationService>();
-        services.AddScoped<INotificationPublisher>(sp => sp.GetRequiredService<BaseNotificationService>());
-        services.AddStartupTask<NotificationStartup>();
         return services;
     }
 }

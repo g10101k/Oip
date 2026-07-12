@@ -23,30 +23,28 @@ internal static class Program
         {
             var settings = AppSettings.Initialize(args, false, true);
 
-            if (settings.IsStandalone)
+            if (settings.StartupMode != StartupMode.Service)
             {
-                logger.Warn(
-                    "Oip.Discussions service is configured to run in Standalone mode. Run the main Oip host instead.");
+                logger.Warn("Oip.Discussions must be configured with StartupMode.DistributedService.");
                 return;
             }
 
             var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
 
             builder.AddNlog();
-            builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
+            builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddOipModuleContext(settings.ConnectionString);
-            builder.AddDefaultHealthChecks();
-            builder.AddDefaultAuthentication(settings);
-            builder.AddOpenApi(settings);
-            builder.Services.AddApplicationsModuleRemote(settings);
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
-            builder.Services.AddStartupRunner();
-            builder.Services.AddCors();
-            builder.Services.AddUsersModuleRemote(settings);
-            builder.Services.AddDiscussionsModuleRemote(settings);
-            builder.AddOipForwardedHeaders(settings);
-            builder.AddControllersAndView();
+            builder.Services.AddDefaultHealthChecks();
+            builder.Services.AddDefaultAuthentication(settings);
+            builder.Services.AddOpenApi(settings);
+            builder.Services.AddStartupRunner()
+                .AddCors(settings)
+                .AddApplicationsService(settings)
+                .AddUserService(settings)
+                .AddDiscussionsService(settings)
+                .AddForwardedHeaders(settings)
+                .AddControllersAndView();
             builder.Services
                 .AddController<DiscussionController>()
                 .AddController<FolderModuleController>()
@@ -55,7 +53,7 @@ internal static class Program
                 .AddController<ModuleController>()
                 .AddController<ProxySettingsController>()
                 .AddController<SecurityController>();
-            builder.AddLocalization();
+            builder.Services.AddOipLocalization();
 
             var app = builder.Build();
             app.UseOipForwardedHeaders();
@@ -68,13 +66,12 @@ internal static class Program
             app.UseAuthentication();
             app.UseOipCsrfProtection();
             app.UseAuthorization();
-            app.UseCors(options => options.AllowAnyOrigin());
+            app.UseCors();
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
 
-            app.MigrateOipModuleDatabase();
-            app.AddDiscussions(settings);
+            app.UseDiscussionsService(settings);
 
             app.Run();
         }

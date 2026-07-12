@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Data.Constants;
+using Oip.Notifications.Base.Services;
 using Oip.Users.Base.Data.Entities;
 using Oip.Users.Base.Data.Repositories;
 using Oip.Users.Base.Notifications;

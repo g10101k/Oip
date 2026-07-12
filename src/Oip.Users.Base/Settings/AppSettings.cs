@@ -3,8 +3,8 @@ using Oip.Settings;
 
 namespace Oip.Users.Base.Settings;
 
-/// <inheritdoc cref="IBaseOipModuleAppSettings"/>
-public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettings
+/// <inheritdoc cref="ISettings"/>
+public class AppSettings : BaseAppSettings<AppSettings>, ISettings
 {
     /// <inheritdoc />
     public OipServicesSettings Services { get; set; } = new();
@@ -38,7 +38,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, IBaseOipModuleAppSettin
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
     /// <inheritdoc />
-    public bool IsStandalone { get; set; } = false;
+    public StartupMode StartupMode { get; set; } = StartupMode.Service;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();

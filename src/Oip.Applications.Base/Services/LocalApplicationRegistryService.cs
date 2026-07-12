@@ -13,7 +13,7 @@ namespace Oip.Applications.Base.Services;
 /// </summary>
 public class LocalApplicationRegistryService(
     ApplicationRegistryRepository repository,
-    IBaseOipModuleAppSettings appSettings)
+    ISettings appSettings)
     : IApplicationRegistryService
 {
     public async Task<ApplicationRegistryItemDto> RegisterApplicationAsync(

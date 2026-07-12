@@ -10,7 +10,7 @@ namespace Oip.Base.Controllers;
 [ApiController]
 [Route("api/proxy-settings")]
 [ApiExplorerSettings(GroupName = "ignore")]
-public class ProxySettingsController(IBaseOipModuleAppSettings appSettings) : ControllerBase
+public class ProxySettingsController(ISettings appSettings) : ControllerBase
 {
     /// <summary>
     /// Retrieves the current proxy configuration settings for the application.
@@ -20,14 +20,14 @@ public class ProxySettingsController(IBaseOipModuleAppSettings appSettings) : Co
     {
         var config = new
         {
-            Standalone = appSettings.IsStandalone,
+            Standalone = appSettings.StartupMode == StartupMode.Standalone,
             Targets = new
             {
                 Main = appSettings.Services.Oip,
-                Applications = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipApplications,
-                Users = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipUsers,
-                Discussion = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipDiscussions,
-                Notification = appSettings.IsStandalone ? appSettings.Services.Oip : appSettings.Services.OipNotifications
+                Applications = appSettings.StartupMode == StartupMode.Standalone ? appSettings.Services.Oip : appSettings.Services.OipApplications,
+                Users = appSettings.StartupMode == StartupMode.Standalone ? appSettings.Services.Oip : appSettings.Services.OipUsers,
+                Discussion = appSettings.StartupMode == StartupMode.Standalone ? appSettings.Services.Oip : appSettings.Services.OipDiscussions,
+                Notification = appSettings.StartupMode == StartupMode.Standalone ? appSettings.Services.Oip : appSettings.Services.OipNotifications
             }
         };
 

@@ -71,7 +71,7 @@ public static class WebApplicationBuilderExtension
         foreach (var type in result)
         {
             var moduleName = type.Name.Replace("Controller", string.Empty);
-            RouteAttribute? attr = type.GetCustomAttribute<RouteAttribute>();
+            var attr = type.GetCustomAttribute<RouteAttribute>();
             if (attr == null) continue;
             var link = attr.Template.Replace("api", string.Empty);
             var module = moduleContext.Modules.FirstOrDefault(m => m.Name == moduleName);

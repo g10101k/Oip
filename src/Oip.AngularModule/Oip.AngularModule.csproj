@@ -19,10 +19,10 @@
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0"/>
         <PackageReference Include="NLog" Version="5.3.4"/>
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
-        <PackageReference Include="Oip.Settings" Version="1.3.0"/>
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Oip.Applications.Base\Oip.Applications.Base.csproj"/>
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
         <ProjectReference Include="..\Oip.Users.Base\Oip.Users.Base.csproj"/>
         <ProjectReference Include="..\Oip.Discussions.Base\Oip.Discussions.Base.csproj"/>
@@ -57,35 +57,6 @@
         <None Include="appsettings.Development.json">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\ng-package.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\package.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\app-modules.en.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\app-modules.ru.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\config.en.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\config.ru.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\db-migration.en.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\db-migration.ru.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\en.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\iframe-module.en.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\iframe-module.ru.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\notfound.en.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\notfound.ru.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\src\assets\i18n\ru.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\tsconfig.lib.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\tsconfig.lib.prod.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-common\tsconfig.spec.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-users\src\assets\i18n\app-info.en.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-users\src\assets\i18n\app-info.ru.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-users\tsconfig.app.json" />
-      <_ContentIncludedByDefault Remove="ClientApp\projects\oip-users\tsconfig.spec.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="ClientApp\projects\oip\src\app\components\" />
-      <Folder Include="Controllers\" />
     </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

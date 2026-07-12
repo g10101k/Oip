@@ -4,9 +4,9 @@ using Oip.Settings.Attributes;
 namespace Oip.Base.Settings;
 
 /// <summary>
-/// Base settings for module application
+/// Base settings for instance of OIP
 /// </summary>
-public interface IBaseOipModuleAppSettings : IAppSettings
+public interface ISettings : IAppSettings
 {
     /// <summary>
     /// Collection of urls OIP services
@@ -50,20 +50,21 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     OpenTelemetrySettings OpenTelemetry { get; set; }
 
     /// <summary>
-    /// Is the application running in standalone mode?
+    /// Defines how the application participates in the OIP deployment.
     /// </summary>
     [NotSaveToDb]
-    bool IsStandalone { get; set; }
+    StartupMode StartupMode { get; set; }
 
     /// <summary>
     /// DataProtection settings
     /// </summary>
-    [NotSaveToDb] 
+    [NotSaveToDb]
     DataProtectionSettings DataProtection { get; set; }
+
     /// <summary>
     /// CORS Settings
     /// </summary>
-    [NotSaveToDb] 
+    [NotSaveToDb]
     CorsSettings Cors { get; set; }
 
     /// <summary>
@@ -77,4 +78,11 @@ public interface IBaseOipModuleAppSettings : IAppSettings
     /// </summary>
     [NotSaveToDb]
     bool GenerateWebClient { get; set; }
+}
+
+public enum StartupMode
+{
+    Standalone = 0,
+    Remote = 1,
+    Service = 2
 }

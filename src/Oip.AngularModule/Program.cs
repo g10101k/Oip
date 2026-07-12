@@ -3,6 +3,7 @@ using NLog.Web;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Oip.AngularModule.Controllers;
 using Oip.AngularModule.Settings;
+using Oip.Applications.Base.Extensions;
 using Oip.Base.Controllers;
 using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
@@ -27,37 +28,37 @@ internal static class Program
             var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
 
             builder.AddNlog();
-            builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
+            builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddOipModuleContext(settings.ConnectionString);
-            builder.AddDefaultHealthChecks();
-            builder.AddDefaultAuthentication(settings);
-            builder.AddOpenApi(settings);
-            builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
+            builder.Services.AddDefaultHealthChecks();
+            builder.Services.AddDefaultAuthentication(settings);
+            builder.Services.AddOpenApi(settings);
+            builder.Services.AddWebClientGenerationStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddHttpClient();
-            builder.Services.AddCors();
-            builder.Services.AddOipCors(settings);
-            builder.Services.AddOipDataProtection(settings);
-            builder.AddControllersAndView();
+            builder.Services.AddCors(settings);
+            builder.Services.AddDataProtection(settings);
+            builder.Services.AddControllersAndView();
             builder.Services
                 .AddController<ExternalModuleExampleModuleController>()
                 .AddController<FolderModuleController>()
                 .AddController<SecurityController>();
-            builder.AddLocalization();
-            builder.AddOpenTelemetry(settings);
+            builder.Services.AddOipLocalization();
+            builder.Services.AddOpenTelemetry(settings);
+            builder.Services.AddApplicationsService(settings);
 
-            if (settings.IsStandalone)
+            if (settings.StartupMode == StartupMode.Standalone)
             {
-                builder.Services.AddUsersModuleLocal(settings);
-                builder.Services.AddDiscussionsModuleLocal(settings);
-                builder.Services.AddNotificationsModuleLocal(settings);
+                builder.Services.AddUserService(settings);
+                builder.Services.AddDiscussionsService(settings);
+                builder.Services.AddNotificationsService(settings);
                 builder.Services.AddSignalR();
                 builder.Services.AddGrpc();
             }
             else
             {
-                builder.Services.AddUsersModuleRemote(settings);
+                builder.Services.AddUserService(settings);
             }
 
             var app = builder.Build();
@@ -97,12 +98,10 @@ internal static class Program
 
             app.MigrateOipModuleDatabase();
 
-            if (settings.IsStandalone)
-            {
-                app.AddUserModuleLocal();
-                app.AddDiscussionsModuleLocal();
-                app.AddNotificationsModuleLocal();
-            }
+            app.UseUsersService(settings);
+            app.UseApplicationsService(settings);
+            app.UseDiscussionsService(settings);
+            app.UseNotificationsService(settings);
 
             app.Run();
         }

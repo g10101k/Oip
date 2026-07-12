@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Oip.Applications.Base.Data;
+using Oip.Applications.Base.Controllers;
 using Oip.Applications.Base.Data.Contexts;
 using Oip.Applications.Base.Data.Repositories;
 using Oip.Applications.Base.Services;
 using Oip.Applications.Base.StartupTasks;
+using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Settings.Enums;
@@ -20,23 +21,58 @@ namespace Oip.Applications.Base.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers the local application registry implementation.
+    /// Registers the application registry services.
     /// </summary>
-    public static IServiceCollection AddApplicationsModuleLocal(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddApplicationsService(this IServiceCollection services, ISettings settings)
     {
-        services.AddApplicationsData(settings);
+        if (settings.StartupMode is StartupMode.Standalone or StartupMode.Service)
+        {
+            services.AddApplicationsData(settings);
+            services.AddLocalServices();
+        }
+
+        switch (settings.StartupMode)
+        {
+            case StartupMode.Standalone:
+                
+                break;
+            case StartupMode.Service:
+                services
+                    .AddBaseServiceControllers()
+                    .AddController<ApplicationsController>();
+                services.AddGrpc();
+                break;
+            case StartupMode.Remote:
+                services.AddGrpcClient<GrpcApplicationRegistryService.GrpcApplicationRegistryServiceClient>(options =>
+                {
+                    options.Address = new Uri(settings.Services.OipApplications);
+                });
+                services.TryAddScoped<IApplicationRegistryService, GrpcApplicationRegistryServiceClientAdapter>();
+                services.AddStartupTask<ApplicationSelfRegistrationStartupTask>();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers local application registry services.
+    /// </summary>
+    public static IServiceCollection AddLocalServices(this IServiceCollection services)
+    {
         services.TryAddScoped<ApplicationRegistryRepository>();
         services.TryAddScoped<IApplicationRegistryService, LocalApplicationRegistryService>();
         services.AddStartupTask<ApplicationSelfRegistrationStartupTask>();
+
         return services;
     }
 
     /// <summary>
     /// Adds application registry data services.
     /// </summary>
-    public static IServiceCollection AddApplicationsData(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
+    public static IServiceCollection AddApplicationsData(this IServiceCollection services, ISettings settings)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
         switch (connectionModel.Provider)
@@ -73,21 +109,6 @@ public static class ServiceCollectionExtensions
                 break;
         }
 
-        return services;
-    }
-    
-    /// <summary>
-    /// Registers the remote application registry implementation.
-    /// </summary>
-    public static IServiceCollection AddApplicationsModuleRemote(this IServiceCollection services,
-        IBaseOipModuleAppSettings settings)
-    {
-        services.AddGrpcClient<GrpcApplicationRegistryService.GrpcApplicationRegistryServiceClient>(options =>
-        {
-            options.Address = new Uri(settings.Services.OipApplications);
-        });
-        services.TryAddScoped<IApplicationRegistryService, GrpcApplicationRegistryServiceClientAdapter>();
-        services.AddStartupTask<ApplicationSelfRegistrationStartupTask>();
         return services;
     }
 }

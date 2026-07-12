@@ -11,20 +11,23 @@ namespace Oip.Discussions.Base.Extensions;
 public static class WebApplicationExtensions
 {
     /// <summary>
-    /// Configures the local discussions module for the current host.
+    /// Configures the discussions module for the current host.
     /// </summary>
-    public static void AddDiscussionsModuleLocal(this WebApplication app)
+    public static void UseDiscussionsService(this WebApplication app, ISettings settings)
     {
-        app.MigrateDatabase<DiscussionsDbContext>();
-    }
+        if (settings.StartupMode is StartupMode.Standalone or StartupMode.Service)
+        {
+            app.MigrateDatabase<DiscussionsDbContext>();
+        }
 
-    /// <summary>
-    /// Adds the discussions service to the application.
-    /// </summary>
-    /// <param name="app">The application builder.</param>
-    /// <param name="settings">The application settings.</param>
-    public static void AddDiscussions(this WebApplication app, IBaseOipModuleAppSettings settings)
-    {
-        app.MigrateDatabase<DiscussionsDbContext>();
+        switch (settings.StartupMode)
+        {
+            case StartupMode.Standalone:
+            case StartupMode.Service:
+            case StartupMode.Remote:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 }

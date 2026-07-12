@@ -794,7 +794,8 @@ public class NotificationService(
         try
         {
             var notificationType = await notificationTypeRepository.GetByNameAsync(request.NotificationType) ??
-                    throw new RpcException(new Status(StatusCode.NotFound, "Notification type not found"));
+                                   throw new RpcException(
+                                       new Status(StatusCode.NotFound, "Notification type not found"));
             var notification = new NotificationEntity
             {
                 NotificationTypeId = notificationType.NotificationTypeId,

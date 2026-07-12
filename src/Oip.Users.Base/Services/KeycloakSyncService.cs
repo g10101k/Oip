@@ -3,6 +3,7 @@ using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Clients;
 using Oip.Base.Services;
+using Oip.Notifications.Base.Services;
 using Oip.Users.Base.Data.Entities;
 using Oip.Users.Base.Data.Repositories;
 using Oip.Users.Base.Notifications;

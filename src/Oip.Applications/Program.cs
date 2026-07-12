@@ -25,23 +25,21 @@ internal static class Program
             var builder = WebApplication.CreateBuilder(settings.AppSettingsOptions.ProgramArguments);
 
             builder.AddNlog();
-            builder.Services.AddSingleton<IBaseOipModuleAppSettings>(settings);
-            builder.Services.AddSettingsToDependencyInjection(settings);
-            builder.Services.AddApplicationsModuleLocal(settings);
-            builder.AddDefaultHealthChecks();
-            builder.AddDefaultAuthentication(settings);
-            builder.AddOpenApi(settings);
-            builder.Services.AddGrpc();
-            builder.Services.GenerateWebClientStartupTask(settings);
-            builder.Services.AddStartupRunner();
-            builder.Services.AddCors();
-            builder.AddOipForwardedHeaders(settings);
-            builder.AddControllersAndView();
             builder.Services
+                .AddSingleton<ISettings>(settings)
+                .AddSettingsToDependencyInjection(settings)
+                .AddApplicationsService(settings)
+                .AddDefaultHealthChecks()
+                .AddDefaultAuthentication(settings)
+                .AddOpenApi(settings)
+                .AddStartupRunner()
+                .AddCors(settings)
+                .AddForwardedHeaders(settings)
+                .AddControllersAndView()
                 .AddController<ApplicationsController>()
-                .AddController<SecurityController>();
-            builder.AddLocalization();
-            builder.AddOpenTelemetry(settings);
+                .AddController<SecurityController>()
+                .AddOipLocalization()
+                .AddOpenTelemetry(settings);
 
             var app = builder.Build();
             app.UseOipForwardedHeaders();
@@ -54,12 +52,11 @@ internal static class Program
             app.UseOipCsrfProtection();
             app.UseAuthorization();
             app.UseCors(options => options.AllowAnyOrigin());
-            app.MapGrpcService<GrpcApplicationRegistryService>();
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapOpenTelemetry(settings);
 
-            app.MigrateDatabase<ApplicationRegistryDbContext>();
+            app.UseApplicationsService(settings);
 
             app.Run();
         }
