@@ -7,14 +7,11 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
-using Oip.Notifications.Base;
-using Oip.Notifications.Base.Services;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 using Oip.Users.Base.Contexts;
 using Oip.Users.Base.Controllers;
 using Oip.Users.Base.Data.Repositories;
-using Oip.Users.Base.Notifications;
 using Oip.Users.Base.Services;
 using Oip.Users.Base.Settings;
 using Oip.Users.Base.StartupTasks;
@@ -32,32 +29,27 @@ public static class ServiceCollectionExtensions
     /// Adds the User service to the dependency injection container,
     /// switching between Standalone, Service and Remote implementations based on StartupMode.
     /// </summary>
-    public static IServiceCollection AddUserService(this IServiceCollection services,
-        ISettings settings, StartupMode? overrideMode = null)
+    public static IServiceCollection AddUserService(this IServiceCollection services, ISettings settings,
+        AddingMode? startupMode = null)
     {
-        var mode = settings.StartupMode;
-        if (overrideMode is not null)
-            mode = overrideMode.Value;
-
-        if (mode is StartupMode.Standalone or StartupMode.Service)
-        {
-            services.AddUsersData(settings);
-            services.AddLocalServices(settings);
-        }
+        var mode = startupMode ?? settings.AddingMode;
 
         switch (mode)
         {
-            case StartupMode.Standalone:
-                // Do nothing, all controllers
+            case AddingMode.Local:
+                services.AddUsersData(settings);
+                services.AddLocalServices(settings);
                 break;
-            case StartupMode.Service:
+            case AddingMode.Service:
+                services.AddUsersData(settings);
+                services.AddLocalServices(settings);
                 services
                     .AddBaseServiceControllers()
                     .AddController<UsersController>()
                     .AddController<UserProfileController>();
                 services.AddGrpc();
                 break;
-            case StartupMode.Remote:
+            case AddingMode.Remote:
                 services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(options =>
                 {
                     options.Address = new Uri(settings.Services.OipUsers);

@@ -5,7 +5,6 @@ using Oip.Discussions.Base.Controllers;
 using Oip.Discussions.Base.Data;
 using Oip.Discussions.Base.Data.Repositories;
 using Oip.Discussions.Base.Services;
-using Oip.Settings.Enums;
 
 namespace Oip.Discussions.Base.Extensions;
 
@@ -17,24 +16,25 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers the discussions module services.
     /// </summary>
-    public static IServiceCollection AddDiscussionsService(this IServiceCollection services, ISettings settings)
+    public static IServiceCollection AddDiscussionsService(this IServiceCollection services, ISettings settings,
+        AddingMode? startupMode = null)
     {
-        if (settings.StartupMode is StartupMode.Standalone or StartupMode.Service)
+        var mode = startupMode ?? settings.AddingMode;
+        
+        switch (mode)
         {
-            services.AddDiscussionData(settings);
-            services.AddLocalServices();
-        }
-
-        switch (settings.StartupMode)
-        {
-            case StartupMode.Standalone:
+            case AddingMode.Local:
+                services.AddDiscussionData(settings);
+                services.AddLocalServices();
                 break;
-            case StartupMode.Service:
+            case AddingMode.Service:
+                services.AddDiscussionData(settings);
+                services.AddLocalServices();
                 services
                     .AddBaseServiceControllers()
                     .AddController<DiscussionController>();
                 break;
-            case StartupMode.Remote:
+            case AddingMode.Remote:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

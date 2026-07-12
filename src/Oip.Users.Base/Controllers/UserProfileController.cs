@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Oip.Base.Exceptions;
+using Oip.Base.Services;
 using Oip.Users.Base.Data.Repositories;
 using Oip.Users.Base.Services;
-using CurrentUserService = Oip.Base.Services.UserService;
 
 namespace Oip.Users.Base.Controllers;
 
@@ -16,7 +16,7 @@ namespace Oip.Users.Base.Controllers;
 [Route("api/user-profile")]
 [ApiExplorerSettings(GroupName = "users")]
 public class UserProfileController(
-    CurrentUserService userService,
+    ClaimService claimService,
     UserRepository userRepository,
     IUserPhotoStorage userPhotoStorage) : ControllerBase
 {
@@ -32,7 +32,7 @@ public class UserProfileController(
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserPhoto(CancellationToken cancellationToken)
     {
-        var email = userService.GetUserEmail();
+        var email = claimService.GetUserEmail();
         if (string.IsNullOrWhiteSpace(email))
         {
             return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user email is not available.",
@@ -86,7 +86,7 @@ public class UserProfileController(
                 StatusCodes.Status400BadRequest));
         }
 
-        var email = userService.GetUserEmail();
+        var email = claimService.GetUserEmail();
         if (string.IsNullOrWhiteSpace(email))
         {
             return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user email is not available.",
@@ -114,7 +114,7 @@ public class UserProfileController(
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<UserSettingsDto> GetSettings()
     {
-        var json = userRepository.GetUserSettings(userService.GetUserEmail()!);
+        var json = userRepository.GetUserSettings(claimService.GetUserEmail()!);
 
         return JsonConvert.DeserializeObject<UserSettingsDto>(json) ?? new();
     }
@@ -131,7 +131,7 @@ public class UserProfileController(
     public async Task UpdateSettings(UserSettingsDto settings)
     {
         var json = JsonConvert.SerializeObject(settings);
-        await userRepository.UpdateUserSettings(userService.GetUserEmail()!, json);
+        await userRepository.UpdateUserSettings(claimService.GetUserEmail()!, json);
     }
 
     private async Task<IActionResult> GetUserPhotoResultAsync(

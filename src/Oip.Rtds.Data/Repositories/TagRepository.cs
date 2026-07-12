@@ -17,19 +17,19 @@ public class TagRepository
 {
     private readonly RtdsMetaContext _rtdsMetaContext;
     private readonly RtdsContext _rtdsContext;
-    private readonly UserService _userService;
+    private readonly ClaimService _claimService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TagRepository"/> class
     /// </summary>
     /// <param name="rtdsMetaContext">The context for tag metadata operations</param>
     /// <param name="rtdsContext">The context for time-series data operations</param>
-    /// <param name="userService">The user service</param>
-    public TagRepository(RtdsMetaContext rtdsMetaContext, RtdsContext rtdsContext, UserService userService)
+    /// <param name="claimService">The user service</param>
+    public TagRepository(RtdsMetaContext rtdsMetaContext, RtdsContext rtdsContext, ClaimService claimService)
     {
         _rtdsMetaContext = rtdsMetaContext;
         _rtdsContext = rtdsContext;
-        _userService = userService;
+        _claimService = claimService;
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public class TagRepository
                 DigitalSet = createTag.DigitalSet,
                 Step = createTag.Step,
                 CreationDate = DateTimeOffset.UtcNow,
-                Creator = _userService.GetUserEmail() ?? throw new InvalidOperationException("User not found"),
+                Creator = _claimService.GetUserEmail() ?? throw new InvalidOperationException("User not found"),
                 ValueCalculation = createTag.ValueCalculation,
                 TimeCalculation = createTag.TimeCalculation,
                 ErrorCalculation = createTag.ErrorCalculation

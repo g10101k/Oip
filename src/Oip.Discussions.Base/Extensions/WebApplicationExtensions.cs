@@ -15,16 +15,16 @@ public static class WebApplicationExtensions
     /// </summary>
     public static void UseDiscussionsService(this WebApplication app, ISettings settings)
     {
-        if (settings.StartupMode is StartupMode.Standalone or StartupMode.Service)
+        if (settings.AddingMode is AddingMode.Local or AddingMode.Service)
         {
             app.MigrateDatabase<DiscussionsDbContext>();
         }
 
-        switch (settings.StartupMode)
+        switch (settings.AddingMode)
         {
-            case StartupMode.Standalone:
-            case StartupMode.Service:
-            case StartupMode.Remote:
+            case AddingMode.Local:
+            case AddingMode.Service:
+            case AddingMode.Remote:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

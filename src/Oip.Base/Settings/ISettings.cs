@@ -53,7 +53,7 @@ public interface ISettings : IAppSettings
     /// Defines how the application participates in the OIP deployment.
     /// </summary>
     [NotSaveToDb]
-    StartupMode StartupMode { get; set; }
+    AddingMode AddingMode { get; set; }
 
     /// <summary>
     /// DataProtection settings
@@ -80,9 +80,27 @@ public interface ISettings : IAppSettings
     bool GenerateWebClient { get; set; }
 }
 
-public enum StartupMode
+public enum AddingMode
 {
-    Standalone = 0,
+    /// <summary>
+    /// Сервис добавляется локально:
+    /// - добавляется слой данных
+    /// - слой логики,
+    /// - подключаются все контроллеры без ограниченйи (AddController не используется),
+    /// - gRPC для внутреннего не поднимается.
+    /// </summary>
+    Local = 0,
+    /// <summary>
+    /// Режим добавления удаленных сервисов, подключается gRPC клиент для удаленного вызова сервиса.
+    /// Добавляются сервисы кеширования.
+    /// </summary>
     Remote = 1,
+    /// <summary>
+    /// Сервис добавляется локально для удаленного использования.
+    /// - добавляется слой данных
+    /// - слой логики,
+    /// - подключаются  контроллеры через AddController (Работают только контроллеры добавленные через AddController)
+    /// - gRPC поднимается.
+    /// </summary>
     Service = 2
 }

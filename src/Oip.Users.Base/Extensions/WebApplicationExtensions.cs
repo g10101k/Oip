@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Oip.Base.Data.Extensions;
 using Oip.Base.Settings;
-using Oip.Settings.Enums;
 using Oip.Users.Base.Contexts;
 using Oip.Users.Base.Services;
 
@@ -15,21 +14,20 @@ public static class WebApplicationExtensions
     /// <summary>
     /// Configures the local users module for the current host.
     /// </summary>
-    public static void UseUsersService(this WebApplication app, ISettings settings)
+    public static void UseUsersService(this WebApplication app, ISettings settings, AddingMode? addingMode = null)
     {
-        if (settings.StartupMode is StartupMode.Standalone or StartupMode.Service)
-        {
-            app.MigrateUserDatabase();
-        }
+        var mode = addingMode ?? settings.AddingMode;
 
-        switch (settings.StartupMode)
+        switch (mode)
         {
-            case StartupMode.Standalone:
+            case AddingMode.Local:
+                app.MigrateUserDatabase();
                 break;
-            case StartupMode.Service:
+            case AddingMode.Service:
+                app.MigrateUserDatabase();
                 app.MapGrpcService<UserService>();
                 break;
-            case StartupMode.Remote:
+            case AddingMode.Remote:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

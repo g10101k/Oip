@@ -35,7 +35,7 @@ internal static class Program
             builder.Services.GenerateWebClientStartupTask(settings);
             builder.Services.AddStartupRunner();
             builder.Services.AddSingleton(settings);
-            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<ClaimService>();
             builder.Services.AddCors();
             builder.Services.AddForwardedHeaders(settings);
             builder.Services.AddControllersAndView();

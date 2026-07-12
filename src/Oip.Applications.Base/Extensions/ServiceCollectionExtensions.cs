@@ -23,26 +23,25 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Registers the application registry services.
     /// </summary>
-    public static IServiceCollection AddApplicationsService(this IServiceCollection services, ISettings settings)
+    public static IServiceCollection AddApplicationsService(this IServiceCollection services, ISettings settings,
+        AddingMode? startupMode = null)
     {
-        if (settings.StartupMode is StartupMode.Standalone or StartupMode.Service)
-        {
-            services.AddApplicationsData(settings);
-            services.AddLocalServices();
-        }
+        var mode = startupMode ?? settings.AddingMode;
 
-        switch (settings.StartupMode)
+        switch (mode)
         {
-            case StartupMode.Standalone:
-                
+            case AddingMode.Local:
+                services.AddApplicationsData(settings);
+                services.AddLocalServices();
                 break;
-            case StartupMode.Service:
-                services
+            case AddingMode.Service:
+                services.AddApplicationsData(settings)
+                    .AddLocalServices()
                     .AddBaseServiceControllers()
                     .AddController<ApplicationsController>();
                 services.AddGrpc();
                 break;
-            case StartupMode.Remote:
+            case AddingMode.Remote:
                 services.AddGrpcClient<GrpcApplicationRegistryService.GrpcApplicationRegistryServiceClient>(options =>
                 {
                     options.Address = new Uri(settings.Services.OipApplications);

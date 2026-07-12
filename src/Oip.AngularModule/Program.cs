@@ -1,16 +1,13 @@
 using NLog;
 using NLog.Web;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Oip.AngularModule.Controllers;
 using Oip.AngularModule.Settings;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Controllers;
 using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
-using Oip.Base.Providers;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
-using Oip.Base.StartupTasks;
 using Oip.Discussions.Base.Extensions;
 using Oip.Notifications.Base.Extensions;
 using Oip.Users.Base.Extensions;
@@ -48,7 +45,7 @@ internal static class Program
             builder.Services.AddOpenTelemetry(settings);
             builder.Services.AddApplicationsService(settings);
 
-            if (settings.StartupMode == StartupMode.Standalone)
+            if (settings.AddingMode == AddingMode.Local)
             {
                 builder.Services.AddUserService(settings);
                 builder.Services.AddDiscussionsService(settings);

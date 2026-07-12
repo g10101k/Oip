@@ -20,14 +20,14 @@ public class ProxySettingsController(ISettings appSettings) : ControllerBase
     {
         var config = new
         {
-            Standalone = appSettings.StartupMode == StartupMode.Standalone,
+            Standalone = appSettings.AddingMode == AddingMode.Local,
             Targets = new
             {
                 Main = appSettings.Services.Oip,
-                Applications = appSettings.StartupMode == StartupMode.Standalone ? appSettings.Services.Oip : appSettings.Services.OipApplications,
-                Users = appSettings.StartupMode == StartupMode.Standalone ? appSettings.Services.Oip : appSettings.Services.OipUsers,
-                Discussion = appSettings.StartupMode == StartupMode.Standalone ? appSettings.Services.Oip : appSettings.Services.OipDiscussions,
-                Notification = appSettings.StartupMode == StartupMode.Standalone ? appSettings.Services.Oip : appSettings.Services.OipNotifications
+                Applications = appSettings.AddingMode == AddingMode.Local ? appSettings.Services.Oip : appSettings.Services.OipApplications,
+                Users = appSettings.AddingMode == AddingMode.Local ? appSettings.Services.Oip : appSettings.Services.OipUsers,
+                Discussion = appSettings.AddingMode == AddingMode.Local ? appSettings.Services.Oip : appSettings.Services.OipDiscussions,
+                Notification = appSettings.AddingMode == AddingMode.Local ? appSettings.Services.Oip : appSettings.Services.OipNotifications
             }
         };
 

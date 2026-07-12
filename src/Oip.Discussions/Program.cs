@@ -2,11 +2,9 @@ using NLog;
 using NLog.Web;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Controllers;
-using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
-using Oip.Base.StartupTasks;
 using Oip.Discussions.Base.Controllers;
 using Oip.Discussions.Base.Extensions;
 using Oip.Discussions.Base.Settings;
@@ -23,7 +21,7 @@ internal static class Program
         {
             var settings = AppSettings.Initialize(args, false, true);
 
-            if (settings.StartupMode != StartupMode.Service)
+            if (settings.AddingMode != AddingMode.Service)
             {
                 logger.Warn("Oip.Discussions must be configured with StartupMode.DistributedService.");
                 return;

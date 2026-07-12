@@ -24,34 +24,26 @@ public static class ServiceCollectionExtensions
     /// Registers notifications for local composition.
     /// </summary>
     public static IServiceCollection AddNotificationsService(this IServiceCollection services, ISettings settings,
-        StartupMode? remote = null)
+        AddingMode? startupMode = null)
     {
-        var mode = remote ?? settings.StartupMode;
-        
-        if (mode is StartupMode.Standalone or StartupMode.Service)
-        {
-            // Нужно регать данные Context + Repository
-            services.AddNotificationData(settings);
-            // Внутренние сервисы обеспечивающие бизнес логику
-            services.AddLocalServices(settings);
-            services.AddSignalR();
-        }
-
+        var mode = startupMode ?? settings.AddingMode;
         switch (mode)
         {
-            case StartupMode.Standalone:
-                // Нужно регистрировать локальные имплементации которые подменяют вызовы grpc
+            case AddingMode.Local:
+                services.AddNotificationData(settings);
+                services.AddLocalServices(settings);
+                services.AddSignalR();
                 services.TryAddScoped<INotificationServiceClient, LocalNotificationServiceClient>();
                 break;
-            case StartupMode.Service:
-                services
-                    .AddBaseServiceControllers()
+            case AddingMode.Service:
+                services.AddNotificationData(settings);
+                services.AddLocalServices(settings);
+                services.AddSignalR();
+                services.AddBaseServiceControllers()
                     .AddController<NotificationController>();
-                // Нужно зарегистрировать grpc сервисы чтобы они работали
                 services.AddGrpc();
                 break;
-            case StartupMode.Remote:
-                // Нужно зарегистрировать grpc клиенты
+            case AddingMode.Remote:
                 services.AddGrpcClient<GrpcNotificationService.GrpcNotificationServiceClient>(options =>
                 {
                     options.Address = new Uri(settings.Services.OipNotifications);
@@ -79,9 +71,6 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Adds notification data services to the dependency injection container.
     /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <param name="settings">The application settings.</param>
-    /// <returns>The modified service collection.</returns>
     public static IServiceCollection AddNotificationData(this IServiceCollection services, ISettings settings)
     {
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);

@@ -49,7 +49,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     public bool GenerateWebClient { get; set; } = false;
 
     /// <inheritdoc />
-    public StartupMode StartupMode { get; set; } = StartupMode.Standalone;
+    public AddingMode AddingMode { get; set; } = AddingMode.Local;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();

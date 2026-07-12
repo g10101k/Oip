@@ -92,7 +92,7 @@ public static class OipModuleApplication
         builder.Services.AddStartupTask<SwaggerGenerateWebClientStartupTask>();
         builder.Services.AddStartupRunner();
         builder.Services.AddSingleton(settings);
-        builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<ClaimService>();
         builder.Services.AddCors();
         builder.Services.AddControllersAndView();
         builder.Services.AddOipLocalization();
@@ -625,7 +625,7 @@ public static class OipModuleApplication
             .ConfigurePrimaryHttpMessageHandler(() => settings.IsDevelopment()
                 ? CreateDevelopmentHttpClientHandler()
                 : new HttpClientHandler());
-        services.AddScoped<UserService>();
+        services.AddScoped<ClaimService>();
         services.AddScoped<KeycloakService>();
         return services;
     }

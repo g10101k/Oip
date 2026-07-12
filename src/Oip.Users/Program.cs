@@ -7,7 +7,6 @@ using Oip.Base.Settings;
 using Oip.Notifications.Base.Extensions;
 using Oip.Users.Base.Controllers;
 using Oip.Users.Base.Extensions;
-using Oip.Users.Base.Services;
 using Oip.Users.Base.Settings;
 
 namespace Oip.Users;
@@ -21,7 +20,7 @@ internal static class Program
         {
             var settings = AppSettings.Initialize(args, false, true);
 
-            if (settings.StartupMode != StartupMode.Service)
+            if (settings.AddingMode != AddingMode.Service)
             {
                 logger.Warn("Oip.Users must be configured with StartupMode.DistributedService.");
                 return;
@@ -48,7 +47,7 @@ internal static class Program
             builder.Services.AddOipLocalization();
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddUserService(settings);
-            builder.Services.AddNotificationsService(settings, StartupMode.Remote);
+            builder.Services.AddNotificationsService(settings, AddingMode.Remote);
             builder.Services.AddHttpClient();
             builder.Services.AddGrpc();
             builder.Services.AddOpenTelemetry(settings);

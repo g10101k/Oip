@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Oip.Applications.Base.Data.Contexts;
 using Oip.Applications.Base.Services;
 using Oip.Base.Settings;
-using Oip.Settings.Enums;
 
 namespace Oip.Applications.Base.Extensions;
 
@@ -18,19 +17,19 @@ public static class WebApplicationExtensions
     /// </summary>
     public static void UseApplicationsService(this WebApplication app, ISettings settings)
     {
-        if (settings.StartupMode is StartupMode.Standalone or StartupMode.Service)
+        if (settings.AddingMode is AddingMode.Local or AddingMode.Service)
         {
             app.MigrateApplicationsDatabase();
         }
 
-        switch (settings.StartupMode)
+        switch (settings.AddingMode)
         {
-            case StartupMode.Standalone:
+            case AddingMode.Local:
                 break;
-            case StartupMode.Service:
+            case AddingMode.Service:
                 app.MapGrpcService<GrpcApplicationRegistryService>();
                 break;
-            case StartupMode.Remote:
+            case AddingMode.Remote:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

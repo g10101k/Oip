@@ -18,7 +18,7 @@ public static class WebApplicationExtensions
     /// </summary>
     public static void UseNotificationsService(this WebApplication app, ISettings settings)
     {
-        if (settings.StartupMode is StartupMode.Standalone or StartupMode.Service)
+        if (settings.AddingMode is AddingMode.Local or AddingMode.Service)
         {
             // Обновляем бд
             app.MigrateNotificationDatabase();
@@ -26,16 +26,16 @@ public static class WebApplicationExtensions
             app.MapHub<NotificationHub>("/hubs/notification");
         }
 
-        switch (settings.StartupMode)
+        switch (settings.AddingMode)
         {
-            case StartupMode.Standalone:
+            case AddingMode.Local:
                 // Регистрировать gRPC не требуется, т.к. все локально
                 break;
-            case StartupMode.Service:
+            case AddingMode.Service:
                 // gRPC
                 app.MapGrpcService<NotificationService>();
                 break;
-            case StartupMode.Remote:
+            case AddingMode.Remote:
                 // Регистрировать gRPC не требуется, т.к. сервис запущен в отдельном приложении
                 break;
             default:

@@ -39,7 +39,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     public OpenTelemetrySettings OpenTelemetry { get; set; } = new();
 
     /// <inheritdoc />
-    public StartupMode StartupMode { get; set; } = StartupMode.Standalone;
+    public AddingMode AddingMode { get; set; } = AddingMode.Local;
 
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();

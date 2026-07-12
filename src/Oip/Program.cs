@@ -41,22 +41,14 @@ internal static class Program
             builder.Services.AddCors(settings);
             builder.Services.AddDataProtection(settings);
             builder.Services.AddForwardedHeaders(settings);
-            builder.Services.AddControllersAndView();
+
             builder.Services.AddOipLocalization();
             builder.Services.AddOpenTelemetry(settings);
-            
+
             builder.Services.AddUserService(settings);
             builder.Services.AddDiscussionsService(settings);
             builder.Services.AddNotificationsService(settings);
             builder.Services.AddApplicationsService(settings);
-
-
-            builder.Services
-                .AddControllersAndView()
-                .AddApplicationControllers()
-                .AddController<CustomerModuleController>()
-                .AddController<DashboardModuleController>()
-                .AddController<WeatherForecastModuleController>();
 
             var app = builder.Build();
 
@@ -79,13 +71,10 @@ internal static class Program
             app.MigrateOipModuleDatabase();
             app.MigrateDemoCustomerTableContext();
 
-            if (settings.StartupMode == StartupMode.Standalone)
-            {
-                app.UseApplicationsService(settings);
-                app.UseUsersService(settings);
-                app.UseDiscussionsService(settings);
-                app.UseNotificationsService(settings);
-            }
+            app.UseApplicationsService(settings);
+            app.UseUsersService(settings);
+            app.UseDiscussionsService(settings);
+            app.UseNotificationsService(settings);
 
             app.Run();
         }
