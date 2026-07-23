@@ -1,10 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Minio;
 using Oip.Base.Extensions;
 using Oip.Base.Settings;
 using Oip.Discussions.Base.Controllers;
 using Oip.Discussions.Base.Data;
 using Oip.Discussions.Base.Data.Repositories;
 using Oip.Discussions.Base.Services;
+using Oip.Discussions.Base.Settings;
 
 namespace Oip.Discussions.Base.Extensions;
 
@@ -49,8 +52,28 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddLocalServices(this IServiceCollection services)
     {
         services.AddScoped<CommentService>();
-        services.AddScoped<IDiscussionAttachmentStorage, LocalDiscussionAttachmentStorage>();
+        services.AddDiscussionAttachmentStorage();
 
+        return services;
+    }
+
+    private static IServiceCollection AddDiscussionAttachmentStorage(this IServiceCollection services)
+    {
+        services.TryAddSingleton<DiscussionAttachmentMinioClient>(sp =>
+        {
+            var settings = sp.GetRequiredService<DiscussionAttachmentStorageSettings>();
+            var client = new MinioClient()
+                .WithEndpoint(settings.Endpoint)
+                .WithCredentials(settings.AccessKey, settings.SecretKey);
+
+            if (settings.UseSsl)
+            {
+                client = client.WithSSL();
+            }
+
+            return new DiscussionAttachmentMinioClient(client.Build());
+        });
+        services.TryAddScoped<IDiscussionAttachmentStorage, MinioDiscussionAttachmentStorage>();
         return services;
     }
 

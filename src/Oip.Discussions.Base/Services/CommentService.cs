@@ -239,7 +239,11 @@ public class CommentService(
         EnsureCommentOwnership(comment, currentUser.UserId);
         ValidateAttachment(request.File);
 
-        var storageFile = await attachmentStorage.SaveAsync(request.File, cancellationToken);
+        var storageFile = await attachmentStorage.SaveAsync(
+            comment.ObjectTypeId,
+            comment.ObjectId,
+            request.File,
+            cancellationToken);
         var attachment = new AttachmentEntity
         {
             CommentId = comment.CommentId,
