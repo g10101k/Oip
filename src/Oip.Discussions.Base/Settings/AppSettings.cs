@@ -51,6 +51,11 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     /// <inheritdoc />
     public ReverseProxySettings ReverseProxy { get; set; } = new();
 
+    /// <summary>
+    /// Discussion attachment storage settings.
+    /// </summary>
+    public DiscussionAttachmentStorageSettings DiscussionAttachmentStorage { get; set; } = new();
+
     /// <inheritdoc />
     public bool GenerateWebClient { get; set; }
 }
