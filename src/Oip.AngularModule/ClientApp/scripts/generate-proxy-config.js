@@ -15,7 +15,7 @@ async function loadProxyConfigFromApi() {
 
   for (let attempt = 1; attempt <= 10; attempt += 1) {
     try {
-      console.log(`Loading proxy settings from ${defaultTarget}, attempt ${attempt}/10\n`);
+      process.stderr.write(`Loading proxy settings from ${defaultTarget}, attempt ${attempt}/10\n`);
 
       const response = await fetch(`${defaultTarget}/api/proxy-settings/get-spa-proxy-settings`);
 
