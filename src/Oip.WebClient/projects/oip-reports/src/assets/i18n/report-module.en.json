@@ -1,0 +1,25 @@
+{
+  "title": "Report Runner",
+  "content": {
+    "eyebrow": "Declarative reporting",
+    "subtitle": "Run report templates from JSON definitions, inspect the generated preview, and export the same document through one pipeline.",
+    "statusLabel": "Last job",
+    "cacheLabel": "Cache",
+    "idle": "Idle",
+    "cached": "Cached",
+    "fresh": "Fresh",
+    "report": "Report",
+    "preview": "Preview",
+    "export": "Export HTML",
+    "previewPanel": "Preview",
+    "rows": "Rows",
+    "loading": "Generating preview...",
+    "empty": "Choose a report and run preview to render the document here."
+  },
+  "settings": {
+    "title": "Report Module Settings",
+    "description": "Configure the default report definition for this module instance.",
+    "defaultReport": "Default report id",
+    "save": "Save settings"
+  }
+}

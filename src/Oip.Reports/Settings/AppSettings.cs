@@ -18,8 +18,8 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     {
         Code = "oip-reports",
         DisplayName = "OIP  Reports",
-        BaseUrl = "https://localhost:50002",
-        InternalBaseUrl = "https://localhost:5002",
+        BaseUrl = "https://localhost:50009",
+        InternalBaseUrl = "https://localhost:5009",
         Icon = "pi pi-home",
         Order = 10,
         ServiceType = ServiceType.Application

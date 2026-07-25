@@ -1,0 +1,126 @@
+{
+  "id": "customer-directory",
+  "name": "Customer Directory",
+  "description": "Active customer directory with category and revenue filters.",
+  "currentVersionLabel": "v1",
+  "currentVersion": 1,
+  "dataSourceKey": "customers",
+  "parameters": [
+    {
+      "name": "title",
+      "label": "Report Title",
+      "type": "String",
+      "required": true,
+      "defaultValue": "Customer Directory"
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "type": "String",
+      "required": false,
+      "defaultValue": ""
+    },
+    {
+      "name": "minLifetimeValue",
+      "label": "Min Lifetime Value",
+      "type": "Number",
+      "required": false,
+      "defaultValue": "0"
+    },
+    {
+      "name": "includeInactive",
+      "label": "Include Inactive",
+      "type": "Boolean",
+      "required": false,
+      "defaultValue": "false"
+    }
+  ],
+  "dataSources": [
+    {
+      "key": "customers",
+      "providerKey": "ef-demo-customer",
+      "query": {}
+    }
+  ],
+  "styles": [
+    {
+      "id": "muted",
+      "cssClass": "muted",
+      "properties": {}
+    }
+  ],
+  "bands": [
+    {
+      "type": "Header",
+      "elements": [
+        {
+          "type": "Text",
+          "textTemplate": "{{parameter:title}}"
+        },
+        {
+          "type": "Text",
+          "textTemplate": "Category filter: {{parameter:category}}",
+          "styleId": "muted"
+        }
+      ]
+    },
+    {
+      "type": "Detail",
+      "elements": [
+        {
+          "label": "Customer",
+          "type": "Value",
+          "valuePath": "fullName"
+        },
+        {
+          "label": "Email",
+          "type": "Value",
+          "valuePath": "email"
+        },
+        {
+          "label": "Category",
+          "type": "Value",
+          "valuePath": "category"
+        },
+        {
+          "label": "Country",
+          "type": "Value",
+          "valuePath": "country"
+        },
+        {
+          "label": "Status",
+          "type": "Value",
+          "valuePath": "status"
+        },
+        {
+          "label": "Orders",
+          "type": "Value",
+          "valuePath": "ordersCount",
+          "align": "right"
+        },
+        {
+          "label": "Lifetime Value",
+          "type": "Value",
+          "valuePath": "lifetimeValue",
+          "format": "0.00",
+          "align": "right"
+        }
+      ]
+    },
+    {
+      "type": "Footer",
+      "elements": [
+        {
+          "type": "Text",
+          "textTemplate": "Rows: {{summary:count}} | Total lifetime value: {{summary:sum:lifetimeValue}}"
+        }
+      ]
+    }
+  ],
+  "supportedFormats": [
+    "Html"
+  ],
+  "metadata": {
+    "category": "sales"
+  }
+}

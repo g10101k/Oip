@@ -6,15 +6,14 @@
         <IsPackable>false</IsPackable>
         <SpaRoot>.\..\Oip.WebClient\</SpaRoot>
         <SpaProxyServerUrl>https://localhost:50009</SpaProxyServerUrl>
-        <SpaProxyLaunchCommand>npm run start</SpaProxyLaunchCommand>
+        <SpaProxyLaunchCommand>npm run start:reports</SpaProxyLaunchCommand>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);CS1591</NoWarn>
-        <UserSecretsId>6439c53a-8832-4b63-a468-b55f6ca63b2b</UserSecretsId>
+        <UserSecretsId>2614b7b4-cefd-4c12-a4c1-770f127b8db8</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.22"/>
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.22"/>
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0"/>
         <PackageReference Include="NLog" Version="5.3.4"/>
@@ -24,8 +23,10 @@
     <ItemGroup>
         <ProjectReference Include="..\Oip.Applications.Base\Oip.Applications.Base.csproj"/>
         <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
+        <ProjectReference Include="..\Oip.Demo\Oip.Demo.csproj" />
         <ProjectReference Include="..\Oip.Discussions.Base\Oip.Discussions.Base.csproj" />
         <ProjectReference Include="..\Oip.Notifications.Base\Oip.Notifications.Base.csproj" />
+        <ProjectReference Include="..\Oip.Reports.Base\Oip.Reports.Base.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -58,10 +59,6 @@
         </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Controllers\" />
-    </ItemGroup>
-
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
         <!-- Ensure Node.js is installed -->
         <Exec Command="node --version" ContinueOnError="true">
@@ -75,7 +72,7 @@
     <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition=" '$(UseAppHost)' != 'false'  ">
         <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
         <Exec WorkingDirectory="$(SpaRoot)" Command="npm install"/>
-        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build:oip"/>
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build:reports"/>
 
         <!-- Include the newly-built files in the publish output -->
         <ItemGroup>

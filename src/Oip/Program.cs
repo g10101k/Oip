@@ -1,16 +1,14 @@
 using NLog;
 using NLog.Web;
-using Microsoft.EntityFrameworkCore;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Controllers;
-using Oip.Settings;
 using Oip.Demo.TableQueryDemo;
+using Oip.Settings;
 using Oip.Discussions.Base.Extensions;
-using Oip.Extensions;
 using Oip.Notifications.Base.Extensions;
 using Oip.Users.Base.Extensions;
 
@@ -30,8 +28,7 @@ internal static class Program
             builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddOipModuleContext(settings.ConnectionString);
-            builder.Services.AddDbContext<DemoCustomerTableContext>(options =>
-                options.UseInMemoryDatabase("CustomerTableDemo"));
+            builder.Services.AddDemoCustomerTable();
             builder.Services.AddDefaultHealthChecks();
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);

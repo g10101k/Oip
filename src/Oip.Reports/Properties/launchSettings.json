@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "Oip": {
+    "Oip.Reports": {
       "commandName": "Project",
       "launchBrowser": true,
       "applicationUrl": "https://localhost:5009",

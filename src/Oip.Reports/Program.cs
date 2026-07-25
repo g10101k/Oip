@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using NLog;
 using NLog.Web;
 using Oip.Applications.Base.Extensions;
@@ -6,8 +5,10 @@ using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
+using Oip.Demo.TableQueryDemo;
 using Oip.Discussions.Base.Extensions;
 using Oip.Notifications.Base.Extensions;
+using Oip.Reports.Reports;
 using Oip.Reports.Settings;
 using Oip.Users.Base.Extensions;
 
@@ -27,6 +28,7 @@ internal static class Program
             builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddOipModuleContext(settings.ConnectionString);
+            builder.Services.AddDemoCustomerTable();
             builder.Services.AddDefaultHealthChecks();
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);
@@ -36,7 +38,6 @@ internal static class Program
             builder.Services.AddCors(settings);
             builder.Services.AddDataProtection(settings);
             builder.Services.AddForwardedHeaders(settings);
-
             builder.Services.AddOipLocalization();
             builder.Services.AddOpenTelemetry(settings);
             builder.Services.AddControllersAndView();
@@ -44,6 +45,7 @@ internal static class Program
             builder.Services.AddDiscussionsService(settings);
             builder.Services.AddNotificationsService(settings);
             builder.Services.AddApplicationsService(settings);
+            builder.Services.AddReportServices();
 
             var app = builder.Build();
 
@@ -68,6 +70,7 @@ internal static class Program
             app.UseNotificationsService(settings);
             
             app.MigrateOipModuleDatabase();
+            app.MigrateDemoCustomerTableContext();
             
             app.Run();
         }

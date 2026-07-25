@@ -372,6 +372,122 @@
         }
       }
     },
+    "oip-reports": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/oip-reports",
+      "sourceRoot": "projects/oip-reports/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "ngx-build-plus:browser",
+          "options": {
+            "outputPath": "dist/oip-reports",
+            "index": "projects/oip-reports/src/index.html",
+            "main": "projects/oip-reports/src/main.ts",
+            "extraWebpackConfig": "projects/oip-reports/webpack.config.js",
+            "commonChunk": false,
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "projects/oip-reports/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/oip-reports/src/assets",
+              {
+                "glob": "**/*",
+                "input": "./projects/oip-common/src/assets",
+                "output": "/assets/"
+              }
+            ],
+            "styles": [
+              "projects/oip-reports/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "extraWebpackConfig": "projects/oip-reports/webpack.prod.config.js",
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "ngx-build-plus:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "oip-reports:build:production"
+            },
+            "development": {
+              "buildTarget": "oip-reports:build:development",
+              "proxyConfig": "proxy.conf.js"
+            }
+          },
+          "defaultConfiguration": "development",
+          "options": {
+            "proxyConfig": "proxy.conf.js",
+            "publicHost": "https://localhost:50009",
+            "port": 50009,
+            "headers": {
+              "Content-Security-Policy": "script-src 'self' 'unsafe-inline' https://localhost:50001;style-src 'self' 'unsafe-inline';img-src 'self' data:;font-src 'self';frame-ancestors 'self' https://s-gbt-wsn-00010:8443;block-all-mixed-content",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+            },
+            "extraWebpackConfig": "projects/oip-reports/webpack.config.js"
+          }
+        },
+        "extract-i18n": {
+          "builder": "ngx-build-plus:extract-i18n",
+          "options": {
+            "buildTarget": "oip-reports:build",
+            "extraWebpackConfig": "projects/oip-reports/webpack.config.js"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/oip-reports/src/test.ts",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "projects/oip-reports/tsconfig.spec.json",
+            "karmaConfig": "projects/oip-reports/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/oip-reports/src/assets"
+            ],
+            "styles": [
+              "projects/oip-reports/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    },
     "oip-common": {
       "projectType": "library",
       "root": "projects/oip-common",
