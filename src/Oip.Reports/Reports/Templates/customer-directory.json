@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 2,
   "id": "customer-directory",
   "name": "Customer Directory",
   "description": "Active customer directory with category and revenue filters.",
@@ -117,9 +118,31 @@
       ]
     }
   ],
-  "supportedFormats": [
-    "Html"
+  "page": {
+    "paperFormat": "A4",
+    "orientation": "Portrait",
+    "width": 210,
+    "height": 297,
+    "unit": "Millimeter",
+    "margins": {
+      "top": 15,
+      "right": 15,
+      "bottom": 15,
+      "left": 15
+    }
+  },
+  "exports": [
+    {
+      "format": "Html",
+      "fileNameTemplate": "customer-directory.html",
+      "settings": {}
+    }
   ],
+  "localization": {
+    "defaultCulture": "en",
+    "supportedCultures": [ "en" ],
+    "resources": {}
+  },
   "metadata": {
     "category": "sales"
   }

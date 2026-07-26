@@ -4,6 +4,7 @@ namespace Oip.Reports.Base.Models;
 
 public class ReportDefinition
 {
+    public required int SchemaVersion { get; set; }
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -14,8 +15,42 @@ public class ReportDefinition
     public List<ReportDataSource> DataSources { get; set; } = [];
     public List<ReportStyle> Styles { get; set; } = [];
     public List<ReportBand> Bands { get; set; } = [];
-    public List<ReportExportFormat> SupportedFormats { get; set; } = [ReportExportFormat.Html];
+    public required ReportPageSettings Page { get; set; }
+    public required List<ReportExportDefinition> Exports { get; set; }
+    public required ReportLocalizationSettings Localization { get; set; }
     public Dictionary<string, string> Metadata { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+}
+
+public class ReportPageSettings
+{
+    public required ReportPaperFormat PaperFormat { get; set; }
+    public required ReportPageOrientation Orientation { get; set; }
+    public required decimal Width { get; set; }
+    public required decimal Height { get; set; }
+    public required ReportMeasurementUnit Unit { get; set; }
+    public required ReportPageMargins Margins { get; set; }
+}
+
+public class ReportPageMargins
+{
+    public required decimal Top { get; set; }
+    public required decimal Right { get; set; }
+    public required decimal Bottom { get; set; }
+    public required decimal Left { get; set; }
+}
+
+public class ReportExportDefinition
+{
+    public required ReportExportFormat Format { get; set; }
+    public required string FileNameTemplate { get; set; }
+    public required Dictionary<string, string> Settings { get; set; }
+}
+
+public class ReportLocalizationSettings
+{
+    public required string DefaultCulture { get; set; }
+    public required List<string> SupportedCultures { get; set; }
+    public required Dictionary<string, Dictionary<string, string>> Resources { get; set; }
 }
 
 public class ReportTemplateVersion
@@ -25,7 +60,7 @@ public class ReportTemplateVersion
     public string VersionLabel { get; set; } = string.Empty;
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     public string CreatedBy { get; set; } = "system";
-    public ReportDefinition Definition { get; set; } = new();
+    public ReportDefinition Definition { get; set; } = null!;
 }
 
 public class ReportParameterDefinition
@@ -196,7 +231,38 @@ public enum ReportParameterType
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ReportExportFormat
 {
-    Html
+    Html,
+    Pdf,
+    Xlsx,
+    Docx,
+    Csv
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ReportPaperFormat
+{
+    A3,
+    A4,
+    A5,
+    Letter,
+    Legal,
+    Custom
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ReportPageOrientation
+{
+    Portrait,
+    Landscape
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ReportMeasurementUnit
+{
+    Millimeter,
+    Inch,
+    Point,
+    Pixel
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

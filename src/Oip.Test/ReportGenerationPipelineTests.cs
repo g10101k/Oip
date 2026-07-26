@@ -17,10 +17,35 @@ public class ReportGenerationPipelineTests
     {
         var definition = new ReportDefinition
         {
+            SchemaVersion = 2,
             Id = "sales-report",
             Name = "Sales Report",
             CurrentVersion = 1,
             DataSourceKey = "main",
+            Page = new ReportPageSettings
+            {
+                PaperFormat = ReportPaperFormat.A4,
+                Orientation = ReportPageOrientation.Portrait,
+                Width = 210,
+                Height = 297,
+                Unit = ReportMeasurementUnit.Millimeter,
+                Margins = new ReportPageMargins { Top = 15, Right = 15, Bottom = 15, Left = 15 }
+            },
+            Exports =
+            [
+                new ReportExportDefinition
+                {
+                    Format = ReportExportFormat.Html,
+                    FileNameTemplate = "sales-report.html",
+                    Settings = []
+                }
+            ],
+            Localization = new ReportLocalizationSettings
+            {
+                DefaultCulture = "en",
+                SupportedCultures = ["en"],
+                Resources = []
+            },
             Parameters =
             [
                 new ReportParameterDefinition

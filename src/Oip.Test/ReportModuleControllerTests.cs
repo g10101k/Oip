@@ -33,6 +33,7 @@ public class ReportModuleControllerTests
             Path.Combine(_contentRootPath, "Reports", "Templates", "customer-directory.json"),
             """
             {
+              "schemaVersion": 2,
               "id": "customer-directory",
               "name": "Customer Directory",
               "description": "Customer demo report",
@@ -51,7 +52,22 @@ public class ReportModuleControllerTests
                 { "type": "Detail", "elements": [ { "label": "Customer", "type": "Value", "valuePath": "fullName" } ] },
                 { "type": "Footer", "elements": [ { "type": "Text", "textTemplate": "Rows: {{summary:count}}" } ] }
               ],
-              "supportedFormats": [ "Html" ]
+              "page": {
+                "paperFormat": "A4",
+                "orientation": "Portrait",
+                "width": 210,
+                "height": 297,
+                "unit": "Millimeter",
+                "margins": { "top": 15, "right": 15, "bottom": 15, "left": 15 }
+              },
+              "exports": [
+                { "format": "Html", "fileNameTemplate": "customer-directory.html", "settings": {} }
+              ],
+              "localization": {
+                "defaultCulture": "en",
+                "supportedCultures": [ "en" ],
+                "resources": {}
+              }
             }
             """);
 
