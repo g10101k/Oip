@@ -8,30 +8,30 @@ public class OipServicesSettings
     /// <summary>
     /// URL endpoint for the OIP shell service
     /// </summary>
-    public string Oip { get; set; } = "https://localhost:5002";
+    public string Shell { get; set; } = "https://localhost:5002";
 
     /// <summary>
     /// URL endpoint for the OIP applications registry service
     /// </summary>
-    public string OipApplications { get; set; } = "https://localhost:5008";
+    public string ApplicationsService { get; set; } = "https://localhost:5008";
 
     /// <summary>
     /// URL endpoint for the OIP RTDS service
     /// </summary>
-    public string OipRtds { get; set; } = "https://localhost:5003";
+    public string RtdsService { get; set; } = "https://localhost:5003";
 
     /// <summary>
     /// URL endpoint for the OIP users service
     /// </summary>
-    public string OipUsers { get; set; } = "https://localhost:5005";
+    public string UsersService { get; set; } = "https://localhost:5005";
 
     /// <summary>
     /// URL endpoint for the OIP discussions service
     /// </summary>
-    public string OipDiscussions { get; set; } = "https://localhost:5006";
+    public string DiscussionsService { get; set; } = "https://localhost:5006";
 
     /// <summary>
     /// Gets or sets the endpoint URL for the OIP notifications service
     /// </summary>
-    public string OipNotifications { get; set; } = "https://localhost:5007";
+    public string NotificationsService { get; set; } = "https://localhost:5007";
 }

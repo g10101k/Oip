@@ -44,7 +44,6 @@ internal static class Program
                 .AddController<IframeModuleController>()
                 .AddController<MenuController>()
                 .AddController<ModuleController>()
-                .AddController<ProxySettingsController>()
                 .AddController<SecurityController>()
                 .AddController<RtdsMetaDataContextMigrationModuleController>()
                 .AddController<TagManagementModuleController>();

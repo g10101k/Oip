@@ -15,6 +15,9 @@ export const APP_THEME_PRESETS = new InjectionToken<ReadonlyArray<AppThemePreset
   factory: () => []
 });
 
-export const APP_THEME_PRESETS_MERGE_MODE = new InjectionToken<AppThemePresetMergeMode>('APP_THEME_PRESETS_MERGE_MODE', {
-  factory: () => 'mergeWithDefaults'
-});
+export const APP_THEME_PRESETS_MERGE_MODE = new InjectionToken<AppThemePresetMergeMode>(
+  'APP_THEME_PRESETS_MERGE_MODE',
+  {
+    factory: () => 'mergeWithDefaults'
+  }
+);

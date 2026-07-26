@@ -46,7 +46,7 @@ public static class ServiceCollectionExtensions
             case AddingMode.Remote:
                 services.AddGrpcClient<GrpcNotificationService.GrpcNotificationServiceClient>(options =>
                 {
-                    options.Address = new Uri(settings.Services.OipNotifications);
+                    options.Address = new Uri(settings.Services.NotificationsService);
                 });
 
                 services.TryAddScoped<INotificationServiceClient, GrpcNotificationServiceClientAdapter>();

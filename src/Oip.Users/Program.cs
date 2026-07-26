@@ -39,7 +39,6 @@ internal static class Program
             builder.Services.AddForwardedHeaders(settings);
             builder.Services.AddControllersAndView();
             builder.Services
-                .AddController<ProxySettingsController>()
                 .AddController<SecurityController>()
                 .AddController<UserProfileController>()
                 .AddController<KeycloakEventsController>()

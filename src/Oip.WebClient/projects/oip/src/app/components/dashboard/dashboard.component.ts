@@ -19,14 +19,14 @@ import { BaseModuleComponent, NoSettingsDto, SecurityComponent } from 'oip-commo
   template: `
     @if (isContent) {
       <div class="grid grid-cols-12 gap-4">
-        <app-stats-widget class="contents"/>
+        <app-stats-widget class="contents" />
         <div class="col-span-12 xl:col-span-6">
-          <app-recent-sales-widget/>
-          <app-best-selling-widget/>
+          <app-recent-sales-widget />
+          <app-best-selling-widget />
         </div>
         <div class="col-span-12 xl:col-span-6">
-          <app-revenue-stream-widget/>
-          <app-notifications-widget/>
+          <app-revenue-stream-widget />
+          <app-notifications-widget />
         </div>
       </div>
     } @else if (isSecurity) {

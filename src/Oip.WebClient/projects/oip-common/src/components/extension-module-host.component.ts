@@ -17,7 +17,7 @@ import { BaseModuleComponent } from './base-module.component';
 import { emitOipContextChange } from '../extension-host/extension-host.events';
 import { ExtensionModulesApi } from '../api/extension-modules.api';
 import { OipExtensionHostContext, OipExtensionModuleMetadata } from '../extension-host/extension-host.types';
-import { CustomElementExtensionModuleHostComponent } from "./custom-element-extension-module-host.component";
+import { CustomElementExtensionModuleHostComponent } from './custom-element-extension-module-host.component';
 
 @Component({
   standalone: true,
@@ -35,7 +35,7 @@ import { CustomElementExtensionModuleHostComponent } from "./custom-element-exte
   `
 })
 export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, unknown> implements OnDestroy {
-  @ViewChild('extensionContainer', {read: ViewContainerRef})
+  @ViewChild('extensionContainer', { read: ViewContainerRef })
   private set extensionViewContainer(viewContainer: ViewContainerRef | undefined) {
     this.viewContainer = viewContainer;
     this.queueRenderExtension();
@@ -98,9 +98,9 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
       return;
     }
 
-    this.extensionMetadata = await this.extensionModulesApi.getExtensionModuleByKey({
+    this.extensionMetadata = (await this.extensionModulesApi.getExtensionModuleByKey({
       extensionKey: this.extensionKey
-    }) as unknown as OipExtensionModuleMetadata;
+    })) as unknown as OipExtensionModuleMetadata;
 
     await this.loadExtensionTranslations(this.extensionMetadata);
   }
@@ -152,7 +152,7 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   }
 
   private async renderFederatedExtension(metadata: OipExtensionModuleMetadata): Promise<void> {
-    const {remoteEntryUrl, exposedModule, componentName} = metadata;
+    const { remoteEntryUrl, exposedModule, componentName } = metadata;
     if (!remoteEntryUrl || !exposedModule || !componentName) {
       this.loadError = 'Module Federation extension metadata is incomplete.';
       return;
@@ -236,7 +236,7 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
       }
     };
 
-    Object.assign(this.extensionElement, {oipContext: context});
+    Object.assign(this.extensionElement, { oipContext: context });
     emitOipContextChange(this.extensionElement, context);
   }
 

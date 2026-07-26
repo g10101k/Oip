@@ -18,7 +18,17 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
-  imports: [FormsModule, TableModule, Tag, ButtonModule, ToolbarModule, Tooltip, ConfirmDialog, TranslatePipe, InputTextModule],
+  imports: [
+    FormsModule,
+    TableModule,
+    Tag,
+    ButtonModule,
+    ToolbarModule,
+    Tooltip,
+    ConfirmDialog,
+    TranslatePipe,
+    InputTextModule
+  ],
   providers: [ConfirmationService, ModuleApi, ExtensionModulesApi],
   selector: 'app-modules',
   template: `

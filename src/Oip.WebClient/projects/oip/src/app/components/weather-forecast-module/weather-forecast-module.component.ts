@@ -10,8 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
-import { DatePicker } from "primeng/datepicker";
-import { convertToPrimeNgDateFormat } from "oip-common";
+import { DatePicker } from 'primeng/datepicker';
+import { convertToPrimeNgDateFormat } from 'oip-common';
 
 interface WeatherModuleLocalSettings {
   first: number;
@@ -27,31 +27,29 @@ interface WeatherModuleLocalSettings {
       <div class="card">
         <div>
           <h5>{{ this.title }}</h5>
-          <p-date-picker
-            [dateFormat]="layoutService.primeNgDateFormat()"
-          ></p-date-picker>
+          <p-date-picker [dateFormat]="layoutService.primeNgDateFormat()"></p-date-picker>
           <p-table #table [value]="data" (onFilter)="onFilter()">
             <ng-template let-columns pTemplate="header">
               <tr>
                 <th pSortableColumn="date" scope="col">
                   {{ 'weather-forecast-module.content.table.date' | translate }}
-                  <p-sortIcon field="date"/>
-                  <p-columnFilter display="menu" field="date" type="date"/>
+                  <p-sortIcon field="date" />
+                  <p-columnFilter display="menu" field="date" type="date" />
                 </th>
                 <th pSortableColumn="temperatureC" scope="col">
                   {{ 'weather-forecast-module.content.table.temperatureC' | translate }}
-                  <p-sortIcon field="temperatureC"/>
-                  <p-columnFilter display="menu" field="temperatureC" type="numeric"/>
+                  <p-sortIcon field="temperatureC" />
+                  <p-columnFilter display="menu" field="temperatureC" type="numeric" />
                 </th>
                 <th pSortableColumn="temperatureF" scope="col">
                   {{ 'weather-forecast-module.content.table.temperatureF' | translate }}
-                  <p-sortIcon field="temperatureF"/>
-                  <p-columnFilter display="menu" field="temperatureF" type="numeric"/>
+                  <p-sortIcon field="temperatureF" />
+                  <p-columnFilter display="menu" field="temperatureF" type="numeric" />
                 </th>
                 <th pSortableColumn="summary" scope="col">
                   {{ 'weather-forecast-module.content.table.summary' | translate }}
-                  <p-sortIcon field="summary"/>
-                  <p-columnFilter display="menu" field="summary" type="text"/>
+                  <p-sortIcon field="summary" />
+                  <p-columnFilter display="menu" field="summary" type="text" />
                 </th>
               </tr>
             </ng-template>
@@ -78,7 +76,7 @@ interface WeatherModuleLocalSettings {
                 {{ 'weather-forecast-module.settings.dayCount' | translate }}
               </label>
               <div class="col-span-12 md:col-span-10">
-                <input id="dayCount" pInputText type="text" [(ngModel)]="settings.dayCount"/>
+                <input id="dayCount" pInputText type="text" [(ngModel)]="settings.dayCount" />
               </div>
             </div>
             <div class="flex justify-end">
@@ -91,14 +89,27 @@ interface WeatherModuleLocalSettings {
         </div>
       </div>
     } @else if (isSecurity) {
-      <security [controller]="controller" [id]="id"/>
+      <security [controller]="controller" [id]="id" />
     }
   `,
   providers: [WeatherForecastModuleApi],
-  imports: [TableModule, SharedModule, TagModule, SecurityComponent, Button, FormsModule, InputText, DatePipe, TranslatePipe, DatePicker]
+  imports: [
+    TableModule,
+    SharedModule,
+    TagModule,
+    SecurityComponent,
+    Button,
+    FormsModule,
+    InputText,
+    DatePipe,
+    TranslatePipe,
+    DatePicker
+  ]
 })
-export class WeatherForecastModuleComponent extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
-  implements OnInit, OnDestroy {
+export class WeatherForecastModuleComponent
+  extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
+  implements OnInit, OnDestroy
+{
   @ViewChild('table') table!: Table;
   protected readonly dataService = inject(WeatherForecastModuleApi);
   protected data: WeatherForecastResponse[] = [];

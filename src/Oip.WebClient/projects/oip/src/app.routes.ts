@@ -24,9 +24,7 @@ export const appRoutes: Routes = [
       {
         path: 'customer-module/:id',
         loadComponent: () =>
-          import('./app/components/customer-module/customer-module.component').then(
-            (m) => m.CustomerModuleComponent
-          ),
+          import('./app/components/customer-module/customer-module.component').then((m) => m.CustomerModuleComponent),
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
@@ -79,6 +77,6 @@ export const appRoutes: Routes = [
     path: 'unauthorized',
     loadComponent: () => import('oip-common').then((m) => m.UnauthorizedComponent)
   },
-  {path: 'notfound', component: NotfoundComponent},
-  {path: '**', redirectTo: '/notfound'}
+  { path: 'notfound', component: NotfoundComponent },
+  { path: '**', redirectTo: '/notfound' }
 ];

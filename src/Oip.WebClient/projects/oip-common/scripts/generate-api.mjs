@@ -67,7 +67,7 @@ let config = {
   fixInvalidTypeNamePrefix: "Type",
   fixInvalidEnumKeyPrefix: "Value",
   codeGenConstructs: (constructs) => ({
-    ...constructs,
+    ...constructs
   }),
   primitiveTypeConstructs: (constructs) => ({
     ...constructs,
@@ -84,13 +84,13 @@ let config = {
     onCreateRouteName: (routeNameInfo, rawRouteInfo) => {
       const route = rawRouteInfo.route || rawRouteInfo.path || "<unknown route>";
       const method = rawRouteInfo.method || rawRouteInfo.requestMethod || "<unknown method>";
-      const tags = Array.isArray(rawRouteInfo.tags) ? rawRouteInfo.tags.join(", ") : (rawRouteInfo.tags || "<none>");
+      const tags = Array.isArray(rawRouteInfo.tags) ? rawRouteInfo.tags.join(", ") : rawRouteInfo.tags || "<none>";
       const moduleName = rawRouteInfo.moduleName;
 
       if (!moduleName) {
         throw new Error(
           `Invalid API route name for ${method.toUpperCase()} ${route}. Missing moduleName. Tags: ${tags}. ` +
-            "Add a controller tag/module name or provide explicit operationId.",
+            "Add a controller tag/module name or provide explicit operationId."
         );
       }
 
@@ -98,7 +98,7 @@ let config = {
         throw new Error(
           `Invalid API route name for ${method.toUpperCase()} ${route}. Generated usage "${routeNameInfo.usage}" ` +
             `equals moduleName "${moduleName}". Add an action segment in controller route, ` +
-            `e.g. [HttpGet("get-${moduleName}")], or provide explicit operationId.`,
+            `e.g. [HttpGet("get-${moduleName}")], or provide explicit operationId.`
         );
       }
 
