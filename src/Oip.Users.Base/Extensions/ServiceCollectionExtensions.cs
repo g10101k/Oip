@@ -53,7 +53,7 @@ public static class ServiceCollectionExtensions
             case AddingMode.Remote:
                 services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(options =>
                 {
-                    options.Address = new Uri(settings.Services.OipUsers);
+                    options.Address = new Uri(settings.Services.UsersService);
                 });
                 services.TryAddScoped<IUserService, RemoteUserService>();
                 services.AddUserCacheRepository();

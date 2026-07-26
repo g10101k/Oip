@@ -8,9 +8,7 @@ export const langIntercept: HttpInterceptorFn = (req, next) => {
   const layoutService = inject(LayoutService);
   const securityService = inject(SecurityService);
   const lang = layoutService.language() ? layoutService.language() : 'en';
-  const headers = req.headers
-    .set('Accept-language', lang)
-    .set('X-Timezone', layoutService.timeZone());
+  const headers = req.headers.set('Accept-language', lang).set('X-Timezone', layoutService.timeZone());
   const reqWithCredentials = req.clone({
     headers,
     withCredentials: true
@@ -26,10 +24,14 @@ export const langIntercept: HttpInterceptorFn = (req, next) => {
 
   return securityService.getCsrfToken().pipe(
     take(1),
-    switchMap((csrfToken) => next(csrfToken?.token
-      ? reqWithCredentials.clone({
-        headers: reqWithCredentials.headers.set(csrfToken.headerName, csrfToken.token)
-      })
-      : reqWithCredentials))
+    switchMap((csrfToken) =>
+      next(
+        csrfToken?.token
+          ? reqWithCredentials.clone({
+              headers: reqWithCredentials.headers.set(csrfToken.headerName, csrfToken.token)
+            })
+          : reqWithCredentials
+      )
+    )
   );
 };

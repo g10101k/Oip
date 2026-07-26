@@ -785,9 +785,6 @@ public static class OipModuleApplication
     /// <summary>
     /// Build Oip Module application
     /// </summary>
-    /// <param name="settings"></param>
-    /// <param name="builder">The WebApplicationBuilder instance</param>
-    /// <returns></returns>
     [Obsolete("Use particle method call")]
     public static WebApplication BuildApp(this WebApplicationBuilder builder, ISettings settings)
     {
@@ -819,6 +816,45 @@ public static class OipModuleApplication
     {
         app.UseForwardedHeaders();
         return app;
+    }
+
+    /// <summary>
+    /// Enables forwarded headers middleware.
+    /// </summary>
+    public static WebApplication UseOipSpa(this WebApplication app, ISettings settings)
+    {
+        var isStandalone = settings.ServiceAddingMode == AddingMode.Local;
+
+        if (isStandalone)
+        {
+            SetSpaServiceEnvironment(nameof(settings.Services.Shell), settings.Services.Shell);
+        }
+        else
+        {
+            SetSpaEnvironmentVariables(settings.Services);
+        }
+
+        return app;
+    }
+
+    private static void SetSpaEnvironmentVariables(OipServicesSettings services)
+    {
+        foreach (var property in typeof(OipServicesSettings).GetProperties())
+        {
+            if (property.PropertyType != typeof(string))
+                continue;
+
+            var value = property.GetValue(services) as string;
+            if (string.IsNullOrWhiteSpace(value))
+                continue;
+
+            SetSpaServiceEnvironment(property.Name, value);
+        }
+    }
+
+    private static void SetSpaServiceEnvironment(string name, string value)
+    {
+        Environment.SetEnvironmentVariable($"OIP_URLS:{name}", value);
     }
 
     private static bool TryParseKnownNetwork(string value, out Microsoft.AspNetCore.HttpOverrides.IPNetwork network)

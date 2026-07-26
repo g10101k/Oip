@@ -27,8 +27,8 @@ import { UserProfileApi } from '../api/user-profile.api';
         maxFileSize="1000000"
         mode="basic"
         name="files"
-        [customUpload]="true"
         [auto]="true"
+        [customUpload]="true"
         (uploadHandler)="uploadPhoto($event)" />
     </div>
   `

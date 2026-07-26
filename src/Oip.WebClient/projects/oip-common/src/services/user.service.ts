@@ -48,20 +48,24 @@ export class UserService {
     const data = this.securityService.getCurrentUser();
     const givenNameInitial = data?.given_name?.trim()?.[0];
     const familyNameInitial = data?.family_name?.trim()?.[0];
-    const displayNameInitials = this.getInitials(data?.displayName ?? data?.name ?? data?.userName ?? data?.preferred_username);
+    const displayNameInitials = this.getInitials(
+      data?.displayName ?? data?.name ?? data?.userName ?? data?.preferred_username
+    );
 
     return `${givenNameInitial ?? ''}${familyNameInitial ?? ''}`.toUpperCase() || displayNameInitials;
   }
 
   get userName(): string {
     const data = this.securityService.getCurrentUser();
-    return [data?.given_name, data?.family_name].filter(Boolean).join(' ')
-      || data?.displayName
-      || data?.name
-      || data?.userName
-      || data?.preferred_username
-      || data?.email
-      || '';
+    return (
+      [data?.given_name, data?.family_name].filter(Boolean).join(' ') ||
+      data?.displayName ||
+      data?.name ||
+      data?.userName ||
+      data?.preferred_username ||
+      data?.email ||
+      ''
+    );
   }
 
   /**
@@ -120,22 +124,19 @@ export class UserService {
   }
 
   private getInitials(value?: string): string {
-    return value
-      ?.trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join('')
-      .toUpperCase() ?? '';
+    return (
+      value
+        ?.trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase() ?? ''
+    );
   }
 
   private getCurrentUserPhotoKey(user: any): string | null {
-    return user?.sub
-      || user?.userName
-      || user?.preferred_username
-      || user?.displayName
-      || user?.name
-      || null;
+    return user?.sub || user?.userName || user?.preferred_username || user?.displayName || user?.name || null;
   }
 }

@@ -38,7 +38,6 @@ internal static class Program
             builder.Services.AddCors(settings);
             builder.Services.AddDataProtection(settings);
             builder.Services.AddForwardedHeaders(settings);
-
             builder.Services.AddOipLocalization();
             builder.Services.AddOpenTelemetry(settings);
             builder.Services.AddControllersAndView();
@@ -48,7 +47,7 @@ internal static class Program
             builder.Services.AddApplicationsService(settings);
 
             var app = builder.Build();
-
+            app.UseOipSpa(settings);
             app.UseOipForwardedHeaders();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
@@ -68,10 +67,9 @@ internal static class Program
             app.UseUsersService(settings);
             app.UseDiscussionsService(settings);
             app.UseNotificationsService(settings);
-            
             app.MigrateOipModuleDatabase();
             app.MigrateDemoCustomerTableContext();
-            
+
             app.Run();
         }
         catch (OperationCanceledException)

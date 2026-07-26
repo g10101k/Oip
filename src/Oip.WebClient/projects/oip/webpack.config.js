@@ -1,7 +1,7 @@
-const { shareAll, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack');
+const { shareAll, withModuleFederationPlugin } = require("@angular-architects/module-federation/webpack");
 
 module.exports = withModuleFederationPlugin({
   shared: {
-    ...shareAll({ singleton: true, strictVersion: true, requiredVersion: 'auto' }),
+    ...shareAll({ singleton: true, strictVersion: true, requiredVersion: "auto" })
   }
 });

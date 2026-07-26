@@ -7,7 +7,6 @@ import { Button } from 'primeng/button';
 import { SecurityComponent } from './security.component';
 import { IframeModuleSettings } from '../api/data-contracts';
 
-
 @Component({
   standalone: true,
   imports: [SecurityComponent, TranslatePipe, InputText, FormsModule, Button],
@@ -32,7 +31,7 @@ import { IframeModuleSettings } from '../api/data-contracts';
                 placeholder="{{ 'iframe-module.iframeModule.urlPlaceholder' | translate }}"
                 qa-id="iframe-module-settings-site-url-input"
                 type="text"
-                [(ngModel)]="settings.url"/>
+                [(ngModel)]="settings.url" />
             </div>
             <div class="flex justify-end">
               <p-button
@@ -46,7 +45,7 @@ import { IframeModuleSettings } from '../api/data-contracts';
         </div>
       </div>
     } @else if (isSecurity) {
-      <security [controller]="controller" [id]="id"/>
+      <security [controller]="controller" [id]="id" />
     }
   `
 })

@@ -53,7 +53,6 @@ public static class ServiceCollectionExtensions
             .AddController<IframeModuleController>()
             .AddController<MenuController>()
             .AddController<ModuleController>()
-            .AddController<ProxySettingsController>()
             .AddController<ExtensionsController>()
             .AddController<ExtensionModulesController>();
 

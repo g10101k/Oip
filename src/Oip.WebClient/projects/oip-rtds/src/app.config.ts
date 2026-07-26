@@ -5,16 +5,18 @@ import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
 import { provideAppThemes, provideOip } from 'oip-common';
-import { appTheme } from "../../oip/src/app.theme";
+import { appTheme } from '../../oip/src/app.theme';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideOip(),
     provideAppThemes(appTheme, { mode: 'replaceDefaults' }),
-    provideRouter(appRoutes, withInMemoryScrolling({anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled'}),
+    provideRouter(
+      appRoutes,
+      withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
       withEnabledBlockingInitialNavigation()
     ),
     provideAnimationsAsync(),
-    providePrimeNG({theme: {preset: Aura, options: {darkModeSelector: '.app-dark'}}})
+    providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } })
   ]
 };

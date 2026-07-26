@@ -3,7 +3,6 @@ import Aura from '@primeng/themes/aura';
 import { primitive } from '@primeng/themes/aura/base';
 import { AppThemePreset } from 'oip-common';
 
-
 export const appTheme: AppThemePreset[] = [
   {
     id: 'Oip',
@@ -26,10 +25,10 @@ export const appTheme: AppThemePreset[] = [
         }
       }
     }),
-    primaryColors:{
+    primaryColors: {
       rose: primitive['red']
     },
-    surfaceColors:{
+    surfaceColors: {
       zinc: {
         0: '#ffffff',
         50: '#fafafa',

@@ -75,15 +75,18 @@ export class BffSecurityService implements OnDestroy, SecurityService {
   public readonly payload = new BehaviorSubject<any>(null);
 
   auth(): void {
-    this.http.get<AuthSessionResponse>(this.buildUrl('api/security/get-current-auth-session'), {
-      withCredentials: true
-    }).pipe(
-      tap((session) => this.applySession(session)),
-      catchError(() => {
-        this.applyAnonymousSession();
-        return of(null);
+    this.http
+      .get<AuthSessionResponse>(this.buildUrl('api/security/get-current-auth-session'), {
+        withCredentials: true
       })
-    ).subscribe();
+      .pipe(
+        tap((session) => this.applySession(session)),
+        catchError(() => {
+          this.applyAnonymousSession();
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
   logout(): void {
@@ -135,11 +138,12 @@ export class BffSecurityService implements OnDestroy, SecurityService {
   }
 
   getCsrfToken(): Observable<AuthCsrfToken | null> {
-    this.http.get<AuthCsrfToken>(this.buildUrl('api/security/get-auth-csrf-token'), {
-      withCredentials: true
-    }).pipe(
-      catchError(() => of(null))
-    ).subscribe((token) => this.csrfToken.next(token));
+    this.http
+      .get<AuthCsrfToken>(this.buildUrl('api/security/get-auth-csrf-token'), {
+        withCredentials: true
+      })
+      .pipe(catchError(() => of(null)))
+      .subscribe((token) => this.csrfToken.next(token));
 
     return this.csrfToken.asObservable();
   }
@@ -169,7 +173,7 @@ export class BffSecurityService implements OnDestroy, SecurityService {
 
     this.authenticated.next(session.isAuthenticated);
     this.currentUser.next(user);
-    this.payload.next({realm_access: {roles}, ...user});
+    this.payload.next({ realm_access: { roles }, ...user });
   }
 
   private createCurrentUser(session: AuthSessionResponse, roles: string[]): CurrentUser {

@@ -134,7 +134,7 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                 {{ 'applications.table.icon' | translate }}
                 <p-sortIcon field="icon"></p-sortIcon>
               </th>
-              <th pSortableColumn="order" class="text-right">
+              <th class="text-right" pSortableColumn="order">
                 {{ 'applications.table.order' | translate }}
                 <p-sortIcon field="order"></p-sortIcon>
               </th>
@@ -207,16 +207,16 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                     [severity]="application.enabled ? 'success' : 'danger'"
                     [value]="
                       (application.enabled ? 'applications.table.yes' : 'applications.table.no') | translate
-                  "></p-tag>
+                    "></p-tag>
                 }
               </td>
               <td>
                 @if (application._isEditing && application._editModel; as editModel) {
                   <p-select
+                    appendTo="body"
                     class="w-full min-w-36"
                     optionLabel="label"
                     optionValue="value"
-                    appendTo="body"
                     [options]="serviceTypeOptions"
                     [(ngModel)]="editModel.serviceType"></p-select>
                 } @else {
@@ -237,33 +237,33 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                       icon="pi pi-check"
                       severity="success"
                       text="true"
+                      tooltipPosition="bottom"
                       [disabled]="activeRowAction"
                       [pTooltip]="'applications.table.saveTooltip' | translate"
-                      tooltipPosition="bottom"
                       (onClick)="saveApplication(application)"></p-button>
                     <p-button
                       icon="pi pi-times"
                       severity="secondary"
                       text="true"
+                      tooltipPosition="bottom"
                       [disabled]="activeRowAction"
                       [pTooltip]="'applications.table.cancelTooltip' | translate"
-                      tooltipPosition="bottom"
                       (onClick)="cancelEdit(application)"></p-button>
                   } @else {
                     <p-button
                       icon="pi pi-pencil"
                       text="true"
+                      tooltipPosition="bottom"
                       [disabled]="activeRowAction"
                       [pTooltip]="'applications.table.editTooltip' | translate"
-                      tooltipPosition="bottom"
                       (onClick)="editApplication(application)"></p-button>
                     <p-button
                       icon="pi pi-trash"
                       severity="danger"
                       text="true"
+                      tooltipPosition="bottom"
                       [disabled]="activeRowAction"
                       [pTooltip]="'applications.table.deleteTooltip' | translate"
-                      tooltipPosition="bottom"
                       (onClick)="deleteApplication(application)"></p-button>
                   }
                 </div>
@@ -273,7 +273,7 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="10" class="py-8 text-center text-surface-500">
+              <td class="py-8 text-center text-surface-500" colspan="10">
                 {{ 'applications.empty' | translate }}
               </td>
             </tr>
@@ -518,9 +518,7 @@ export class ApplicationsComponent implements OnInit {
   }
 
   private filterApplications(filter: string): ApplicationTableItem[] {
-    const source = this.draftApplication
-      ? [this.draftApplication, ...this.applications]
-      : [...this.applications];
+    const source = this.draftApplication ? [this.draftApplication, ...this.applications] : [...this.applications];
     const normalizedFilter = filter.trim().toLocaleLowerCase();
 
     if (!normalizedFilter) {

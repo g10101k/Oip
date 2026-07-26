@@ -16,14 +16,24 @@ import { NotificationService } from '../services/notification.service';
 @Component({
   selector: 'app-user-notifications',
   standalone: true,
-  imports: [CommonModule, BadgeModule, ButtonModule, PaginatorModule, Popover, ProgressSpinnerModule, Tag, Tooltip, TranslatePipe],
+  imports: [
+    CommonModule,
+    BadgeModule,
+    ButtonModule,
+    PaginatorModule,
+    Popover,
+    ProgressSpinnerModule,
+    Tag,
+    Tooltip,
+    TranslatePipe
+  ],
   template: `
     <button
       class="layout-topbar-action relative"
       id="oip-app-topbar-notification-button"
       type="button"
-      (click)="toggle($event)"
-      [attr.aria-label]="'Notifications: ' + unreadNotificationCount()">
+      [attr.aria-label]="'Notifications: ' + unreadNotificationCount()"
+      (click)="toggle($event)">
       <i class="pi pi-bell"></i>
       @if (unreadNotificationCount() > 0) {
         <p-badge
@@ -99,8 +109,8 @@ import { NotificationService } from '../services/notification.service';
           styleClass="mt-3"
           [first]="skip"
           [rows]="take"
-          [totalRecords]="totalCount"
           [rowsPerPageOptions]="[5, 10, 20]"
+          [totalRecords]="totalCount"
           (onPageChange)="onPageChange($event)"></p-paginator>
       }
     </p-popover>
