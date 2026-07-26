@@ -48,7 +48,7 @@ internal static class Program
             builder.Services.AddReportServices();
 
             var app = builder.Build();
-
+            app.UseOipSpa(settings);
             app.UseOipForwardedHeaders();
             app.AddRequestLocalization();
             app.AddExceptionHandler();
