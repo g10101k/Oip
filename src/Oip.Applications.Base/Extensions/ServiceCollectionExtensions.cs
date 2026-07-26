@@ -44,7 +44,7 @@ public static class ServiceCollectionExtensions
             case AddingMode.Remote:
                 services.AddGrpcClient<GrpcApplicationRegistryService.GrpcApplicationRegistryServiceClient>(options =>
                 {
-                    options.Address = new Uri(settings.Services.OipApplications);
+                    options.Address = new Uri(settings.Services.ApplicationsService);
                 });
                 services.TryAddScoped<IApplicationRegistryService, GrpcApplicationRegistryServiceClientAdapter>();
                 services.AddStartupTask<ApplicationSelfRegistrationStartupTask>();

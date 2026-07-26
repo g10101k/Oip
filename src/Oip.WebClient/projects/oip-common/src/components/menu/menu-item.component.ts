@@ -28,7 +28,7 @@ interface MenuItemComponentTranslation {
   deleteItemConfirmRejectButtonPropsLabel: string;
   deleteItemConfirmAcceptButtonPropsLabel: string;
   moveUp: string;
-  moveDown: string
+  moveDown: string;
 }
 
 @Component({

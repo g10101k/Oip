@@ -134,7 +134,7 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
     return this.httpClient.request<SecurityDto[]>({
       path: `/api/${controller}/get-security`,
       method: 'GET',
-      query: {id},
+      query: { id },
       secure: true,
       format: 'json'
     });
@@ -149,5 +149,4 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
       type: ContentType.Json
     });
   }
-
 }

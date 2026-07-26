@@ -55,7 +55,7 @@ interface SelectOption<TValue = string> {
       <div class="card space-y-4">
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h5 class="mb-1"><i class="fa-duotone fa-solid fa-user"></i> {{ title }} </h5>
+            <h5 class="mb-1"><i class="fa-duotone fa-solid fa-user"></i> {{ title }}</h5>
             <p class="m-0 text-surface-500">{{ 'customer-module.content.subtitle' | translate }}</p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row">
@@ -64,86 +64,93 @@ interface SelectOption<TValue = string> {
               type="text"
               [placeholder]="'customer-module.content.globalSearch' | translate"
               [(ngModel)]="globalFilter"
-              (keydown.enter)="applyGlobalFilter()"/>
+              (keydown.enter)="applyGlobalFilter()" />
             <p-button
               icon="pi pi-search"
               [label]="'customer-module.content.search' | translate"
-              (onClick)="applyGlobalFilter()"/>
+              (onClick)="applyGlobalFilter()" />
             <p-button
               icon="pi pi-filter-slash"
               severity="secondary"
               [label]="'customer-module.content.clear' | translate"
-              (onClick)="clearFilters()"/>
+              (onClick)="clearFilters()" />
             <p-button
               icon="pi pi-plus"
               severity="success"
               [disabled]="loading || !canEdit"
               [label]="'customer-module.content.add' | translate"
-              (onClick)="beginCreateCustomer()"/>
+              (onClick)="beginCreateCustomer()" />
           </div>
         </div>
 
         <p-table
           #table
-          [value]="visibleCustomers"
+          dataKey="id"
+          responsiveLayout="scroll"
+          [filters]="localSettings().filters ?? {}"
+          [first]="localSettings().first ?? 0"
+          [globalFilterFields]="globalFilterFields"
           [lazy]="true"
           [lazyLoadOnInit]="false"
           [loading]="loading"
           [paginator]="true"
           [rows]="localSettings().rows ?? 10"
-          [first]="localSettings().first ?? 0"
-          [totalRecords]="tableTotalRecords"
-          [rowsPerPageOptions]="[10, 50, 100, 500, 1000, { showAll: 'customer-module.content.rowsPerPageOptionsAll' | translate }]"
-          [filters]="localSettings().filters ?? {}"
+          [rowsPerPageOptions]="[
+            10,
+            50,
+            100,
+            500,
+            1000,
+            { showAll: 'customer-module.content.rowsPerPageOptionsAll' | translate }
+          ]"
           [sortField]="localSettings().sortField ?? undefined"
           [sortOrder]="localSettings().sortOrder ?? 1"
-          [globalFilterFields]="globalFilterFields"
-          responsiveLayout="scroll"
-          dataKey="id"
+          [totalRecords]="tableTotalRecords"
+          [value]="visibleCustomers"
           (onLazyLoad)="loadCustomers($event)">
           <ng-template pTemplate="header">
             <tr>
               <th pSortableColumn="fullName">
                 {{ 'customer-module.content.table.fullName' | translate }}
-                <p-sortIcon field="fullName"/>
-                <p-columnFilter display="menu" field="fullName" type="text"/>
+                <p-sortIcon field="fullName" />
+                <p-columnFilter display="menu" field="fullName" type="text" />
               </th>
               <th pSortableColumn="email">
                 {{ 'customer-module.content.table.email' | translate }}
-                <p-sortIcon field="email"/>
-                <p-columnFilter display="menu" field="email" type="text"/>
+                <p-sortIcon field="email" />
+                <p-columnFilter display="menu" field="email" type="text" />
               </th>
               <th pSortableColumn="categoryName">
                 {{ 'customer-module.content.table.category' | translate }}
-                <p-sortIcon field="categoryName"/>
-                <p-columnFilter display="menu" field="categoryName" type="text"/>
+                <p-sortIcon field="categoryName" />
+                <p-columnFilter display="menu" field="categoryName" type="text" />
               </th>
               <th pSortableColumn="countryName">
                 {{ 'customer-module.content.table.country' | translate }}
-                <p-sortIcon field="countryName"/>
-                <p-columnFilter display="menu" field="countryName" type="text"/>
+                <p-sortIcon field="countryName" />
+                <p-columnFilter display="menu" field="countryName" type="text" />
               </th>
               <th pSortableColumn="status">
                 {{ 'customer-module.content.table.status' | translate }}
-                <p-sortIcon field="status"/>
-                <p-columnFilter display="menu" field="status" type="text"/>
+                <p-sortIcon field="status" />
+                <p-columnFilter display="menu" field="status" type="text" />
               </th>
               <th pSortableColumn="creditScore">
                 {{ 'customer-module.content.table.creditScore' | translate }}
-                <p-sortIcon field="creditScore"/>
-                <p-columnFilter display="menu" field="creditScore" type="numeric"/>
+                <p-sortIcon field="creditScore" />
+                <p-columnFilter display="menu" field="creditScore" type="numeric" />
               </th>
               @if (hasRight(viewFinancialsRight)) {
                 <th pSortableColumn="lifetimeValue">
                   {{ 'customer-module.content.table.lifetimeValue' | translate }}
-                  <p-sortIcon field="lifetimeValue"/>
-                  <p-columnFilter display="menu" field="lifetimeValue" type="numeric"/>
+                  <p-sortIcon field="lifetimeValue" />
+                  <p-columnFilter display="menu" field="lifetimeValue" type="numeric" />
                 </th>
               }
               <th pSortableColumn="createdAt">
                 {{ 'customer-module.content.table.createdAt' | translate }}
-                <p-sortIcon field="createdAt"/>
-                <p-columnFilter display="menu" field="createdAt" type="date"/>
+                <p-sortIcon field="createdAt" />
+                <p-columnFilter display="menu" field="createdAt" type="date" />
               </th>
               <th class="text-center">
                 {{ 'customer-module.content.table.ordersCount' | translate }}
@@ -154,18 +161,18 @@ interface SelectOption<TValue = string> {
             </tr>
           </ng-template>
 
-          <ng-template pTemplate="body" let-customer>
+          <ng-template let-customer pTemplate="body">
             <tr>
               <td>
                 @if (customer._isEditing && customer._editModel; as editModel) {
-                  <input pInputText class="w-full min-w-40" [(ngModel)]="editModel.fullName"/>
+                  <input class="w-full min-w-40" pInputText [(ngModel)]="editModel.fullName" />
                 } @else {
                   <span class="font-medium">{{ customer.fullName }}</span>
                 }
               </td>
               <td>
                 @if (customer._isEditing && customer._editModel; as editModel) {
-                  <input pInputText class="w-full min-w-40" [(ngModel)]="editModel.email"/>
+                  <input class="w-full min-w-40" pInputText [(ngModel)]="editModel.email" />
                 } @else {
                   {{ customer.email }}
                 }
@@ -173,14 +180,14 @@ interface SelectOption<TValue = string> {
               <td>
                 @if (customer._isEditing && customer._editModel; as editModel) {
                   <p-select
-                    class="w-full min-w-36"
                     appendTo="body"
+                    class="w-full min-w-36"
                     optionLabel="label"
                     optionValue="value"
                     [filter]="true"
                     [options]="categoryOptions"
                     [placeholder]="'customer-module.content.table.category' | translate"
-                    [(ngModel)]="editModel.category"/>
+                    [(ngModel)]="editModel.category" />
                 } @else {
                   {{ customer.category }}
                 }
@@ -188,14 +195,14 @@ interface SelectOption<TValue = string> {
               <td>
                 @if (customer._isEditing && customer._editModel; as editModel) {
                   <p-select
-                    class="w-full min-w-36"
                     appendTo="body"
+                    class="w-full min-w-36"
                     optionLabel="label"
                     optionValue="value"
                     [filter]="true"
                     [options]="countryOptions"
                     [placeholder]="'customer-module.content.table.country' | translate"
-                    [(ngModel)]="editModel.country"/>
+                    [(ngModel)]="editModel.country" />
                 } @else {
                   {{ customer.country }}
                 }
@@ -207,15 +214,18 @@ interface SelectOption<TValue = string> {
                     optionLabel="label"
                     optionValue="value"
                     [options]="statusOptions"
-                    [(ngModel)]="editModel.status"/>
+                    [(ngModel)]="editModel.status" />
                 } @else {
-                  <p-tag [value]="customer.status" [severity]="statusSeverity(customer.status)"/>
+                  <p-tag [severity]="statusSeverity(customer.status)" [value]="customer.status" />
                 }
               </td>
               <td>
                 @if (customer._isEditing && customer._editModel; as editModel) {
-                  <input pInputText type="number" class="w-full min-w-28 text-right"
-                         [(ngModel)]="editModel.creditScore"/>
+                  <input
+                    class="w-full min-w-28 text-right"
+                    pInputText
+                    type="number"
+                    [(ngModel)]="editModel.creditScore" />
                 } @else {
                   <span class="block text-right tabular-nums">{{ customer.creditScore }}</span>
                 }
@@ -223,8 +233,11 @@ interface SelectOption<TValue = string> {
               @if (hasRight(viewFinancialsRight)) {
                 <td>
                   @if (customer._isEditing && customer._editModel; as editModel) {
-                    <input pInputText type="number" class="w-full min-w-32 text-right"
-                           [(ngModel)]="editModel.lifetimeValue"/>
+                    <input
+                      class="w-full min-w-32 text-right"
+                      pInputText
+                      type="number"
+                      [(ngModel)]="editModel.lifetimeValue" />
                   } @else {
                     <span class="block text-right tabular-nums">{{ customer.lifetimeValue | number: '1.2-2' }}</span>
                   }
@@ -246,25 +259,25 @@ interface SelectOption<TValue = string> {
                       severity="success"
                       [disabled]="activeRowAction || !canEdit"
                       [text]="true"
-                      (onClick)="saveCustomer(customer)"/>
+                      (onClick)="saveCustomer(customer)" />
                     <p-button
                       icon="pi pi-times"
                       severity="secondary"
                       [disabled]="activeRowAction"
                       [text]="true"
-                      (onClick)="cancelEdit(customer)"/>
+                      (onClick)="cancelEdit(customer)" />
                   } @else {
                     <p-button
                       icon="pi pi-pencil"
                       [disabled]="activeRowAction || !canEdit"
                       [text]="true"
-                      (onClick)="editCustomer(customer)"/>
+                      (onClick)="editCustomer(customer)" />
                     <p-button
                       icon="pi pi-trash"
                       severity="danger"
                       [disabled]="activeRowAction || !canDelete"
                       [text]="true"
-                      (onClick)="deleteCustomer(customer)"/>
+                      (onClick)="deleteCustomer(customer)" />
                   }
                 </div>
               </td>
@@ -273,7 +286,7 @@ interface SelectOption<TValue = string> {
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td [attr.colspan]="hasRight(viewFinancialsRight) ? 10 : 9" class="py-8 text-center text-surface-500">
+              <td class="py-8 text-center text-surface-500" [attr.colspan]="hasRight(viewFinancialsRight) ? 10 : 9">
                 {{ 'customer-module.content.empty' | translate }}
               </td>
             </tr>
@@ -286,7 +299,7 @@ interface SelectOption<TValue = string> {
         <p class="mt-3 mb-0 text-surface-500">{{ 'customer-module.settings.description' | translate }}</p>
       </div>
     } @else if (isSecurity) {
-      <security [controller]="controller" [id]="id"/>
+      <security [controller]="controller" [id]="id" />
     }
   `,
   providers: [CustomerModuleApi],
@@ -307,17 +320,20 @@ interface SelectOption<TValue = string> {
 })
 export class CustomerModuleComponent
   extends BaseModuleComponent<CustomerModuleSettings, CustomerModuleLocalSettings>
-  implements OnInit, OnDestroy, AfterViewInit {
+  implements OnInit, OnDestroy, AfterViewInit
+{
   @ViewChild('table') table!: Table;
 
   protected readonly dataService = inject(CustomerModuleApi);
 
   protected readonly viewFinancialsRight = 'view-financials';
   protected readonly globalFilterFields = ['fullName', 'email', 'categoryName', 'countryName'];
-  protected readonly statusOptions: SelectOption<DemoCustomerStatus>[] = Object.values(DemoCustomerStatus).map((status) => ({
-    label: status,
-    value: status
-  }));
+  protected readonly statusOptions: SelectOption<DemoCustomerStatus>[] = Object.values(DemoCustomerStatus).map(
+    (status) => ({
+      label: status,
+      value: status
+    })
+  );
 
   protected categoryOptions: SelectOption[] = [];
   protected countryOptions: SelectOption[] = [];
@@ -386,7 +402,7 @@ export class CustomerModuleComponent
     const request: TableQueryRequest = {
       first: event.first ?? this.localSettings().first ?? 0,
       rows: event.rows ?? this.localSettings().rows ?? 10,
-      sortField: typeof event.sortField === 'string' ? event.sortField : this.localSettings().sortField ?? undefined,
+      sortField: typeof event.sortField === 'string' ? event.sortField : (this.localSettings().sortField ?? undefined),
       sortOrder: event.sortOrder ?? this.localSettings().sortOrder ?? 1,
       globalFilter: this.globalFilter,
       filters: filters as never
@@ -394,7 +410,7 @@ export class CustomerModuleComponent
 
     try {
       const response = await this.dataService.getPage(request);
-      this.customers = (response.data ?? []).map((customer) => ({...customer}));
+      this.customers = (response.data ?? []).map((customer) => ({ ...customer }));
       this.totalRecords = response.total ?? 0;
       this.syncVisibleCustomers();
 
@@ -521,7 +537,6 @@ export class CustomerModuleComponent
       await this.loadCustomers(this.createLazyEventFromState());
     } catch (error) {
       this.msgService.errorFromException(error, 'Save customer error');
-
     } finally {
       this.activeRowAction = false;
     }
@@ -554,7 +569,6 @@ export class CustomerModuleComponent
       await this.loadCustomers(this.createLazyEventFromState());
     } catch (error) {
       this.msgService.errorFromException(error, 'Delete customer error');
-
     } finally {
       this.activeRowAction = false;
     }
@@ -652,9 +666,7 @@ export class CustomerModuleComponent
   }
 
   private syncVisibleCustomers(): void {
-    this.visibleCustomers = this.draftCustomer
-      ? [this.draftCustomer, ...this.customers]
-      : [...this.customers];
+    this.visibleCustomers = this.draftCustomer ? [this.draftCustomer, ...this.customers] : [...this.customers];
     this.tableTotalRecords = this.totalRecords + (this.draftCustomer ? 1 : 0);
   }
 }

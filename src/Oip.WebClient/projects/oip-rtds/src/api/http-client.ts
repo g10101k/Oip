@@ -236,9 +236,7 @@ export class HttpClient<SecurityDataType = unknown> {
       return;
     }
 
-    this.securityService.authorize(
-      `${window.location.pathname}${window.location.search}${window.location.hash}`,
-    );
+    this.securityService.authorize(`${window.location.pathname}${window.location.search}${window.location.hash}`);
   }
 
   private async getCsrfRequestParams(method: string | undefined, path: string): Promise<RequestParams> {

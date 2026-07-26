@@ -11,11 +11,7 @@ import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '../services/app.layout.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import {
-  APP_THEME_PRESETS,
-  APP_THEME_PRESETS_MERGE_MODE,
-  AppThemePreset
-} from '../services/theme-presets.token';
+import { APP_THEME_PRESETS, APP_THEME_PRESETS_MERGE_MODE, AppThemePreset } from '../services/theme-presets.token';
 
 const DEFAULT_THEME_PRESETS: ReadonlyArray<AppThemePreset> = [
   { id: 'Aura', label: 'Aura', preset: Aura as Preset },
@@ -99,12 +95,12 @@ declare type SurfacesType = {
         <span class="text-sm text-muted-color font-semibold">{{ 'app-configurator.presets' | translate }}</span>
         <p-selectButton
           id="oip-app-configurator-preset-select-button"
+          optionLabel="label"
+          optionValue="value"
           size="small"
           [allowEmpty]="false"
           [ngModel]="selectedPreset()"
           [options]="presets"
-          optionLabel="label"
-          optionValue="value"
           (ngModelChange)="onPresetChange($event)" />
       </div>
       @if (showMenuModeButton()) {
@@ -146,8 +142,9 @@ export class AppConfiguratorComponent implements OnInit {
 
   private readonly defaultThemePreset = this.themePresets[0] ?? DEFAULT_THEME_PRESETS[0];
 
-  private readonly fallbackPrimaryColors = ((DEFAULT_THEME_PRESETS[0].preset as { primitive?: Record<string, PaletteDesignToken> })
-    .primitive ?? {}) as Record<string, PaletteDesignToken>;
+  private readonly fallbackPrimaryColors = ((
+    DEFAULT_THEME_PRESETS[0].preset as { primitive?: Record<string, PaletteDesignToken> }
+  ).primitive ?? {}) as Record<string, PaletteDesignToken>;
 
   presets = this.themePresets.map((theme) => ({ label: theme.label ?? theme.id, value: theme.id }));
 
@@ -479,7 +476,8 @@ export class AppConfiguratorComponent implements OnInit {
         .map(([name, palette]) => ({ name, palette }));
     }
 
-    const presetPalette = ((activeThemePreset.preset as { primitive?: Record<string, PaletteDesignToken> }).primitive ?? {});
+    const presetPalette =
+      (activeThemePreset.preset as { primitive?: Record<string, PaletteDesignToken> }).primitive ?? {};
     const palettes: SurfacesType[] = [{ name: 'noir', palette: {} }];
 
     PRIMARY_COLORS.forEach((color) => {
@@ -548,7 +546,9 @@ export class AppConfiguratorComponent implements OnInit {
     this.layoutService.layoutConfig.update((state) => ({
       ...state,
       preset: nextThemeId,
-      primary: primaryColors.some((color) => color.name === state.primary) ? state.primary : (primaryColors[0]?.name ?? state.primary),
+      primary: primaryColors.some((color) => color.name === state.primary)
+        ? state.primary
+        : (primaryColors[0]?.name ?? state.primary),
       surface:
         nextTheme.surfaceColors && !surfaceColors.some((color) => color.name === state.surface)
           ? (surfaceColors[0]?.name ?? state.surface)

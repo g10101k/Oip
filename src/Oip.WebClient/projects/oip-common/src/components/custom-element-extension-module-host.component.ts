@@ -1,20 +1,20 @@
-import { ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, ViewChild } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { SecurityComponent } from "./security.component";
-import { TranslatePipe } from "@ngx-translate/core";
-import { Button } from "primeng/button";
-import { firstValueFrom } from "rxjs";
-import { ExtensionModulesApi } from "../api/extension-modules.api";
-import { BaseModuleComponent } from "./base-module.component";
-import { ExtensionLoaderService } from "../extension-host/extension-loader.service";
-import { Router } from "@angular/router";
+import { ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SecurityComponent } from './security.component';
+import { TranslatePipe } from '@ngx-translate/core';
+import { Button } from 'primeng/button';
+import { firstValueFrom } from 'rxjs';
+import { ExtensionModulesApi } from '../api/extension-modules.api';
+import { BaseModuleComponent } from './base-module.component';
+import { ExtensionLoaderService } from '../extension-host/extension-loader.service';
+import { Router } from '@angular/router';
 import {
   OipExtensionHostContext,
   OipExtensionModuleMetadata,
   OipExtensionNavigateEvent,
   OipExtensionNotifyEvent
-} from "../extension-host/extension-host.types";
-import { emitOipContextChange, OIP_EXTENSION_EVENTS } from "../extension-host/extension-host.events";
+} from '../extension-host/extension-host.types';
+import { emitOipContextChange, OIP_EXTENSION_EVENTS } from '../extension-host/extension-host.events';
 
 @Component({
   standalone: true,
@@ -42,12 +42,14 @@ import { emitOipContextChange, OIP_EXTENSION_EVENTS } from "../extension-host/ex
         </div>
       </div>
     } @else if (showSecurity) {
-      <security [controller]="controller" [id]="id"/>
+      <security [controller]="controller" [id]="id" />
     }
   `
 })
-export class CustomElementExtensionModuleHostComponent extends BaseModuleComponent<unknown, unknown>
-  implements OnDestroy {
+export class CustomElementExtensionModuleHostComponent
+  extends BaseModuleComponent<unknown, unknown>
+  implements OnDestroy
+{
   @ViewChild('extensionContainer')
   private set extensionContainer(element: ElementRef<HTMLElement> | undefined) {
     this.container = element;
@@ -126,9 +128,9 @@ export class CustomElementExtensionModuleHostComponent extends BaseModuleCompone
       return;
     }
 
-    this.extensionMetadata = await this.extensionModulesApi.getExtensionModuleByKey({
+    this.extensionMetadata = (await this.extensionModulesApi.getExtensionModuleByKey({
       extensionKey: this.extensionKey
-    }) as unknown as OipExtensionModuleMetadata;
+    })) as unknown as OipExtensionModuleMetadata;
 
     await this.loadExtensionTranslations(this.extensionMetadata);
   }
@@ -212,7 +214,7 @@ export class CustomElementExtensionModuleHostComponent extends BaseModuleCompone
       }
     };
 
-    Object.assign(this.extensionElement, {oipContext: context});
+    Object.assign(this.extensionElement, { oipContext: context });
     emitOipContextChange(this.extensionElement, context);
   }
 
@@ -300,7 +302,7 @@ export class CustomElementExtensionModuleHostComponent extends BaseModuleCompone
   }
 
   private async renderCustomElementExtension(metadata: OipExtensionModuleMetadata): Promise<void> {
-    const {elementName, scriptUrl} = metadata;
+    const { elementName, scriptUrl } = metadata;
     if (!this.container || !elementName || !scriptUrl) {
       this.loadError = 'Custom Element extension metadata is incomplete.';
       return;

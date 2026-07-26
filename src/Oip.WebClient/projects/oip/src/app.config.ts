@@ -13,10 +13,12 @@ export const appConfig: ApplicationConfig = {
     provideOip(),
     provideAppThemes(appTheme, { mode: 'replaceDefaults' }),
     ProductService,
-    provideRouter(appRoutes, withInMemoryScrolling({anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled'}),
+    provideRouter(
+      appRoutes,
+      withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
       withEnabledBlockingInitialNavigation()
     ),
     provideAnimationsAsync(),
-    providePrimeNG({theme: {preset: Aura, options: {darkModeSelector: '.app-dark'}}})
+    providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } })
   ]
 };

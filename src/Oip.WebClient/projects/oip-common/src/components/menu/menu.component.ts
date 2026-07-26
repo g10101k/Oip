@@ -27,8 +27,7 @@ import { MenuApi } from '../../api/menu.api';
   providers: [MenuApi],
   selector: 'app-menu',
   standalone: true,
-  template: `
-    <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
+  template: ` <div #empty class="layout-sidebar" (contextmenu)="onContextMenu($event)">
       <ul class="layout-menu">
         @for (item of menuService.menu; track item; let i = $index) {
           <ng-container>
@@ -49,9 +48,9 @@ import { MenuApi } from '../../api/menu.api';
       </ul>
     </div>
     @if (securityService.isAdmin()) {
-      <p-contextMenu [target]="empty"/>
-      <menu-item-create-dialog/>
-      <menu-item-edit-dialog/>
+      <p-contextMenu [target]="empty" />
+      <menu-item-create-dialog />
+      <menu-item-edit-dialog />
     }`
 })
 export class MenuComponent implements OnInit {

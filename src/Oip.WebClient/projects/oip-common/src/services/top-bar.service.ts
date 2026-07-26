@@ -44,9 +44,7 @@ export class TopBarService {
 
   checkId(id: string): boolean {
     const activeTopBarItem = this.activeTopBarItem;
-    const result = activeTopBarItem === undefined
-      ? id === 'content'
-      : activeTopBarItem.id == id;
+    const result = activeTopBarItem === undefined ? id === 'content' : activeTopBarItem.id == id;
     return result;
   }
 }

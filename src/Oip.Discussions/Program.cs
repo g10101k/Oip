@@ -49,7 +49,6 @@ internal static class Program
                 .AddController<IframeModuleController>()
                 .AddController<MenuController>()
                 .AddController<ModuleController>()
-                .AddController<ProxySettingsController>()
                 .AddController<SecurityController>();
             builder.Services.AddOipLocalization();
 

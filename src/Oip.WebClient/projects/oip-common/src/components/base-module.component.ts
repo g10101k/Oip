@@ -1,4 +1,14 @@
-import { ChangeDetectorRef, Component, DestroyRef, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  WritableSignal
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TopBarDto } from '../dtos/top-bar.dto';
 import { TopBarService } from '../services/top-bar.service';
@@ -21,7 +31,7 @@ interface BaseComponentLocalization {
   content: string;
 }
 
-@Component({standalone: true, template: ''})
+@Component({ standalone: true, template: '' })
 export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSettings> implements OnInit, OnDestroy {
   private static readonly readRight = 'read';
   private static readonly editRight = 'edit';
@@ -121,7 +131,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    */
   private onConfigUpdate(): void {
     if (Object.keys(this.localSettings()).length > 0) {
-      this._localSettings = {...this.localSettings()};
+      this._localSettings = { ...this.localSettings() };
       this.localSettingsUpdate.next(this._localSettings);
       localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this._localSettings));
     }
@@ -181,9 +191,9 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Defines the top bar items.
    */
   public topBarItems: TopBarDto[] = [
-    {id: 'content', icon: 'pi-box', caption: ''},
-    {id: 'settings', icon: 'pi-cog', caption: ''},
-    {id: 'security', icon: 'pi-lock', caption: ''}
+    { id: 'content', icon: 'pi-box', caption: '' },
+    { id: 'settings', icon: 'pi-cog', caption: '' },
+    { id: 'security', icon: 'pi-lock', caption: '' }
   ];
 
   /**
@@ -317,14 +327,12 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Called whenever the module instance changes, including the first load.
    * Derived components can override this to refresh module-specific data.
    */
-  protected async onModuleInstanceChange(): Promise<void> {
-  }
+  protected async onModuleInstanceChange(): Promise<void> {}
 
   /**
    * Called whenever current user rights for the active module instance are recalculated.
    */
-  protected onSecurityRightsChange(): void {
-  }
+  protected onSecurityRightsChange(): void {}
 
   /**
    * Starts watching current token roles and maps them to module instance security settings.
@@ -340,9 +348,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     this.rightsSubscription = this.securityService.payload
       .pipe(
         switchMap((payload) =>
-          from(this.getSecurity(controller, id)).pipe(
-            map((securitySettings) => ({ payload, securitySettings }))
-          )
+          from(this.getSecurity(controller, id)).pipe(map((securitySettings) => ({ payload, securitySettings })))
         ),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -379,12 +385,15 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   }
 
   protected hasSecurityRight(roles: string[], securitySettings: SecurityDto[], code: string): boolean {
-    return securitySettings
-      .find((security) => security.code === code)
-      ?.roles?.some((role) => roles.includes(role)) ?? false;
+    return (
+      securitySettings.find((security) => security.code === code)?.roles?.some((role) => roles.includes(role)) ?? false
+    );
   }
 
-  protected getSecurity(controller: string = this.controller, id: number | undefined = this.id): Promise<SecurityDto[]> {
+  protected getSecurity(
+    controller: string = this.controller,
+    id: number | undefined = this.id
+  ): Promise<SecurityDto[]> {
     if (!controller || id == null) {
       return Promise.resolve([]);
     }
