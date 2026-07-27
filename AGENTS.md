@@ -48,7 +48,7 @@ When working on API contracts, controllers, DTOs, OpenAPI/Swagger/NSwag configur
 Required command:
 
 ```bash
-dotnet run --configuration Debug
+dotnet run --configuration Debug -- --GenerateWebClient=true 
 ```
 
 When requesting escalation, use a justification like:

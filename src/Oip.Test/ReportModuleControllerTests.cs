@@ -48,9 +48,9 @@ public class ReportModuleControllerTests
               ],
               "styles": [],
               "bands": [
-                { "type": "Header", "elements": [ { "type": "Text", "textTemplate": "{{parameter:title}}" } ] },
-                { "type": "Detail", "elements": [ { "label": "Customer", "type": "Value", "valuePath": "fullName" } ] },
-                { "type": "Footer", "elements": [ { "type": "Text", "textTemplate": "Rows: {{summary:count}}" } ] }
+                { "type": "ReportHeader", "height": 15, "elements": [ { "type": "Text", "textTemplate": "{{parameter:title}}", "layout": { "x": 0, "y": 0, "width": 180, "height": 8 } } ] },
+                { "type": "Detail", "height": 10, "elements": [ { "label": "Customer", "type": "Value", "valuePath": "fullName", "layout": { "x": 0, "y": 0, "width": 180, "height": 8 } } ] },
+                { "type": "ReportFooter", "height": 15, "elements": [ { "type": "Text", "textTemplate": "Rows: {{summary:count}}", "layout": { "x": 0, "y": 0, "width": 180, "height": 8 } } ] }
               ],
               "page": {
                 "paperFormat": "A4",
@@ -79,7 +79,9 @@ public class ReportModuleControllerTests
         services.AddSingleton<IWebHostEnvironment>(new TestWebHostEnvironment(_contentRootPath));
         services.AddScoped<ModuleRepository>();
         services.AddScoped<IReportStorageService, DiskReportStorageService>();
-        services.AddScoped<IReportDataProvider, DemoCustomerReportDataProvider>();
+        services.AddScoped<DemoCustomerReportDataProvider>();
+        services.AddScoped<IReportDataProvider>(provider => provider.GetRequiredService<DemoCustomerReportDataProvider>());
+        services.AddScoped<IReportDataSchemaProvider>(provider => provider.GetRequiredService<DemoCustomerReportDataProvider>());
         services.AddScoped<IReportLayoutStrategy, DefaultReportLayoutStrategy>();
         services.AddScoped<IReportDocumentRenderer, HtmlReportRenderer>();
         services.AddScoped<IReportExporter, HtmlReportExporter>();
@@ -151,6 +153,21 @@ public class ReportModuleControllerTests
         Assert.That(okResult, Is.Not.Null);
         Assert.That(payload, Is.Not.Null);
         Assert.That(payload!.ContentBase64, Is.Not.Empty);
+    }
+
+    [Test]
+    public async Task GetReportDataSourceSchemaByReportId_ReturnsCustomerFields()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var controller = scope.ServiceProvider.GetRequiredService<ReportModuleController>();
+
+        var actionResult = await controller.GetReportDataSourceSchemaByReportId("customer-directory");
+        var okResult = actionResult.Result as OkObjectResult;
+        var schemas = okResult?.Value as IReadOnlyCollection<ReportDataSourceSchema>;
+
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That(schemas, Is.Not.Null);
+        Assert.That(schemas!.Single().Fields.Select(x => x.Path), Does.Contain("fullName"));
     }
 
     [Test]

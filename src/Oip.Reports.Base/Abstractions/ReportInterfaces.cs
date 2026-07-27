@@ -17,6 +17,11 @@ public interface IReportDataProvider
     Task<ReportDataSet> GetDataAsync(ReportContext context, ReportDataSource dataSource, CancellationToken cancellationToken = default);
 }
 
+public interface IReportDataSchemaProvider
+{
+    Task<IReadOnlyCollection<ReportDataSourceSchema>> GetSchemaAsync(ReportDefinition definition, CancellationToken cancellationToken = default);
+}
+
 public interface IReportLayoutStrategy
 {
     ReportLayout BuildLayout(ReportContext context);
@@ -45,6 +50,7 @@ public interface IReportDefinitionService
     Task<ReportDefinition> CreateReportAsync(ReportDefinition definition, CancellationToken cancellationToken = default);
     Task<ReportDefinition> UpdateReportAsync(string reportId, ReportDefinition definition, CancellationToken cancellationToken = default);
     Task DeleteReportAsync(string reportId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<ReportDataSourceSchema>> GetDataSourceSchemaAsync(string reportId, CancellationToken cancellationToken = default);
 }
 
 public interface IReportGenerationService

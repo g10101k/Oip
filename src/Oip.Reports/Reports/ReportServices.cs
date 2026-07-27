@@ -122,8 +122,37 @@ public sealed class DiskReportStorageService(IWebHostEnvironment environment) : 
     }
 }
 
-public sealed class DemoCustomerReportDataProvider(DemoCustomerTableContext context) : IReportDataProvider
+public sealed class DemoCustomerReportDataProvider(DemoCustomerTableContext context) : IReportDataProvider, IReportDataSchemaProvider
 {
+    private static readonly ReportDataFieldDefinition[] CustomerFields =
+    [
+        new() { Path = "id", Label = "ID", Type = ReportDataFieldType.Number },
+        new() { Path = "fullName", Label = "Customer", Type = ReportDataFieldType.String },
+        new() { Path = "email", Label = "Email", Type = ReportDataFieldType.String },
+        new() { Path = "category", Label = "Category", Type = ReportDataFieldType.String },
+        new() { Path = "country", Label = "Country", Type = ReportDataFieldType.String },
+        new() { Path = "status", Label = "Status", Type = ReportDataFieldType.String },
+        new() { Path = "isActive", Label = "Active", Type = ReportDataFieldType.Boolean },
+        new() { Path = "creditScore", Label = "Credit score", Type = ReportDataFieldType.Number },
+        new() { Path = "lifetimeValue", Label = "Lifetime value", Type = ReportDataFieldType.Number },
+        new() { Path = "createdAt", Label = "Created at", Type = ReportDataFieldType.Date },
+        new() { Path = "ordersCount", Label = "Orders", Type = ReportDataFieldType.Number }
+    ];
+
+    public Task<IReadOnlyCollection<ReportDataSourceSchema>> GetSchemaAsync(ReportDefinition definition, CancellationToken cancellationToken = default)
+    {
+        var schema = definition.DataSources
+            .Where(x => string.Equals(x.ProviderKey, "ef-demo-customer", StringComparison.OrdinalIgnoreCase))
+            .Select(x => new ReportDataSourceSchema
+            {
+                DataSourceKey = x.Key,
+                Fields = CustomerFields.Select(x => new ReportDataFieldDefinition { Path = x.Path, Label = x.Label, Type = x.Type }).ToList()
+            })
+            .ToArray();
+
+        return Task.FromResult<IReadOnlyCollection<ReportDataSourceSchema>>(schema);
+    }
+
     public async Task<ReportDataSet> GetDataAsync(ReportContext reportContext, ReportDataSource dataSource, CancellationToken cancellationToken = default)
     {
         if (!string.Equals(dataSource.ProviderKey, "ef-demo-customer", StringComparison.OrdinalIgnoreCase))
@@ -187,7 +216,9 @@ public sealed class DemoCustomerReportDataProvider(DemoCustomerTableContext cont
     }
 }
 
-public sealed class ReportDefinitionService(IReportStorageService storageService) : IReportDefinitionService
+public sealed class ReportDefinitionService(
+    IReportStorageService storageService,
+    IReportDataSchemaProvider dataSchemaProvider) : IReportDefinitionService
 {
     public Task<IReadOnlyCollection<ReportDefinitionSummary>> GetReportsAsync(CancellationToken cancellationToken = default) =>
         storageService.GetDefinitionsAsync(cancellationToken);
@@ -195,14 +226,74 @@ public sealed class ReportDefinitionService(IReportStorageService storageService
     public Task<ReportDefinition?> GetReportByIdAsync(string reportId, CancellationToken cancellationToken = default) =>
         storageService.GetDefinitionAsync(reportId, cancellationToken);
 
-    public Task<ReportDefinition> CreateReportAsync(ReportDefinition definition, CancellationToken cancellationToken = default) =>
-        storageService.CreateDefinitionAsync(definition, cancellationToken);
+    public async Task<ReportDefinition> CreateReportAsync(ReportDefinition definition, CancellationToken cancellationToken = default)
+    {
+        await ValidateAsync(definition, cancellationToken);
+        return await storageService.CreateDefinitionAsync(definition, cancellationToken);
+    }
 
-    public Task<ReportDefinition> UpdateReportAsync(string reportId, ReportDefinition definition, CancellationToken cancellationToken = default) =>
-        storageService.UpdateDefinitionAsync(reportId, definition, cancellationToken);
+    public async Task<ReportDefinition> UpdateReportAsync(string reportId, ReportDefinition definition, CancellationToken cancellationToken = default)
+    {
+        await ValidateAsync(definition, cancellationToken);
+        return await storageService.UpdateDefinitionAsync(reportId, definition, cancellationToken);
+    }
 
     public Task DeleteReportAsync(string reportId, CancellationToken cancellationToken = default) =>
         storageService.DeleteDefinitionAsync(reportId, cancellationToken);
+
+    public async Task<IReadOnlyCollection<ReportDataSourceSchema>> GetDataSourceSchemaAsync(string reportId, CancellationToken cancellationToken = default)
+    {
+        var definition = await storageService.GetDefinitionAsync(reportId, cancellationToken)
+                         ?? throw new InvalidOperationException($"Report with id '{reportId}' was not found.");
+        return await dataSchemaProvider.GetSchemaAsync(definition, cancellationToken);
+    }
+
+    private async Task ValidateAsync(ReportDefinition definition, CancellationToken cancellationToken)
+    {
+        if (definition.Bands.GroupBy(x => x.Id, StringComparer.OrdinalIgnoreCase).Any(x => x.Count() > 1))
+            throw new InvalidOperationException("Band identifiers must be unique.");
+
+        var elements = definition.Bands.SelectMany(x => x.Elements).ToArray();
+        if (elements.GroupBy(x => x.Id, StringComparer.OrdinalIgnoreCase).Any(x => x.Count() > 1))
+            throw new InvalidOperationException("Element identifiers must be unique.");
+
+        var styles = definition.Styles.Select(x => x.Id).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var schemas = await dataSchemaProvider.GetSchemaAsync(definition, cancellationToken);
+        var fields = schemas.SelectMany(x => x.Fields).Select(x => x.Path).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var pageWidth = definition.Page.Width - definition.Page.Margins.Left - definition.Page.Margins.Right;
+
+        foreach (var band in definition.Bands)
+        {
+            if (band.Height is null or <= 0)
+                throw new InvalidOperationException($"Band '{band.Id}' must have a positive height.");
+
+            if (band.Grouping is not null && !fields.Contains(band.Grouping.Expression))
+                throw new InvalidOperationException($"Grouping field '{band.Grouping.Expression}' is not available.");
+
+            foreach (var summary in band.Grouping?.Summaries ?? [])
+                if (!string.IsNullOrWhiteSpace(summary.ValueExpression) && !fields.Contains(summary.ValueExpression))
+                    throw new InvalidOperationException($"Summary field '{summary.ValueExpression}' is not available.");
+
+            foreach (var element in band.Elements)
+            {
+                var layout = element.Layout;
+                if (layout.X < 0 || layout.Y < 0 || layout.Width <= 0 || layout.Height <= 0 ||
+                    layout.X + layout.Width > pageWidth || layout.Y + layout.Height > band.Height)
+                    throw new InvalidOperationException($"Element '{element.Id}' is outside the bounds of band '{band.Id}'.");
+
+                if (!string.IsNullOrWhiteSpace(element.StyleId) && !styles.Contains(element.StyleId))
+                    throw new InvalidOperationException($"Style '{element.StyleId}' does not exist.");
+
+                if (element.Type == ReportElementType.Value && !fields.Contains(element.ValuePath ?? string.Empty))
+                    throw new InvalidOperationException($"Value field '{element.ValuePath}' is not available.");
+
+                if (element.Type == ReportElementType.Image &&
+                    (!Uri.TryCreate(element.SourceUrl, UriKind.Absolute, out var uri) ||
+                     (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)))
+                    throw new InvalidOperationException($"Image element '{element.Id}' must have an HTTP(S) URL.");
+            }
+        }
+    }
 }
 
 public sealed class CachedReportGenerationService(
@@ -256,7 +347,9 @@ public static class ReportServiceCollectionExtensions
     {
         services.AddMemoryCache();
         services.AddScoped<IReportStorageService, DiskReportStorageService>();
-        services.AddScoped<IReportDataProvider, DemoCustomerReportDataProvider>();
+        services.AddScoped<DemoCustomerReportDataProvider>();
+        services.AddScoped<IReportDataProvider>(provider => provider.GetRequiredService<DemoCustomerReportDataProvider>());
+        services.AddScoped<IReportDataSchemaProvider>(provider => provider.GetRequiredService<DemoCustomerReportDataProvider>());
         services.AddScoped<IReportLayoutStrategy, DefaultReportLayoutStrategy>();
         services.AddScoped<IReportDocumentRenderer, HtmlReportRenderer>();
         services.AddScoped<IReportExporter, HtmlReportExporter>();

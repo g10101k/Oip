@@ -30,7 +30,7 @@ public class DefaultReportLayoutStrategy : IReportLayoutStrategy
                         {
                             Text = ReportGeneratorUtils.ResolveElementValue(element, context, dataRow),
                             CssClass = ResolveCssClass(context.TemplateVersion.Definition, element.StyleId),
-                            Width = element.Width,
+                            Width = element.Layout.Width,
                             Align = element.Align,
                             IsHtml = element.AllowHtml
                         }).ToList()
@@ -45,7 +45,7 @@ public class DefaultReportLayoutStrategy : IReportLayoutStrategy
                     {
                         Text = ReportGeneratorUtils.ResolveElementValue(element, context),
                         CssClass = ResolveCssClass(context.TemplateVersion.Definition, element.StyleId),
-                        Width = element.Width,
+                        Width = element.Layout.Width,
                         Align = element.Align,
                         IsHtml = element.AllowHtml
                     }).ToList()

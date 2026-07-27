@@ -12,7 +12,7 @@ namespace Oip.Reports.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/report")]
+[Route("api/report-module")]
 public class ReportModuleController(
     ModuleRepository moduleRepository,
     IReportDefinitionService reportDefinitionService,
@@ -95,6 +95,24 @@ public class ReportModuleController(
             throw new ApiException("Report not found", $"Report with id '{id}' was not found.", StatusCodes.Status404NotFound);
 
         return Ok(report);
+    }
+
+    [HttpGet("get-report-data-source-schema-by-report-id")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<ReportDataSourceSchema>), StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<IReadOnlyCollection<ReportDataSourceSchema>>> GetReportDataSourceSchemaByReportId(
+        [FromQuery] string id,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return Ok(await reportDefinitionService.GetDataSourceSchemaAsync(id, cancellationToken));
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new ApiException("Report not found", ex.Message, StatusCodes.Status404NotFound);
+        }
     }
 
     [HttpPut("update-report/{id}")]

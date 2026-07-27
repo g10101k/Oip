@@ -9,113 +9,146 @@ public class HtmlReportRenderer : IReportDocumentRenderer
 {
     public ReportDocument Render(ReportContext context, ReportLayout layout, string cacheKey)
     {
+        var definition = context.TemplateVersion.Definition;
+        var unit = ToCssUnit(definition.Page.Unit);
+        var printableWidth = definition.Page.Width - definition.Page.Margins.Left - definition.Page.Margins.Right;
         var html = new StringBuilder();
-        html.AppendLine("<!DOCTYPE html>");
-        html.AppendLine("<html lang=\"en\">");
-        html.AppendLine("<head>");
-        html.AppendLine("<meta charset=\"utf-8\" />");
-        html.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />");
+        html.AppendLine("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\" />");
         html.AppendLine($"<title>{ReportGeneratorUtils.Encode(layout.Title)}</title>");
         html.AppendLine("<style>");
-        html.AppendLine("body{font-family:Segoe UI,Arial,sans-serif;background:#f4f6f8;margin:0;padding:24px;color:#17212b;}");
-        html.AppendLine(".report-shell{max-width:1100px;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 18px 60px rgba(15,23,42,.12);overflow:hidden;}");
-        html.AppendLine(".report-head{padding:24px 28px;background:linear-gradient(135deg,#0f766e,#155e75);color:#fff;}");
-        html.AppendLine(".report-body{padding:24px 28px 32px;}");
-        html.AppendLine(".report-meta{font-size:13px;opacity:.8;margin-top:8px;}");
-        html.AppendLine(".report-table{width:100%;border-collapse:collapse;}");
-        html.AppendLine(".report-table th,.report-table td{padding:12px 14px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top;}");
-        html.AppendLine(".report-table th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#475569;background:#f8fafc;}");
-        html.AppendLine(".report-footer{margin-top:18px;padding-top:16px;border-top:2px solid #e2e8f0;font-weight:600;color:#0f172a;}");
-        html.AppendLine(".text-right{text-align:right;}.text-center{text-align:center;}.muted{color:#64748b;}.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;}");
-        html.AppendLine("</style>");
-        html.AppendLine("</head>");
-        html.AppendLine("<body>");
-        html.AppendLine("<div class=\"report-shell\">");
-        html.AppendLine("<div class=\"report-head\">");
-        html.AppendLine($"<div class=\"eyebrow\">Report Preview</div><h1>{ReportGeneratorUtils.Encode(layout.Title)}</h1>");
-        html.AppendLine($"<div class=\"report-meta\">Generated in {ReportGeneratorUtils.Encode(context.Request.UserContext.GetValueOrDefault("timezone") ?? "UTC")} | Rows: {context.DataSet.Rows.Count}</div>");
-        html.AppendLine("</div>");
-        html.AppendLine("<div class=\"report-body\">");
+        html.AppendLine($"@page{{size:{definition.Page.Width}{unit} {definition.Page.Height}{unit};margin:{definition.Page.Margins.Top}{unit} {definition.Page.Margins.Right}{unit} {definition.Page.Margins.Bottom}{unit} {definition.Page.Margins.Left}{unit};}}");
+        html.AppendLine("*{box-sizing:border-box}body{margin:0;background:#f1f5f9;font-family:Segoe UI,Arial,sans-serif;color:#17212b}.report-page{width:max-content;min-width:100%;margin:0 auto;padding:20px;background:white}.report-band{position:relative;width:100%;overflow:hidden}.report-band.page-break-before{break-before:page}.report-band.page-break-after{break-after:page}.report-element{position:absolute;overflow:hidden}.report-line{height:0!important;border-top:1px solid #17212b}.report-rectangle{border:1px solid #17212b}.report-image{width:100%;height:100%;object-fit:contain}.detail-row{position:relative;width:100%}@media print{body{background:#fff}.report-page{padding:0}.repeat-on-page{position:running(report-repeat)}}");
+        html.AppendLine("</style></head><body><main class=\"report-page\">");
 
-        var header = layout.Sections.FirstOrDefault(x => x.Type == ReportBandType.Header);
-        if (header is not null)
+        var rows = ApplyGrouping(context, definition.Bands);
+        foreach (var band in definition.Bands)
         {
-            foreach (var row in header.Rows)
+            if (!band.Visible || !IsVisible(band.DisplayCondition, context, null))
+                continue;
+
+            if (band.Type == ReportBandType.Detail)
             {
-                foreach (var cell in row.Cells)
-                {
-                    html.AppendLine(cell.IsHtml
-                        ? cell.Text
-                        : $"<p class=\"{cell.CssClass}\">{ReportGeneratorUtils.Encode(cell.Text)}</p>");
-                }
+                foreach (var row in rows)
+                    html.Append(RenderBand(band, context, row, printableWidth, unit));
+                continue;
             }
+
+            if (band.Type is ReportBandType.GroupHeader or ReportBandType.GroupFooter)
+            {
+                var group = band.Grouping;
+                if (group is null)
+                    continue;
+
+                foreach (var groupRows in rows.GroupBy(row => row.GetValueOrDefault(group.Expression)))
+                    html.Append(RenderBand(band, context, groupRows.First(), printableWidth, unit));
+                continue;
+            }
+
+            html.Append(RenderBand(band, context, null, printableWidth, unit));
         }
 
-        var detail = layout.Sections.FirstOrDefault(x => x.Type == ReportBandType.Detail);
-        if (detail is not null && detail.Rows.Count > 0)
-        {
-            html.AppendLine("<table class=\"report-table\">");
-            html.AppendLine("<thead><tr>");
-            var detailBand = context.TemplateVersion.Definition.Bands.First(x => x.Type == ReportBandType.Detail);
-            foreach (var element in detailBand.Elements)
-            {
-                html.AppendLine($"<th>{ReportGeneratorUtils.Encode(element.Label ?? element.ValuePath ?? string.Empty)}</th>");
-            }
-
-            html.AppendLine("</tr></thead>");
-            html.AppendLine("<tbody>");
-            foreach (var row in detail.Rows)
-            {
-                html.AppendLine("<tr>");
-                foreach (var cell in row.Cells)
-                {
-                    var cssClass = string.Join(" ", new[]
-                    {
-                        cell.CssClass,
-                        cell.Align switch
-                        {
-                            "right" => "text-right",
-                            "center" => "text-center",
-                            _ => null
-                        }
-                    }.Where(x => !string.IsNullOrWhiteSpace(x)));
-
-                    html.AppendLine(cell.IsHtml
-                        ? $"<td class=\"{cssClass}\">{cell.Text}</td>"
-                        : $"<td class=\"{cssClass}\">{ReportGeneratorUtils.Encode(cell.Text)}</td>");
-                }
-
-                html.AppendLine("</tr>");
-            }
-
-            html.AppendLine("</tbody></table>");
-        }
-
-        var footer = layout.Sections.FirstOrDefault(x => x.Type == ReportBandType.Footer);
-        if (footer is not null)
-        {
-            html.AppendLine("<div class=\"report-footer\">");
-            foreach (var row in footer.Rows)
-            {
-                foreach (var cell in row.Cells)
-                {
-                    html.AppendLine(cell.IsHtml
-                        ? cell.Text
-                        : $"<div class=\"{cell.CssClass}\">{ReportGeneratorUtils.Encode(cell.Text)}</div>");
-                }
-            }
-
-            html.AppendLine("</div>");
-        }
-
-        html.AppendLine("</div></div></body></html>");
-
+        html.AppendLine("</main></body></html>");
         return new ReportDocument
         {
             CacheKey = cacheKey,
-            FileName = $"{context.TemplateVersion.Definition.Id}-v{context.TemplateVersion.Version}.html",
+            FileName = $"{definition.Id}-v{context.TemplateVersion.Version}.html",
             Html = html.ToString(),
             GeneratedAtUtc = DateTime.UtcNow
         };
     }
+
+    private static IEnumerable<Dictionary<string, object?>> ApplyGrouping(ReportContext context, IEnumerable<ReportBand> bands)
+    {
+        var grouping = bands.FirstOrDefault(x => x.Grouping is not null)?.Grouping;
+        if (grouping is null)
+            return context.DataSet.Rows;
+
+        return grouping.SortDirection == ReportSortDirection.Descending
+            ? context.DataSet.Rows.OrderByDescending(x => Convert.ToString(x.GetValueOrDefault(grouping.Expression)))
+            : context.DataSet.Rows.OrderBy(x => Convert.ToString(x.GetValueOrDefault(grouping.Expression)));
+    }
+
+    private static string RenderBand(ReportBand band, ReportContext context, IDictionary<string, object?>? row, decimal printableWidth, string unit)
+    {
+        var breakClass = band.PageBreak switch
+        {
+            ReportPageBreak.Before => " page-break-before",
+            ReportPageBreak.After => " page-break-after",
+            ReportPageBreak.BeforeAndAfter => " page-break-before page-break-after",
+            _ => string.Empty
+        };
+        var repeatClass = band.RepeatOnEachPage ? " repeat-on-page" : string.Empty;
+        var containerClass = band.Type == ReportBandType.Detail ? "detail-row" : "report-band";
+        var html = new StringBuilder($"<section class=\"{containerClass}{breakClass}{repeatClass}\" style=\"height:{band.Height}{unit};max-width:{printableWidth}{unit}\">");
+        foreach (var element in band.Elements.OrderBy(x => x.Layout.ZIndex))
+        {
+            if (!IsVisible(band.DisplayCondition, context, row))
+                continue;
+            html.Append(RenderElement(element, context, row, context.TemplateVersion.Definition, unit));
+        }
+        html.AppendLine("</section>");
+        return html.ToString();
+    }
+
+    private static string RenderElement(ReportElement element, ReportContext context, IDictionary<string, object?>? row, ReportDefinition definition, string unit)
+    {
+        var layout = element.Layout;
+        var styles = $"left:{layout.X}{unit};top:{layout.Y}{unit};width:{layout.Width}{unit};height:{layout.Height}{unit};z-index:{layout.ZIndex};{ResolveStyle(definition, element.StyleId)}";
+        var css = element.Type switch
+        {
+            ReportElementType.Line => "report-element report-line",
+            ReportElementType.Rectangle => "report-element report-rectangle",
+            _ => "report-element"
+        };
+        var value = element.Type switch
+        {
+            ReportElementType.Image => $"<img class=\"report-image\" src=\"{ReportGeneratorUtils.Encode(element.SourceUrl)}\" alt=\"{ReportGeneratorUtils.Encode(element.Label)}\" />",
+            ReportElementType.Line or ReportElementType.Rectangle => string.Empty,
+            _ when element.AllowHtml => ReportGeneratorUtils.ResolveElementValue(element, context, row),
+            _ => ReportGeneratorUtils.Encode(ReportGeneratorUtils.ResolveElementValue(element, context, row))
+        };
+        return $"<div class=\"{css}\" style=\"{styles}\">{value}</div>";
+    }
+
+    private static string ResolveStyle(ReportDefinition definition, string? styleId)
+    {
+        var style = definition.Styles.FirstOrDefault(x => string.Equals(x.Id, styleId, StringComparison.OrdinalIgnoreCase));
+        if (style is null)
+            return string.Empty;
+
+        var allowedProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "font-family", "font-size", "font-weight", "font-style", "color", "background", "background-color",
+            "border", "border-color", "border-width", "border-style", "text-align", "padding", "opacity"
+        };
+        return string.Concat(style.Properties
+            .Where(x => allowedProperties.Contains(x.Key))
+            .Select(x => $"{x.Key}:{x.Value};"));
+    }
+
+    private static bool IsVisible(string? condition, ReportContext context, IDictionary<string, object?>? row)
+    {
+        if (string.IsNullOrWhiteSpace(condition) || string.Equals(condition, "always", StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (string.Equals(condition, "never", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var parts = condition.Split("==", StringSplitOptions.TrimEntries);
+        if (parts.Length != 2)
+            return true;
+        var left = parts[0].StartsWith("parameter:", StringComparison.OrdinalIgnoreCase)
+            ? context.Parameters.GetValueOrDefault(parts[0]["parameter:".Length..])
+            : parts[0].StartsWith("row:", StringComparison.OrdinalIgnoreCase) && row is not null && row.TryGetValue(parts[0]["row:".Length..], out var rowValue)
+                ? Convert.ToString(rowValue)
+                : null;
+        return string.Equals(left, parts[1], StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string ToCssUnit(ReportMeasurementUnit unit) => unit switch
+    {
+        ReportMeasurementUnit.Inch => "in",
+        ReportMeasurementUnit.Point => "pt",
+        ReportMeasurementUnit.Pixel => "px",
+        _ => "mm"
+    };
 }

@@ -52,68 +52,81 @@
   ],
   "bands": [
     {
-      "type": "Header",
+      "type": "ReportHeader",
+      "height": 24,
       "elements": [
         {
           "type": "Text",
-          "textTemplate": "{{parameter:title}}"
+          "textTemplate": "{{parameter:title}}",
+          "layout": { "x": 0, "y": 0, "width": 180, "height": 10, "zIndex": 0 }
         },
         {
           "type": "Text",
           "textTemplate": "Category filter: {{parameter:category}}",
-          "styleId": "muted"
+          "styleId": "muted",
+          "layout": { "x": 0, "y": 12, "width": 180, "height": 8, "zIndex": 0 }
         }
       ]
     },
     {
       "type": "Detail",
+      "height": 10,
       "elements": [
         {
           "label": "Customer",
           "type": "Value",
-          "valuePath": "fullName"
+          "valuePath": "fullName",
+          "layout": { "x": 0, "y": 0, "width": 32, "height": 8, "zIndex": 0 }
         },
         {
           "label": "Email",
           "type": "Value",
-          "valuePath": "email"
+          "valuePath": "email",
+          "layout": { "x": 34, "y": 0, "width": 32, "height": 8, "zIndex": 0 }
         },
         {
           "label": "Category",
           "type": "Value",
-          "valuePath": "category"
+          "valuePath": "category",
+          "layout": { "x": 68, "y": 0, "width": 20, "height": 8, "zIndex": 0 }
         },
         {
           "label": "Country",
           "type": "Value",
-          "valuePath": "country"
+          "valuePath": "country",
+          "layout": { "x": 90, "y": 0, "width": 20, "height": 8, "zIndex": 0 }
         },
         {
           "label": "Status",
           "type": "Value",
-          "valuePath": "status"
+          "valuePath": "status",
+          "layout": { "x": 112, "y": 0, "width": 18, "height": 8, "zIndex": 0 }
         },
         {
           "label": "Orders",
           "type": "Value",
           "valuePath": "ordersCount",
-          "align": "right"
+          "align": "right",
+          "layout": { "x": 132, "y": 0, "width": 18, "height": 8, "zIndex": 0 }
         },
         {
           "label": "Lifetime Value",
           "type": "Value",
           "valuePath": "lifetimeValue",
           "format": "0.00",
-          "align": "right"
+          "align": "right",
+          "layout": { "x": 152, "y": 0, "width": 28, "height": 8, "zIndex": 0 }
         }
       ]
     },
     {
-      "type": "Footer",
+      "type": "ReportFooter",
+      "height": 15,
       "elements": [
         {
           "type": "Text",
-          "textTemplate": "Rows: {{summary:count}} | Total lifetime value: {{summary:sum:lifetimeValue}}"
+          "textTemplate": "Rows: {{summary:count}} | Total lifetime value: {{summary:sum:lifetimeValue}}",
+          "layout": { "x": 0, "y": 0, "width": 180, "height": 8, "zIndex": 0 }
         }
       ]
     }

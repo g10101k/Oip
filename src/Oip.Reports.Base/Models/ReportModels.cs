@@ -146,7 +146,28 @@ public class ReportBand
     public ReportBandType Type { get; set; }
     public string? Title { get; set; }
     public string? StyleId { get; set; }
+    public bool Visible { get; set; } = true;
+    public string? DisplayCondition { get; set; }
+    public decimal? Height { get; set; }
+    public ReportPageBreak PageBreak { get; set; }
+    public bool RepeatOnEachPage { get; set; }
+    public ReportGroupSettings? Grouping { get; set; }
     public List<ReportElement> Elements { get; set; } = [];
+}
+
+public class ReportGroupSettings
+{
+    public string Expression { get; set; } = string.Empty;
+    public ReportSortDirection SortDirection { get; set; } = ReportSortDirection.Ascending;
+    public List<ReportSummaryDefinition> Summaries { get; set; } = [];
+}
+
+public class ReportSummaryDefinition
+{
+    public string Name { get; set; } = string.Empty;
+    public ReportSummaryOperation Operation { get; set; } = ReportSummaryOperation.Sum;
+    public string? ValueExpression { get; set; }
+    public string? Format { get; set; }
 }
 
 public class ReportElement
@@ -158,9 +179,32 @@ public class ReportElement
     public string? ValuePath { get; set; }
     public string? Format { get; set; }
     public string? StyleId { get; set; }
-    public string? Width { get; set; }
     public string? Align { get; set; }
+    public string? SourceUrl { get; set; }
+    public required ReportElementLayout Layout { get; set; }
     public bool AllowHtml { get; set; }
+}
+
+public class ReportElementLayout
+{
+    public required decimal X { get; set; }
+    public required decimal Y { get; set; }
+    public required decimal Width { get; set; }
+    public required decimal Height { get; set; }
+    public int ZIndex { get; set; }
+}
+
+public class ReportDataSourceSchema
+{
+    public string DataSourceKey { get; set; } = string.Empty;
+    public List<ReportDataFieldDefinition> Fields { get; set; } = [];
+}
+
+public class ReportDataFieldDefinition
+{
+    public string Path { get; set; } = string.Empty;
+    public string Label { get; set; } = string.Empty;
+    public ReportDataFieldType Type { get; set; }
 }
 
 public class ReportContext
@@ -199,7 +243,7 @@ public class ReportLayoutCell
 {
     public string Text { get; set; } = string.Empty;
     public string? CssClass { get; set; }
-    public string? Width { get; set; }
+    public decimal? Width { get; set; }
     public string? Align { get; set; }
     public bool IsHtml { get; set; }
 }
@@ -207,16 +251,59 @@ public class ReportLayoutCell
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ReportBandType
 {
-    Header,
+    ReportHeader,
+    PageHeader,
+    GroupHeader,
     Detail,
-    Footer
+    GroupFooter,
+    PageFooter,
+    ReportFooter,
+    SubReport
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ReportPageBreak
+{
+    None,
+    Before,
+    After,
+    BeforeAndAfter
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ReportSortDirection
+{
+    Ascending,
+    Descending
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ReportSummaryOperation
+{
+    Count,
+    Sum,
+    Average,
+    Minimum,
+    Maximum
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ReportElementType
 {
     Text,
-    Value
+    Value,
+    Line,
+    Rectangle,
+    Image
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ReportDataFieldType
+{
+    String,
+    Number,
+    Date,
+    Boolean
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

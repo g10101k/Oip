@@ -6,6 +6,7 @@ import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Tag } from 'primeng/tag';
+import { RouterLink } from '@angular/router';
 import { BaseModuleComponent, ContentType, SecurityComponent } from 'oip-common';
 
 interface ReportModuleSettings {
@@ -121,6 +122,12 @@ interface SelectOption<TValue = string> {
               }
 
               <div class="flex flex-col gap-2 pt-2">
+                <a
+                  class="p-button p-button-secondary justify-center"
+                  [routerLink]="['/report-designer', id]"
+                  [queryParams]="{reportId: selectedReportId}">
+                  <i class="pi pi-pencil"></i><span>Дизайнер</span>
+                </a>
                 <p-button
                   icon="pi pi-eye"
                   [label]="'report.content.preview' | translate"
@@ -185,7 +192,7 @@ interface SelectOption<TValue = string> {
       <security [controller]="controller" [id]="id"/>
     }
   `,
-  imports: [CommonModule, FormsModule, SecurityComponent, TranslatePipe, Button, InputText, Select, Tag]
+  imports: [CommonModule, FormsModule, RouterLink, SecurityComponent, TranslatePipe, Button, InputText, Select, Tag]
 })
 export class ReportModuleComponent extends BaseModuleComponent<ReportModuleSettings, ReportModuleLocalSettings> implements OnInit {
   protected reportOptions: SelectOption[] = [];

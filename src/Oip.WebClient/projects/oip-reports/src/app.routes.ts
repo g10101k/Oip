@@ -9,8 +9,13 @@ export const appRoutes: Routes = [
     canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)],
     children: [
       {
-        path: 'report/:id',
+        path: 'report-module/:id',
         loadComponent: () => import('./app/components/report-module/report-module.component').then((m) => m.ReportModuleComponent),
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
+      },
+      {
+        path: 'report-designer/:id',
+        loadComponent: () => import('./app/components/report-designer/report-designer.component').then((m) => m.ReportDesignerComponent),
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {

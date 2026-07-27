@@ -67,22 +67,25 @@ public class ReportGenerationPipelineTests
             [
                 new ReportBand
                 {
-                    Type = ReportBandType.Header,
-                    Elements = [new ReportElement { TextTemplate = "{{parameter:title}}" }]
+                    Type = ReportBandType.ReportHeader,
+                    Height = 20,
+                    Elements = [new ReportElement { TextTemplate = "{{parameter:title}}", Layout = new ReportElementLayout { X = 0, Y = 0, Width = 180, Height = 10 } }]
                 },
                 new ReportBand
                 {
                     Type = ReportBandType.Detail,
+                    Height = 10,
                     Elements =
                     [
-                        new ReportElement { Label = "Customer", ValuePath = "customer" },
-                        new ReportElement { Label = "Amount", ValuePath = "amount", Format = "0.00", Align = "right" }
+                        new ReportElement { Label = "Customer", ValuePath = "customer", Layout = new ReportElementLayout { X = 0, Y = 0, Width = 90, Height = 8 } },
+                        new ReportElement { Label = "Amount", ValuePath = "amount", Format = "0.00", Align = "right", Layout = new ReportElementLayout { X = 100, Y = 0, Width = 80, Height = 8 } }
                     ]
                 },
                 new ReportBand
                 {
-                    Type = ReportBandType.Footer,
-                    Elements = [new ReportElement { TextTemplate = "Rows: {{summary:count}} | Sum: {{summary:sum:amount}}" }]
+                    Type = ReportBandType.ReportFooter,
+                    Height = 15,
+                    Elements = [new ReportElement { TextTemplate = "Rows: {{summary:count}} | Sum: {{summary:sum:amount}}", Layout = new ReportElementLayout { X = 0, Y = 0, Width = 180, Height = 8 } }]
                 }
             ]
         };
@@ -109,6 +112,7 @@ public class ReportGenerationPipelineTests
         Assert.That(result.Document!.Html, Does.Contain("Quarterly Revenue"));
         Assert.That(result.Document.Html, Does.Contain("Acme"));
         Assert.That(result.Document.Html, Does.Contain("Rows: 2 | Sum: 20"));
+        Assert.That(result.Document.Html, Does.Contain("left:100mm"));
     }
 
     [Test]
