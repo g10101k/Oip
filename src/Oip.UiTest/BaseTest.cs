@@ -1,6 +1,4 @@
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
-using OpenQA.Selenium.Support.UI;
 
 namespace Oip.UiTest;
 
@@ -10,24 +8,24 @@ namespace Oip.UiTest;
 internal class BaseTest
 {
     /// <summary>
-    /// The WebDriver instance used for browser automation.
-    /// </summary>
-    internal IWebDriver Driver;
-
-    /// <summary>
     /// The base URL for the application under test.
     /// </summary>
-    protected const string BaseUrl = "https://localhost:50000";
+    protected const string BaseUrl = "https://localhost:50002";
 
     /// <summary>
-    /// The WebDriverWait instance used to wait for specific conditions on the web page.
+    /// The WebDriver instance used for browser automation. Shared across all tests, see <see cref="TestSetup"/>.
     /// </summary>
-    protected WebDriverWait Wait;
+    internal IWebDriver Driver => TestSetup.GlobalDriver;
+
+    /// <summary>
+    /// The Waiter instance (extends WebDriverWait) used to wait for specific conditions on the web page.
+    /// </summary>
+    protected Waiter Wait => TestSetup.GlobalWait;
 
     /// <summary>
     /// Provides methods to perform user interactions such as mouse movements, keyboard actions, and context menu interactions.
     /// </summary>
-    protected Actions Actions;
+    protected Actions Actions => TestSetup.GlobalActions!;
 
     /// <summary>
     /// Represents the By locator for the sign-in button on the unauthorized page.
@@ -50,9 +48,10 @@ internal class BaseTest
     protected By KeycloakLoginButton => By.Id("kc-login");
 
     /// <summary>
-    /// The locator for the Keycloak error message related to the username field.
+    /// The locator for the Keycloak login error alert (custom "oip" theme no longer renders
+    /// the stock "input-error-username" element, only this alert banner).
     /// </summary>
-    protected By KeycloakErrorUserName => By.Id("input-error-username");
+    protected By KeycloakErrorUserName => By.CssSelector(".oip-alert.oip-alert-error");
 
     /// <summary>
     /// The locator for the input field used when creating a new menu item.
@@ -67,7 +66,7 @@ internal class BaseTest
     /// <summary>
     /// The container element for the OIP menu.
     /// </summary>
-    protected By OipMenuContainer => By.CssSelector("div.menu-scroll-container");
+    protected By OipMenuContainer => By.ClassName("layout-sidebar");
 
     /// <summary>
     /// The module selector for creating a new menu item.
@@ -81,62 +80,15 @@ internal class BaseTest
     protected By OipAppTopBarLogoutButton => By.Id("oip-app-topbar-logout-button");
 
     /// <summary>
+    /// The accept/confirm button of any PrimeNG ConfirmDialog (e.g. the logout confirmation
+    /// opened by <see cref="OipAppTopBarLogoutButton"/>, or the delete confirmation in the menu).
+    /// </summary>
+    protected By ConfirmDialogAcceptButton => By.CssSelector(".p-confirmdialog-accept-button");
+
+    /// <summary>
     /// The default timeout in seconds for WebDriverWait operations.
     /// </summary>
     internal const int StandardTimeOutInSeconds = 15;
-
-    /// <summary>
-    /// Base class for UI tests. Provides common functionality and setup.
-    /// </summary>
-    protected BaseTest()
-    {
-        var options = new ChromeOptions();
-        options.AddArgument("--no-sandbox");
-        options.AddArgument("--start-maximized");
-        options.AddArgument("--disable-infobars");
-
-        Driver = new ChromeDriver(options);
-        Driver.Manage().Window.Maximize();
-        Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(15);
-        Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(15));
-        Actions = new Actions(Driver);
-    }
-
-    /// <summary>
-    /// Captures a screenshot and saves it to a file.
-    /// </summary>
-    /// <param name="testName">Name of the test case to include in the screenshot file name.</param>
-    /// <param name="stepName">Name of the test step to include in the screenshot file name. Optional parameter.</param>
-    public void TakeScreenshot(string testName, string stepName = "")
-    {
-        if (Driver is ITakesScreenshot screenshotDriver)
-        {
-            Screenshot screenshot = screenshotDriver.GetScreenshot();
-
-            // Create the screenshots directory if it does not exist.
-            string screenshotsDir = Path.Combine(Directory.GetCurrentDirectory(), "TestScreenshots");
-            if (!Directory.Exists(screenshotsDir))
-            {
-                Directory.CreateDirectory(screenshotsDir);
-            }
-
-            // Build the file name.
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string fileName = string.IsNullOrEmpty(stepName)
-                ? $"{testName}_{timestamp}.png"
-                : $"{testName}_{stepName}_{timestamp}.png";
-
-            string filePath = Path.Combine(screenshotsDir, fileName);
-            screenshot.SaveAsFile(filePath);
-        }
-    }
-
-    /// <summary>
-    /// Pauses the execution for a specified number of milliseconds.
-    /// </summary>
-    /// <param name="seconds">The number of milliseconds to sleep. Defaults to 1000 (1 second).</param>
-    internal void Sleep(int seconds = 1000) => Thread.Sleep(seconds);
-
 
     /// <summary>
     /// Cross platform Ctrl+A
@@ -186,33 +138,24 @@ internal class BaseTest
         Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(StandardTimeOutInSeconds);
         return exists;
     }
-    
-    /// <summary>
-    /// Performs initial setup before any tests are executed.
-    /// </summary>
-    [OneTimeSetUp]
-    public void OneTimeSetUp()
-    {
-        Driver.Navigate().GoToUrl($"{BaseUrl}/unauthorized");
-        Sleep();
-        Wait.Until(d => d.FindElement(OipSignInButton));
-
-        Driver.FindElement(OipSignInButton).Click();
-
-        Wait.Until(d => d.FindElement(KeycloakUsername));
-        Driver.FindElement(KeycloakUsername).SendKeys("admin");
-        Driver.FindElement(KeycloakPassword).SendKeys("P@ssw0rd");
-        Driver.FindElement(KeycloakLoginButton).Click();
-    }
-
 
     /// <summary>
-    /// Performs cleanup after all tests have completed.
+    /// Sends key presses and verifies that the entered value matches.
     /// </summary>
-    [OneTimeTearDown]
-    public void OneTimeTearDown()
+    /// <param name="locator">The input field locator</param>
+    /// <param name="text">The text to enter</param>
+    /// <param name="milliseconds">Interval between retries</param>
+    /// <param name="maxAttempts">Maximum number of retries</param>
+    protected void SendKeyWithCheck(By locator, string text, int milliseconds = 300,
+        int maxAttempts = 15)
     {
-        Driver.Quit();
-        Driver.Dispose();
+        _ = Wait.Until(d =>
+        {
+            var element = d.FindElement(locator);
+            element.Click();
+            element.Clear();
+            element.SendKeys(text);
+            return element.GetAttribute("value") == text;
+        }, TimeSpan.FromMilliseconds(milliseconds), maxAttempts);
     }
 }

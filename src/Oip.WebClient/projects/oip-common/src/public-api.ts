@@ -50,6 +50,7 @@ export {
   AppThemePresetMergeMode
 } from './services/theme-presets.token';
 export { mergeWithDefaults, provideAppThemes, replaceDefaults } from './services/theme-presets.provider';
+export { defaultTheme } from './services/app-default.theme';
 export { provideOip } from './providers/oip.provider';
 
 // Events

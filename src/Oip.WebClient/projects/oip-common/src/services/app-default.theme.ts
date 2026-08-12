@@ -1,9 +1,9 @@
 import { definePreset } from '@primeng/themes';
 import Aura from '@primeng/themes/aura';
 import { primitive } from '@primeng/themes/aura/base';
-import { AppThemePreset } from 'oip-common';
+import { AppThemePreset } from './theme-presets.token';
 
-export const appTheme: AppThemePreset[] = [
+export const defaultTheme: AppThemePreset[] = [
   {
     id: 'Oip',
     label: 'Oip',

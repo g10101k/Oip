@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { MenuChangeEvent } from '../events/menu-change.event';
 import { MenuApi } from '../api/menu.api';
 import { AppTitleService } from './app-title.service';
+import { LayoutService } from './app.layout.service';
 import {
   AddModuleInstanceDto,
   DeleteModuleInstanceParams,
@@ -16,12 +17,20 @@ export class MenuService {
   private readonly resetSource = new Subject();
   private readonly titleService = inject(AppTitleService);
   private readonly menuDataService = inject(MenuApi);
+  private readonly layoutService = inject(LayoutService);
   menuSource$ = this.menuSource.asObservable();
   resetSource$ = this.resetSource.asObservable();
   contextMenuItem: any;
 
   public menu: ModuleInstanceDto[] = [];
-  public adminMode: boolean = false;
+
+  get adminMode(): boolean {
+    return this.layoutService.adminMode();
+  }
+
+  set adminMode(value: boolean) {
+    this.layoutService.layoutConfig.update((config) => ({ ...config, adminMode: value }));
+  }
 
   async loadMenu() {
     this.menu = this.adminMode ? await this.getAdminMenu() : await this.getMenu();

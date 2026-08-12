@@ -13,6 +13,7 @@ export interface AppConfig {
   timeFormat: string;
   dateTimeFormat: string;
   timeZone: string;
+  adminMode?: boolean;
 }
 
 interface LayoutState {
@@ -100,6 +101,8 @@ export class LayoutService {
 
   timeZone = computed(() => this.layoutConfig().timeZone);
 
+  adminMode = computed(() => this.layoutConfig().adminMode ?? false);
+
   transitionComplete = signal<boolean>(false);
 
   private initialized = false;
@@ -145,7 +148,8 @@ export class LayoutService {
       dateFormat: 'yyyy-MM-dd',
       timeFormat: 'HH:mm:ss',
       dateTimeFormat: 'yyyy-MM-dd HH:mm:ss',
-      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      adminMode: false
     };
   }
 

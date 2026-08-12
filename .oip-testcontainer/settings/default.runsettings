@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+    <TestRunParameters>
+        <Parameter name="WindowsPosition" value="0,0" />
+        <Parameter name="BaseUrl" value="https://oip:50000" />
+        <Parameter name="BaseDirectory" value="/home/seluser/uploads" />
+        <Parameter name="RemoteDriverUrl" value="http://localhost:4444/wd/hub" />
+        <Parameter name="Username" value="admin" />
+        <Parameter name="Password" value="P@ssw0rd" />
+    </TestRunParameters>
+</RunSettings>
