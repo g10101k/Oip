@@ -2,7 +2,7 @@
 
 ## Certificate Generation
 
-To generate certificates use:
+To generate CA certificates use:
 
 ````shell
 cd .oip-devcontainer
@@ -10,6 +10,12 @@ cd .oip-devcontainer
 mkdir -p https
 
 openssl req -x509 -sha256 -days 365 -nodes -newkey rsa:2048 -keyout ./https/oip-dev-ca.key -out ./https/oip-dev-ca.crt -config oip-dev-ca.conf
+````
+
+To generate development certificates use:
+
+````shell
+cd .oip-devcontainer
 
 openssl genrsa -out ./https/oip.key 2048
 openssl req -new -key ./https/oip.key -out ./https/oip.csr -config oip.conf
@@ -111,8 +117,10 @@ The override mounts the host Data Protection keys folder into `/PersistKeys` ins
 
 ## Test Container Startup
 
-To start dev containers use:
+The UI-test container compose file has moved to `../.oip-testcontainer/docker-compose.yml`. Run
+it from the `.oip-testcontainer` directory:
 
 ````shell
-docker compose -f test.yml up --build --force-recreate
+cd ../.oip-testcontainer
+docker compose up --build --force-recreate
 ````

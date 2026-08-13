@@ -98,8 +98,10 @@ public class SecurityController(
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult DeleteAuthSession()
     {
+        var redirectUri = GetLogoutRedirectUri(Request.Headers.Referer.FirstOrDefault());
+
         return SignOut(
-            new AuthenticationProperties { RedirectUri = "/unauthorized" },
+            new AuthenticationProperties { RedirectUri = redirectUri },
             OipModuleApplication.CookieAuthenticationScheme,
             OipModuleApplication.OpenIdConnectAuthenticationScheme);
     }
@@ -130,5 +132,13 @@ public class SecurityController(
     {
         var realmRoles = await keycloakService.GetRealmRoles();
         return realmRoles.Select(x => x.Name).ToList();
+    }
+        
+    private static string GetLogoutRedirectUri(string? referer)
+    {
+        if (!string.IsNullOrWhiteSpace(referer) && Uri.TryCreate(referer, UriKind.Absolute, out var refererUri))
+            return $"{refererUri.Scheme}://{refererUri.Authority}/unauthorized";
+
+        return "/unauthorized";
     }
 }

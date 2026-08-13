@@ -4,13 +4,12 @@ import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScroll
 import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
-import { provideAppThemes, provideOip } from 'oip-common';
-import { appTheme } from '../../oip/src/app.theme';
+import { defaultTheme, provideAppThemes, provideOip } from 'oip-common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideOip(),
-    provideAppThemes(appTheme, { mode: 'replaceDefaults' }),
+    provideAppThemes(defaultTheme, { mode: 'replaceDefaults' }),
     provideRouter(
       appRoutes,
       withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),

@@ -5,11 +5,11 @@ services:
       dockerfile: ./Oip/Dockerfile
       args: [ '--force-recreate' ]
       additional_contexts:
-        oip-dev-https: ./https
+        oip-dev-https: ../.oip-devcontainer/https
     ports:
       - "50000:50000"
     volumes:
-      - ./https:/https:ro
+      - ../.oip-devcontainer/https:/https:ro
     environment:
       TZ: Europe/Moscow
       ConnectionString: XpoProvider=Postgres;Server=postgres;Database=oip;uid=postgres;pwd=postgres;
@@ -22,7 +22,7 @@ services:
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/oip.pfx
     networks:
       - backend-network
-    extra_hosts: 
+    extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
       postgres:
@@ -49,7 +49,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-  
+
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     command: [ "start-dev", "--import-realm" ]
@@ -74,8 +74,8 @@ services:
       - "8443:8443"
       - "9000:9000"
     volumes:
-      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
-      - ./https:/opt/keycloak/data/cert/:ro
+      - ../.oip-devcontainer/keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
+      - ../.oip-devcontainer/https:/opt/keycloak/data/cert/:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -103,7 +103,7 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../.oip-devcontainer/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
 
@@ -114,6 +114,60 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
 
+  selenium-hub:
+    image: selenium/hub:4.41.0-20260222
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    environment:
+      - TZ=Europe/Moscow
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4444/wd/hub/status" ]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+  chrome:
+    image: selenium/node-chrome:4.41.0-20260222
+    platform: linux/amd64
+    shm_size: 2gb
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+    volumes:
+      # Доверенный dev CA сертификат Oip, чтобы Chrome не ругался на self-signed https://oip:50000
+      - ../.oip-devcontainer/https:/usr/local/share/ca-certificates:ro
+      # Каталог с тестами доступен внутри контейнера, например для загрузки тестовых файлов
+      - ../src/Oip.UiTest:/home/seluser/uploads
+    environment:
+      - TZ=Europe/Moscow
+      - SE_EVENT_BUS_HOST=selenium-hub
+
+  chrome-video:
+    image: selenium/video:ffmpeg-8.0-20260222
+    volumes:
+      - tests_video:/videos
+    depends_on:
+      - chrome
+    environment:
+      - TZ=Europe/Moscow
+      - DISPLAY_CONTAINER_NAME=chrome
+      - SE_NODE_GRID_URL=http://selenium-hub:4444
+      - SE_VIDEO_FILE_NAME=auto
+
+  file-browser:
+    image: filebrowser/filebrowser:latest
+    restart: always
+    ports:
+      - "8081:80"
+    volumes:
+      - tests_video:/srv
+    environment:
+      - TZ=Europe/Moscow
+      - FB_NOAUTH=true
+
 networks:
   backend-network: { }
   bridge-network:
@@ -121,3 +175,4 @@ networks:
 
 volumes:
   redis-data:
+  tests_video:
