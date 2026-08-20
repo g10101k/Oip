@@ -139,6 +139,10 @@ export interface GetModuleInstanceSettingsParams4 {
   id?: number;
 }
 
+export interface GetModuleInstanceRightsParams {
+  id?: number;
+}
+
 export interface DeleteModuleInstanceParams {
   id?: number;
 }

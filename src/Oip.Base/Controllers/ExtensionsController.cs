@@ -8,6 +8,7 @@ using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
 using Oip.Base.Properties;
+using Oip.Base.Security;
 
 namespace Oip.Base.Controllers;
 
@@ -24,6 +25,7 @@ public class ExtensionsController(ModuleRepository moduleRepository, IHttpClient
     /// Gets the security configuration for an extension module instance.
     /// </summary>
     [Authorize, HttpGet("get-security")]
+    [Right(SecurityConstants.Read)]
     [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<List<SecurityResponse>> GetSecurity(int id)
     {
@@ -70,6 +72,7 @@ public class ExtensionsController(ModuleRepository moduleRepository, IHttpClient
     /// Gets raw settings for an extension module instance.
     /// </summary>
     [Authorize, HttpGet("get-module-instance-settings")]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]

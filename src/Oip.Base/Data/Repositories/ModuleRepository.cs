@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Entities;
@@ -95,7 +96,7 @@ public class ModuleRepository(OipModuleContext db)
             .Include(x => x.Module)
             .Where(x => x.Module.Kind == ModuleKind.Extension || modulesLoadedNames.Contains(x.Module.Name)) // Load the related Module.
             .Include(x => x.Securities) // Load Securities if needed.
-            .Where(m => m.Securities.Any(s => s.Right == "read" && roles.Contains(s.Role)))
+            .Where(m => m.Securities.Any(s => s.Right == SecurityConstants.Read && roles.Contains(s.Role)))
             .OrderBy(m => m.Order)
             .ToListAsync();
 
@@ -120,6 +121,49 @@ public class ModuleRepository(OipModuleContext db)
             };
 
         return await query.AsNoTracking().ToListAsync();
+    }
+
+    /// <summary>
+    /// Determines whether any of the specified roles grants the given right on a module instance.
+    /// </summary>
+    /// <param name="moduleInstanceId">The ID of the module instance.</param>
+    /// <param name="roles">The roles of the current user.</param>
+    /// <param name="right">The right to check, see <see cref="SecurityConstants"/>.</param>
+    /// <returns><c>true</c> when the right is granted; otherwise <c>false</c>.</returns>
+    public async Task<bool> HasInstanceRight(int moduleInstanceId, List<string> roles, string right)
+    {
+        if (roles.Contains(SecurityConstants.AdminRole))
+            return true;
+
+        if (roles.Count == 0)
+            return false;
+
+        return await db.ModuleInstanceSecurities
+            .AnyAsync(x => x.ModuleInstanceId == moduleInstanceId
+                           && x.Right == right
+                           && roles.Contains(x.Role));
+    }
+
+    /// <summary>
+    /// Retrieves the rights the specified roles grant on a module instance.
+    /// </summary>
+    /// <param name="moduleInstanceId">The ID of the module instance.</param>
+    /// <param name="roles">The roles of the current user.</param>
+    /// <returns>A distinct list of rights. Administrators get every right configured on the instance plus <see cref="SecurityConstants.Read"/>.</returns>
+    public async Task<List<string>> GetUserRightsByInstanceId(int moduleInstanceId, List<string> roles)
+    {
+        var isAdmin = roles.Contains(SecurityConstants.AdminRole);
+
+        var query = db.ModuleInstanceSecurities.Where(x => x.ModuleInstanceId == moduleInstanceId);
+        if (!isAdmin)
+            query = query.Where(x => roles.Contains(x.Role));
+
+        var rights = await query.Select(x => x.Right).Distinct().ToListAsync();
+
+        if (isAdmin && !rights.Contains(SecurityConstants.Read))
+            rights.Add(SecurityConstants.Read);
+
+        return rights;
     }
 
     /// <summary>

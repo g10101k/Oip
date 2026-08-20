@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
 using Oip.Base.Properties;
+using Oip.Base.Security;
 
 namespace Oip.Base.Controllers;
 
@@ -25,6 +27,7 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// <param name="id">The ID of the module instance.</param>
     /// <returns>A list of <see cref="SecurityResponse"/> objects representing the security rights and associated roles.</returns>
     [Authorize, HttpGet("get-security")]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType<List<SecurityResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
@@ -80,6 +83,7 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// <param name="id">The ID of the module instance.</param>
     /// <returns>An <see cref="IActionResult"/> containing the deserialized settings object.</returns>
     [Authorize, HttpGet("get-module-instance-settings")]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
@@ -130,6 +134,27 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
                 Roles = [SecurityConstants.AdminRole]
             }
         };
+    }
+
+    /// <summary>
+    /// Checks whether the current user holds the specified right on the module instance the request targets.
+    /// </summary>
+    /// <param name="right">The right to check, see <see cref="SecurityConstants" />.</param>
+    /// <param name="source">Where to read the module instance identifier from.</param>
+    /// <returns><c>true</c> when the right is granted; otherwise <c>false</c>.</returns>
+    /// <remarks>
+    /// Use this for partial restrictions inside an endpoint, such as masking a field. To deny the whole endpoint,
+    /// use <see cref="RightAttribute" /> instead.
+    /// </remarks>
+    protected async Task<bool> HasInstanceRight(string right,
+        ModuleInstanceIdSource source = ModuleInstanceIdSource.Header)
+    {
+        var moduleInstanceId = ModuleInstanceIdResolver.Resolve(Request, RouteData, source);
+        if (moduleInstanceId is null)
+            return false;
+
+        var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+        return await moduleRepository.HasInstanceRight(moduleInstanceId.Value, roles, right);
     }
 
     /// <summary>

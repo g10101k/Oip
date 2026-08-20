@@ -29,6 +29,19 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
     }
 
     /// <summary>
+    /// Retrieves the rights the current user has on the specified module instance.
+    /// </summary>
+    /// <param name="id">The ID of the module instance.</param>
+    /// <returns>A list of right codes, see <see cref="SecurityConstants"/>.</returns>
+    [Authorize, HttpGet("get-module-instance-rights")]
+    [ProducesResponseType<List<string>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    public async Task<List<string>> GetModuleInstanceRights(int id)
+    {
+        return await moduleRepository.GetUserRightsByInstanceId(id, claimService.GetUserRoles());
+    }
+
+    /// <summary>
     /// Retrieves the admin-specific menu.
     /// </summary>
     /// <returns>A list of <see cref="ModuleInstanceDto"/> objects representing the admin menu.</returns>

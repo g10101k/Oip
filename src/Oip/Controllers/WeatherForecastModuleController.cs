@@ -5,6 +5,7 @@ using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
+using Oip.Base.Security;
 using Oip.Controllers.Api;
 using Oip.Properties;
 
@@ -40,6 +41,7 @@ public class WeatherForecastModuleController(ModuleRepository moduleRepository)
     /// <returns></returns>
     [HttpGet("get-weather-forecast")]
     [Authorize]
+    [Right(SecurityConstants.Read, ModuleInstanceIdSource.Header)]
     [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult Get(int dayCount)

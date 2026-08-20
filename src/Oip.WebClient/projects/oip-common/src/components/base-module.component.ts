@@ -337,32 +337,44 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   /**
    * Starts watching current token roles and maps them to module instance security settings.
    */
-  protected watchSecurityRights(controller: string = this.controller, id: number | undefined = this.id): void {
+  protected watchSecurityRights(controller: string = this.controller, id: number | undefined = this.id): Promise<void> {
     this.rightsSubscription?.unsubscribe();
     this.resetRightsState();
 
     if (!controller || id == null) {
-      return;
+      return Promise.resolve();
     }
 
-    this.rightsSubscription = this.securityService.payload
-      .pipe(
-        switchMap((payload) =>
-          from(this.getSecurity(controller, id)).pipe(map((securitySettings) => ({ payload, securitySettings })))
-        ),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: ({ payload, securitySettings }) => {
-          const roles = payload?.realm_access?.roles ?? [];
-          this.updateRightsState(roles, securitySettings);
-        },
-        error: (error) => {
-          this.securityRightsLoaded = true;
-          console.error('Не удалось загрузить права', error);
-          this.onSecurityRightsChange();
+    return new Promise<void>((resolve) => {
+      let settled = false;
+      const settle = () => {
+        if (!settled) {
+          settled = true;
+          resolve();
         }
-      });
+      };
+
+      this.rightsSubscription = this.securityService.payload
+        .pipe(
+          switchMap((payload) =>
+            from(this.getSecurity(controller, id)).pipe(map((securitySettings) => ({ payload, securitySettings })))
+          ),
+          takeUntilDestroyed(this.destroyRef)
+        )
+        .subscribe({
+          next: ({ payload, securitySettings }) => {
+            const roles = payload?.realm_access?.roles ?? [];
+            this.updateRightsState(roles, securitySettings);
+            settle();
+          },
+          error: (error) => {
+            this.securityRightsLoaded = true;
+            console.error('Не удалось загрузить права', error);
+            this.onSecurityRightsChange();
+            settle();
+          }
+        });
+    });
   }
 
   private resetRightsState(): void {
@@ -464,8 +476,13 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
 
   private async reloadModuleInstance(): Promise<void> {
     this.moduleInstanceReloadPromise = this.moduleInstanceReloadPromise.then(async () => {
+      // Rights first: the backend rejects settings and data requests without the read right.
+      await this.watchSecurityRights();
+      if (!this.canRead) {
+        return;
+      }
+
       await this.getSettings();
-      this.watchSecurityRights();
       await this.onModuleInstanceChange();
     });
 

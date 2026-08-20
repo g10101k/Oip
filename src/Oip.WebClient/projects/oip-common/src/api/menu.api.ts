@@ -9,6 +9,7 @@ import {
   ChangeOrderParams,
   DeleteModuleInstanceParams,
   EditModuleInstanceDto,
+  GetModuleInstanceRightsParams,
   IntKeyValueDto,
   ModuleInstanceDto,
 } from "./data-contracts";
@@ -22,6 +23,18 @@ export class MenuApi<
     this.request<ModuleInstanceDto[], any>({
       path: `/api/menu/get`,
       method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  getModuleInstanceRights = (
+    query: GetModuleInstanceRightsParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<string[], ApiExceptionResponse>({
+      path: `/api/menu/get-module-instance-rights`,
+      method: "GET",
+      query: query,
       secure: true,
       format: "json",
       ...params,

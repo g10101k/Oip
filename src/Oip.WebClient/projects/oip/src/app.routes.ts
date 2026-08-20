@@ -1,5 +1,12 @@
 import { Routes } from '@angular/router';
-import { AuthGuardService, NotfoundComponent, AppLayoutComponent, DiscussionComponent } from 'oip-common';
+import {
+  AuthGuardService,
+  moduleAccessGuard,
+  AccessComponent,
+  NotfoundComponent,
+  AppLayoutComponent,
+  DiscussionComponent
+} from 'oip-common';
 import { inject } from '@angular/core';
 
 export const appRoutes: Routes = [
@@ -7,6 +14,7 @@ export const appRoutes: Routes = [
     path: '',
     component: AppLayoutComponent,
     canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)],
+    canActivateChild: [moduleAccessGuard],
     children: [
       {
         path: 'dashboard/:id',
@@ -33,6 +41,10 @@ export const appRoutes: Routes = [
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
+        path: 'access',
+        component: AccessComponent
+      },
+      {
         path: 'error',
         loadComponent: () => import('oip-common').then((m) => m.ErrorComponent)
       },
@@ -54,12 +66,14 @@ export const appRoutes: Routes = [
       {
         path: 'modules',
         loadComponent: () => import('oip-common').then((m) => m.AppModulesComponent),
-        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)],
+        data: { requireAdmin: true }
       },
       {
         path: 'applications',
         loadComponent: () => import('oip-common').then((m) => m.ApplicationsComponent),
-        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)],
+        data: { requireAdmin: true }
       },
       {
         path: 'iframe-module/:id',

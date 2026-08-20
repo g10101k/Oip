@@ -124,6 +124,10 @@ public sealed class ModuleGenerator(TargetProject project, ModuleName module, bo
                  public class {{module.ControllerClassName}}(ModuleRepository moduleRepository)
                      : BaseModuleController<{{module.SettingsClassName}}>(moduleRepository)
                  {
+                     // Mark every data endpoint you add here with
+                     // [Right(SecurityConstants.Read, ModuleInstanceIdSource.Header)] from
+                     // Oip.Api.Security, so the module is closed to users without the right by default.
+
                      /// <inheritdoc />
                      public override List<SecurityResponse> GetModuleRights()
                      {
