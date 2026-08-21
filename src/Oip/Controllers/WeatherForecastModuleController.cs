@@ -41,7 +41,7 @@ public class WeatherForecastModuleController(ModuleRepository moduleRepository)
     /// <returns></returns>
     [HttpGet("get-weather-forecast")]
     [Authorize]
-    [Right(SecurityConstants.Read, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType<List<WeatherForecastResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult Get(int dayCount)

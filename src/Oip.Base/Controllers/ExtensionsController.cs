@@ -21,15 +21,21 @@ namespace Oip.Base.Controllers;
 public class ExtensionsController(ModuleRepository moduleRepository, IHttpClientFactory httpClientFactory)
     : ControllerBase
 {
+    private int GetModuleInstanceId()
+    {
+        return Request.GetModuleInstanceId() ?? throw new ApiException("Module instance is not specified",
+            "The request does not specify the module instance it targets.", StatusCodes.Status400BadRequest);
+    }
+
     /// <summary>
-    /// Gets the security configuration for an extension module instance.
+    /// Gets the security configuration for the extension module instance the request targets.
     /// </summary>
     [Authorize, HttpGet("get-security")]
     [Right(SecurityConstants.Read)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<List<SecurityResponse>> GetSecurity(int id)
+    public async Task<List<SecurityResponse>> GetSecurity()
     {
-        var roleRightPair = await moduleRepository.GetSecurityByInstanceId(id);
+        var roleRightPair = await moduleRepository.GetSecurityByInstanceId(GetModuleInstanceId());
         var read = new SecurityResponse
         {
             Code = SecurityConstants.Read,
@@ -69,16 +75,16 @@ public class ExtensionsController(ModuleRepository moduleRepository, IHttpClient
     }
 
     /// <summary>
-    /// Gets raw settings for an extension module instance.
+    /// Gets raw settings for the extension module instance the request targets.
     /// </summary>
     [Authorize, HttpGet("get-module-instance-settings")]
     [Right(SecurityConstants.Read)]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
-    public IActionResult GetModuleInstanceSettings(int id)
+    public IActionResult GetModuleInstanceSettings()
     {
-        var settings = moduleRepository.GetModuleInstanceSettings(id);
+        var settings = moduleRepository.GetModuleInstanceSettings(GetModuleInstanceId());
         if (string.IsNullOrWhiteSpace(settings))
         {
             return Ok(new { });

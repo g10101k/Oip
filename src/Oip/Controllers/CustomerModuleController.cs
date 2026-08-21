@@ -31,7 +31,7 @@ public class CustomerModuleController(
     /// Retrieves a filtered page of customers for the customer module table.
     /// </summary>
     [HttpPost("get-page")]
-    [Right(SecurityConstants.Read, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
@@ -104,7 +104,7 @@ public class CustomerModuleController(
     /// Retrieves available customer categories.
     /// </summary>
     [HttpGet("get-categories")]
-    [Right(SecurityConstants.Read, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
@@ -124,7 +124,7 @@ public class CustomerModuleController(
     /// Retrieves available customer countries.
     /// </summary>
     [HttpGet("get-countries")]
-    [Right(SecurityConstants.Read, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
@@ -144,7 +144,7 @@ public class CustomerModuleController(
     /// Creates a new customer.
     /// </summary>
     [HttpPost("create")]
-    [Right(SecurityConstants.Edit, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Edit)]
     [ProducesResponseType(typeof(DemoCustomerTableRowDto), StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
@@ -171,7 +171,7 @@ public class CustomerModuleController(
     /// Updates an existing customer.
     /// </summary>
     [HttpPut("update/{id}")]
-    [Right(SecurityConstants.Edit, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Edit)]
     [ProducesResponseType(typeof(DemoCustomerTableRowDto), StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
@@ -204,7 +204,7 @@ public class CustomerModuleController(
     /// Deletes a customer.
     /// </summary>
     [HttpDelete("delete/{id}")]
-    [Right(SecurityConstants.Delete, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Delete)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]

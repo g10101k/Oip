@@ -17,8 +17,6 @@ import {
   PutSecurityRequest,
   SecurityResponse,
   TagDto,
-  TagManagementGetModuleInstanceSettingsParams,
-  TagManagementGetSecurityParams,
   TagManagementGetTagsByFilterParams
 } from './data-contracts';
 import { ContentType, HttpClient, RequestParams } from './http-client';
@@ -101,15 +99,14 @@ export class TagManagementModule<SecurityDataType = unknown> extends HttpClient<
    *
    * @tags TagManagementModule
    * @name tagManagementGetSecurity
-   * @summary Gets the security configuration for the specified module instance ID.
+   * @summary Gets the security configuration for the module instance the request targets.
    * @request GET:/api/tag-management/get-security
    * @secure
    */
-  tagManagementGetSecurity = (query: TagManagementGetSecurityParams, params: RequestParams = {}) =>
+  tagManagementGetSecurity = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/tag-management/get-security`,
       method: 'GET',
-      query: query,
       secure: true,
       format: 'json',
       ...params
@@ -137,18 +134,14 @@ export class TagManagementModule<SecurityDataType = unknown> extends HttpClient<
    *
    * @tags TagManagementModule
    * @name tagManagementGetModuleInstanceSettings
-   * @summary Gets the settings for the specified module instance.
+   * @summary Gets the settings for the module instance the request targets.
    * @request GET:/api/tag-management/get-module-instance-settings
    * @secure
    */
-  tagManagementGetModuleInstanceSettings = (
-    query: TagManagementGetModuleInstanceSettingsParams,
-    params: RequestParams = {}
-  ) =>
+  tagManagementGetModuleInstanceSettings = (params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/tag-management/get-module-instance-settings`,
       method: 'GET',
-      query: query,
       secure: true,
       ...params
     });

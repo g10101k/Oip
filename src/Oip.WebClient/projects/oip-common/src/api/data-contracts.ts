@@ -127,18 +127,6 @@ export interface DeleteExtensionModuleParams {
   id: number;
 }
 
-export interface GetModuleInstanceSettingsParams {
-  id?: number;
-}
-
-export interface GetModuleInstanceSettingsParams2 {
-  id?: number;
-}
-
-export interface GetModuleInstanceSettingsParams4 {
-  id?: number;
-}
-
 export interface GetModuleInstanceRightsParams {
   id?: number;
 }

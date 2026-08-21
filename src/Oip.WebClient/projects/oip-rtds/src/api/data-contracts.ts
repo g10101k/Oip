@@ -142,27 +142,8 @@ Default `now()`; */
   creator?: string | null;
 }
 
-export interface RtdsMetaDataContextMigrationModuleGetSecurityParams {
-  /** The ID of the module instance. */
-  id?: number;
-}
-
-export interface RtdsMetaDataContextMigrationModuleGetModuleInstanceSettingsParams {
-  /** The ID of the module instance. */
-  id?: number;
-}
-
 export interface TagManagementGetTagsByFilterParams {
   /** Name filter to search tags by. */
   filter?: string;
 }
 
-export interface TagManagementGetSecurityParams {
-  /** The ID of the module instance. */
-  id?: number;
-}
-
-export interface TagManagementGetModuleInstanceSettingsParams {
-  /** The ID of the module instance. */
-  id?: number;
-}

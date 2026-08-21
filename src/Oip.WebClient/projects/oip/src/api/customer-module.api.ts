@@ -10,7 +10,6 @@ import {
   DeleteParams,
   DemoCustomerTableRowDto,
   DemoCustomerTableRowDtoTablePageResult,
-  GetModuleInstanceSettingsParams,
   SaveDemoCustomerRequest,
   TableQueryRequest,
   UpdateParams,
@@ -77,14 +76,10 @@ export class CustomerModuleApi<
       secure: true,
       ...params,
     });
-  getModuleInstanceSettings = (
-    query: GetModuleInstanceSettingsParams,
-    params: RequestParams = {},
-  ) =>
+  getModuleInstanceSettings = (params: RequestParams = {}) =>
     this.request<CustomerModuleSettings, ApiExceptionResponse>({
       path: `/api/customer-module/get-module-instance-settings`,
       method: "GET",
-      query: query,
       secure: true,
       format: "json",
       ...params,

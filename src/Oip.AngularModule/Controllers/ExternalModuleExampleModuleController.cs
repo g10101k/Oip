@@ -22,7 +22,7 @@ public class ExternalModuleExampleModuleController(ModuleRepository moduleReposi
     /// </summary>
     [HttpGet("get-external-module-example-data")]
     [Authorize]
-    [Right(SecurityConstants.Read, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType<ExternalModuleExampleDataDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult GetExternalModuleExampleData()

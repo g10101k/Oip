@@ -24,6 +24,7 @@ import { SecurityDto } from '../dtos/security.dto';
 import { SecurityService } from '../services/security.service';
 import { ContentType, HttpClient } from '../api/http-client';
 import { PutSecurityDto } from '../dtos/put-security.dto';
+import { ApiExceptionResponse } from '../api/data-contracts';
 
 interface BaseComponentLocalization {
   security: string;
@@ -31,7 +32,7 @@ interface BaseComponentLocalization {
   content: string;
 }
 
-@Component({ standalone: true, template: '' })
+@Component({standalone: true, template: ''})
 export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSettings> implements OnInit, OnDestroy {
   private static readonly readRight = 'read';
   private static readonly editRight = 'edit';
@@ -131,7 +132,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    */
   private onConfigUpdate(): void {
     if (Object.keys(this.localSettings()).length > 0) {
-      this._localSettings = { ...this.localSettings() };
+      this._localSettings = {...this.localSettings()};
       this.localSettingsUpdate.next(this._localSettings);
       localStorage.setItem(`Instance_${this.id}`, JSON.stringify(this._localSettings));
     }
@@ -191,9 +192,9 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Defines the top bar items.
    */
   public topBarItems: TopBarDto[] = [
-    { id: 'content', icon: 'pi-box', caption: '' },
-    { id: 'settings', icon: 'pi-cog', caption: '' },
-    { id: 'security', icon: 'pi-lock', caption: '' }
+    {id: 'content', icon: 'pi-box', caption: ''},
+    {id: 'settings', icon: 'pi-cog', caption: ''},
+    {id: 'security', icon: 'pi-lock', caption: ''}
   ];
 
   /**
@@ -327,12 +328,14 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Called whenever the module instance changes, including the first load.
    * Derived components can override this to refresh module-specific data.
    */
-  protected async onModuleInstanceChange(): Promise<void> {}
+  protected async onModuleInstanceChange(): Promise<void> {
+  }
 
   /**
    * Called whenever current user rights for the active module instance are recalculated.
    */
-  protected onSecurityRightsChange(): void {}
+  protected onSecurityRightsChange(): void {
+  }
 
   /**
    * Starts watching current token roles and maps them to module instance security settings.
@@ -357,12 +360,12 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
       this.rightsSubscription = this.securityService.payload
         .pipe(
           switchMap((payload) =>
-            from(this.getSecurity(controller, id)).pipe(map((securitySettings) => ({ payload, securitySettings })))
+            from(this.getSecurity(controller, id)).pipe(map((securitySettings) => ({payload, securitySettings})))
           ),
           takeUntilDestroyed(this.destroyRef)
         )
         .subscribe({
-          next: ({ payload, securitySettings }) => {
+          next: ({payload, securitySettings}) => {
             const roles = payload?.realm_access?.roles ?? [];
             this.updateRightsState(roles, securitySettings);
             settle();
@@ -402,25 +405,21 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     );
   }
 
-  protected getSecurity(
-    controller: string = this.controller,
-    id: number | undefined = this.id
-  ): Promise<SecurityDto[]> {
+  protected getSecurity(controller: string = this.controller, id: number | undefined = this.id): Promise<SecurityDto[]> {
     if (!controller || id == null) {
       return Promise.resolve([]);
     }
 
-    return this.httpClient.request<SecurityDto[]>({
+    return this.httpClient.request<SecurityDto[], ApiExceptionResponse>({
       path: `/api/${controller}/get-security`,
       method: 'GET',
-      query: { id },
       secure: true,
       format: 'json'
     });
   }
 
   protected saveSecurity(request: PutSecurityDto, controller: string = this.controller): Promise<unknown> {
-    return this.httpClient.request<unknown>({
+    return this.httpClient.request<unknown, ApiExceptionResponse>({
       path: `/api/${controller}/put-security`,
       method: 'PUT',
       body: request,
@@ -429,14 +428,10 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     });
   }
 
-  protected getModuleInstanceSettings<TSettings>(
-    controller: string = this.controller,
-    id: number | undefined = this.id
-  ): Promise<TSettings> {
-    return this.httpClient.request<TSettings>({
+  protected getModuleInstanceSettings<TSettings>(controller: string = this.controller): Promise<TSettings> {
+    return this.httpClient.request<TSettings, ApiExceptionResponse>({
       path: `/api/${controller}/get-module-instance-settings`,
       method: 'GET',
-      query: { id },
       secure: true,
       format: 'json'
     });
@@ -446,7 +441,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     request: { id: number; settings: TSettings },
     controller: string = this.controller
   ): Promise<unknown> {
-    return this.httpClient.request<unknown>({
+    return this.httpClient.request<unknown, ApiExceptionResponse>({
       path: `/api/${controller}/put-module-instance-settings`,
       method: 'PUT',
       body: request,
@@ -456,7 +451,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   }
 
   protected getMigrations<TMigration>(controller: string = this.controller): Promise<TMigration[]> {
-    return this.httpClient.request<TMigration[]>({
+    return this.httpClient.request<TMigration[], ApiExceptionResponse>({
       path: `/api/${controller}/get-migrations`,
       method: 'GET',
       secure: true,
@@ -465,7 +460,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   }
 
   protected applyModuleMigration(request: unknown, controller: string = this.controller): Promise<unknown> {
-    return this.httpClient.request<unknown>({
+    return this.httpClient.request<unknown, ApiExceptionResponse>({
       path: `/api/${controller}/apply-migration`,
       method: 'POST',
       body: request,

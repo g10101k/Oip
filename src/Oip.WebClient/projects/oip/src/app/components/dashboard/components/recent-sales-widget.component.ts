@@ -4,7 +4,7 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../service/product.service';
-import { Product } from '../../../api/product';
+import { Product } from '../../../../api/product';
 
 @Component({
   standalone: true,

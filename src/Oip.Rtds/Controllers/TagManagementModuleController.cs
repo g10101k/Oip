@@ -30,7 +30,7 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     /// <returns>HTTP 200 OK on success.</returns>
     [HttpPost("add-tag")]
     [Authorize]
-    [Right(SecurityConstants.Edit, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Edit)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
@@ -47,7 +47,7 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     /// <returns>A list of matching tags.</returns>
     [HttpGet("get-tags-by-filter")]
     [Authorize]
-    [Right(SecurityConstants.Read, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType<List<TagDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
@@ -63,7 +63,7 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     /// <returns>An IActionResult indicating success.</returns>
     [HttpPost("edit-tag")]
     [Authorize]
-    [Right(SecurityConstants.Edit, ModuleInstanceIdSource.Header)]
+    [Right(SecurityConstants.Edit)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
