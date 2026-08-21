@@ -109,10 +109,10 @@ public sealed class ModuleGenerator(TargetProject project, ModuleName module, bo
     {
         return $$"""
                  using Microsoft.AspNetCore.Mvc;
-                 using Oip.Api.Controllers;
-                 using Oip.Api.Controllers.Api;
-                 using Oip.Data.Constants;
-                 using Oip.Data.Repositories;
+                 using Oip.Base.Controllers;
+                 using Oip.Base.Controllers.Api;
+                 using Oip.Base.Data.Constants;
+                 using Oip.Base.Data.Repositories;
 
                  namespace {{project.RootNamespace}}.Controllers;
 
@@ -126,7 +126,7 @@ public sealed class ModuleGenerator(TargetProject project, ModuleName module, bo
                  {
                      // Mark every data endpoint you add here with
                      // [Right(SecurityConstants.Read)] from
-                     // Oip.Api.Security, so the module is closed to users without the right by default.
+                     // Oip.Base.Security, so the module is closed to users without the right by default.
 
                      /// <inheritdoc />
                      public override List<SecurityResponse> GetModuleRights()
