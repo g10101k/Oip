@@ -4,11 +4,19 @@ import { InterpolationParameters, TranslateService, Translation, TranslationObje
 import { LayoutService } from './app.layout.service';
 import { PrimeNG } from 'primeng/config';
 import { Observable, of, shareReplay, tap } from 'rxjs';
+import en from './l10n/en.json';
+import ru from './l10n/ru.json';
 
 /**
  * Translations of a single namespace grouped by language code, e.g. { en: {...}, ru: {...} }
  */
 export type TranslationsByLang = Record<string, TranslationObject>;
+
+/**
+ * Global dictionaries shared by all components. They are bundled with the library,
+ * so the application never requests `assets/i18n/{lang}.json`.
+ */
+const globalTranslations: TranslationsByLang = { en, ru };
 
 export interface LanguageDto {
   code: string;
@@ -40,10 +48,14 @@ export class L10nService {
    * Components derived from <c>BaseModuleComponent</c> don't call it directly - it is enough
    * to declare the static <c>translations</c> field.
    * @param byLang - Translations grouped by language code
+   * @param namespace - Explicit namespace, needed when the dictionaries are still empty
    */
-  public static registerTranslations(byLang: TranslationsByLang | undefined): void {
+  public static registerTranslations(byLang: TranslationsByLang | undefined, namespace?: string): void {
     if (!byLang) {
       return;
+    }
+    if (namespace) {
+      L10nService.staticTranslations.set(namespace, byLang);
     }
     for (const translations of Object.values(byLang)) {
       for (const namespace of Object.keys(translations)) {
@@ -53,6 +65,10 @@ export class L10nService {
   }
 
   constructor() {
+    // Global dictionaries are available before the first `use()` call, so TranslateHttpLoader is never asked for them.
+    L10nService.registerTranslations(globalTranslations);
+    Object.entries(globalTranslations).forEach(([lang, translations]) => this.mergeTranslation(lang, translations));
+
     // Static translations are merged once per language, so they have to be re-merged on every language change.
     this.translateService.onLangChange.subscribe((event) => {
       L10nService.staticTranslations.forEach((byLang) => {

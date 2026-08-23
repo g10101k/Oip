@@ -106,7 +106,7 @@ import { NotificationService } from '../services/notification.service';
         </div>
 
         <p-paginator
-          styleClass="mt-3"
+          class="mt-3"
           [first]="skip"
           [rows]="take"
           [rowsPerPageOptions]="[5, 10, 20]"

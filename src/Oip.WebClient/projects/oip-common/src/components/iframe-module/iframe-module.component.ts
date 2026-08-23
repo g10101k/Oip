@@ -1,11 +1,13 @@
 import { Component, ElementRef, inject, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { BaseModuleComponent } from './base-module.component';
+import { BaseModuleComponent } from '../base-module.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { InputText } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
-import { SecurityComponent } from './security.component';
-import { IframeModuleSettings } from '../api/data-contracts';
+import { SecurityComponent } from '../security.component';
+import { IframeModuleSettings } from '../../api/data-contracts';
+import en from './l10n/iframe-module.en.json';
+import ru from './l10n/iframe-module.ru.json';
 
 @Component({
   standalone: true,
@@ -53,6 +55,8 @@ export class IframeModuleComponent
   extends BaseModuleComponent<IframeModuleSettings, IframeModuleSettings>
   implements OnInit, OnDestroy
 {
+  static override readonly translations = { en, ru };
+
   private iframe?: ElementRef<HTMLIFrameElement>;
   private readonly renderer = inject(Renderer2);
   private readonly translate = inject(TranslateService);
@@ -61,7 +65,6 @@ export class IframeModuleComponent
 
   constructor() {
     super();
-    this.l10nService.loadComponentTranslations('iframe-module');
   }
 
   @ViewChild('iframe')

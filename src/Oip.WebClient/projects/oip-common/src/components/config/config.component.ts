@@ -1,18 +1,23 @@
 import { Component, inject } from '@angular/core';
-import { ProfileComponent } from './profile.component';
+import { ProfileComponent } from '../profile.component';
 import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
-import { LayoutService } from '../services/app.layout.service';
-import { UserService } from '../services/user.service';
+import { LayoutService } from '../../services/app.layout.service';
+import { UserService } from '../../services/user.service';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { RouterLink } from '@angular/router';
-import { SecurityService } from '../services/security.service';
-import { MenuService } from '../services/app.menu.service';
+import { SecurityService } from '../../services/security.service';
+import { MenuService } from '../../services/app.menu.service';
 import { Button } from 'primeng/button';
-import { L10nService } from '../services/l10n.service';
+import { L10nService } from '../../services/l10n.service';
 import { TranslatePipe } from '@ngx-translate/core';
+
+import en from './l10n/config.en.json';
+import ru from './l10n/config.ru.json';
+
+L10nService.registerTranslations({ en, ru });
 
 @Component({
   selector: 'app-config',

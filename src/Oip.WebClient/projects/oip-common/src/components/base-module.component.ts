@@ -237,6 +237,8 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     this.subscriptions.push(
       this.route.url.subscribe((url) => {
         this.controller = url[0].path;
+        // The route path is the translation namespace, register it before asking for translations.
+        L10nService.registerTranslations((this.constructor as typeof BaseModuleComponent).translations, this.controller);
         this.l10n$ = this.l10nService.get(this.controller);
       })
     );

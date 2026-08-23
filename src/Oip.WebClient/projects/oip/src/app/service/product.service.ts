@@ -6,11 +6,11 @@ import { Product } from '../../api/product';
 export class ProductService {
   http: HttpClient = inject(HttpClient);
 
-  getProductsSmall() {
-    return this.http
+  async getProductsSmall() {
+    const res = await this.http
       .get<any>('assets/demo/data/products-small.json')
-      .toPromise()
-      .then((res) => res.data as Product[])
-      .then((data) => data);
+      .toPromise();
+    const data = res.data as Product[];
+    return data;
   }
 }

@@ -2,6 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { SecurityService, L10nService } from 'oip-common';
 import { RouterOutlet } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
+import en from './l10n/app-info.en.json';
+import ru from './l10n/app-info.ru.json';
+
+L10nService.registerTranslations({ en, ru });
 
 @Component({
   selector: 'app-root',

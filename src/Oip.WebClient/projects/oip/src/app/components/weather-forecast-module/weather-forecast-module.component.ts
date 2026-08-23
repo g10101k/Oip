@@ -12,8 +12,8 @@ import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DatePicker } from 'primeng/datepicker';
 import { convertToPrimeNgDateFormat } from 'oip-common';
-import en from './weather-forecast-module.en.json';
-import ru from './weather-forecast-module.ru.json';
+import en from './l10n/weather-forecast-module.en.json';
+import ru from './l10n/weather-forecast-module.ru.json';
 
 interface WeatherModuleLocalSettings {
   first: number;

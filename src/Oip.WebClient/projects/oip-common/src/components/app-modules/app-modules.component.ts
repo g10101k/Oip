@@ -5,17 +5,22 @@ import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
-import { MsgService } from '../services/msg.service';
+import { MsgService } from '../../services/msg.service';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { L10nService } from '../services/l10n.service';
-import { ExtensionModulesApi } from '../api/extension-modules.api';
-import { ModuleApi } from '../api/module.api';
-import { ExistModuleDto } from '../api/data-contracts';
-import { AppTitleService } from '../services/app-title.service';
+import { L10nService } from '../../services/l10n.service';
+import { ExtensionModulesApi } from '../../api/extension-modules.api';
+import { ModuleApi } from '../../api/module.api';
+import { ExistModuleDto } from '../../api/data-contracts';
+import { AppTitleService } from '../../services/app-title.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
+
+import en from './l10n/app-modules.en.json';
+import ru from './l10n/app-modules.ru.json';
+
+L10nService.registerTranslations({ en, ru });
 
 @Component({
   imports: [

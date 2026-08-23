@@ -12,11 +12,16 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToolbarModule } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
 import { firstValueFrom } from 'rxjs';
-import { ApplicationsApi } from '../api/applications.api';
-import { ApplicationRegistryItemDto, ServiceType } from '../api/applications-data-contracts';
-import { AppTitleService } from '../services/app-title.service';
-import { L10nService } from '../services/l10n.service';
-import { MsgService } from '../services/msg.service';
+import { ApplicationsApi } from '../../api/applications.api';
+import { ApplicationRegistryItemDto, ServiceType } from '../../api/applications-data-contracts';
+import { AppTitleService } from '../../services/app-title.service';
+import { L10nService } from '../../services/l10n.service';
+import { MsgService } from '../../services/msg.service';
+
+import en from './l10n/applications.en.json';
+import ru from './l10n/applications.ru.json';
+
+L10nService.registerTranslations({ en, ru });
 
 interface ApplicationEditModel {
   code: string;
