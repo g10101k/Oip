@@ -57,6 +57,7 @@
     "label": "Имя",
     "module": "Модуль",
     "selectModule": "Выберите модуль",
+    "searchModule": "Поиск модуля",
     "icon": "Иконка",
     "cancel": "Отмена",
     "save": "Сохранить"

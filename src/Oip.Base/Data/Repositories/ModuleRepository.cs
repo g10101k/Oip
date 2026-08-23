@@ -291,6 +291,7 @@ public class ModuleRepository(OipModuleContext db)
     public async Task<IEnumerable<IntKeyValueDto>> GetModules()
     {
         var query = from module in db.Modules
+            orderby module.Name
             select new IntKeyValueDto(module.ModuleId, module.Name);
         return await query.AsNoTracking().ToListAsync();
     }
