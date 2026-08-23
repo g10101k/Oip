@@ -170,6 +170,8 @@ services:
         KEYCLOAK_EVENTS_VERSION: 0.61
     command: [ "start-dev", "--import-realm" ]
     restart: unless-stopped
+    extra_hosts:
+      - host.docker.internal:host-gateway
     environment:
       KC_DB: postgres
       KC_DB_USERNAME: ${POSTGRES_USER:-postgres}

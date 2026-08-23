@@ -60,7 +60,7 @@ docker compose -f .oip-devcontainer/dev.yml up -d --force-recreate keycloak
 
 ````shell
 docker compose -f .oip-devcontainer/dev.yml exec keycloak /opt/keycloak/bin/kcadm.sh config credentials \
-  --server https://localhost:8443 \
+  --server http://localhost:8080 \
   --realm master \
   --user admin \
   --password 'P@ssw0rd'
@@ -80,8 +80,18 @@ docker compose -f .oip-devcontainer/dev.yml exec keycloak /opt/keycloak/bin/kcad
 
 ````shell
 docker compose -f .oip-devcontainer/dev.yml exec keycloak /opt/keycloak/bin/kcadm.sh update realms/oip \
-  -s 'attributes._providerConfig.ext-event-http.0={"targetUri":"https://host.docker.internal:5002/api/keycloak-events/receive-keycloak-event","sharedSecret":"change-me-keycloak-events","retry":true}'
+  -s 'attributes={"_providerConfig.ext-event-http.0":"{\"targetUri\":\"https://host.docker.internal:5002/api/keycloak-events/receive-keycloak-event\",\"sharedSecret\":\"change-me-keycloak-events\",\"retry\":true}"}'
 ````
+
+Такая запись перезаписывает `attributes` realm целиком. Если в realm уже есть другие атрибуты, их нужно сначала
+прочитать и включить в тот же объект:
+
+````shell
+docker compose -f .oip-devcontainer/dev.yml exec keycloak /opt/keycloak/bin/kcadm.sh get realms/oip --fields attributes
+````
+
+Если OIP запускается не на хосте, а как сервис docker-compose, вместо `host.docker.internal` в `targetUri`
+подставляется имя сервиса, например `https://oip:50002/...` или `https://oip-users:5005/...`.
 
 Параметр `retry=true` включает повторную отправку на стороне `ext-event-http`, если HTTP-доставка события завершилась
 ошибкой. Это retry provider-а Keycloak, а не очередь OIP и не бизнес-повтор синхронизации.
@@ -119,7 +129,8 @@ docker compose -f .oip-devcontainer/dev.yml exec keycloak /opt/keycloak/bin/kcad
 - проверить, что Keycloak image пересобран и jar расширения находится в `/opt/keycloak/providers`;
 - проверить, что в realm есть listener `ext-event-http`;
 - проверить `_providerConfig.ext-event-http.0`;
-- проверить, что target URI доступен из контейнера Keycloak;
+- проверить, что target URI доступен из контейнера Keycloak
+  (`docker compose -f .oip-devcontainer/dev.yml exec keycloak getent hosts host.docker.internal`);
 - проверить HMAC secret.
 
 Если запросы приходят, но слишком часто:
