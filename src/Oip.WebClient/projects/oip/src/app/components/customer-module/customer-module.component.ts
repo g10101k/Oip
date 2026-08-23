@@ -8,7 +8,7 @@ import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { BaseModuleComponent, ContentType, L10nService, SecurityComponent } from 'oip-common';
+import { BaseModuleComponent, ContentType, SecurityComponent } from 'oip-common';
 import { CustomerModuleApi } from '../../../api/customer-module.api';
 import {
   CustomerModuleSettings,
@@ -16,6 +16,8 @@ import {
   DemoCustomerTableRowDto,
   TableQueryRequest
 } from '../../../api/data-contracts';
+import en from './l10n/customer-module.en.json';
+import ru from './l10n/customer-module.ru.json';
 
 interface CustomerModuleLocalSettings {
   first?: number;
@@ -322,6 +324,8 @@ export class CustomerModuleComponent
   extends BaseModuleComponent<CustomerModuleSettings, CustomerModuleLocalSettings>
   implements OnInit, OnDestroy, AfterViewInit
 {
+  static override readonly translations = { en, ru };
+
   @ViewChild('table') table!: Table;
 
   protected readonly dataService = inject(CustomerModuleApi);

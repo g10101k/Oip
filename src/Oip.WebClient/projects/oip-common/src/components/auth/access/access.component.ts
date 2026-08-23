@@ -14,7 +14,7 @@ import { RippleModule } from 'primeng/ripple';
         <div
           class="w-full surface-card py-8 px-5 sm:px-8 flex flex-column align-items-center"
           style="border-radius:53px">
-          <div class="grid flex flex-column align-items-center">
+          <div class="grid flex-column align-items-center">
             <div
               class="flex justify-content-center align-items-center bg-orange-500 border-circle"
               style="width:3.2rem; height:3.2rem;">
@@ -23,14 +23,14 @@ import { RippleModule } from 'primeng/ripple';
             <h1 class="text-900 font-bold text-4xl lg:text-5xl mb-2">Access Denied</h1>
             <span class="text-600 mb-5">You do not have the necessary permisions. Please contact admins.</span>
             <img alt="Access denied" class="mb-5" src="assets/demo/images/access/asset-access.svg" width="80%" />
-            <button
+            <p-button
               class="p-button-text"
               icon="pi pi-arrow-left"
               id="oip-app-access-go-to-dashboard-button"
               label="Go to Dashboard"
               pButton
               pRipple
-              [routerLink]="['/']"></button>
+              [routerLink]="['/']"></p-button>
           </div>
         </div>
       </div>

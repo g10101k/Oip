@@ -8,10 +8,12 @@ import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Tooltip } from 'primeng/tooltip';
-import { BaseModuleComponent } from './base-module.component';
-import { NoSettingsDto } from '../dtos/no-settings.dto';
-import { SecurityComponent } from './security.component';
+import { BaseModuleComponent } from '../base-module.component';
+import { NoSettingsDto } from '../../dtos/no-settings.dto';
+import { SecurityComponent } from '../security.component';
 import { TranslatePipe } from '@ngx-translate/core';
+import en from './l10n/db-migration.en.json';
+import ru from './l10n/db-migration.ru.json';
 
 export interface MigrationDto {
   name: string;
@@ -124,12 +126,9 @@ export class DbMigrationComponent
   extends BaseModuleComponent<NoSettingsDto, NoSettingsDto>
   implements OnInit, OnDestroy
 {
-  data: MigrationDto[];
+  static override readonly translations = { en, ru };
 
-  constructor() {
-    super();
-    this.l10nService.loadComponentTranslations('db-migration');
-  }
+  data: MigrationDto[];
 
   async ngOnInit() {
     await super.ngOnInit();

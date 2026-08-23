@@ -5,6 +5,8 @@ import { RecentSalesWidgetComponent } from './components/recent-sales-widget.com
 import { BestSellingWidgetComponent } from './components/best-selling-widget.component';
 import { RevenueStreamWidgetComponent } from './components/revenue-stream-widget.component';
 import { BaseModuleComponent, NoSettingsDto, SecurityComponent } from 'oip-common';
+import en from './l10n/dashboard.en.json';
+import ru from './l10n/dashboard.ru.json';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,4 +36,6 @@ import { BaseModuleComponent, NoSettingsDto, SecurityComponent } from 'oip-commo
     }
   `
 })
-export class DashboardComponent extends BaseModuleComponent<NoSettingsDto, NoSettingsDto> {}
+export class DashboardComponent extends BaseModuleComponent<NoSettingsDto, NoSettingsDto> {
+  static override readonly translations = { en, ru };
+}

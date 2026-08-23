@@ -4,6 +4,19 @@ import { InterpolationParameters, TranslateService, Translation, TranslationObje
 import { LayoutService } from './app.layout.service';
 import { PrimeNG } from 'primeng/config';
 import { Observable, of, shareReplay, tap } from 'rxjs';
+import en from './l10n/en.json';
+import ru from './l10n/ru.json';
+
+/**
+ * Translations of a single namespace grouped by language code, e.g. { en: {...}, ru: {...} }
+ */
+export type TranslationsByLang = Record<string, TranslationObject>;
+
+/**
+ * Global dictionaries shared by all components. They are bundled with the library,
+ * so the application never requests `assets/i18n/{lang}.json`.
+ */
+const globalTranslations: TranslationsByLang = { en, ru };
 
 export interface LanguageDto {
   code: string;
@@ -23,6 +36,49 @@ export class L10nService {
   private readonly primeNg = inject(PrimeNG);
   private readonly layoutService = inject(LayoutService);
   public availableLanguages: LanguageDto[];
+
+  /**
+   * Translations bundled with components, registered at module load time.
+   */
+  private static readonly staticTranslations: Map<string, TranslationsByLang> = new Map();
+
+  /**
+   * Registers translations bundled with a component instead of loading them over HTTP.
+   * Namespaces are taken from the root keys of the passed dictionaries.
+   * Components derived from <c>BaseModuleComponent</c> don't call it directly - it is enough
+   * to declare the static <c>translations</c> field.
+   * @param byLang - Translations grouped by language code
+   * @param namespace - Explicit namespace, needed when the dictionaries are still empty
+   */
+  public static registerTranslations(byLang: TranslationsByLang | undefined, namespace?: string): void {
+    if (!byLang) {
+      return;
+    }
+    if (namespace) {
+      L10nService.staticTranslations.set(namespace, byLang);
+    }
+    for (const translations of Object.values(byLang)) {
+      for (const namespace of Object.keys(translations)) {
+        L10nService.staticTranslations.set(namespace, byLang);
+      }
+    }
+  }
+
+  constructor() {
+    // Global dictionaries are available before the first `use()` call, so TranslateHttpLoader is never asked for them.
+    L10nService.registerTranslations(globalTranslations);
+    Object.entries(globalTranslations).forEach(([lang, translations]) => this.mergeTranslation(lang, translations));
+
+    // Static translations are merged once per language, so they have to be re-merged on every language change.
+    this.translateService.onLangChange.subscribe((event) => {
+      L10nService.staticTranslations.forEach((byLang) => {
+        const translations = byLang[event.lang];
+        if (translations) {
+          this.mergeTranslation(event.lang, translations);
+        }
+      });
+    });
+  }
 
   /**
    * Loads translations for a specific component
@@ -51,8 +107,7 @@ export class L10nService {
 
     const request = this.httpClient.get(url).pipe(
       tap((translations) => {
-        const current = this.translateService.translations[selectedLang] || {};
-        this.translateService.setTranslation(selectedLang, { ...current, ...translations }, true);
+        this.mergeTranslation(selectedLang, translations as TranslationObject);
         this.loadedTranslations.add(key);
         this.loadingTranslations.delete(key);
       }),
@@ -91,6 +146,16 @@ export class L10nService {
       return of(null);
     }
 
+    // Translations bundled with the component - no HTTP request needed.
+    const staticTranslations = L10nService.staticTranslations.get(component);
+    if (staticTranslations) {
+      const translations = staticTranslations[lang];
+      if (translations) {
+        this.mergeTranslation(lang, translations);
+      }
+      return of(null);
+    }
+
     const loading = this.loadingTranslations.get(key);
     if (loading) {
       return loading;
@@ -98,8 +163,7 @@ export class L10nService {
 
     const request = this.httpClient.get(`./assets/i18n/${component}.${lang}.json`).pipe(
       tap((translations) => {
-        const current = this.translateService.translations[lang] || {};
-        this.translateService.setTranslation(lang, { ...current, ...translations }, true);
+        this.mergeTranslation(lang, translations as TranslationObject);
         this.loadedTranslations.add(key);
         this.loadingTranslations.delete(key);
       }),
@@ -116,6 +180,16 @@ export class L10nService {
     });
 
     return request;
+  }
+
+  /**
+   * Merges a translation dictionary into the dictionary of the given language
+   * @param lang - Language code
+   * @param translations - Translations to merge
+   */
+  private mergeTranslation(lang: string, translations: TranslationObject): void {
+    const current = this.translateService.translations[lang] || {};
+    this.translateService.setTranslation(lang, { ...current, ...translations }, true);
   }
 
   /**
