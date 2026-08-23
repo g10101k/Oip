@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
-import { BaseModuleComponent, L10nService, SecurityComponent } from 'oip-common';
+import { BaseModuleComponent, SecurityComponent } from 'oip-common';
 import { WeatherForecastModuleApi } from '../../../api/weather-forecast-module.api';
 import { WeatherForecastResponse, WeatherModuleSettings } from '../../../api/data-contracts';
 import { TagModule } from 'primeng/tag';
@@ -12,6 +12,8 @@ import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DatePicker } from 'primeng/datepicker';
 import { convertToPrimeNgDateFormat } from 'oip-common';
+import en from './weather-forecast-module.en.json';
+import ru from './weather-forecast-module.ru.json';
 
 interface WeatherModuleLocalSettings {
   first: number;
@@ -110,6 +112,8 @@ export class WeatherForecastModuleComponent
   extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
   implements OnInit, OnDestroy
 {
+  static override readonly translations = { en, ru };
+
   @ViewChild('table') table!: Table;
   protected readonly dataService = inject(WeatherForecastModuleApi);
   protected data: WeatherForecastResponse[] = [];

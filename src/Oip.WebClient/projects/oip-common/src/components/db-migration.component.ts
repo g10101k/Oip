@@ -12,6 +12,8 @@ import { BaseModuleComponent } from './base-module.component';
 import { NoSettingsDto } from '../dtos/no-settings.dto';
 import { SecurityComponent } from './security.component';
 import { TranslatePipe } from '@ngx-translate/core';
+import en from './db-migration.en.json';
+import ru from './db-migration.ru.json';
 
 export interface MigrationDto {
   name: string;
@@ -124,12 +126,9 @@ export class DbMigrationComponent
   extends BaseModuleComponent<NoSettingsDto, NoSettingsDto>
   implements OnInit, OnDestroy
 {
-  data: MigrationDto[];
+  static override readonly translations = { en, ru };
 
-  constructor() {
-    super();
-    this.l10nService.loadComponentTranslations('db-migration');
-  }
+  data: MigrationDto[];
 
   async ngOnInit() {
     await super.ngOnInit();

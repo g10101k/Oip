@@ -19,7 +19,7 @@ import { from, Observable, Subject, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AppTitleService } from '../services/app-title.service';
 import { LayoutService } from '../services/app.layout.service';
-import { L10nService } from '../services/l10n.service';
+import { L10nService, TranslationsByLang } from '../services/l10n.service';
 import { SecurityDto } from '../dtos/security.dto';
 import { SecurityService } from '../services/security.service';
 import { ContentType, HttpClient } from '../api/http-client';
@@ -119,6 +119,17 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @type {string}
    */
   public title: string;
+  /**
+   * Translations bundled with the component, grouped by language code.
+   * Declare it in a derived component to load translations from the component folder
+   * instead of `assets/i18n`:
+   *
+   * ```ts
+   * static override readonly translations = { en, ru };
+   * ```
+   */
+  public static readonly translations: TranslationsByLang | undefined;
+
   public l10nService = inject(L10nService);
   public l10n$: Observable<Translation | TranslationObject>;
   public canRead = false;
@@ -215,6 +226,8 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Initializes the component and subscribes to local settings updates.
    */
   constructor() {
+    // Must run before the route subscription below asks L10nService for the translations.
+    L10nService.registerTranslations((this.constructor as typeof BaseModuleComponent).translations);
     effect(() => {
       const config = this.localSettings();
       if (config) {
