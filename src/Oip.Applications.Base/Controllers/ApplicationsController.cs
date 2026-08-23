@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Oip.Applications.Base.Contracts;
+using Oip.Base.Data.Constants;
 using Oip.Base.Exceptions;
 
 namespace Oip.Applications.Base.Controllers;
@@ -43,7 +44,7 @@ public class ApplicationsController(IApplicationRegistryService registryService)
     /// <summary>
     /// Creates a registered frontend application.
     /// </summary>
-    [Authorize]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     [HttpPost("create-application-registry-item")]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public Task<ApplicationRegistryItemDto> CreateApplicationRegistryItem(
@@ -56,7 +57,7 @@ public class ApplicationsController(IApplicationRegistryService registryService)
     /// <summary>
     /// Updates a registered frontend application by code.
     /// </summary>
-    [Authorize]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     [HttpPut("update-application-registry-item/{code}")]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public Task<ApplicationRegistryItemDto> UpdateApplicationRegistryItem(
@@ -70,7 +71,7 @@ public class ApplicationsController(IApplicationRegistryService registryService)
     /// <summary>
     /// Deletes a registered frontend application by code.
     /// </summary>
-    [Authorize]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
     [HttpDelete("delete-application-registry-item/{code}")]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteApplicationRegistryItem(

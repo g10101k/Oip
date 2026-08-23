@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Repositories;
 using Oip.Settings.Enums;
-using Oip.Settings.Helpers;
+using Oip.Settings.Models;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -15,7 +15,7 @@ public static class ServiceCollectionExtension
     /// <summary>
     /// Add data context
     /// </summary>
-    public static IServiceCollection AddOipModuleContext(this IServiceCollection services, string connectionString,
+    public static IServiceCollection AddOipModuleContext(this IServiceCollection services, ConnectionModel connectionString,
         string migrationHistoryTableName = OipModuleContext.MigrationHistoryTableName,
         string migrationHistorySchemaName = OipModuleContext.SchemaName)
     {
@@ -29,18 +29,17 @@ public static class ServiceCollectionExtension
     /// Adds and configures the Oip module context and module repository to the service collection.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="connectionString">The connection string for the database.</param>
+    /// <param name="connectionModel">The connection string for the database.</param>
     /// <param name="migrationHistoryTableName">The name of the migration history table (default: "__OipModuleMigrationHistory").</param>
     /// <param name="migrationHistorySchemaName">The schema name for the migration history table (default: "oip").</param>
     /// <returns>The configured service collection.</returns>
-    public static IServiceCollection AddOipBasedContext<T>(this IServiceCollection services, string connectionString,
+    public static IServiceCollection AddOipBasedContext<T>(this IServiceCollection services, ConnectionModel connectionModel,
         string migrationHistoryTableName = OipModuleContext.MigrationHistoryTableName,
         string migrationHistorySchemaName = OipModuleContext.SchemaName)
         where T : DbContext
     {
-        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(connectionString);
         // Register DbContext with a configuration lambda.
-        return services.AddDbContext<T>((serviceProvider, options) =>
+        return services.AddDbContext<T>(options =>
         {
             switch (connectionModel.Provider)
             {
@@ -58,8 +57,10 @@ public static class ServiceCollectionExtension
                 case XpoProvider.SQLite:
                     throw new InvalidOperationException("SQLite provider is not supported");
                 default:
-                    throw new InvalidOperationException($"Invalid provider in connection string {connectionString}");
+                    throw new InvalidOperationException(
+                        $"Invalid provider `{Enum.GetName(connectionModel.Provider)}` in connection string");
             }
+            options.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
         });
     }
 }

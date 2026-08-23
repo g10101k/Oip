@@ -8,6 +8,7 @@ using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Data.Services;
 using Oip.Base.Exceptions;
+using Oip.Base.Security;
 using Oip.Demo.TableQueryDemo;
 using Oip.Properties;
 
@@ -30,6 +31,7 @@ public class CustomerModuleController(
     /// Retrieves a filtered page of customers for the customer module table.
     /// </summary>
     [HttpPost("get-page")]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
@@ -87,6 +89,9 @@ public class CustomerModuleController(
                 options,
                 cancellationToken);
 
+            if (!await HasInstanceRight(ViewFinancialsRight))
+                result = result with { Data = result.Data.Select(MaskFinancials).ToList() };
+
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -99,6 +104,7 @@ public class CustomerModuleController(
     /// Retrieves available customer categories.
     /// </summary>
     [HttpGet("get-categories")]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
@@ -118,6 +124,7 @@ public class CustomerModuleController(
     /// Retrieves available customer countries.
     /// </summary>
     [HttpGet("get-countries")]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
@@ -137,6 +144,7 @@ public class CustomerModuleController(
     /// Creates a new customer.
     /// </summary>
     [HttpPost("create")]
+    [Right(SecurityConstants.Edit)]
     [ProducesResponseType(typeof(DemoCustomerTableRowDto), StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
@@ -156,13 +164,14 @@ public class CustomerModuleController(
         await context.SaveChangesAsync(cancellationToken);
         await LoadRelationsAsync(customer, cancellationToken);
 
-        return Ok(MapCustomer(customer));
+        return Ok(await MapCustomerWithRights(customer));
     }
 
     /// <summary>
     /// Updates an existing customer.
     /// </summary>
     [HttpPut("update/{id}")]
+    [Right(SecurityConstants.Edit)]
     [ProducesResponseType(typeof(DemoCustomerTableRowDto), StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
@@ -188,13 +197,14 @@ public class CustomerModuleController(
         await context.SaveChangesAsync(cancellationToken);
         await LoadRelationsAsync(customer, cancellationToken);
 
-        return Ok(MapCustomer(customer));
+        return Ok(await MapCustomerWithRights(customer));
     }
 
     /// <summary>
     /// Deletes a customer.
     /// </summary>
     [HttpDelete("delete/{id}")]
+    [Right(SecurityConstants.Delete)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
@@ -272,6 +282,17 @@ public class CustomerModuleController(
         await context.Entry(customer).Reference(x => x.Category).LoadAsync(cancellationToken);
         await context.Entry(customer).Reference(x => x.Country).LoadAsync(cancellationToken);
         await context.Entry(customer).Collection(x => x.Orders).LoadAsync(cancellationToken);
+    }
+
+    private async Task<DemoCustomerTableRowDto> MapCustomerWithRights(DemoCustomer customer)
+    {
+        var dto = MapCustomer(customer);
+        return await HasInstanceRight(ViewFinancialsRight) ? dto : MaskFinancials(dto);
+    }
+
+    private static DemoCustomerTableRowDto MaskFinancials(DemoCustomerTableRowDto row)
+    {
+        return row with { LifetimeValue = 0 };
     }
 
     private static DemoCustomerTableRowDto MapCustomer(DemoCustomer customer)

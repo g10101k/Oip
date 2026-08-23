@@ -1,5 +1,12 @@
 import { Routes } from '@angular/router';
-import { AuthGuardService, NotfoundComponent, AppLayoutComponent, DiscussionComponent } from 'oip-common';
+import {
+  AuthGuardService,
+  moduleAccessGuard,
+  AccessComponent,
+  NotfoundComponent,
+  AppLayoutComponent,
+  DiscussionComponent
+} from 'oip-common';
 import { inject } from '@angular/core';
 
 export const appRoutes: Routes = [
@@ -7,6 +14,7 @@ export const appRoutes: Routes = [
     path: '',
     component: AppLayoutComponent,
     canActivate: [() => inject(AuthGuardService).canActivate()],
+    canActivateChild: [moduleAccessGuard],
     children: [
       {
         path: 'external-module-example-module/:id',
@@ -20,6 +28,10 @@ export const appRoutes: Routes = [
         path: 'discussion/:id',
         loadComponent: () => import('oip-common').then((m) => m.DiscussionComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
+      },
+      {
+        path: 'access',
+        component: AccessComponent
       },
       {
         path: 'error',
@@ -43,20 +55,20 @@ export const appRoutes: Routes = [
       {
         path: 'modules',
         loadComponent: () => import('oip-common').then((m) => m.AppModulesComponent),
-        canActivate: [() => inject(AuthGuardService).canActivate()]
+        canActivate: [() => inject(AuthGuardService).canActivate()],
+        data: { requireAdmin: true }
       },
       {
         path: 'iframe-module/:id',
         loadComponent: () => import('oip-common').then((m) => m.IframeModuleComponent),
         canActivate: [() => inject(AuthGuardService).canActivate()]
-      },
-
+      }
     ]
   },
   {
     path: 'unauthorized',
     loadComponent: () => import('oip-common').then((m) => m.UnauthorizedComponent)
   },
-  {path: 'notfound', component: NotfoundComponent},
-  {path: '**', redirectTo: '/notfound'}
+  { path: 'notfound', component: NotfoundComponent },
+  { path: '**', redirectTo: '/notfound' }
 ];

@@ -16,8 +16,6 @@ import {
   MigrationDto,
   ObjectSaveSettingsRequest,
   PutSecurityRequest,
-  RtdsMetaDataContextMigrationModuleGetModuleInstanceSettingsParams,
-  RtdsMetaDataContextMigrationModuleGetSecurityParams,
   SecurityResponse
 } from './data-contracts';
 import { ContentType, HttpClient, RequestParams } from './http-client';
@@ -97,18 +95,14 @@ export class RtdsMetaDataContextMigrationModule<SecurityDataType = unknown> exte
    *
    * @tags RtdsMetaDataContextMigrationModule
    * @name rtdsMetaDataContextMigrationModuleGetSecurity
-   * @summary Gets the security configuration for the specified module instance ID.
+   * @summary Gets the security configuration for the module instance the request targets.
    * @request GET:/api/rtds-meta-data-context-migration-module/get-security
    * @secure
    */
-  rtdsMetaDataContextMigrationModuleGetSecurity = (
-    query: RtdsMetaDataContextMigrationModuleGetSecurityParams,
-    params: RequestParams = {}
-  ) =>
+  rtdsMetaDataContextMigrationModuleGetSecurity = (params: RequestParams = {}) =>
     this.request<SecurityResponse[], any>({
       path: `/api/rtds-meta-data-context-migration-module/get-security`,
       method: 'GET',
-      query: query,
       secure: true,
       format: 'json',
       ...params
@@ -136,18 +130,14 @@ export class RtdsMetaDataContextMigrationModule<SecurityDataType = unknown> exte
    *
    * @tags RtdsMetaDataContextMigrationModule
    * @name rtdsMetaDataContextMigrationModuleGetModuleInstanceSettings
-   * @summary Gets the settings for the specified module instance.
+   * @summary Gets the settings for the module instance the request targets.
    * @request GET:/api/rtds-meta-data-context-migration-module/get-module-instance-settings
    * @secure
    */
-  rtdsMetaDataContextMigrationModuleGetModuleInstanceSettings = (
-    query: RtdsMetaDataContextMigrationModuleGetModuleInstanceSettingsParams,
-    params: RequestParams = {}
-  ) =>
+  rtdsMetaDataContextMigrationModuleGetModuleInstanceSettings = (params: RequestParams = {}) =>
     this.request<void, any>({
       path: `/api/rtds-meta-data-context-migration-module/get-module-instance-settings`,
       method: 'GET',
-      query: query,
       secure: true,
       ...params
     });

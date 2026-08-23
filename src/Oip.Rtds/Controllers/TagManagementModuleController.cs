@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Controllers;
+using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
+using Oip.Base.Security;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Repositories;
 
@@ -27,7 +29,8 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     /// <param name="createTag">Tag entity to be added.</param>
     /// <returns>HTTP 200 OK on success.</returns>
     [HttpPost("add-tag")]
-    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [Authorize]
+    [Right(SecurityConstants.Edit)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
@@ -43,7 +46,8 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     /// <param name="filter">Name filter to search tags by.</param>
     /// <returns>A list of matching tags.</returns>
     [HttpGet("get-tags-by-filter")]
-    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [Authorize]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType<List<TagDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
@@ -58,7 +62,8 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     /// <param name="createTag">The tag object containing updated information.</param>
     /// <returns>An IActionResult indicating success.</returns>
     [HttpPost("edit-tag")]
-    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [Authorize]
+    [Right(SecurityConstants.Edit)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
@@ -66,5 +71,19 @@ public class TagManagementModuleController(TagRepository tagRepository, ModuleRe
     {
         tagRepository.EditTag(createTag);
         return Ok();
+    }
+
+    /// <inheritdoc />
+    public override List<SecurityResponse> GetModuleRights()
+    {
+        var rights = base.GetModuleRights();
+        rights.Add(new SecurityResponse
+        {
+            Code = SecurityConstants.Edit,
+            Name = "Edit",
+            Description = "Can add and edit tags",
+            Roles = [SecurityConstants.AdminRole]
+        });
+        return rights;
     }
 }

@@ -9,7 +9,6 @@ using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Notifications.Base.Services;
 using Oip.Settings.Enums;
-using Oip.Settings.Helpers;
 using Oip.Users.Base.Contexts;
 using Oip.Users.Base.Controllers;
 using Oip.Users.Base.Data.Repositories;
@@ -115,7 +114,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddUsersData(this IServiceCollection services, ISettings settings)
     {
-        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
+        var connectionModel = settings.ConnectionString;
         switch (connectionModel.Provider)
         {
             case XpoProvider.Postgres:
@@ -126,6 +125,7 @@ public static class ServiceCollectionExtensions
                         {
                             x.MigrationsHistoryTable(UserContext.MigrationHistoryTableName, UserContext.SchemaName);
                         });
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
             case XpoProvider.MSSqlServer:
@@ -136,8 +136,21 @@ public static class ServiceCollectionExtensions
                         {
                             x.MigrationsHistoryTable(UserContext.MigrationHistoryTableName, UserContext.SchemaName);
                         });
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
+            case XpoProvider.InMemoryDataStore:
+                services.AddDbContext<UserContext>(option =>
+                {
+                    option.UseInMemoryDatabase("Oip.Users");
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
+                });
+                break;
+            case XpoProvider.SQLite:
+                throw new InvalidOperationException("SQLite provider is not supported");
+            default:
+                throw new InvalidOperationException(
+                    $"Invalid provider `{Enum.GetName(connectionModel.Provider)}` in connection string");
         }
 
         return services;

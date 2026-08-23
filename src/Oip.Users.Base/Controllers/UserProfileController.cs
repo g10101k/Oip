@@ -57,7 +57,7 @@ public class UserProfileController(
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserPhotoById(int userId, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetByIdAsync(userId);
+        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         return await GetUserPhotoResultAsync(user, cancellationToken);
     }
 
@@ -112,7 +112,7 @@ public class UserProfileController(
     [ProducesResponseType<UserSettingsDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
-    public async Task<UserSettingsDto> GetSettings()
+    public UserSettingsDto GetSettings()
     {
         var json = userRepository.GetUserSettings(claimService.GetUserEmail()!);
 

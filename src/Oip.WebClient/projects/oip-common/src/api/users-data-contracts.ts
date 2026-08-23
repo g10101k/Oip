@@ -5,6 +5,29 @@ export interface ApiExceptionResponse {
   stackTrace?: string | null;
 }
 
+export interface CustomUserNotify {
+  username?: string | null;
+}
+
+export interface SyncUserRequest {
+  keycloakUserId?: string | null;
+}
+
+export interface UserEntity {
+  userId?: number;
+  keycloakId?: string | null;
+  email: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  lastSyncedAt?: Date;
+  photoObjectName?: string | null;
+  photoContentType?: string | null;
+  settings?: string | null;
+}
+
 export interface UserSettingsDto {
   preset?: string | null;
   primary?: string | null;
@@ -23,4 +46,21 @@ export interface GetUserPhotoByIdParams {
 
 export interface PostUserPhotoPayload {
   files?: Blob;
+}
+
+export interface GetAllUsersParams {
+  skip?: number;
+  take?: number;
+}
+
+export interface GetUserParams {
+  id?: number;
+}
+
+export interface GetUserByKeycloakIdParams {
+  keycloakId?: string;
+}
+
+export interface SearchUserParams {
+  term?: string;
 }

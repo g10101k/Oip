@@ -1,5 +1,11 @@
 import { Routes } from '@angular/router';
-import { AuthGuardService, NotfoundComponent, AppLayoutComponent } from 'oip-common';
+import {
+  AuthGuardService,
+  moduleAccessGuard,
+  AccessComponent,
+  NotfoundComponent,
+  AppLayoutComponent
+} from 'oip-common';
 import { inject } from '@angular/core';
 
 export const appRoutes: Routes = [
@@ -7,6 +13,7 @@ export const appRoutes: Routes = [
     path: '',
     component: AppLayoutComponent,
     canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)],
+    canActivateChild: [moduleAccessGuard],
     children: [
       {
         path: 'tag-management/:id',
@@ -18,6 +25,10 @@ export const appRoutes: Routes = [
         path: 'rtds-meta-data-context-migration-module/:id',
         loadComponent: () => import('oip-common').then((m) => m.DbMigrationComponent),
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
+      },
+      {
+        path: 'access',
+        component: AccessComponent
       },
       {
         path: 'error',
@@ -36,7 +47,8 @@ export const appRoutes: Routes = [
       {
         path: 'applications',
         loadComponent: () => import('oip-common').then((m) => m.ApplicationsComponent),
-        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
+        canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)],
+        data: { requireAdmin: true }
       }
     ]
   },

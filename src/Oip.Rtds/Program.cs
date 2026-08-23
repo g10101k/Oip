@@ -27,7 +27,7 @@ internal static class Program
             builder.AddNlog();
             builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
-            builder.Services.AddOipModuleContext(settings.NormalizedConnectionString);
+            builder.Services.AddOipModuleContext(settings.ConnectionString);
             builder.Services.AddDefaultHealthChecks();
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);

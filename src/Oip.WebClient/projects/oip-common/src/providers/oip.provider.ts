@@ -4,11 +4,13 @@ import { importProvidersFrom, makeEnvironmentProviders } from '@angular/core';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { MessageService } from 'primeng/api';
+import { MenuApi } from '../api/menu.api';
 import { NotificationApi } from '../api/notification.api';
 import { SecurityApi } from '../api/security.api';
 import { UserProfileApi } from '../api/user-profile.api';
 import { langIntercept } from '../intercepts/i18n-intercept.service';
 import { AuthGuardService } from '../services/auth-guard.service';
+import { ModuleInstanceRightsService } from '../services/module-instance-rights.service';
 import { NotificationService } from '../services/notification.service';
 import { BffSecurityService, SecurityService } from '../services/security.service';
 import { UserService } from '../services/user.service';
@@ -22,12 +24,14 @@ export function provideOip() {
     { provide: LocationStrategy, useClass: PathLocationStrategy },
     { provide: SecurityService, useClass: BffSecurityService },
     AuthGuardService,
+    ModuleInstanceRightsService,
     MessageService,
     UserService,
     NotificationService,
     UserProfileApi,
     SecurityApi,
     NotificationApi,
+    MenuApi,
     importProvidersFrom([
       TranslateModule.forRoot({
         loader: {

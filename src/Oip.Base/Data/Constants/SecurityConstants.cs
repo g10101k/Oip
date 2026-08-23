@@ -25,4 +25,9 @@ public static class SecurityConstants
     /// Role that grants full administrative access, including user and settings management.
     /// </summary>
     public const string AdminRole = "admin";
+
+    /// <summary>
+    /// Header carrying the module instance identifier for endpoints that do not accept it explicitly.
+    /// </summary>
+    public const string ModuleInstanceIdHeader = "X-Module-Instance-Id";
 }

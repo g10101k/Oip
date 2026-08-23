@@ -119,7 +119,7 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     try {
-      const result = await this.getSecurity(controller, id);
+      const result = await this.getSecurity(controller);
       if (loadToken === this.securityLoadToken) {
         this.securityData = result;
       }
@@ -130,11 +130,10 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
     }
   }
 
-  private getSecurity(controller: string, id: number) {
+  private getSecurity(controller: string) {
     return this.httpClient.request<SecurityDto[]>({
       path: `/api/${controller}/get-security`,
       method: 'GET',
-      query: { id },
       secure: true,
       format: 'json'
     });

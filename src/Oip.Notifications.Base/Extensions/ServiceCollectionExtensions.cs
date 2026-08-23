@@ -11,7 +11,6 @@ using Oip.Notifications.Base.Data.Repositories;
 using Oip.Notifications.Base.Services;
 using Oip.Notifications.Base.Startups;
 using Oip.Settings.Enums;
-using Oip.Settings.Helpers;
 
 namespace Oip.Notifications.Base.Extensions;
 
@@ -73,7 +72,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddNotificationData(this IServiceCollection services, ISettings settings)
     {
-        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
+        var connectionModel = settings.ConnectionString;
         switch (connectionModel.Provider)
         {
             case XpoProvider.Postgres:
@@ -85,6 +84,7 @@ public static class ServiceCollectionExtensions
                             x.MigrationsHistoryTable(NotificationsDbContext.MigrationHistoryTableName,
                                 NotificationsDbContext.SchemaName);
                         });
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
             case XpoProvider.MSSqlServer:
@@ -96,14 +96,21 @@ public static class ServiceCollectionExtensions
                             x.MigrationsHistoryTable(NotificationsDbContext.MigrationHistoryTableName,
                                 NotificationsDbContext.SchemaName);
                         });
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
-            default:
+            case XpoProvider.InMemoryDataStore:
                 services.AddDbContext<NotificationsDbContext>(option =>
                 {
                     option.UseInMemoryDatabase("Oip.Notifications");
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
+            case XpoProvider.SQLite:
+                throw new InvalidOperationException("SQLite provider is not supported");
+            default:
+                throw new InvalidOperationException(
+                    $"Invalid provider `{Enum.GetName(connectionModel.Provider)}` in connection string");
         }
 
         services.AddScoped<NotificationDeliveryRepository>();

@@ -10,7 +10,6 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Oip.Settings.Enums;
-using Oip.Settings.Helpers;
 using GrpcApplicationRegistryService = Oip.Applications.Base.Grpc.GrpcApplicationRegistryService;
 
 namespace Oip.Applications.Base.Extensions;
@@ -73,7 +72,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddApplicationsData(this IServiceCollection services, ISettings settings)
     {
-        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
+        var connectionModel = settings.ConnectionString;
         switch (connectionModel.Provider)
         {
             case XpoProvider.Postgres:
@@ -86,6 +85,7 @@ public static class ServiceCollectionExtensions
                                 ApplicationRegistryDbContext.MigrationHistoryTableName,
                                 ApplicationRegistryDbContext.SchemaName);
                         });
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
             case XpoProvider.MSSqlServer:
@@ -98,14 +98,21 @@ public static class ServiceCollectionExtensions
                                 ApplicationRegistryDbContext.MigrationHistoryTableName,
                                 ApplicationRegistryDbContext.SchemaName);
                         });
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
-            default:
+            case XpoProvider.InMemoryDataStore:
                 services.AddDbContext<ApplicationRegistryDbContext>(option =>
                 {
                     option.UseInMemoryDatabase("Oip.Applications");
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
+            case XpoProvider.SQLite:
+                throw new InvalidOperationException("SQLite provider is not supported");
+            default:
+                throw new InvalidOperationException(
+                    $"Invalid provider `{Enum.GetName(connectionModel.Provider)}` in connection string");
         }
 
         return services;

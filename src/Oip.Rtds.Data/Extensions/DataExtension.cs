@@ -4,7 +4,6 @@ using Oip.Base.Settings;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Repositories;
 using Oip.Settings.Enums;
-using Oip.Settings.Helpers;
 
 namespace Oip.Rtds.Data.Extensions;
 
@@ -21,7 +20,7 @@ public static class DataExtension
     /// <returns>The modified service collection.</returns>
     public static IServiceCollection AddRtdsData(this IServiceCollection services, ISettings settings)
     {
-        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(settings.ConnectionString);
+        var connectionModel = settings.ConnectionString;
         switch (connectionModel.Provider)
         {
             case XpoProvider.Postgres:
@@ -33,6 +32,7 @@ public static class DataExtension
                             x.MigrationsHistoryTable(RtdsMetaContext.MigrationHistoryTableName,
                                 RtdsMetaContext.SchemaName);
                         });
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
             case XpoProvider.MSSqlServer:
@@ -44,8 +44,21 @@ public static class DataExtension
                             x.MigrationsHistoryTable(RtdsMetaContext.MigrationHistoryTableName,
                                 RtdsMetaContext.SchemaName);
                         });
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
                 });
                 break;
+            case XpoProvider.InMemoryDataStore:
+                services.AddDbContext<RtdsMetaContext>(option =>
+                {
+                    option.UseInMemoryDatabase("Oip.Rtds");
+                    option.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
+                });
+                break;
+            case XpoProvider.SQLite:
+                throw new InvalidOperationException("SQLite provider is not supported");
+            default:
+                throw new InvalidOperationException(
+                    $"Invalid provider `{Enum.GetName(connectionModel.Provider)}` in connection string");
         }
         services.AddScoped<RtdsContext>();
         services.AddScoped<TagRepository>();

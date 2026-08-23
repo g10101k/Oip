@@ -5,6 +5,7 @@ using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
+using Oip.Base.Security;
 
 namespace Oip.AngularModule.Controllers;
 
@@ -21,6 +22,7 @@ public class ExternalModuleExampleModuleController(ModuleRepository moduleReposi
     /// </summary>
     [HttpGet("get-external-module-example-data")]
     [Authorize]
+    [Right(SecurityConstants.Read)]
     [ProducesResponseType<ExternalModuleExampleDataDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public IActionResult GetExternalModuleExampleData()

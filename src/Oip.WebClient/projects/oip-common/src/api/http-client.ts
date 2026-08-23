@@ -3,6 +3,7 @@
 // @ts-nocheck
 
 import { inject, Injectable } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { LayoutService } from "../services/app.layout.service";
 import { SecurityService } from "../services/security.service";
@@ -63,16 +64,42 @@ export enum ContentType {
 export class HttpClient<SecurityDataType = unknown> {
   protected securityService = inject(SecurityService);
   protected layoutService = inject(LayoutService);
+  protected router = inject(Router);
   public baseUrl: string = "";
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"] =
-    () => ({
-      headers: {
-        "Accept-language": this.layoutService.language()
-          ? this.layoutService.language()
-          : "en",
-        "X-Timezone": this.layoutService.timeZone(),
-      },
-    });
+    () => {
+      const moduleInstanceId = this.getCurrentModuleInstanceId();
+      return {
+        headers: {
+          "Accept-language": this.layoutService.language()
+            ? this.layoutService.language()
+            : "en",
+          "X-Timezone": this.layoutService.timeZone(),
+          ...(moduleInstanceId != null
+            ? { "X-Module-Instance-Id": String(moduleInstanceId) }
+            : {}),
+        },
+      };
+    };
+
+  /**
+   * Reads the module instance id of the deepest activated route.
+   * The backend uses it to check module instance rights on endpoints that do not carry the id in their contract.
+   */
+  protected getCurrentModuleInstanceId(): number | undefined {
+    // May run before the first navigation completes, when route snapshots are not available yet.
+    let route: ActivatedRoute | null | undefined =
+      this.router.routerState?.root;
+    let id: string | null = null;
+
+    while (route) {
+      id = route.snapshot?.paramMap?.get("id") ?? id;
+      route = route.firstChild;
+    }
+
+    const parsed = id != null ? Number(id) : Number.NaN;
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
 
   private abortControllers = new Map<CancelToken, AbortController>();
   private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
@@ -268,10 +295,26 @@ export class HttpClient<SecurityDataType = unknown> {
         this.abortControllers.delete(cancelToken);
       }
 
-      if (!response.ok) throw data;
+      if (!response.ok) {
+        this.authorizeOnUnauthorized(response, path);
+        throw data;
+      }
       return data.data;
     });
   };
+
+  private authorizeOnUnauthorized(response: Response, path: string): void {
+    if (
+      response.status !== 401 ||
+      path.includes("/api/security/create-auth-session")
+    ) {
+      return;
+    }
+
+    this.securityService.authorize(
+      `${window.location.pathname}${window.location.search}${window.location.hash}`,
+    );
+  }
 
   private async getCsrfRequestParams(
     method: string | undefined,

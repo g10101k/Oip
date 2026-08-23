@@ -16,6 +16,7 @@ namespace Oip.Users.Base.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/users")]
+[ApiExplorerSettings(GroupName = "users")]
 public class UsersController(
     UserRepository userRepository,
     KeycloakSyncService keycloakSyncService,
