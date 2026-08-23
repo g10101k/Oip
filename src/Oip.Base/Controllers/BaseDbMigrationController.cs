@@ -14,11 +14,6 @@ namespace Oip.Base.Controllers;
 /// <summary>
 /// Base controller for managing database migrations.
 /// </summary>
-/// <remarks>
-/// Provides administrative endpoints to inspect and manage Entity Framework Core database migrations.
-/// Includes functionality to list all migrations, apply pending ones, or migrate to a specific version.
-/// Intended to be inherited and used in modules that expose migration endpoints.
-/// </remarks>
 [ApiController]
 public abstract class BaseDbMigrationController<TSettings> : BaseModuleController<TSettings> where TSettings : class
 {
@@ -37,12 +32,6 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     /// <summary>
     /// Retrieves all database migrations and their current state.
     /// </summary>
-    /// <remarks>
-    /// The returned list includes:
-    /// - Migrations that have been applied to the database.
-    /// - Pending migrations that exist in code but are not applied.
-    /// - Migrations defined in code regardless of their application status.
-    /// </remarks>
     /// <returns>A list of <see cref="MigrationDto"/> objects containing migration metadata.</returns>
     [HttpGet("get-migrations")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
@@ -85,11 +74,6 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     /// <summary>
     /// Applies all pending migrations to the database.
     /// </summary>
-    /// <remarks>
-    /// Uses Entity Framework Core's migration mechanism to bring the database schema
-    /// up to date with the current codebase. This operation is irreversible and should be
-    /// performed with caution in production environments.
-    /// </remarks>
     /// <returns>HTTP 200 OK on success.</returns>
     [HttpPost("migrate")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
@@ -105,10 +89,6 @@ public abstract class BaseDbMigrationController<TSettings> : BaseModuleControlle
     /// <summary>
     /// Applies a specific database migration by name.
     /// </summary>
-    /// <remarks>
-    /// This method allows applying or reverting to a specific migration by name.
-    /// Useful for targeted database updates or rolling back schema changes.
-    /// </remarks>
     /// <param name="request">A request containing the name of the migration to apply.</param>
     /// <returns>HTTP 200 OK on success.</returns>
     [Authorize(Roles = SecurityConstants.AdminRole)]
