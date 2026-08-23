@@ -54,10 +54,14 @@ type PrimeIconOption = {
         <p-select
           appendTo="body"
           class="flex-auto"
+          filterBy="value"
+          filterPlaceholder="{{ 'menuItemCreateDialogComponent.searchModule' | translate }}"
           id="oip-menu-item-create-module"
           optionLabel="value"
           optionValue="key"
           placeholder="{{ 'menuItemCreateDialogComponent.selectModule' | translate }}"
+          scrollHeight="18rem"
+          [filter]="true"
           [options]="modules"
           [(ngModel)]="selectModule" />
       </div>

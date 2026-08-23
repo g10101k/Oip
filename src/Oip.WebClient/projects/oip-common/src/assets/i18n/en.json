@@ -57,6 +57,7 @@
     "label": "Label",
     "module": "Module",
     "selectModule": "Select module",
+    "searchModule": "Search module",
     "icon": "Icon",
     "cancel": "Cancel",
     "save": "Save"

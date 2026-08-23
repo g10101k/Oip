@@ -109,7 +109,6 @@ export class MenuItemEditDialogComponent {
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
 
-  modules: any[] = [];
   roles: string[] = [];
   iconOptions: PrimeIconOption[] = Object.values(PrimeIcons)
     .filter((icon): icon is string => typeof icon === 'string')
@@ -166,9 +165,6 @@ export class MenuItemEditDialogComponent {
     };
 
     this.roles = await this.securityApi.getRealmRoles();
-    this.menuService.getModules().then((data) => {
-      this.modules = data;
-    });
 
     this.visible = true;
     this.visibleChange.emit(this.visible);
