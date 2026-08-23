@@ -13,23 +13,24 @@ internal class OipModuleContextDesignTimeDbContextFactory : IDesignTimeDbContext
     {
         var optionsBuilder = new DbContextOptionsBuilder<OipModuleContext>();
         var settings = DesignDbSettings.Initialize(args, false, true);
-        switch (settings.Provider)
+        var model = settings.ConnectionString;
+        switch (model.Provider)
         {
             case XpoProvider.Postgres:
-                optionsBuilder.UseNpgsql(settings.NormalizedConnectionString, x =>
-                {
-                    x.MigrationsAssembly("Oip.Data.Postgres");
-                });
+                optionsBuilder.UseNpgsql(model.NormalizeConnectionString,
+                    x => x.MigrationsHistoryTable(OipModuleContext.MigrationHistoryTableName,
+                        OipModuleContext.SchemaName));
                 break;
             case XpoProvider.MSSqlServer:
-                optionsBuilder.UseSqlServer(settings.NormalizedConnectionString, x =>
-                {
-                    x.MigrationsAssembly("Oip.Data.SqlServer");
-                });
+                optionsBuilder.UseSqlServer(model.NormalizeConnectionString,
+                    x => x.MigrationsHistoryTable(OipModuleContext.MigrationHistoryTableName,
+                        OipModuleContext.SchemaName));
                 break;
             default:
-                throw new InvalidOperationException($"Provider `{Enum.GetName(settings.Provider)}` is not supported");
+                throw new InvalidOperationException($"Provider `{Enum.GetName(model.Provider)}` is not supported");
         }
+
+        optionsBuilder.EnableSensitiveDataLogging(model.SensitiveDataLogging);
 
         return new OipModuleContext(optionsBuilder.Options, true);
     }
