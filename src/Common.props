@@ -6,7 +6,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/g10101k/Oip</RepositoryUrl>
         <Copyright>2026</Copyright>
-        <Version>0.6.0</Version>
+        <Version>0.6.1</Version>
         <AssemblyVersion>$(Version)</AssemblyVersion>
         <PackageVersion>$(Version)</PackageVersion>
         <RepositoryType>git</RepositoryType>

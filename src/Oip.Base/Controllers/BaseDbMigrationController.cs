@@ -15,7 +15,7 @@ namespace Oip.Base.Controllers;
 /// Base controller for managing database migrations.
 /// </summary>
 [ApiController]
-public abstract class BaseDbMigrationController<TSettings> : BaseModuleController<TSettings> where TSettings : class
+public abstract class BaseDbMigrationController<TSettings> : BaseModuleController<TSettings> where TSettings : class, new()
 {
     private readonly DbContext _dbContext;
 

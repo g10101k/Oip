@@ -29,13 +29,11 @@
         <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.11"/>
         <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1"/>
         <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.2.1"/>
-
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1"/>
         <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11"/>
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.0.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
         <PackageReference Include="Oip.Settings" Version="2.0.1" />
         <PackageReference Include="Polly" Version="8.5.0"/>

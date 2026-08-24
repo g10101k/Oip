@@ -30,8 +30,7 @@ public class CustomerModuleController(
     /// <summary>
     /// Retrieves a filtered page of customers for the customer module table.
     /// </summary>
-    [HttpPost("get-page")]
-    [Right(SecurityConstants.Read)]
+    [Right(SecurityConstants.Read), HttpPost("get-page")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]

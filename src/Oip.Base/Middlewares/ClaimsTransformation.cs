@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Oip.Base.Middlewares;
 
@@ -62,20 +62,23 @@ public class ClaimsTransformation : IClaimsTransformation
         ClaimsPrincipal currentUser,
         ClaimsIdentity identity)
     {
-        JObject json;
+        JsonNode? json;
         try
         {
-            json = JObject.Parse(realmAccessJson);
+            json = JsonNode.Parse(realmAccessJson);
         }
         catch (JsonException)
         {
             return;
         }
 
-        if (json["roles"] is JArray rolesArray)
+        if (json is not JsonObject realmAccess || realmAccess["roles"] is not JsonArray rolesArray)
+            return;
+
+        foreach (var role in rolesArray)
         {
-            foreach (var role in rolesArray)
-                AddRoleIfMissing(currentUser, identity, role.ToString());
+            if (role is JsonValue value && value.TryGetValue<string>(out var roleName))
+                AddRoleIfMissing(currentUser, identity, roleName);
         }
     }
 

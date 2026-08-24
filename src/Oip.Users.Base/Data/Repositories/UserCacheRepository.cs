@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Oip.Base.Extensions;
 using Oip.Base.Services;
 
@@ -105,7 +105,7 @@ public class UserCacheRepository(
     {
         var cachedUser = eventMessage.User.ToCacheDto();
         _users.AddOrUpdate(cachedUser.UserId, cachedUser, (i, user) => user);
-        logger.LogDebug("{json}", JsonConvert.SerializeObject(eventMessage));
+        logger.LogDebug("{json}", JsonSerializer.Serialize(eventMessage));
     }
 
     public UserCacheDto? GetUserByKeycloakUserId(string key)

@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Dtos;
@@ -19,7 +19,7 @@ namespace Oip.Base.Controllers;
 /// </summary>
 /// <typeparam name="TSettings">The type representing module settings.</typeparam>
 public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRepository)
-    : ControllerBase where TSettings : class
+    : ControllerBase where TSettings : class, new()
 {
     /// <summary>
     /// Gets the security configuration for the module instance the request targets.
@@ -86,12 +86,7 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
     public ActionResult<TSettings> GetModuleInstanceSettings()
-    {
-        var settingString = moduleRepository.GetModuleInstanceSettings(GetModuleInstanceId());
-        var result = JsonConvert.DeserializeObject<TSettings>(settingString) ??
-                     Activator.CreateInstance(typeof(TSettings)) as TSettings;
-        return Ok(result);
-    }
+        => Ok(moduleRepository.GetModuleInstanceSettings<TSettings>(GetModuleInstanceId()));
 
     /// <summary>
     /// Saves the settings for the specified module instance.
@@ -106,7 +101,7 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     [ApiExplorerSettings(IgnoreApi = true)]
     public void SaveSettings(SaveSettingsRequest request)
     {
-        var settingString = JsonConvert.SerializeObject(request.Settings);
+        var settingString = JsonSerializer.Serialize(request.Settings);
         moduleRepository.UpdateModuleInstanceSettings(request.Id, settingString);
     }
 

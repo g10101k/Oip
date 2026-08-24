@@ -11,6 +11,10 @@ export interface ApiExceptionResponse {
   stackTrace?: string | null;
 }
 
+export interface ApplyMigrationRequest {
+  name?: string | null;
+}
+
 export type CustomerModuleSettings = object;
 
 export interface DashboardSettings {
@@ -36,6 +40,13 @@ export interface DemoCustomerTableRowDtoTablePageResult {
   total?: number;
   first?: number;
   rows?: number;
+}
+
+export interface MigrationDto {
+  name?: string | null;
+  applied?: boolean;
+  pending?: boolean;
+  exist?: boolean;
 }
 
 export interface SaveDemoCustomerRequest {

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Contexts;
@@ -15,6 +16,15 @@ namespace Oip.Base.Data.Repositories;
 /// </remarks>
 public class ModuleRepository(OipModuleContext db)
 {
+    /// <summary>
+    /// Options used to read module instance settings. Property names are matched case-insensitively so that
+    /// settings persisted before the switch to <see cref="JsonSerializer"/> keep deserializing.
+    /// </summary>
+    private static readonly JsonSerializerOptions SettingsJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     /// <summary>
     /// Retrieves all available modules with their associated security settings.
     /// </summary>
@@ -94,7 +104,8 @@ public class ModuleRepository(OipModuleContext db)
         var modulesLoadedNames = loadedModules.Select(x => x.Name.Replace("Controller", string.Empty)).ToList();
         var query = await db.ModuleInstances
             .Include(x => x.Module)
-            .Where(x => x.Module.Kind == ModuleKind.Extension || modulesLoadedNames.Contains(x.Module.Name)) // Load the related Module.
+            .Where(x => x.Module.Kind == ModuleKind.Extension ||
+                        modulesLoadedNames.Contains(x.Module.Name)) // Load the related Module.
             .Include(x => x.Securities) // Load Securities if needed.
             .Where(m => m.Securities.Any(s => s.Right == SecurityConstants.Read && roles.Contains(s.Role)))
             .OrderBy(m => m.Order)
@@ -253,6 +264,21 @@ public class ModuleRepository(OipModuleContext db)
     }
 
     /// <summary>
+    /// Retrieves the settings of a specific module instance deserialized into <typeparamref name="TSettings"/>.
+    /// </summary>
+    /// <param name="id">The ID of the module instance.</param>
+    /// <typeparam name="TSettings">The type the settings are deserialized into.</typeparam>
+    /// <returns>The deserialized settings, or a new instance when the module instance has no settings yet.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if the module instance is not found.</exception>
+    public TSettings GetModuleInstanceSettings<TSettings>(int id) where TSettings : class, new()
+    {
+        var settings = GetModuleInstanceSettings(id);
+        if (string.IsNullOrWhiteSpace(settings))
+            return new TSettings();
+        return JsonSerializer.Deserialize<TSettings>(settings, SettingsJsonOptions) ?? new TSettings();
+    }
+
+    /// <summary>
     /// Updates the settings string of a specified module instance.
     /// </summary>
     /// <param name="id">The ID of the module instance.</param>
@@ -375,7 +401,8 @@ public class ModuleRepository(OipModuleContext db)
     /// <summary>
     /// Updates an extension module.
     /// </summary>
-    public async Task<ModuleDto> UpdateExtensionModule(int moduleId, ExtensionModuleManifestDto manifest, string manifestUrl)
+    public async Task<ModuleDto> UpdateExtensionModule(int moduleId, ExtensionModuleManifestDto manifest,
+        string manifestUrl)
     {
         var module = await db.Modules.FirstOrDefaultAsync(x => x.ModuleId == moduleId && x.Kind == ModuleKind.Extension)
                      ?? throw new KeyNotFoundException($"Extension module with id {moduleId} not found");

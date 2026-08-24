@@ -1,7 +1,7 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Oip.Base.Exceptions;
 using Oip.Base.Services;
 using Oip.Users.Base.Data.Repositories;
@@ -20,6 +20,15 @@ public class UserProfileController(
     UserRepository userRepository,
     IUserPhotoStorage userPhotoStorage) : ControllerBase
 {
+    /// <summary>
+    /// Options used to read user settings. Property names are matched case-insensitively so that settings
+    /// persisted before the switch to <see cref="JsonSerializer"/> keep deserializing.
+    /// </summary>
+    private static readonly JsonSerializerOptions SettingsJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     /// <summary>
     /// Gets current user photo.
     /// </summary>
@@ -115,8 +124,10 @@ public class UserProfileController(
     public UserSettingsDto GetSettings()
     {
         var json = userRepository.GetUserSettings(claimService.GetUserEmail()!);
+        if (string.IsNullOrWhiteSpace(json))
+            return new();
 
-        return JsonConvert.DeserializeObject<UserSettingsDto>(json) ?? new();
+        return JsonSerializer.Deserialize<UserSettingsDto>(json, SettingsJsonOptions) ?? new();
     }
 
     /// <summary>
@@ -130,7 +141,7 @@ public class UserProfileController(
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task UpdateSettings(UserSettingsDto settings)
     {
-        var json = JsonConvert.SerializeObject(settings);
+        var json = JsonSerializer.Serialize(settings);
         await userRepository.UpdateUserSettings(claimService.GetUserEmail()!, json);
     }
 

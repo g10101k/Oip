@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Oip.Base.Helpers;
 
 namespace Oip.Base.Clients;
@@ -16,17 +16,18 @@ public sealed class KeycloakClient : HttpClient
     private readonly HttpClient _httpClient;
     private AuthResponse? _authResponse;
 
-    private static readonly Lazy<JsonSerializerSettings> Settings = new(() => new JsonSerializerSettings
+    private static readonly Lazy<JsonSerializerOptions> Settings = new(() => new JsonSerializerOptions
     {
-        NullValueHandling = NullValueHandling.Ignore,
-        ContractResolver = new CamelCasePropertyNamesContractResolver()
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true
     }, true);
 
 
     /// <summary>
     /// Json settings
     /// </summary>
-    private JsonSerializerSettings JsonSerializerSettings => Settings.Value;
+    private JsonSerializerOptions JsonSerializerOptions => Settings.Value;
 
     /// <inheritdoc />
     public KeycloakClient(HttpClient httpClient)
@@ -202,7 +203,7 @@ public sealed class KeycloakClient : HttpClient
                 var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
                 {
-                    var typedBody = JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
+                    var typedBody = JsonSerializer.Deserialize<T>(responseText, JsonSerializerOptions);
                     return new ObjectResponseResult<T?>(typedBody, responseText);
                 }
                 catch (JsonException exception)
@@ -215,13 +216,10 @@ public sealed class KeycloakClient : HttpClient
 
             await using var responseStream =
                 await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-            using var streamReader = new StreamReader(responseStream);
-            await using var jsonTextReader = new JsonTextReader(streamReader);
-            {
-                var serializer = JsonSerializer.Create(JsonSerializerSettings);
-                var typedBody = serializer.Deserialize<T>(jsonTextReader);
-                return new ObjectResponseResult<T?>(typedBody, string.Empty);
-            }
+            var streamedBody = await JsonSerializer
+                .DeserializeAsync<T>(responseStream, JsonSerializerOptions, cancellationToken)
+                .ConfigureAwait(false);
+            return new ObjectResponseResult<T?>(streamedBody, string.Empty);
         }
         catch (JsonException exception)
         {
@@ -478,13 +476,13 @@ public class AuthResponse
     /// <summary>
     /// The access token.
     /// </summary>
-    [JsonProperty("access_token")]
+    [JsonPropertyName("access_token")]
     public string AccessToken { get; set; } = null!;
 
     /// <summary>
     /// The number of seconds the access token is valid for.
     /// </summary>
-    [JsonProperty("expires_in")]
+    [JsonPropertyName("expires_in")]
     public int ExpiresIn { get; set; }
 
     /// <summary>
@@ -495,25 +493,25 @@ public class AuthResponse
     /// <summary>
     /// The number of seconds the refresh token is valid for.
     /// </summary>
-    [JsonProperty("refresh_expires_in")]
+    [JsonPropertyName("refresh_expires_in")]
     public int RefreshExpiresIn { get; set; }
 
     /// <summary>
     /// The type of the token.
     /// </summary>
-    [JsonProperty("token_type")]
+    [JsonPropertyName("token_type")]
     public string TokenType { get; set; } = null!;
 
     /// <summary>
     /// The number of seconds before the access token is valid.
     /// </summary>
-    [JsonProperty("not_before_policy")]
+    [JsonPropertyName("not_before_policy")]
     public int NotBeforePolicy { get; set; }
 
     /// <summary>
     /// Gets or sets the scope.
     /// </summary>
-    [JsonProperty("scope")]
+    [JsonPropertyName("scope")]
     public string Scope { get; set; } = null!;
 }
 
@@ -561,61 +559,61 @@ public class UserRepresentation
     /// <summary>
     /// User identifier.
     /// </summary>
-    [JsonProperty("id")]
+    [JsonPropertyName("id")]
     public string? Id { get; set; }
 
     /// <summary>
     /// Username.
     /// </summary>
-    [JsonProperty("username")]
+    [JsonPropertyName("username")]
     public string? Username { get; set; }
 
     /// <summary>
     /// Email address.
     /// </summary>
-    [JsonProperty("email")]
+    [JsonPropertyName("email")]
     public string? Email { get; set; }
 
     /// <summary>
     /// First name.
     /// </summary>
-    [JsonProperty("firstName")]
+    [JsonPropertyName("firstName")]
     public string? FirstName { get; set; }
 
     /// <summary>
     /// Last name.
     /// </summary>
-    [JsonProperty("lastName")]
+    [JsonPropertyName("lastName")]
     public string? LastName { get; set; }
 
     /// <summary>
     /// Indicating whether the user is enabled.
     /// </summary>
-    [JsonProperty("enabled")]
+    [JsonPropertyName("enabled")]
     public bool? Enabled { get; set; }
 
     /// <summary>
     /// Indicating whether the email is verified.
     /// </summary>
-    [JsonProperty("emailVerified")]
+    [JsonPropertyName("emailVerified")]
     public bool? EmailVerified { get; set; }
 
     /// <summary>
     /// User attributes.
     /// </summary>
-    [JsonProperty("attributes")]
+    [JsonPropertyName("attributes")]
     public Dictionary<string, object>? Attributes { get; set; }
 
     /// <summary>
     /// Timestamp when the user was created.
     /// </summary>
-    [JsonProperty("createdTimestamp")]
+    [JsonPropertyName("createdTimestamp")]
     public long? CreatedTimestamp { get; set; }
 
     /// <summary>
     /// Required actions for the user.
     /// </summary>
-    [JsonProperty("requiredActions")]
+    [JsonPropertyName("requiredActions")]
     public List<string>? RequiredActions { get; set; }
 }
 
@@ -627,13 +625,13 @@ public class UsersResponse
     /// <summary>
     /// List of users.
     /// </summary>
-    [JsonProperty("users")]
+    [JsonPropertyName("users")]
     public List<UserRepresentation>? Users { get; set; }
 
     /// <summary>
     /// Count of users.
     /// </summary>
-    [JsonProperty("count")]
+    [JsonPropertyName("count")]
     public int Count { get; set; }
 }
 

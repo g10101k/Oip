@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Net;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -27,8 +28,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using NLog.Web;
 using Oip.Base.Clients;
 using Oip.Base.Exceptions;
@@ -779,7 +778,7 @@ public static class OipModuleApplication
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
         var response = new ApiExceptionResponse(title, message, statusCode);
-        await context.Response.WriteAsync(JsonConvert.SerializeObject(response, JsonSettings.Value));
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, JsonSettings.Value));
     }
 
     /// <summary>
@@ -967,7 +966,7 @@ public static class OipModuleApplication
                             app.Environment.IsDevelopment() ? ex.StackTrace : null);
                     }
 
-                    await context.Response.WriteAsync(JsonConvert.SerializeObject(response, JsonSettings.Value));
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(response, JsonSettings.Value));
                 }
             });
         });
@@ -1078,10 +1077,10 @@ public static class OipModuleApplication
     }
 
 
-    private static readonly Lazy<JsonSerializerSettings> JsonSettings = new(() => new JsonSerializerSettings
+    private static readonly Lazy<JsonSerializerOptions> JsonSettings = new(() => new JsonSerializerOptions
     {
-        NullValueHandling = NullValueHandling.Ignore,
-        ContractResolver = new CamelCasePropertyNamesContractResolver()
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     }, true);
 
 

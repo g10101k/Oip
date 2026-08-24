@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json;
 using Oip.Notifications.Base;
 using Oip.Notifications.Base.Services;
 
@@ -27,7 +27,7 @@ public class UserNotificationService(INotificationServiceClient client) : INotif
         await client.CreateNotificationAsync(new CreateNotificationRequest()
         {
             NotificationType = typeof(TNotification).FullName,
-            DataJson = JsonConvert.SerializeObject(notification)
+            DataJson = JsonSerializer.Serialize(notification, notification?.GetType() ?? typeof(TNotification))
         });
     }
 }
