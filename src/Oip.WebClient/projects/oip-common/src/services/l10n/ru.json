@@ -1,10 +1,4 @@
 {
-  "app-configurator": {
-    "primary": "Основной",
-    "surface": "Фон",
-    "presets": "Стиль",
-    "menuMode": "Режим меню"
-  },
   "msgService": {
     "success": "Успешно",
     "info": "Информация",

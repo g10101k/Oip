@@ -1,10 +1,4 @@
 {
-  "app-configurator": {
-    "primary": "Primary",
-    "surface": "Surface",
-    "presets": "Presets",
-    "menuMode": "Menu Mode"
-  },
   "msgService": {
     "success": "Success",
     "info": "Info",

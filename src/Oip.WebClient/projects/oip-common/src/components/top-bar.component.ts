@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { LayoutService } from '../services/app.layout.service';
-import { AppConfiguratorComponent } from './app-configurator.component';
+import { AppConfiguratorComponent } from './app-configurator/app-configurator.component';
 import { SecurityService } from '../services/security.service';
 import { TopBarService } from '../services/top-bar.service';
 import { Tab, TabList, Tabs } from 'primeng/tabs';

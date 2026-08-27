@@ -16,7 +16,7 @@ export { ConfigComponent } from './components/config/config.component';
 export { DbMigrationComponent } from './components/db-migration/db-migration.component';
 export { AppModulesComponent } from './components/app-modules/app-modules.component';
 export { ApplicationsComponent } from './components/applications/applications.component';
-export { AppConfiguratorComponent } from './components/app-configurator.component';
+export { AppConfiguratorComponent } from './components/app-configurator/app-configurator.component';
 export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator.component';
 export { DiscussionComponent } from './components/discussion/discussion.component';
 export { IframeModuleComponent } from './components/iframe-module/iframe-module.component';
