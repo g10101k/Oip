@@ -206,6 +206,19 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     }
 
     /// <summary>
+    /// Clears user photo storage metadata.
+    /// </summary>
+    public async Task ClearUserPhotoMetadataAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var user = await GetTrackedByIdAsync(userId, cancellationToken) ??
+                   throw new InvalidOperationException($"User with id: {userId} - not found");
+
+        user.PhotoObjectName = null;
+        user.PhotoContentType = null;
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// Gets user entities by identifier list.
     /// </summary>
     public async Task<List<UserEntity>> GetByIdsAsync(IEnumerable<int> userIds, CancellationToken cancellationToken = default)

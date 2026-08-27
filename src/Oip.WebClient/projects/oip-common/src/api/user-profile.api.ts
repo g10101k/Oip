@@ -43,6 +43,13 @@ export class UserProfileApi<
       type: ContentType.FormData,
       ...params,
     });
+  deleteUserPhoto = (params: RequestParams = {}) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/user-profile/delete-user-photo`,
+      method: "DELETE",
+      secure: true,
+      ...params,
+    });
   getSettings = (params: RequestParams = {}) =>
     this.request<UserSettingsDto, ApiExceptionResponse>({
       path: `/api/user-profile/get-settings`,

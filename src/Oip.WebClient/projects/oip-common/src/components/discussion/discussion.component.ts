@@ -31,11 +31,17 @@ import {
   CommentHistoryDto,
   CommentReactionDto,
   MentionUserDto
-} from '../api/discussion-data-contracts';
-import { DiscussionApi } from '../api/discussion.api';
-import { MsgService } from '../services/msg.service';
-import { LayoutService } from '../services/app.layout.service';
-import { getInitialsFromString } from '../helpers/avatar.helper';
+} from '../../api/discussion-data-contracts';
+import { DiscussionApi } from '../../api/discussion.api';
+import { MsgService } from '../../services/msg.service';
+import { LayoutService } from '../../services/app.layout.service';
+import { getInitialsFromString } from '../../helpers/avatar.helper';
+import { L10nService } from '../../services/l10n.service';
+
+import en from './l10n/discussion.en.json';
+import ru from './l10n/discussion.ru.json';
+
+L10nService.registerTranslations({ en, ru });
 
 type HistoryState = {
   loading: boolean;
@@ -475,6 +481,10 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   historyByComment: Record<number, HistoryState> = {};
   emojiPalette = ['👍', '👎', '🐳', '🍆', '🍑'];
   private mentionSearchTimer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor(l10nService: L10nService) {
+    l10nService.get('discussionComponent');
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['objectTypeId'] || changes['objectId']) && this.objectTypeId && this.objectId) {

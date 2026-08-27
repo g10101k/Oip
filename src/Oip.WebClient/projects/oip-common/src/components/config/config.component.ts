@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ProfileComponent } from '../profile.component';
+import { ProfileComponent } from '../profile/profile.component';
 import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';

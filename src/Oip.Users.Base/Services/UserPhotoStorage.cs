@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Minio;
 using Minio.DataModel.Args;
 using Oip.Users.Base.Settings;
 
@@ -33,13 +32,18 @@ public interface IUserPhotoStorage
         string objectName,
         string contentType,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a stored user photo if present.
+    /// </summary>
+    Task DeleteAsync(string objectName, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
 /// MinIO-backed user photo storage.
 /// </summary>
 public class MinioUserPhotoStorage(
-    IMinioClient minioClient,
+    UserPhotoMinioClient minioClient,
     UserPhotoStorageSettings settings,
     ILogger<MinioUserPhotoStorage> logger) : IUserPhotoStorage
 {
@@ -59,7 +63,7 @@ public class MinioUserPhotoStorage(
             await EnsureBucketExistsAsync(cancellationToken);
 
             await using var stream = file.OpenReadStream();
-            await minioClient.PutObjectAsync(
+            await minioClient.Client.PutObjectAsync(
                 new PutObjectArgs()
                     .WithBucket(settings.BucketName)
                     .WithObject(objectName)
@@ -91,7 +95,7 @@ public class MinioUserPhotoStorage(
         var memoryStream = new MemoryStream();
         try
         {
-            await minioClient.GetObjectAsync(
+            await minioClient.Client.GetObjectAsync(
                 new GetObjectArgs()
                     .WithBucket(settings.BucketName)
                     .WithObject(objectName)
@@ -123,14 +127,36 @@ public class MinioUserPhotoStorage(
         return new UserPhotoContent(memoryStream, contentType);
     }
 
+    /// <inheritdoc />
+    public async Task DeleteAsync(string objectName, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await minioClient.Client.RemoveObjectAsync(
+                new RemoveObjectArgs()
+                    .WithBucket(settings.BucketName)
+                    .WithObject(objectName),
+                cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(
+                exception,
+                "Failed to delete user photo {ObjectName} from MinIO bucket {BucketName}.",
+                objectName,
+                settings.BucketName);
+            throw;
+        }
+    }
+
     private async Task EnsureBucketExistsAsync(CancellationToken cancellationToken)
     {
-        var exists = await minioClient.BucketExistsAsync(
+        var exists = await minioClient.Client.BucketExistsAsync(
             new BucketExistsArgs().WithBucket(settings.BucketName),
             cancellationToken);
         if (!exists)
         {
-            await minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(settings.BucketName), cancellationToken);
+            await minioClient.Client.MakeBucketAsync(new MakeBucketArgs().WithBucket(settings.BucketName), cancellationToken);
         }
     }
 }

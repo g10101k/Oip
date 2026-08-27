@@ -34,7 +34,7 @@ public class UserProfileController(
     /// </summary>
     /// <returns>User photo image or not found response.</returns>
     [Authorize, HttpGet("get-user-photo")]
-    [Produces("image/jpeg", "image/png", "image/gif", "image/webp")]
+    [Produces("image/jpeg", "image/png", "image/gif", "image/webp", "application/json")]
     [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
@@ -59,7 +59,7 @@ public class UserProfileController(
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>User photo image or not found response.</returns>
     [Authorize, HttpGet("get-user-photo-by-id/{userId:int}")]
-    [Produces("image/jpeg", "image/png", "image/gif", "image/webp")]
+    [Produces("image/jpeg", "image/png", "image/gif", "image/webp", "application/json")]
     [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
@@ -109,6 +109,36 @@ public class UserProfileController(
             storedPhoto.ObjectName,
             storedPhoto.ContentType,
             cancellationToken);
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Deletes the current user's photo.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>OK result</returns>
+    [Authorize, HttpDelete("delete-user-photo")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteUserPhoto(CancellationToken cancellationToken)
+    {
+        var email = claimService.GetUserEmail();
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user email is not available.",
+                StatusCodes.Status401Unauthorized));
+        }
+
+        var user = await userRepository.GetByEmailAsync(email, cancellationToken);
+        if (user == null || string.IsNullOrWhiteSpace(user.PhotoObjectName))
+        {
+            return Ok();
+        }
+
+        await userPhotoStorage.DeleteAsync(user.PhotoObjectName, cancellationToken);
+        await userRepository.ClearUserPhotoMetadataAsync(user.UserId, cancellationToken);
 
         return Ok();
     }

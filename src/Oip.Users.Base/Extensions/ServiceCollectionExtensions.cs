@@ -91,7 +91,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddUserPhotoStorage(this IServiceCollection services)
     {
-        services.TryAddSingleton<IMinioClient>(sp =>
+        services.TryAddSingleton<UserPhotoMinioClient>(sp =>
         {
             var settings = sp.GetRequiredService<UserPhotoStorageSettings>();
             var client = new MinioClient()
@@ -103,7 +103,7 @@ public static class ServiceCollectionExtensions
                 client = client.WithSSL();
             }
 
-            return client.Build();
+            return new UserPhotoMinioClient(client.Build());
         });
         services.TryAddScoped<IUserPhotoStorage, MinioUserPhotoStorage>();
         return services;
