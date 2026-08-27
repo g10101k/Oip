@@ -6,24 +6,12 @@
     "error": "Ошибка",
     "secondary": "Вспомогательный"
   },
-  "securityComponent": {
-    "security": "Безопасность",
-    "save": "Сохранить",
-    "savedSecurity": "Настройки сохранены",
-    "selectRoles": "Выберите роли"
-  },
   "configComponent": {
     "profile": "Профиль",
     "photo": "Фото",
     "usePhoto256x256Pixel": "Используйте фото 256х256 пикселей",
     "localization": "Язык",
     "selectLanguage": "Выберите язык"
-  },
-  "baseComponent": {
-    "content": "Содержимое",
-    "settings": "Настройки",
-    "security": "Безопасность",
-    "success": "Сохранено"
   },
   "menuComponent": {
     "all": "Все",
@@ -76,13 +64,6 @@
     "logoutConfirmAccept": "Выйти",
     "profile": "Профиль",
     "applications": "Приложения"
-  },
-  "userNotifications": {
-    "title": "Оповещения",
-    "empty": "Непрочитанных оповещений нет",
-    "refresh": "Обновить",
-    "markAsRead": "Прочитано",
-    "markedAsRead": "Оповещение отмечено прочитанным"
   },
   "primeng": {
     "accept": "Да",

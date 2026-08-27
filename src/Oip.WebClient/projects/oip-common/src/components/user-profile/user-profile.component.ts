@@ -53,7 +53,7 @@ L10nService.registerTranslations({ en, ru });
     </div>
   `
 })
-export class ProfileComponent {
+export class UserProfileComponent {
   readonly userService = inject(UserService);
   readonly msgService = inject(MsgService);
   readonly translateService = inject(TranslateService);

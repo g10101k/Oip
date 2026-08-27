@@ -6,24 +6,12 @@
     "error": "Error",
     "secondary": "Secondary"
   },
-  "securityComponent": {
-    "security": "Security",
-    "save": "Save",
-    "savedSecurity": "Security settings saved",
-    "selectRoles": "Select roles"
-  },
   "configComponent": {
     "profile": "Profile",
     "photo": "Photo",
     "usePhoto256x256Pixel": "Use a 256x256 pixel photo",
     "localization": "Language",
     "selectLanguage": "Select language"
-  },
-  "baseComponent": {
-    "content": "Content",
-    "settings": "Settings",
-    "security": "Security",
-    "success": "Saved successfully"
   },
   "menuComponent": {
     "all": "All",
@@ -76,13 +64,6 @@
     "logoutConfirmAccept": "Logout",
     "profile": "Profile",
     "applications": "Applications"
-  },
-  "userNotifications": {
-    "title": "Notifications",
-    "empty": "No unread notifications",
-    "refresh": "Refresh",
-    "markAsRead": "Read",
-    "markedAsRead": "Notification marked as read"
   },
   "primeng": ""
 }

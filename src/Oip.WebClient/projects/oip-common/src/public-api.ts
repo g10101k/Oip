@@ -1,6 +1,6 @@
 // Components
-export { BaseModuleComponent } from './components/base-module.component';
-export { SecurityComponent } from './components/security.component';
+export { BaseModuleComponent } from './components/base-module/base-module.component';
+export { SecurityComponent } from './components/security/security.component';
 export { AppTopbar } from './components/top-bar.component';
 export { FooterComponent } from './components/footer.component';
 export { MenuComponent } from './components/menu/menu.component';
@@ -11,7 +11,7 @@ export { NotfoundComponent } from './components/notfound/notfound.component';
 export { UnauthorizedComponent } from './components/auth/unauthorized/unauthorized.component';
 export { AccessComponent } from './components/auth/access/access.component';
 export { ErrorComponent } from './components/auth/error/error.component';
-export { ProfileComponent } from './components/profile/profile.component';
+export { UserProfileComponent } from './components/user-profile/user-profile.component';
 export { ConfigComponent } from './components/config/config.component';
 export { DbMigrationComponent } from './components/db-migration/db-migration.component';
 export { AppModulesComponent } from './components/app-modules/app-modules.component';
@@ -21,7 +21,7 @@ export { AppFloatingConfiguratorComponent } from './components/app-floating-conf
 export { DiscussionComponent } from './components/discussion/discussion.component';
 export { IframeModuleComponent } from './components/iframe-module/iframe-module.component';
 export { ExtensionModuleHostComponent } from './components/extension-module-host.component';
-export { UserNotificationsComponent } from './components/user-notifications.component';
+export { UserNotificationsComponent } from './components/user-notifications/user-notifications.component';
 export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher.component';
 
 // DTOs

@@ -8,10 +8,16 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Tag } from 'primeng/tag';
 import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { NotificationApi } from '../api/notification.api';
-import { UserNotificationDto } from '../api/notification-data-contracts';
-import { MsgService } from '../services/msg.service';
-import { NotificationService } from '../services/notification.service';
+import { NotificationApi } from '../../api/notification.api';
+import { UserNotificationDto } from '../../api/notification-data-contracts';
+import { MsgService } from '../../services/msg.service';
+import { NotificationService } from '../../services/notification.service';
+import { L10nService } from '../../services/l10n.service';
+
+import en from './l10n/user-notifications.en.json';
+import ru from './l10n/user-notifications.ru.json';
+
+L10nService.registerTranslations({ en, ru });
 
 @Component({
   selector: 'app-user-notifications',
@@ -137,6 +143,10 @@ export class UserNotificationsComponent {
 
     return count > 99 ? '99+' : count.toString();
   });
+
+  constructor(l10nService: L10nService) {
+    l10nService.get('userNotifications');
+  }
 
   protected async toggle(event: Event): Promise<void> {
     this.popover?.toggle(event);
