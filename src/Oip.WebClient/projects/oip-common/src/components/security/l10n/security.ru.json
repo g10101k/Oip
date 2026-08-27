@@ -1,0 +1,8 @@
+{
+  "securityComponent": {
+    "security": "Безопасность",
+    "save": "Сохранить",
+    "savedSecurity": "Настройки сохранены",
+    "selectRoles": "Выберите роли"
+  }
+}

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ProfileComponent } from '../profile.component';
+import { UserProfileComponent } from '../user-profile/user-profile.component';
 import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -127,7 +127,7 @@ L10nService.registerTranslations({ en, ru });
     </div>
   `,
   imports: [
-    ProfileComponent,
+    UserProfileComponent,
     Tooltip,
     FormsModule,
     Select,

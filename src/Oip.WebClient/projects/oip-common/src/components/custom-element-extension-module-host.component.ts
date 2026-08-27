@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SecurityComponent } from './security.component';
+import { SecurityComponent } from './security/security.component';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Button } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
 import { ExtensionModulesApi } from '../api/extension-modules.api';
-import { BaseModuleComponent } from './base-module.component';
+import { BaseModuleComponent } from './base-module/base-module.component';
 import { ExtensionLoaderService } from '../extension-host/extension-loader.service';
 import { Router } from '@angular/router';
 import {

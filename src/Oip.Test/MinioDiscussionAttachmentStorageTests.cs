@@ -5,6 +5,7 @@ using Minio;
 using Minio.DataModel;
 using Minio.DataModel.Args;
 using Minio.DataModel.Response;
+using Minio.Exceptions;
 using Moq;
 using Oip.Discussions.Base.Services;
 using Oip.Discussions.Base.Settings;
@@ -156,6 +157,25 @@ public class MinioDiscussionAttachmentStorageTests
             _storage.OpenReadAsync("discussions/attachments/fail.txt", "text/plain", "fail.txt"));
 
         Assert.That(thrown, Is.SameAs(exception));
+        VerifyErrorLogged("Failed to read discussion attachment");
+    }
+
+    [Test]
+    public void OpenReadAsync_WhenMinioIsUnreachable_ThrowsConnectionExceptionInsteadOfEmptyStream()
+    {
+        // Regression guard: when MinIO is unreachable, the SDK must surface a ConnectionException
+        // (not silently return an empty stream that our code would mistake for an empty object).
+        var connectionException = new ConnectionException("Connection error: Connection refused");
+
+        _minioClientMock
+            .Setup(x => x.GetObjectAsync(It.IsAny<GetObjectArgs>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(connectionException);
+
+        var thrown = Assert.ThrowsAsync<ConnectionException>(() =>
+            _storage.OpenReadAsync("discussions/attachments/unreachable.txt", "text/plain", "unreachable.txt"));
+
+        Assert.That(thrown, Is.SameAs(connectionException));
+        Assert.That(thrown!.Message, Does.Contain("Connection error"));
         VerifyErrorLogged("Failed to read discussion attachment");
     }
 

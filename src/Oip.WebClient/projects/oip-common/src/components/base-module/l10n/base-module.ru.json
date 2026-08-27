@@ -1,0 +1,8 @@
+{
+  "baseComponent": {
+    "content": "Содержимое",
+    "settings": "Настройки",
+    "security": "Безопасность",
+    "success": "Сохранено"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "profileComponent": {
+    "changePhoto": "Upload Photo",
+    "successfullyUploaded": "Uploaded successfully",
+    "failedToLoadPhoto": "Failed to load user photo",
+    "deletePhoto": "Delete Photo",
+    "deletePhotoConfirmHeader": "Delete Photo",
+    "deletePhotoConfirmMessage": "Are you sure you want to delete your photo?",
+    "deletePhotoConfirmRejectButtonPropsLabel": "Cancel",
+    "deletePhotoConfirmAcceptButtonPropsLabel": "Delete",
+    "photoDeleted": "Photo deleted",
+    "failedToDeletePhoto": "Failed to delete user photo"
+  }
+}

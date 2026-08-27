@@ -9,9 +9,15 @@ import Lara from '@primeng/themes/lara';
 import Nora from '@primeng/themes/nora';
 import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { LayoutService } from '../services/app.layout.service';
+import { LayoutService } from '../../services/app.layout.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { APP_THEME_PRESETS, APP_THEME_PRESETS_MERGE_MODE, AppThemePreset } from '../services/theme-presets.token';
+import { APP_THEME_PRESETS, APP_THEME_PRESETS_MERGE_MODE, AppThemePreset } from '../../services/theme-presets.token';
+import { L10nService } from '../../services/l10n.service';
+
+import en from './l10n/app-configurator.en.json';
+import ru from './l10n/app-configurator.ru.json';
+
+L10nService.registerTranslations({ en, ru });
 
 const DEFAULT_THEME_PRESETS: ReadonlyArray<AppThemePreset> = [
   { id: 'Aura', label: 'Aura', preset: Aura as Preset },
@@ -112,7 +118,11 @@ declare type SurfacesType = {
             [allowEmpty]="false"
             [ngModel]="menuMode()"
             [options]="menuModeOptions"
-            (ngModelChange)="onMenuModeChange($event)" />
+            (ngModelChange)="onMenuModeChange($event)">
+            <ng-template pTemplate="item" let-item>
+              {{ item.label | translate }}
+            </ng-template>
+          </p-selectButton>
         </div>
       }
     </div>
@@ -151,9 +161,13 @@ export class AppConfiguratorComponent implements OnInit {
   showMenuModeButton = signal(!this.router.url.includes('auth'));
 
   menuModeOptions = [
-    { label: 'Static', value: 'static' },
-    { label: 'Overlay', value: 'overlay' }
+    { label: 'app-configurator.menuModeStatic', value: 'static' },
+    { label: 'app-configurator.menuModeOverlay', value: 'overlay' }
   ];
+
+  constructor(l10nService: L10nService) {
+    l10nService.get('app-configurator');
+  }
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {

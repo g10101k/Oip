@@ -1,0 +1,8 @@
+{
+  "baseComponent": {
+    "content": "Content",
+    "settings": "Settings",
+    "security": "Security",
+    "success": "Saved successfully"
+  }
+}

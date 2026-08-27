@@ -3,12 +3,18 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import { MsgService } from '../services/msg.service';
-import { PutSecurityDto } from '../dtos/put-security.dto';
+import { MsgService } from '../../services/msg.service';
+import { PutSecurityDto } from '../../dtos/put-security.dto';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { ContentType, HttpClient } from '../api/http-client';
-import { SecurityDto } from '../dtos/security.dto';
-import { SecurityApi } from '../api/security.api';
+import { ContentType, HttpClient } from '../../api/http-client';
+import { SecurityDto } from '../../dtos/security.dto';
+import { SecurityApi } from '../../api/security.api';
+import { L10nService } from '../../services/l10n.service';
+
+import en from './l10n/security.en.json';
+import ru from './l10n/security.ru.json';
+
+L10nService.registerTranslations({ en, ru });
 
 @Component({
   selector: 'security',
@@ -59,6 +65,10 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
   @Input() id?: number;
   @Input() controller?: string;
   roles: string[] = [];
+
+  constructor(l10nService: L10nService) {
+    l10nService.get('securityComponent');
+  }
 
   ngOnDestroy(): void {
     // on destroy

@@ -10,21 +10,26 @@ import {
   WritableSignal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TopBarDto } from '../dtos/top-bar.dto';
-import { TopBarService } from '../services/top-bar.service';
-import { MsgService } from '../services/msg.service';
+import { TopBarDto } from '../../dtos/top-bar.dto';
+import { TopBarService } from '../../services/top-bar.service';
+import { MsgService } from '../../services/msg.service';
 import { ActivatedRoute } from '@angular/router';
 import { InterpolationParameters, TranslateService, Translation, TranslationObject } from '@ngx-translate/core';
 import { from, Observable, Subject, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { AppTitleService } from '../services/app-title.service';
-import { LayoutService } from '../services/app.layout.service';
-import { L10nService, TranslationsByLang } from '../services/l10n.service';
-import { SecurityDto } from '../dtos/security.dto';
-import { SecurityService } from '../services/security.service';
-import { ContentType, HttpClient } from '../api/http-client';
-import { PutSecurityDto } from '../dtos/put-security.dto';
-import { ApiExceptionResponse } from '../api/data-contracts';
+import { AppTitleService } from '../../services/app-title.service';
+import { LayoutService } from '../../services/app.layout.service';
+import { L10nService, TranslationsByLang } from '../../services/l10n.service';
+import { SecurityDto } from '../../dtos/security.dto';
+import { SecurityService } from '../../services/security.service';
+import { ContentType, HttpClient } from '../../api/http-client';
+import { PutSecurityDto } from '../../dtos/put-security.dto';
+import { ApiExceptionResponse } from '../../api/data-contracts';
+
+import en from './l10n/base-module.en.json';
+import ru from './l10n/base-module.ru.json';
+
+L10nService.registerTranslations({ en, ru });
 
 interface BaseComponentLocalization {
   security: string;
@@ -228,6 +233,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   constructor() {
     // Must run before the route subscription below asks L10nService for the translations.
     L10nService.registerTranslations((this.constructor as typeof BaseModuleComponent).translations);
+    this.l10nService.get('baseComponent');
     effect(() => {
       const config = this.localSettings();
       if (config) {
@@ -279,10 +285,10 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    */
   async ngOnInit(): Promise<void> {
     this.subscriptions.push(
-      this.translateService.get('baseComponent').subscribe((value: BaseComponentLocalization) => {
-        this.topBarItems[0].caption = value.content;
-        this.topBarItems[1].caption = value.settings;
-        this.topBarItems[2].caption = value.security;
+      this.translateService.stream('baseComponent').subscribe((value: BaseComponentLocalization) => {
+        this.topBarItems.forEach((item) => {
+          item.caption = value[item.id];
+        });
       })
     );
 

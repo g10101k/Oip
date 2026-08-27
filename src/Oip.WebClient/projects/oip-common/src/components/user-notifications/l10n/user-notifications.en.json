@@ -1,0 +1,9 @@
+{
+  "userNotifications": {
+    "title": "Notifications",
+    "empty": "No unread notifications",
+    "refresh": "Refresh",
+    "markAsRead": "Read",
+    "markedAsRead": "Notification marked as read"
+  }
+}

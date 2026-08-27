@@ -1,0 +1,14 @@
+{
+  "profileComponent": {
+    "changePhoto": "Загрузить фото",
+    "successfullyUploaded": "Загружено",
+    "failedToLoadPhoto": "Не удалось загрузить фото пользователя",
+    "deletePhoto": "Удалить фото",
+    "deletePhotoConfirmHeader": "Удаление фото",
+    "deletePhotoConfirmMessage": "Вы уверены, что хотите удалить своё фото?",
+    "deletePhotoConfirmRejectButtonPropsLabel": "Отмена",
+    "deletePhotoConfirmAcceptButtonPropsLabel": "Удалить",
+    "photoDeleted": "Фото удалено",
+    "failedToDeletePhoto": "Не удалось удалить фото пользователя"
+  }
+}

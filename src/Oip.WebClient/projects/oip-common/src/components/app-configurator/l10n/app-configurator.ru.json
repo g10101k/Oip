@@ -1,0 +1,10 @@
+{
+  "app-configurator": {
+    "primary": "Основной",
+    "surface": "Фон",
+    "presets": "Стиль",
+    "menuMode": "Режим меню",
+    "menuModeStatic": "Статичное",
+    "menuModeOverlay": "Всплывающее"
+  }
+}

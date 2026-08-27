@@ -36,7 +36,7 @@ export const appRoutes: Routes = [
       },
       {
         path: 'profile',
-        loadComponent: () => import('oip-common').then((m) => m.ProfileComponent),
+        loadComponent: () => import('oip-common').then((m) => m.UserProfileComponent),
         canActivate: [(_, state) => inject(AuthGuardService).canActivate(state.url)]
       },
       {
