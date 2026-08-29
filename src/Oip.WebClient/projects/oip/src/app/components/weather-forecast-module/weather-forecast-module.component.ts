@@ -11,7 +11,7 @@ import { InputText } from 'primeng/inputtext';
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DatePicker } from 'primeng/datepicker';
-import { convertToPrimeNgDateFormat } from 'oip-common';
+import { convertToPrimeNgDateFormat, provideTranslations } from 'oip-common';
 import en from './l10n/weather-forecast-module.en.json';
 import ru from './l10n/weather-forecast-module.ru.json';
 
@@ -112,7 +112,7 @@ export class WeatherForecastModuleComponent
   extends BaseModuleComponent<WeatherModuleSettings, WeatherModuleLocalSettings>
   implements OnInit, OnDestroy
 {
-  static override readonly translations = { en, ru };
+  private readonly translations = provideTranslations({ en, ru });
 
   @ViewChild('table') table!: Table;
   protected readonly dataService = inject(WeatherForecastModuleApi);

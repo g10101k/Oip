@@ -1,0 +1,40 @@
+{
+  "menuComponent": {
+    "all": "All",
+    "new": "Add"
+  },
+  "menuItemComponent": {
+    "new": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteItemConfirmHeader": "Delete",
+    "deleteItemConfirmMessage": "Are you sure you want to delete the item?",
+    "deleteItemSuccessMessage": "Deleted successfully",
+    "deleteItemConfirmRejectButtonPropsLabel": "Cancel",
+    "deleteItemConfirmAcceptButtonPropsLabel": "Delete",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
+  },
+  "menuItemEditDialogComponent": {
+    "header": "Edit menu item",
+    "parentLabel": "Parent item",
+    "label": "Label",
+    "module": "Module",
+    "selectModule": "Select module",
+    "icon": "Icon",
+    "cancel": "Cancel",
+    "save": "Save",
+    "security": "Read access"
+  },
+  "menuItemCreateDialogComponent": {
+    "header": "New menu item",
+    "parentLabel": "Parent item",
+    "label": "Label",
+    "module": "Module",
+    "selectModule": "Select module",
+    "searchModule": "Search module",
+    "icon": "Icon",
+    "cancel": "Cancel",
+    "save": "Save"
+  }
+}

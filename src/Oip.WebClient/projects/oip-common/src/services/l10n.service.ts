@@ -136,8 +136,9 @@ export class L10nService {
   }
 
   /**
-   * Internal method to load translations from JSON files
-   * @param component - Component or translation namespace
+   * Internal method to merge a namespace's statically-registered translations
+   * (see <c>registerTranslations</c>) into the active language dictionary.
+   * @param component - Translation namespace
    * @param lang - Language code to load translations for
    */
   private loadTranslations(component: string, lang: string): Observable<unknown> {
@@ -146,40 +147,19 @@ export class L10nService {
       return of(null);
     }
 
-    // Translations bundled with the component - no HTTP request needed.
     const staticTranslations = L10nService.staticTranslations.get(component);
-    if (staticTranslations) {
-      const translations = staticTranslations[lang];
-      if (translations) {
-        this.mergeTranslation(lang, translations);
-      }
+    if (!staticTranslations) {
+      console.error(`No translations registered for namespace "${component}".`);
       return of(null);
     }
 
-    const loading = this.loadingTranslations.get(key);
-    if (loading) {
-      return loading;
+    const translations = staticTranslations[lang];
+    if (translations) {
+      this.mergeTranslation(lang, translations);
     }
+    this.loadedTranslations.add(key);
 
-    const request = this.httpClient.get(`./assets/i18n/${component}.${lang}.json`).pipe(
-      tap((translations) => {
-        this.mergeTranslation(lang, translations as TranslationObject);
-        this.loadedTranslations.add(key);
-        this.loadingTranslations.delete(key);
-      }),
-      shareReplay(1)
-    );
-
-    this.loadingTranslations.set(key, request);
-    request.subscribe({
-      error: (e) => {
-        this.loadingTranslations.delete(key);
-        console.error(`No translations found for ${component}.${lang}.json`);
-        console.error(e);
-      }
-    });
-
-    return request;
+    return of(null);
   }
 
   /**

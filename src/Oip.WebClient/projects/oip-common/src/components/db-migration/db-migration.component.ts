@@ -12,6 +12,7 @@ import { BaseModuleComponent } from '../base-module/base-module.component';
 import { NoSettingsDto } from '../../dtos/no-settings.dto';
 import { SecurityComponent } from '../security/security.component';
 import { TranslatePipe } from '@ngx-translate/core';
+import { provideTranslations } from '../../helpers/l10n.helper';
 import en from './l10n/db-migration.en.json';
 import ru from './l10n/db-migration.ru.json';
 
@@ -126,7 +127,7 @@ export class DbMigrationComponent
   extends BaseModuleComponent<NoSettingsDto, NoSettingsDto>
   implements OnInit, OnDestroy
 {
-  static override readonly translations = { en, ru };
+  private readonly translations = provideTranslations({ en, ru });
 
   data: MigrationDto[];
 

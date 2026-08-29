@@ -13,6 +13,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { MenuItemEditDialogComponent } from './menu-item-edit-dialog.component';
 import { MenuApi } from '../../api/menu.api';
 
+import { provideTranslations } from '../../helpers/l10n.helper';
+import en from './l10n/menu.en.json';
+import ru from './l10n/menu.ru.json';
+
 @Component({
   imports: [
     MenuItemComponent,
@@ -54,6 +58,10 @@ import { MenuApi } from '../../api/menu.api';
     }`
 })
 export class MenuComponent implements OnInit {
+  // Registers the whole menu/l10n/menu.*.json bundle, which also covers
+  // menuItemComponent, menuItemEditDialogComponent and menuItemCreateDialogComponent.
+  private readonly translations = provideTranslations({ en, ru });
+
   readonly menuService = inject(MenuService);
   readonly securityService = inject(SecurityService);
   readonly translateService = inject(TranslateService);

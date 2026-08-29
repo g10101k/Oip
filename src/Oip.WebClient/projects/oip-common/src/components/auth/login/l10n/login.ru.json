@@ -1,0 +1,12 @@
+{
+  "login": {
+    "welcome": "Добро пожаловать в OIP!",
+    "signInToContinue": "Войдите чтобы продолжить",
+    "email": "Email",
+    "emailAddress": "Адрес электронной почты",
+    "password": "Пароль",
+    "rememberMe": "Запомнить меня",
+    "forgotPassword": "Забыли пароль?",
+    "signIn": "Войти"
+  }
+}

@@ -13,7 +13,7 @@ public sealed class ModuleGenerator(TargetProject project, ModuleName module, bo
             module.ComponentFolder);
         var componentPath = Path.Combine(componentDirectory, module.ComponentFileName);
         var routesPath = Path.Combine(project.AngularProjectPath, "src", "app.routes.ts");
-        var i18nDirectory = Path.Combine(project.AngularProjectPath, "src", "assets", "i18n");
+        var i18nDirectory = Path.Combine(componentDirectory, "l10n");
         var englishI18nPath = Path.Combine(i18nDirectory, $"{module.RoutePath}.en.json");
         var russianI18nPath = Path.Combine(i18nDirectory, $"{module.RoutePath}.ru.json");
 
@@ -158,12 +158,14 @@ public sealed class ModuleGenerator(TargetProject project, ModuleName module, bo
     {
         return $$$"""
                   import { Component } from '@angular/core';
-                  import { BaseModuleComponent, NoSettingsDto, SecurityComponent } from 'oip-common';
+                  import { BaseModuleComponent, NoSettingsDto, provideTranslations, SecurityComponent } from 'oip-common';
                   import { {{{module.SettingsClassName}}} } from '../../../api/data-contracts';
                   import { TranslatePipe } from '@ngx-translate/core';
                   import { Button } from 'primeng/button';
                   import { InputText } from 'primeng/inputtext';
                   import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+                  import en from './l10n/{{{module.RoutePath}}}.en.json';
+                  import ru from './l10n/{{{module.RoutePath}}}.ru.json';
 
                   @Component({
                     selector: 'app-{{{module.RoutePath}}}',
@@ -206,6 +208,8 @@ public sealed class ModuleGenerator(TargetProject project, ModuleName module, bo
                     `
                   })
                   export class {{{module.ComponentClassName}}} extends BaseModuleComponent<{{{module.SettingsClassName}}}, NoSettingsDto> {
+                    private readonly translations = provideTranslations({ en, ru });
+
                     protected override async onModuleInstanceChange(): Promise<void> {
                       // Initialize module data here.
                     }

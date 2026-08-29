@@ -8,7 +8,7 @@ import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { BaseModuleComponent, ContentType, SecurityComponent } from 'oip-common';
+import { BaseModuleComponent, ContentType, provideTranslations, SecurityComponent } from 'oip-common';
 import { CustomerModuleApi } from '../../../api/customer-module.api';
 import {
   CustomerModuleSettings,
@@ -324,7 +324,7 @@ export class CustomerModuleComponent
   extends BaseModuleComponent<CustomerModuleSettings, CustomerModuleLocalSettings>
   implements OnInit, OnDestroy, AfterViewInit
 {
-  static override readonly translations = { en, ru };
+  private readonly translations = provideTranslations({ en, ru });
 
   @ViewChild('table') table!: Table;
 

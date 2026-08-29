@@ -2,6 +2,11 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
+import { TranslatePipe } from '@ngx-translate/core';
+import { provideTranslations } from '../../../helpers/l10n.helper';
+
+import en from './l10n/access.en.json';
+import ru from './l10n/access.ru.json';
 
 @Component({
   selector: 'app-access',
@@ -20,23 +25,25 @@ import { RippleModule } from 'primeng/ripple';
               style="width:3.2rem; height:3.2rem;">
               <i class="text-50 pi pi-fw pi-lock text-2xl"></i>
             </div>
-            <h1 class="text-900 font-bold text-4xl lg:text-5xl mb-2">Access Denied</h1>
-            <span class="text-600 mb-5">You do not have the necessary permisions. Please contact admins.</span>
+            <h1 class="text-900 font-bold text-4xl lg:text-5xl mb-2">{{ 'access.title' | translate }}</h1>
+            <span class="text-600 mb-5">{{ 'access.message' | translate }}</span>
             <img alt="Access denied" class="mb-5" src="assets/demo/images/access/asset-access.svg" width="80%" />
             <p-button
               class="p-button-text"
               icon="pi pi-arrow-left"
               id="oip-app-access-go-to-dashboard-button"
-              label="Go to Dashboard"
               pButton
               pRipple
+              [label]="'access.button' | translate"
               [routerLink]="['/']"></p-button>
           </div>
         </div>
       </div>
     </div>
   </div>`,
-  imports: [RouterLink, ButtonModule, RippleModule],
+  imports: [RouterLink, ButtonModule, RippleModule, TranslatePipe],
   standalone: true
 })
-export class AccessComponent {}
+export class AccessComponent {
+  private readonly translations = provideTranslations({ en, ru });
+}

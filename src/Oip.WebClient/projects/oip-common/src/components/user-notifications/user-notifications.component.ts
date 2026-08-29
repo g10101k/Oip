@@ -12,12 +12,10 @@ import { NotificationApi } from '../../api/notification.api';
 import { UserNotificationDto } from '../../api/notification-data-contracts';
 import { MsgService } from '../../services/msg.service';
 import { NotificationService } from '../../services/notification.service';
-import { L10nService } from '../../services/l10n.service';
+import { provideTranslations } from '../../helpers/l10n.helper';
 
 import en from './l10n/user-notifications.en.json';
 import ru from './l10n/user-notifications.ru.json';
-
-L10nService.registerTranslations({ en, ru });
 
 @Component({
   selector: 'app-user-notifications',
@@ -123,6 +121,8 @@ L10nService.registerTranslations({ en, ru });
   `
 })
 export class UserNotificationsComponent {
+  private readonly translations = provideTranslations({ en, ru });
+
   @ViewChild('popover') private popover?: Popover;
 
   protected notifications: UserNotificationDto[] = [];
@@ -143,10 +143,6 @@ export class UserNotificationsComponent {
 
     return count > 99 ? '99+' : count.toString();
   });
-
-  constructor(l10nService: L10nService) {
-    l10nService.get('userNotifications');
-  }
 
   protected async toggle(event: Event): Promise<void> {
     this.popover?.toggle(event);

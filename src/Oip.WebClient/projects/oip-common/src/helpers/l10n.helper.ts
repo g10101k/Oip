@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { L10nService, TranslationsByLang } from '../services/l10n.service';
-import { Observable } from "rxjs";
-import { Translation, TranslationObject } from "@ngx-translate/core";
+import { Observable, of } from 'rxjs';
+import { Translation, TranslationObject } from '@ngx-translate/core';
 
 /**
  * Registers a component's co-located translations and merges them into the
@@ -26,9 +26,7 @@ export function provideTranslations(byLang: TranslationsByLang): Observable<Tran
   L10nService.registerTranslations(byLang);
 
   const namespace = namespaceOf(byLang);
-  if (namespace) {
-    return inject(L10nService).get(namespace);
-  }
+  return namespace ? inject(L10nService).get(namespace) : of({});
 }
 
 function namespaceOf(byLang: TranslationsByLang): string | undefined {

@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { LogoComponent } from '../logo.component';
+import { LogoComponent } from '../logo/logo.component';
 import { Button } from 'primeng/button';
-import { AppFloatingConfiguratorComponent } from '../app-floating-configurator.component';
+import { AppFloatingConfiguratorComponent } from '../app-floating-configurator/app-floating-configurator.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { L10nService } from '../../services/l10n.service';
+import { provideTranslations } from '../../helpers/l10n.helper';
 
 import en from './l10n/notfound.en.json';
 import ru from './l10n/notfound.ru.json';
-
-L10nService.registerTranslations({ en, ru });
 
 @Component({
   selector: 'app-notfound',
@@ -38,7 +36,5 @@ L10nService.registerTranslations({ en, ru });
   standalone: true
 })
 export class NotfoundComponent {
-  constructor(l10nService: L10nService) {
-    l10nService.get('notfound');
-  }
+  private readonly translations = provideTranslations({ en, ru });
 }

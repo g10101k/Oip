@@ -13,11 +13,11 @@ import {
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Button } from 'primeng/button';
 import { firstValueFrom } from 'rxjs';
-import { BaseModuleComponent } from './base-module/base-module.component';
-import { emitOipContextChange } from '../extension-host/extension-host.events';
-import { ExtensionModulesApi } from '../api/extension-modules.api';
-import { OipExtensionHostContext, OipExtensionModuleMetadata } from '../extension-host/extension-host.types';
-import { CustomElementExtensionModuleHostComponent } from './custom-element-extension-module-host.component';
+import { BaseModuleComponent } from '../base-module/base-module.component';
+import { emitOipContextChange } from '../../extension-host/extension-host.events';
+import { ExtensionModulesApi } from '../../api/extension-modules.api';
+import { OipExtensionHostContext, OipExtensionModuleMetadata } from '../../extension-host/extension-host.types';
+import { CustomElementExtensionModuleHostComponent } from '../custom-element-extension-module-host/custom-element-extension-module-host.component';
 
 @Component({
   standalone: true,

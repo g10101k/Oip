@@ -9,12 +9,10 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ContentType, HttpClient } from '../../api/http-client';
 import { SecurityDto } from '../../dtos/security.dto';
 import { SecurityApi } from '../../api/security.api';
-import { L10nService } from '../../services/l10n.service';
+import { provideTranslations } from '../../helpers/l10n.helper';
 
 import en from './l10n/security.en.json';
 import ru from './l10n/security.ru.json';
-
-L10nService.registerTranslations({ en, ru });
 
 @Component({
   selector: 'security',
@@ -55,6 +53,8 @@ L10nService.registerTranslations({ en, ru });
   standalone: true
 })
 export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
+  private readonly translations = provideTranslations({ en, ru });
+
   private readonly msgService = inject(MsgService);
   private readonly translateService = inject(TranslateService);
   private readonly httpClient = inject(HttpClient);
@@ -65,10 +65,6 @@ export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
   @Input() id?: number;
   @Input() controller?: string;
   roles: string[] = [];
-
-  constructor(l10nService: L10nService) {
-    l10nService.get('securityComponent');
-  }
 
   ngOnDestroy(): void {
     // on destroy

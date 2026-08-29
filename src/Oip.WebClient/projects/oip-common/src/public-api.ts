@@ -1,12 +1,12 @@
 // Components
 export { BaseModuleComponent } from './components/base-module/base-module.component';
 export { SecurityComponent } from './components/security/security.component';
-export { AppTopbar } from './components/top-bar.component';
-export { FooterComponent } from './components/footer.component';
+export { AppTopbar } from './components/top-bar/top-bar.component';
+export { FooterComponent } from './components/footer/footer.component';
 export { MenuComponent } from './components/menu/menu.component';
-export { AppLayoutComponent } from './components/app.layout.component';
-export { SidebarComponent } from './components/sidebar.component';
-export { LogoComponent } from './components/logo.component';
+export { AppLayoutComponent } from './components/app.layout/app.layout.component';
+export { SidebarComponent } from './components/sidebar/sidebar.component';
+export { LogoComponent } from './components/logo/logo.component';
 export { NotfoundComponent } from './components/notfound/notfound.component';
 export { UnauthorizedComponent } from './components/auth/unauthorized/unauthorized.component';
 export { AccessComponent } from './components/auth/access/access.component';
@@ -17,12 +17,12 @@ export { DbMigrationComponent } from './components/db-migration/db-migration.com
 export { AppModulesComponent } from './components/app-modules/app-modules.component';
 export { ApplicationsComponent } from './components/applications/applications.component';
 export { AppConfiguratorComponent } from './components/app-configurator/app-configurator.component';
-export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator.component';
+export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator/app-floating-configurator.component';
 export { DiscussionComponent } from './components/discussion/discussion.component';
 export { IframeModuleComponent } from './components/iframe-module/iframe-module.component';
-export { ExtensionModuleHostComponent } from './components/extension-module-host.component';
+export { ExtensionModuleHostComponent } from './components/extension-module-host/extension-module-host.component';
 export { UserNotificationsComponent } from './components/user-notifications/user-notifications.component';
-export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher.component';
+export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher/top-bar-application-switcher.component';
 
 // DTOs
 export { TopBarDto } from './dtos/top-bar.dto';
@@ -85,5 +85,6 @@ export { SecurityApi } from './api/security.api';
 export { ApplicationsApi } from './api/applications.api';
 export { UserProfileApi } from './api/user-profile.api';
 export { convertToPrimeNgDateFormat } from './helpers/date.helper';
+export { provideTranslations } from './helpers/l10n.helper';
 export { NotificationApi } from './api/notification.api';
-export { CustomElementExtensionModuleHostComponent } from './components/custom-element-extension-module-host.component';
+export { CustomElementExtensionModuleHostComponent } from './components/custom-element-extension-module-host/custom-element-extension-module-host.component';

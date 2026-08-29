@@ -1,0 +1,40 @@
+{
+  "menuComponent": {
+    "all": "Все",
+    "new": "Добавить"
+  },
+  "menuItemComponent": {
+    "new": "Добавить",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "deleteItemConfirmHeader": "Удаление",
+    "deleteItemConfirmMessage": "Вы уверены что хотите удалить элемент?",
+    "deleteItemSuccessMessage": "Успешно удалено",
+    "deleteItemConfirmRejectButtonPropsLabel": "Отмена",
+    "deleteItemConfirmAcceptButtonPropsLabel": "Удалить",
+    "moveUp": "Вверх",
+    "moveDown": "Вниз"
+  },
+  "menuItemEditDialogComponent": {
+    "header": "Редактировать элемент меню",
+    "parentLabel": "Родительский узел",
+    "label": "Имя",
+    "module": "Модуль",
+    "selectModule": "Выберите модуль",
+    "icon": "Иконка",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "security": "Доступ на чтение"
+  },
+  "menuItemCreateDialogComponent": {
+    "header": "Новый элемент меню",
+    "parentLabel": "Родительский узел",
+    "label": "Имя",
+    "module": "Модуль",
+    "selectModule": "Выберите модуль",
+    "searchModule": "Поиск модуля",
+    "icon": "Иконка",
+    "cancel": "Отмена",
+    "save": "Сохранить"
+  }
+}

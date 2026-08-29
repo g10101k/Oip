@@ -2,6 +2,11 @@ import { Component } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
+import { provideTranslations } from '../../../helpers/l10n.helper';
+
+import en from './l10n/error.en.json';
+import ru from './l10n/error.ru.json';
 
 @Component({
   selector: 'app-error',
@@ -20,16 +25,16 @@ import { RouterLink } from '@angular/router';
               style="height:3.2rem; width:3.2rem;">
               <i class="pi pi-fw pi-exclamation-circle text-2xl text-white"></i>
             </div>
-            <h1 class="text-900 font-bold text-5xl mb-2">Error Occured</h1>
-            <span class="text-600 mb-5">Requested resource is not available.</span>
+            <h1 class="text-900 font-bold text-5xl mb-2">{{ 'error.title' | translate }}</h1>
+            <span class="text-600 mb-5">{{ 'error.message' | translate }}</span>
             <img alt="Error" class="mb-5" src="assets/demo/images/error/asset-error.svg" width="80%" />
             <button
               class="p-button-text"
               icon="pi pi-arrow-left"
               id="oip-app-error-go-to-dashboard-button"
-              label="Go to Dashboard"
               pButton
               pRipple
+              [label]="'error.button' | translate"
               [routerLink]="['/']"></button>
           </div>
         </div>
@@ -37,6 +42,8 @@ import { RouterLink } from '@angular/router';
     </div>
   </div>`,
   standalone: true,
-  imports: [ButtonModule, RippleModule, RouterLink]
+  imports: [ButtonModule, RippleModule, RouterLink, TranslatePipe]
 })
-export class ErrorComponent {}
+export class ErrorComponent {
+  private readonly translations = provideTranslations({ en, ru });
+}

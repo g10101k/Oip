@@ -39,6 +39,8 @@ public class ModuleGeneratorTests
 
         Assert.That(component, Does.Contain("import { InvoiceModuleSettings } from '../../../api/data-contracts';"));
         Assert.That(component, Does.Contain("import { TranslatePipe } from '@ngx-translate/core';"));
+        Assert.That(component, Does.Contain("import en from './l10n/invoice-module.en.json';"));
+        Assert.That(component, Does.Contain("import ru from './l10n/invoice-module.ru.json';"));
         Assert.That(component, Does.Contain("imports: [SecurityComponent, TranslatePipe, Button, InputText, ReactiveFormsModule, FormsModule]"));
         Assert.That(component, Does.Contain("{{ 'invoice-module.content.subtitle' | translate }}"));
         Assert.That(component, Does.Contain("@else if (isSettings)"));
@@ -47,11 +49,14 @@ public class ModuleGeneratorTests
         Assert.That(
             component,
             Does.Contain("extends BaseModuleComponent<InvoiceModuleSettings, NoSettingsDto>"));
+        Assert.That(component, Does.Contain("private readonly translations = provideTranslations({ en, ru });"));
         Assert.That(component, Does.Contain("protected override async onModuleInstanceChange(): Promise<void>"));
         Assert.That(component, Does.Contain("// Initialize module data here."));
 
-        var englishI18nPath = Path.Combine(project.AngularProjectPath, "src", "assets", "i18n", "invoice-module.en.json");
-        var russianI18nPath = Path.Combine(project.AngularProjectPath, "src", "assets", "i18n", "invoice-module.ru.json");
+        var englishI18nPath = Path.Combine(
+            project.AngularProjectPath, "src", "app", "components", "invoice-module", "l10n", "invoice-module.en.json");
+        var russianI18nPath = Path.Combine(
+            project.AngularProjectPath, "src", "app", "components", "invoice-module", "l10n", "invoice-module.ru.json");
         var englishI18n = File.ReadAllText(englishI18nPath);
         var russianI18n = File.ReadAllText(russianI18nPath);
 

@@ -1,0 +1,11 @@
+{
+  "topbar": {
+    "logout": "Выход",
+    "logoutConfirmHeader": "Выход",
+    "logoutConfirmMessage": "Вы уверены, что хотите выйти?",
+    "logoutConfirmCancel": "Отмена",
+    "logoutConfirmAccept": "Выйти",
+    "profile": "Профиль",
+    "applications": "Приложения"
+  }
+}

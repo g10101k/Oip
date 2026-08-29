@@ -1,0 +1,7 @@
+{
+  "access": {
+    "title": "Access Denied",
+    "message": "You do not have the necessary permissions. Please contact admins.",
+    "button": "Go to Dashboard"
+  }
+}
