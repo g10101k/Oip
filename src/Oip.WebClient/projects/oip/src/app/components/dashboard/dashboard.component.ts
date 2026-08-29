@@ -4,7 +4,7 @@ import { StatsWidgetComponent } from './components/stats-widget.component';
 import { RecentSalesWidgetComponent } from './components/recent-sales-widget.component';
 import { BestSellingWidgetComponent } from './components/best-selling-widget.component';
 import { RevenueStreamWidgetComponent } from './components/revenue-stream-widget.component';
-import { BaseModuleComponent, NoSettingsDto, SecurityComponent } from 'oip-common';
+import { BaseModuleComponent, NoSettingsDto, provideTranslations, SecurityComponent } from 'oip-common';
 import en from './l10n/dashboard.en.json';
 import ru from './l10n/dashboard.ru.json';
 
@@ -37,5 +37,5 @@ import ru from './l10n/dashboard.ru.json';
   `
 })
 export class DashboardComponent extends BaseModuleComponent<NoSettingsDto, NoSettingsDto> {
-  static override readonly translations = { en, ru };
+  private readonly translations = provideTranslations({ en, ru });
 }

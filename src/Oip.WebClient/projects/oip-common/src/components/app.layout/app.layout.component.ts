@@ -2,12 +2,12 @@ import { Component, Renderer2, ViewChild, OnDestroy, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
-import { AppTopbar } from './top-bar.component';
-import { FooterComponent } from './footer.component';
-import { LayoutService } from './../services/app.layout.service';
-import { SidebarComponent } from './sidebar.component';
-import { MenuApi } from '../api/menu.api';
-import { MenuService } from '../services/app.menu.service';
+import { AppTopbar } from '../top-bar/top-bar.component';
+import { FooterComponent } from '../footer/footer.component';
+import { LayoutService } from '../../services/app.layout.service';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { MenuApi } from '../../api/menu.api';
+import { MenuService } from '../../services/app.menu.service';
 
 @Component({
   selector: 'app-layout',

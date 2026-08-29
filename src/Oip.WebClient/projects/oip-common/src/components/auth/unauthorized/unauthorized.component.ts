@@ -2,11 +2,15 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { LogoComponent } from '../../logo.component';
+import { LogoComponent } from '../../logo/logo.component';
 import { BffSecurityService, SecurityService } from '../../../services/security.service';
-import { AppFloatingConfiguratorComponent } from '../../app-floating-configurator.component';
+import { AppFloatingConfiguratorComponent } from '../../app-floating-configurator/app-floating-configurator.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
+import { provideTranslations } from '../../../helpers/l10n.helper';
+
+import en from './l10n/unauthorized.en.json';
+import ru from './l10n/unauthorized.ru.json';
 
 @Component({
   template: `
@@ -48,6 +52,8 @@ import { TranslatePipe } from '@ngx-translate/core';
   ]
 })
 export class UnauthorizedComponent implements OnInit {
+  private readonly translations = provideTranslations({ en, ru });
+
   protected readonly securityService = inject(SecurityService);
   private readonly route = inject(ActivatedRoute);
 

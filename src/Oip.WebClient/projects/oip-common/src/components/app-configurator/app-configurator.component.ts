@@ -12,12 +12,10 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '../../services/app.layout.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { APP_THEME_PRESETS, APP_THEME_PRESETS_MERGE_MODE, AppThemePreset } from '../../services/theme-presets.token';
-import { L10nService } from '../../services/l10n.service';
+import { provideTranslations } from '../../helpers/l10n.helper';
 
 import en from './l10n/app-configurator.en.json';
 import ru from './l10n/app-configurator.ru.json';
-
-L10nService.registerTranslations({ en, ru });
 
 const DEFAULT_THEME_PRESETS: ReadonlyArray<AppThemePreset> = [
   { id: 'Aura', label: 'Aura', preset: Aura as Preset },
@@ -133,6 +131,8 @@ declare type SurfacesType = {
   }
 })
 export class AppConfiguratorComponent implements OnInit {
+  private readonly translations = provideTranslations({ en, ru });
+
   router = inject(Router);
 
   config: PrimeNG = inject(PrimeNG);
@@ -164,10 +164,6 @@ export class AppConfiguratorComponent implements OnInit {
     { label: 'app-configurator.menuModeStatic', value: 'static' },
     { label: 'app-configurator.menuModeOverlay', value: 'overlay' }
   ];
-
-  constructor(l10nService: L10nService) {
-    l10nService.get('app-configurator');
-  }
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {

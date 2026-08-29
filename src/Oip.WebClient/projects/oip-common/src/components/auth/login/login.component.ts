@@ -6,7 +6,12 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
-import { AppFloatingConfiguratorComponent } from '../../app-floating-configurator.component';
+import { AppFloatingConfiguratorComponent } from '../../app-floating-configurator/app-floating-configurator.component';
+import { TranslatePipe } from '@ngx-translate/core';
+import { provideTranslations } from '../../../helpers/l10n.helper';
+
+import en from './l10n/login.en.json';
+import ru from './l10n/login.ru.json';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +24,8 @@ import { AppFloatingConfiguratorComponent } from '../../app-floating-configurato
     FormsModule,
     RouterModule,
     RippleModule,
-    AppFloatingConfiguratorComponent
+    AppFloatingConfiguratorComponent,
+    TranslatePipe
   ],
   template: `
     <app-floating-configurator />
@@ -58,35 +64,37 @@ import { AppFloatingConfiguratorComponent } from '../../app-floating-configurato
                     fill="var(--primary-color)" />
                 </g>
               </svg>
-              <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Welcome to PrimeLand!</div>
-              <span class="text-muted-color font-medium">Sign in to continue</span>
+              <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">
+                {{ 'login.welcome' | translate }}
+              </div>
+              <span class="text-muted-color font-medium">{{ 'login.signInToContinue' | translate }}</span>
             </div>
 
             <div>
               <label
                 class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2"
                 for="oip-app-login-email-address-input"
-                >Email</label
+                >{{ 'login.email' | translate }}</label
               >
               <input
                 class="w-full md:w-[30rem] mb-8"
                 id="oip-app-login-email-address-input"
                 pInputText
-                placeholder="Email address"
                 type="text"
+                [placeholder]="'login.emailAddress' | translate"
                 [(ngModel)]="email" />
 
               <label
                 class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2"
                 for="oip-app-login-password"
-                >Password</label
+                >{{ 'login.password' | translate }}</label
               >
               <p-password
                 id="oip-app-login-password"
-                placeholder="Password"
                 styleClass="mb-4"
                 [feedback]="false"
                 [fluid]="true"
+                [placeholder]="'login.password' | translate"
                 [toggleMask]="true"
                 [(ngModel)]="password"></p-password>
 
@@ -97,13 +105,17 @@ import { AppFloatingConfiguratorComponent } from '../../app-floating-configurato
                     class="mr-2"
                     id="oip-app-login-remember-me-checkbox"
                     [(ngModel)]="checked"></p-checkbox>
-                  <label for="oip-app-login-remember-me-checkbox">Remember me</label>
+                  <label for="oip-app-login-remember-me-checkbox">{{ 'login.rememberMe' | translate }}</label>
                 </div>
                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary"
-                  >Forgot password?</span
+                  >{{ 'login.forgotPassword' | translate }}</span
                 >
               </div>
-              <p-button id="oip-app-login-sign-in-button" label="Sign In" routerLink="/" styleClass="w-full"></p-button>
+              <p-button
+                id="oip-app-login-sign-in-button"
+                routerLink="/"
+                styleClass="w-full"
+                [label]="'login.signIn' | translate"></p-button>
             </div>
           </div>
         </div>
@@ -112,6 +124,8 @@ import { AppFloatingConfiguratorComponent } from '../../app-floating-configurato
   `
 })
 export class LoginComponent {
+  private readonly translations = provideTranslations({ en, ru });
+
   email: string = '';
 
   password: string = '';

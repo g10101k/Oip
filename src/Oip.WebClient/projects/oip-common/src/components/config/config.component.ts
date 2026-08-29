@@ -13,11 +13,10 @@ import { MenuService } from '../../services/app.menu.service';
 import { Button } from 'primeng/button';
 import { L10nService } from '../../services/l10n.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { provideTranslations } from '../../helpers/l10n.helper';
 
 import en from './l10n/config.en.json';
 import ru from './l10n/config.ru.json';
-
-L10nService.registerTranslations({ en, ru });
 
 @Component({
   selector: 'app-config',
@@ -139,6 +138,8 @@ L10nService.registerTranslations({ en, ru });
   ]
 })
 export class ConfigComponent {
+  private readonly translations = provideTranslations({ en, ru });
+
   private readonly layoutService = inject(LayoutService);
   protected readonly l10nService = inject(L10nService);
   protected readonly userService = inject(UserService);
@@ -155,7 +156,6 @@ export class ConfigComponent {
   protected selectedTimeZone: string;
 
   constructor() {
-    this.l10nService.loadComponentTranslations('config');
     this.selectedLanguage = this.layoutService.language();
     this.selectedDateFormat = this.layoutService.dateFormat();
     this.selectedTimeFormat = this.layoutService.timeFormat();

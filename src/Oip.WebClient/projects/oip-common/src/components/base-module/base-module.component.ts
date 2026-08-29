@@ -15,21 +15,20 @@ import { TopBarService } from '../../services/top-bar.service';
 import { MsgService } from '../../services/msg.service';
 import { ActivatedRoute } from '@angular/router';
 import { InterpolationParameters, TranslateService, Translation, TranslationObject } from '@ngx-translate/core';
-import { from, Observable, Subject, Subscription } from 'rxjs';
+import { from, Subject, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AppTitleService } from '../../services/app-title.service';
 import { LayoutService } from '../../services/app.layout.service';
-import { L10nService, TranslationsByLang } from '../../services/l10n.service';
+import { L10nService } from '../../services/l10n.service';
 import { SecurityDto } from '../../dtos/security.dto';
 import { SecurityService } from '../../services/security.service';
 import { ContentType, HttpClient } from '../../api/http-client';
 import { PutSecurityDto } from '../../dtos/put-security.dto';
 import { ApiExceptionResponse } from '../../api/data-contracts';
+import { provideTranslations } from '../../helpers/l10n.helper';
 
 import en from './l10n/base-module.en.json';
 import ru from './l10n/base-module.ru.json';
-
-L10nService.registerTranslations({ en, ru });
 
 interface BaseComponentLocalization {
   security: string;
@@ -124,19 +123,10 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * @type {string}
    */
   public title: string;
-  /**
-   * Translations bundled with the component, grouped by language code.
-   * Declare it in a derived component to load translations from the component folder
-   * instead of `assets/i18n`:
-   *
-   * ```ts
-   * static override readonly translations = { en, ru };
-   * ```
-   */
-  public static readonly translations: TranslationsByLang | undefined;
+
+  private readonly baseTranslations = provideTranslations({ en, ru });
 
   public l10nService = inject(L10nService);
-  public l10n$: Observable<Translation | TranslationObject>;
   public canRead = false;
   public canEdit = false;
   public canDelete = false;
@@ -231,9 +221,6 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Initializes the component and subscribes to local settings updates.
    */
   constructor() {
-    // Must run before the route subscription below asks L10nService for the translations.
-    L10nService.registerTranslations((this.constructor as typeof BaseModuleComponent).translations);
-    this.l10nService.get('baseComponent');
     effect(() => {
       const config = this.localSettings();
       if (config) {
@@ -243,9 +230,6 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     this.subscriptions.push(
       this.route.url.subscribe((url) => {
         this.controller = url[0].path;
-        // The route path is the translation namespace, register it before asking for translations.
-        L10nService.registerTranslations((this.constructor as typeof BaseModuleComponent).translations, this.controller);
-        this.l10n$ = this.l10nService.get(this.controller);
       })
     );
     this.subscriptions.push(

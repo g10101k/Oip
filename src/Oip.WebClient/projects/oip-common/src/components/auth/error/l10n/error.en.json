@@ -1,0 +1,7 @@
+{
+  "error": {
+    "title": "Error Occurred",
+    "message": "Requested resource is not available.",
+    "button": "Go to Dashboard"
+  }
+}

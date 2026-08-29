@@ -76,11 +76,26 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<UserService>();
         services.AddUserPhotoStorage();
         services.TryAddScoped<KeycloakSyncService>();
-        services.AddUserCacheRepository();
+        services.AddLocalUserCacheRepository();
         services.AddStartupTask<KeycloakSyncStartupTask>();
         return services;
     }
 
+    /// <summary>
+    /// Registers a lightweight, on-demand user cache repository that queries local data directly.
+    /// Used for Local and Service modes, where users already live in the local database and a
+    /// periodically refreshed in-memory cache with gRPC subscriptions would be redundant.
+    /// </summary>
+    private static IServiceCollection AddLocalUserCacheRepository(this IServiceCollection services)
+    {
+        services.TryAddScoped<IUserCacheRepository, LocalUserCacheRepository>();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers the remote user cache repository: an in-memory cache periodically refreshed via
+    /// polling and kept up to date through a gRPC subscription to user change events.
+    /// </summary>
     private static IServiceCollection AddUserCacheRepository(this IServiceCollection services)
     {
         services.TryAddSingleton<UserCacheRepository>();

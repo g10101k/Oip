@@ -1,0 +1,11 @@
+{
+  "topbar": {
+    "logout": "Logout",
+    "logoutConfirmHeader": "Logout",
+    "logoutConfirmMessage": "Are you sure you want to logout?",
+    "logoutConfirmCancel": "Cancel",
+    "logoutConfirmAccept": "Logout",
+    "profile": "Profile",
+    "applications": "Applications"
+  }
+}

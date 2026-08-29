@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { SecurityComponent } from '../security/security.component';
 import { IframeModuleSettings } from '../../api/data-contracts';
+import { provideTranslations } from '../../helpers/l10n.helper';
 import en from './l10n/iframe-module.en.json';
 import ru from './l10n/iframe-module.ru.json';
 
@@ -55,7 +56,7 @@ export class IframeModuleComponent
   extends BaseModuleComponent<IframeModuleSettings, IframeModuleSettings>
   implements OnInit, OnDestroy
 {
-  static override readonly translations = { en, ru };
+  private readonly translations = provideTranslations({ en, ru });
 
   private iframe?: ElementRef<HTMLIFrameElement>;
   private readonly renderer = inject(Renderer2);

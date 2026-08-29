@@ -9,12 +9,10 @@ import { MsgService } from '../../services/msg.service';
 import { UserService } from '../../services/user.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { UserProfileApi } from '../../api/user-profile.api';
-import { L10nService } from '../../services/l10n.service';
+import { provideTranslations } from '../../helpers/l10n.helper';
 
 import en from './l10n/profile.en.json';
 import ru from './l10n/profile.ru.json';
-
-L10nService.registerTranslations({ en, ru });
 
 @Component({
   selector: 'user-profile',
@@ -54,15 +52,13 @@ L10nService.registerTranslations({ en, ru });
   `
 })
 export class UserProfileComponent {
+  private readonly translations = provideTranslations({ en, ru });
+
   readonly userService = inject(UserService);
   readonly msgService = inject(MsgService);
   readonly translateService = inject(TranslateService);
   readonly userProfileApi = inject(UserProfileApi);
   private readonly confirmationService = inject(ConfirmationService);
-
-  constructor(l10nService: L10nService) {
-    l10nService.get('profileComponent');
-  }
 
   async uploadPhoto(event: any): Promise<void> {
     const file = event.files?.[0];

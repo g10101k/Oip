@@ -3,19 +3,23 @@ import { ConfirmationService } from 'primeng/api';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
-import { LayoutService } from '../services/app.layout.service';
-import { AppConfiguratorComponent } from './app-configurator/app-configurator.component';
-import { SecurityService } from '../services/security.service';
-import { TopBarService } from '../services/top-bar.service';
+import { LayoutService } from '../../services/app.layout.service';
+import { AppConfiguratorComponent } from '../app-configurator/app-configurator.component';
+import { SecurityService } from '../../services/security.service';
+import { TopBarService } from '../../services/top-bar.service';
 import { Tab, TabList, Tabs } from 'primeng/tabs';
 import { AvatarModule } from 'primeng/avatar';
-import { UserService } from '../services/user.service';
+import { UserService } from '../../services/user.service';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { LogoService } from '../services/logo.service';
+import { LogoService } from '../../services/logo.service';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { UserNotificationsComponent } from './user-notifications/user-notifications.component';
-import { AppTopbarApplicationSwitcherComponent } from './top-bar-application-switcher.component';
+import { UserNotificationsComponent } from '../user-notifications/user-notifications.component';
+import { AppTopbarApplicationSwitcherComponent } from '../top-bar-application-switcher/top-bar-application-switcher.component';
+import { provideTranslations } from '../../helpers/l10n.helper';
+
+import en from './l10n/topbar.en.json';
+import ru from './l10n/topbar.ru.json';
 
 @Component({
   selector: 'app-topbar',
@@ -141,6 +145,8 @@ import { AppTopbarApplicationSwitcherComponent } from './top-bar-application-swi
   providers: [ConfirmationService]
 })
 export class AppTopbar {
+  private readonly translations = provideTranslations({ en, ru });
+
   securityService = inject(SecurityService);
   topBarService = inject(TopBarService);
   userService = inject(UserService);
@@ -150,8 +156,7 @@ export class AppTopbar {
   private readonly translateService = inject(TranslateService);
 
   onActiveTabChange(value: string | number | undefined) {
-    const nextActiveId = value == null ? undefined : String(value);
-    this.topBarService.activeId = nextActiveId;
+    this.topBarService.activeId = value == null ? undefined : String(value);
   }
 
   toggleDarkMode() {
