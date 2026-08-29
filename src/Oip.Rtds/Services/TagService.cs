@@ -44,15 +44,17 @@ public class TagService(TagRepository tagRepository, RtdsRepository rtdsReposito
     /// Writes data to tags
     /// </summary>
     /// <param name="request">The request containing tag data to write</param>
+    /// <param name="cancellationToken">Token to cancel the operation</param>
     /// <returns>Response indicating success or failure</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when an invalid value type is provided</exception>
-    public async Task<WriteDataResponse> WriteData(WriteDataRequest request)
+    public async Task<WriteDataResponse> WriteData(WriteDataRequest request,
+        CancellationToken cancellationToken = default)
     {
         var t = request.Tags.Where(x => x.ValueCase is WriteDataTag.ValueOneofCase.DoubleValue)
             .Select(x => new InsertValueDto<double>(x.Id, TagTypes.Float32, x.Time.ToDateTimeOffset(),
                 x.DoubleValue, TagValueStatus.Good)).ToList();
 
-        await rtdsRepository.InsertValues(t);
+        await rtdsRepository.InsertValues(t, cancellationToken);
         return new WriteDataResponse()
         {
             Success = true

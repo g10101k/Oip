@@ -109,7 +109,8 @@ public class RtdsService(IServiceScopeFactory scopeFactory) : Rtds.Grpc.RtdsServ
     /// <returns>Response indicating success or failure</returns>
     public override async Task<WriteDataResponse> WriteData(WriteDataRequest request, ServerCallContext context)
     {
-        return await scopeFactory.ExecuteAsync<TagService, WriteDataResponse>(x => x.WriteData(request));
+        return await scopeFactory.ExecuteAsync<TagService, WriteDataResponse>(x =>
+            x.WriteData(request, context.CancellationToken));
     }
 
     private string GenerateEventId()

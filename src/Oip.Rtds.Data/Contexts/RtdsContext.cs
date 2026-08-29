@@ -1,3 +1,5 @@
+using System.Data;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Octonica.ClickHouseClient;
 using Oip.Rtds.Grpc;
@@ -11,11 +13,12 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
 {
     private readonly ILogger<RtdsContext> _logger;
     private readonly ClickHouseConnection _connection;
+    private readonly SemaphoreSlim _connectionGate = new(1, 1);
     private bool _disposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RtdsContext"/> class using the provided application settings.
-    /// Opens the ClickHouse connection immediately.
+    /// The connection is opened lazily on the first operation.
     /// </summary>
     /// <param name="appSettings">Application settings containing connection string</param>
     /// <param name="logger">Logger instance for logging operations</param>
@@ -23,28 +26,54 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     {
         _logger = logger;
         _connection = new ClickHouseConnection(appSettings.RtsConnectionString);
-        _connection.Open();
     }
 
     /// <summary>
-    /// Finalizer for releasing unmanaged resources.
+    /// Returns an open ClickHouse connection, opening or reopening it when required.
     /// </summary>
-    ~RtdsContext()
+    /// <param name="cancellationToken">Token to cancel the operation</param>
+    /// <returns>An open connection.</returns>
+    private async Task<ClickHouseConnection> GetOpenConnectionAsync(CancellationToken cancellationToken)
     {
-        Dispose(false);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+        if (_connection.State == ConnectionState.Open)
+            return _connection;
+
+        await _connectionGate.WaitAsync(cancellationToken);
+        try
+        {
+            if (_connection.State == ConnectionState.Broken)
+            {
+                _logger.LogWarning("ClickHouse connection is broken, reopening");
+                await _connection.CloseAsync();
+            }
+
+            if (_connection.State != ConnectionState.Open)
+                await _connection.OpenAsync(cancellationToken);
+
+            return _connection;
+        }
+        finally
+        {
+            _connectionGate.Release();
+        }
     }
 
     /// <summary>
     /// Creates the database if it doesn't exist.
     /// </summary>
     /// <param name="databaseName">The name of the database to create.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public async Task EnsureDatabaseCreatedAsync(string databaseName = "data")
+    public async Task EnsureDatabaseCreatedAsync(string databaseName = "data",
+        CancellationToken cancellationToken = default)
     {
+        var connection = await GetOpenConnectionAsync(cancellationToken);
         var sql = $"CREATE DATABASE IF NOT EXISTS {databaseName}";
-        await using var cmd = _connection.CreateCommand();
+        await using var cmd = connection.CreateCommand();
         cmd.CommandText = sql;
-        await cmd.ExecuteNonQueryAsync();
+        await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
     /// <summary>
@@ -52,75 +81,73 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="valueType">The type of value stored in the tag table.</param>
     /// <param name="statusType">The type of status stored in the tag table.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <exception cref="InvalidOperationException">Thrown when a table with the same name already exists.</exception>
-    public async Task CreateTagTableAsync(string valueType, string statusType)
+    public async Task CreateTagTableAsync(string valueType, string statusType,
+        CancellationToken cancellationToken = default)
     {
-        await EnsureDatabaseCreatedAsync(); // Ensure database exists before creating table
+        await EnsureDatabaseCreatedAsync(cancellationToken: cancellationToken); // Ensure database exists before creating table
+        var connection = await GetOpenConnectionAsync(cancellationToken);
         var sql = string.Format(QueryConstants.CreateIntTagValue, valueType, statusType);
-        await using var cmd = _connection.CreateCommand();
+        await using var cmd = connection.CreateCommand();
         cmd.CommandText = sql;
-        await cmd.ExecuteNonQueryAsync();
+        await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
     /// <summary>
-    /// Inserts a collection of numeric values into the tag table
+    /// Inserts a collection of numeric values into the tag table.
+    /// All values must share the same <see cref="InsertValueDto{T}.ValueType"/>.
     /// </summary>
     /// <param name="values">List of value DTOs containing data to insert</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <returns>Task representing the asynchronous insert operation</returns>
-    public async Task InsertValues(List<InsertValueDto<double>> values)
+    public async Task InsertValues(List<InsertValueDto<double>> values,
+        CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var valuesForQuery = values.Aggregate("",
-                (current, value) =>
-                    current + string.Format(
-                        $",({value.Id}, '{value.Time.UtcDateTime:yyyy-MM-dd HH:mm:ss.fff}', {value.Value}, '{value.Status}')"));
-            valuesForQuery = valuesForQuery.Remove(0, 1);
+        if (values.Count == 0)
+            return;
 
-            var commandText = string.Format(QueryConstants.InsertIntoQuery, values[0].ValueType, valuesForQuery);
-            await using var cmd = _connection.CreateCommand();
-            cmd.CommandText = commandText;
-            await cmd.ExecuteNonQueryAsync();
-        }
-        catch (Exception e)
+        var connection = await GetOpenConnectionAsync(cancellationToken);
+        var commandText = string.Format(QueryConstants.InsertIntoQuery, values[0].ValueType);
+        await using var writer = await connection.CreateColumnWriterAsync(commandText, cancellationToken);
+
+        var valueColumnType = writer.GetFieldType(writer.GetOrdinal("Value"));
+        var ids = new uint[values.Count];
+        var times = new DateTimeOffset[values.Count];
+        var columnValues = new object[values.Count];
+        var statuses = new string[values.Count];
+
+        for (var i = 0; i < values.Count; i++)
         {
-            _logger.LogError(e, "An error occurred while inserting values");
+            var value = values[i];
+            ids[i] = value.Id;
+            times[i] = value.Time;
+            columnValues[i] = Convert.ChangeType(value.Value, valueColumnType, CultureInfo.InvariantCulture);
+            statuses[i] = value.Status.ToString();
         }
+
+        await writer.WriteTableAsync(new object[] { ids, times, columnValues, statuses }, values.Count,
+            cancellationToken);
+        await writer.EndWriteAsync(cancellationToken);
     }
 
     #region IDisposable Support
 
     /// <summary>
-    /// Releases the unmanaged and managed resources used by the <see cref="RtdsContext"/> instance.
+    /// Releases the managed resources used by the <see cref="RtdsContext"/> instance.
     /// </summary>
     public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Releases the managed and optionally unmanaged resources used by the <see cref="RtdsContext"/>.
-    /// </summary>
-    /// <param name="disposing">
-    /// True to release both managed and unmanaged resources; false to release only unmanaged resources.
-    /// </param>
-    private void Dispose(bool disposing)
     {
         if (_disposed)
             return;
 
-        if (disposing)
-        {
-            _connection.Close();
-            _connection.Dispose();
-        }
-
+        _connection.Dispose();
+        _connectionGate.Dispose();
         _disposed = true;
     }
 
     /// <summary>
-    /// Asynchronously releases the unmanaged and managed resources used by the <see cref="RtdsContext"/> instance.
+    /// Asynchronously releases the managed resources used by the <see cref="RtdsContext"/> instance.
     /// </summary>
     /// <returns>A <see cref="ValueTask"/> representing the asynchronous dispose operation.</returns>
     public async ValueTask DisposeAsync()
@@ -128,19 +155,9 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
         if (_disposed)
             return;
 
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-        _disposed = true;
-    }
-
-    /// <summary>
-    /// Performs the core asynchronous logic for releasing managed resources.
-    /// </summary>
-    /// <returns>A <see cref="ValueTask"/> representing the asynchronous dispose operation.</returns>
-    private async ValueTask DisposeAsyncCore()
-    {
-        await _connection.CloseAsync();
         await _connection.DisposeAsync();
+        _connectionGate.Dispose();
+        _disposed = true;
     }
 
     #endregion

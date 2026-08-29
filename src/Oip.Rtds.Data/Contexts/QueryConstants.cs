@@ -16,5 +16,7 @@ ORDER BY (Id, Time);
 ";
 
     public const string InsertIntoQuery = @"
-INSERT INTO data.{0}TagValue (Id, Time, Value, Status) VALUES {1}";
+INSERT INTO data.{0}TagValue (Id, Time, Value, Status)
+SETTINGS async_insert = 1, wait_for_async_insert = 1
+VALUES";
 }

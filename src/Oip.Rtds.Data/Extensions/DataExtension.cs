@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Oip.Base.Settings;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Repositories;
+using Oip.Rtds.Data.Services;
 using Oip.Settings.Enums;
 
 namespace Oip.Rtds.Data.Extensions;
@@ -63,6 +64,9 @@ public static class DataExtension
         services.AddScoped<RtdsContext>();
         services.AddScoped<TagRepository>();
         services.AddScoped<RtdsRepository>();
+        services.AddSingleton<RtdsContextFactory>();
+        services.AddSingleton<RtdsWriteQueue>();
+        services.AddHostedService<RtdsWriterHostedService>();
         return services;
     }
 }

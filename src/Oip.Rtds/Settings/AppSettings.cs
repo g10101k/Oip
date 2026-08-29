@@ -1,5 +1,6 @@
 using Oip.Base.Settings;
 using Oip.Rtds.Data;
+using Oip.Rtds.Data.Settings;
 using Oip.Settings;
 
 namespace Oip.Rtds.Settings;
@@ -11,6 +12,11 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings, IRtdsAppSett
     /// Gets or sets the connection string for the RTD service
     /// </summary>
     public string RtsConnectionString { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the settings of the background writer that batches tag values before inserting them
+    /// </summary>
+    public RtdsWriterSettings RtdsWriter { get; set; } = new();
 
     /// <inheritdoc />
     public OipServicesSettings Services { get; set; } = new();
