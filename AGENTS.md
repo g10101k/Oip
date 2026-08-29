@@ -19,15 +19,13 @@ Examples:
 - create-{object-name}
 - update-{object-name}/{id}
 - delete-{object-name}/{id}
-  where {object-name} name of object (factory, customer, etc.).
+
+where {object-name} name of object (factory, customer, etc.).
 
 ## Error Handling (CRITICAL)
 
-All controllers MUST return errors using ApiExceptionResponse.  
+All controllers MUST return errors using ApiExceptionResponse.
 Location: Oip.Base/Exceptions/ApiExceptionResponse.cs
-
-
-# Codex Instructions
 
 ## Entity Framework Migrations
 
@@ -37,24 +35,8 @@ When working on EF Core models, DbContext configuration, entity mappings use `do
 
 This repository uses ASP.NET `dotnet run` to generate Angular Web API clients.
 
-When working on API contracts, controllers, DTOs, OpenAPI/Swagger/NSwag configuration, or generated Angular API client files:
-
-- Treat generated Angular API clients as build output.
-- Do not manually edit generated Angular client files unless the user explicitly asks.
-- Run the backend generation command from the ASP.NET project directory that contains the responsible `.csproj`.
-- Use Debug configuration by default.
-- Run the generation command outside the sandbox with escalated permissions, because sandboxed execution can prevent the Angular clients from being generated correctly.
-
-Required command:
-
 ```bash
-dotnet run --configuration Debug
-```
-
-When requesting escalation, use a justification like:
-
-```text
-Do you want to run the ASP.NET backend outside the sandbox so Angular Web API clients can be generated correctly?
+dotnet run PROJECTFILE --no-restore -- --GenerateWebClient=true
 ```
 
 Suggested approval prefix:
@@ -68,3 +50,8 @@ After generation:
 - Inspect the generated diff.
 - Summarize which generated Angular client files changed.
 - Do not revert user changes or unrelated working tree changes.
+
+
+# Code comment
+
+Don’t use remarks in xml-commnet for csharp
