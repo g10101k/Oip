@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, isDevMode } from '@angular/core';
 import { L10nService, TranslationsByLang } from '../services/l10n.service';
 import { Observable, of } from 'rxjs';
 import { Translation, TranslationObject } from '@ngx-translate/core';
@@ -23,6 +23,10 @@ import { Translation, TranslationObject } from '@ngx-translate/core';
  * ```
  */
 export function provideTranslations(byLang: TranslationsByLang): Observable<Translation | TranslationObject> {
+  if (isDevMode()) {
+    warnOnKeyMismatch(byLang);
+  }
+
   L10nService.registerTranslations(byLang);
 
   const namespace = namespaceOf(byLang);
@@ -32,4 +36,54 @@ export function provideTranslations(byLang: TranslationsByLang): Observable<Tran
 function namespaceOf(byLang: TranslationsByLang): string | undefined {
   const firstLangDict = Object.values(byLang)[0];
   return firstLangDict ? Object.keys(firstLangDict)[0] : undefined;
+}
+
+/**
+ * Dev-only sanity check: warns when the language dictionaries in `byLang`
+ * don't all declare the same set of keys - a common source of a translated
+ * string silently falling back to its raw key in one language only.
+ */
+function warnOnKeyMismatch(byLang: TranslationsByLang): void {
+  const langs = Object.keys(byLang);
+  if (langs.length < 2) {
+    return;
+  }
+
+  const keysByLang = new Map(langs.map((lang) => [lang, collectKeyPaths(byLang[lang])]));
+  const [baseLang, ...otherLangs] = langs;
+  const baseKeys = keysByLang.get(baseLang)!;
+  const namespace = namespaceOf(byLang) ?? '(unknown namespace)';
+
+  for (const lang of otherLangs) {
+    const langKeys = keysByLang.get(lang)!;
+    const missing = [...baseKeys].filter((key) => !langKeys.has(key));
+    const extra = [...langKeys].filter((key) => !baseKeys.has(key));
+
+    if (missing.length > 0) {
+      console.warn(
+        `[provideTranslations] "${namespace}": "${lang}" is missing keys present in "${baseLang}": ${missing.join(', ')}`
+      );
+    }
+    if (extra.length > 0) {
+      console.warn(
+        `[provideTranslations] "${namespace}": "${lang}" has extra keys not present in "${baseLang}": ${extra.join(', ')}`
+      );
+    }
+  }
+}
+
+/**
+ * Recursively collects dot-joined paths to every leaf value in an object,
+ * e.g. { a: { b: 'x' } } -> ['a.b'].
+ */
+function collectKeyPaths(value: unknown, prefix = '', paths: Set<string> = new Set()): Set<string> {
+  if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+    for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+      collectKeyPaths(child, prefix ? `${prefix}.${key}` : key, paths);
+    }
+  } else {
+    paths.add(prefix);
+  }
+
+  return paths;
 }
