@@ -79,7 +79,7 @@ public class RtdsService(IServiceScopeFactory scopeFactory) : Rtds.Grpc.RtdsServ
     /// <returns>A response containing the retrieved tags.</returns>
     public override Task<GetTagsResponse> GetTags(GetTagsRequest request, ServerCallContext context)
     {
-        return scopeFactory.ExecuteAsync<TagService, GetTagsResponse>(x => x.GetTagsByInterfaceId(request));
+        return scopeFactory.ExecuteAsync<TagService, GetTagsResponse>(x => x.GetTagsByInterfaceId(request, context.CancellationToken));
     }
 
     private async Task BroadcastEvent(EventMessage eventMessage)
@@ -109,7 +109,8 @@ public class RtdsService(IServiceScopeFactory scopeFactory) : Rtds.Grpc.RtdsServ
     /// <returns>Response indicating success or failure</returns>
     public override async Task<WriteDataResponse> WriteData(WriteDataRequest request, ServerCallContext context)
     {
-        return await scopeFactory.ExecuteAsync<TagService, WriteDataResponse>(x => x.WriteData(request));
+        return await scopeFactory.ExecuteAsync<TagService, WriteDataResponse>(x =>
+            x.WriteData(request, context.CancellationToken));
     }
 
     private string GenerateEventId()

@@ -48,27 +48,22 @@ public class TagCacheService
     /// Updates cached tag values with new data from the write request.
     /// </summary>
     /// <param name="request">The write request containing tag values to update.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the request contains an unsupported value type.</exception>
+    /// <exception cref="NotSupportedException">Thrown if a tag has an unsupported value type.</exception>
     public void UpdateValues(WriteDataRequest request)
     {
         foreach (var t in request.Tags)
         {
-            if (TryGetTag(t.Id, out var tag))
-            {
-                switch (t.ValueCase)
-                {
-                    case WriteDataTag.ValueOneofCase.None:
-                        break;
-                    case WriteDataTag.ValueOneofCase.DoubleValue:
-                        tag!.DoubleValue = t.DoubleValue;
-                        break;
-                    case WriteDataTag.ValueOneofCase.Int32Value:
-                        tag!.Int32Value = t.Int32Value;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
+            if (!TryGetTag(t.Id, out var tag) || tag is null)
+                continue;
+
+            var value = t.GetValue();
+            if (value is null)
+                continue;
+
+            // The cached value is kept in the declared type of the tag, so a later comparison against
+            // it does not depend on which oneof case the writer happened to use.
+            tag.SetValue(tag.ValueType, value);
+            tag.ValueTime = t.Time;
         }
     }
 

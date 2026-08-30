@@ -38,15 +38,40 @@ message GetTagsRequest {
   uint32 interface_id = 1;
 }
 
-// Defines the data types supported for tags
+// Defines the data types supported for tags. Every member maps onto a ClickHouse column type,
+// see Oip.Rtds.Base.TagTypeMap for the mapping. Existing numbers are kept stable because they are
+// persisted in the tag metadata database.
 enum TagTypes {
+  // 32-bit floating point, ClickHouse Float32.
   FLOAT32 = 0;
+  // 64-bit floating point, ClickHouse Float64.
   FLOAT64 = 1;
+  // 16-bit signed integer, ClickHouse Int16.
   INT16 = 2;
+  // 32-bit signed integer, ClickHouse Int32.
   INT32 = 3;
+  // Index into a digital state set, stored as ClickHouse UInt8.
   DIGITAL = 4;
+  // Text value, ClickHouse String.
   STRING = 5;
+  // Binary value, stored as ClickHouse String.
   BLOB = 6;
+  // 8-bit signed integer, ClickHouse Int8.
+  INT8 = 7;
+  // 64-bit signed integer, ClickHouse Int64.
+  INT64 = 8;
+  // 8-bit unsigned integer, ClickHouse UInt8.
+  UINT8 = 9;
+  // 16-bit unsigned integer, ClickHouse UInt16.
+  UINT16 = 10;
+  // 32-bit unsigned integer, ClickHouse UInt32.
+  UINT32 = 11;
+  // 64-bit unsigned integer, ClickHouse UInt64.
+  UINT64 = 12;
+  // Boolean value, ClickHouse Bool.
+  BOOLEAN = 13;
+  // Point in time with millisecond resolution, ClickHouse DateTime64(3, 'UTC').
+  DATE_TIME = 14;
 }
 
 // Represents the status of a tag value.
@@ -87,9 +112,18 @@ message TagResponse {
   optional string error_calculation = 15;
   optional string value_calculation = 16;
   google.protobuf.Timestamp valueTime = 17;
+  // The last known value. The case in use is the one that matches value_type.
   oneof value {
     double double_value = 18;
     int32 int32_value = 19;
+    float float_value = 20;
+    int64 int64_value = 21;
+    uint32 uint32_value = 22;
+    uint64 uint64_value = 23;
+    bool bool_value = 24;
+    string string_value = 25;
+    bytes bytes_value = 26;
+    google.protobuf.Timestamp timestamp_value = 27;
   };
 }
 
@@ -101,9 +135,18 @@ message WriteDataTag {
   uint32 id = 1;
   google.protobuf.Timestamp time = 2;
   TagValueStatus status = 3;
+  // The value being written. The case in use is the one that matches the value type of the tag.
   oneof value {
     double double_value = 4;
     int32 int32_value = 5;
+    float float_value = 6;
+    int64 int64_value = 7;
+    uint32 uint32_value = 8;
+    uint64 uint64_value = 9;
+    bool bool_value = 10;
+    string string_value = 11;
+    bytes bytes_value = 12;
+    google.protobuf.Timestamp timestamp_value = 13;
   };
 }
 

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.Loader;
+using Oip.Rtds.Grpc;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -80,6 +81,11 @@ public class CompiledFormula : IDisposable
     /// </summary>
     public Type FormulaType { get; init; }
 
+    /// <summary>
+    /// Gets the tag type the formula was compiled for.
+    /// </summary>
+    public TagTypes ValueType { get; init; }
+
     private MethodInfo ValueMethod { get; init; }
     private MethodInfo TimeMethod { get; init; }
     private MethodInfo ErrorMethod { get; init; }
@@ -87,11 +93,11 @@ public class CompiledFormula : IDisposable
     /// <summary>
     /// Evaluates the value formula with the provided parameters.
     /// </summary>
-    /// <param name="value">The input value for the formula.</param>
+    /// <param name="value">The input value, converted to the tag type before the call.</param>
     /// <param name="time">The timestamp for the calculation.</param>
     /// <returns>The calculated result.</returns>
-    public object EvaluateValue(object value, DateTimeOffset time) =>
-        ValueMethod.Invoke(null, [value, time])!;
+    public object EvaluateValue(object? value, DateTimeOffset time) =>
+        ValueMethod.Invoke(null, [TagTypeMap.ConvertValue(value, ValueType), time])!;
 
     /// <summary>
     /// Evaluates the time formula with the provided parameters.
@@ -99,8 +105,8 @@ public class CompiledFormula : IDisposable
     /// <param name="value">The input value for the formula.</param>
     /// <param name="time">The timestamp for the calculation.</param>
     /// <returns>The calculated time result.</returns>
-    public DateTimeOffset EvaluateTimeValue(object value, DateTimeOffset time) =>
-        (DateTimeOffset)TimeMethod.Invoke(null, [value, time])!;
+    public DateTimeOffset EvaluateTimeValue(object? value, DateTimeOffset time) =>
+        (DateTimeOffset)TimeMethod.Invoke(null, [TagTypeMap.ConvertValue(value, ValueType), time])!;
 
     /// <summary>
     /// Evaluates the error formula with the provided parameters.
@@ -109,7 +115,7 @@ public class CompiledFormula : IDisposable
     /// <param name="time">The timestamp for the calculation.</param>
     /// <returns>The calculated error value.</returns>
     public double EvaluateErrorValue(object? value, DateTimeOffset time) =>
-        Convert.ToDouble(ErrorMethod.Invoke(null, [value, time])!);
+        Convert.ToDouble(ErrorMethod.Invoke(null, [TagTypeMap.ConvertValue(value, ValueType), time])!);
 
     /// <summary>
     /// Disposes of the compiled formula resources.
@@ -130,8 +136,10 @@ public class CompiledFormula : IDisposable
     /// <param name="valueMethod">The value calculation method.</param>
     /// <param name="timeMethod">The time calculation method.</param>
     /// <param name="errorMethod">The error calculation method.</param>
+    /// <param name="valueType">The tag type the formula was compiled for.</param>
     public CompiledFormula(uint id, string hash, AssemblyLoadContext alc, Assembly assembly,
-        Type formulaType, MethodInfo valueMethod, MethodInfo timeMethod, MethodInfo errorMethod)
+        Type formulaType, MethodInfo valueMethod, MethodInfo timeMethod, MethodInfo errorMethod,
+        TagTypes valueType)
     {
         Id = id;
         Hash = hash;
@@ -141,6 +149,7 @@ public class CompiledFormula : IDisposable
         ValueMethod = valueMethod;
         TimeMethod = timeMethod;
         ErrorMethod = errorMethod;
+        ValueType = valueType;
     }
 }
 

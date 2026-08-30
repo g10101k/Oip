@@ -54,15 +54,41 @@ public class CompressService(TagCacheService tagCacheService, ILogger<CompressSe
 
         var lastTime = tag.ValueTime.ToDateTimeOffset();
         var deltaTime = calculateResult.Time - lastTime;
-        var deltaValue = Math.Abs(Convert.ToDouble(tag.DoubleValue, CultureInfo.InvariantCulture) -
-                                  Convert.ToDouble(calculateResult.Value));
 
         // Skip if the time difference is too small
         if (deltaTime.TotalMilliseconds < tag.CompressionMinTime)
             return false;
 
-        // Write if the time difference exceeds the maximum or the value change exceeds the error threshold
-        return deltaTime.TotalMilliseconds > tag.CompressionMaxTime || deltaValue > calculateResult.Error;
+        if (deltaTime.TotalMilliseconds > tag.CompressionMaxTime)
+            return true;
+
+        return HasSignificantChange(calculateResult, tag);
+    }
+
+    /// <summary>
+    /// Determines whether the value has moved far enough from the last stored one to be worth writing.
+    /// Numeric tags use the deadband of the calculated error, the remaining types have no meaningful
+    /// distance, so any change counts.
+    /// </summary>
+    /// <param name="calculateResult">The calculated result to check</param>
+    /// <param name="tag">The tag associated with the result</param>
+    /// <returns><c>true</c> when the value changed significantly, <c>false</c> otherwise</returns>
+    private static bool HasSignificantChange(CalculateResult calculateResult, TagResponse tag)
+    {
+        var lastValue = tag.GetValue();
+
+        if (!TagTypeMap.IsNumeric(tag.ValueType))
+        {
+            var last = TagTypeMap.ConvertValue(lastValue, tag.ValueType);
+            var current = TagTypeMap.ConvertValue(calculateResult.Value, tag.ValueType);
+            return last is byte[] lastBytes && current is byte[] currentBytes
+                ? !lastBytes.SequenceEqual(currentBytes)
+                : !Equals(last, current);
+        }
+
+        var deltaValue = Math.Abs(Convert.ToDouble(lastValue, CultureInfo.InvariantCulture) -
+                                  Convert.ToDouble(calculateResult.Value, CultureInfo.InvariantCulture));
+        return deltaValue > calculateResult.Error;
     }
 
     /// <summary>
@@ -73,11 +99,12 @@ public class CompressService(TagCacheService tagCacheService, ILogger<CompressSe
     /// <returns>A <see cref="WriteDataTag"/> containing the prepared data</returns>
     private static WriteDataTag PrepareDataSend(CalculateResult calculateResult, TagResponse tagResponse)
     {
-        return new WriteDataTag
+        var writeDataTag = new WriteDataTag
         {
             Id = tagResponse.Id,
-            DoubleValue = (double)calculateResult.Value,
             Time = Timestamp.FromDateTimeOffset(calculateResult.Time)
         };
+        writeDataTag.SetValue(tagResponse.ValueType, calculateResult.Value);
+        return writeDataTag;
     }
 }

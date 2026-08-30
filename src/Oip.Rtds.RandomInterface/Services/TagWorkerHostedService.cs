@@ -29,8 +29,10 @@ public class TagWorkerService(
         if (tags.Count == 0)
             return;
 
+        // The last known value is fed back in as both the formula input and the previous value,
+        // in whatever type the tag was declared with.
         var result = tags
-            .Select(tag => formulaManager.Evaluate(tag.Id, double.MaxValue, tag.DoubleValue, DateTimeOffset.Now))
+            .Select(tag => formulaManager.Evaluate(tag.Id, tag.GetValue(), tag.GetValue(), DateTimeOffset.Now))
             .ToArray();
 
         await bufferWriterService.WriteToService(result);

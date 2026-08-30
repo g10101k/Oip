@@ -81,7 +81,9 @@ public class FormulaManager : IDisposable
     private CompiledFormula CompileSingleFormula(uint id, TagTypes tagTypes, string valueFormula, string timeFormula,
         string errorFormula)
     {
-        var hash = ComputeSha256($"{valueFormula}{timeFormula}{errorFormula}");
+        // The tag type is part of the key: the same formula text compiles into a different assembly
+        // for a different value type, so keying on the text alone would hand out a mistyped formula.
+        var hash = ComputeSha256($"{tagTypes}|{valueFormula}|{timeFormula}|{errorFormula}");
 
         if (string.IsNullOrWhiteSpace(valueFormula.Trim()))
             valueFormula = "return value;";
@@ -99,7 +101,7 @@ public class FormulaManager : IDisposable
             {
                 return new CompiledFormula(id, cached.Hash, cached.LoadContext, cached.Assembly,
                     cached.FormulaType, GetMethod(cached, "ValueFormula"), GetMethod(cached, "TimeFormula"),
-                    GetMethod(cached, "ErrorFormula"));
+                    GetMethod(cached, "ErrorFormula"), cached.ValueType);
             }
         }
         finally
@@ -110,7 +112,7 @@ public class FormulaManager : IDisposable
         // If not, compile it.
         var formulasNamespace = "Oip.Rtds.Base.DynamicFormulas";
         var className = $"Formula_{id}";
-        var typ = GetCsharpType(tagTypes);
+        var typ = TagTypeMap.GetCsharpTypeName(tagTypes);
 
 
         string source = $@"
@@ -147,7 +149,7 @@ namespace {formulasNamespace}
             }}
         }}
 
-        public static {typ} ErrorFormula({typ} value, DateTimeOffset time)
+        public static double ErrorFormula({typ} value, DateTimeOffset time)
         {{
             try
             {{
@@ -203,7 +205,8 @@ namespace {formulasNamespace}
                 id, hash, alc, assembly, type,
                 GetMethod(type, "ValueFormula"),
                 GetMethod(type, "TimeFormula"),
-                GetMethod(type, "ErrorFormula")
+                GetMethod(type, "ErrorFormula"),
+                tagTypes
             );
 
             _lock.EnterWriteLock();
@@ -242,7 +245,7 @@ namespace {formulasNamespace}
     /// <param name="time">Timestamp to use in time-based calculations</param>
     /// <returns>Calculation result containing computed value, time, and error</returns>
     /// <exception cref="KeyNotFoundException">Thrown when formula with specified id is not found</exception>
-    public CalculateResult Evaluate(uint id, object value, object? prevValue, DateTimeOffset time)
+    public CalculateResult Evaluate(uint id, object? value, object? prevValue, DateTimeOffset time)
     {
         _lock.EnterReadLock();
         try
@@ -294,29 +297,5 @@ namespace {formulasNamespace}
         }
 
         _lock.Dispose();
-    }
-
-
-    private string GetCsharpType(TagTypes tagTypes)
-    {
-        switch (tagTypes)
-        {
-            case TagTypes.Float32:
-                return "double";
-            case TagTypes.Float64:
-                return "double";
-            case TagTypes.Int16:
-                return "short";
-            case TagTypes.Int32:
-                return "int";
-            case TagTypes.Digital:
-                return "bool";
-            case TagTypes.String:
-                return "string";
-            case TagTypes.Blob:
-                return "byte[]";
-            default:
-                throw new ArgumentOutOfRangeException(nameof(tagTypes), tagTypes, null);
-        }
     }
 }

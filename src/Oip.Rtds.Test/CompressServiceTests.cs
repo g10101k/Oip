@@ -78,6 +78,7 @@ public class CompressServiceTests
         var tag1 = new TagResponse
         {
             Id = 1,
+            ValueType = TagTypes.Float64,
             Compressing = false,
             DoubleValue = 50.0,
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMinutes(-1))
@@ -86,6 +87,7 @@ public class CompressServiceTests
         var tag2 = new TagResponse
         {
             Id = 2,
+            ValueType = TagTypes.Float64,
             Compressing = false,
             DoubleValue = 150.0,
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMinutes(-1))
@@ -120,6 +122,7 @@ public class CompressServiceTests
         var tag = new TagResponse
         {
             Id = 1,
+            ValueType = TagTypes.Float64,
             Compressing = true,
             CompressionMinTime = 1000, // 1 second
             CompressionMaxTime = 5000, // 5 seconds
@@ -153,6 +156,7 @@ public class CompressServiceTests
         var tag = new TagResponse
         {
             Id = 1,
+            ValueType = TagTypes.Float64,
             Compressing = true,
             CompressionMinTime = 1000,
             CompressionMaxTime = 5000,
@@ -188,6 +192,7 @@ public class CompressServiceTests
         var tag = new TagResponse
         {
             Id = 1,
+            ValueType = TagTypes.Float64,
             Compressing = true,
             CompressionMinTime = 1000,
             CompressionMaxTime = 5000,
@@ -223,6 +228,7 @@ public class CompressServiceTests
         var tag = new TagResponse
         {
             Id = 1,
+            ValueType = TagTypes.Float64,
             Compressing = true,
             CompressionMinTime = 1000,
             CompressionMaxTime = 5000,
@@ -259,6 +265,7 @@ public class CompressServiceTests
         var tag2 = new TagResponse
         {
             Id = 2,
+            ValueType = TagTypes.Float64,
             Compressing = false,
             DoubleValue = 150.0,
             ValueTime = Timestamp.FromDateTimeOffset(now.AddMinutes(-1))
@@ -312,6 +319,7 @@ public class CompressServiceTests
         var tag = new TagResponse
         {
             Id = 1,
+            ValueType = TagTypes.Float64,
             Compressing = compressing,
             CompressionMinTime = compressionMinTime,
             CompressionMaxTime = compressionMaxTime,

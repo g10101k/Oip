@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Services;
+using Oip.Rtds.Base;
 using Oip.Rtds.Data.Contexts;
 using Oip.Rtds.Data.Dtos;
 using Oip.Rtds.Data.Entities;
@@ -67,11 +68,9 @@ public class TagRepository
             });
 
             await _rtdsMetaContext.SaveChangesAsync();
-            var tableName = $"{tagEntity.Entity.Id:D6}";
-            var valueType = GetClickHouseTypeFromTagType(createTag.ValueType);
             var statusType = GenerateClickHouseEnum8<TagValueStatus>();
 
-            await _rtdsContext.CreateTagTableAsync(valueType, statusType);
+            await _rtdsContext.CreateTagTableAsync(createTag.ValueType, statusType);
             await _rtdsMetaContext.Database.CommitTransactionAsync();
         }
         catch (Exception)
@@ -112,29 +111,6 @@ public class TagRepository
                 ErrorCalculation = x.ErrorCalculation,
             })
             .ToList();
-    }
-
-    /// <summary>
-    /// Converts a <see cref="TagTypes"/> enum value to the corresponding ClickHouse data type
-    /// </summary>
-    /// <param name="pointType">The tag type to convert</param>
-    /// <returns>The ClickHouse type name as string</returns>
-    /// <exception cref="NotSupportedException">
-    /// Thrown when the specified tag type is not supported
-    /// </exception>
-    private static string GetClickHouseTypeFromTagType(TagTypes pointType)
-    {
-        return pointType switch
-        {
-            TagTypes.Float32 => "Float32",
-            TagTypes.Float64 => "Float64",
-            TagTypes.Int16 => "Int32",
-            TagTypes.Int32 => "Int32",
-            TagTypes.Digital => "UInt8",
-            TagTypes.String => "String",
-            TagTypes.Blob => "String",
-            _ => throw new NotSupportedException($"Unsupported TagType: {pointType}")
-        };
     }
 
     /// <summary>
@@ -181,10 +157,34 @@ public class TagRepository
     /// Retrieves tags associated with a specific interface ID.
     /// </summary>
     /// <param name="requestInterfaceId">The ID of the interface to filter tags by.</param>
-    /// <returns>An enumerable collection of <see cref="TagEntity"/> objects matching the specified interface ID.</returns>
-    public IEnumerable<TagEntity> GetTagsByInterfaceId(uint requestInterfaceId)
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>A list of <see cref="TagEntity"/> objects matching the specified interface ID.</returns>
+    public Task<List<TagEntity>> GetTagsByInterfaceIdAsync(uint requestInterfaceId,
+        CancellationToken cancellationToken = default)
     {
         return _rtdsMetaContext.Tags
-            .Where(x => x.InterfaceId == requestInterfaceId && x.Enabled).AsNoTracking();
+            .Where(x => x.InterfaceId == requestInterfaceId && x.Enabled)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Retrieves the declared value type of each of the given tags.
+    /// The write path needs it because the type a value has to be stored as is the one the tag was declared
+    /// with, not the one the value happens to arrive in.
+    /// </summary>
+    /// <param name="tagIds">Identifiers of the tags to look up.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>The value type of every tag that exists, keyed by tag id.</returns>
+    public async Task<Dictionary<uint, TagTypes>> GetValueTypesAsync(IReadOnlyCollection<uint> tagIds,
+        CancellationToken cancellationToken = default)
+    {
+        if (tagIds.Count == 0)
+            return new Dictionary<uint, TagTypes>();
+
+        return await _rtdsMetaContext.Tags
+            .Where(x => tagIds.Contains(x.Id))
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Id, x => x.ValueType, cancellationToken);
     }
 }
