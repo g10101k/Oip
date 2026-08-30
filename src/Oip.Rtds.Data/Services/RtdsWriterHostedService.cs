@@ -83,7 +83,7 @@ public sealed class RtdsWriterHostedService : BackgroundService
     /// </summary>
     /// <param name="stoppingToken">Token signalled when the host is shutting down.</param>
     /// <returns>The values to write.</returns>
-    private async Task<List<InsertValueDto<double>>> ReadBatchAsync(CancellationToken stoppingToken)
+    private async Task<List<InsertValueDto>> ReadBatchAsync(CancellationToken stoppingToken)
     {
         var batch = ReadBatch();
         if (batch.Count == 0 || batch.Count >= _settings.MaxBatchSize)
@@ -111,9 +111,9 @@ public sealed class RtdsWriterHostedService : BackgroundService
     /// Takes the values currently available in the queue, up to the configured batch size.
     /// </summary>
     /// <returns>The values to write.</returns>
-    private List<InsertValueDto<double>> ReadBatch()
+    private List<InsertValueDto> ReadBatch()
     {
-        var batch = new List<InsertValueDto<double>>(Math.Min(_settings.MaxBatchSize, 1024));
+        var batch = new List<InsertValueDto>(Math.Min(_settings.MaxBatchSize, 1024));
         while (batch.Count < _settings.MaxBatchSize && _queue.Reader.TryRead(out var value))
             batch.Add(value);
         return batch;
@@ -127,7 +127,7 @@ public sealed class RtdsWriterHostedService : BackgroundService
     /// <param name="batch">The values to write.</param>
     /// <param name="stoppingToken">Token signalled when the host is shutting down.</param>
     /// <returns>Task representing the asynchronous write operation.</returns>
-    private async Task FlushAsync(List<InsertValueDto<double>> batch, CancellationToken stoppingToken)
+    private async Task FlushAsync(List<InsertValueDto> batch, CancellationToken stoppingToken)
     {
         foreach (var group in batch.GroupBy(value => (value.ValueType, Partition: GetPartition(value.Time))))
             await WriteWithRetryAsync(group.ToList(), stoppingToken);
@@ -150,7 +150,7 @@ public sealed class RtdsWriterHostedService : BackgroundService
     /// <param name="values">The values to write.</param>
     /// <param name="stoppingToken">Token signalled when the host is shutting down.</param>
     /// <returns>Task representing the asynchronous write operation.</returns>
-    private async Task WriteWithRetryAsync(List<InsertValueDto<double>> values, CancellationToken stoppingToken)
+    private async Task WriteWithRetryAsync(List<InsertValueDto> values, CancellationToken stoppingToken)
     {
         // The token stays the same across attempts. A failure can mean the server wrote the block and only the
         // response was lost, so without it a retry would insert the same values a second time.

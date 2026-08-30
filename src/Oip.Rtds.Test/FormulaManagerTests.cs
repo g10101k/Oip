@@ -12,10 +12,10 @@ public class FormulaManagerTests : IDisposable
     [Test]
     public void UpdateFormulasTest()
     {
-        _manager.UpdateFormulas(2, TagTypes.Float32, "return new Random().Next(4, 10) * value;",
+        _manager.UpdateFormulas(2, TagTypes.Float64, "return new Random().Next(4, 10) * value;",
             "return DateTimeOffset.Now;",
             "return new Random().Next(0, 10);");
-        _manager.UpdateFormulas(3, TagTypes.Float32, "", "", "");
+        _manager.UpdateFormulas(3, TagTypes.Float64, "", "", "");
 
         var r1 = _manager.Evaluate(3, 4, null, DateTimeOffset.Now);
         var r2 = _manager.Evaluate(2, 4, null, DateTimeOffset.Now);
@@ -33,7 +33,7 @@ public class FormulaManagerTests : IDisposable
         var timeFormula = "return time.AddHours(1);";
         var errorFormula = "return 0.1;";
 
-        _manager.UpdateFormulas(id, TagTypes.Float32, valueFormula, timeFormula, errorFormula);
+        _manager.UpdateFormulas(id, TagTypes.Float64, valueFormula, timeFormula, errorFormula);
 
         // act
         var now = DateTimeOffset.UtcNow;
@@ -49,7 +49,7 @@ public class FormulaManagerTests : IDisposable
     public void UpdateFormulas_ShouldUseDefaultFormulas_WhenEmptyStrings()
     {
         uint id = 2;
-        _manager.UpdateFormulas(id, TagTypes.Float32, "", "", "");
+        _manager.UpdateFormulas(id, TagTypes.Float64, "", "", "");
 
         var now = DateTimeOffset.UtcNow;
         var inputValue = 123.45;
@@ -70,8 +70,8 @@ public class FormulaManagerTests : IDisposable
         string time = "return time;";
         string err = "return 0.0;";
 
-        _manager.UpdateFormulas(id1, TagTypes.Float32, val, time, err);
-        _manager.UpdateFormulas(id2, TagTypes.Float32, val, time, err); // Same code; it should be placed into the cache.
+        _manager.UpdateFormulas(id1, TagTypes.Float64, val, time, err);
+        _manager.UpdateFormulas(id2, TagTypes.Float64, val, time, err); // Same code; it should be placed into the cache.
 
         var r1 = _manager.Evaluate(id1, 1, null, DateTimeOffset.Now);
         var r2 = _manager.Evaluate(id2, 1, null, DateTimeOffset.Now);
@@ -97,7 +97,7 @@ public class FormulaManagerTests : IDisposable
         string errFormula = "return 0.0;";
 
         var ex = Assert.Throws<InvalidOperationException>(() =>
-            _manager.UpdateFormulas(id, TagTypes.Float32, badValueFormula, timeFormula, errFormula));
+            _manager.UpdateFormulas(id, TagTypes.Float64, badValueFormula, timeFormula, errFormula));
 
         Assert.That(ex?.Message, Does.Contain("Compilation failed"));
     }
@@ -127,7 +127,7 @@ namespace Test
     {
         // Compile the formula and access CompiledFormula directly.
         uint id = 42;
-        _manager.UpdateFormulas(id, TagTypes.Float32, "return value * 3;", "return time;", "return 0.5;");
+        _manager.UpdateFormulas(id, TagTypes.Float64, "return value * 3;", "return time;", "return 0.5;");
         var now = DateTimeOffset.Now;
         var result = _manager.Evaluate(id, 2.0f, null, now);
 
@@ -139,10 +139,52 @@ namespace Test
     {
         // Compile the formula and access CompiledFormula directly.
         uint id = 43;
-        _manager.UpdateFormulas(id, TagTypes.Float32, "return OipRandom.Sinusoid(60, 100);", "return time;",
+        _manager.UpdateFormulas(id, TagTypes.Float64, "return OipRandom.Sinusoid(60, 100);", "return time;",
             "return 0.5;");
         var now = DateTimeOffset.Now;
         _ = _manager.Evaluate(id, 2, null, now);
+    }
+
+    [Test]
+    public void UpdateFormulas_ShouldCompileForEveryTagType()
+    {
+        uint id = 100;
+        foreach (var tagType in Enum.GetValues<TagTypes>())
+        {
+            var currentId = id++;
+            Assert.DoesNotThrow(() => _manager.UpdateFormulas(currentId, tagType, "", "", ""),
+                $"default formulas of {tagType}");
+        }
+    }
+
+    [TestCase(TagTypes.Int32, "return value * 2;", 21, 42)]
+    [TestCase(TagTypes.Int16, "return (short)(value + 1);", 7, (short)8)]
+    [TestCase(TagTypes.Uint8, "return (byte)(value + 1);", 7, (byte)8)]
+    [TestCase(TagTypes.Boolean, "return !value;", true, false)]
+    [TestCase(TagTypes.String, "return value + \"!\";", "hi", "hi!")]
+    public void Evaluate_ShouldReturnTheValueInTheTagType(TagTypes tagType, string valueFormula, object input,
+        object expected)
+    {
+        uint id = 200;
+        _manager.UpdateFormulas(id, tagType, valueFormula, "", "");
+
+        var result = _manager.Evaluate(id, input, null, DateTimeOffset.UtcNow);
+
+        Assert.That(result.Value, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void UpdateFormulas_ShouldNotReuseACachedFormula_OfAnotherTagType()
+    {
+        uint float64Id = 300;
+        uint int32Id = 301;
+        const string valueFormula = "return value + 1;";
+
+        _manager.UpdateFormulas(float64Id, TagTypes.Float64, valueFormula, "", "");
+        _manager.UpdateFormulas(int32Id, TagTypes.Int32, valueFormula, "", "");
+
+        Assert.That(_manager.Evaluate(float64Id, 1.5, null, DateTimeOffset.UtcNow).Value, Is.EqualTo(2.5));
+        Assert.That(_manager.Evaluate(int32Id, 1, null, DateTimeOffset.UtcNow).Value, Is.EqualTo(2));
     }
 
     public void Dispose()

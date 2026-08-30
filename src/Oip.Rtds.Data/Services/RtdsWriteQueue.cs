@@ -9,7 +9,7 @@ namespace Oip.Rtds.Data.Services;
 /// </summary>
 public sealed class RtdsWriteQueue
 {
-    private readonly Channel<InsertValueDto<double>> _channel;
+    private readonly Channel<InsertValueDto> _channel;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RtdsWriteQueue"/> class.
@@ -18,7 +18,7 @@ public sealed class RtdsWriteQueue
     public RtdsWriteQueue(IRtdsAppSettings appSettings)
     {
         var settings = appSettings.RtdsWriter;
-        _channel = Channel.CreateBounded<InsertValueDto<double>>(
+        _channel = Channel.CreateBounded<InsertValueDto>(
             new BoundedChannelOptions(settings.QueueCapacity)
             {
                 SingleReader = true,
@@ -30,7 +30,7 @@ public sealed class RtdsWriteQueue
     /// <summary>
     /// Gets the reader used by the background writer to drain the queue.
     /// </summary>
-    public ChannelReader<InsertValueDto<double>> Reader => _channel.Reader;
+    public ChannelReader<InsertValueDto> Reader => _channel.Reader;
 
     /// <summary>
     /// Enqueues values for writing. Completes when all values are accepted by the queue,
@@ -39,7 +39,7 @@ public sealed class RtdsWriteQueue
     /// <param name="values">Values to enqueue.</param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <returns>Task representing the asynchronous enqueue operation.</returns>
-    public async Task EnqueueAsync(IReadOnlyList<InsertValueDto<double>> values,
+    public async Task EnqueueAsync(IReadOnlyList<InsertValueDto> values,
         CancellationToken cancellationToken = default)
     {
         for (var i = 0; i < values.Count; i++)

@@ -1,7 +1,8 @@
+using System.Collections.Concurrent;
 using System.Data;
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Octonica.ClickHouseClient;
+using Oip.Rtds.Base;
 using Oip.Rtds.Grpc;
 
 namespace Oip.Rtds.Data.Contexts;
@@ -11,7 +12,14 @@ namespace Oip.Rtds.Data.Contexts;
 /// </summary>
 public sealed class RtdsContext : IDisposable, IAsyncDisposable
 {
+    /// <summary>
+    /// Databases already created by this process, keyed by connection string and database name.
+    /// <c>CREATE DATABASE IF NOT EXISTS</c> is idempotent but still costs a round trip on every tag creation.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, bool> CreatedDatabases = new();
+
     private readonly ILogger<RtdsContext> _logger;
+    private readonly string _connectionString;
     private readonly ClickHouseConnection _connection;
     private readonly SemaphoreSlim _connectionGate = new(1, 1);
     private bool _disposed;
@@ -25,6 +33,7 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     public RtdsContext(IRtdsAppSettings appSettings, ILogger<RtdsContext> logger)
     {
         _logger = logger;
+        _connectionString = appSettings.RtsConnectionString;
         _connection = new ClickHouseConnection(appSettings.RtsConnectionString);
     }
 
@@ -61,7 +70,7 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
-    /// Creates the database if it doesn't exist.
+    /// Creates the database if it doesn't exist. Skipped once this process has created it.
     /// </summary>
     /// <param name="databaseName">The name of the database to create.</param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
@@ -69,27 +78,32 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     public async Task EnsureDatabaseCreatedAsync(string databaseName = "data",
         CancellationToken cancellationToken = default)
     {
+        var cacheKey = $"{_connectionString}|{databaseName}";
+        if (CreatedDatabases.ContainsKey(cacheKey))
+            return;
+
         var connection = await GetOpenConnectionAsync(cancellationToken);
         var sql = $"CREATE DATABASE IF NOT EXISTS {databaseName}";
         await using var cmd = connection.CreateCommand();
         cmd.CommandText = sql;
         await cmd.ExecuteNonQueryAsync(cancellationToken);
+        CreatedDatabases[cacheKey] = true;
     }
 
     /// <summary>
-    /// Asynchronously creates a new tag table in the RTDS using ClickHouse.
+    /// Asynchronously creates the value table of the given tag type, if it does not exist yet.
     /// </summary>
-    /// <param name="valueType">The type of value stored in the tag table.</param>
+    /// <param name="tagType">The type of the values stored in the table.</param>
     /// <param name="statusType">The type of status stored in the tag table.</param>
-    /// <param name="valueCodec">Compression codec expression for the Value column, e.g. <c>CODEC(Gorilla, ZSTD(1))</c>.</param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
-    /// <exception cref="InvalidOperationException">Thrown when a table with the same name already exists.</exception>
-    public async Task CreateTagTableAsync(string valueType, string statusType, string valueCodec,
+    public async Task CreateTagTableAsync(TagTypes tagType, string statusType,
         CancellationToken cancellationToken = default)
     {
         await EnsureDatabaseCreatedAsync(cancellationToken: cancellationToken); // Ensure database exists before creating table
         var connection = await GetOpenConnectionAsync(cancellationToken);
-        var sql = string.Format(QueryConstants.CreateIntTagValue, valueType, statusType, valueCodec,
+        var tableSuffix = TagTypeMap.GetTableSuffix(tagType);
+        var sql = string.Format(QueryConstants.CreateTagValueTable, tableSuffix,
+            TagTypeMap.GetClickHouseType(tagType), statusType, TagTypeMap.GetValueCodec(tagType),
             QueryConstants.DeduplicationWindow);
         await using var cmd = connection.CreateCommand();
         cmd.CommandText = sql;
@@ -97,14 +111,14 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
 
         // The table may predate insert deduplication, in which case CREATE IF NOT EXISTS left the setting disabled.
         await using var alterCmd = connection.CreateCommand();
-        alterCmd.CommandText = string.Format(QueryConstants.EnableDeduplication, valueType,
+        alterCmd.CommandText = string.Format(QueryConstants.EnableDeduplication, tableSuffix,
             QueryConstants.DeduplicationWindow);
         await alterCmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
     /// <summary>
-    /// Inserts a collection of numeric values into the tag table.
-    /// All values must share the same <see cref="InsertValueDto{T}.ValueType"/>.
+    /// Inserts a collection of values into the tag value table.
+    /// All values must share the same <see cref="InsertValueDto.ValueType"/>.
     /// </summary>
     /// <param name="values">List of value DTOs containing data to insert</param>
     /// <param name="deduplicationToken">
@@ -113,20 +127,23 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// </param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <returns>Task representing the asynchronous insert operation</returns>
-    public async Task InsertValues(List<InsertValueDto<double>> values, string deduplicationToken,
+    public async Task InsertValues(List<InsertValueDto> values, string deduplicationToken,
         CancellationToken cancellationToken = default)
     {
         if (values.Count == 0)
             return;
 
         var connection = await GetOpenConnectionAsync(cancellationToken);
-        var commandText = string.Format(QueryConstants.InsertIntoQuery, values[0].ValueType, deduplicationToken);
+        var commandText = string.Format(QueryConstants.InsertIntoQuery,
+            TagTypeMap.GetTableSuffix(values[0].ValueType), deduplicationToken);
         await using var writer = await connection.CreateColumnWriterAsync(commandText, cancellationToken);
 
         var valueColumnType = writer.GetFieldType(writer.GetOrdinal("Value"));
         var ids = new uint[values.Count];
         var times = new DateTimeOffset[values.Count];
-        var columnValues = new object[values.Count];
+        // A typed array rather than object[]: the column writer needs the values in the type of the column,
+        // and a mismatch has to fail here instead of being coerced silently.
+        var columnValues = Array.CreateInstance(valueColumnType, values.Count);
         var statuses = new string[values.Count];
 
         for (var i = 0; i < values.Count; i++)
@@ -134,7 +151,7 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
             var value = values[i];
             ids[i] = value.Id;
             times[i] = value.Time;
-            columnValues[i] = Convert.ChangeType(value.Value, valueColumnType, CultureInfo.InvariantCulture);
+            columnValues.SetValue(TagTypeMap.ConvertTo(value.Value, valueColumnType), i);
             statuses[i] = value.Status.ToString();
         }
 
@@ -176,12 +193,13 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
 }
 
 /// <summary>
-/// Represents a data transfer object for inserting tag values
+/// Represents a data transfer object for inserting tag values.
+/// The value is carried as an object because a batch mixes tags of every supported type;
+/// it is stored in the CLR type <see cref="TagTypeMap.GetClrType"/> returns for <paramref name="ValueType"/>.
 /// </summary>
-/// <typeparam name="T">Type of the value data</typeparam>
 /// <param name="Id">Tag identifier</param>
 /// <param name="ValueType">Type of the tag value</param>
 /// <param name="Time">Timestamp of the value</param>
 /// <param name="Value">The actual value data</param>
 /// <param name="Status">Status of the tag value</param>
-public record InsertValueDto<T>(uint Id, TagTypes ValueType, DateTimeOffset Time, T Value, TagValueStatus Status);
+public record InsertValueDto(uint Id, TagTypes ValueType, DateTimeOffset Time, object Value, TagValueStatus Status);
