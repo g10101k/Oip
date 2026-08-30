@@ -81,17 +81,25 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="valueType">The type of value stored in the tag table.</param>
     /// <param name="statusType">The type of status stored in the tag table.</param>
+    /// <param name="valueCodec">Compression codec expression for the Value column, e.g. <c>CODEC(Gorilla, ZSTD(1))</c>.</param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <exception cref="InvalidOperationException">Thrown when a table with the same name already exists.</exception>
-    public async Task CreateTagTableAsync(string valueType, string statusType,
+    public async Task CreateTagTableAsync(string valueType, string statusType, string valueCodec,
         CancellationToken cancellationToken = default)
     {
         await EnsureDatabaseCreatedAsync(cancellationToken: cancellationToken); // Ensure database exists before creating table
         var connection = await GetOpenConnectionAsync(cancellationToken);
-        var sql = string.Format(QueryConstants.CreateIntTagValue, valueType, statusType);
+        var sql = string.Format(QueryConstants.CreateIntTagValue, valueType, statusType, valueCodec,
+            QueryConstants.DeduplicationWindow);
         await using var cmd = connection.CreateCommand();
         cmd.CommandText = sql;
         await cmd.ExecuteNonQueryAsync(cancellationToken);
+
+        // The table may predate insert deduplication, in which case CREATE IF NOT EXISTS left the setting disabled.
+        await using var alterCmd = connection.CreateCommand();
+        alterCmd.CommandText = string.Format(QueryConstants.EnableDeduplication, valueType,
+            QueryConstants.DeduplicationWindow);
+        await alterCmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
     /// <summary>
@@ -99,16 +107,20 @@ public sealed class RtdsContext : IDisposable, IAsyncDisposable
     /// All values must share the same <see cref="InsertValueDto{T}.ValueType"/>.
     /// </summary>
     /// <param name="values">List of value DTOs containing data to insert</param>
+    /// <param name="deduplicationToken">
+    /// Token identifying the batch. Reusing it for a retry of the same batch lets ClickHouse discard the second
+    /// copy of a block it has already written, so a retry after a lost response does not duplicate rows.
+    /// </param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <returns>Task representing the asynchronous insert operation</returns>
-    public async Task InsertValues(List<InsertValueDto<double>> values,
+    public async Task InsertValues(List<InsertValueDto<double>> values, string deduplicationToken,
         CancellationToken cancellationToken = default)
     {
         if (values.Count == 0)
             return;
 
         var connection = await GetOpenConnectionAsync(cancellationToken);
-        var commandText = string.Format(QueryConstants.InsertIntoQuery, values[0].ValueType);
+        var commandText = string.Format(QueryConstants.InsertIntoQuery, values[0].ValueType, deduplicationToken);
         await using var writer = await connection.CreateColumnWriterAsync(commandText, cancellationToken);
 
         var valueColumnType = writer.GetFieldType(writer.GetOrdinal("Value"));

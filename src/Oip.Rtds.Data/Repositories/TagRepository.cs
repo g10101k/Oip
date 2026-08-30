@@ -67,11 +67,11 @@ public class TagRepository
             });
 
             await _rtdsMetaContext.SaveChangesAsync();
-            var tableName = $"{tagEntity.Entity.Id:D6}";
             var valueType = GetClickHouseTypeFromTagType(createTag.ValueType);
             var statusType = GenerateClickHouseEnum8<TagValueStatus>();
+            var valueCodec = GetValueCodecFromTagType(createTag.ValueType);
 
-            await _rtdsContext.CreateTagTableAsync(valueType, statusType);
+            await _rtdsContext.CreateTagTableAsync(valueType, statusType, valueCodec);
             await _rtdsMetaContext.Database.CommitTransactionAsync();
         }
         catch (Exception)
@@ -133,6 +133,30 @@ public class TagRepository
             TagTypes.Digital => "UInt8",
             TagTypes.String => "String",
             TagTypes.Blob => "String",
+            _ => throw new NotSupportedException($"Unsupported TagType: {pointType}")
+        };
+    }
+
+    /// <summary>
+    /// Returns the compression codec expression for the Value column of the given tag type.
+    /// Floating point series compress best with Gorilla, integer series with T64, strings with plain ZSTD.
+    /// </summary>
+    /// <param name="pointType">The tag type to get the codec for</param>
+    /// <returns>The ClickHouse codec expression as string</returns>
+    /// <exception cref="NotSupportedException">
+    /// Thrown when the specified tag type is not supported
+    /// </exception>
+    private static string GetValueCodecFromTagType(TagTypes pointType)
+    {
+        return pointType switch
+        {
+            TagTypes.Float32 => "CODEC(Gorilla, ZSTD(1))",
+            TagTypes.Float64 => "CODEC(Gorilla, ZSTD(1))",
+            TagTypes.Int16 => "CODEC(T64, ZSTD(1))",
+            TagTypes.Int32 => "CODEC(T64, ZSTD(1))",
+            TagTypes.Digital => "CODEC(T64, ZSTD(1))",
+            TagTypes.String => "CODEC(ZSTD(1))",
+            TagTypes.Blob => "CODEC(ZSTD(1))",
             _ => throw new NotSupportedException($"Unsupported TagType: {pointType}")
         };
     }

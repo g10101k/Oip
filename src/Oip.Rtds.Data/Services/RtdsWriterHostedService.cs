@@ -120,15 +120,28 @@ public sealed class RtdsWriterHostedService : BackgroundService
     }
 
     /// <summary>
-    /// Writes the batch to ClickHouse, one insert per tag value type.
+    /// Writes the batch to ClickHouse, one insert per tag value type and target partition.
+    /// Splitting by partition keeps every insert down to a single block, which is what lets the deduplication
+    /// token of <see cref="WriteWithRetryAsync"/> identify the batch unambiguously on a retry.
     /// </summary>
     /// <param name="batch">The values to write.</param>
     /// <param name="stoppingToken">Token signalled when the host is shutting down.</param>
     /// <returns>Task representing the asynchronous write operation.</returns>
     private async Task FlushAsync(List<InsertValueDto<double>> batch, CancellationToken stoppingToken)
     {
-        foreach (var group in batch.GroupBy(value => value.ValueType))
+        foreach (var group in batch.GroupBy(value => (value.ValueType, Partition: GetPartition(value.Time))))
             await WriteWithRetryAsync(group.ToList(), stoppingToken);
+    }
+
+    /// <summary>
+    /// Returns the partition a value falls into, matching the <c>PARTITION BY toYYYYMM(Time)</c> of the tag tables.
+    /// </summary>
+    /// <param name="time">Timestamp of the value.</param>
+    /// <returns>The partition key.</returns>
+    private static int GetPartition(DateTimeOffset time)
+    {
+        var utc = time.UtcDateTime;
+        return utc.Year * 100 + utc.Month;
     }
 
     /// <summary>
@@ -139,12 +152,16 @@ public sealed class RtdsWriterHostedService : BackgroundService
     /// <returns>Task representing the asynchronous write operation.</returns>
     private async Task WriteWithRetryAsync(List<InsertValueDto<double>> values, CancellationToken stoppingToken)
     {
+        // The token stays the same across attempts. A failure can mean the server wrote the block and only the
+        // response was lost, so without it a retry would insert the same values a second time.
+        var deduplicationToken = Guid.NewGuid().ToString("N");
+
         for (var attempt = 0; attempt <= _settings.MaxRetryCount; attempt++)
         {
             try
             {
                 // The write itself is not cancelled on shutdown, so an accepted batch is not lost.
-                await _context.InsertValues(values, CancellationToken.None);
+                await _context.InsertValues(values, deduplicationToken, CancellationToken.None);
                 return;
             }
             catch (Exception e)
