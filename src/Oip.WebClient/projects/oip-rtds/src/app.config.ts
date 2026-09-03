@@ -4,11 +4,13 @@ import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScroll
 import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
-import { defaultTheme, provideAppThemes, provideOip } from 'oip-common';
+import { defaultTheme, provideAppInfo, provideAppThemes, provideOip } from 'oip-common';
+import packageJson from '../../../package.json';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideOip(),
+    provideAppInfo({ version: packageJson.version }),
     provideAppThemes(defaultTheme, { mode: 'replaceDefaults' }),
     provideRouter(
       appRoutes,

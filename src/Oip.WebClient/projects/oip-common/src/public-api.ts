@@ -42,6 +42,7 @@ export { MenuService } from './services/app.menu.service';
 export { UserService } from './services/user.service';
 export { L10nService, LanguageDto } from './services/l10n.service';
 export { provideLogoComponent, LogoService, LOGO_COMPONENT_TOKEN } from './services/logo.service';
+export { provideAppInfo, AppInfoService, APP_INFO_TOKEN, AppInfo, AppInfoValue } from './services/app-info.service';
 export { NotificationService } from './services/notification.service';
 export { ApplicationRegistryService } from './services/application-registry.service';
 export { TableFilterService } from './services/table-filter.service';

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgComponentOutlet } from '@angular/common';
 import { LogoService } from '../../services/logo.service';
+import { AppInfoService } from '../../services/app-info.service';
 
 @Component({
   selector: 'app-footer',
@@ -12,9 +13,9 @@ import { LogoService } from '../../services/logo.service';
           <ng-container
             *ngComponentOutlet="logoService.getLogoComponent(); inputs: { width: 18, height: 18 }"></ng-container>
         </div>
-        <span class="font-medium">{{ 'app-info.footer' | translate }}</span>
+        <span class="font-medium">{{ appInfoService.getFooter() ?? ('app-info.footer' | translate) }}</span>
       </div>
-      <p class="mr-auto">{{ 'app-info.version' | translate }}</p>
+      <p class="mr-auto">{{ appInfoService.getVersion() ?? ('app-info.version' | translate) }}</p>
     </div>
   `,
   standalone: true,
@@ -22,4 +23,5 @@ import { LogoService } from '../../services/logo.service';
 })
 export class FooterComponent {
   protected logoService = inject(LogoService);
+  protected appInfoService = inject(AppInfoService);
 }

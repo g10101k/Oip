@@ -12,5 +12,8 @@ oip --name Report --project path/to/App.csproj
 
 - `--name` - module name.
 - `--project` - path to the target project file.
+- `--angular-project` - Angular project name from `angular.json` or path to the Angular project
+  directory. Overrides the automatic discovery based on `SpaRoot`, `SpaProxyServerUrl` and
+  `SpaProxyLaunchCommand`.
 - `--force` - overwrite generated files when they already exist.
 - `-h`, `--help` - show command usage.

@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Check npm and NuGet versions are in sync
+        run: node ./src/Oip.WebClient/scripts/bump-version.js --check
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
