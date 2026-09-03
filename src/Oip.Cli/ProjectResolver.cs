@@ -4,7 +4,12 @@ namespace Oip.Cli;
 
 public static class ProjectResolver
 {
-    public static TargetProject Resolve(string? explicitProjectPath, string currentDirectory, TextReader input, TextWriter output)
+    public static TargetProject Resolve(
+        string? explicitProjectPath,
+        string currentDirectory,
+        TextReader input,
+        TextWriter output,
+        string? explicitAngularProject = null)
     {
         var projectPath = explicitProjectPath is not null
             ? Path.GetFullPath(explicitProjectPath, currentDirectory)
@@ -36,8 +41,20 @@ public static class ProjectResolver
             rootNamespace = projectName;
         }
 
+        var spaProxyServerUrl = document.Descendants("SpaProxyServerUrl").FirstOrDefault()?.Value;
+        var spaProxyLaunchCommand = document.Descendants("SpaProxyLaunchCommand").FirstOrDefault()?.Value;
+
         var spaRoot = Path.GetFullPath(NormalizePathSeparators(spaRootValue), projectDirectory);
-        var angularProjectPath = ResolveAngularProjectPath(projectName, spaRoot, currentDirectory, input, output);
+        var angularProjectPath = explicitAngularProject is not null
+            ? ResolveExplicitAngularProject(explicitAngularProject, spaRoot, currentDirectory)
+            : ResolveAngularProjectPath(
+                projectName,
+                spaRoot,
+                spaProxyServerUrl,
+                spaProxyLaunchCommand,
+                currentDirectory,
+                input,
+                output);
 
         return new TargetProject(
             projectPath,
@@ -59,27 +76,46 @@ public static class ProjectResolver
         };
     }
 
+    private static string ResolveExplicitAngularProject(
+        string explicitAngularProject,
+        string spaRoot,
+        string currentDirectory)
+    {
+        var byName = AngularProjectDiscovery.TryResolveByName(spaRoot, explicitAngularProject);
+        if (byName is not null)
+        {
+            return byName;
+        }
+
+        var path = Path.GetFullPath(NormalizePathSeparators(explicitAngularProject), currentDirectory);
+        if (Directory.Exists(path))
+        {
+            return path;
+        }
+
+        throw new CliException(
+            $"Angular project was not found in {spaRoot} and is not an existing directory: {explicitAngularProject}");
+    }
+
     private static string ResolveAngularProjectPath(
         string projectName,
         string spaRoot,
+        string? spaProxyServerUrl,
+        string? spaProxyLaunchCommand,
         string currentDirectory,
         TextReader input,
         TextWriter output)
     {
-        var mappedName = projectName switch
+        var discovered = AngularProjectDiscovery.TryResolve(spaRoot, spaProxyServerUrl, spaProxyLaunchCommand);
+        if (discovered is not null)
         {
-            "Oip" => "oip",
-            "Oip.Rtds" => "oip-rtds",
-            _ => null
-        };
+            return discovered;
+        }
 
-        if (mappedName is not null)
+        var conventionPath = Path.Combine(spaRoot, "projects", projectName.ToLowerInvariant().Replace('.', '-'));
+        if (Directory.Exists(conventionPath))
         {
-            var mappedPath = Path.Combine(spaRoot, "projects", mappedName);
-            if (Directory.Exists(mappedPath))
-            {
-                return mappedPath;
-            }
+            return conventionPath;
         }
 
         output.Write("Angular project path: ");

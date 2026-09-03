@@ -4,6 +4,7 @@ public sealed class CliOptions
 {
     public string? Name { get; private init; }
     public string? ProjectPath { get; private init; }
+    public string? AngularProject { get; private init; }
     public bool Force { get; private init; }
     public bool ShowHelp { get; private init; }
 
@@ -11,6 +12,7 @@ public sealed class CliOptions
     {
         string? name = null;
         string? projectPath = null;
+        string? angularProject = null;
         var force = false;
 
         for (var i = 0; i < args.Length; i++)
@@ -23,6 +25,9 @@ public sealed class CliOptions
                     break;
                 case "--project":
                     projectPath = ReadValue(args, ref i, arg);
+                    break;
+                case "--angular-project":
+                    angularProject = ReadValue(args, ref i, arg);
                     break;
                 case "--force":
                     force = true;
@@ -48,6 +53,7 @@ public sealed class CliOptions
         {
             Name = name,
             ProjectPath = projectPath,
+            AngularProject = angularProject,
             Force = force,
             ShowHelp = false
         };
