@@ -13,6 +13,7 @@ import { UserService } from '../../services/user.service';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LogoService } from '../../services/logo.service';
+import { AppInfoService } from '../../services/app-info.service';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { UserNotificationsComponent } from '../user-notifications/user-notifications.component';
 import { AppTopbarApplicationSwitcherComponent } from '../top-bar-application-switcher/top-bar-application-switcher.component';
@@ -49,7 +50,7 @@ import ru from './l10n/topbar.ru.json';
         <a class="layout-topbar-logo" id="oip-app-topbar-logo-link" routerLink="">
           <ng-container
             *ngComponentOutlet="logoService.getLogoComponent(); inputs: { width: 36, height: 36 }"></ng-container>
-          <span>{{ 'app-info.title' | translate }}</span>
+          <span>{{ appInfoService.getTitle() ?? ('app-info.title' | translate) }}</span>
         </a>
       </div>
 
@@ -152,6 +153,7 @@ export class AppTopbar {
   userService = inject(UserService);
   layoutService = inject(LayoutService);
   logoService = inject(LogoService);
+  appInfoService = inject(AppInfoService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translateService = inject(TranslateService);
 
