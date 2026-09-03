@@ -81,26 +81,6 @@ function writeWebClientVersion(version) {
   writeJson(webClientPackagePath, packageJson);
 }
 
-function readWebClientDependency() {
-  const packageJson = readJson(webClientPackagePath);
-
-  return packageJson.dependencies?.['oip-common'] ?? packageJson.devDependencies?.['oip-common'];
-}
-
-function writeWebClientDependency(version) {
-  const packageJson = readJson(webClientPackagePath);
-
-  if (packageJson.dependencies && packageJson.dependencies['oip-common']) {
-    packageJson.dependencies['oip-common'] = version;
-  }
-
-  if (packageJson.devDependencies && packageJson.devDependencies['oip-common']) {
-    packageJson.devDependencies['oip-common'] = version;
-  }
-
-  writeJson(webClientPackagePath, packageJson);
-}
-
 function readCommonPackageVersion() {
   return readJson(commonPackagePath).version;
 }
@@ -115,11 +95,6 @@ function writeCommonPackageVersion(version) {
 const targets = [
   { name: `${relative(commonPropsPath)} <Version>`, read: readNuGetVersion, write: writeNuGetVersion },
   { name: `${relative(webClientPackagePath)} version`, read: readWebClientVersion, write: writeWebClientVersion },
-  {
-    name: `${relative(webClientPackagePath)} dependencies.oip-common`,
-    read: readWebClientDependency,
-    write: writeWebClientDependency,
-  },
   { name: `${relative(commonPackagePath)} version`, read: readCommonPackageVersion, write: writeCommonPackageVersion },
 ];
 
