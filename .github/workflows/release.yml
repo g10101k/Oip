@@ -26,6 +26,12 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Ensure npm supports trusted publishing
+        # OIDC requires npm 11.5.1 or later, older npm silently falls back to a token
+        run: |
+          npm install -g npm@latest
+          npm -v
       - name: Check npm and NuGet versions are in sync
         run: node ./src/Oip.WebClient/scripts/bump-version.js --check
       - name: Check the tag matches the released version
