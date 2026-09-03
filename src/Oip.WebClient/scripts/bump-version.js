@@ -118,18 +118,17 @@ function findMismatched(current) {
 
 function check(current) {
   const mismatched = findMismatched(current);
-
-  for (const item of current) {
-    console.log(`${item.version} ${item.target.name}`);
-  }
+  // Keep the report in the same stream as the outcome, otherwise CI logs interleave them.
+  const report = current.map((item) => `${item.version} ${item.target.name}`).join('\n');
 
   if (mismatched.length > 0) {
     throw new Error(
-      `Versions are out of sync with ${current[0].target.name}. Run "npm run version:set -- <version>" to align them.`
+      `${report}\nVersions are out of sync with ${current[0].target.name}. ` +
+        `Run "npm run version:set -- <version>" to align them.`
     );
   }
 
-  console.log('Versions are in sync.');
+  console.log(`${report}\nVersions are in sync.`);
 }
 
 function getTargetVersion(current) {
