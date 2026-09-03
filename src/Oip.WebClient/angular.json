@@ -31,7 +31,7 @@
               "projects/oip/src/assets",
               {
                 "glob": "**/*",
-                "input": "node_modules/oip-common/assets",
+                "input": "./projects/oip-common/src/assets",
                 "output": "/assets"
               }
             ],

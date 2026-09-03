@@ -1,25 +1,51 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+# Publishes NuGet packages and the oip-common npm package for a v* tag.
+# The file name is registered as a trusted publisher for oip-common on npmjs.com,
+# renaming it breaks the npm publish step.
 
-name: Publish main
+name: Release
 
 on:
   push:
-    branches: [ "main-test" ]
+    tags: [ "v*" ]
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Check npm and NuGet versions are in sync
+        run: node ./src/Oip.WebClient/scripts/bump-version.js --check
+      - name: Check the tag matches the released version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          version="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' ./src/Common.props)"
+          if [ "$tag" != "$version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match Common.props version $version."
+            exit 1
+          fi
       - name: Restore dependencies
         run: dotnet restore ./src/Oip.sln
       - name: Build
         run: dotnet build ./src/Oip.sln --configuration Release --no-restore
+      - name: Install web client dependencies
+        run: npm ci
+        working-directory: ./src/Oip.WebClient
+      - name: Build oip-common
+        run: npx ng build oip-common
+        working-directory: ./src/Oip.WebClient
       - name: Publish nuget
         run: |
           dotnet nuget push ./src/Oip.Base/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
@@ -28,3 +54,6 @@ jobs:
           dotnet nuget push ./src/Oip.Notifications.Base/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
           dotnet nuget push ./src/Oip.Users.Base/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
           dotnet nuget push ./src/Oip.Cli/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_PUSH_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish npm
+        run: npm publish
+        working-directory: ./src/Oip.WebClient/dist/oip-common
