@@ -239,7 +239,8 @@ public class ModuleRepository(OipModuleContext db)
             Items = module.Items.Count == 0
                 ? null
                 : module.Items.Select(x => ToDto(x, startModuleInstanceId)).ToList(),
-            Securities = module.Securities.Select(s => s.Role).ToList()
+            Securities = module.Securities.Where(s => s.Right == SecurityConstants.Read).Select(s => s.Role)
+                .ToList()
         };
     }
 
@@ -311,6 +312,7 @@ public class ModuleRepository(OipModuleContext db)
     {
         var query = from module in db.ModuleInstances
                 .Include(x => x.Module)
+                .Include(x => x.Securities)
             select module;
         var result = (await query.ToListAsync()).Where(x => x.Parent == null).Select(x => ToDto(x));
 
@@ -490,7 +492,7 @@ public class ModuleRepository(OipModuleContext db)
         if (editModel.ViewRoles != null)
         {
             var rolesToRemove = instance.Securities
-                .Where(s => !editModel.ViewRoles.Contains(s.Role))
+                .Where(s => s.Right == SecurityConstants.Read && !editModel.ViewRoles.Contains(s.Role))
                 .ToList();
 
             foreach (var roleEntity in rolesToRemove)
@@ -498,7 +500,8 @@ public class ModuleRepository(OipModuleContext db)
                 db.ModuleInstanceSecurities.Remove(roleEntity);
             }
 
-            var existingRoles = instance.Securities.Select(s => s.Role).ToHashSet();
+            var existingRoles = instance.Securities.Where(s => s.Right == SecurityConstants.Read)
+                .Select(s => s.Role).ToHashSet();
             var newRoles = editModel.ViewRoles
                 .Where(role => !existingRoles.Contains(role))
                 .Select(role => new ModuleInstanceSecurityEntity
@@ -506,7 +509,7 @@ public class ModuleRepository(OipModuleContext db)
                     ModuleInstance = instance,
                     ModuleInstanceId = instance.ModuleInstanceId,
                     Role = role,
-                    Right = "read"
+                    Right = SecurityConstants.Read
                 });
 
             foreach (var newRole in newRoles)
