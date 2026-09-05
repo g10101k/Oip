@@ -41,14 +41,14 @@ public class UserProfileController(
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserPhoto(CancellationToken cancellationToken)
     {
-        var email = claimService.GetUserEmail();
-        if (string.IsNullOrWhiteSpace(email))
+        var subject = claimService.GetUserSubject();
+        if (string.IsNullOrWhiteSpace(subject))
         {
-            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user email is not available.",
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user subject is not available.",
                 StatusCodes.Status401Unauthorized));
         }
 
-        var user = await userRepository.GetByEmailAsync(email, cancellationToken);
+        var user = await userRepository.GetBySubjectAsync(subject, cancellationToken);
         return await GetUserPhotoResultAsync(user, cancellationToken);
     }
 
@@ -95,14 +95,14 @@ public class UserProfileController(
                 StatusCodes.Status400BadRequest));
         }
 
-        var email = claimService.GetUserEmail();
-        if (string.IsNullOrWhiteSpace(email))
+        var subject = claimService.GetUserSubject();
+        if (string.IsNullOrWhiteSpace(subject))
         {
-            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user email is not available.",
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user subject is not available.",
                 StatusCodes.Status401Unauthorized));
         }
 
-        var user = await userRepository.GetOrCreateByEmailAsync(email, cancellationToken);
+        var user = await userRepository.GetOrCreateBySubjectAsync(subject, claimService.GetUserEmail(), cancellationToken);
         var storedPhoto = await userPhotoStorage.SaveAsync(user.UserId, files, cancellationToken);
         await userRepository.UpdateUserPhotoMetadataAsync(
             user.UserId,
@@ -124,14 +124,14 @@ public class UserProfileController(
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteUserPhoto(CancellationToken cancellationToken)
     {
-        var email = claimService.GetUserEmail();
-        if (string.IsNullOrWhiteSpace(email))
+        var subject = claimService.GetUserSubject();
+        if (string.IsNullOrWhiteSpace(subject))
         {
-            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user email is not available.",
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user subject is not available.",
                 StatusCodes.Status401Unauthorized));
         }
 
-        var user = await userRepository.GetByEmailAsync(email, cancellationToken);
+        var user = await userRepository.GetBySubjectAsync(subject, cancellationToken);
         if (user == null || string.IsNullOrWhiteSpace(user.PhotoObjectName))
         {
             return Ok();
@@ -144,35 +144,52 @@ public class UserProfileController(
     }
 
     /// <summary>
-    /// Get user setting by e-mail
+    /// Get settings of the current user
     /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     [Authorize, HttpGet("get-settings")]
     [ProducesResponseType<UserSettingsDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
-    public UserSettingsDto GetSettings()
+    public async Task<ActionResult<UserSettingsDto>> GetSettings(CancellationToken cancellationToken)
     {
-        var json = userRepository.GetUserSettings(claimService.GetUserEmail()!);
-        if (string.IsNullOrWhiteSpace(json))
-            return new();
+        var subject = claimService.GetUserSubject();
+        if (string.IsNullOrWhiteSpace(subject))
+        {
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user subject is not available.",
+                StatusCodes.Status401Unauthorized));
+        }
 
-        return JsonSerializer.Deserialize<UserSettingsDto>(json, SettingsJsonOptions) ?? new();
+        var json = await userRepository.GetUserSettingsAsync(subject, cancellationToken);
+        if (string.IsNullOrWhiteSpace(json))
+            return new UserSettingsDto();
+
+        return JsonSerializer.Deserialize<UserSettingsDto>(json, SettingsJsonOptions) ?? new UserSettingsDto();
     }
 
     /// <summary>
     /// Update User settings
     /// </summary>
     /// <param name="settings">Settings</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     [Authorize, HttpPut("set-settings")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
-    public async Task UpdateSettings(UserSettingsDto settings)
+    public async Task<IActionResult> UpdateSettings(UserSettingsDto settings, CancellationToken cancellationToken)
     {
+        var subject = claimService.GetUserSubject();
+        if (string.IsNullOrWhiteSpace(subject))
+        {
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user subject is not available.",
+                StatusCodes.Status401Unauthorized));
+        }
+
         var json = JsonSerializer.Serialize(settings);
-        await userRepository.UpdateUserSettings(claimService.GetUserEmail()!, json);
+        await userRepository.UpdateUserSettingsAsync(subject, json, cancellationToken);
+        return Ok();
     }
 
     private async Task<IActionResult> GetUserPhotoResultAsync(

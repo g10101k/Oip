@@ -28,6 +28,16 @@ public class ClaimService(IHttpContextAccessor httpContextAccessor)
     }
 
     /// <summary>
+    /// Get stable user identifier from the subject claim
+    /// </summary>
+    /// <returns></returns>
+    public string? GetUserSubject()
+    {
+        return GetClaimValue(ClaimTypes.NameIdentifier) ??
+               GetClaimValue("sub");
+    }
+
+    /// <summary>
     /// Get user first name
     /// </summary>
     /// <returns></returns>

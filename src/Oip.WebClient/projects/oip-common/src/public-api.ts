@@ -24,6 +24,7 @@ export { ExtensionModuleHostComponent } from './components/extension-module-host
 export { UserNotificationsComponent } from './components/user-notifications/user-notifications.component';
 export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher/top-bar-application-switcher.component';
 export { BlockLoaderComponent } from './components/block-loader/block-loader.component';
+export { NoModulesComponent } from './components/no-modules/no-modules.component';
 
 // DTOs
 export { TopBarDto } from './dtos/top-bar.dto';
@@ -48,6 +49,7 @@ export { NotificationService } from './services/notification.service';
 export { ApplicationRegistryService } from './services/application-registry.service';
 export { TableFilterService } from './services/table-filter.service';
 export { ModuleLoadingService } from './services/module-loading.service';
+export { StartPageService } from './services/start-page.service';
 export { ExtensionLoaderService } from './extension-host/extension-loader.service';
 export {
   APP_THEME_PRESETS,
@@ -107,6 +109,10 @@ export {
   oipDbMigrationRoute,
   oipIframeModuleRoute,
   oipExtensionsRoute,
+  oipNoModulesRoute,
+  oipStartRoute,
+  oipStartRedirectGuard,
+  StartRouteData,
   OipRouteFeatures,
   OipRouteToggle,
   OipRoutesOptions

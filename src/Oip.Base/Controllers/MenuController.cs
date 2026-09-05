@@ -24,8 +24,67 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
     [Authorize, HttpGet("get")]
     public async Task<IEnumerable<ModuleInstanceDto>> Get()
     {
-        var menu = await moduleRepository.GetModuleForMenuAll(claimService.GetUserRoles());
+        var menu = await moduleRepository.GetModuleForMenuAll(claimService.GetUserRoles(),
+            claimService.GetUserSubject());
         return menu;
+    }
+
+    /// <summary>
+    /// Sets the module instance the current user opens by default.
+    /// </summary>
+    /// <param name="id">The ID of the module instance.</param>
+    [Authorize, HttpPost("set-start-module/{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SetStartModule(int id)
+    {
+        var userSubject = claimService.GetUserSubject();
+        if (string.IsNullOrWhiteSpace(userSubject))
+        {
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user subject is not available.",
+                StatusCodes.Status401Unauthorized));
+        }
+
+        // A module instance the user cannot read must never become their landing page.
+        if (!await moduleRepository.HasInstanceRight(id, claimService.GetUserRoles(), SecurityConstants.Read))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new ApiExceptionResponse("Forbidden", "Read right on the module instance is required.",
+                    StatusCodes.Status403Forbidden));
+        }
+
+        try
+        {
+            await moduleRepository.SetStartModule(userSubject, id);
+        }
+        catch (KeyNotFoundException e)
+        {
+            return NotFound(new ApiExceptionResponse("Module instance not found", e.Message,
+                StatusCodes.Status404NotFound));
+        }
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Clears the start module instance of the current user.
+    /// </summary>
+    [Authorize, HttpDelete("delete-start-module")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteStartModule()
+    {
+        var userSubject = claimService.GetUserSubject();
+        if (string.IsNullOrWhiteSpace(userSubject))
+        {
+            return Unauthorized(new ApiExceptionResponse("Unauthorized", "Current user subject is not available.",
+                StatusCodes.Status401Unauthorized));
+        }
+
+        await moduleRepository.DeleteStartModule(userSubject);
+        return Ok();
     }
 
     /// <summary>

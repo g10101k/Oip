@@ -51,8 +51,9 @@ import ru from './l10n/menu.ru.json';
         }
       </ul>
     </div>
+    <!-- Always rendered: choosing a start page is available to every user, not only to admins. -->
+    <p-contextMenu />
     @if (securityService.isAdmin()) {
-      <p-contextMenu [target]="empty" />
       <menu-item-create-dialog />
       <menu-item-edit-dialog />
     }`
@@ -82,6 +83,9 @@ export class MenuComponent implements OnInit {
       return;
     }
 
+    $event.preventDefault();
+    $event.stopPropagation();
+
     this.menuService.contextMenuItem = null;
     this.contextMenu.model = [
       {
@@ -90,5 +94,6 @@ export class MenuComponent implements OnInit {
         command: (event) => this.newClick(event)
       }
     ];
+    this.contextMenu.show($event);
   }
 }

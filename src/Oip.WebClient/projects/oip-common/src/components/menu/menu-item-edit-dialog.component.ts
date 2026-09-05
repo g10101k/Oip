@@ -41,6 +41,19 @@ type PrimeIconOption = {
       </div>
 
       <div class="flex items-center gap-4 mb-4">
+        <label class="font-semibold w-1/3" for="oip-menu-item-edit-dialog-module">
+          {{ 'menuItemEditDialogComponent.module' | translate }}
+        </label>
+        <input
+          autocomplete="off"
+          class="flex-auto"
+          disabled
+          id="oip-menu-item-edit-dialog-module"
+          pInputText
+          [ngModel]="moduleName" />
+      </div>
+
+      <div class="flex items-center gap-4 mb-4">
         <label class="font-semibold w-1/3" for="oip-menu-item-edit-dialog-icon">
           {{ 'menuItemEditDialogComponent.icon' | translate }}
         </label>
@@ -110,6 +123,7 @@ export class MenuItemEditDialogComponent {
   @Output() visibleChange = new EventEmitter<boolean>();
 
   roles: string[] = [];
+  moduleName = '';
   iconOptions: PrimeIconOption[] = Object.values(PrimeIcons)
     .filter((icon): icon is string => typeof icon === 'string')
     .map((icon) => ({
@@ -164,7 +178,9 @@ export class MenuItemEditDialogComponent {
       viewRoles: this.menuService.contextMenuItem?.securities
     };
 
-    this.roles = await this.securityApi.getRealmRoles();
+    const [roles, modules] = await Promise.all([this.securityApi.getRealmRoles(), this.menuService.getModules()]);
+    this.roles = roles;
+    this.moduleName = modules.find((module) => module.key === this.item.moduleId)?.value ?? '';
 
     this.visible = true;
     this.visibleChange.emit(this.visible);

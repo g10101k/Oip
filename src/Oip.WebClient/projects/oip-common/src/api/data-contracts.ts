@@ -100,6 +100,7 @@ export interface ModuleInstanceDto {
   parentId?: number | null;
   order?: number;
   separator?: boolean;
+  isStart?: boolean;
 }
 
 export interface ModuleSecurityDto {
@@ -124,6 +125,10 @@ export interface UpdateExtensionModuleParams {
 }
 
 export interface DeleteExtensionModuleParams {
+  id: number;
+}
+
+export interface SetStartModuleParams {
   id: number;
 }
 

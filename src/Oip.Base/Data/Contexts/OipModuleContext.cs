@@ -43,6 +43,11 @@ public class OipModuleContext : DbContext
     /// </summary>
     public DbSet<ModuleSecurityEntity> ModuleSecurities => Set<ModuleSecurityEntity>();
 
+    /// <summary>
+    /// Start module instances chosen by users
+    /// </summary>
+    public DbSet<UserStartModuleEntity> UserStartModules => Set<UserStartModuleEntity>();
+
 
     /// <summary>
     /// .ctor
@@ -72,6 +77,7 @@ public class OipModuleContext : DbContext
         modelBuilder.ApplyConfiguration(new ModuleInstanceEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new ModuleInstanceSecurityEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new ModuleSecurityEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new UserStartModuleEntityConfiguration(Database, _designTime));
 
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }

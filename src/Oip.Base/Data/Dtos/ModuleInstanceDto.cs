@@ -69,4 +69,9 @@ public class ModuleInstanceDto
     /// Indicates whether this module instance should be displayed as a separator.
     /// </summary>
     public bool Separator { get; set; }
+
+    /// <summary>
+    /// Indicates whether the current user opens this module instance by default.
+    /// </summary>
+    public bool IsStart { get; set; }
 }
