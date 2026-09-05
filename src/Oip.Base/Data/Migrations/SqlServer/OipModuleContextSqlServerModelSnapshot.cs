@@ -22,7 +22,7 @@ namespace Oip.Base.Data.SqlServer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Oip.Data.Entities.ModuleEntity", b =>
+            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleEntity", b =>
                 {
                     b.Property<string>("ApiBaseUrl")
                         .HasMaxLength(2048)
@@ -106,7 +106,7 @@ namespace Oip.Base.Data.SqlServer.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceEntity", b =>
+            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleInstanceEntity", b =>
                 {
                     b.Property<string>("Icon")
                         .HasMaxLength(64)
@@ -159,7 +159,7 @@ namespace Oip.Base.Data.SqlServer.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.ModuleInstanceSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleInstanceSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleInstanceId")
                         .HasColumnType("int")
@@ -190,7 +190,7 @@ namespace Oip.Base.Data.SqlServer.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.ModuleSecurityEntity", b =>
+            modelBuilder.Entity("Oip.Base.Data.Entities.ModuleSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleId")
                         .HasColumnType("int")
@@ -221,28 +221,28 @@ namespace Oip.Base.Data.SqlServer.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Oip.Data.Entities.UserEntity", b =>
+            modelBuilder.Entity("Oip.Base.Data.Entities.UserStartModuleEntity", b =>
                 {
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)")
-                        .HasComment("E-mail");
+                    b.Property<int>("ModuleInstanceId")
+                        .HasColumnType("int")
+                        .HasComment("Module instance opened when no explicit route is requested");
 
-                    b.Property<byte[]>("Photo")
-                        .HasColumnType("varbinary(max)")
-                        .HasComment("User photo");
-
-                    b.Property<int>("UserId")
+                    b.Property<int>("UserStartModuleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasComment("User id");
+                        .HasComment("Id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserStartModuleId"));
 
-                    b.ToTable("User", "oip", t =>
+                    b.Property<string>("UserSubject")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasComment("Stable user identifier taken from the subject claim (max 255 chars)");
+
+                    b.ToTable("UserStartModule", "oip", t =>
                         {
-                            t.HasComment("User entity");
+                            t.HasComment("Module instance a user opens by default");
                         });
                 });
 #pragma warning restore 612, 618

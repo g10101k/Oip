@@ -97,8 +97,10 @@ public class ModuleRepository(OipModuleContext db)
     /// Retrieves all module instances available in the menu, filtered by user roles.
     /// </summary>
     /// <param name="roles">List of user roles to filter modules by access.</param>
+    /// <param name="userSubject">Subject of the current user, used to mark the start module instance.</param>
     /// <returns>A collection of module instances accessible to the specified roles.</returns>
-    public async Task<IEnumerable<ModuleInstanceDto>> GetModuleForMenuAll(List<string> roles)
+    public async Task<IEnumerable<ModuleInstanceDto>> GetModuleForMenuAll(List<string> roles,
+        string? userSubject = null)
     {
         var loadedModules = await WebApplicationBuilderExtension.GetAllLoadedModulesAsync();
         var modulesLoadedNames = loadedModules.Select(x => x.Name.Replace("Controller", string.Empty)).ToList();
@@ -111,7 +113,8 @@ public class ModuleRepository(OipModuleContext db)
             .OrderBy(m => m.Order)
             .ToListAsync();
 
-        var result = query.Where(x => x.Parent == null).Select(ToDto);
+        var startModuleInstanceId = await GetStartModuleInstanceId(userSubject);
+        var result = query.Where(x => x.Parent == null).Select(x => ToDto(x, startModuleInstanceId));
 
         return result.ToList();
     }
@@ -214,11 +217,13 @@ public class ModuleRepository(OipModuleContext db)
     /// Converts a <see cref="ModuleInstanceEntity"/> to a <see cref="ModuleInstanceDto"/>.
     /// </summary>
     /// <param name="module">The <see cref="ModuleInstanceEntity"/> to convert.</param>
+    /// <param name="startModuleInstanceId">Module instance marked as the start page of the current user.</param>
     /// <return>The converted <see cref="ModuleInstanceDto"/>.</return>
-    private static ModuleInstanceDto ToDto(ModuleInstanceEntity module)
+    private static ModuleInstanceDto ToDto(ModuleInstanceEntity module, int? startModuleInstanceId = null)
     {
         return new ModuleInstanceDto
         {
+            IsStart = startModuleInstanceId == module.ModuleInstanceId,
             ModuleInstanceId = module.ModuleInstanceId,
             ModuleId = module.ModuleId,
             ParentId = module.ParentId,
@@ -231,7 +236,9 @@ public class ModuleRepository(OipModuleContext db)
             Url = module.Url,
             Target = module.Target,
             Settings = module.Settings,
-            Items = module.Items.Count == 0 ? null : module.Items.Select(ToDto).ToList(),
+            Items = module.Items.Count == 0
+                ? null
+                : module.Items.Select(x => ToDto(x, startModuleInstanceId)).ToList(),
             Securities = module.Securities.Select(s => s.Role).ToList()
         };
     }
@@ -305,7 +312,7 @@ public class ModuleRepository(OipModuleContext db)
         var query = from module in db.ModuleInstances
                 .Include(x => x.Module)
             select module;
-        var result = (await query.ToListAsync()).Where(x => x.Parent == null).Select(ToDto);
+        var result = (await query.ToListAsync()).Where(x => x.Parent == null).Select(x => ToDto(x));
 
         return result.ToList();
     }
@@ -533,7 +540,13 @@ public class ModuleRepository(OipModuleContext db)
             .Where(m => idsToDelete.Contains(m.ModuleInstanceId))
             .ToListAsync();
 
+        // The schema carries no foreign keys, so start module references are cleaned up explicitly.
+        var startModulesToDelete = await db.UserStartModules
+            .Where(s => idsToDelete.Contains(s.ModuleInstanceId))
+            .ToListAsync();
+
         db.ModuleInstanceSecurities.RemoveRange(securitiesToDelete);
+        db.UserStartModules.RemoveRange(startModulesToDelete);
         db.ModuleInstances.RemoveRange(instancesToDelete);
         await db.SaveChangesAsync();
     }
@@ -632,6 +645,63 @@ public class ModuleRepository(OipModuleContext db)
 
         (firstModule.Order, secondModule.Order) = (secondModule.Order, firstModule.Order);
 
+        await db.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Gets the module instance the user opens by default.
+    /// </summary>
+    /// <param name="userSubject">Subject of the user.</param>
+    /// <returns>The module instance id, or <c>null</c> when the user has not chosen one.</returns>
+    public async Task<int?> GetStartModuleInstanceId(string? userSubject)
+    {
+        if (string.IsNullOrWhiteSpace(userSubject))
+            return null;
+
+        var startModule = await db.UserStartModules
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.UserSubject == userSubject);
+
+        return startModule?.ModuleInstanceId;
+    }
+
+    /// <summary>
+    /// Sets the module instance the user opens by default, replacing any previous choice.
+    /// </summary>
+    /// <param name="userSubject">Subject of the user.</param>
+    /// <param name="moduleInstanceId">The module instance to open by default.</param>
+    /// <exception cref="KeyNotFoundException">Thrown when the module instance cannot be found.</exception>
+    public async Task SetStartModule(string userSubject, int moduleInstanceId)
+    {
+        var exists = await db.ModuleInstances.AnyAsync(x => x.ModuleInstanceId == moduleInstanceId);
+        if (!exists)
+            throw new KeyNotFoundException($"Module instance with id {moduleInstanceId} not found");
+
+        // One row per user: older rows are dropped so a partially written state cannot pile up.
+        var current = await db.UserStartModules.Where(x => x.UserSubject == userSubject).ToListAsync();
+        if (current.Count > 0)
+            db.UserStartModules.RemoveRange(current);
+
+        await db.UserStartModules.AddAsync(new UserStartModuleEntity
+        {
+            UserSubject = userSubject,
+            ModuleInstanceId = moduleInstanceId
+        });
+
+        await db.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Clears the start module instance of the user.
+    /// </summary>
+    /// <param name="userSubject">Subject of the user.</param>
+    public async Task DeleteStartModule(string userSubject)
+    {
+        var current = await db.UserStartModules.Where(x => x.UserSubject == userSubject).ToListAsync();
+        if (current.Count == 0)
+            return;
+
+        db.UserStartModules.RemoveRange(current);
         await db.SaveChangesAsync();
     }
 }

@@ -2,102 +2,105 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Base.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Base.Data.Postgres.Migrations
+namespace Oip.Base.Data.Migrations.SqlServer
 {
-    [DbContext(typeof(OipModuleContextPostgres))]
-    partial class OipModuleContextPostgresModelSnapshot : ModelSnapshot
+    [DbContext(typeof(OipModuleContextSqlServer))]
+    [Migration("20260905114810_AddUserStartModule_SqlServer")]
+    partial class AddUserStartModule_SqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.22")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Oip.Base.Data.Entities.ModuleEntity", b =>
                 {
                     b.Property<string>("ApiBaseUrl")
                         .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)")
+                        .HasColumnType("nvarchar(2048)")
                         .HasComment("Backend API base URL for the extension service.");
 
                     b.Property<string>("ComponentName")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("nvarchar(256)")
                         .HasComment("Exported Angular component name.");
 
                     b.Property<string>("ElementName")
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("nvarchar(128)")
                         .HasComment("Custom element tag name exposed by the extension bundle.");
 
                     b.Property<string>("ExposedModule")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("nvarchar(256)")
                         .HasComment("Module Federation exposed module name.");
 
                     b.Property<string>("ExtensionKey")
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("nvarchar(128)")
                         .HasComment("Stable extension key.");
 
                     b.Property<int>("Kind")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Module delivery kind.");
 
                     b.Property<string>("LoadType")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("nvarchar(64)")
                         .HasComment("Extension loader type.");
 
                     b.Property<string>("ManifestUrl")
                         .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)")
+                        .HasColumnType("nvarchar(2048)")
                         .HasComment("URL of the extension manifest, if this module is an extension.");
 
                     b.Property<int>("ModuleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("nvarchar(512)")
                         .HasComment("Name");
 
                     b.Property<string>("RemoteEntryUrl")
                         .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)")
+                        .HasColumnType("nvarchar(2048)")
                         .HasComment("Module Federation remote entry URL.");
 
                     b.Property<string>("RouterLink")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasColumnType("nvarchar(256)")
                         .HasComment("Route link to component");
 
                     b.Property<string>("ScriptUrl")
                         .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)")
+                        .HasColumnType("nvarchar(2048)")
                         .HasComment("JavaScript entrypoint that registers the custom element.");
 
                     b.Property<string>("Settings")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Settings for module");
 
                     b.Property<string>("Version")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("nvarchar(64)")
                         .HasComment("Extension version.");
 
                     b.ToTable("Module", "oip", t =>
@@ -110,47 +113,47 @@ namespace Oip.Base.Data.Postgres.Migrations
                 {
                     b.Property<string>("Icon")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("nvarchar(64)")
                         .HasComment("Label");
 
                     b.Property<string>("Label")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("nvarchar(128)")
                         .HasComment("Label");
 
                     b.Property<int>("ModuleId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Module id");
 
                     b.Property<int>("ModuleInstanceId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleInstanceId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleInstanceId"));
 
                     b.Property<int>("Order")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Module position");
 
                     b.Property<int?>("ParentId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Parent id");
 
                     b.Property<string>("Settings")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("Settings");
 
                     b.Property<string>("Target")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("nvarchar(64)")
                         .HasComment("Target");
 
                     b.Property<string>("Url")
                         .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
+                        .HasColumnType("nvarchar(1024)")
                         .HasComment("Url");
 
                     b.ToTable("ModuleInstance", "oip", t =>
@@ -162,26 +165,26 @@ namespace Oip.Base.Data.Postgres.Migrations
             modelBuilder.Entity("Oip.Base.Data.Entities.ModuleInstanceSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleInstanceId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("ModuleId");
 
                     b.Property<int>("ModuleInstanceSecurityId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleInstanceSecurityId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleInstanceSecurityId"));
 
                     b.Property<string>("Right")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Right (max 255 chars)");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Role (max 255 chars)");
 
                     b.ToTable("ModuleInstanceSecurity", "oip", t =>
@@ -193,26 +196,26 @@ namespace Oip.Base.Data.Postgres.Migrations
             modelBuilder.Entity("Oip.Base.Data.Entities.ModuleSecurityEntity", b =>
                 {
                     b.Property<int>("ModuleId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("ModuleId");
 
                     b.Property<int>("ModuleSecurityId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ModuleSecurityId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModuleSecurityId"));
 
                     b.Property<string>("Right")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Right");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Role");
 
                     b.ToTable("ModuleSecurity", "oip", t =>
@@ -224,20 +227,20 @@ namespace Oip.Base.Data.Postgres.Migrations
             modelBuilder.Entity("Oip.Base.Data.Entities.UserStartModuleEntity", b =>
                 {
                     b.Property<int>("ModuleInstanceId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Module instance opened when no explicit route is requested");
 
                     b.Property<int>("UserStartModuleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserStartModuleId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserStartModuleId"));
 
                     b.Property<string>("UserSubject")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .HasColumnType("nvarchar(255)")
                         .HasComment("Stable user identifier taken from the subject claim (max 255 chars)");
 
                     b.ToTable("UserStartModule", "oip", t =>
