@@ -5,23 +5,35 @@ import { Router } from '@angular/router';
 import { $t, updatePreset, updateSurfacePalette } from '@primeng/themes';
 import type { PaletteDesignToken, Preset } from '@primeuix/themes/types';
 import Aura from '@primeng/themes/aura';
-import Lara from '@primeng/themes/lara';
-import Nora from '@primeng/themes/nora';
 import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '../../services/app.layout.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { APP_THEME_PRESETS, APP_THEME_PRESETS_MERGE_MODE, AppThemePreset } from '../../services/theme-presets.token';
+import {
+  APP_THEME_PRESETS,
+  APP_THEME_PRESETS_MERGE_MODE,
+  AppThemePreset,
+  AppThemePresetLoader
+} from '../../services/theme-presets.token';
 import { provideTranslations } from '../../helpers/l10n.helper';
 
 import en from './l10n/app-configurator.en.json';
 import ru from './l10n/app-configurator.ru.json';
 
+/**
+ * Aura stays eager: it is the fallback preset and its primitive palette backs the color swatches
+ * shown before any other preset is resolved. Lara and Nora are loaded on demand, which keeps roughly
+ * 300 KB out of the initial bundle for applications that never switch away from the default theme.
+ */
 const DEFAULT_THEME_PRESETS: ReadonlyArray<AppThemePreset> = [
   { id: 'Aura', label: 'Aura', preset: Aura as Preset },
-  { id: 'Lara', label: 'Lara', preset: Lara as Preset },
-  { id: 'Nora', label: 'Nora', preset: Nora as Preset }
+  { id: 'Lara', label: 'Lara', preset: () => import('@primeng/themes/lara').then((m) => m.default as Preset) },
+  { id: 'Nora', label: 'Nora', preset: () => import('@primeng/themes/nora').then((m) => m.default as Preset) }
 ];
+
+function isPresetLoader(preset: AppThemePreset['preset']): preset is AppThemePresetLoader {
+  return typeof preset === 'function';
+}
 
 const PRIMARY_COLORS = [
   'emerald',
@@ -152,6 +164,20 @@ export class AppConfiguratorComponent implements OnInit {
 
   private readonly defaultThemePreset = this.themePresets[0] ?? DEFAULT_THEME_PRESETS[0];
 
+  /**
+   * Presets resolved so far, keyed by theme id. Seeded with the eagerly provided ones and filled in
+   * as loaders resolve; it is a signal so the color swatches recompute once a preset arrives.
+   */
+  private readonly resolvedPresets = signal<ReadonlyMap<string, Preset>>(
+    new Map(
+      this.themePresets
+        .filter((theme) => !isPresetLoader(theme.preset))
+        .map((theme) => [theme.id, theme.preset as Preset])
+    )
+  );
+
+  private readonly pendingPresets = new Map<string, Promise<Preset>>();
+
   private readonly fallbackPrimaryColors = ((
     DEFAULT_THEME_PRESETS[0].preset as { primitive?: Record<string, PaletteDesignToken> }
   ).primitive ?? {}) as Record<string, PaletteDesignToken>;
@@ -168,7 +194,7 @@ export class AppConfiguratorComponent implements OnInit {
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       const presetId = this.ensureValidThemeId(this.layoutService.layoutConfig().preset);
-      this.onPresetChange(presetId);
+      void this.onPresetChange(presetId);
     }
   }
 
@@ -479,6 +505,43 @@ export class AppConfiguratorComponent implements OnInit {
     return this.themePresetsMap.get(themeId ?? '') ?? this.defaultThemePreset;
   }
 
+  /**
+   * The preset of a theme, or `undefined` while its loader is still in flight.
+   */
+  private getResolvedPreset(theme: AppThemePreset): Preset | undefined {
+    return isPresetLoader(theme.preset) ? this.resolvedPresets().get(theme.id) : theme.preset;
+  }
+
+  /**
+   * Resolves a theme preset, running its loader at most once and caching the result.
+   * A failed load falls back to the default preset so the configurator stays usable.
+   */
+  private async loadPreset(theme: AppThemePreset): Promise<Preset> {
+    const resolved = this.getResolvedPreset(theme);
+    if (resolved) {
+      return resolved;
+    }
+
+    const pending = this.pendingPresets.get(theme.id);
+    if (pending) {
+      return pending;
+    }
+
+    const load = (theme.preset as AppThemePresetLoader)()
+      .then((preset) => {
+        this.resolvedPresets.update((presets) => new Map(presets).set(theme.id, preset));
+        return preset;
+      })
+      .catch((error) => {
+        console.error(`[AppConfigurator] Failed to load theme preset "${theme.id}".`, error);
+        return this.getResolvedPreset(this.defaultThemePreset) ?? (Aura as Preset);
+      })
+      .finally(() => this.pendingPresets.delete(theme.id));
+
+    this.pendingPresets.set(theme.id, load);
+    return load;
+  }
+
   private getPrimaryColorOptions(activeThemePreset: AppThemePreset): SurfacesType[] {
     if (activeThemePreset.primaryColors) {
       return Object.entries(activeThemePreset.primaryColors)
@@ -487,7 +550,8 @@ export class AppConfiguratorComponent implements OnInit {
     }
 
     const presetPalette =
-      (activeThemePreset.preset as { primitive?: Record<string, PaletteDesignToken> }).primitive ?? {};
+      (this.getResolvedPreset(activeThemePreset) as { primitive?: Record<string, PaletteDesignToken> } | undefined)
+        ?.primitive ?? {};
     const palettes: SurfacesType[] = [{ name: 'noir', palette: {} }];
 
     PRIMARY_COLORS.forEach((color) => {
@@ -547,9 +611,10 @@ export class AppConfiguratorComponent implements OnInit {
     }
   }
 
-  onPresetChange(event: string) {
+  async onPresetChange(event: string) {
     const nextThemeId = this.ensureValidThemeId(event);
     const nextTheme = this.getThemeById(nextThemeId);
+    const preset = await this.loadPreset(nextTheme);
     const primaryColors = this.getPrimaryColorOptions(nextTheme);
     const surfaceColors = this.getSurfaceColorOptions(nextTheme);
 
@@ -564,7 +629,6 @@ export class AppConfiguratorComponent implements OnInit {
           ? (surfaceColors[0]?.name ?? state.surface)
           : state.surface
     }));
-    const preset = nextTheme.preset;
     const surfacePalette = this.surfaceColors().find((s) => s.name === this.selectedSurfaceColor())?.palette;
     $t().preset(preset).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
   }

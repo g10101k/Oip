@@ -51,6 +51,7 @@ export {
   APP_THEME_PRESETS,
   APP_THEME_PRESETS_MERGE_MODE,
   AppThemePreset,
+  AppThemePresetLoader,
   AppThemePresetMergeMode
 } from './services/theme-presets.token';
 export { mergeWithDefaults, provideAppThemes, replaceDefaults } from './services/theme-presets.provider';
@@ -89,3 +90,22 @@ export { convertToPrimeNgDateFormat } from './helpers/date.helper';
 export { provideTranslations } from './helpers/l10n.helper';
 export { NotificationApi } from './api/notification.api';
 export { CustomElementExtensionModuleHostComponent } from './components/custom-element-extension-module-host/custom-element-extension-module-host.component';
+
+// Routing
+export {
+  oipAuthGuard,
+  provideOipRoutes,
+  oipAccessRoute,
+  oipErrorRoute,
+  oipProfileRoute,
+  oipConfigRoute,
+  oipApplicationsRoute,
+  oipModulesRoute,
+  oipDiscussionRoute,
+  oipDbMigrationRoute,
+  oipIframeModuleRoute,
+  oipExtensionsRoute,
+  OipRouteFeatures,
+  OipRouteToggle,
+  OipRoutesOptions
+} from './routing/oip.routes';
