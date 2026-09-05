@@ -12,6 +12,7 @@ import {
   GetModuleInstanceRightsParams,
   IntKeyValueDto,
   ModuleInstanceDto,
+  SetStartModuleParams,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
@@ -25,6 +26,23 @@ export class MenuApi<
       method: "GET",
       secure: true,
       format: "json",
+      ...params,
+    });
+  setStartModule = (
+    { id, ...query }: SetStartModuleParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/menu/set-start-module/${id}`,
+      method: "POST",
+      secure: true,
+      ...params,
+    });
+  deleteStartModule = (params: RequestParams = {}) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/menu/delete-start-module`,
+      method: "DELETE",
+      secure: true,
       ...params,
     });
   getModuleInstanceRights = (

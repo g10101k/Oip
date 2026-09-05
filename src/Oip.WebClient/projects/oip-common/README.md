@@ -117,10 +117,38 @@ provideOipRoutes({
 | `dbMigration`  | `db-migration/:id`             |                                                    |
 | `iframeModule` | `iframe-module/:id`            |                                                    |
 | `extensions`   | `extensions/:extensionKey/:id` |                                                    |
+| `noModules`    | `no-modules`                   | Shown when the user has no module available        |
+| `start`        | `` (the shell root)            | Redirects to the start module, see below           |
 
 The remaining options: `layout` replaces the shell component, `rootRoutes` adds routes outside the
 shell, `notFoundPath` and `unauthorizedPath` rename those two pages, and `wildcard: false` drops the
 `**` route when your application registers its own catch-all.
+
+Open a module by default
+
+The empty path is claimed by a redirect route that resolves the module instance the user lands on.
+It picks, in order: the `startRoute` of the host application, the module the user marked as their
+start page, the first module of their menu, and finally the `no-modules` page. The menu returned by
+the backend is already filtered by rights, so the resolved module is always one the user may open —
+a module that was deleted or whose rights were revoked simply drops out and the next candidate wins.
+
+```ts
+provideOipRoutes({
+  children: [
+    /* ... */
+  ],
+  startRoute: "/dashboard/1"
+});
+```
+
+Leave `startRoute` unset to follow the user's own choice. Users pick it from the sidebar: right
+click a menu item and choose *Set as start page*, which stores it per user on the backend and marks
+the item with a star. The route is skipped when `children` already declares its own empty path, and
+`features: { start: false }` drops it entirely.
+
+`StartPageService` backs all of this — `resolveStartUrl()` returns the target as a `UrlTree` (or
+`null` when nothing is available), `setStartModule(id)` and `clearStartModule()` change the choice.
+Results are cached per user and dropped when the session or the choice changes.
 
 Every built-in route is also exported on its own — `oipConfigRoute`, `oipModulesRoute` and so on —
 for applications that assemble the route tree by hand instead of calling `provideOipRoutes`.

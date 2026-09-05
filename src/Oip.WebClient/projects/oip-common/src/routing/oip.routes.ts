@@ -1,10 +1,12 @@
  import { inject, Type } from '@angular/core';
-import { CanActivateFn, Route, Routes } from '@angular/router';
+import { CanActivateFn, Route, Router, Routes } from '@angular/router';
 import { AppLayoutComponent } from '../components/app.layout/app.layout.component';
 import { AccessComponent } from '../components/auth/access/access.component';
 import { NotfoundComponent } from '../components/notfound/notfound.component';
 import { AuthGuardService } from '../services/auth-guard.service';
+import { ModuleLoadingService } from '../services/module-loading.service';
 import { moduleAccessGuard } from '../services/module-access-guard.service';
+import { StartPageService } from '../services/start-page.service';
 
 /**
  * Guard that requires an authenticated session and preserves the requested url as the return url.
@@ -13,6 +15,68 @@ import { moduleAccessGuard } from '../services/module-access-guard.service';
  * `inject(AuthGuardService)` lambda.
  */
 export const oipAuthGuard: CanActivateFn = (_, state) => inject(AuthGuardService).canActivate(state.url);
+
+/**
+ * Route data read by {@link oipStartRedirectGuard}.
+ */
+export interface StartRouteData {
+  /** Explicit start route of the host application, taking precedence over the user's own choice. */
+  startRoute?: string;
+  /** Where to go when the user has no module available. */
+  noModulesPath?: string;
+}
+
+/**
+ * Redirects the empty route to the module instance the user lands on by default.
+ *
+ * The order is: the explicit `startRoute` of the host application, then the module the user marked
+ * as their start page, then the first module available to them, and finally the no modules page.
+ */
+export const oipStartRedirectGuard: CanActivateFn = async (route) => {
+  const router = inject(Router);
+  const startPageService = inject(StartPageService);
+  const moduleLoading = inject(ModuleLoadingService);
+  const data = (route.data ?? {}) as StartRouteData;
+  const noModules = router.parseUrl(`/${data.noModulesPath ?? 'no-modules'}`);
+
+  if (data.startRoute) {
+    return router.parseUrl(data.startRoute);
+  }
+
+  try {
+    // Resolving reads the menu over the network, so keep the blocker up until the target is known.
+    return (await moduleLoading.track(startPageService.resolveStartUrl())) ?? noModules;
+  } catch (error) {
+    console.error('Failed to resolve the start module', error);
+    return noModules;
+  }
+};
+
+/**
+ * Page shown when the user has no module instance to open.
+ */
+export function oipNoModulesRoute(path = 'no-modules'): Route {
+  return {
+    path,
+    loadComponent: () => import('../components/no-modules/no-modules.component').then((m) => m.NoModulesComponent),
+    canActivate: [oipAuthGuard]
+  };
+}
+
+/**
+ * Empty route redirecting to the start module of the current user.
+ *
+ * Registered last among the shell children so a host application can claim the empty path itself.
+ */
+export function oipStartRoute(path = '', data: StartRouteData = {}): Route {
+  return {
+    path,
+    pathMatch: 'full',
+    canActivate: [oipAuthGuard, oipStartRedirectGuard],
+    children: [],
+    data
+  };
+}
 
 /**
  * Access denied page. Referenced by {@link AuthGuardService} and {@link moduleAccessGuard} redirects,
@@ -145,6 +209,10 @@ export interface OipRouteFeatures {
   iframeModule?: OipRouteToggle;
   /** Extension module host. Default path: `extensions/:extensionKey/:id`. */
   extensions?: OipRouteToggle;
+  /** Page shown when no module is available. Default path: `no-modules`. */
+  noModules?: OipRouteToggle;
+  /** Empty route redirecting to the start module. Default path: `` (the shell root). */
+  start?: OipRouteToggle;
 }
 
 /**
@@ -155,6 +223,11 @@ export interface OipRoutesOptions {
   children?: Routes;
   /** Which built-in routes to register, and under which paths. All of them are on by default. */
   features?: OipRouteFeatures;
+  /**
+   * Route opened by the empty path, overriding the start module of the user. Leave it unset to land
+   * on the module the user chose, or on the first module available to them.
+   */
+  startRoute?: string;
   /** Shell component wrapping every child route. Default: {@link AppLayoutComponent}. */
   layout?: Type<unknown>;
   /** Routes registered outside the shell, before the not found handling. */
@@ -194,7 +267,8 @@ function builtInRoute(toggle: OipRouteToggle | undefined, factory: (path?: strin
  *       canActivate: [oipAuthGuard]
  *     }
  *   ],
- *   features: { dbMigration: 'legacy-migration/:id', modules: false }
+ *   features: { dbMigration: 'legacy-migration/:id', modules: false },
+ *   startRoute: '/dashboard/1'
  * });
  */
 export function provideOipRoutes(options: OipRoutesOptions = {}): Routes {
@@ -211,6 +285,14 @@ export function provideOipRoutes(options: OipRoutesOptions = {}): Routes {
   builtInRoute(features.dbMigration, oipDbMigrationRoute, children);
   builtInRoute(features.iframeModule, oipIframeModuleRoute, children);
   builtInRoute(features.extensions, oipExtensionsRoute, children);
+  builtInRoute(features.noModules, oipNoModulesRoute, children);
+
+  // Registered last so a host application that declares its own empty path keeps it.
+  if (features.start !== false && !children.some((route) => route.path === '')) {
+    const noModulesPath = typeof features.noModules === 'string' ? features.noModules : 'no-modules';
+    const startPath = typeof features.start === 'string' ? features.start : '';
+    children.push(oipStartRoute(startPath, { startRoute: options.startRoute, noModulesPath }));
+  }
 
   const notFoundPath = options.notFoundPath ?? 'notfound';
 

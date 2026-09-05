@@ -13,7 +13,11 @@
     "deleteItemConfirmRejectButtonPropsLabel": "Cancel",
     "deleteItemConfirmAcceptButtonPropsLabel": "Delete",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "setStartModule": "Set as start page",
+    "unsetStartModule": "Clear start page",
+    "setStartModuleSuccessMessage": "Start page updated",
+    "unsetStartModuleSuccessMessage": "Start page cleared"
   },
   "menuItemEditDialogComponent": {
     "header": "Edit menu item",

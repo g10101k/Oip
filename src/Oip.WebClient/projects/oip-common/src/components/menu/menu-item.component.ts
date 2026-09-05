@@ -17,6 +17,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { MenuApi } from '../../api/menu.api';
 import { ChangeOrderParams, DeleteModuleInstanceParams, ModuleInstanceDto } from '../../api/data-contracts';
 import { SecurityService } from '../../services/security.service';
+import { StartPageService } from '../../services/start-page.service';
 
 interface MenuItemComponentTranslation {
   delete: string;
@@ -29,6 +30,10 @@ interface MenuItemComponentTranslation {
   deleteItemConfirmAcceptButtonPropsLabel: string;
   moveUp: string;
   moveDown: string;
+  setStartModule: string;
+  unsetStartModule: string;
+  setStartModuleSuccessMessage: string;
+  unsetStartModuleSuccessMessage: string;
 }
 
 @Component({
@@ -85,6 +90,9 @@ interface MenuItemComponentTranslation {
           (contextmenu)="onContextMenu($event, item)">
           <i class="layout-menuitem-icon" [ngClass]="item.icon"></i>
           <span class="layout-menuitem-text">{{ item.label }}</span>
+          @if (item.isStart) {
+            <i class="pi pi-fw pi-star-fill ml-auto text-xs opacity-60"></i>
+          }
           @if (item.items) {
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
           }
@@ -118,6 +126,7 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   private readonly msgService = inject(MsgService);
   private readonly menuDataService = inject(MenuApi);
   private readonly securityService = inject(SecurityService);
+  private readonly startPageService = inject(StartPageService);
 
   @Input() item: ContextMenuItemDto;
   @Input() index!: number;
@@ -231,7 +240,19 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   }
 
   onContextMenu($event: MouseEvent, item: any) {
+    const startModuleItems = this.getStartModuleItems(item);
+    // Choosing a start page is available to every user, the rest of the menu is administrative.
     if (!this.securityService.isAdmin()) {
+      if (startModuleItems.length === 0) {
+        return;
+      }
+
+      $event.stopPropagation();
+      $event.preventDefault();
+
+      this.menuService.contextMenuItem = item;
+      this.contextMenu.model = startModuleItems;
+      this.contextMenu.show($event);
       return;
     }
 
@@ -240,6 +261,8 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
     this.menuService.contextMenuItem = item;
     this.contextMenu.model = [
+      ...startModuleItems,
+      { separator: true, visible: startModuleItems.length > 0 },
       {
         label: this.localization.new,
         icon: PrimeIcons.PLUS,
@@ -279,6 +302,43 @@ export class MenuItemComponent implements OnInit, OnDestroy {
       }
     ];
     this.contextMenu.show($event);
+  }
+
+  /**
+   * Builds the start page entries of the context menu. Only a navigable leaf can be a start page.
+   */
+  private getStartModuleItems(item: ContextMenuItemDto): MenuItem[] {
+    if (!item?.routerLink || item.items?.length) {
+      return [];
+    }
+
+    return item.isStart
+      ? [
+          {
+            label: this.localization.unsetStartModule,
+            icon: PrimeIcons.STAR,
+            command: () => this.clearStartModule()
+          }
+        ]
+      : [
+          {
+            label: this.localization.setStartModule,
+            icon: PrimeIcons.STAR_FILL,
+            command: () => this.setStartModule(item)
+          }
+        ];
+  }
+
+  private async setStartModule(item: ContextMenuItemDto) {
+    await this.startPageService.setStartModule(item.moduleInstanceId);
+    this.msgService.success(this.localization.setStartModuleSuccessMessage);
+    await this.menuService.loadMenu();
+  }
+
+  private async clearStartModule() {
+    await this.startPageService.clearStartModule();
+    this.msgService.success(this.localization.unsetStartModuleSuccessMessage);
+    await this.menuService.loadMenu();
   }
 
   private deleteItem(event: MenuItemCommandEvent) {

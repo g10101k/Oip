@@ -13,7 +13,11 @@
     "deleteItemConfirmRejectButtonPropsLabel": "Отмена",
     "deleteItemConfirmAcceptButtonPropsLabel": "Удалить",
     "moveUp": "Вверх",
-    "moveDown": "Вниз"
+    "moveDown": "Вниз",
+    "setStartModule": "Сделать стартовой",
+    "unsetStartModule": "Убрать стартовую",
+    "setStartModuleSuccessMessage": "Стартовая страница обновлена",
+    "unsetStartModuleSuccessMessage": "Стартовая страница сброшена"
   },
   "menuItemEditDialogComponent": {
     "header": "Редактировать элемент меню",
