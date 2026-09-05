@@ -35,9 +35,9 @@ type PrimeIconOption = {
           <input
             autocomplete="off"
             class="flex-auto"
+            disabled
             id="oip-menu-item-create-dialog-parent-input"
             pInputText
-            readonly
             [ngModel]="menuService.contextMenuItem?.label" />
         </div>
       }
