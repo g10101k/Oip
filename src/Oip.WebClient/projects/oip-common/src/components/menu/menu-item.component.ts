@@ -90,9 +90,6 @@ interface MenuItemComponentTranslation {
           (contextmenu)="onContextMenu($event, item)">
           <i class="layout-menuitem-icon" [ngClass]="item.icon"></i>
           <span class="layout-menuitem-text">{{ item.label }}</span>
-          @if (item.isStart) {
-            <i class="pi pi-fw pi-star-fill ml-auto text-xs opacity-60"></i>
-          }
           @if (item.items) {
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
           }
