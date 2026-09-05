@@ -26,6 +26,7 @@ import { ContentType, HttpClient } from '../../api/http-client';
 import { PutSecurityDto } from '../../dtos/put-security.dto';
 import { ApiExceptionResponse } from '../../api/data-contracts';
 import { provideTranslations } from '../../helpers/l10n.helper';
+import { ModuleLoadingService } from '../../services/module-loading.service';
 
 import en from './l10n/base-module.en.json';
 import ru from './l10n/base-module.ru.json';
@@ -49,6 +50,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   protected securitySettings: SecurityDto[] = [];
   protected readonly destroyRef = inject(DestroyRef);
   protected readonly securityService = inject(SecurityService);
+  protected readonly moduleLoadingService = inject(ModuleLoadingService);
   protected readonly httpClient = inject(HttpClient);
 
   /**
@@ -475,16 +477,21 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   }
 
   private async reloadModuleInstance(): Promise<void> {
-    this.moduleInstanceReloadPromise = this.moduleInstanceReloadPromise.then(async () => {
-      // Rights first: the backend rejects settings and data requests without the read right.
-      await this.watchSecurityRights();
-      if (!this.canRead) {
-        return;
-      }
+    // Blocks the UI for the whole bootstrap: router navigation has already ended by the time it runs.
+    this.moduleInstanceReloadPromise = this.moduleInstanceReloadPromise.then(() =>
+      this.moduleLoadingService.track(
+        (async () => {
+          // Rights first: the backend rejects settings and data requests without the read right.
+          await this.watchSecurityRights();
+          if (!this.canRead) {
+            return;
+          }
 
-      await this.getSettings();
-      await this.onModuleInstanceChange();
-    });
+          await this.getSettings();
+          await this.onModuleInstanceChange();
+        })()
+      )
+    );
 
     await this.moduleInstanceReloadPromise;
   }
