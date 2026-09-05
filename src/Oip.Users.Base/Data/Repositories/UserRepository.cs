@@ -146,16 +146,28 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     {
         return await context.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+            .Where(x => x.Email == email && x.IsActive)
+            .OrderByDescending(x => x.KeycloakId != string.Empty)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <summary>
-    /// Gets a tracked user entity by e-mail.
+    /// Gets a user entity by the Keycloak subject identifier taken from the current token.
     /// </summary>
-    public async Task<UserEntity?> GetTrackedByEmailAsync(string email, CancellationToken cancellationToken = default)
+    public async Task<UserEntity?> GetBySubjectAsync(string subject, CancellationToken cancellationToken = default)
     {
         return await context.Users
-            .FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.KeycloakId == subject, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets a tracked user entity by the Keycloak subject identifier.
+    /// </summary>
+    public async Task<UserEntity?> GetTrackedBySubjectAsync(string subject, CancellationToken cancellationToken = default)
+    {
+        return await context.Users
+            .FirstOrDefaultAsync(x => x.KeycloakId == subject, cancellationToken);
     }
 
     /// <summary>
@@ -168,19 +180,39 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     }
 
     /// <summary>
-    /// Gets an existing user by e-mail or creates a minimal profile for the current authenticated user.
+    /// Gets an existing user by the Keycloak subject identifier or creates a minimal profile for the current
+    /// authenticated user. A profile that was created before the subject was known is linked to it by e-mail.
     /// </summary>
-    public async Task<UserEntity> GetOrCreateByEmailAsync(string email, CancellationToken cancellationToken = default)
+    public async Task<UserEntity> GetOrCreateBySubjectAsync(
+        string subject,
+        string? email,
+        CancellationToken cancellationToken = default)
     {
-        var user = await GetTrackedByEmailAsync(email, cancellationToken);
+        var user = await GetTrackedBySubjectAsync(subject, cancellationToken);
         if (user != null)
         {
             return user;
         }
 
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            user = await context.Users
+                .FirstOrDefaultAsync(
+                    x => x.Email == email && x.IsActive && x.KeycloakId == string.Empty,
+                    cancellationToken);
+            if (user != null)
+            {
+                user.KeycloakId = subject;
+                user.UpdatedAt = DateTimeOffset.UtcNow;
+                await context.SaveChangesAsync(cancellationToken);
+                return user;
+            }
+        }
+
         user = new UserEntity
         {
-            Email = email,
+            KeycloakId = subject,
+            Email = email ?? string.Empty,
             Settings = string.Empty
         };
         context.Users.Add(user);
@@ -238,24 +270,28 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     /// <summary>
     /// Get user settings
     /// </summary>
-    /// <param name="email"></param>
+    /// <param name="subject">Keycloak subject identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns></returns>
-    public string GetUserSettings(string email)
+    public async Task<string> GetUserSettingsAsync(string subject, CancellationToken cancellationToken = default)
     {
-        return context.Users.Where(x => x.Email == email).AsNoTracking().FirstOrDefault()?.Settings ?? string.Empty;
+        var user = await GetBySubjectAsync(subject, cancellationToken);
+        return user?.Settings ?? string.Empty;
     }
 
     /// <summary>
     /// Update User settings
     /// </summary>
-    /// <param name="email">email</param>
+    /// <param name="subject">Keycloak subject identifier</param>
     /// <param name="json">settings</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <exception cref="InvalidOperationException">User not found</exception>
-    public async Task UpdateUserSettings(string email, string json)
+    public async Task UpdateUserSettingsAsync(string subject, string json, CancellationToken cancellationToken = default)
     {
-        var user = await context.Users.FirstOrDefaultAsync(x => x.Email == email) ??
-                   throw new InvalidOperationException($"User with email: {email} - not found");
+        var user = await GetTrackedBySubjectAsync(subject, cancellationToken) ??
+                   throw new InvalidOperationException($"User with subject: {subject} - not found");
         user.Settings = json;
-        await context.SaveChangesAsync();
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+        await context.SaveChangesAsync(cancellationToken);
     }
 }
