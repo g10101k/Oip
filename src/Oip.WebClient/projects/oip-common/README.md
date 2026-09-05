@@ -124,3 +124,38 @@ shell, `notFoundPath` and `unauthorizedPath` rename those two pages, and `wildca
 
 Every built-in route is also exported on its own — `oipConfigRoute`, `oipModulesRoute` and so on —
 for applications that assemble the route tree by hand instead of calling `provideOipRoutes`.
+
+Block the UI during module transitions
+
+`AppLayoutComponent` renders `BlockLoaderComponent`, a full screen blocker driven by
+`ModuleLoadingService`. It covers router navigation on its own, plus the module bootstrap that
+`BaseModuleComponent` runs after `NavigationEnd` — rights, settings, `onModuleInstanceChange()` and
+extension loading — so nothing is clickable while a module is still coming up. Applications using
+the standard shell get it for free; only a custom `layout` component has to render
+`<block-loader />`, and it must sit outside `.layout-wrapper`, which the blocker marks `inert`
+while it is visible.
+
+Register your own long running work with `ModuleLoadingService` when it must block the same way:
+
+```ts
+import { Component, inject } from "@angular/core";
+import { BaseModuleComponent, ModuleLoadingService } from "oip-common";
+
+@Component({
+  /* ... */
+})
+export class ReportModuleComponent extends BaseModuleComponent<ReportSettings, void> {
+  private readonly moduleLoadingService = inject(ModuleLoadingService);
+
+  protected async runReport(): Promise<void> {
+    await this.moduleLoadingService.track(this.reportApi.build(this.id));
+  }
+}
+```
+
+`track()` releases the blocker when the promise rejects, so an error never leaves the UI locked. The
+`begin()` / `end()` pair is available for work that is not a promise; balance it from a `finally`
+block. A `begin()` that is never released is dropped after 30 seconds with a console warning.
+
+The blocker appears only when a transition lasts longer than 150 ms and then stays for at least
+300 ms, so fast navigation does not flash a spinner.
