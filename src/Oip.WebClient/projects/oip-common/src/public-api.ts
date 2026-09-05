@@ -23,6 +23,7 @@ export { IframeModuleComponent } from './components/iframe-module/iframe-module.
 export { ExtensionModuleHostComponent } from './components/extension-module-host/extension-module-host.component';
 export { UserNotificationsComponent } from './components/user-notifications/user-notifications.component';
 export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher/top-bar-application-switcher.component';
+export { BlockLoaderComponent } from './components/block-loader/block-loader.component';
 
 // DTOs
 export { TopBarDto } from './dtos/top-bar.dto';
@@ -46,6 +47,7 @@ export { provideAppInfo, AppInfoService, APP_INFO_TOKEN, AppInfo, AppInfoValue }
 export { NotificationService } from './services/notification.service';
 export { ApplicationRegistryService } from './services/application-registry.service';
 export { TableFilterService } from './services/table-filter.service';
+export { ModuleLoadingService } from './services/module-loading.service';
 export { ExtensionLoaderService } from './extension-host/extension-loader.service';
 export {
   APP_THEME_PRESETS,

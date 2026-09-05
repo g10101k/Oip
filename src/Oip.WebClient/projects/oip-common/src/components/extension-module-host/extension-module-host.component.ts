@@ -69,7 +69,7 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
   async reloadExtension(): Promise<void> {
     this.loadError = null;
     this.extensionMetadata = undefined;
-    await this.loadExtensionMetadata();
+    await this.moduleLoadingService.track(this.loadExtensionMetadata());
     await this.renderExtension();
   }
 
@@ -105,7 +105,12 @@ export class ExtensionModuleHostComponent extends BaseModuleComponent<unknown, u
     await this.loadExtensionTranslations(this.extensionMetadata);
   }
 
-  private async renderExtension(): Promise<void> {
+  /** Blocks the UI while the extension is (re)mounted, including the queued render after the view init. */
+  private renderExtension(): Promise<void> {
+    return this.moduleLoadingService.track(this.renderExtensionInternal());
+  }
+
+  private async renderExtensionInternal(): Promise<void> {
     if (this.destroyed || !this.viewContainer) {
       return;
     }

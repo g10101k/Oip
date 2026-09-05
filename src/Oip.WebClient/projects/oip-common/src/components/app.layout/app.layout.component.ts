@@ -6,13 +6,14 @@ import { AppTopbar } from '../top-bar/top-bar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { LayoutService } from '../../services/app.layout.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { BlockLoaderComponent } from '../block-loader/block-loader.component';
 import { MenuApi } from '../../api/menu.api';
 import { MenuService } from '../../services/app.menu.service';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, AppTopbar, SidebarComponent, RouterModule, FooterComponent],
+  imports: [CommonModule, AppTopbar, SidebarComponent, RouterModule, FooterComponent, BlockLoaderComponent],
   template: `
     <div class="layout-wrapper" [ngClass]="containerClass">
       <app-topbar></app-topbar>
@@ -25,6 +26,8 @@ import { MenuService } from '../../services/app.menu.service';
       </div>
       <div class="layout-mask animate-fadein"></div>
     </div>
+    <!-- Outside the wrapper on purpose: the blocker marks the wrapper inert while it is visible. -->
+    <block-loader />
   `,
   providers: [MenuService, MenuApi]
 })
