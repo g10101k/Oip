@@ -5,6 +5,7 @@ using Oip.Applications.Base.Extensions;
 using Oip.Base.Data.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
+using Oip.Base.Security.DefaultSecrets;
 using Oip.Base.Settings;
 using Oip.Settings;
 using Oip.Demo.TableQueryDemo;
@@ -35,6 +36,7 @@ internal static class Program
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);
             builder.Services.AddWebClientGenerationStartupTask(settings);
+            builder.Services.AddDefaultSecretsValidation(builder.Configuration);
             builder.Services.AddStartupRunner();
             builder.Services.AddHttpClient();
             builder.Services.AddCors(settings);

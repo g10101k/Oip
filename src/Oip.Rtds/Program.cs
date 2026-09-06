@@ -5,6 +5,7 @@ using Oip.Base.Controllers;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
+using Oip.Base.Security.DefaultSecrets;
 using Oip.Base.Settings;
 using Oip.Rtds.Controllers;
 using Oip.Rtds.Data;
@@ -33,6 +34,7 @@ internal static class Program
             builder.Services.AddOpenApi(settings);
             builder.Services.AddApplicationsService(settings);
             builder.Services.AddWebClientGenerationStartupTask(settings);
+            builder.Services.AddDefaultSecretsValidation(builder.Configuration);
             builder.Services.AddStartupRunner();
             builder.Services.AddSingleton(settings);
             builder.Services.AddScoped<ClaimService>();

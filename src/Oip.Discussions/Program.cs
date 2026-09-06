@@ -4,6 +4,7 @@ using Oip.Applications.Base.Extensions;
 using Oip.Base.Controllers;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
+using Oip.Base.Security.DefaultSecrets;
 using Oip.Base.Settings;
 using Oip.Discussions.Base.Controllers;
 using Oip.Discussions.Base.Extensions;
@@ -36,6 +37,7 @@ internal static class Program
             builder.Services.AddDefaultHealthChecks();
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);
+            builder.Services.AddDefaultSecretsValidation(builder.Configuration);
             builder.Services.AddStartupRunner()
                 .AddCors(settings)
                 .AddApplicationsService(settings)

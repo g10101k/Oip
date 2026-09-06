@@ -1,3 +1,6 @@
+using Oip.Base.Security.DefaultSecrets;
+using Oip.Base.Settings.Attributes;
+
 namespace Oip.Base.Settings;
 
 /// <summary>
@@ -23,6 +26,7 @@ public class SecurityServiceSettings
     /// <summary>
     /// Client secret
     /// </summary>
+    [SecretSetting(KnownDefaultSecrets.KeycloakClientSecret)]
     public string ClientSecret { get; set; } = null!;
     
     /// <summary>
@@ -33,6 +37,7 @@ public class SecurityServiceSettings
     /// <summary>
     /// Gets or sets the Keycloak admin password.
     /// </summary>
+    [SecretSetting(KnownDefaultSecrets.KeycloakAdminPassword, Required = false)]
     public string AdminPassword { get; set; } = null!;
 
     /// <summary>

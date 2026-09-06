@@ -34,6 +34,7 @@
 * [Генерация клиентов web api](./SwaggerWebClientGenerator.md)
 * [Режим standalone & distributed](./StandaloneAndDistributedMode.md)
 * [Безопасность](./Security.md)
+* [Секреты по умолчанию](./DefaultSecrets.md)
 * [Синхронизация пользователей Keycloak](./KeycloakUserSync.md)
 * [Управление темами во frontend](./ThemeManagement.md)
 

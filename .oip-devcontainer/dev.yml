@@ -15,7 +15,7 @@ services:
       SecurityService:BaseUrl: https://localhost:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
       SecurityService:AuthTicketStore:RedisConnectionString: redis:6379,password=${REDIS_PASSWORD:-P@ssw0rd},defaultDatabase=0
-      KeycloakEvents:SharedSecret: change-me-keycloak-events
+      KeycloakSync:SharedSecret: change-me-keycloak-events
       DataProtection__PersistKeysToFileSystemPath: /PersistKeys
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://0.0.0.0:50002
@@ -52,7 +52,7 @@ services:
       SecurityService:BaseUrl: https://localhost:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
       SecurityService:AuthTicketStore:RedisConnectionString: redis:6379,password=${REDIS_PASSWORD:-P@ssw0rd},defaultDatabase=0
-      KeycloakEvents:SharedSecret: change-me-keycloak-events
+      KeycloakSync:SharedSecret: change-me-keycloak-events
       DataProtection__PersistKeysToFileSystemPath: /PersistKeys
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://0.0.0.0:5005

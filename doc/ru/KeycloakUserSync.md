@@ -21,7 +21,7 @@ Keycloak admin event -> webhook в OIP -> GET пользователя из Keyc
 - `ext-event-http` - provider id HTTP-отправителя из расширения.
 - `KeycloakEventsController` - внутренний webhook endpoint OIP.
 - `UserSyncService` - сервис синхронизации пользователя из Keycloak в локальную БД.
-- `KeycloakEvents:SharedSecret` - общий секрет для HMAC-подписи webhook-запроса.
+- `KeycloakSync:SharedSecret` - общий секрет для HMAC-подписи webhook-запроса.
 
 Webhook endpoint:
 
@@ -113,8 +113,8 @@ docker compose -f .oip-devcontainer/dev.yml exec keycloak /opt/keycloak/bin/kcad
 
 ````json
 {
-  "KeycloakEvents": {
-    "Enabled": true,
+  "KeycloakSync": {
+    "BatchSize": 100,
     "SharedSecret": "change-me-keycloak-events"
   }
 }

@@ -54,7 +54,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     /// <inheritdoc />
     public DataProtectionSettings DataProtection { get; set; } = new();
     
-    public KeycloakSyncSettings KeycloakSyncSettings { get; set; } = new();
+    public KeycloakSyncSettings KeycloakSync { get; set; } = new();
 
     /// <summary>
     /// User photo storage

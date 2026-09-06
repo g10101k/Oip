@@ -1,3 +1,6 @@
+using Oip.Base.Security.DefaultSecrets;
+using Oip.Base.Settings.Attributes;
+
 namespace Oip.Base.Settings;
 
 /// <summary>
@@ -18,7 +21,8 @@ public class ObjectStorageSettings
     /// <summary>
     /// Secret key.
     /// </summary>
-    public string SecretKey { get; set; } = "P@ssw0rd";
+    [SecretSetting(KnownDefaultSecrets.ObjectStorageSecretKey)]
+    public string SecretKey { get; set; } = KnownDefaultSecrets.ObjectStorageSecretKey;
 
     /// <summary>
     /// Bucket name for discussion attachments.

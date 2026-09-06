@@ -4,6 +4,7 @@ using Oip.Applications.Base.Extensions;
 using Oip.Applications.Base.Settings;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
+using Oip.Base.Security.DefaultSecrets;
 using Oip.Base.Settings;
 
 namespace Oip.Applications;
@@ -26,6 +27,7 @@ internal static class Program
                 .AddDefaultHealthChecks()
                 .AddDefaultAuthentication(settings)
                 .AddOpenApi(settings)
+                .AddDefaultSecretsValidation(builder.Configuration)
                 .AddStartupRunner()
                 .AddCors(settings)
                 .AddForwardedHeaders(settings)

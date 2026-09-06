@@ -1,4 +1,6 @@
+using Oip.Base.Security.DefaultSecrets;
 using Oip.Base.Settings;
+using Oip.Base.Settings.Attributes;
 using Oip.Settings;
 
 namespace Oip.Users.Base.Settings;
@@ -52,7 +54,7 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     /// <summary>
     /// Represents synchronization options for the application.
     /// </summary>
-    public KeycloakSyncSettings KeycloakSyncSettings { get; set; } = new();
+    public KeycloakSyncSettings KeycloakSync { get; set; } = new();
     
     public CorsSettings Cors { get; set; } = new();
 }
@@ -75,5 +77,6 @@ public class KeycloakSyncSettings
     /// <summary>
     /// The shared secret used to validate the X-Keycloak-Signature HMAC header.
     /// </summary>
+    [SecretSetting(KnownDefaultSecrets.KeycloakEventsSharedSecret, Required = false)]
     public string SharedSecret { get; set; } = string.Empty;
 }

@@ -53,7 +53,7 @@ https://host.docker.internal:5002/api/keycloak-events/receive-keycloak-event
 ````
 
 The webhook is signed with `X-Keycloak-Signature` using the shared secret configured in both
-`realm-export.json` and the app `KeycloakEvents:SharedSecret` setting.
+`realm-export.json` and the app `KeycloakSync:SharedSecret` setting.
 
 If the Keycloak Postgres volume already contains the realm, changing `realm-export.json` will not update it
 automatically. Update the realm attributes/listeners in the Admin UI or recreate the Keycloak database volume.
