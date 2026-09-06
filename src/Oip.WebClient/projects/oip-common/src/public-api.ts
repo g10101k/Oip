@@ -25,6 +25,7 @@ export { UserNotificationsComponent } from './components/user-notifications/user
 export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher/top-bar-application-switcher.component';
 export { BlockLoaderComponent } from './components/block-loader/block-loader.component';
 export { NoModulesComponent } from './components/no-modules/no-modules.component';
+export { DefaultSecretsBannerComponent } from './components/default-secrets-banner/default-secrets-banner.component';
 
 // DTOs
 export { TopBarDto } from './dtos/top-bar.dto';

@@ -3,6 +3,8 @@ using NLog.Web;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Controllers;
 using Oip.Base.Extensions;
+using Oip.Base.Runtime;
+using Oip.Base.Security.DefaultSecrets;
 using Oip.Base.Settings;
 using Oip.Notifications.Base.Extensions;
 using Oip.Users.Base.Controllers;
@@ -33,6 +35,8 @@ internal static class Program
             builder.Services.AddOpenApi(settings);
             builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
+            builder.Services.AddDefaultSecretsValidation();
+            builder.Services.AddStartupRunner();
             builder.Services.AddApplicationsService(settings);
             builder.Services.AddSingleton(settings);
             builder.Services.AddCors(settings);

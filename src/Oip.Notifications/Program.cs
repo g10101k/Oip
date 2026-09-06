@@ -3,6 +3,7 @@ using NLog.Web;
 using Oip.Applications.Base.Extensions;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
+using Oip.Base.Security.DefaultSecrets;
 using Oip.Base.Settings;
 using Oip.Notifications.Base.Extensions;
 using Oip.Notifications.Base.Settings;
@@ -30,6 +31,7 @@ internal static class Program
             builder.Services.AddApplicationsService(settings);
             builder.Services.AddUserService(settings);
 
+            builder.Services.AddDefaultSecretsValidation();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors(settings);
             builder.Services.AddForwardedHeaders(settings);

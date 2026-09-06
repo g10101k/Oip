@@ -37,6 +37,7 @@ using Oip.Base.Providers;
 using Oip.Base.Runtime;
 using Oip.Base.Services;
 using Oip.Base.Settings;
+using Oip.Base.Security.DefaultSecrets;
 using Oip.Base.StartupTasks;
 using OpenTelemetry.Metrics;
 using Polly;
@@ -283,7 +284,8 @@ public static class OipModuleApplication
     public static IServiceCollection AddDefaultHealthChecks(this IServiceCollection services)
     {
         services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"])
+            .AddDefaultSecretsCheck();
 
         return services;
     }
@@ -886,7 +888,7 @@ public static class OipModuleApplication
         app.MapGet("/health", async (HealthCheckService health) =>
             {
                 var result = await health.CheckHealthAsync();
-                return result.Status == HealthStatus.Healthy
+                return result.Status != HealthStatus.Unhealthy
                     ? Results.Ok(result)
                     : Results.StatusCode(503);
             })

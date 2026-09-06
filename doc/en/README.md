@@ -34,6 +34,7 @@ Subsequent runs can be performed using:
 * [Web API Client Generation](./SwaggerWebClientGenerator.md)
 * [Standalone & Distributed Mode](./StandaloneAndDistributedMode.md)
 * [Security](./Security.md)
+* [Default Secrets](./DefaultSecrets.md)
 * [Keycloak User Synchronization](./KeycloakUserSync.md)
 * [Frontend Theme Management](./ThemeManagement.md)
 
