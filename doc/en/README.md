@@ -21,6 +21,11 @@ First-time setup:
 7. Use the login `admin` / `P@ssw0rd`;
 8. You can now log in to the portal with this user;
 
+The defaults are written into `dev.yml`, so nothing has to be configured to start. Those credentials are public
+though - every clone has them. Before this installation is reachable by anyone but you, copy
+`.oip-devcontainer/.env.example` to `.oip-devcontainer/.env`, put your own values in it and rotate the secrets
+inside the services: [Secret Rotation](./SecretRotation.md).
+
 Subsequent runs can be performed using:
 
 * `cd .devcontainer`
@@ -35,6 +40,7 @@ Subsequent runs can be performed using:
 * [Standalone & Distributed Mode](./StandaloneAndDistributedMode.md)
 * [Security](./Security.md)
 * [Default Secrets](./DefaultSecrets.md)
+* [Secret Rotation](./SecretRotation.md)
 * [Keycloak User Synchronization](./KeycloakUserSync.md)
 * [Frontend Theme Management](./ThemeManagement.md)
 

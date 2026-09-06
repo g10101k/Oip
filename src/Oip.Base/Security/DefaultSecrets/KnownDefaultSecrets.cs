@@ -18,6 +18,11 @@ public static class KnownDefaultSecrets
     public const string KeycloakAdminPassword = "P@ssw0rd";
 
     /// <summary>
+    /// MinIO/S3 access key shipped as a code default. It is the root user of the development container.
+    /// </summary>
+    public const string ObjectStorageAccessKey = "admin";
+
+    /// <summary>
     /// MinIO/S3 secret key shipped as a code default and in <c>appsettings.json</c>.
     /// </summary>
     public const string ObjectStorageSecretKey = "P@ssw0rd";

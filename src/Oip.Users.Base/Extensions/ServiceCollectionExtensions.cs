@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Minio;
 using Oip.Base.Extensions;
 using Oip.Base.Runtime;
+using Oip.Base.Security.Connectivity;
 using Oip.Base.Services;
 using Oip.Base.Settings;
 using Oip.Notifications.Base.Services;
@@ -121,6 +122,10 @@ public static class ServiceCollectionExtensions
             return new UserPhotoMinioClient(client.Build());
         });
         services.TryAddScoped<IUserPhotoStorage, MinioUserPhotoStorage>();
+        services.AddSecretConnectivityProbe(sp => new DelegateSecretConnectivityProbe(
+            "MinIO (UserPhotoStorage)",
+            "'UserPhotoStorage:AccessKey' and 'UserPhotoStorage:SecretKey' (MINIO_ACCESS_KEY, MINIO_SECRET_KEY)",
+            ct => sp.GetRequiredService<UserPhotoMinioClient>().Client.ListBucketsAsync(ct)));
         return services;
     }
 

@@ -29,6 +29,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
+using Oip.Base.Security.Connectivity;
 using Oip.Base.Clients;
 using Oip.Base.Exceptions;
 using Oip.Base.Helpers;
@@ -423,6 +424,7 @@ public static class OipModuleApplication
         services.AddDataProtection()
             .SetApplicationName("OIP");
         services.AddAuthenticationTicketStore(settings.SecurityService.AuthTicketStore);
+        services.AddSecretConnectivityValidation();
         services.AddAntiforgery(options =>
         {
             options.HeaderName = CsrfHeaderName;
@@ -664,6 +666,7 @@ public static class OipModuleApplication
     {
         if (!string.IsNullOrWhiteSpace(settings.RedisConnectionString))
         {
+            services.AddRedisSecretConnectivityProbe(settings);
             services.AddStackExchangeRedisCache(options => { options.Configuration = settings.RedisConnectionString; });
             services.AddSingleton<ITicketStore>(provider => new DistributedAuthenticationTicketStore(
                 provider.GetRequiredService<IDistributedCache>(),

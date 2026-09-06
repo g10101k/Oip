@@ -14,13 +14,20 @@ services:
       ConnectionString: XpoProvider=Postgres;Server=postgres;Database=oip;uid=postgres;pwd=postgres;
       SecurityService:BaseUrl: https://localhost:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
+      SecurityService:ClientSecret: ${KEYCLOAK_CLIENT_SECRET:-Xnw6h8wH0dgehxGxZYgWKbKosKCx9E8L}
       SecurityService:AuthTicketStore:RedisConnectionString: redis:6379,password=${REDIS_PASSWORD:-P@ssw0rd},defaultDatabase=0
-      KeycloakSync:SharedSecret: change-me-keycloak-events
+      KeycloakSync:SharedSecret: ${KEYCLOAK_EVENTS_SHARED_SECRET:-change-me-keycloak-events}
+      UserPhotoStorage:Endpoint: minio:9000
+      UserPhotoStorage:AccessKey: ${MINIO_ACCESS_KEY:-admin}
+      UserPhotoStorage:SecretKey: ${MINIO_SECRET_KEY:-P@ssw0rd}
+      DiscussionAttachmentStorage:Endpoint: minio:9000
+      DiscussionAttachmentStorage:AccessKey: ${MINIO_ACCESS_KEY:-admin}
+      DiscussionAttachmentStorage:SecretKey: ${MINIO_SECRET_KEY:-P@ssw0rd}
       DataProtection__PersistKeysToFileSystemPath: /PersistKeys
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://0.0.0.0:50002
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:50002
-      ASPNETCORE_Kestrel__Certificates__Default__Password: P@ssw0rd
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${DEV_CERT_PASSWORD:-P@ssw0rd}
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/oip.pfx
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -30,6 +37,8 @@ services:
       keycloak:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
   oip-users:
@@ -51,13 +60,17 @@ services:
       Services:OipNotifications: https://oip-notifications:5007
       SecurityService:BaseUrl: https://localhost:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
+      SecurityService:ClientSecret: ${KEYCLOAK_CLIENT_SECRET:-Xnw6h8wH0dgehxGxZYgWKbKosKCx9E8L}
       SecurityService:AuthTicketStore:RedisConnectionString: redis:6379,password=${REDIS_PASSWORD:-P@ssw0rd},defaultDatabase=0
-      KeycloakSync:SharedSecret: change-me-keycloak-events
+      KeycloakSync:SharedSecret: ${KEYCLOAK_EVENTS_SHARED_SECRET:-change-me-keycloak-events}
+      UserPhotoStorage:Endpoint: minio:9000
+      UserPhotoStorage:AccessKey: ${MINIO_ACCESS_KEY:-admin}
+      UserPhotoStorage:SecretKey: ${MINIO_SECRET_KEY:-P@ssw0rd}
       DataProtection__PersistKeysToFileSystemPath: /PersistKeys
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://0.0.0.0:5005
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:5005
-      ASPNETCORE_Kestrel__Certificates__Default__Password: P@ssw0rd
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${DEV_CERT_PASSWORD:-P@ssw0rd}
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/oip.pfx
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -67,6 +80,8 @@ services:
       keycloak:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
   oip-applications:
@@ -87,12 +102,13 @@ services:
       Services:OipNotifications: https://oip-notifications:5007
       SecurityService:BaseUrl: https://localhost:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
+      SecurityService:ClientSecret: ${KEYCLOAK_CLIENT_SECRET:-Xnw6h8wH0dgehxGxZYgWKbKosKCx9E8L}
       SecurityService:AuthTicketStore:RedisConnectionString: redis:6379,password=${REDIS_PASSWORD:-P@ssw0rd},defaultDatabase=0
       DataProtection__PersistKeysToFileSystemPath: /PersistKeys
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://0.0.0.0:5008
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:5008
-      ASPNETCORE_Kestrel__Certificates__Default__Password: P@ssw0rd
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${DEV_CERT_PASSWORD:-P@ssw0rd}
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/oip.pfx
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -123,6 +139,7 @@ services:
       Services:OipUsers: https://oip-users:5005
       SecurityService:BaseUrl: https://localhost:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
+      SecurityService:ClientSecret: ${KEYCLOAK_CLIENT_SECRET:-Xnw6h8wH0dgehxGxZYgWKbKosKCx9E8L}
       SecurityService:AuthTicketStore:RedisConnectionString: redis:6379,password=${REDIS_PASSWORD:-P@ssw0rd},defaultDatabase=0
       DataProtection__PersistKeysToFileSystemPath: /PersistKeys
       SmtpSettings:SmtpHost: mailhog
@@ -132,7 +149,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://0.0.0.0:5007
       Kestrel__Endpoints__Https__Url: https://0.0.0.0:5007
-      ASPNETCORE_Kestrel__Certificates__Default__Password: P@ssw0rd
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${DEV_CERT_PASSWORD:-P@ssw0rd}
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/oip.pfx
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -178,10 +195,10 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       KC_DB_URL: "jdbc:postgresql://postgres:5432/keycloak"
       KC_METRICS_ENABLED: true
-      KEYCLOAK_ADMIN: ${GF_ADMIN_USERNAME:-admin}
-      KEYCLOAK_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD:-P@ssw0rd}
-      KC_BOOTSTRAP_ADMIN_USERNAME: ${GF_ADMIN_USERNAME:-admin}
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD:-P@ssw0rd}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USERNAME:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-P@ssw0rd}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-P@ssw0rd}
       KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/data/cert/oip.pem
       KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/data/cert/oip.key
       KC_TRUSTSTORE_PATHS: /opt/keycloak/data/cert/oip-dev-ca.crt
@@ -219,8 +236,8 @@ services:
     environment:
       - TZ=UTC
       - CLICKHOUSE_DB=default
-      - CLICKHOUSE_USER=admin
-      - CLICKHOUSE_PASSWORD=P@ssw0rd
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-admin}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-P@ssw0rd}
 
   mailhog:
     image: mailhog/mailhog:latest
@@ -257,7 +274,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
 
   minio:
     image: minio/minio:latest
@@ -266,8 +283,8 @@ services:
       - "9010:9000"  # API port
       - "9011:9001"  # Console port
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=P@ssw0rd
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-admin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-P@ssw0rd}
     volumes:
       - minio_data:/data
     healthcheck:

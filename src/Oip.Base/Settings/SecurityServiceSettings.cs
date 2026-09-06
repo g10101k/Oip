@@ -75,7 +75,7 @@ public class AuthTicketStoreSettings
     /// Redis connection string for distributed authentication ticket storage.
     /// </summary>
     [SecretSetting(KnownDefaultSecrets.AuthTicketStoreRedisConnectionString, Required = false)]
-    public string? RedisConnectionString { get; set; }
+    public string? RedisConnectionString { get; set; } = KnownDefaultSecrets.AuthTicketStoreRedisConnectionString;
 
     /// <summary>
     /// Distributed cache key prefix for authentication tickets.

@@ -102,7 +102,11 @@ public class DefaultSecretsHealthCheckTests
         SecurityService = new SecurityServiceSettings
         {
             ClientSecret = clientSecret,
-            AdminPassword = "real-admin-password"
+            AdminPassword = "real-admin-password",
+            AuthTicketStore = new AuthTicketStoreSettings
+            {
+                RedisConnectionString = "redis:6379,password=real-redis-password,defaultDatabase=0"
+            }
         },
         UserPhotoStorage = new() { SecretKey = "real-photo-secret" },
         DiscussionAttachmentStorage = new() { SecretKey = "real-attachment-secret" }

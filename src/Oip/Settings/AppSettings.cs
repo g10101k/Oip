@@ -1,5 +1,6 @@
 using Oip.Base.Settings;
 using Oip.Discussions.Base.Settings;
+using Oip.Settings.Attributes;
 using Oip.Users.Base.Settings;
 
 namespace Oip.Settings;

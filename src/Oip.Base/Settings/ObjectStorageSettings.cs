@@ -16,7 +16,7 @@ public class ObjectStorageSettings
     /// <summary>
     /// Access key.
     /// </summary>
-    public string AccessKey { get; set; } = "admin";
+    public string AccessKey { get; set; } = KnownDefaultSecrets.ObjectStorageAccessKey;
 
     /// <summary>
     /// Secret key.

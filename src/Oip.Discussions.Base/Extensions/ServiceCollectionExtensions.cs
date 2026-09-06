@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Minio;
 using Oip.Base.Extensions;
+using Oip.Base.Security.Connectivity;
 using Oip.Base.Settings;
 using Oip.Discussions.Base.Controllers;
 using Oip.Discussions.Base.Data;
@@ -74,6 +75,11 @@ public static class ServiceCollectionExtensions
             return new DiscussionAttachmentMinioClient(client.Build());
         });
         services.TryAddScoped<IDiscussionAttachmentStorage, MinioDiscussionAttachmentStorage>();
+        services.AddSecretConnectivityProbe(sp => new DelegateSecretConnectivityProbe(
+            "MinIO (DiscussionAttachmentStorage)",
+            "'DiscussionAttachmentStorage:AccessKey' and 'DiscussionAttachmentStorage:SecretKey' " +
+            "(MINIO_ACCESS_KEY, MINIO_SECRET_KEY)",
+            ct => sp.GetRequiredService<DiscussionAttachmentMinioClient>().Client.ListBucketsAsync(ct)));
         return services;
     }
 

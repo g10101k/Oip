@@ -1,5 +1,24 @@
 # Development Container
 
+## Secrets
+
+Every secret has a default written into `dev.yml` as `${VAR:-default}`, so the stack starts without any further
+setup. To use your own values, copy `.env.example` to `.env` and edit the copy: Docker Compose picks `.env` up
+automatically and substitutes it into both the infrastructure containers and the application configuration. `.env`
+is git-ignored, which is why the repository ships the example rather than the file itself.
+
+````shell
+cd .oip-devcontainer
+cp .env.example .env
+````
+
+The `oip-backend` client secret, the event listener shared secret and the MinIO account the applications use are
+stored by Keycloak and MinIO themselves rather than read from their environment, so recreating a container does not
+move them. `./apply-secrets.sh` writes all three into the running stack from `.env` and is idempotent.
+
+The values shipped with the repository are public. `doc/en/SecretRotation.md` (`doc/ru/SecretRotation.md`) explains,
+per secret, what to change, in which order, and what has to be restarted.
+
 ## Certificate Generation
 
 To generate CA certificates use:
@@ -21,7 +40,7 @@ openssl genrsa -out ./https/oip.key 2048
 openssl req -new -key ./https/oip.key -out ./https/oip.csr -config oip.conf
 
 openssl x509 -req -in ./https/oip.csr -CA ./https/oip-dev-ca.crt -CAkey ./https/oip-dev-ca.key -CAcreateserial -out ./https/oip.pem -days 365 -sha256 -extfile oip.conf -extensions req_ext
-openssl pkcs12 -export -out ./https/oip.pfx -inkey ./https/oip.key -in ./https/oip.pem -passout pass:P@ssw0rd
+openssl pkcs12 -export -out ./https/oip.pfx -inkey ./https/oip.key -in ./https/oip.pem -passout pass:"${DEV_CERT_PASSWORD:-P@ssw0rd}"
 ````
 
 ## Development CA Trust
@@ -53,7 +72,8 @@ https://host.docker.internal:5002/api/keycloak-events/receive-keycloak-event
 ````
 
 The webhook is signed with `X-Keycloak-Signature` using the shared secret configured in both
-`realm-export.json` and the app `KeycloakSync:SharedSecret` setting.
+`realm-export.json` and the app `KeycloakSync:SharedSecret` setting. Both sides come from
+`KEYCLOAK_EVENTS_SHARED_SECRET`; `./apply-secrets.sh` pushes it into a realm that has already been imported.
 
 If the Keycloak Postgres volume already contains the realm, changing `realm-export.json` will not update it
 automatically. Update the realm attributes/listeners in the Admin UI or recreate the Keycloak database volume.

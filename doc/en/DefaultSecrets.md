@@ -49,20 +49,23 @@ properties, so a sample value is written down exactly once.
 | --- | --- | --- |
 | `SecurityService:ClientSecret` | `SecurityService__ClientSecret` | `KnownDefaultSecrets` (code default) |
 | `SecurityService:AdminPassword` | `SecurityService__AdminPassword` | not shipped, set it yourself |
-| `SecurityService:AuthTicketStore:RedisConnectionString` | `SecurityService__AuthTicketStore__RedisConnectionString` | each service `appsettings.json` |
+| `SecurityService:AuthTicketStore:RedisConnectionString` | `SecurityService__AuthTicketStore__RedisConnectionString` | `KnownDefaultSecrets` (code default) |
 | `UserPhotoStorage:SecretKey` | `UserPhotoStorage__SecretKey` | `KnownDefaultSecrets` (code default) |
 | `DiscussionAttachmentStorage:SecretKey` | `DiscussionAttachmentStorage__SecretKey` | `KnownDefaultSecrets` (code default) |
-| `KeycloakSync:SharedSecret` | `KeycloakSync__SharedSecret` | `.oip-devcontainer/dev.yml` and `realm-export.json` |
+| `KeycloakSync:SharedSecret` | `KeycloakSync__SharedSecret` | `.oip-devcontainer/.env.example` and `realm-export.json` |
 | `SmtpSettings:SmtpPassword` | `SmtpSettings__SmtpPassword` | not shipped, set it yourself |
 | `Kestrel:Endpoints:Https:Certificate:Password` | `Kestrel__Endpoints__Https__Certificate__Password` | `appsettings.Development.json` |
 
 Use environment variables, `dotnet user-secrets` during development, or your own secret store. `__` is the
 environment variable separator that ASP.NET Core maps to `:`.
 
-The sample values are no longer copied into every service. `SecurityService:ClientSecret` and the object storage
-secret keys come from the code defaults in `KnownDefaultSecrets`, and `KeycloakSync:SharedSecret` is supplied by
-the development container, where it has to match `realm-export.json` anyway. Rotating a sample value means editing
-one place instead of hunting through eight `appsettings.json` files.
+The sample values are no longer copied into every service. `SecurityService:ClientSecret`, the Redis connection
+string and the object storage secret keys come from the code defaults in `KnownDefaultSecrets`, and
+`KeycloakSync:SharedSecret` is supplied by the development container, where it has to match `realm-export.json`
+anyway. Rotating a sample value means editing one place instead of hunting through eight `appsettings.json` files.
+
+Changing a secret is described separately, per secret, in [Secret Rotation](./SecretRotation.md): which environment
+variable owns it, what has to change inside Keycloak or MinIO, and what has to be restarted.
 
 ## CI guard
 

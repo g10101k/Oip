@@ -49,20 +49,23 @@
 | --- | --- | --- |
 | `SecurityService:ClientSecret` | `SecurityService__ClientSecret` | `KnownDefaultSecrets` (дефолт в коде) |
 | `SecurityService:AdminPassword` | `SecurityService__AdminPassword` | не поставляется, задайте сами |
-| `SecurityService:AuthTicketStore:RedisConnectionString` | `SecurityService__AuthTicketStore__RedisConnectionString` | `appsettings.json` каждого сервиса |
+| `SecurityService:AuthTicketStore:RedisConnectionString` | `SecurityService__AuthTicketStore__RedisConnectionString` | `KnownDefaultSecrets` (дефолт в коде) |
 | `UserPhotoStorage:SecretKey` | `UserPhotoStorage__SecretKey` | `KnownDefaultSecrets` (дефолт в коде) |
 | `DiscussionAttachmentStorage:SecretKey` | `DiscussionAttachmentStorage__SecretKey` | `KnownDefaultSecrets` (дефолт в коде) |
-| `KeycloakSync:SharedSecret` | `KeycloakSync__SharedSecret` | `.oip-devcontainer/dev.yml` и `realm-export.json` |
+| `KeycloakSync:SharedSecret` | `KeycloakSync__SharedSecret` | `.oip-devcontainer/.env.example` и `realm-export.json` |
 | `SmtpSettings:SmtpPassword` | `SmtpSettings__SmtpPassword` | не поставляется, задайте сами |
 | `Kestrel:Endpoints:Https:Certificate:Password` | `Kestrel__Endpoints__Https__Certificate__Password` | `appsettings.Development.json` |
 
 Используйте переменные окружения, `dotnet user-secrets` при разработке или собственное хранилище секретов. `__` —
 разделитель в переменных окружения, который ASP.NET Core отображает в `:`.
 
-Тестовые значения больше не копируются в каждый сервис. `SecurityService:ClientSecret` и секретные ключи
-объектного хранилища берутся из дефолтов в `KnownDefaultSecrets`, а `KeycloakSync:SharedSecret` задаёт
-dev-контейнер, где он всё равно обязан совпадать с `realm-export.json`. Ротация тестового значения теперь
+Тестовые значения больше не копируются в каждый сервис. `SecurityService:ClientSecret`, строка подключения к Redis
+и секретные ключи объектного хранилища берутся из дефолтов в `KnownDefaultSecrets`, а `KeycloakSync:SharedSecret`
+задаёт dev-контейнер, где он всё равно обязан совпадать с `realm-export.json`. Ротация тестового значения теперь
 затрагивает одно место вместо восьми файлов `appsettings.json`.
+
+Как именно менять секрет — по каждому секрету отдельно — описано в [Ротации секретов](./SecretRotation.md): какая
+переменная окружения им владеет, что нужно изменить внутри Keycloak или MinIO и что перезапустить.
 
 ## Гард в CI
 
