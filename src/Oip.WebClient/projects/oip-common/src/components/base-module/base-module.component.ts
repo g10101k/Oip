@@ -44,6 +44,13 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   private static readonly deleteRight = 'delete';
 
   protected isInitialized = false;
+
+  /**
+   * Set to true in a descendant to hide the layout footer while the module is active.
+   * The footer is restored when the module is destroyed.
+   */
+  protected hideFooter = false;
+
   protected moduleInstanceReloadPromise: Promise<void> = Promise.resolve();
   protected rightsSubscription?: Subscription;
   protected securityRoles: string[] = [];
@@ -253,10 +260,11 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   /**
    * Lifecycle hook that is called when a component is destroyed.
    * Unsubscribes from all subscriptions to prevent memory leaks,
-   * resets the top bar items to an empty array, and sets the active ID
-   * to the ID of the first top bar item (if available).
+   * restores the layout footer, resets the top bar items to an empty array,
+   * and sets the active ID to the ID of the first top bar item (if available).
    */
   ngOnDestroy() {
+    this.layoutService.footerVisible.set(true);
     this.topBarService.setTopBarItems([]);
     this.topBarService.activeId = this.topBarItems[0].id;
     this.rightsSubscription?.unsubscribe();
@@ -264,12 +272,15 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   }
 
   /**
-   * Initializes the component. Subscribes to translation service to set captions for top bar items,
+   * Initializes the component. Applies the footer visibility declared by the module,
+   * subscribes to translation service to set captions for top bar items,
    * sets the top bar items via the top bar service, sets the active ID,
    * subscribes to route parameters to get the ID, and retrieves settings.
    * @return {Promise<void>} A promise that resolves when the initialization is complete.
    */
   async ngOnInit(): Promise<void> {
+    this.layoutService.footerVisible.set(!this.hideFooter);
+
     this.subscriptions.push(
       this.translateService.stream('baseComponent').subscribe((value: BaseComponentLocalization) => {
         this.topBarItems.forEach((item) => {

@@ -105,6 +105,12 @@ export class LayoutService {
 
   transitionComplete = signal<boolean>(false);
 
+  /**
+   * Controls the visibility of the layout footer.
+   * Modules can hide the footer to free up vertical space for full-screen content.
+   */
+  footerVisible = signal<boolean>(true);
+
   private initialized = false;
 
   constructor() {
