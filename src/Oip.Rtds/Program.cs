@@ -34,7 +34,7 @@ internal static class Program
             builder.Services.AddOpenApi(settings);
             builder.Services.AddApplicationsService(settings);
             builder.Services.AddWebClientGenerationStartupTask(settings);
-            builder.Services.AddDefaultSecretsValidation(builder.Configuration);
+            builder.Services.AddDefaultSecretsValidation();
             builder.Services.AddStartupRunner();
             builder.Services.AddSingleton(settings);
             builder.Services.AddScoped<ClaimService>();

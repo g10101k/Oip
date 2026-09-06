@@ -31,7 +31,7 @@ internal static class Program
             builder.Services.AddApplicationsService(settings);
             builder.Services.AddUserService(settings);
 
-            builder.Services.AddDefaultSecretsValidation(builder.Configuration);
+            builder.Services.AddDefaultSecretsValidation();
             builder.Services.AddStartupRunner();
             builder.Services.AddCors(settings);
             builder.Services.AddForwardedHeaders(settings);

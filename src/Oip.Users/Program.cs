@@ -35,7 +35,7 @@ internal static class Program
             builder.Services.AddOpenApi(settings);
             builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
-            builder.Services.AddDefaultSecretsValidation(builder.Configuration);
+            builder.Services.AddDefaultSecretsValidation();
             builder.Services.AddStartupRunner();
             builder.Services.AddApplicationsService(settings);
             builder.Services.AddSingleton(settings);

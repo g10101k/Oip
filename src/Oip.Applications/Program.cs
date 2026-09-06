@@ -27,7 +27,7 @@ internal static class Program
                 .AddDefaultHealthChecks()
                 .AddDefaultAuthentication(settings)
                 .AddOpenApi(settings)
-                .AddDefaultSecretsValidation(builder.Configuration)
+                .AddDefaultSecretsValidation()
                 .AddStartupRunner()
                 .AddCors(settings)
                 .AddForwardedHeaders(settings)

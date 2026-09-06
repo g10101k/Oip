@@ -9,6 +9,8 @@ using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Exceptions;
 using Oip.Base.Extensions;
+using Oip.Base.Security.DefaultSecrets;
+using Microsoft.Extensions.Hosting;
 using Oip.Base.Services;
 
 namespace Oip.Base.Controllers;
@@ -21,7 +23,9 @@ namespace Oip.Base.Controllers;
 [ApiExplorerSettings(GroupName = "base")]
 public class SecurityController(
     KeycloakService keycloakService,
-    IAntiforgery antiforgery) : ControllerBase
+    IAntiforgery antiforgery,
+    DefaultSecretsValidator defaultSecretsValidator,
+    IHostEnvironment environment) : ControllerBase
 {
     [HttpGet("get-current-auth-session")]
     [AllowAnonymous]
@@ -134,6 +138,21 @@ public class SecurityController(
         return realmRoles.Select(x => x.Name).ToList();
     }
         
+    /// <summary>
+    /// Retrieves the settings that still hold a secret shipped with the repository.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="DefaultSecretsReportResponse"/> listing every setting that needs attention.
+    /// </returns>
+    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [HttpGet("get-default-secrets-report")]
+    [ProducesResponseType<DefaultSecretsReportResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public DefaultSecretsReportResponse GetDefaultSecretsReport() =>
+        DefaultSecretsReportResponse.Create(defaultSecretsValidator.Report, environment.IsProduction());
+
     private static string GetLogoutRedirectUri(string? referer)
     {
         if (!string.IsNullOrWhiteSpace(referer) && Uri.TryCreate(referer, UriKind.Absolute, out var refererUri))

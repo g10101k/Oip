@@ -1,0 +1,34 @@
+title = "OIP secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Build output and third party code are not ours to review."
+paths = [
+  '''(^|/)(bin|obj|dist|node_modules|\.angular|\.vs|\.idea)/''',
+  '''package-lock\.json$''',
+  '''\.DS_Store$'''
+]
+
+[[allowlists]]
+description = """
+Self-signed certificates generated for the development container. They secure localhost only and are regenerated
+by anyone who needs their own; no deployment ever uses them.
+"""
+paths = ['''(^|/)\.oip-devcontainer/https/''']
+
+[[allowlists]]
+description = """
+Credentials shipped with the repository on purpose so that the development container starts out of the box.
+They are declared in src/Oip.Base/Security/DefaultSecrets/KnownDefaultSecrets.cs and reported at startup by the
+default secret validator. Adding a value here is a deliberate decision: it must be a sample credential that an
+operator is expected to override, never a real one.
+"""
+regexTarget = "match"
+regexes = [
+  '''Xnw6h8wH0dgehxGxZYgWKbKosKCx9E8L''',
+  '''change-me-keycloak-events''',
+  '''P@ssw0rd''',
+  '''CfDJ8HC2fbULANdNhgPoKimUG23QvgSAgULIOlvuJngp5Cxk8DqYx9PYNGrhk_2DOd9XrUsCcZv2xzJglieYPKIusSu_3icVX0axyKg0ZDBb33x_r20SKULloOGpbBQXpwjmSA'''
+]

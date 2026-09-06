@@ -26,7 +26,7 @@ public sealed class DefaultSecretsStartupTask(
             return Task.CompletedTask;
         }
 
-        var report = validator.Validate();
+        var report = validator.Report;
 
         if (!report.HasFindings)
         {

@@ -3,35 +3,44 @@ using Microsoft.Extensions.Configuration;
 namespace Oip.Test;
 
 /// <summary>
-/// Guards the configuration section names of the Keycloak synchronization settings against drifting apart from the
-/// property names they are bound to.
+/// Guards the configuration section names in the shipped <c>appsettings.json</c> files against drifting apart from
+/// the property names they are bound to. A section that no longer binds silently falls back to code defaults.
 /// </summary>
 [TestFixture]
 public class KeycloakSyncSettingsBindingTests
 {
     [Test]
-    public void UsersAppSettingsBindSharedSecret()
+    public void UsersAppSettingsBindKeycloakSyncSection()
     {
         var settings = Bind<Oip.Users.Base.Settings.AppSettings>("Oip.Users");
 
-        Assert.That(settings.KeycloakSync.SharedSecret, Is.Not.Empty);
+        Assert.That(settings.KeycloakSync.BatchSize, Is.EqualTo(100));
     }
 
     [Test]
-    public void ShellAppSettingsBindSharedSecret()
+    public void ShellAppSettingsBindKeycloakSyncSection()
     {
         var settings = Bind<Oip.Settings.AppSettings>("Oip");
 
-        Assert.That(settings.KeycloakSync.SharedSecret, Is.Not.Empty);
+        Assert.That(settings.KeycloakSync.BatchSize, Is.EqualTo(100));
+    }
+
+    [Test]
+    public void ShellAppSettingsBindObjectStorageSections()
+    {
+        var settings = Bind<Oip.Settings.AppSettings>("Oip");
+
+        Assert.That(settings.UserPhotoStorage.BucketName, Is.EqualTo("oip-user-photos"));
+        Assert.That(settings.DiscussionAttachmentStorage.BucketName, Is.EqualTo("oip-discussion-attachments"));
     }
 
     [TestCase("Oip")]
     [TestCase("Oip.Users")]
-    public void AppSettingsBindObjectStorageSecret(string project)
+    public void AppSettingsBindSecurityServiceSection(string project)
     {
-        var configuration = LoadAppSettings(project);
+        var settings = Bind<Oip.Settings.AppSettings>(project);
 
-        Assert.That(configuration["UserPhotoStorage:SecretKey"], Is.Not.Empty);
+        Assert.That(settings.SecurityService.ClientId, Is.EqualTo("oip-backend"));
     }
 
     private static TSettings Bind<TSettings>(string project) where TSettings : new()

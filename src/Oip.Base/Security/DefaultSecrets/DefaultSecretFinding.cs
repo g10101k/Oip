@@ -25,6 +25,11 @@ public enum DefaultSecretFindingKind
 public sealed record DefaultSecretFinding(string ConfigKey, DefaultSecretFindingKind Kind, string? OverrideHint)
 {
     /// <summary>
+    /// Environment variable that overrides the setting.
+    /// </summary>
+    public string EnvironmentVariable => ConfigKey.Replace(":", "__", StringComparison.Ordinal);
+
+    /// <summary>
     /// Builds an operator facing description of the finding.
     /// </summary>
     public string Describe(string applicationName)
@@ -33,14 +38,10 @@ public sealed record DefaultSecretFinding(string ConfigKey, DefaultSecretFinding
             ? "still holds the default value shipped with the repository"
             : "is required but empty";
 
-        var hint = OverrideHint ?? DefaultOverrideHint(ConfigKey);
-        return $"[{applicationName}] Configuration key '{ConfigKey}' {problem}. {hint}";
-    }
+        var hint = OverrideHint ??
+                   $"Override it with the environment variable '{EnvironmentVariable}', with user-secrets, " +
+                   "or with your secret store before using this installation.";
 
-    private static string DefaultOverrideHint(string configKey)
-    {
-        var environmentVariable = configKey.Replace(":", "__", StringComparison.Ordinal);
-        return $"Override it with the environment variable '{environmentVariable}', " +
-               "with user-secrets, or with your secret store before using this installation.";
+        return $"[{applicationName}] Configuration key '{ConfigKey}' {problem}. {hint}";
     }
 }

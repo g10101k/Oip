@@ -33,7 +33,7 @@ internal static class Program
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);
             builder.Services.AddWebClientGenerationStartupTask(settings);
-            builder.Services.AddDefaultSecretsValidation(builder.Configuration);
+            builder.Services.AddDefaultSecretsValidation();
             builder.Services.AddStartupRunner();
             builder.Services.AddHttpClient();
             builder.Services.AddCors(settings);

@@ -15,6 +15,22 @@ reports each secret setting that
 Findings are logged as `Warning` outside `Production` and as `Error` in `Production`. Each message names the
 configuration key and the environment variable that overrides it.
 
+The result is computed once and cached, so the startup log, the health check and the administration UI always
+report the same state.
+
+## Where findings are visible
+
+* **Startup log** - one entry per finding.
+* **Health check** - the `default-secrets` check, tagged `ready`, reports `Degraded` while any finding remains and
+  lists the offending keys in its description and data. `/health` returns `200` for a degraded state and `503` only
+  for an unhealthy one; `/liveness` is not affected, it only runs checks tagged `live`.
+* **Administration UI** - a banner in the application layout, shown to administrators **in `Production` only**.
+  It is backed by `GET /api/security/get-default-secrets-report`, which requires the `admin` role and lists every
+  setting together with the environment variable that overrides it. The endpoint reports findings in every
+  environment and raises `showBanner` only in `Production`, so a developer running the sample configuration is not
+  trained to ignore a permanent warning. To see the banner locally, start the service with
+  `ASPNETCORE_ENVIRONMENT=Production`.
+
 ## Where the secrets are declared
 
 Secret bearing settings are declared in one place:
@@ -24,23 +40,37 @@ Secret bearing settings are declared in one place:
 * configuration keys that are not part of the settings object graph, listed in
   `KnownDefaultSecrets.RawSecrets` (`Oip.Base/Security/DefaultSecrets/KnownDefaultSecrets.cs`).
 
-The shipped values themselves are constants of `KnownDefaultSecrets`, so rotating a sample value means editing a
-single file plus the `appsettings.json` files that carry it.
+The shipped values themselves are constants of `KnownDefaultSecrets` and double as the defaults of the matching
+properties, so a sample value is written down exactly once.
 
 ## Settings to override
 
-| Configuration key | Environment variable | Shipped default |
+| Configuration key | Environment variable | Where the sample value lives |
 | --- | --- | --- |
-| `SecurityService:ClientSecret` | `SecurityService__ClientSecret` | Keycloak client secret of the sample realm |
-| `SecurityService:AdminPassword` | `SecurityService__AdminPassword` | `P@ssw0rd` |
-| `UserPhotoStorage:SecretKey` | `UserPhotoStorage__SecretKey` | `P@ssw0rd` |
-| `DiscussionAttachmentStorage:SecretKey` | `DiscussionAttachmentStorage__SecretKey` | `P@ssw0rd` |
-| `KeycloakSync:SharedSecret` | `KeycloakSync__SharedSecret` | `change-me-keycloak-events` |
-| `SmtpSettings:SmtpPassword` | `SmtpSettings__SmtpPassword` | sample data protection blob |
-| `Kestrel:Endpoints:Https:Certificate:Password` | `Kestrel__Endpoints__Https__Certificate__Password` | `P@ssw0rd` |
+| `SecurityService:ClientSecret` | `SecurityService__ClientSecret` | `KnownDefaultSecrets` (code default) |
+| `SecurityService:AdminPassword` | `SecurityService__AdminPassword` | not shipped, set it yourself |
+| `SecurityService:AuthTicketStore:RedisConnectionString` | `SecurityService__AuthTicketStore__RedisConnectionString` | each service `appsettings.json` |
+| `UserPhotoStorage:SecretKey` | `UserPhotoStorage__SecretKey` | `KnownDefaultSecrets` (code default) |
+| `DiscussionAttachmentStorage:SecretKey` | `DiscussionAttachmentStorage__SecretKey` | `KnownDefaultSecrets` (code default) |
+| `KeycloakSync:SharedSecret` | `KeycloakSync__SharedSecret` | `.oip-devcontainer/dev.yml` and `realm-export.json` |
+| `SmtpSettings:SmtpPassword` | `SmtpSettings__SmtpPassword` | not shipped, set it yourself |
+| `Kestrel:Endpoints:Https:Certificate:Password` | `Kestrel__Endpoints__Https__Certificate__Password` | `appsettings.Development.json` |
 
 Use environment variables, `dotnet user-secrets` during development, or your own secret store. `__` is the
 environment variable separator that ASP.NET Core maps to `:`.
+
+The sample values are no longer copied into every service. `SecurityService:ClientSecret` and the object storage
+secret keys come from the code defaults in `KnownDefaultSecrets`, and `KeycloakSync:SharedSecret` is supplied by
+the development container, where it has to match `realm-export.json` anyway. Rotating a sample value means editing
+one place instead of hunting through eight `appsettings.json` files.
+
+## CI guard
+
+`.github/workflows/pullrequest.yml` runs `gitleaks` over the checked-out tree on every pull request and fails when
+a new hardcoded secret appears. The sample credentials above are allowlisted **by value** in `.gitleaks.toml`, so
+a new secret is caught wherever it is added - including inside a file that already carries a sample one. Adding a
+value to that allowlist is a deliberate decision: it must be a sample credential an operator is expected to
+override, never a real one.
 
 ## Configuration
 

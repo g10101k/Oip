@@ -15,6 +15,22 @@
 Находки логируются как `Warning` вне `Production` и как `Error` в `Production`. В сообщении указывается ключ
 конфигурации и переменная окружения, которой его можно переопределить.
 
+Результат вычисляется один раз и кэшируется, поэтому стартовый лог, health check и админский интерфейс всегда
+показывают одно и то же состояние.
+
+## Где видны находки
+
+* **Стартовый лог** - по одной записи на каждую находку.
+* **Health check** - проверка `default-secrets` с тегом `ready` возвращает `Degraded`, пока остаётся хотя бы одна
+  находка, и перечисляет проблемные ключи в описании и данных. `/health` при `Degraded` отдаёт `200` и `503` только
+  при `Unhealthy`; `/liveness` не затрагивается - он выполняет только проверки с тегом `live`.
+* **Админский интерфейс** - баннер в layout приложения, показывается администраторам **только в `Production`**.
+  Данные берутся из `GET /api/security/get-default-secrets-report`, эндпоинт требует роль `admin` и перечисляет
+  каждую настройку вместе с переменной окружения для переопределения. Находки эндпоинт отдаёт в любом окружении,
+  но флаг `showBanner` поднимает только в `Production` - чтобы разработчик на тестовой конфигурации не привыкал
+  игнорировать постоянное предупреждение. Чтобы посмотреть баннер локально, запустите сервис с
+  `ASPNETCORE_ENVIRONMENT=Production`.
+
 ## Где объявлены секреты
 
 Секретные настройки объявлены в одном месте:
@@ -24,23 +40,38 @@
 * ключи конфигурации вне графа настроек — в списке `KnownDefaultSecrets.RawSecrets`
   (`Oip.Base/Security/DefaultSecrets/KnownDefaultSecrets.cs`).
 
-Сами значения по умолчанию — константы `KnownDefaultSecrets`, поэтому ротация тестового значения затрагивает один
-файл кода плюс те `appsettings.json`, где оно продублировано.
+Сами значения по умолчанию — константы `KnownDefaultSecrets`, и они же служат дефолтами соответствующих свойств,
+поэтому тестовое значение задано ровно один раз.
 
 ## Что нужно переопределить
 
-| Ключ конфигурации | Переменная окружения | Значение по умолчанию |
+| Ключ конфигурации | Переменная окружения | Где лежит тестовое значение |
 | --- | --- | --- |
-| `SecurityService:ClientSecret` | `SecurityService__ClientSecret` | client secret тестового realm Keycloak |
-| `SecurityService:AdminPassword` | `SecurityService__AdminPassword` | `P@ssw0rd` |
-| `UserPhotoStorage:SecretKey` | `UserPhotoStorage__SecretKey` | `P@ssw0rd` |
-| `DiscussionAttachmentStorage:SecretKey` | `DiscussionAttachmentStorage__SecretKey` | `P@ssw0rd` |
-| `KeycloakSync:SharedSecret` | `KeycloakSync__SharedSecret` | `change-me-keycloak-events` |
-| `SmtpSettings:SmtpPassword` | `SmtpSettings__SmtpPassword` | тестовый data protection blob |
-| `Kestrel:Endpoints:Https:Certificate:Password` | `Kestrel__Endpoints__Https__Certificate__Password` | `P@ssw0rd` |
+| `SecurityService:ClientSecret` | `SecurityService__ClientSecret` | `KnownDefaultSecrets` (дефолт в коде) |
+| `SecurityService:AdminPassword` | `SecurityService__AdminPassword` | не поставляется, задайте сами |
+| `SecurityService:AuthTicketStore:RedisConnectionString` | `SecurityService__AuthTicketStore__RedisConnectionString` | `appsettings.json` каждого сервиса |
+| `UserPhotoStorage:SecretKey` | `UserPhotoStorage__SecretKey` | `KnownDefaultSecrets` (дефолт в коде) |
+| `DiscussionAttachmentStorage:SecretKey` | `DiscussionAttachmentStorage__SecretKey` | `KnownDefaultSecrets` (дефолт в коде) |
+| `KeycloakSync:SharedSecret` | `KeycloakSync__SharedSecret` | `.oip-devcontainer/dev.yml` и `realm-export.json` |
+| `SmtpSettings:SmtpPassword` | `SmtpSettings__SmtpPassword` | не поставляется, задайте сами |
+| `Kestrel:Endpoints:Https:Certificate:Password` | `Kestrel__Endpoints__Https__Certificate__Password` | `appsettings.Development.json` |
 
 Используйте переменные окружения, `dotnet user-secrets` при разработке или собственное хранилище секретов. `__` —
 разделитель в переменных окружения, который ASP.NET Core отображает в `:`.
+
+Тестовые значения больше не копируются в каждый сервис. `SecurityService:ClientSecret` и секретные ключи
+объектного хранилища берутся из дефолтов в `KnownDefaultSecrets`, а `KeycloakSync:SharedSecret` задаёт
+dev-контейнер, где он всё равно обязан совпадать с `realm-export.json`. Ротация тестового значения теперь
+затрагивает одно место вместо восьми файлов `appsettings.json`.
+
+## Гард в CI
+
+`.github/workflows/pullrequest.yml` на каждый pull request прогоняет `gitleaks` по рабочему дереву и падает, если
+появился новый захардкоженный секрет. Перечисленные выше тестовые значения занесены в allowlist **по значению** в
+`.gitleaks.toml`, поэтому новый секрет будет пойман где угодно — в том числе в файле, где уже лежит тестовый.
+Добавление значения в этот allowlist — осознанное решение: там место только тестовым учётным данным, которые
+оператор обязан переопределить, но не настоящим.
+
 
 ## Настройка
 

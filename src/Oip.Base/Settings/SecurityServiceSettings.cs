@@ -27,7 +27,7 @@ public class SecurityServiceSettings
     /// Client secret
     /// </summary>
     [SecretSetting(KnownDefaultSecrets.KeycloakClientSecret)]
-    public string ClientSecret { get; set; } = null!;
+    public string ClientSecret { get; set; } = KnownDefaultSecrets.KeycloakClientSecret;
     
     /// <summary>
     /// Gets or sets the Keycloak admin username.
@@ -74,6 +74,7 @@ public class AuthTicketStoreSettings
     /// <summary>
     /// Redis connection string for distributed authentication ticket storage.
     /// </summary>
+    [SecretSetting(KnownDefaultSecrets.AuthTicketStoreRedisConnectionString, Required = false)]
     public string? RedisConnectionString { get; set; }
 
     /// <summary>

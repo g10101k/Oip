@@ -24,3 +24,20 @@ jobs:
         run: dotnet build ./src/Oip.sln --no-restore
       #    - name: Test
       #      run: dotnet test --no-build --verbosity normal
+
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install gitleaks
+        env:
+          GITLEAKS_VERSION: 8.30.1
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+      # Scans the checked-out tree, not the history: the guard is about what a pull request adds.
+      # Sample credentials shipped on purpose are allowlisted by value in .gitleaks.toml.
+      - name: Scan for hardcoded secrets
+        run: gitleaks dir . --config .gitleaks.toml --no-banner --redact --exit-code 1

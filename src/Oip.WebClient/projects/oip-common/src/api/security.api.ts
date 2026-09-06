@@ -7,6 +7,7 @@ import {
   ApiExceptionResponse,
   AuthCsrfTokenResponse,
   AuthSessionResponse,
+  DefaultSecretsReportResponse,
 } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
@@ -47,6 +48,14 @@ export class SecurityApi<
   getRealmRoles = (params: RequestParams = {}) =>
     this.request<string[], any>({
       path: `/api/security/get-realm-roles`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  getDefaultSecretsReport = (params: RequestParams = {}) =>
+    this.request<DefaultSecretsReportResponse, ApiExceptionResponse>({
+      path: `/api/security/get-default-secrets-report`,
       method: "GET",
       secure: true,
       format: "json",

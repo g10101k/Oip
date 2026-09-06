@@ -4,6 +4,11 @@ export enum ModuleKind {
   Extension = "Extension",
 }
 
+export enum DefaultSecretFindingKind {
+  ShippedDefault = "ShippedDefault",
+  Missing = "Missing",
+}
+
 export interface AddModuleInstanceDto {
   moduleId?: number;
   label?: string | null;
@@ -34,6 +39,19 @@ export interface AuthSessionResponse {
 
 export interface CryptRequest {
   message?: string | null;
+}
+
+export interface DefaultSecretFindingResponse {
+  configKey?: string | null;
+  kind?: DefaultSecretFindingKind;
+  environmentVariable?: string | null;
+}
+
+export interface DefaultSecretsReportResponse {
+  hasFindings?: boolean;
+  checkedCount?: number;
+  showBanner?: boolean;
+  findings?: DefaultSecretFindingResponse[] | null;
 }
 
 export interface EditModuleInstanceDto {

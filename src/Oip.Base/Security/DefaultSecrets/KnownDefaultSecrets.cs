@@ -23,6 +23,11 @@ public static class KnownDefaultSecrets
     public const string ObjectStorageSecretKey = "P@ssw0rd";
 
     /// <summary>
+    /// Redis connection string of the development container, carrying the sample password.
+    /// </summary>
+    public const string AuthTicketStoreRedisConnectionString = "localhost:6379,password=P@ssw0rd,defaultDatabase=0";
+
+    /// <summary>
     /// Shared secret used to validate Keycloak event callbacks.
     /// </summary>
     public const string KeycloakEventsSharedSecret = "change-me-keycloak-events";

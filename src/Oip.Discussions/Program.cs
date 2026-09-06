@@ -37,7 +37,7 @@ internal static class Program
             builder.Services.AddDefaultHealthChecks();
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);
-            builder.Services.AddDefaultSecretsValidation(builder.Configuration);
+            builder.Services.AddDefaultSecretsValidation();
             builder.Services.AddStartupRunner()
                 .AddCors(settings)
                 .AddApplicationsService(settings)

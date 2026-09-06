@@ -9,16 +9,26 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import { BlockLoaderComponent } from '../block-loader/block-loader.component';
 import { MenuApi } from '../../api/menu.api';
 import { MenuService } from '../../services/app.menu.service';
+import { DefaultSecretsBannerComponent } from '../default-secrets-banner/default-secrets-banner.component';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, AppTopbar, SidebarComponent, RouterModule, FooterComponent, BlockLoaderComponent],
+  imports: [
+    CommonModule,
+    AppTopbar,
+    SidebarComponent,
+    RouterModule,
+    FooterComponent,
+    BlockLoaderComponent,
+    DefaultSecretsBannerComponent
+  ],
   template: `
     <div class="layout-wrapper" [ngClass]="containerClass">
       <app-topbar></app-topbar>
       <app-sidebar></app-sidebar>
       <div class="layout-main-container">
+        <default-secrets-banner />
         <div class="layout-main">
           <router-outlet></router-outlet>
         </div>
