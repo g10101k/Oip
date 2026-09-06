@@ -38,4 +38,5 @@ import ru from './l10n/dashboard.ru.json';
 })
 export class DashboardComponent extends BaseModuleComponent<NoSettingsDto, NoSettingsDto> {
   private readonly translations = provideTranslations({ en, ru });
+  protected override hideFooter = true;
 }

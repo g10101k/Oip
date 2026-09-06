@@ -22,7 +22,9 @@ import { MenuService } from '../../services/app.menu.service';
         <div class="layout-main">
           <router-outlet></router-outlet>
         </div>
-        <app-footer></app-footer>
+        @if (layoutService.footerVisible()) {
+          <app-footer></app-footer>
+        }
       </div>
       <div class="layout-mask animate-fadein"></div>
     </div>
