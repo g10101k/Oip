@@ -85,7 +85,7 @@ export class UserService {
 
     this.requestedPhotoKey = photoKey;
 
-    this.userProfileApi.getUserPhoto({ format: 'blob' }).then(
+    this.userProfileApi.getUserPhoto().then(
       (data) => {
         this.createImageFromBlob(data as Blob);
         this.photoLoaded = true;
