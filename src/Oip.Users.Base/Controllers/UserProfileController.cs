@@ -34,8 +34,8 @@ public class UserProfileController(
     /// </summary>
     /// <returns>User photo image or not found response.</returns>
     [Authorize, HttpGet("get-user-photo")]
-    [Produces("image/jpeg", "image/png", "image/gif", "image/webp", "application/json")]
-    [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK,
+        "image/jpeg", "image/png", "image/gif", "image/webp")]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
@@ -59,8 +59,8 @@ public class UserProfileController(
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>User photo image or not found response.</returns>
     [Authorize, HttpGet("get-user-photo-by-id/{userId:int}")]
-    [Produces("image/jpeg", "image/png", "image/gif", "image/webp", "application/json")]
-    [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK,
+        "image/jpeg", "image/png", "image/gif", "image/webp")]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
