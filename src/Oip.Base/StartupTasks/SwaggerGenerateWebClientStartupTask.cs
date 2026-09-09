@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi;
-using Microsoft.OpenApi.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Settings;
 using Swashbuckle.AspNetCore.Swagger;
@@ -37,7 +36,7 @@ internal class SwaggerGenerateWebClientStartupTask(
                 try
                 {
                     logger.LogDebug("Generating Swagger for {Name}", config.Name);
-                    var swaggerJson = GetSwaggerJson(config);
+                    var swaggerJson = await GetSwaggerJson(config, cancellationToken);
                     logger.LogInformation("Generating client for {Name}...", config.Name);
                     path = await SaveSwaggerFile(config, swaggerJson);
                     await GenerateTypeScriptClient(config, path, cancellationToken);
@@ -67,10 +66,10 @@ internal class SwaggerGenerateWebClientStartupTask(
         }
     }
 
-    private string GetSwaggerJson(OpenApiItem config)
+    private async Task<string> GetSwaggerJson(OpenApiItem config, CancellationToken cancellationToken)
     {
         var swaggerDoc = swaggerProvider.GetSwagger(config.Name);
-        return swaggerDoc.SerializeAsJson(OpenApiSpecVersion.OpenApi3_0);
+        return await swaggerDoc.SerializeAsJsonAsync(OpenApiSpecVersion.OpenApi3_0, cancellationToken);
     }
 
     private async Task<string> SaveSwaggerFile(OpenApiItem config, string content)

@@ -1,5 +1,5 @@
 ARG BUILD_PLATFORM=linux/amd64
-FROM --platform=$BUILD_PLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM --platform=$BUILD_PLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY . .
@@ -9,7 +9,7 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Oip.Notifications/Oip.Notifications.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 EXPOSE 5007
 COPY --from=oip-dev-https oip-dev-ca.crt /usr/local/share/ca-certificates/oip-dev-ca.crt

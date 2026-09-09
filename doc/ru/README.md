@@ -3,7 +3,7 @@
 Базовый набор концепций для разработки кроссплатформенных веб-приложений основанный на следующем стеке:
 
 * Angular 20 (prime-ng, sakai-ng);
-* .NET 8.0 (EFCore);
+* .NET 10.0 (EFCore);
 * Keyсloak.
 
 Основной ценностью данного проекта является подходы использованные в разработке этого примера.
@@ -12,7 +12,7 @@
 
 Первый запуск:
 
-1. Установите .NET 8.0 SDK https://dotnet.microsoft.com/en-us/download/dotnet/8.0;
+1. Установите .NET 10.0 SDK https://dotnet.microsoft.com/en-us/download/dotnet/10.0;
 2. Установите последнюю LTS версию Node.js https://nodejs.org/en;
 3. Установите Docker Desktop https://www.docker.com/get-started;
 4. Перейдите в каталог `.oip-devcontainer`;

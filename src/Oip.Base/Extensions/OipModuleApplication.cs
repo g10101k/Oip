@@ -27,7 +27,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using NLog.Web;
 using Oip.Base.Clients;
 using Oip.Base.Exceptions;
@@ -224,22 +224,9 @@ public static class OipModuleApplication
                 Type = SecuritySchemeType.ApiKey,
                 Scheme = Bearer
             });
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = Bearer
-                        },
-                        Scheme = "oauth2",
-                        Name = Bearer,
-                        In = ParameterLocation.Header,
-                    },
-                    new List<string>()
-                }
+                { new OpenApiSecuritySchemeReference(Bearer, document), new List<string>() }
             });
 
             openApiSettings.ForEach(apiSettings =>
@@ -390,7 +377,7 @@ public static class OipModuleApplication
 
             if (settings.TrustAllProxies)
             {
-                options.KnownNetworks.Clear();
+                options.KnownIPNetworks.Clear();
                 options.KnownProxies.Clear();
                 return;
             }
@@ -404,7 +391,7 @@ public static class OipModuleApplication
             foreach (var network in settings.KnownNetworks)
             {
                 if (TryParseKnownNetwork(network, out var knownNetwork))
-                    options.KnownNetworks.Add(knownNetwork);
+                    options.KnownIPNetworks.Add(knownNetwork);
             }
         });
 
@@ -858,9 +845,9 @@ public static class OipModuleApplication
         Environment.SetEnvironmentVariable($"OIP_URLS:{name}", value);
     }
 
-    private static bool TryParseKnownNetwork(string value, out Microsoft.AspNetCore.HttpOverrides.IPNetwork network)
+    private static bool TryParseKnownNetwork(string value, out System.Net.IPNetwork network)
     {
-        network = null!;
+        network = default;
         var parts = value.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (parts.Length != 2 ||
             !IPAddress.TryParse(parts[0], out var prefix) ||
@@ -869,7 +856,7 @@ public static class OipModuleApplication
 
         try
         {
-            network = new Microsoft.AspNetCore.HttpOverrides.IPNetwork(prefix, prefixLength);
+            network = new System.Net.IPNetwork(prefix, prefixLength);
             return true;
         }
         catch (ArgumentOutOfRangeException)
@@ -894,8 +881,7 @@ public static class OipModuleApplication
             })
             .WithGroupName("v1")
             .WithName("HealthCheck")
-            .WithTags("v1")
-            .WithOpenApi();
+            .WithTags("v1");
 
         // Only health checks tagged with the "live" tag must pass for app to be considered alive
         app.MapHealthChecks("/liveness", new HealthCheckOptions

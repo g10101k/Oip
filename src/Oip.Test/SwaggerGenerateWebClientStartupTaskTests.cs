@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Moq;
 using Oip.Base.Settings;
 using Oip.Base.StartupTasks;

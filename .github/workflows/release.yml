@@ -33,7 +33,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -48,7 +48,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ./src/Oip.sln -p:Version=${{ steps.version.outputs.version }}
       - name: Build
-        # The global Version property overrides <Version> from src/Common.props, the tree keeps its own value.
+        # The global Version property overrides <Version> from src/Directory.Build.props, the tree keeps its own value.
         run: dotnet build ./src/Oip.sln --configuration Release --no-restore -p:Version=${{ steps.version.outputs.version }}
       - name: Install web client dependencies
         run: npm ci

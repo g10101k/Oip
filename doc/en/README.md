@@ -3,7 +3,7 @@
 A foundational set of concepts for developing cross-platform web applications based on the following stack:
 
 * Angular 20 (prime-ng, sakai-ng);
-* .NET 8.0 (EFCore);
+* .NET 10.0 (EFCore);
 * Keycloak.
 
 The core value of this project lies in the approaches used in the development of this example.
@@ -12,7 +12,7 @@ The core value of this project lies in the approaches used in the development of
 
 First-time setup:
 
-1. Install the .NET 8.0 SDK https://dotnet.microsoft.com/en-us/download/dotnet/8.0;
+1. Install the .NET 10.0 SDK https://dotnet.microsoft.com/en-us/download/dotnet/10.0;
 2. Install the latest LTS version of Node.js https://nodejs.org/en;
 3. Install Docker Desktop https://www.docker.com/get-started;
 4. Go to the `.oip-devcontainer` directory;
