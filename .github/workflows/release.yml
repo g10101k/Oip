@@ -1,12 +1,12 @@
-# Publishes NuGet packages and the oip-common npm package for a v* tag.
+# Publishes NuGet packages and the oip-common npm package for a published GitHub Release.
 # The file name is registered as a trusted publisher for oip-common on npmjs.com,
 # renaming it breaks the npm publish step.
 
 name: Release
 
 on:
-  push:
-    tags: [ "v*" ]
+  release:
+    types: [ "published" ]
 
 permissions:
   contents: read
@@ -17,6 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Resolve the version from the release tag
+        id: version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        # The tag is the only source of the released version, nothing in the tree is compared against it.
+        run: |
+          version="${TAG#v}"
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'; then
+            echo "Release tag $TAG is not a SemVer version, expected something like v1.2.3."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Releasing $version"
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -32,23 +45,18 @@ jobs:
         run: |
           npm install -g npm@latest
           npm -v
-      - name: Check npm and NuGet versions are in sync
-        run: node ./src/Oip.WebClient/scripts/bump-version.js --check
-      - name: Check the tag matches the released version
-        run: |
-          tag="${GITHUB_REF_NAME#v}"
-          version="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' ./src/Common.props)"
-          if [ "$tag" != "$version" ]; then
-            echo "Tag $GITHUB_REF_NAME does not match Common.props version $version."
-            exit 1
-          fi
       - name: Restore dependencies
-        run: dotnet restore ./src/Oip.sln
+        run: dotnet restore ./src/Oip.sln -p:Version=${{ steps.version.outputs.version }}
       - name: Build
-        run: dotnet build ./src/Oip.sln --configuration Release --no-restore
+        # The global Version property overrides <Version> from src/Common.props, the tree keeps its own value.
+        run: dotnet build ./src/Oip.sln --configuration Release --no-restore -p:Version=${{ steps.version.outputs.version }}
       - name: Install web client dependencies
         run: npm ci
         working-directory: ./src/Oip.WebClient
+      - name: Set the oip-common version
+        # ng-packagr copies this package.json into dist, so the version has to be set before the build.
+        run: npm pkg set version=${{ steps.version.outputs.version }}
+        working-directory: ./src/Oip.WebClient/projects/oip-common
       - name: Build oip-common
         run: npx ng build oip-common
         working-directory: ./src/Oip.WebClient
