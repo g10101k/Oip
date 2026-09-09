@@ -3,6 +3,7 @@
   --oip-primary-hover: #dc2626;
   --oip-surface-page: #f4f4f5;
   --oip-surface-card: #ffffff;
+  --oip-surface-input: #ffffff;
   --oip-surface-muted: #71717a;
   --oip-text: #3f3f46;
   --oip-border: #e5e7eb;
@@ -175,7 +176,7 @@ a:hover {
 .oip-keycloak-form input[type="password"],
 .oip-keycloak-form .pf-c-form-control,
 .oip-keycloak-form .pf-v5-c-form-control {
-  background: #ffffff;
+  background: var(--oip-surface-input);
   border: 1px solid var(--oip-border);
   border-radius: 6px;
   color: var(--oip-text);
@@ -379,7 +380,7 @@ a:hover {
 }
 
 .oip-social-link {
-  background: #ffffff;
+  background: var(--oip-surface-input);
   border: 1px solid var(--oip-border);
   color: var(--oip-text);
   gap: 8px;
@@ -394,15 +395,11 @@ a:hover {
   :root {
     --oip-surface-page: #09090b;
     --oip-surface-card: #18181b;
+    --oip-surface-input: #18181b;
     --oip-surface-muted: #a1a1aa;
     --oip-text: #fafafa;
     --oip-border: #3f3f46;
     color-scheme: dark;
-  }
-
-  .oip-field input,
-  .oip-social-link {
-    background: #18181b;
   }
 
   .oip-social-link:hover {
