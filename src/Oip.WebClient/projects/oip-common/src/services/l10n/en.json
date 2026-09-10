@@ -1,4 +1,7 @@
 {
+  "userService": {
+    "failedToLoadPhoto": "Failed to load user photo"
+  },
   "msgService": {
     "success": "Success",
     "info": "Info",

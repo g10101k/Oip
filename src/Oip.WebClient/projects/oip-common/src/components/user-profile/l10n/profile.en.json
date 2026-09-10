@@ -2,7 +2,6 @@
   "profileComponent": {
     "changePhoto": "Upload Photo",
     "successfullyUploaded": "Uploaded successfully",
-    "failedToLoadPhoto": "Failed to load user photo",
     "deletePhoto": "Delete Photo",
     "deletePhotoConfirmHeader": "Delete Photo",
     "deletePhotoConfirmMessage": "Are you sure you want to delete your photo?",

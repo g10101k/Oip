@@ -94,7 +94,7 @@ export class UserService {
         // A 404 just means the user hasn't uploaded a photo yet (e.g. on first login) —
         // that's an expected state, not a failure, so fall back to initials silently.
         if ((error as { status?: number })?.status !== 404) {
-          this.msgService.errorFromException(error, this.translateService.instant('profileComponent.failedToLoadPhoto'));
+          this.msgService.errorFromException(error, this.translateService.instant('userService.failedToLoadPhoto'));
         }
         this.photoLoaded = false;
       }

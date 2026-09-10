@@ -1,4 +1,7 @@
 {
+  "userService": {
+    "failedToLoadPhoto": "Не удалось загрузить фото пользователя"
+  },
   "msgService": {
     "success": "Успешно",
     "info": "Информация",
