@@ -1,0 +1,28 @@
+<Project>
+    <PropertyGroup Label="Build">
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Package">
+        <Version>0.9.0</Version>
+        <AssemblyVersion>$(Version)</AssemblyVersion>
+        <PackageVersion>$(Version)</PackageVersion>
+        <Authors>Igor Tyulyakov aka g101k</Authors>
+        <Copyright>2026</Copyright>
+        <PackageProjectUrl>https://github.com/g10101k/Oip</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/g10101k/Oip</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup Label="Files">
+        <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="\" Visible="false"/>
+    </ItemGroup>
+</Project>

@@ -5,7 +5,7 @@ WORKDIR /src/Oip.WebClient
 RUN npm install
 RUN npm run build
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY . .
@@ -15,7 +15,7 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Oip/Oip.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0  AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0  AS base
 WORKDIR /app
 EXPOSE 50000
 

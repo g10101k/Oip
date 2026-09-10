@@ -1,24 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <SpaRoot>.\ClientApp\</SpaRoot>
         <SpaProxyServerUrl>https://localhost:50008</SpaProxyServerUrl>
         <SpaProxyLaunchCommand>npm run start</SpaProxyLaunchCommand>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>$(NoWarn);CS1591</NoWarn>
         <UserSecretsId>6439c53a-8832-4b63-a468-b55f6ca63b2b</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.22"/>
-        <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.22"/>
-        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0"/>
-        <PackageReference Include="NLog" Version="5.3.4"/>
-        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory"/>
+        <PackageReference Include="Microsoft.AspNetCore.SpaProxy"/>
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets"/>
+        <PackageReference Include="NLog"/>
+        <PackageReference Include="NLog.Web.AspNetCore"/>
     </ItemGroup>
 
     <ItemGroup>

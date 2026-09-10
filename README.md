@@ -3,7 +3,7 @@
 A template for cross-platform web applications built on the following stack:
 
 - **Frontend**: Angular 20 (PrimeNG, Sakai-NG)
-- **Backend**: .NET 8.0 (Entity Framework Core)
+- **Backend**: .NET 10.0 (Entity Framework Core)
 - **Authentication**: Keycloak
 
 > **Key Value**: Development approaches implemented in this example.
