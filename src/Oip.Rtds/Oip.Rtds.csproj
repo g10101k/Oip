@@ -5,6 +5,7 @@
         <SpaRoot>.\..\Oip.WebClient\</SpaRoot>
         <SpaProxyServerUrl>https://localhost:50003</SpaProxyServerUrl>
         <SpaProxyLaunchCommand>npm run start:rtds</SpaProxyLaunchCommand>
+        <SpaProxyKeepRunning>true</SpaProxyKeepRunning>
     </PropertyGroup>
     
     <ItemGroup>
