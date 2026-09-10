@@ -5,6 +5,7 @@
         <SpaRoot>.\ClientApp\</SpaRoot>
         <SpaProxyServerUrl>https://localhost:50008</SpaProxyServerUrl>
         <SpaProxyLaunchCommand>npm run start</SpaProxyLaunchCommand>
+        <SpaProxyKeepRunning>true</SpaProxyKeepRunning>
         <UserSecretsId>6439c53a-8832-4b63-a468-b55f6ca63b2b</UserSecretsId>
     </PropertyGroup>
 

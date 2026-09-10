@@ -19,7 +19,6 @@
     "version:set": "node scripts/bump-version.js",
     "version:check": "node scripts/bump-version.js --check",
     "publish": "node scripts/publish-common.js",
-    "publish:local": "node scripts/publish-local.js",
     "test": "ng test",
     "lint": "ng lint --fix || npx prettier --write projects/",
     "e2e": "ng e2e"

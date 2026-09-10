@@ -4,7 +4,7 @@
     "baseUrl": "./",
     "paths": {
       "oip-common": [
-        "dist/oip-common"
+        "projects/oip-common/src/public-api.ts"
       ]
     },
     "outDir": "./out-tsc",
