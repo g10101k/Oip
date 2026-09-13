@@ -86,9 +86,20 @@ internal class BaseTest
     protected By ConfirmDialogAcceptButton => By.CssSelector(".p-confirmdialog-accept-button");
 
     /// <summary>
+    /// The application wrapper while it is blocked by BlockLoaderComponent: a full screen overlay is up
+    /// and the wrapper is marked <c>inert</c>, so clicks and context menus never reach the menu below it.
+    /// </summary>
+    protected By BlockedLayoutWrapper => By.CssSelector(".layout-wrapper[inert]");
+
+    /// <summary>
     /// The default timeout in seconds for WebDriverWait operations.
     /// </summary>
     internal const int StandardTimeOutInSeconds = 15;
+
+    /// <summary>
+    /// How long the blocker must stay away before the application counts as interactive.
+    /// </summary>
+    private const int InteractiveSettleMilliseconds = 500;
 
     /// <summary>
     /// Cross platform Ctrl+A
@@ -117,13 +128,45 @@ internal class BaseTest
     }
 
     /// <summary>
-    /// Navigates to the specified module instance.
+    /// Navigates to the specified module instance and waits until the application accepts input again.
     /// </summary>
     /// <param name="moduleName">The name of the module to navigate to.</param>
     internal void GoToModuleInstance(string moduleName)
     {
+        GoToModuleInstance(By.XPath($"//span[text()='{moduleName}']"));
+    }
+
+    /// <summary>
+    /// Navigates to the module instance found by the given locator and waits until the application
+    /// accepts input again.
+    /// </summary>
+    /// <param name="itemLocator">The locator of the menu item to open.</param>
+    internal void GoToModuleInstance(By itemLocator)
+    {
         var scrollContainer = Wait.Until(d => d.FindElement(By.ClassName("layout-sidebar")));
-        scrollContainer.FindElement(By.XPath($"//span[text()='{moduleName}']")).Click();
+        scrollContainer.FindElement(itemLocator).Click();
+        WaitForAppInteractive();
+    }
+
+    /// <summary>
+    /// Waits until BlockLoaderComponent has released the application.
+    /// The blocker outlives the router navigation - it also covers module rights, settings and
+    /// extension loading registered in ModuleLoadingService - and it appears 150 ms after the
+    /// transition starts, so a single check right after a click can pass before it even shows up.
+    /// </summary>
+    internal void WaitForAppInteractive()
+    {
+        Wait.Until(_ =>
+        {
+            for (var elapsed = 0; elapsed < InteractiveSettleMilliseconds; elapsed += 100)
+            {
+                if (ExistsNow(BlockedLayoutWrapper))
+                    return false;
+                Thread.Sleep(100);
+            }
+
+            return true;
+        });
     }
 
     /// <summary>
