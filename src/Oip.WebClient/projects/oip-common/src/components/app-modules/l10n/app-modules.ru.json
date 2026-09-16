@@ -12,7 +12,8 @@
       "currentlyLoaded": "Загружен",
       "yes": "Да",
       "no": "Нет",
-      "deleteTooltip": "Удалить"
+      "deleteTooltip": "Удалить",
+      "empty": "Нет модулей"
     },
     "confirm": {
       "header": "Внимание",
@@ -24,7 +25,10 @@
       "deleteSuccess": "Модуль удален",
       "deleteError": "Не удалось удалить модуль",
       "registerError": "Не удалось зарегистрировать внешний модуль",
-      "registerSuccess": "Внешний модуль зарегистрирован"
-    }
+      "registerSuccess": "Внешний модуль зарегистрирован",
+      "loadError": "Не удалось загрузить модули"
+    },
+    "filterPlaceholder": "Фильтр по ID или имени",
+    "clearFilterTooltip": "Сбросить фильтр"
   }
 }

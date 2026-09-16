@@ -6,8 +6,12 @@
         "date": "Date",
         "temperatureC": "Temperature C",
         "temperatureF": "Temperature F",
-        "summary": "Summary"
-      }
+        "summary": "Summary",
+        "empty": "No forecast data"
+      },
+      "refreshTooltip": "Refresh",
+      "filterPlaceholder": "Filter by summary",
+      "clearFilterTooltip": "Clear filter"
     },
     "settings": {
       "title": "Weather Settings",

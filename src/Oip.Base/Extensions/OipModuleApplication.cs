@@ -659,7 +659,8 @@ public static class OipModuleApplication
                 settings.DistributedKeyPrefix,
                 new InMemoryAuthenticationTicketStore(
                     settings.MaxInMemoryTickets,
-                    TimeSpan.FromSeconds(settings.CleanupIntervalSeconds))));
+                    TimeSpan.FromSeconds(settings.CleanupIntervalSeconds)),
+                settings.RedisConnectionString));
         }
         else
         {
@@ -667,6 +668,9 @@ public static class OipModuleApplication
                 settings.MaxInMemoryTickets,
                 TimeSpan.FromSeconds(settings.CleanupIntervalSeconds)));
         }
+
+        services.AddSingleton<IAuthSessionStore>(provider =>
+            (IAuthSessionStore)provider.GetRequiredService<ITicketStore>());
 
         services.AddSingleton<IPostConfigureOptions<CookieAuthenticationOptions>,
             CookieAuthenticationTicketStorePostConfigure>();

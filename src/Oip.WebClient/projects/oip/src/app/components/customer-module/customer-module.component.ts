@@ -3,8 +3,10 @@ import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FilterMetadata, SharedModule } from 'primeng/api';
-import { Button } from 'primeng/button';
-import { InputText } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { ToolbarModule } from 'primeng/toolbar';
+import { Tooltip } from 'primeng/tooltip';
+import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -54,41 +56,62 @@ interface SelectOption<TValue = string> {
 @Component({
   template: `
     @if (isContent) {
-      <div class="card space-y-4">
-        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h5 class="mb-1"><i class="fa-duotone fa-solid fa-user"></i> {{ title }}</h5>
-            <p class="m-0 text-surface-500">{{ 'customer-module.content.subtitle' | translate }}</p>
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="card w-full">
+          <div class="mb-4">
+            <p-toolbar>
+              <div class="flex flex-col md:flex-row md:items-center gap-2 w-full">
+                <div class="font-semibold text-lg flex items-center gap-2 mx-2">
+                  <i class="pi pi-users"></i>
+                  {{ title }}
+                </div>
+
+                <div class="flex-1"></div>
+                <div class="flex items-center gap-1 w-full md:w-auto">
+                  <p-button
+                    icon="pi pi-refresh"
+                    rounded="true"
+                    severity="secondary"
+                    text="true"
+                    tooltipPosition="bottom"
+                    [loading]="loading"
+                    [disabled]="activeRowAction"
+                    [pTooltip]="'customer-module.content.refreshTooltip' | translate"
+                    (onClick)="refreshAction()"></p-button>
+                  <p-button
+                    icon="pi pi-plus"
+                    rounded="true"
+                    severity="success"
+                    text="true"
+                    tooltipPosition="bottom"
+                    [disabled]="loading || !canEdit"
+                    [pTooltip]="'customer-module.content.add' | translate"
+                    (onClick)="beginCreateCustomer()"></p-button>
+                  <input
+                    class="w-full md:w-96"
+                    pInputText
+                    type="text"
+                    [placeholder]="'customer-module.content.globalSearch' | translate"
+                    [(ngModel)]="globalFilter"
+                    (ngModelChange)="applyGlobalFilter()" />
+                  <p-button
+                    icon="pi pi-filter-slash"
+                    rounded="true"
+                    severity="secondary"
+                    text="true"
+                    tooltipPosition="bottom"
+                    [disabled]="!hasActiveFilters"
+                    [pTooltip]="'customer-module.content.clear' | translate"
+                    (onClick)="clearFilters()"></p-button>
+                </div>
+              </div>
+            </p-toolbar>
           </div>
-          <div class="flex flex-col gap-2 sm:flex-row">
-            <input
-              pInputText
-              type="text"
-              [placeholder]="'customer-module.content.globalSearch' | translate"
-              [(ngModel)]="globalFilter"
-              (keydown.enter)="applyGlobalFilter()" />
-            <p-button
-              icon="pi pi-search"
-              [label]="'customer-module.content.search' | translate"
-              (onClick)="applyGlobalFilter()" />
-            <p-button
-              icon="pi pi-filter-slash"
-              severity="secondary"
-              [label]="'customer-module.content.clear' | translate"
-              (onClick)="clearFilters()" />
-            <p-button
-              icon="pi pi-plus"
-              severity="success"
-              [disabled]="loading || !canEdit"
-              [label]="'customer-module.content.add' | translate"
-              (onClick)="beginCreateCustomer()" />
-          </div>
-        </div>
 
         <p-table
           #table
+          class="mt-4"
           dataKey="id"
-          responsiveLayout="scroll"
           [filters]="localSettings().filters ?? {}"
           [first]="localSettings().first ?? 0"
           [globalFilterFields]="globalFilterFields"
@@ -254,16 +277,22 @@ interface SelectOption<TValue = string> {
                 </span>
               </td>
               <td>
-                <div class="flex items-center justify-center gap-2">
+                <div class="flex items-center justify-center gap-1">
                   @if (customer._isEditing) {
                     <p-button
                       icon="pi pi-check"
+                      rounded="true"
+                      tooltipPosition="bottom"
+                      [pTooltip]="'customer-module.content.table.saveTooltip' | translate"
                       severity="success"
                       [disabled]="activeRowAction || !canEdit"
                       [text]="true"
                       (onClick)="saveCustomer(customer)" />
                     <p-button
                       icon="pi pi-times"
+                      rounded="true"
+                      tooltipPosition="bottom"
+                      [pTooltip]="'customer-module.content.table.cancelTooltip' | translate"
                       severity="secondary"
                       [disabled]="activeRowAction"
                       [text]="true"
@@ -271,11 +300,17 @@ interface SelectOption<TValue = string> {
                   } @else {
                     <p-button
                       icon="pi pi-pencil"
+                      rounded="true"
+                      tooltipPosition="bottom"
+                      [pTooltip]="'customer-module.content.table.editTooltip' | translate"
                       [disabled]="activeRowAction || !canEdit"
                       [text]="true"
                       (onClick)="editCustomer(customer)" />
                     <p-button
                       icon="pi pi-trash"
+                      rounded="true"
+                      tooltipPosition="bottom"
+                      [pTooltip]="'customer-module.content.table.deleteTooltip' | translate"
                       severity="danger"
                       [disabled]="activeRowAction || !canDelete"
                       [text]="true"
@@ -288,12 +323,13 @@ interface SelectOption<TValue = string> {
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td class="py-8 text-center text-surface-500" [attr.colspan]="hasRight(viewFinancialsRight) ? 10 : 9">
+              <td [attr.colspan]="hasRight(viewFinancialsRight) ? 10 : 9">
                 {{ 'customer-module.content.empty' | translate }}
               </td>
             </tr>
           </ng-template>
         </p-table>
+        </div>
       </div>
     } @else if (isSettings) {
       <div class="card">
@@ -310,9 +346,11 @@ interface SelectOption<TValue = string> {
     SharedModule,
     TagModule,
     SecurityComponent,
-    Button,
+    ButtonModule,
+    ToolbarModule,
+    Tooltip,
     FormsModule,
-    InputText,
+    InputTextModule,
     Select,
     DatePipe,
     DecimalPipe,
@@ -438,6 +476,20 @@ export class CustomerModuleComponent
 
   protected applyGlobalFilter(): void {
     this.table.filterGlobal(this.globalFilter, 'contains');
+  }
+
+  protected get hasActiveFilters(): boolean {
+    if (this.globalFilter) return true;
+    const filters = this.table?.filters ?? this.localSettings().filters ?? {};
+    return Object.entries(filters).some(([field, meta]) =>
+      field !== 'global' &&
+      (Array.isArray(meta) ? meta : [meta]).some((m) => m?.value !== null && m?.value !== undefined && m?.value !== '')
+    );
+  }
+
+  protected async refreshAction(): Promise<void> {
+    this.cancelAllEdits();
+    await this.loadCustomers(this.createLazyEventFromState());
   }
 
   protected clearFilters(): void {

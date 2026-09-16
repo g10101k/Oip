@@ -37,7 +37,8 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddController<CryptController>()
-            .AddController<SecurityController>();
+            .AddController<SecurityController>()
+            .AddController<AuthSessionsController>();
 
         return services;
     }

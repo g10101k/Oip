@@ -1,17 +1,18 @@
-import { Component, inject, OnDestroy, OnInit, output, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BaseModuleComponent, SecurityComponent } from 'oip-common';
 import { WeatherForecastModuleApi } from '../../../api/weather-forecast-module.api';
 import { WeatherForecastResponse, WeatherModuleSettings } from '../../../api/data-contracts';
 import { TagModule } from 'primeng/tag';
 import { FilterMetadata, SharedModule } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
-import { Button } from 'primeng/button';
+import { ButtonModule } from 'primeng/button';
+import { ToolbarModule } from 'primeng/toolbar';
+import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
+import { InputTextModule } from 'primeng/inputtext';
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
-import { DatePicker } from 'primeng/datepicker';
-import { convertToPrimeNgDateFormat, provideTranslations } from 'oip-common';
+import { provideTranslations } from 'oip-common';
 import en from './l10n/weather-forecast-module.en.json';
 import ru from './l10n/weather-forecast-module.ru.json';
 
@@ -26,12 +27,60 @@ interface WeatherModuleLocalSettings {
 @Component({
   template: `
     @if (isContent) {
-      <div class="card">
-        <div>
-          <h5>{{ this.title }}</h5>
-          <p-date-picker [dateFormat]="layoutService.primeNgDateFormat()"></p-date-picker>
-          <p-table #table [value]="data" (onFilter)="onFilter()">
-            <ng-template let-columns pTemplate="header">
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="card w-full">
+          <div class="mb-4">
+            <p-toolbar>
+              <div class="flex flex-col md:flex-row md:items-center gap-2 w-full">
+                <div class="font-semibold text-lg flex items-center gap-2 mx-2">
+                  <i class="pi pi-cloud"></i>
+                  {{ title }}
+                </div>
+
+                <div class="flex-1"></div>
+                <div class="flex items-center gap-1 w-full md:w-auto">
+                  <p-button
+                    icon="pi pi-refresh"
+                    rounded="true"
+                    severity="secondary"
+                    text="true"
+                    tooltipPosition="bottom"
+                    [loading]="loading"
+                    [pTooltip]="'weather-forecast-module.content.refreshTooltip' | translate"
+                    (onClick)="refreshAction()"></p-button>
+                  <input
+                    class="w-full md:w-96"
+                    pInputText
+                    type="text"
+                    [placeholder]="'weather-forecast-module.content.filterPlaceholder' | translate"
+                    [(ngModel)]="globalFilter"
+                    (ngModelChange)="table.filterGlobal($event, 'contains')"/>
+                  <p-button
+                    icon="pi pi-filter-slash"
+                    rounded="true"
+                    severity="secondary"
+                    text="true"
+                    tooltipPosition="bottom"
+                    [disabled]="!hasActiveFilters"
+                    [pTooltip]="'weather-forecast-module.content.clearFilterTooltip' | translate"
+                    (onClick)="clearFilter()"></p-button>
+                </div>
+              </div>
+            </p-toolbar>
+          </div>
+          <p-table
+            #table
+            class="mt-4"
+            dataKey="date"
+            sortField="date"
+            [sortOrder]="1"
+            [paginator]="true"
+            [rows]="20"
+            [globalFilterFields]="['summary']"
+            [value]="data"
+            [loading]="loading"
+            (onFilter)="onFilter()">
+            <ng-template pTemplate="header">
               <tr>
                 <th pSortableColumn="date" scope="col">
                   {{ 'weather-forecast-module.content.table.date' | translate }}
@@ -55,7 +104,7 @@ interface WeatherModuleLocalSettings {
                 </th>
               </tr>
             </ng-template>
-            <ng-template let-columns="columns" let-forecast pTemplate="body">
+            <ng-template let-forecast pTemplate="body">
               <tr>
                 <td>{{ forecast.date | date: layoutService.dateTimeFormat() }}</td>
                 <td>{{ forecast.temperatureC }}</td>
@@ -63,6 +112,11 @@ interface WeatherModuleLocalSettings {
                 <td>
                   <p-tag severity="success" [value]="forecast.summary"></p-tag>
                 </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="4">{{ 'weather-forecast-module.content.table.empty' | translate }}</td>
               </tr>
             </ng-template>
           </p-table>
@@ -100,12 +154,13 @@ interface WeatherModuleLocalSettings {
     SharedModule,
     TagModule,
     SecurityComponent,
-    Button,
+    ButtonModule,
+    ToolbarModule,
+    Tooltip,
     FormsModule,
-    InputText,
+    InputTextModule,
     DatePipe,
-    TranslatePipe,
-    DatePicker
+    TranslatePipe
   ]
 })
 export class WeatherForecastModuleComponent
@@ -117,18 +172,44 @@ export class WeatherForecastModuleComponent
   @ViewChild('table') table!: Table;
   protected readonly dataService = inject(WeatherForecastModuleApi);
   protected data: WeatherForecastResponse[] = [];
+  protected loading = false;
+  protected globalFilter = '';
 
   protected override async onModuleInstanceChange(): Promise<void> {
+    await this.refreshAction();
+    const filters = this.localSettings().filters;
+    if (filters && this.table) {
+      this.table.filters = filters;
+      const global = filters['global'];
+      this.globalFilter = (Array.isArray(global) ? global[0]?.value : global?.value) ?? '';
+    }
+  }
+
+  async refreshAction() {
+    this.loading = true;
     try {
       this.data = await this.dataService.getWeatherForecast({
         dayCount: this.settings.dayCount
       });
     } catch (error) {
       this.data = [];
-      console.error(this.t('weather-forecast-module.errorFetchingMessage'), error);
       this.msgService.errorFromException(error, this.t('weather-forecast-module.errorFetchingMessage'));
+    } finally {
+      this.loading = false;
     }
-    if (this.localSettings().filters && this.table) this.table.filters = this.localSettings().filters;
+  }
+
+  protected get hasActiveFilters(): boolean {
+    if (!this.table?.filters) return false;
+    return Object.values(this.table.filters).some((meta) =>
+      (Array.isArray(meta) ? meta : [meta]).some((m) => m?.value !== null && m?.value !== undefined && m?.value !== '')
+    );
+  }
+
+  clearFilter() {
+    this.globalFilter = '';
+    this.table.clearFilterValues();
+    this.table._filter();
   }
 
   onFilter() {
@@ -137,6 +218,4 @@ export class WeatherForecastModuleComponent
       filters: this.table.filters
     }));
   }
-
-  protected readonly convertToPrimeNgDateFormat = convertToPrimeNgDateFormat;
 }

@@ -3,10 +3,8 @@
     "title": "Модуль клиентов",
     "content": {
       "rowsPerPageOptionsAll": "Все",
-      "subtitle": "Демо-таблица клиентов с серверной фильтрацией, сортировкой и пагинацией.",
       "globalSearch": "Поиск по имени, email, стране или категории",
-      "search": "Найти",
-      "clear": "Сбросить",
+      "clear": "Сбросить фильтр",
       "add": "Добавить",
       "empty": "По текущим фильтрам клиенты не найдены.",
       "table": {
@@ -19,8 +17,13 @@
         "lifetimeValue": "Суммарная ценность",
         "createdAt": "Создан",
         "ordersCount": "Заказы",
-        "actions": "Действия"
-      }
+        "actions": "Действия",
+        "saveTooltip": "Сохранить",
+        "cancelTooltip": "Отмена",
+        "editTooltip": "Редактировать",
+        "deleteTooltip": "Удалить"
+      },
+      "refreshTooltip": "Обновить"
     },
     "messages": {
       "requiredFields": "Заполните имя, email, категорию и страну.",

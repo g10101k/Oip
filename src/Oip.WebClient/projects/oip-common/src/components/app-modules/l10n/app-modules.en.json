@@ -12,7 +12,8 @@
       "currentlyLoaded": "Currently Loaded",
       "yes": "Yes",
       "no": "No",
-      "deleteTooltip": "Delete"
+      "deleteTooltip": "Delete",
+      "empty": "No modules"
     },
     "confirm": {
       "header": "Warning",
@@ -24,7 +25,10 @@
       "deleteSuccess": "Module deleted",
       "deleteError": "Module delete failed",
       "registerError": "External module registration failed",
-      "registerSuccess": "External module registered"
-    }
+      "registerSuccess": "External module registered",
+      "loadError": "Failed to load modules"
+    },
+    "filterPlaceholder": "Filter by ID or name",
+    "clearFilterTooltip": "Clear filter"
   }
 }

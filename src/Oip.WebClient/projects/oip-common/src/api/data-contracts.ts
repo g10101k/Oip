@@ -29,6 +29,20 @@ export interface AuthCsrfTokenResponse {
   headerName?: string | null;
 }
 
+export interface AuthSessionDto {
+  sessionId: string | null;
+  userId?: string | null;
+  userName?: string | null;
+  displayName?: string | null;
+  email?: string | null;
+  createdUtc?: Date | null;
+  lastActivityUtc?: Date | null;
+  expiresUtc?: Date | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  isCurrent?: boolean;
+}
+
 export interface AuthSessionResponse {
   isAuthenticated?: boolean;
   userName?: string | null;
@@ -52,6 +66,10 @@ export interface DefaultSecretsReportResponse {
   checkedCount?: number;
   showBanner?: boolean;
   findings?: DefaultSecretFindingResponse[] | null;
+}
+
+export interface DeleteAuthSessionsResponse {
+  deletedCount?: number;
 }
 
 export interface EditModuleInstanceDto {
@@ -132,6 +150,18 @@ export interface RegisterExtensionModuleRequest {
 
 export interface UpdateExtensionModuleRequest {
   manifestUrl?: string | null;
+}
+
+export interface GetAuthSessionsParams {
+  userId?: string;
+}
+
+export interface DeleteAuthSessionParams {
+  sessionId: string;
+}
+
+export interface DeleteAuthSessionsByUserParams {
+  userId: string;
 }
 
 export interface GetExtensionModuleByKeyParams {

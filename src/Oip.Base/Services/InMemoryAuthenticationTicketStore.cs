@@ -1,13 +1,13 @@
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 
 namespace Oip.Base.Services;
 
 /// <summary>
 /// Stores cookie authentication tickets server-side so the browser receives only an opaque session key.
 /// </summary>
-public sealed class InMemoryAuthenticationTicketStore : ITicketStore
+public sealed class InMemoryAuthenticationTicketStore : IAuthSessionStore
 {
     private readonly ConcurrentDictionary<string, StoredAuthenticationTicket> _tickets = new();
     private readonly TimeSpan _cleanupInterval;
@@ -22,17 +22,25 @@ public sealed class InMemoryAuthenticationTicketStore : ITicketStore
 
     private int MaxTickets { get; }
 
-    public Task<string> StoreAsync(AuthenticationTicket ticket)
+    public Task<string> StoreAsync(AuthenticationTicket ticket) => StoreAsync(ticket, null);
+
+    public Task<string> StoreAsync(AuthenticationTicket ticket, HttpContext httpContext,
+        CancellationToken cancellationToken) => StoreAsync(ticket, (HttpContext?)httpContext);
+
+    private Task<string> StoreAsync(AuthenticationTicket ticket, HttpContext? httpContext)
     {
         var key = Guid.NewGuid().ToString("N");
-        _tickets[key] = new StoredAuthenticationTicket(ticket, DateTimeOffset.UtcNow);
+        var now = DateTimeOffset.UtcNow;
+        AuthSessionMetadata.Initialize(key, ticket, httpContext, now);
+        _tickets[key] = new StoredAuthenticationTicket(ticket, now, now);
         CleanupIfNeeded(forceLimitCheck: true);
         return Task.FromResult(key);
     }
 
     public Task RenewAsync(string key, AuthenticationTicket ticket)
     {
-        _tickets[key] = new StoredAuthenticationTicket(ticket, DateTimeOffset.UtcNow);
+        var now = DateTimeOffset.UtcNow;
+        _tickets[key] = new StoredAuthenticationTicket(ticket, now, now);
         CleanupIfNeeded(forceLimitCheck: true);
         return Task.CompletedTask;
     }
@@ -44,11 +52,15 @@ public sealed class InMemoryAuthenticationTicketStore : ITicketStore
         if (!_tickets.TryGetValue(key, out var storedTicket))
             return Task.FromResult<AuthenticationTicket?>(null);
 
-        if (IsExpired(storedTicket.Ticket, DateTimeOffset.UtcNow))
+        var now = DateTimeOffset.UtcNow;
+        if (IsExpired(storedTicket.Ticket, now))
         {
             _tickets.TryRemove(key, out _);
             return Task.FromResult<AuthenticationTicket?>(null);
         }
+
+        if (now - storedTicket.LastActivityUtc >= AuthSessionMetadata.ActivityUpdateInterval)
+            _tickets.TryUpdate(key, storedTicket with { LastActivityUtc = now }, storedTicket);
 
         return Task.FromResult<AuthenticationTicket?>(storedTicket.Ticket);
     }
@@ -57,6 +69,16 @@ public sealed class InMemoryAuthenticationTicketStore : ITicketStore
     {
         _tickets.TryRemove(key, out _);
         return Task.CompletedTask;
+    }
+
+    public Task<IReadOnlyList<AuthSessionInfo>> GetSessionsAsync(CancellationToken cancellationToken = default)
+    {
+        var now = DateTimeOffset.UtcNow;
+        IReadOnlyList<AuthSessionInfo> sessions = _tickets
+            .Where(pair => !IsExpired(pair.Value.Ticket, now))
+            .Select(pair => AuthSessionMetadata.Create(pair.Key, pair.Value.Ticket, pair.Value.LastActivityUtc))
+            .ToList();
+        return Task.FromResult(sessions);
     }
 
     private void CleanupIfNeeded(bool forceLimitCheck)
@@ -106,5 +128,8 @@ public sealed class InMemoryAuthenticationTicketStore : ITicketStore
     private static bool IsExpired(AuthenticationTicket ticket, DateTimeOffset now) =>
         ticket.Properties.ExpiresUtc is { } expiresUtc && expiresUtc <= now;
 
-    private sealed record StoredAuthenticationTicket(AuthenticationTicket Ticket, DateTimeOffset StoredUtc);
+    private sealed record StoredAuthenticationTicket(
+        AuthenticationTicket Ticket,
+        DateTimeOffset StoredUtc,
+        DateTimeOffset LastActivityUtc);
 }

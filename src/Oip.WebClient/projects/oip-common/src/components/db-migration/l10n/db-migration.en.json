@@ -3,7 +3,7 @@
     "migrationManager": "Migration manager",
     "actions": {
       "refresh": "Refresh",
-      "cleanFilter": "Clean filter",
+      "cleanFilter": "Clear filter",
       "applyMigration": "Apply migration"
     },
     "columns": {
@@ -14,6 +14,10 @@
     },
     "messages": {
       "errorRefreshing": "Error refreshing database"
-    }
+    },
+    "filterPlaceholder": "Filter by migration name",
+    "empty": "No migrations",
+    "yes": "Yes",
+    "no": "No"
   }
 }

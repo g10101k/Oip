@@ -40,46 +40,91 @@ L10nService.registerTranslations({ en, ru });
     <p-confirmDialog></p-confirmDialog>
     <div class="flex flex-col md:flex-row gap-4">
       <div class="card w-full">
-        <div class="font-semibold text-xl mb-4">
-          {{ 'app-modules.title' | translate }}
-        </div>
         <div class="mb-4">
           <p-toolbar>
             <div class="flex flex-col md:flex-row md:items-center gap-2 w-full">
-              <div class="flex flex-col sm:flex-row gap-2 flex-1">
+              <div class="font-semibold text-lg flex items-center gap-2 mx-2">
+                <i class="pi pi-box"></i>
+                {{ 'app-modules.title' | translate }}
+              </div>
+
+              <div class="flex items-center gap-1 flex-1">
                 <input
                   class="w-full"
                   pInputText
                   type="url"
+                  id="oip-app-modules-manifest-url"
                   [disabled]="registeringExternalModule"
                   [placeholder]="'app-modules.register.manifestUrlPlaceholder' | translate"
                   [(ngModel)]="externalModuleManifestUrl"
                   (keydown.enter)="registerExternalModule()" />
                 <p-button
                   icon="pi pi-plus"
+                  rounded="true"
                   severity="success"
+                  text="true"
+                  tooltipPosition="bottom"
+                  id="oip-app-modules-register"
                   [disabled]="!canRegisterExternalModule"
-                  [label]="'app-modules.register.button' | translate"
+                  [pTooltip]="'app-modules.register.button' | translate"
                   [loading]="registeringExternalModule"
                   (onClick)="registerExternalModule()"></p-button>
               </div>
-              <p-button
-                icon="pi pi-refresh"
-                rounded="true"
-                severity="secondary"
-                text="true"
-                tooltipPosition="bottom"
-                [pTooltip]="'app-modules.refreshTooltip' | translate"
-                (onClick)="refreshAction()"></p-button>
+
+              <div class="flex items-center gap-1 w-full md:w-auto">
+                <p-button
+                  icon="pi pi-refresh"
+                  rounded="true"
+                  severity="secondary"
+                  text="true"
+                  tooltipPosition="bottom"
+                  [loading]="loading"
+                  [pTooltip]="'app-modules.refreshTooltip' | translate"
+                  (onClick)="refreshAction()"></p-button>
+                <input
+                  class="w-full md:w-96"
+                  pInputText
+                  type="text"
+                  id="oip-app-modules-filter"
+                  [placeholder]="'app-modules.filterPlaceholder' | translate"
+                  [(ngModel)]="moduleFilter" />
+                <p-button
+                  icon="pi pi-filter-slash"
+                  rounded="true"
+                  severity="secondary"
+                  text="true"
+                  tooltipPosition="bottom"
+                  id="oip-app-modules-clear-filter"
+                  [disabled]="!moduleFilter"
+                  [pTooltip]="'app-modules.clearFilterTooltip' | translate"
+                  (onClick)="moduleFilter = ''"></p-button>
+              </div>
             </div>
           </p-toolbar>
         </div>
-        <p-table class="mt-4" [paginator]="true" [rows]="100" [value]="modules">
+        <p-table
+          class="mt-4"
+          dataKey="moduleId"
+          sortField="name"
+          [sortOrder]="1"
+          [paginator]="true"
+          [rows]="100"
+          [value]="filteredModules"
+          [loading]="loading">
           <ng-template pTemplate="header">
             <tr>
-              <th>{{ 'app-modules.table.moduleId' | translate }}</th>
-              <th>{{ 'app-modules.table.name' | translate }}</th>
-              <th>{{ 'app-modules.table.currentlyLoaded' | translate }}</th>
+              <th pSortableColumn="moduleId">
+                {{ 'app-modules.table.moduleId' | translate }}
+                <p-sortIcon field="moduleId"></p-sortIcon>
+              </th>
+              <th pSortableColumn="name">
+                {{ 'app-modules.table.name' | translate }}
+                <p-sortIcon field="name"></p-sortIcon>
+              </th>
+              <th pSortableColumn="currentlyLoaded">
+                {{ 'app-modules.table.currentlyLoaded' | translate }}
+                <p-sortIcon field="currentlyLoaded"></p-sortIcon>
+              </th>
               <th style="width: 4rem"></th>
             </tr>
           </ng-template>
@@ -106,6 +151,11 @@ L10nService.registerTranslations({ en, ru });
               </td>
             </tr>
           </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4">{{ 'app-modules.table.empty' | translate }}</td>
+            </tr>
+          </ng-template>
         </p-table>
       </div>
     </div>
@@ -113,6 +163,8 @@ L10nService.registerTranslations({ en, ru });
 })
 export class AppModulesComponent implements OnInit {
   protected modules: ExistModuleDto[] = [];
+  protected moduleFilter = '';
+  protected loading = false;
   protected msgService = inject(MsgService);
   protected confirmationService = inject(ConfirmationService);
   protected l10nService = inject(L10nService);
@@ -133,8 +185,29 @@ export class AppModulesComponent implements OnInit {
     await this.refreshAction();
   }
 
+  protected get filteredModules(): ExistModuleDto[] {
+    const filter = this.moduleFilter.trim().toLowerCase();
+    if (!filter) {
+      return this.modules;
+    }
+    return this.modules.filter((module) =>
+      [module.moduleId, module.name].some((value) => value?.toString().toLowerCase().includes(filter))
+    );
+  }
+
   async refreshAction() {
-    this.modules = await this.moduleService.getModulesWithLoadStatus();
+    this.loading = true;
+    try {
+      this.modules = await this.moduleService.getModulesWithLoadStatus();
+    } catch (error) {
+      this.msgService.errorFromException(
+        error,
+        this.t('app-modules.messages.loadError'),
+        this.t('app-modules.messages.loadError')
+      );
+    } finally {
+      this.loading = false;
+    }
   }
 
   protected get canRegisterExternalModule() {
