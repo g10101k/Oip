@@ -134,6 +134,17 @@ export function oipModulesRoute(path = 'modules'): Route {
   };
 }
 
+/** Active authentication sessions, administrators only. */
+export function oipSessionsRoute(path = 'sessions'): Route {
+  return {
+    path,
+    loadComponent: () =>
+      import('../components/auth-sessions/auth-sessions.component').then((m) => m.AuthSessionsComponent),
+    canActivate: [oipAuthGuard],
+    data: { requireAdmin: true }
+  };
+}
+
 /** Discussion module. The path must keep an `:id` segment. */
 export function oipDiscussionRoute(path = 'discussion/:id'): Route {
   return {
@@ -201,6 +212,8 @@ export interface OipRouteFeatures {
   applications?: OipRouteToggle;
   /** Module registry, administrators only. Default path: `modules`. */
   modules?: OipRouteToggle;
+  /** Active authentication sessions, administrators only. Default path: `sessions`. */
+  sessions?: OipRouteToggle;
   /** Discussion module. Default path: `discussion/:id`. */
   discussion?: OipRouteToggle;
   /** Database migration module. Default path: `db-migration/:id`. */
@@ -281,6 +294,7 @@ export function provideOipRoutes(options: OipRoutesOptions = {}): Routes {
   builtInRoute(features.config, oipConfigRoute, children);
   builtInRoute(features.applications, oipApplicationsRoute, children);
   builtInRoute(features.modules, oipModulesRoute, children);
+  builtInRoute(features.sessions, oipSessionsRoute, children);
   builtInRoute(features.discussion, oipDiscussionRoute, children);
   builtInRoute(features.dbMigration, oipDbMigrationRoute, children);
   builtInRoute(features.iframeModule, oipIframeModuleRoute, children);

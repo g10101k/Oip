@@ -1,0 +1,35 @@
+{
+  "auth-sessions": {
+    "title": "Active sessions",
+    "refreshTooltip": "Refresh",
+    "filterPlaceholder": "Filter by user, email or IP address",
+    "table": {
+      "user": "User",
+      "created": "Signed in",
+      "lastActivity": "Last activity",
+      "expires": "Expires",
+      "ipAddress": "IP address",
+      "userAgent": "Browser",
+      "current": "Current",
+      "terminateTooltip": "Terminate session",
+      "terminateAllTooltip": "Terminate all user sessions",
+      "empty": "No active sessions"
+    },
+    "confirm": {
+      "header": "Warning",
+      "terminateMessage": "Terminate the session of {{user}}?",
+      "terminateAllMessage": "Terminate all sessions of {{user}}?",
+      "cancel": "Cancel",
+      "terminate": "Terminate",
+      "terminateEveryoneMessage": "Terminate all sessions except the current one?"
+    },
+    "messages": {
+      "loadError": "Failed to load sessions",
+      "terminateSuccess": "Session terminated",
+      "terminateAllSuccess": "Sessions terminated: {{count}}",
+      "terminateError": "Session termination failed"
+    },
+    "terminateAllTooltip": "Terminate all except current",
+    "clearFilterTooltip": "Clear filter"
+  }
+}

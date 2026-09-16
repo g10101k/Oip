@@ -1,0 +1,35 @@
+{
+  "auth-sessions": {
+    "title": "Активные сессии",
+    "refreshTooltip": "Обновить",
+    "filterPlaceholder": "Фильтр по пользователю, email или IP-адресу",
+    "table": {
+      "user": "Пользователь",
+      "created": "Вход",
+      "lastActivity": "Последняя активность",
+      "expires": "Истекает",
+      "ipAddress": "IP-адрес",
+      "userAgent": "Браузер",
+      "current": "Текущая",
+      "terminateTooltip": "Завершить сессию",
+      "terminateAllTooltip": "Завершить все сессии пользователя",
+      "empty": "Активных сессий нет"
+    },
+    "confirm": {
+      "header": "Внимание",
+      "terminateMessage": "Завершить сессию пользователя {{user}}?",
+      "terminateAllMessage": "Завершить все сессии пользователя {{user}}?",
+      "cancel": "Отмена",
+      "terminate": "Завершить",
+      "terminateEveryoneMessage": "Завершить все сессии, кроме текущей?"
+    },
+    "messages": {
+      "loadError": "Не удалось загрузить сессии",
+      "terminateSuccess": "Сессия завершена",
+      "terminateAllSuccess": "Завершено сессий: {{count}}",
+      "terminateError": "Не удалось завершить сессию"
+    },
+    "terminateAllTooltip": "Завершить все, кроме текущей",
+    "clearFilterTooltip": "Очистить фильтр"
+  }
+}

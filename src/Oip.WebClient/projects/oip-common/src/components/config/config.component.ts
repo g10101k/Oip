@@ -120,6 +120,14 @@ import ru from './l10n/config.ru.json';
                 label="{{ 'config.goTo' | translate }}"
                 routerLink="/applications" />
             </div>
+            <div class="flex items-center gap-2">
+              <label for="oip-app-config-sessions-link">{{ 'config.sessionManagement' | translate }}</label>
+              <p-button
+                icon="pi pi-users"
+                id="oip-app-config-sessions-link"
+                label="{{ 'config.goTo' | translate }}"
+                routerLink="/sessions" />
+            </div>
           </div>
         </div>
       }

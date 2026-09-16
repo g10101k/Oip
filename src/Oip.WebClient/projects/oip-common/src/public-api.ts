@@ -15,6 +15,7 @@ export { UserProfileComponent } from './components/user-profile/user-profile.com
 export { ConfigComponent } from './components/config/config.component';
 export { DbMigrationComponent } from './components/db-migration/db-migration.component';
 export { AppModulesComponent } from './components/app-modules/app-modules.component';
+export { AuthSessionsComponent } from './components/auth-sessions/auth-sessions.component';
 export { ApplicationsComponent } from './components/applications/applications.component';
 export { AppConfiguratorComponent } from './components/app-configurator/app-configurator.component';
 export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator/app-floating-configurator.component';
@@ -89,6 +90,7 @@ export {
 export { FolderModuleApi } from './api/folder-module.api';
 export { IframeModuleApi } from './api/iframe-module.api';
 export { SecurityApi } from './api/security.api';
+export { AuthSessionsApi } from './api/auth-sessions.api';
 export { ApplicationsApi } from './api/applications.api';
 export { UserProfileApi } from './api/user-profile.api';
 export { convertToPrimeNgDateFormat } from './helpers/date.helper';
@@ -106,6 +108,7 @@ export {
   oipConfigRoute,
   oipApplicationsRoute,
   oipModulesRoute,
+  oipSessionsRoute,
   oipDiscussionRoute,
   oipDbMigrationRoute,
   oipIframeModuleRoute,
