@@ -58,65 +58,71 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
   selector: 'app-applications',
   template: `
     <p-confirmDialog></p-confirmDialog>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col md:flex-row gap-4">
       <div class="card w-full">
-        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div class="font-semibold text-xl mb-1">
-              {{ 'applications.title' | translate }}
-            </div>
-            <p class="m-0 text-surface-500">{{ 'applications.subtitle' | translate }}</p>
-          </div>
-          <div class="flex flex-col gap-2 sm:flex-row">
-            <input
-              class="w-full sm:w-72"
-              pInputText
-              type="text"
-              [placeholder]="'applications.searchPlaceholder' | translate"
-              [(ngModel)]="globalFilter"
-              (keydown.enter)="applyGlobalFilter()" />
-            <p-button
-              icon="pi pi-search"
-              [label]="'applications.search' | translate"
-              (onClick)="applyGlobalFilter()"></p-button>
-            <p-button
-              icon="pi pi-filter-slash"
-              severity="secondary"
-              [label]="'applications.clear' | translate"
-              (onClick)="clearFilters()"></p-button>
-          </div>
-        </div>
-
-        <div class="my-4">
+        <div class="mb-4">
           <p-toolbar>
-            <p-button
-              icon="pi pi-plus"
-              severity="success"
-              [disabled]="loading || activeRowAction"
-              [label]="'applications.add' | translate"
-              (onClick)="beginCreateApplication()"></p-button>
-            <p-button
-              icon="pi pi-refresh"
-              rounded="true"
-              severity="secondary"
-              text="true"
-              tooltipPosition="bottom"
-              [disabled]="loading || activeRowAction"
-              [pTooltip]="'applications.refreshTooltip' | translate"
-              (onClick)="refreshAction()"></p-button>
+            <div class="flex flex-col md:flex-row md:items-center gap-2 w-full">
+              <div class="font-semibold text-lg flex items-center gap-2 mx-2">
+                <i class="pi pi-th-large"></i>
+                {{ 'applications.title' | translate }}
+              </div>
+
+              <div class="flex-1"></div>
+              <div class="flex items-center gap-1 w-full md:w-auto">
+                <p-button
+                  icon="pi pi-refresh"
+                  rounded="true"
+                  severity="secondary"
+                  text="true"
+                  tooltipPosition="bottom"
+                  id="oip-applications-refresh"
+                  [loading]="loading"
+                  [disabled]="activeRowAction"
+                  [pTooltip]="'applications.refreshTooltip' | translate"
+                  (onClick)="refreshAction()"></p-button>
+                <p-button
+                  icon="pi pi-plus"
+                  rounded="true"
+                  severity="success"
+                  text="true"
+                  tooltipPosition="bottom"
+                  id="oip-applications-add"
+                  [disabled]="loading || activeRowAction"
+                  [pTooltip]="'applications.add' | translate"
+                  (onClick)="beginCreateApplication()"></p-button>
+                <input
+                  class="w-full md:w-96"
+                  pInputText
+                  type="text"
+                  id="oip-applications-filter"
+                  [placeholder]="'applications.searchPlaceholder' | translate"
+                  [(ngModel)]="globalFilter"
+                  (ngModelChange)="applyGlobalFilter()" />
+                <p-button
+                  icon="pi pi-filter-slash"
+                  rounded="true"
+                  severity="secondary"
+                  text="true"
+                  tooltipPosition="bottom"
+                  id="oip-applications-clear-filter"
+                  [disabled]="!globalFilter"
+                  [pTooltip]="'applications.clear' | translate"
+                  (onClick)="clearFilters()"></p-button>
+              </div>
+            </div>
           </p-toolbar>
         </div>
 
         <p-table
-          #table
+          class="mt-4"
           dataKey="code"
-          responsiveLayout="scroll"
-          [globalFilterFields]="globalFilterFields"
-          [loading]="loading"
+          sortField="order"
+          [sortOrder]="1"
           [paginator]="true"
-          [rows]="25"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          [value]="visibleApplications">
+          [rows]="50"
+          [value]="visibleApplications"
+          [loading]="loading">
           <ng-template pTemplate="header">
             <tr>
               <th pSortableColumn="code">
@@ -236,10 +242,11 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                   "></p-tag>
               </td>
               <td>
-                <div class="flex items-center justify-center gap-2">
+                <div class="flex items-center justify-center gap-1">
                   @if (application._isEditing) {
                     <p-button
                       icon="pi pi-check"
+                      rounded="true"
                       severity="success"
                       text="true"
                       tooltipPosition="bottom"
@@ -248,6 +255,7 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                       (onClick)="saveApplication(application)"></p-button>
                     <p-button
                       icon="pi pi-times"
+                      rounded="true"
                       severity="secondary"
                       text="true"
                       tooltipPosition="bottom"
@@ -257,6 +265,7 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                   } @else {
                     <p-button
                       icon="pi pi-pencil"
+                      rounded="true"
                       text="true"
                       tooltipPosition="bottom"
                       [disabled]="activeRowAction"
@@ -264,6 +273,7 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
                       (onClick)="editApplication(application)"></p-button>
                     <p-button
                       icon="pi pi-trash"
+                      rounded="true"
                       severity="danger"
                       text="true"
                       tooltipPosition="bottom"
@@ -278,9 +288,7 @@ interface ApplicationTableItem extends ApplicationRegistryItemDto {
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td class="py-8 text-center text-surface-500" colspan="10">
-                {{ 'applications.empty' | translate }}
-              </td>
+              <td colspan="10">{{ 'applications.empty' | translate }}</td>
             </tr>
           </ng-template>
         </p-table>

@@ -1,10 +1,8 @@
 {
   "applications": {
     "title": "Applications",
-    "subtitle": "Manage the frontend application registry",
-    "searchPlaceholder": "Search applications",
-    "search": "Search",
-    "clear": "Clear",
+    "searchPlaceholder": "Filter applications",
+    "clear": "Clear filter",
     "add": "Add",
     "refreshTooltip": "Refresh",
     "empty": "No applications found",
