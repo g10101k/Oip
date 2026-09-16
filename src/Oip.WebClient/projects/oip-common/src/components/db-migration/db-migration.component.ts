@@ -1,9 +1,9 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService, SharedModule } from 'primeng/api';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
+import { ToolbarModule } from 'primeng/toolbar';
 import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -33,8 +33,8 @@ export interface ApplyMigrationRequest {
     SharedModule,
     TagModule,
     InputTextModule,
-    TextareaModule,
     ButtonModule,
+    ToolbarModule,
     FormsModule,
     ConfirmDialog,
     SecurityComponent,
@@ -44,77 +44,117 @@ export interface ApplyMigrationRequest {
   selector: 'db-migration',
   template: `
     @if (isContent) {
-      <div class="card" style="height: 100%">
-        <p-confirmDialog />
-        <div>
-          <h5>{{ 'db-migration.migrationManager' | translate }}</h5>
-          <div class="flex flex-row gap-2">
-            <p-button
-              icon="pi pi-refresh"
-              severity="secondary"
-              tooltipPosition="bottom"
-              [outlined]="true"
-              [pTooltip]="'db-migration.actions.refresh' | translate"
-              (click)="refreshAction()" />
-            <p-button
-              icon="pi pi-filter-slash"
-              severity="secondary"
-              tooltipPosition="bottom"
-              [outlined]="true"
-              [pTooltip]="'db-migration.actions.cleanFilter' | translate"
-              (click)="dt.clear()" />
-          </div>
-          <div>
-            <p-table #dt dataKey="name" editMode="row" size="small" [scrollable]="true" [value]="data">
-              <ng-template let-columns pTemplate="header">
-                <tr>
-                  <th pSortableColumn="name" scope="col">
-                    {{ 'db-migration.columns.name' | translate }}
-                    <p-columnFilter display="menu" field="name" type="text" />
-                  </th>
-                  <th scope="col">{{ 'db-migration.columns.applied' | translate }}</th>
-                  <th scope="col">{{ 'db-migration.columns.exist' | translate }}</th>
-                  <th scope="col">{{ 'db-migration.columns.pending' | translate }}</th>
-                  <th scope="col"></th>
-                </tr>
-              </ng-template>
+      <p-confirmDialog />
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="card w-full">
+          <div class="mb-4">
+            <p-toolbar>
+              <div class="flex flex-col md:flex-row md:items-center gap-2 w-full">
+                <div class="font-semibold text-lg flex items-center gap-2 mx-2">
+                  <i class="pi pi-database"></i>
+                  {{ 'db-migration.migrationManager' | translate }}
+                </div>
 
-              <ng-template #body let-columns="columns" let-editing="editing" let-ri="rowIndex" let-rowData>
-                <tr [pEditableRow]="rowData">
-                  <td>
-                    {{ rowData.name }}
-                  </td>
-                  <td>
-                    @if (rowData.applied) {
-                      <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true"></p-button>
-                    }
-                  </td>
-                  <td>
-                    @if (rowData.exist) {
-                      <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true" />
-                    }
-                  </td>
-                  <td>
-                    @if (rowData.pending) {
-                      <p-button icon="pi pi-check" severity="success" [rounded]="true" [text]="true"></p-button>
-                    }
-                  </td>
-                  <td>
-                    <p-button
-                      icon="pi pi-bolt"
-                      pCancelEditableRow
-                      pTooltip="{{ 'db-migration.actions.applyMigration' | translate }}"
-                      severity="secondary"
-                      tooltipPosition="left"
-                      [rounded]="true"
-                      [text]="true"
-                      (click)="applyMigration(rowData)">
-                    </p-button>
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
+                <div class="flex-1"></div>
+                <div class="flex items-center gap-1 w-full md:w-auto">
+                  <p-button
+                    icon="pi pi-refresh"
+                    rounded="true"
+                    severity="secondary"
+                    text="true"
+                    tooltipPosition="bottom"
+                    [loading]="loading"
+                    [pTooltip]="'db-migration.actions.refresh' | translate"
+                    (onClick)="refreshAction()"></p-button>
+                  <input
+                    class="w-full md:w-96"
+                    pInputText
+                    type="text"
+                    [placeholder]="'db-migration.filterPlaceholder' | translate"
+                    [(ngModel)]="globalFilter"
+                    (ngModelChange)="dt.filterGlobal($event, 'contains')" />
+                  <p-button
+                    icon="pi pi-filter-slash"
+                    rounded="true"
+                    severity="secondary"
+                    text="true"
+                    tooltipPosition="bottom"
+                    [disabled]="!hasActiveFilters"
+                    [pTooltip]="'db-migration.actions.cleanFilter' | translate"
+                    (onClick)="clearFilter()"></p-button>
+                </div>
+              </div>
+            </p-toolbar>
           </div>
+          <p-table
+            #dt
+            class="mt-4"
+            dataKey="name"
+            sortField="name"
+            [sortOrder]="1"
+            [paginator]="true"
+            [rows]="50"
+            [globalFilterFields]="['name']"
+            [value]="data"
+            [loading]="loading">
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="name" scope="col">
+                  {{ 'db-migration.columns.name' | translate }}
+                  <p-sortIcon field="name"></p-sortIcon>
+                  <p-columnFilter display="menu" field="name" type="text" />
+                </th>
+                <th pSortableColumn="applied" scope="col">
+                  {{ 'db-migration.columns.applied' | translate }}
+                  <p-sortIcon field="applied"></p-sortIcon>
+                </th>
+                <th pSortableColumn="exist" scope="col">
+                  {{ 'db-migration.columns.exist' | translate }}
+                  <p-sortIcon field="exist"></p-sortIcon>
+                </th>
+                <th pSortableColumn="pending" scope="col">
+                  {{ 'db-migration.columns.pending' | translate }}
+                  <p-sortIcon field="pending"></p-sortIcon>
+                </th>
+                <th style="width: 4rem" scope="col"></th>
+              </tr>
+            </ng-template>
+            <ng-template let-migration pTemplate="body">
+              <tr>
+                <td>{{ migration.name }}</td>
+                <td>
+                  <p-tag
+                    [severity]="migration.applied ? 'success' : 'secondary'"
+                    [value]="(migration.applied ? 'db-migration.yes' : 'db-migration.no') | translate"></p-tag>
+                </td>
+                <td>
+                  <p-tag
+                    [severity]="migration.exist ? 'success' : 'secondary'"
+                    [value]="(migration.exist ? 'db-migration.yes' : 'db-migration.no') | translate"></p-tag>
+                </td>
+                <td>
+                  <p-tag
+                    [severity]="migration.pending ? 'warn' : 'secondary'"
+                    [value]="(migration.pending ? 'db-migration.yes' : 'db-migration.no') | translate"></p-tag>
+                </td>
+                <td>
+                  <p-button
+                    icon="pi pi-bolt"
+                    rounded="true"
+                    severity="secondary"
+                    text="true"
+                    tooltipPosition="left"
+                    [pTooltip]="'db-migration.actions.applyMigration' | translate"
+                    (onClick)="applyMigration(migration)"></p-button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5">{{ 'db-migration.empty' | translate }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
         </div>
       </div>
     } @else if (isSecurity) {
@@ -129,7 +169,11 @@ export class DbMigrationComponent
 {
   private readonly translations = provideTranslations({ en, ru });
 
-  data: MigrationDto[];
+  @ViewChild('dt') dt!: Table;
+
+  data: MigrationDto[] = [];
+  protected loading = false;
+  protected globalFilter = '';
 
   async ngOnInit() {
     await super.ngOnInit();
@@ -137,14 +181,28 @@ export class DbMigrationComponent
   }
 
   async refreshAction() {
-    this.getData()
-      .then((response) => {
-        this.data = response;
-      })
-      .catch((error) => {
-        console.log(error);
-        this.msgService.error(this.l10nService.instant('db-migration.messages.errorRefreshing'));
-      });
+    this.loading = true;
+    try {
+      this.data = await this.getData();
+    } catch (error) {
+      console.log(error);
+      this.msgService.error(this.l10nService.instant('db-migration.messages.errorRefreshing'));
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  protected get hasActiveFilters(): boolean {
+    if (!this.dt?.filters) return false;
+    return Object.values(this.dt.filters).some((meta) =>
+      (Array.isArray(meta) ? meta : [meta]).some((m) => m?.value !== null && m?.value !== undefined && m?.value !== '')
+    );
+  }
+
+  clearFilter() {
+    this.globalFilter = '';
+    this.dt.clearFilterValues();
+    this.dt._filter();
   }
 
   async getData() {

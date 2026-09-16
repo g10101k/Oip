@@ -3,7 +3,7 @@
     "migrationManager": "Менеджер миграций",
     "actions": {
       "refresh": "Обновить",
-      "cleanFilter": "Очистить фильтр",
+      "cleanFilter": "Сбросить фильтр",
       "applyMigration": "Применить миграцию"
     },
     "columns": {
@@ -14,6 +14,10 @@
     },
     "messages": {
       "errorRefreshing": "Ошибка обновления базы данных"
-    }
+    },
+    "filterPlaceholder": "Фильтр по имени миграции",
+    "empty": "Нет миграций",
+    "yes": "Да",
+    "no": "Нет"
   }
 }
