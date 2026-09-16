@@ -6,8 +6,12 @@
         "date": "Дата",
         "temperatureC": "Температура, C",
         "temperatureF": "Температура, F",
-        "summary": "Описание"
-      }
+        "summary": "Описание",
+        "empty": "Нет данных прогноза"
+      },
+      "refreshTooltip": "Обновить",
+      "filterPlaceholder": "Фильтр по описанию",
+      "clearFilterTooltip": "Сбросить фильтр"
     },
     "settings": {
       "title": "Настройки погоды",
