@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Human-in-the-loop workflow contracts for OIP template</Title>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include=".\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NLog"/>
+        <PackageReference Include="NLog.Web.AspNetCore"/>
+        <PackageReference Include="Temporalio"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Oip.Base\Oip.Base.csproj"/>
+    </ItemGroup>
+</Project>
