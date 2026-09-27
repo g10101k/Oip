@@ -34,6 +34,7 @@
         <PackageReference Include="Swashbuckle.AspNetCore"/>
 
         <PackageReference Include="System.IdentityModel.Tokens.Jwt"/>
+        <PackageReference Include="Temporalio"/>
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore"/>
