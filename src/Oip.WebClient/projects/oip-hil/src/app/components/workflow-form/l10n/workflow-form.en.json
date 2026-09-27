@@ -1,0 +1,20 @@
+{
+  "workflow-form": {
+    "title": "Workflow form",
+    "subtitle": "Fill in the form to resume the workflow.",
+    "workflowInstance": "Workflow instance",
+    "createdAt": "Created",
+    "comment": "Comment",
+    "commentPlaceholder": "Optional comment",
+    "submit": "Submit",
+    "notFound": "Form not found.",
+    "submitted": "Form submitted. Workflow status: {{status}}.",
+    "messages": {
+      "loadError": "Failed to load the form",
+      "submitError": "Failed to submit the form",
+      "required": "Fill in all fields"
+    },
+    "submittedAt": "Submitted",
+    "cancelled": "The workflow was closed before the form was submitted."
+  }
+}

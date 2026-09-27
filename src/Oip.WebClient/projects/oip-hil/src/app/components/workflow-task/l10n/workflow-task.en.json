@@ -1,0 +1,23 @@
+{
+  "workflow-task": {
+    "title": "Workflow task",
+    "subtitle": "Complete the task to resume the workflow.",
+    "workflowInstance": "Workflow instance",
+    "createdAt": "Created",
+    "outcome": "Outcome",
+    "result": "Result",
+    "resultPlaceholder": "Enter the result",
+    "comment": "Comment",
+    "commentPlaceholder": "Optional comment",
+    "complete": "Complete",
+    "notFound": "Task not found.",
+    "completed": "Task completed. Workflow status: {{status}}.",
+    "messages": {
+      "loadError": "Failed to load the task",
+      "completeError": "Failed to complete the task",
+      "outcomeRequired": "Choose an outcome"
+    },
+    "completedAt": "Completed",
+    "cancelled": "The workflow was closed before the task was completed."
+  }
+}
