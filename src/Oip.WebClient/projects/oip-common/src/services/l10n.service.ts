@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { effect, inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { InterpolationParameters, TranslateService, Translation, TranslationObject } from '@ngx-translate/core';
 import { LayoutService } from './app.layout.service';
@@ -68,6 +68,9 @@ export class L10nService {
     // Global dictionaries are available before the first `use()` call, so TranslateHttpLoader is never asked for them.
     L10nService.registerTranslations(globalTranslations);
     Object.entries(globalTranslations).forEach(([lang, translations]) => this.mergeTranslation(lang, translations));
+
+    // The first day of the week is a user setting, it overrides the value of the language dictionary.
+    effect(() => this.primeNg.setTranslation({ firstDayOfWeek: this.layoutService.firstDayOfWeek() }));
 
     // Static translations are merged once per language, so they have to be re-merged on every language change.
     this.translateService.onLangChange.subscribe((event) => {
@@ -179,7 +182,7 @@ export class L10nService {
     if (key) {
       this.get(key);
     }
-    this.translateService.use(selectedLanguage);
+    this.translateService.use(selectedLanguage).subscribe(() => this.applyPrimeNgTranslation());
   }
 
   init(languages: LanguageDto[]) {
@@ -189,8 +192,17 @@ export class L10nService {
     this.translateService.setDefaultLang(lang);
     this.translateService.use(lang).subscribe(() => {
       this.loadComponentTranslations('app-info');
-      this.translateService.get('primeng').subscribe((res) => this.primeNg.setTranslation(res));
+      this.applyPrimeNgTranslation();
     });
+  }
+
+  /**
+   * Passes the PrimeNG dictionary of the current language to PrimeNG, keeping the user's first day of the week
+   */
+  private applyPrimeNgTranslation(): void {
+    this.translateService
+      .get('primeng')
+      .subscribe((res) => this.primeNg.setTranslation({ ...res, firstDayOfWeek: this.layoutService.firstDayOfWeek() }));
   }
 
   instant(key: string | string[], interpolateParams?: InterpolationParameters): Translation | TranslationObject {

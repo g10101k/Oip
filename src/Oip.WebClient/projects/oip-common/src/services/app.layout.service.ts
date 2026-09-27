@@ -13,6 +13,8 @@ export interface AppConfig {
   timeFormat: string;
   dateTimeFormat: string;
   timeZone: string;
+  /** First day of the week in date pickers: 0 - Sunday, 1 - Monday, ..., 6 - Saturday. */
+  firstDayOfWeek?: number;
   adminMode?: boolean;
 }
 
@@ -101,6 +103,8 @@ export class LayoutService {
 
   timeZone = computed(() => this.layoutConfig().timeZone);
 
+  firstDayOfWeek = computed(() => this.layoutConfig().firstDayOfWeek ?? 1);
+
   adminMode = computed(() => this.layoutConfig().adminMode ?? false);
 
   transitionComplete = signal<boolean>(false);
@@ -142,6 +146,7 @@ export class LayoutService {
     if (appConfigUiString != null) {
       const config = JSON.parse(appConfigUiString) as AppConfig;
       config.timeZone ??= Intl.DateTimeFormat().resolvedOptions().timeZone;
+      config.firstDayOfWeek ??= 1;
       return config;
     }
     return {
@@ -155,6 +160,7 @@ export class LayoutService {
       timeFormat: 'HH:mm:ss',
       dateTimeFormat: 'yyyy-MM-dd HH:mm:ss',
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      firstDayOfWeek: 1,
       adminMode: false
     };
   }
