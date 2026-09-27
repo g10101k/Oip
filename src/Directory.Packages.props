@@ -52,6 +52,10 @@
         <PackageVersion Include="Riok.Mapperly" Version="4.2.1"/>
     </ItemGroup>
 
+    <ItemGroup Label="Workflows">
+        <PackageVersion Include="Temporalio" Version="1.19.0"/>
+    </ItemGroup>
+
     <ItemGroup Label="Data and storage">
         <PackageVersion Include="Dapper" Version="2.1.66"/>
         <PackageVersion Include="Minio" Version="6.0.5"/>
