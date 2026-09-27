@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { UserProfileComponent } from '../user-profile/user-profile.component';
 import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
@@ -83,6 +83,16 @@ import ru from './l10n/config.ru.json';
               [placeholder]="'config.timeFormat' | translate"
               [(ngModel)]="selectedTimeFormat"
               (onChange)="changeTimeFormat()" />
+            <div class="mt-5">{{ 'config.firstDayOfWeek' | translate }}</div>
+            <p-select
+              class="w-full md:w-56"
+              optionLabel="label"
+              optionValue="value"
+              qa-id="oip-app-config-first-day-of-week-select"
+              [options]="weekDays()"
+              [placeholder]="'config.firstDayOfWeek' | translate"
+              [(ngModel)]="selectedFirstDayOfWeek"
+              (onChange)="changeFirstDayOfWeek()" />
             <div class="mt-5">{{ 'config.timeZone' | translate }}</div>
             <p-select
               class="w-full md:w-56"
@@ -162,12 +172,24 @@ export class ConfigComponent {
   protected selectedDateFormat: string;
   protected selectedTimeFormat: string;
   protected selectedTimeZone: string;
+  protected selectedFirstDayOfWeek: number;
+
+  /** Days of the week starting from Monday, named in the current language. */
+  protected readonly weekDays = computed(() => {
+    const format = new Intl.DateTimeFormat(this.layoutService.language() ?? 'en', { weekday: 'long' });
+    // 1 January 2024 is a Monday, so day N of that week falls on N January (Sunday - on 7 January).
+    return [1, 2, 3, 4, 5, 6, 0].map((day) => {
+      const name = format.format(new Date(2024, 0, day || 7));
+      return { value: day, label: name.charAt(0).toUpperCase() + name.slice(1) };
+    });
+  });
 
   constructor() {
     this.selectedLanguage = this.layoutService.language();
     this.selectedDateFormat = this.layoutService.dateFormat();
     this.selectedTimeFormat = this.layoutService.timeFormat();
     this.selectedTimeZone = this.layoutService.timeZone();
+    this.selectedFirstDayOfWeek = this.layoutService.firstDayOfWeek();
   }
 
   changeLanguage() {
@@ -184,6 +206,10 @@ export class ConfigComponent {
 
   changeTimeFormat() {
     this.layoutService.layoutConfig.update((config) => ({ ...config, timeFormat: this.selectedTimeFormat }));
+  }
+
+  changeFirstDayOfWeek() {
+    this.layoutService.layoutConfig.update((config) => ({ ...config, firstDayOfWeek: this.selectedFirstDayOfWeek }));
   }
 
   changeTimeZone() {
