@@ -7,14 +7,12 @@ using Oip.Base.Extensions;
 using Oip.Base.Runtime;
 using Oip.Base.Security.DefaultSecrets;
 using Oip.Base.Settings;
-using Oip.Base.Workflows;
 using Oip.Settings;
 using Oip.Demo.TableQueryDemo;
 using Oip.Discussions.Base.Extensions;
 using Oip.Extensions;
 using Oip.Notifications.Base.Extensions;
 using Oip.Users.Base.Extensions;
-using Oip.Workflows;
 
 namespace Oip;
 
@@ -51,9 +49,6 @@ internal static class Program
             builder.Services.AddDiscussionsService(settings);
             builder.Services.AddNotificationsService(settings);
             builder.Services.AddApplicationsService(settings);
-            builder.Services.AddOipWorkflows(settings.Temporal, workflows => workflows
-                .AddWorkflow<HelloWorldWorkflow>()
-                .AddWorkflow<UserTaskDemoWorkflow>());
 
             var app = builder.Build();
             app.UseOipSpa(settings);

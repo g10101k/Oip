@@ -70,9 +70,4 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     /// Discussion attachment storage settings.
     /// </summary>
     public DiscussionAttachmentStorageSettings DiscussionAttachmentStorage { get; set; } = new();
-
-    /// <summary>
-    /// Temporal connection settings.
-    /// </summary>
-    public TemporalSettings Temporal { get; set; } = new();
 }
