@@ -6,28 +6,8 @@ namespace Oip.Hil.Base.Workflows;
 /// <see cref="UserWorkflowBase.UserStepAsync{TResult}"/>.
 /// </summary>
 /// <typeparam name="TResult">Type of the result the page sends back.</typeparam>
-public abstract class UserStepDefinition<TResult>
+public abstract class UserStepDefinition<TResult> : StepDefinition
 {
-    /// <summary>
-    /// Angular route of the page that renders the step, relative to the application root.
-    /// </summary>
-    public abstract string Route { get; }
-
-    /// <summary>
-    /// Title shown to the user.
-    /// </summary>
-    public required string Title { get; init; }
-
-    /// <summary>
-    /// Description shown to the user.
-    /// </summary>
-    public string? Description { get; init; }
-
-    /// <summary>
-    /// Page-specific data, passed to the page as camelCase JSON.
-    /// </summary>
-    public virtual object? Data => null;
-
     /// <summary>
     /// Returns an error for an invalid result, or <c>null</c> when it is valid.
     /// </summary>
@@ -37,4 +17,9 @@ public abstract class UserStepDefinition<TResult>
     /// Converts a valid result before it is returned to the workflow code.
     /// </summary>
     public virtual TResult Normalize(TResult result) => result;
+
+    /// <summary>
+    /// Returns the files of the result attached to the step.
+    /// </summary>
+    public virtual IReadOnlyList<WorkflowAttachment> GetAttachments(TResult result) => [];
 }

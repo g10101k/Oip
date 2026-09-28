@@ -56,6 +56,21 @@ public class UserStep
     /// Step result as returned to the workflow code, serialized in camelCase.
     /// </summary>
     public JsonElement? Result { get; set; }
+
+    /// <summary>
+    /// Whether the workflow performs the step itself instead of waiting for a user.
+    /// </summary>
+    public bool Automated { get; set; }
+
+    /// <summary>
+    /// Error of a failed automated step; <c>null</c> when the step did not fail.
+    /// </summary>
+    public string? Error { get; set; }
+
+    /// <summary>
+    /// Files attached to the step.
+    /// </summary>
+    public List<WorkflowAttachment> Attachments { get; set; } = [];
 }
 
 /// <summary>

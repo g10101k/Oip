@@ -1,3 +1,7 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using Oip.Hil.Base.Workflows;
+
 namespace Oip.Hil.Base.Controllers.Api;
 
 /// <summary>
@@ -74,6 +78,16 @@ public class UserStepDto
     /// Step result as JSON; its shape is defined by the workflow that created the step.
     /// </summary>
     public string? Result { get; set; }
+
+    /// <summary>
+    /// Error of a failed automated step.
+    /// </summary>
+    public string? Error { get; set; }
+
+    /// <summary>
+    /// Files attached to the step.
+    /// </summary>
+    public List<WorkflowAttachment> Attachments { get; set; } = [];
 }
 
 /// <summary>
@@ -94,7 +108,17 @@ public enum UserStepStatus
     /// <summary>
     /// Not completed and will not be: the workflow was closed while waiting for it.
     /// </summary>
-    Cancelled
+    Cancelled,
+
+    /// <summary>
+    /// Automated step performed by the workflow right now.
+    /// </summary>
+    Running,
+
+    /// <summary>
+    /// Automated step that ended with an error.
+    /// </summary>
+    Failed
 }
 
 /// <summary>
@@ -111,6 +135,18 @@ public class CompleteUserStepRequest
     /// Optional comment.
     /// </summary>
     public string? Comment { get; set; }
+}
+
+/// <summary>
+/// File uploaded to complete a step.
+/// </summary>
+public class UploadStepFileRequest
+{
+    /// <summary>
+    /// Uploaded file.
+    /// </summary>
+    [Required]
+    public IFormFile File { get; set; } = null!;
 }
 
 /// <summary>

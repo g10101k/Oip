@@ -17,11 +17,33 @@ const workflowStepRoutes: Routes = [
     path: 'workflow-form/:workflowId/:stepId',
     loadComponent: () =>
       import('./app/components/workflow-form/workflow-form.component').then((m) => m.WorkflowFormComponent)
+  },
+  {
+    path: 'workflow-file-upload/:workflowId/:stepId',
+    loadComponent: () =>
+      import('./app/components/workflow-file-upload/workflow-file-upload.component').then(
+        (m) => m.WorkflowFileUploadComponent
+      )
+  },
+  {
+    path: 'workflow-llm-request/:workflowId/:stepId',
+    loadComponent: () =>
+      import('./app/components/workflow-llm-request/workflow-llm-request.component').then(
+        (m) => m.WorkflowLlmRequestComponent
+      )
   }
 ];
 
 export const appRoutes = provideOipRoutes({
   children: [
+    {
+      path: 'llm-provider-module/:id',
+      loadComponent: () =>
+        import('./app/components/llm-provider-module/llm-provider-module.component').then(
+          (m) => m.LlmProviderModuleComponent
+        ),
+      canActivate: [oipAuthGuard]
+    },
     {
       path: 'workflow-activity-module/:id',
       loadComponent: () =>

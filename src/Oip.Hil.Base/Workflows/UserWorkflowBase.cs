@@ -8,8 +8,10 @@ namespace Oip.Hil.Base.Workflows;
 /// Base class for Temporal workflows that wait for users. <see cref="UserStepAsync{TResult}"/> registers a
 /// <see cref="UserStep"/> rendered by an Angular page and completed through the <see cref="CompleteStepUpdate"/>
 /// update. All steps of the workflow, pending and completed, are kept in the <see cref="StepsMemo"/> memo, so they
-/// are read with the workflow list, also after the workflow is closed.
-/// Kinds of steps and their pages are defined by the application as <see cref="UserStepDefinition{TResult}"/>.
+/// are read with the workflow list, also after the workflow is closed. <see cref="AutomatedStepAsync{TResult}"/>
+/// records a step the workflow performs itself (for example an activity call), so it is shown in the same list.
+/// Kinds of steps and their pages are defined by the application as <see cref="UserStepDefinition{TResult}"/> and
+/// <see cref="AutomatedStepDefinition{TResult}"/>.
 /// </summary>
 public abstract class UserWorkflowBase
 {
@@ -66,21 +68,12 @@ public abstract class UserWorkflowBase
     }
 
     /// <summary>
-    /// Waits until a user completes the step on the page at <see cref="UserStepDefinition{TResult}.Route"/>.
+    /// Waits until a user completes the step on the page at <see cref="StepDefinition.Route"/>.
     /// </summary>
     /// <param name="definition">Step to show to the user.</param>
     protected async Task<UserStepResult<TResult>> UserStepAsync<TResult>(UserStepDefinition<TResult> definition)
     {
-        var data = definition.Data;
-        var step = new UserStep
-        {
-            Id = Workflow.NewGuid().ToString("N"),
-            Route = definition.Route.Trim('/'),
-            Title = definition.Title,
-            Description = definition.Description,
-            Data = data is null ? null : JsonSerializer.SerializeToElement(data, JsonOptions),
-            CreatedAt = Workflow.UtcNow
-        };
+        var step = CreateStep(definition, automated: false);
         pendingSteps[step.Id] = new PendingStep(step, raw => TryRead<TResult>(raw, out var result)
             ? definition.Validate(result)
             : "Result is missing or has a wrong format");
@@ -97,9 +90,58 @@ public abstract class UserWorkflowBase
         step.CompletedBy = completion.CompletedBy;
         step.Comment = completion.Comment;
         step.Result = JsonSerializer.SerializeToElement(result, JsonOptions);
+        step.Attachments = definition.GetAttachments(result).ToList();
         UpsertStepsMemo();
 
         return new UserStepResult<TResult>(result, completion.Comment, completion.CompletedBy);
+    }
+
+    /// <summary>
+    /// Performs a step without a user and records it in the step list, so its progress and result are shown on
+    /// the page at <see cref="StepDefinition.Route"/>. A failure is recorded as the step error and rethrown.
+    /// </summary>
+    /// <param name="definition">Step to perform.</param>
+    protected async Task<TResult> AutomatedStepAsync<TResult>(AutomatedStepDefinition<TResult> definition)
+    {
+        var step = CreateStep(definition, automated: true);
+        steps.Add(step);
+        UpsertStepsMemo();
+
+        TResult result;
+        try
+        {
+            result = await definition.RunAsync(new AutomatedStepContext(Workflow.Info.WorkflowId, step.Id));
+        }
+        catch (FailureException e)
+        {
+            step.CompletedAt = Workflow.UtcNow;
+            step.Error = e.InnerException?.Message ?? e.Message;
+            UpsertStepsMemo();
+            throw;
+        }
+
+        step.CompletedAt = Workflow.UtcNow;
+        step.CompletedBy = definition.GetPerformer(result);
+        step.Result = JsonSerializer.SerializeToElement(result, JsonOptions);
+        step.Attachments = definition.GetAttachments(result).ToList();
+        UpsertStepsMemo();
+
+        return result;
+    }
+
+    private static UserStep CreateStep(StepDefinition definition, bool automated)
+    {
+        var data = definition.Data;
+        return new UserStep
+        {
+            Id = Workflow.NewGuid().ToString("N"),
+            Route = definition.Route.Trim('/'),
+            Title = definition.Title,
+            Description = definition.Description,
+            Data = data is null ? null : JsonSerializer.SerializeToElement(data, JsonOptions),
+            CreatedAt = Workflow.UtcNow,
+            Automated = automated
+        };
     }
 
     private void UpsertStepsMemo() => Workflow.UpsertMemo(MemoUpdate.ValueSet(StepsMemo, steps));

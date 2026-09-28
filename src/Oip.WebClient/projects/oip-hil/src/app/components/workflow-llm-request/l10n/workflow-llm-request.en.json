@@ -1,0 +1,25 @@
+{
+  "workflow-llm-request": {
+    "title": "LLM request",
+    "subtitle": "Step performed by the workflow through an LLM provider.",
+    "workflowInstance": "Workflow instance",
+    "createdAt": "Started",
+    "completedAt": "Completed",
+    "performer": "Provider · model",
+    "systemPrompt": "System prompt",
+    "prompt": "Prompt",
+    "outcomes": "Outcomes",
+    "reason": "Reason",
+    "response": "Response",
+    "usage": "Usage",
+    "usageValue": "{{prompt}} prompt / {{completion}} completion tokens · {{elapsed}} ms",
+    "running": "The request is being processed…",
+    "failed": "The request failed",
+    "cancelled": "The workflow was closed before the request was completed.",
+    "notFound": "Step not found.",
+    "messages": {
+      "loadError": "Failed to load the step"
+    },
+    "settings": "Settings"
+  }
+}

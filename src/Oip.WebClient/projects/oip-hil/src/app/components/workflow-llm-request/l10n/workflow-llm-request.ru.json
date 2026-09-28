@@ -1,0 +1,25 @@
+{
+  "workflow-llm-request": {
+    "title": "Запрос к LLM",
+    "subtitle": "Шаг, выполняемый процессом через LLM-провайдер.",
+    "workflowInstance": "Экземпляр процесса",
+    "createdAt": "Запущен",
+    "completedAt": "Выполнен",
+    "performer": "Провайдер · модель",
+    "systemPrompt": "Системный промпт",
+    "prompt": "Промпт",
+    "outcomes": "Выходы",
+    "reason": "Обоснование",
+    "response": "Ответ",
+    "usage": "Использование",
+    "usageValue": "{{prompt}} во входе / {{completion}} в ответе токенов · {{elapsed}} мс",
+    "running": "Запрос выполняется…",
+    "failed": "Запрос завершился ошибкой",
+    "cancelled": "Процесс завершён до выполнения запроса.",
+    "notFound": "Шаг не найден.",
+    "messages": {
+      "loadError": "Не удалось загрузить шаг"
+    },
+    "settings": "Настройки запроса"
+  }
+}

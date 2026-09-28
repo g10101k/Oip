@@ -9,7 +9,10 @@ import {
   CompleteStepParams,
   CompleteUserStepRequest,
   CompleteUserStepResponse,
+  GetStepAttachmentByNameParams,
   GetStepByIdParams,
+  UploadStepFileParams,
+  UploadStepFilePayload,
   UserStepDto,
 } from "./data-contracts";
 
@@ -40,6 +43,30 @@ export class WorkflowStepApi<
       secure: true,
       type: ContentType.Json,
       format: "json",
+      ...params,
+    });
+  uploadStepFile = (
+    { workflowId, stepId, ...query }: UploadStepFileParams,
+    data: UploadStepFilePayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<CompleteUserStepResponse, ApiExceptionResponse>({
+      path: `/api/workflow-step/upload-step-file/${workflowId}/${stepId}`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.FormData,
+      format: "json",
+      ...params,
+    });
+  getStepAttachmentByName = (
+    { workflowId, stepId, fileName, ...query }: GetStepAttachmentByNameParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ApiExceptionResponse>({
+      path: `/api/workflow-step/get-step-attachment-by-name/${workflowId}/${stepId}/${fileName}`,
+      method: "GET",
+      secure: true,
       ...params,
     });
 }

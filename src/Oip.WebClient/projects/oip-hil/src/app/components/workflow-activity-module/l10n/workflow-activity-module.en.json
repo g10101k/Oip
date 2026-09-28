@@ -9,14 +9,17 @@
         "title": "Task",
         "description": "Description",
         "status": "Status",
-        "createdAt": "Created"
+        "createdAt": "Created",
+        "completedBy": "Completed by"
       },
       "selectHint": "Select a task to complete it here.",
       "period": "Workflow start period",
       "status": {
         "Pending": "Pending",
         "Completed": "Completed",
-        "Cancelled": "Cancelled"
+        "Cancelled": "Cancelled",
+        "Running": "Running",
+        "Failed": "Failed"
       }
     },
     "messages": {

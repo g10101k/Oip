@@ -76,4 +76,9 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     /// Temporal connection settings.
     /// </summary>
     public TemporalSettings Temporal { get; set; } = new();
+
+    /// <summary>
+    /// Disk storage of the files attached to workflow steps.
+    /// </summary>
+    public WorkflowFileStorageSettings FileStorage { get; set; } = new();
 }

@@ -12,9 +12,13 @@ using Oip.Discussions.Base.Controllers;
 using Oip.Discussions.Base.Extensions;
 using Oip.Hil.Base.Controllers;
 using Oip.Hil.Base.Workflows;
+using Oip.Hil.AiFunctions;
 using Oip.Hil.Controllers;
+using Oip.Hil.Data.Contexts;
+using Oip.Hil.Services;
 using Oip.Hil.Settings;
 using Oip.Hil.Workflows;
+using Oip.Hil.Workflows.Activities;
 using Oip.Notifications.Base.Controllers;
 using Oip.Notifications.Base.Extensions;
 using Oip.Users.Base.Controllers;
@@ -36,6 +40,8 @@ internal static class Program
             builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddOipModuleContext(settings.ConnectionString);
+            builder.Services.AddOipBasedContext<LlmContext>(settings.ConnectionString,
+                LlmContext.MigrationHistoryTableName, LlmContext.SchemaName);
             builder.Services.AddDefaultHealthChecks();
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);
@@ -44,6 +50,9 @@ internal static class Program
             builder.Services.AddStartupRunner();
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<ClaimService>();
+            builder.Services.AddScoped<LlmProviderTools>();
+            builder.Services.AddScoped<LlmProviderService>();
+            builder.Services.AddScoped<LlmActivities>();
             builder.Services.AddCors(settings);
             builder.Services.AddDataProtection(settings);
             builder.Services.AddForwardedHeaders(settings);
@@ -53,6 +62,7 @@ internal static class Program
             builder.Services
                 .AddApplicationControllers()
                 .AddController<WorkflowActivityModuleController>()
+                .AddController<LlmProviderModuleController>()
                 .AddController<WorkflowDemoController>()
                 .AddController<WorkflowStepController>();
             // Controllers are registered explicitly, so the controllers of the services hosted in the application
@@ -72,9 +82,10 @@ internal static class Program
             builder.Services.AddDiscussionsService(settings);
             builder.Services.AddNotificationsService(settings);
             builder.Services.AddApplicationsService(settings);
-            builder.Services.AddOipWorkflows(settings.Temporal, workflows => workflows
+            builder.Services.AddOipWorkflows(settings.Temporal, settings.FileStorage, workflows => workflows
                 .AddWorkflow<HelloWorldWorkflow>()
-                .AddWorkflow<UserTaskDemoWorkflow>());
+                .AddWorkflow<UserTaskDemoWorkflow>()
+                .AddActivities<LlmActivities>());
 
             var app = builder.Build();
             app.UseOipSpa(settings);
@@ -98,6 +109,7 @@ internal static class Program
             app.UseDiscussionsService(settings);
             app.UseNotificationsService(settings);
             app.MigrateOipModuleDatabase();
+            app.MigrateDatabase<LlmContext>();
 
             app.Run();
         }

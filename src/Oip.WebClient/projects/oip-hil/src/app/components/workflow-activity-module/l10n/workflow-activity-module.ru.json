@@ -9,14 +9,17 @@
         "title": "Задача",
         "description": "Описание",
         "status": "Статус",
-        "createdAt": "Создана"
+        "createdAt": "Создана",
+        "completedBy": "Исполнитель"
       },
       "selectHint": "Выберите задачу, чтобы выполнить её здесь.",
       "period": "Период запуска процессов",
       "status": {
         "Pending": "Ожидает",
         "Completed": "Выполнена",
-        "Cancelled": "Отменена"
+        "Cancelled": "Отменена",
+        "Running": "Выполняется",
+        "Failed": "Ошибка"
       }
     },
     "messages": {

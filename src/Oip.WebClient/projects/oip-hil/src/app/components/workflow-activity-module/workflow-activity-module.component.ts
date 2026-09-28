@@ -115,6 +115,7 @@ import ru from './l10n/workflow-activity-module.ru.json';
                     <th>{{ 'workflow-activity-module.content.table.description' | translate }}</th>
                     <th>{{ 'workflow-activity-module.content.table.createdAt' | translate }}</th>
                     <th>{{ 'workflow-activity-module.content.table.status' | translate }}</th>
+                    <th>{{ 'workflow-activity-module.content.table.completedBy' | translate }}</th>
                   </tr>
                 </ng-template>
 
@@ -130,16 +131,14 @@ import ru from './l10n/workflow-activity-module.ru.json';
                       <p-tag
                         [severity]="statusSeverity(task.status)"
                         [value]="'workflow-activity-module.content.status.' + task.status | translate" />
-                      @if (task.completedBy) {
-                        <div class="mt-1">{{ task.completedBy }}</div>
-                      }
                     </td>
+                    <td>{{ task.completedBy }}</td>
                   </tr>
                 </ng-template>
 
                 <ng-template pTemplate="emptymessage">
                   <tr>
-                    <td class="py-8 text-center text-surface-500" colspan="4">
+                    <td class="py-8 text-center text-surface-500" colspan="5">
                       {{ 'workflow-activity-module.content.empty' | translate }}
                     </td>
                   </tr>
@@ -199,6 +198,9 @@ export class WorkflowActivityModuleComponent extends BaseModuleComponent<
 
   protected override hideFooter = true;
 
+  private static readonly pollInterval = 3000;
+  private pollTimer: ReturnType<typeof setTimeout> | null = null;
+
   protected tasks: UserStepDto[] = [];
   /** Period of the workflow start: `[from, to]`, `to` is `null` while the range is being selected. */
   protected period: (Date | null)[] | null = null;
@@ -215,6 +217,7 @@ export class WorkflowActivityModuleComponent extends BaseModuleComponent<
       this.appTitleService.setTitle(l10n.title);
     });
     this.stepEvents.completed$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => void this.loadTasks());
+    this.destroyRef.onDestroy(() => this.stopPolling());
     // `routerLinkActive` is not used on purpose: inside `p-table` it hangs the page (infinite change detection).
     this.router.events
       .pipe(
@@ -223,6 +226,13 @@ export class WorkflowActivityModuleComponent extends BaseModuleComponent<
       )
       .subscribe(() => this.updateSelectedTask());
     this.updateSelectedTask();
+  }
+
+  private stopPolling(): void {
+    if (this.pollTimer) {
+      clearTimeout(this.pollTimer);
+      this.pollTimer = null;
+    }
   }
 
   private updateSelectedTask(): void {
@@ -246,12 +256,16 @@ export class WorkflowActivityModuleComponent extends BaseModuleComponent<
     await this.loadTasks();
   }
 
-  protected statusSeverity(status: UserStepStatus): 'warn' | 'success' | 'secondary' {
+  protected statusSeverity(status: UserStepStatus): 'warn' | 'success' | 'info' | 'danger' | 'secondary' {
     switch (status) {
       case UserStepStatus.Pending:
         return 'warn';
       case UserStepStatus.Completed:
         return 'success';
+      case UserStepStatus.Running:
+        return 'info';
+      case UserStepStatus.Failed:
+        return 'danger';
       default:
         return 'secondary';
     }
@@ -279,16 +293,22 @@ export class WorkflowActivityModuleComponent extends BaseModuleComponent<
     });
   }
 
-  protected async loadTasks(): Promise<void> {
+  /** Loads the steps of the period; a `silent` reload (polling) does not show the table spinner. */
+  protected async loadTasks(silent = false): Promise<void> {
+    this.stopPolling();
     if (this.securityRightsLoaded && !this.canRead) {
       this.tasks = [];
       return;
     }
 
-    this.loading = true;
+    this.loading = !silent;
     try {
       const [from, to] = this.period ?? this.defaultPeriod();
       this.tasks = await this.api.getStepsByPeriod({ from: from ?? undefined, to: to ?? undefined });
+      // Automated steps finish without the user, so the list is refreshed until none of them is running.
+      if (this.tasks.some((task) => task.status === UserStepStatus.Running)) {
+        this.pollTimer = setTimeout(() => void this.loadTasks(true), WorkflowActivityModuleComponent.pollInterval);
+      }
     } catch (error) {
       this.tasks = [];
       this.msgService.errorFromException(error, String(this.t('workflow-activity-module.messages.loadError')));

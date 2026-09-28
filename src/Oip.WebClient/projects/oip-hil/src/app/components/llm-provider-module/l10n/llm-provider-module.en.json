@@ -1,0 +1,72 @@
+{
+  "llm-provider-module": {
+    "title": "LLM Providers",
+    "content": {
+      "refreshTooltip": "Refresh",
+      "add": "Add provider",
+      "searchPlaceholder": "Search providers",
+      "clear": "Clear filter",
+      "default": "default",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "noApiKey": "not set",
+      "empty": "No providers configured yet.",
+      "table": {
+        "name": "Name",
+        "providerType": "Type",
+        "baseUrl": "Base URL",
+        "model": "Model",
+        "apiKey": "API key",
+        "status": "Status",
+        "updatedAt": "Updated",
+        "actions": "Actions",
+        "testTooltip": "Test connection",
+        "editTooltip": "Edit",
+        "deleteTooltip": "Delete"
+      }
+    },
+    "dialog": {
+      "createTitle": "New LLM provider",
+      "editTitle": "Edit LLM provider",
+      "name": "Name",
+      "providerType": "Provider type",
+      "baseUrl": "API base URL",
+      "model": "Default model",
+      "apiKey": "API key",
+      "apiKeyPlaceholder": "sk-...",
+      "apiKeyKeep": "Leave empty to keep the current key",
+      "isDefault": "Default provider",
+      "isEnabled": "Enabled",
+      "cancel": "Cancel",
+      "save": "Save",
+      "loadModels": "Load models from provider",
+      "modelsEmpty": "No models available",
+      "modelsLoaded": "{{count}} model(s) loaded from the provider"
+    },
+    "messages": {
+      "loadError": "Failed to load providers",
+      "saveError": "Failed to save provider",
+      "deleteError": "Failed to delete provider",
+      "testError": "Connection check failed",
+      "nameRequired": "Name is required",
+      "apiKeyRequired": "API key is required for a new provider",
+      "createSuccess": "Provider created",
+      "updateSuccess": "Provider updated",
+      "deleteSuccess": "Provider deleted",
+      "modelNotFound": "Model \"{{model}}\" was not found in the provider's model list.",
+      "modelsEmpty": "The provider returned no models",
+      "modelsError": "Failed to load models"
+    },
+    "confirm": {
+      "header": "Delete provider",
+      "message": "Delete provider \"{{name}}\"?",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "settings": {
+      "title": "LLM Providers settings",
+      "showDisabled": "Show disabled providers",
+      "save": "Save"
+    }
+  }
+}

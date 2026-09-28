@@ -19,8 +19,11 @@ public class UserStepService(
     ITemporalClient client,
     TemporalSettings temporalSettings,
     OipWorkflowOptions workflowOptions,
+    WorkflowFileStorage fileStorage,
     ISettings settings)
 {
+    private static readonly JsonSerializerOptions JsonOptions = JsonSerializerOptions.Web;
+
     private static readonly TimeSpan FirstStepTimeout = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan FirstStepPollInterval = TimeSpan.FromMilliseconds(200);
 
@@ -116,6 +119,53 @@ public class UserStepService(
     }
 
     /// <summary>
+    /// Saves the file to the step folder and completes the pending step with the file as its result; the workflow
+    /// validates it. The file is deleted when the step is not completed.
+    /// </summary>
+    public async Task<CompleteUserStepResponse> UploadAsync(string workflowId, string stepId, IFormFile file,
+        string? completedBy, CancellationToken cancellationToken)
+    {
+        if (file.Length == 0)
+            throw new ApiException("Validation error", "File is empty", StatusCodes.Status400BadRequest);
+        if (file.Length > fileStorage.MaxFileSize)
+            throw new ApiException("Validation error",
+                $"File must not be larger than {fileStorage.MaxFileSize} bytes", StatusCodes.Status400BadRequest);
+
+        var step = await GetByIdAsync(workflowId, stepId, cancellationToken);
+        if (step.Status != UserStepStatus.Pending) throw NotFound();
+
+        var fileName = Path.GetFileName(file.FileName);
+        WorkflowAttachment attachment;
+        await using (var content = file.OpenReadStream())
+            attachment = await fileStorage.SaveAsync(workflowId, stepId, fileName, content, cancellationToken);
+
+        try
+        {
+            var request = new CompleteUserStepRequest { Result = JsonSerializer.Serialize(attachment, JsonOptions) };
+            return await CompleteAsync(workflowId, stepId, request, completedBy, cancellationToken);
+        }
+        catch
+        {
+            fileStorage.Delete(workflowId, stepId, attachment.FileName);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Opens a file attached to the step.
+    /// </summary>
+    public async Task<(WorkflowAttachment Attachment, Stream Content)> GetAttachmentAsync(string workflowId,
+        string stepId, string fileName, CancellationToken cancellationToken)
+    {
+        var step = await GetByIdAsync(workflowId, stepId, cancellationToken);
+        // Only files attached to the step are served, not anything else found in the storage.
+        var attachment = step.Attachments.FirstOrDefault(x => x.FileName == fileName) ?? throw AttachmentNotFound();
+        var content = fileStorage.OpenRead(workflowId, attachment.StepId, attachment.FileName) ??
+                      throw AttachmentNotFound();
+        return (attachment, content);
+    }
+
+    /// <summary>
     /// Waits briefly until a just started workflow creates its first step; returns <c>null</c> on timeout.
     /// </summary>
     public Task<UserStepDto?> WaitForFirstStepAsync(string workflowId, CancellationToken cancellationToken)
@@ -183,15 +233,24 @@ public class UserStepService(
             Description = step.Description,
             Data = step.Data?.GetRawText(),
             CreatedAt = ToUtc(step.CreatedAt),
-            Status = step.CompletedAt is not null ? UserStepStatus.Completed
-                : execution.Status == WorkflowExecutionStatus.Running ? UserStepStatus.Pending
-                : UserStepStatus.Cancelled,
+            Status = GetStatus(step, execution),
             WorkflowStatus = execution.Status.ToString(),
             CompletedAt = step.CompletedAt is { } completedAt ? ToUtc(completedAt) : null,
             CompletedBy = step.CompletedBy,
             Comment = step.Comment,
-            Result = step.Result?.GetRawText()
+            Result = step.Result?.GetRawText(),
+            Error = step.Error,
+            Attachments = step.Attachments
         };
+    }
+
+    private static UserStepStatus GetStatus(UserStep step, WorkflowExecution execution)
+    {
+        if (step.CompletedAt is not null)
+            return step.Error is null ? UserStepStatus.Completed : UserStepStatus.Failed;
+        if (execution.Status != WorkflowExecutionStatus.Running)
+            return UserStepStatus.Cancelled;
+        return step.Automated ? UserStepStatus.Running : UserStepStatus.Pending;
     }
 
     private static DateTimeOffset ToUtc(DateTime value) =>
@@ -212,6 +271,9 @@ public class UserStepService(
 
     private static ApiException NotFound() =>
         new("Not found", "Step not found or already completed", StatusCodes.Status404NotFound);
+
+    private static ApiException AttachmentNotFound() =>
+        new("Not found", "Attachment not found", StatusCodes.Status404NotFound);
 
     private static ApiException StepNotFound() =>
         new("Not found", "Step not found", StatusCodes.Status404NotFound);

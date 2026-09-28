@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,44 @@ public abstract class BaseWorkflowStepController(UserStepService userStepService
     public async Task<ActionResult<CompleteUserStepResponse>> CompleteStep(string workflowId,
         string stepId, [FromBody] CompleteUserStepRequest request, CancellationToken cancellationToken)
     {
-        return Ok(await userStepService.CompleteAsync(workflowId, stepId, request, User.Identity?.Name,
+        return Ok(await userStepService.CompleteAsync(workflowId, stepId, request, GetUserName(), cancellationToken));
+    }
+
+    /// <summary>
+    /// Saves the file to the step folder and completes the step with it.
+    /// </summary>
+    [HttpPost("upload-step-file/{workflowId}/{stepId}")]
+    [ProducesResponseType<CompleteUserStepResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<ActionResult<CompleteUserStepResponse>> UploadStepFile(string workflowId, string stepId,
+        [FromForm] UploadStepFileRequest request, CancellationToken cancellationToken)
+    {
+        return Ok(await userStepService.UploadAsync(workflowId, stepId, request.File, GetUserName(),
             cancellationToken));
     }
+
+    /// <summary>
+    /// Downloads a file attached to the step.
+    /// </summary>
+    [HttpGet("get-step-attachment-by-name/{workflowId}/{stepId}/{fileName}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IActionResult> GetStepAttachmentByName(string workflowId, string stepId, string fileName,
+        CancellationToken cancellationToken)
+    {
+        var (attachment, content) =
+            await userStepService.GetAttachmentAsync(workflowId, stepId, fileName, cancellationToken);
+        return File(content, attachment.ContentType, attachment.FileName);
+    }
+
+    /// <summary>
+    /// The claims transformation adds the user name to a secondary identity, so User.Identity.Name may be empty.
+    /// </summary>
+    private string? GetUserName() => User.FindFirstValue("preferred_username") ?? User.Identity?.Name;
 }
