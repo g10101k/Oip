@@ -85,7 +85,7 @@ public class TestSetup
         Username = TestContext.Parameters["Username"] ?? "admin";
         Password = TestContext.Parameters["Password"] ?? "P@ssw0rd";
 
-        var options = new ChromeOptions();
+        var options = new ChromeOptions { AcceptInsecureCertificates = true };
         options.AddArguments(new List<string>
         {
             "--no-sandbox",

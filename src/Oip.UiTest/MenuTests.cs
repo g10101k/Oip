@@ -25,8 +25,11 @@ internal class MenuTests : BaseTest
     /// <summary>
     /// Waits until the menu has finished its (async) initial load, so a subsequent existence
     /// check for a menu item reflects the real state instead of racing the load.
+    /// On an empty database the menu has no items and the app redirects to the "no-modules" page,
+    /// which also means the load has finished.
     /// </summary>
-    private void WaitForMenuLoaded() => Wait.Until(d => d.FindElement(_menuItem));
+    private void WaitForMenuLoaded() =>
+        Wait.Until(d => d.FindElements(_menuItem).Count > 0 || d.Url.Contains("/no-modules"));
 
     /// <summary>
     /// Clicks an item of the currently open context menu, addressing it by its icon.

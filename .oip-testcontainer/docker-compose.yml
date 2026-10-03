@@ -3,7 +3,6 @@ services:
     build:
       context: ../src
       dockerfile: ./Oip/Dockerfile
-      args: [ '--force-recreate' ]
       additional_contexts:
         oip-dev-https: ../.oip-devcontainer/https
     ports:
@@ -12,16 +11,18 @@ services:
       - ../.oip-devcontainer/https:/https:ro
     environment:
       TZ: Europe/Moscow
+      ServiceAddingMode: Local
       ConnectionString: XpoProvider=Postgres;Server=postgres;Database=oip;uid=postgres;pwd=postgres;
-      SecurityService:BaseUrl: https://localhost:8443/
+      SecurityService:BaseUrl: https://keycloak:8443/
       SecurityService:DockerUrl: https://keycloak:8443/
       SecurityService:AuthTicketStore:RedisConnectionString: redis:6379
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://+:50000
       ASPNETCORE_Kestrel__Certificates__Default__Password: P@ssw0rd
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/oip.pfx
-    networks:
-      - backend-network
+      Kestrel:Endpoints:Https:Url: https://+:50000
+      Kestrel:Endpoints:Https:Certificate:Path: /https/oip.pfx
+      Kestrel:Endpoints:Https:Certificate:Password: P@ssw0rd
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
@@ -39,8 +40,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: keycloak
       PGDATA: /data/postgres
-    networks:
-      - backend-network
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -67,7 +66,7 @@ services:
       KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/data/cert/oip.pem
       KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/data/cert/oip.key
     networks:
-      - backend-network
+      - default
       - bridge-network
     ports:
       - "8080:8080"
@@ -75,6 +74,7 @@ services:
       - "9000:9000"
     volumes:
       - ../.oip-devcontainer/keycloak/realm-export.json:/opt/keycloak/data/import/realm.json:ro
+      - ../.oip-devcontainer/keycloak/themes:/opt/keycloak/themes:ro
       - ../.oip-devcontainer/https:/opt/keycloak/data/cert/:ro
     depends_on:
       postgres:
@@ -90,29 +90,11 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped
-    volumes:
-      - redis-data:/data
-    networks:
-      - backend-network
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 5s
       retries: 10
-
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - ../.oip-devcontainer/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
 
   selenium-hub:
     image: selenium/hub:4.41.0-20260222
@@ -137,9 +119,7 @@ services:
       selenium-hub:
         condition: service_healthy
     volumes:
-      # Доверенный dev CA сертификат Oip, чтобы Chrome не ругался на self-signed https://oip:50000
       - ../.oip-devcontainer/https:/usr/local/share/ca-certificates:ro
-      # Каталог с тестами доступен внутри контейнера, например для загрузки тестовых файлов
       - ../src/Oip.UiTest:/home/seluser/uploads
     environment:
       - TZ=Europe/Moscow
@@ -148,7 +128,7 @@ services:
   chrome-video:
     image: selenium/video:ffmpeg-8.0-20260222
     volumes:
-      - tests_video:/videos
+      - /videos
     depends_on:
       - chrome
     environment:
@@ -162,17 +142,15 @@ services:
     restart: always
     ports:
       - "8081:80"
-    volumes:
-      - tests_video:/srv
+    volumes_from:
+      - chrome-video:ro
     environment:
       - TZ=Europe/Moscow
       - FB_NOAUTH=true
+      - FB_ROOT=/videos
 
 networks:
-  backend-network: { }
   bridge-network:
     driver: bridge
 
-volumes:
-  redis-data:
-  tests_video:
+
