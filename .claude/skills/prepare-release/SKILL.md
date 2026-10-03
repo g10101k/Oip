@@ -1,25 +1,25 @@
 ---
 name: prepare-release
-description: Подготовка проекта к релизу — переключиться на актуальный main, убедиться что unit-тесты зелёные, погасить dev-контейнер, поднять тестовый контейнер и прогнать UI-тесты (Oip.UiTest) в standalone-режиме, после чего с разрешения пользователя вернуть dev-контейнер. Использовать, когда пользователь просит подготовить релиз, проверить main перед релизом или прогнать полный набор тестов ("подготовь релиз", "проверь main перед релизом", "prepare release", "release check").
+description: Prepare the project for a release — switch to an up-to-date main, make sure unit tests are green, stop the dev container, start the test container and run the UI tests (Oip.UiTest) in standalone mode, then, with the user's permission, bring the dev container back. Use when the user asks to prepare a release, check main before a release, or run the full test suite ("подготовь релиз", "проверь main перед релизом", "prepare release", "release check").
 ---
 
-# Подготовка к релизу
+# Prepare a release
 
-Скилл проверяет, что `main` готов к релизу. Шаги выполняются **строго по порядку**. Если шаг упал — не переходить к
-следующему шагу проверки, а сразу перейти к **Шагу 6 (восстановление dev-окружения)** и выдать отчёт.
+This skill verifies that `main` is ready for a release. Run the steps **strictly in order**. If a step fails, do not
+continue with the next verification step — go straight to **Step 6 (restore the dev environment)** and report.
 
-К Шагу 6 нужно переходить **всегда**, даже если что-то упало. Но переключение обратно на dev-среду делается только после
-явного разрешения пользователя (см. Шаг 6). Нельзя завершать работу молча, оставив пользователя с погашенным
-dev-контейнером.
+Always reach Step 6, even if something failed. But switching back to the dev environment happens only after the user
+explicitly allows it (see Step 6). Never finish silently and leave the user with the dev container stopped.
 
-Все команды запускаются из корня репозитория, если не сказано иное.
+Run all commands from the repository root unless stated otherwise. Point `docker compose` at the compose files with
+`-f` instead of `cd`-ing into their directories: the shell working directory persists between commands.
 
-## Шаг 1 — Переключиться на актуальный main
+## Step 1 — Switch to an up-to-date main
 
-1. `git status --porcelain` — если в рабочем дереве есть изменения, **остановиться** и спросить пользователя. Не делать
-   stash, reset, checkout поверх изменений без его явного согласия.
-2. Запомнить текущую ветку (`git branch --show-current`) — она понадобится в отчёте.
-3. Переключиться и подтянуть изменения:
+1. `git status --porcelain` — if the working tree has changes, **stop** and ask the user. Do not stash, reset, or check
+   out over the changes without their explicit consent.
+2. Remember the current branch (`git branch --show-current`) — it goes into the report.
+3. Switch and pull:
 
    ```bash
    git fetch origin
@@ -27,14 +27,14 @@ dev-контейнером.
    git pull --ff-only origin main
    ```
 
-   Если `--ff-only` не проходит (локальный main разошёлся с origin), остановиться и показать пользователю
-   `git log --oneline origin/main..main`. Не делать merge/rebase/reset самостоятельно.
-4. Сообщить, на каком коммите стоит `main` (`git log --oneline -1`).
+   If `--ff-only` fails (local main has diverged from origin), stop and show the user
+   `git log --oneline origin/main..main`. Do not merge, rebase, or reset on your own.
+4. Report which commit `main` is on (`git log --oneline -1`).
 
-## Шаг 2 — Unit-тесты
+## Step 2 — Unit tests
 
-Прогнать тестовые проекты по отдельности. `Oip.UiTest` здесь **не запускать**: без поднятого тестового контейнера он
-гарантированно упадёт на логине.
+Run the test projects one by one. **Do not** run `Oip.UiTest` here: without the test container it is guaranteed to fail
+at login.
 
 ```bash
 dotnet test src/Oip.Test/Oip.Test.csproj
@@ -42,116 +42,115 @@ dotnet test src/Oip.Cli.Test/Oip.Cli.Test.csproj
 dotnet test src/Oip.Rtds.Test/Oip.Rtds.Test.csproj
 ```
 
-Если есть упавшие тесты — показать их имена и сообщения об ошибках, дальше не идти (dev-контейнер ещё не трогали,
-поэтому Шаг 6 в этом случае пустой). Не чинить тесты и код в рамках этого скилла — только доложить.
+If any tests fail, show their names and error messages and stop (the dev container has not been touched yet, so Step 6
+is a no-op in this case). Do not fix tests or code as part of this skill — only report.
 
-## Шаг 3 — Погасить dev-контейнер
+## Step 3 — Stop the dev container
 
-Тестовый контейнер использует те же порты (5432, 8080, 8443, 6379), поэтому dev-окружение нужно остановить.
+The test container uses the same ports (5432, 8080, 8443, 6379), so the dev environment has to be stopped.
 
-1. Запомнить, какие dev-сервисы сейчас запущены — в Шаге 6 поднимать **только их**, а не весь `dev.yml` (обычно у
-   пользователя поднята только часть сервисов):
+1. Remember which dev services are currently running — Step 6 starts **only those**, not the whole `dev.yml` (the user
+   usually runs only some of the services):
 
    ```bash
    docker compose -p oip-devcontainer ps --services --filter status=running
    ```
 
-   Сохранить список и показать его пользователю. Если список пустой — dev-контейнер не был запущен, в Шаге 6 поднимать
-   нечего.
-2. Остановить без удаления volume'ов (данные dev-базы и Keycloak должны сохраниться):
+   Save the list and show it to the user. If the list is empty, the dev container was not running and Step 6 has
+   nothing to start.
+2. Stop it without removing volumes (the dev database and Keycloak data must survive):
 
    ```bash
-   cd .oip-devcontainer && docker compose -f dev.yml -f dev.unix.yml down
+   docker compose -f .oip-devcontainer/dev.yml -f .oip-devcontainer/dev.unix.yml down
    ```
 
-   На Windows использовать `dev.windows.yml` вместо `dev.unix.yml`. **Для dev-контейнера никогда не использовать `down -v`.**
-3. Если локально запущен фронт (`ng serve` на порту 50002), его не трогать — он не конфликтует с тестовым контейнером.
+   On Windows use `dev.windows.yml` instead of `dev.unix.yml`. **Never use `down -v` for the dev container.**
+3. If the frontend is running locally (`ng serve` on port 50002), leave it alone — it does not conflict with the test
+   container.
 
-## Шаг 4 — Поднять тестовый контейнер
+## Step 4 — Start the test container
 
-Тестовый контейнер собирает образ `oip` из текущего checkout, то есть из `main`. Standalone-режим задаётся явно
-переменной `ServiceAddingMode: Local` у сервиса `oip` в
-`.oip-testcontainer/docker-compose.yml`. Перед запуском убедиться, что она там есть; если её нет — остановиться и
-сообщить пользователю, а не прогонять тесты в другом режиме.
+The test container builds the `oip` image from the current checkout, i.e. from `main`. Standalone mode is set explicitly
+by the `ServiceAddingMode: Local` variable of the `oip` service in `.oip-testcontainer/docker-compose.yml`. Before
+starting, make sure it is there; if it is missing, stop and tell the user instead of running the tests in another mode.
 
-Инфраструктуру (postgres, keycloak, redis, selenium и т.д.) поднимать без пересоздания — существующие контейнеры
-переиспользуются. Пересобирать и пересоздавать только `oip`, чтобы он гарантированно собрался из текущего `main`:
+Start the infrastructure (postgres, keycloak, redis, selenium, etc.) without recreating it — existing containers are
+reused. Rebuild and recreate only `oip`, so that it is guaranteed to be built from the current `main`:
 
 ```bash
-cd .oip-testcontainer && docker compose up -d
-cd .oip-testcontainer && docker compose up -d --build --force-recreate --no-deps oip
+docker compose -f .oip-testcontainer/docker-compose.yml up -d
+docker compose -f .oip-testcontainer/docker-compose.yml up -d --build --force-recreate --no-deps oip
 ```
 
-Сборка занимает несколько минут — запускать в фоне и дождаться завершения. Если сборка упала из-за нехватки места —
-показать ошибку и предложить пользователю
-`docker builder prune -af` (сам не запускать).
+The build takes several minutes — run it in the background and wait for it to finish. If the build fails because the
+disk is full, show the error and suggest `docker builder prune -af` to the user (do not run it yourself).
 
-Дождаться готовности (опрашивать с паузами, общий таймаут ~5 минут):
+Wait until everything is ready (poll with pauses, overall timeout ~5 minutes):
 
-- Selenium Grid: `curl -sf http://localhost:4444/wd/hub/status` отвечает и `ready: true`;
-- приложение: `curl -sk -o /dev/null -w "%{http_code}" https://localhost:50000/` возвращает `200`;
-- Keycloak: `curl -sk -o /dev/null -w "%{http_code}" https://localhost:8443/realms/oip` возвращает `200`.
+- Selenium Grid: `curl -sf http://localhost:4444/wd/hub/status` responds with `ready: true`;
+- the application: `curl -sk -o /dev/null -w "%{http_code}" https://localhost:50000/` returns `200`;
+- Keycloak: `curl -sk -o /dev/null -w "%{http_code}" https://localhost:8443/realms/oip` returns `200`.
 
-Если за таймаут не поднялось — показать `docker compose ps` и последние строки
-`docker compose logs oip keycloak --tail 50`, затем перейти к Шагу 6.
+If it is not up within the timeout, show `docker compose -f .oip-testcontainer/docker-compose.yml ps` and the tail of
+`docker compose -f .oip-testcontainer/docker-compose.yml logs oip keycloak --tail 50`, then go to Step 6.
 
-## Шаг 5 — UI-тесты
+## Step 5 — UI tests
 
 ```bash
 dotnet test src/Oip.UiTest/Oip.UiTest.csproj --settings .oip-testcontainer/settings/default.runsettings
 ```
 
-`default.runsettings` переключает тесты на Selenium Grid (`RemoteDriverUrl`) и адрес
-`https://oip:50000` внутри docker-сети.
+`default.runsettings` switches the tests to Selenium Grid (`RemoteDriverUrl`) and to the `https://oip:50000` address
+inside the docker network.
 
-- Если упали **все** тесты в `OneTimeSetUp` — это проблема окружения (логин, сертификаты, Keycloak), а не тестов. Так и
-  написать в отчёте, приложив первую ошибку.
-- Если упали отдельные тесты — перечислить их с сообщениями об ошибках.
-- Видео прогонов пишутся в анонимный volume `/videos` контейнера `chrome-video` (просмотр через file-browser на
-  `http://localhost:8081`, пока тестовый контейнер поднят).
+- If **all** tests fail in `OneTimeSetUp`, it is an environment problem (login, certificates, Keycloak), not a test
+  problem. Say so in the report and include the first error.
+- If individual tests fail, list them with their error messages.
+- Test run videos are written to the anonymous `/videos` volume of the `chrome-video` container (viewable through
+  file-browser at `http://localhost:8081` while the test container is up).
 
-## Шаг 6 — Вернуть dev-контейнер (только с разрешения пользователя)
+## Step 6 — Bring the dev container back (only with the user's permission)
 
-Если dev-контейнер в Шаге 3 не трогали (например, упали unit-тесты), этот шаг пропускается.
+If the dev container was not touched in Step 3 (e.g. unit tests failed), skip this step.
 
-Иначе сначала показать промежуточные результаты (unit-тесты, UI-тесты) и **спросить пользователя, можно ли переключаться
-на dev-среду**. В вопросе упомянуть:
+Otherwise, first show the intermediate results (unit tests, UI tests) and **ask the user whether it is OK to switch to
+the dev environment**. In the question, mention:
 
-- что тестовый контейнер будет погашен вместе с volume'ами, видео прогонов будут удалены и file-browser
-  (`http://localhost:8081`) станет недоступен — если есть упавшие UI-тесты, видео нужно посмотреть сейчас;
-- какие dev-сервисы будут подняты (список из Шага 3).
+- that the test container will be stopped together with its volumes, the test run videos will be deleted, and
+  file-browser (`http://localhost:8081`) will become unavailable — if there are failed UI tests, the videos should be
+  watched now;
+- which dev services will be started (the list from Step 3).
 
-Ждать явного ответа. Если пользователь не разрешает — ничего не гасить и не поднимать, а выдать отчёт и команды из
-пунктов 1–2 ниже с уже подставленным списком сервисов, чтобы пользователь мог вернуть dev-среду сам.
+Wait for an explicit answer. If the user does not allow it, do not stop or start anything — give the report and the
+commands from items 1–2 below with the service list already filled in, so the user can restore the dev environment
+themselves.
 
-После разрешения:
+Once allowed:
 
-1. Погасить тестовый контейнер вместе с анонимными volume'ами (видео, данные тестовой базы), чтобы они не копились:
-
-   ```bash
-   cd .oip-testcontainer && docker compose down -v
-   ```
-
-2. Поднять **те же** dev-сервисы, что были запущены в Шаге 3:
+1. Stop the test container together with its anonymous volumes (videos, test database data) so they do not pile up:
 
    ```bash
-   cd .oip-devcontainer && docker compose -f dev.yml -f dev.unix.yml up -d <сервисы из шага 3>
+   docker compose -f .oip-testcontainer/docker-compose.yml down -v
    ```
 
-3. Проверить `docker compose -p oip-devcontainer ps` — все сервисы из списка в статусе
-   `running`/`healthy`.
+2. Start **the same** dev services that were running in Step 3:
 
-Остаёмся на ветке `main`. Не переключаться обратно на исходную ветку, если пользователь не попросил — только упомянуть
-её в отчёте.
+   ```bash
+   docker compose -f .oip-devcontainer/dev.yml -f .oip-devcontainer/dev.unix.yml up -d <services from Step 3>
+   ```
 
-## Отчёт
+3. Check `docker compose -p oip-devcontainer ps` — every service from the list is `running`/`healthy`.
 
-Коротко, на языке пользователя:
+Stay on `main`. Do not switch back to the original branch unless the user asks — just mention it in the report.
 
-- коммит `main`, на котором проводилась проверка;
-- unit-тесты: проект → пройдено/упало/пропущено;
-- UI-тесты: пройдено/упало, список упавших с причиной;
-- состояние окружения: dev-среда восстановлена или (если пользователь не разрешил)
-  тестовый контейнер всё ещё поднят + команды для возврата dev-среды;
-- исходная ветка, с которой переключились;
-- итог одной строкой: **готов к релизу** / **не готов** (и почему).
+## Report
+
+Short, in the user's language:
+
+- the `main` commit that was verified;
+- unit tests: project → passed/failed/skipped;
+- UI tests: passed/failed, the list of failures with reasons;
+- environment state: dev environment restored, or (if the user did not allow it) the test container is still up plus
+  the commands to restore the dev environment;
+- the original branch you switched from;
+- a one-line verdict: **ready for release** / **not ready** (and why).

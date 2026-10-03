@@ -64,7 +64,7 @@ public class ModuleInstanceEntity
     /// Settings
     /// </summary>
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
-    public string Settings { get; set; } = null!;
+    public string? Settings { get; set; }
 
     /// <summary>
     /// Module

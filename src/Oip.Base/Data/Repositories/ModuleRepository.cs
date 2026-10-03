@@ -236,6 +236,7 @@ public class ModuleRepository(OipModuleContext db)
             Url = module.Url,
             Target = module.Target,
             Settings = module.Settings,
+            IsFolder = module.Module.Name == ModuleConstants.FolderModuleName,
             Items = module.Items.Count == 0
                 ? null
                 : module.Items.Select(x => ToDto(x, startModuleInstanceId)).ToList(),
@@ -259,16 +260,14 @@ public class ModuleRepository(OipModuleContext db)
     /// Retrieves the settings string associated with a specific module instance.
     /// </summary>
     /// <param name="id">The ID of the module instance.</param>
-    /// <returns>The settings string.</returns>
+    /// <returns>The settings string, or <c>null</c> when the module instance has no settings.</returns>
     /// <exception cref="KeyNotFoundException">Thrown if the module instance is not found.</exception>
-    public string GetModuleInstanceSettings(int id)
+    public string? GetModuleInstanceSettings(int id)
     {
-        var settings = db.ModuleInstances.Where(x => x.ModuleInstanceId == id).Select(x => x.Settings)
-            .FirstOrDefault();
-
-        if (settings == null)
-            throw new KeyNotFoundException($"Module instance with id {id} not found");
-        return settings;
+        var instance = db.ModuleInstances.Where(x => x.ModuleInstanceId == id).Select(x => new { x.Settings })
+                           .FirstOrDefault()
+                       ?? throw new KeyNotFoundException($"Module instance with id {id} not found");
+        return instance.Settings;
     }
 
     /// <summary>
@@ -327,7 +326,8 @@ public class ModuleRepository(OipModuleContext db)
     {
         var query = from module in db.Modules
             orderby module.Name
-            select new ModuleKeyValueDto(module.ModuleId, module.Name, module.Icon);
+            select new ModuleKeyValueDto(module.ModuleId, module.Name, module.Icon,
+                module.Name == ModuleConstants.FolderModuleName);
         return await query.AsNoTracking().ToListAsync();
     }
 
@@ -446,8 +446,36 @@ public class ModuleRepository(OipModuleContext db)
     /// Adds a new module instance to the system with default security settings.
     /// </summary>
     /// <param name="addModuleInstanceDto">The data transfer object containing module instance details.</param>
+    /// <exception cref="KeyNotFoundException">Thrown if the module or the parent module instance does not exist.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if a non-folder module is placed at the menu root or the parent module instance is not a folder.
+    /// </exception>
     public async Task AddModuleInstance(AddModuleInstanceDto addModuleInstanceDto)
     {
+        var moduleName = await db.Modules.Where(x => x.ModuleId == addModuleInstanceDto.ModuleId)
+                             .Select(x => x.Name)
+                             .FirstOrDefaultAsync()
+                         ?? throw new KeyNotFoundException(
+                             $"Module with id {addModuleInstanceDto.ModuleId} not found");
+
+        if (addModuleInstanceDto.ParentId == null)
+        {
+            if (moduleName != ModuleConstants.FolderModuleName)
+                throw new InvalidOperationException("Only a folder can be placed at the menu root");
+        }
+        else
+        {
+            var parentModuleName = await db.ModuleInstances
+                                       .Where(x => x.ModuleInstanceId == addModuleInstanceDto.ParentId)
+                                       .Select(x => x.Module.Name)
+                                       .FirstOrDefaultAsync()
+                                   ?? throw new KeyNotFoundException(
+                                       $"Module instance with id {addModuleInstanceDto.ParentId} not found");
+
+            if (parentModuleName != ModuleConstants.FolderModuleName)
+                throw new InvalidOperationException("Only a folder can have child items");
+        }
+
         var position = 0;
         if (db.ModuleInstances.Any())
         {
@@ -719,11 +747,16 @@ public class ModuleRepository(OipModuleContext db)
     /// <param name="userSubject">Subject of the user.</param>
     /// <param name="moduleInstanceId">The module instance to open by default.</param>
     /// <exception cref="KeyNotFoundException">Thrown when the module instance cannot be found.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the module instance is a folder.</exception>
     public async Task SetStartModule(string userSubject, int moduleInstanceId)
     {
-        var exists = await db.ModuleInstances.AnyAsync(x => x.ModuleInstanceId == moduleInstanceId);
-        if (!exists)
-            throw new KeyNotFoundException($"Module instance with id {moduleInstanceId} not found");
+        var moduleName = await db.ModuleInstances.Where(x => x.ModuleInstanceId == moduleInstanceId)
+                             .Select(x => x.Module.Name)
+                             .FirstOrDefaultAsync()
+                         ?? throw new KeyNotFoundException($"Module instance with id {moduleInstanceId} not found");
+
+        if (moduleName == ModuleConstants.FolderModuleName)
+            throw new InvalidOperationException("A folder cannot be a start module");
 
         // One row per user: older rows are dropped so a partially written state cannot pile up.
         var current = await db.UserStartModules.Where(x => x.UserSubject == userSubject).ToListAsync();

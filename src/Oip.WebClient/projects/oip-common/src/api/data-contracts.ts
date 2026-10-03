@@ -132,12 +132,14 @@ export interface ModuleInstanceDto {
   order?: number;
   separator?: boolean;
   isStart?: boolean;
+  isFolder?: boolean;
 }
 
 export interface ModuleKeyValueDto {
   key?: number;
   value?: string | null;
   icon?: string | null;
+  isFolder?: boolean;
 }
 
 export interface ModuleSecurityDto {

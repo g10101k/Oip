@@ -74,4 +74,10 @@ public class ModuleInstanceDto
     /// Indicates whether the current user opens this module instance by default.
     /// </summary>
     public bool IsStart { get; set; }
+
+    /// <summary>
+    /// Indicates whether this module instance is a folder, the only kind of item that can be placed at the menu
+    /// root or have child items.
+    /// </summary>
+    public bool IsFolder { get; set; }
 }

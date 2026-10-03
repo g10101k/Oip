@@ -62,7 +62,7 @@ type PrimeIconOption = {
           placeholder="{{ 'menuItemCreateDialogComponent.selectModule' | translate }}"
           scrollHeight="18rem"
           [filter]="true"
-          [options]="modules"
+          [options]="moduleOptions"
           [(ngModel)]="selectModule"
           (ngModelChange)="onModuleChange($event)" />
       </div>
@@ -120,6 +120,7 @@ export class MenuItemCreateDialogComponent implements OnInit {
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
   modules: ModuleKeyValueDto[] = [];
+  moduleOptions: ModuleKeyValueDto[] = [];
   iconOptions: PrimeIconOption[] = Object.values(PrimeIcons)
     .filter((icon): icon is string => typeof icon === 'string')
     .map((icon) => ({
@@ -138,6 +139,23 @@ export class MenuItemCreateDialogComponent implements OnInit {
 
   async ngOnInit() {
     this.modules = await this.menu.getModules();
+    this.updateModuleOptions();
+  }
+
+  /**
+   * Restricts the module list to the folder when the item is created at the menu root,
+   * since only a folder can be placed there.
+   */
+  private updateModuleOptions() {
+    const isRoot = !this.menuService.contextMenuItem;
+    this.moduleOptions = isRoot ? this.modules.filter((module) => module.isFolder) : this.modules;
+
+    if (isRoot && this.moduleOptions.length === 1) {
+      this.selectModule = this.moduleOptions[0].key;
+      this.onModuleChange(this.selectModule);
+    } else if (!this.moduleOptions.some((module) => module.key === this.selectModule)) {
+      this.selectModule = undefined;
+    }
   }
 
   onModuleChange(moduleId: number) {
@@ -184,6 +202,7 @@ export class MenuItemCreateDialogComponent implements OnInit {
   }
 
   showDialog() {
+    this.updateModuleOptions();
     this.visible = true;
     this.visibleChange.emit(this.visible);
   }
