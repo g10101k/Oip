@@ -1,39 +1,41 @@
-# Контейнер для UI-тестов
+# UI test container
 
-Поднимает приложение Oip (сервисы перенесены из `../.oip-devcontainer/test.yml`) и Selenium Grid (hub + Chrome-нода)
-для запуска `Oip.UiTest`. Сертификаты и креды — уже существующие dev-заглушки Oip
-(`../.oip-devcontainer/https`), никаких секретов от других проектов сюда не переносилось.
+**English** | [Русский](README.ru.md)
 
-## Запуск контейнеров
+Brings up the Oip application (services moved from `../.oip-devcontainer/test.yml`) and Selenium Grid (hub + Chrome node)
+for running `Oip.UiTest`. Certificates and credentials are the existing Oip dev stubs
+(`../.oip-devcontainer/https`); no secrets from other projects have been brought in.
+
+## Starting the containers
 
 ```shell
 docker compose up -d --build --force-recreate
 ```
 
-Без пересборки:
+Without rebuilding:
 
 ```shell
 docker compose up -d
 ```
 
-## Запустить UI-тесты в консоли
+## Running UI tests from the console
 
 ```shell
 dotnet test ./../src/Oip.UiTest/Oip.UiTest.csproj --settings ./settings/default.runsettings
 ```
 
-По умолчанию (без `--settings`) `TestSetup` поднимает локальный `ChromeDriver` и ходит на
-`https://localhost:50000` — то есть тесты можно гонять и без Docker вовсе, если приложение уже
-запущено локально. `--settings ./settings/default.runsettings` переключает тесты на Selenium Grid
-из этого docker-compose (`RemoteDriverUrl`) и на адрес сервиса `oip` внутри docker-сети (`BaseUrl`).
+By default (without `--settings`), `TestSetup` starts a local `ChromeDriver` and targets
+`https://localhost:50000` — so the tests can run without Docker at all if the application is already
+running locally. `--settings ./settings/default.runsettings` switches the tests to the Selenium Grid
+from this docker-compose (`RemoteDriverUrl`) and to the address of the `oip` service inside the docker network (`BaseUrl`).
 
-## Если кончилось место
+## Running out of disk space
 
 ```shell
 docker builder prune -af
 ```
 
-## Просмотр записей тестов
+## Viewing test recordings
 
-Видео прогонов складывается в volume `tests_video` и доступно через `file-browser` на
-`http://localhost:8081`.
+Test run videos are stored in an anonymous `/videos` volume of the `chrome-video` container and are available via
+`file-browser` at `http://localhost:8081`. `docker compose down -v` removes them together with the containers.
