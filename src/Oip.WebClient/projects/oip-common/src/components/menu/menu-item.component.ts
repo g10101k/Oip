@@ -270,7 +270,9 @@ export class MenuItemComponent implements OnInit, OnDestroy {
       {
         label: this.localization.new,
         icon: PrimeIcons.PLUS,
-        command: (event) => this.newClick(event)
+        command: (event) => this.newClick(event),
+        // Only a folder can have child items.
+        visible: !!item.isFolder
       },
       {
         label: this.localization.edit,
@@ -316,10 +318,10 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Builds the start page entries of the context menu. Only a navigable leaf can be a start page.
+   * Builds the start page entries of the context menu. Only a navigable non-folder item can be a start page.
    */
   private getStartModuleItems(item: ContextMenuItemDto): MenuItem[] {
-    if (!item?.routerLink || item.items?.length) {
+    if (!item?.routerLink || item.isFolder || item.items?.length) {
       return [];
     }
 

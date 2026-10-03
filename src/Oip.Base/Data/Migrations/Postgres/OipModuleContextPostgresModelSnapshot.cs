@@ -143,7 +143,6 @@ namespace Oip.Base.Data.Postgres.Migrations
                         .HasComment("Parent id");
 
                     b.Property<string>("Settings")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasComment("Settings");
 

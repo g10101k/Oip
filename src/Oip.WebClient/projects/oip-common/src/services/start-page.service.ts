@@ -98,9 +98,9 @@ export class StartPageService {
         continue;
       }
 
-      if (item.items?.length) {
+      if (item.isFolder || item.items?.length) {
         // A folder is never a landing page itself, its children are.
-        result.push(...this.collectNavigableLeaves(item.items));
+        result.push(...this.collectNavigableLeaves(item.items ?? []));
         continue;
       }
 

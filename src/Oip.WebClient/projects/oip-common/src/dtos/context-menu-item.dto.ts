@@ -3,6 +3,7 @@ import { IsActiveMatchOptions, Params, QueryParamsHandling } from '@angular/rout
 export interface ContextMenuItemDto {
   moduleInstanceId: number;
   isStart?: boolean;
+  isFolder?: boolean;
   url: any;
   class: string | string[] | Set<string> | { [p: string]: any } | null | undefined;
   command: any;

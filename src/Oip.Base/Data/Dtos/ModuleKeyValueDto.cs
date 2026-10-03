@@ -6,4 +6,5 @@ namespace Oip.Base.Data.Dtos;
 /// <param name="Key">The module identifier.</param>
 /// <param name="Value">The module name.</param>
 /// <param name="Icon">The default icon for new module instances (optional).</param>
-public record ModuleKeyValueDto(int Key, string Value, string? Icon);
+/// <param name="IsFolder">Indicates whether the module is the Folder module.</param>
+public record ModuleKeyValueDto(int Key, string Value, string? Icon, bool IsFolder);

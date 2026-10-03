@@ -35,6 +35,7 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
     /// <param name="id">The ID of the module instance.</param>
     [Authorize, HttpPost("set-start-module/{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
@@ -63,6 +64,11 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
         {
             return NotFound(new ApiExceptionResponse("Module instance not found", e.Message,
                 StatusCodes.Status404NotFound));
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest(new ApiExceptionResponse("Invalid start module", e.Message,
+                StatusCodes.Status400BadRequest));
         }
 
         return Ok();
@@ -131,8 +137,9 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
     [Authorize(Roles = SecurityConstants.AdminRole)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
-    public async Task AddModuleInstance(AddModuleInstanceDto addModuleInstanceDto)
+    public async Task<IActionResult> AddModuleInstance(AddModuleInstanceDto addModuleInstanceDto)
     {
         if (addModuleInstanceDto.ModuleId <= 0)
         {
@@ -140,7 +147,21 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
                 StatusCodes.Status400BadRequest);
         }
 
-        await moduleRepository.AddModuleInstance(addModuleInstanceDto);
+        try
+        {
+            await moduleRepository.AddModuleInstance(addModuleInstanceDto);
+        }
+        catch (KeyNotFoundException e)
+        {
+            return NotFound(new ApiExceptionResponse("Not found", e.Message, StatusCodes.Status404NotFound));
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest(new ApiExceptionResponse("Invalid menu item", e.Message,
+                StatusCodes.Status400BadRequest));
+        }
+
+        return Ok();
     }
 
     /// <summary>

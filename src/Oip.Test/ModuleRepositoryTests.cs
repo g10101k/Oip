@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Oip.Base.Controllers;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Entities;
@@ -85,6 +87,22 @@ public class ModuleRepositoryTests
         Assert.That(startModules.Count, Is.EqualTo(1));
         Assert.That(await repository.GetStartModuleInstanceId("user-sub"), Is.EqualTo(second.ModuleInstanceId));
         Assert.That(await repository.GetStartModuleInstanceId("other-sub"), Is.Null);
+    }
+
+    [Test]
+    public async Task SetStartModule_ThrowsForFolder()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var folder = new ModuleEntity { Name = ModuleConstants.FolderModuleName };
+        var instance = new ModuleInstanceEntity { Module = folder, Label = "Root", Settings = null };
+        context.ModuleInstances.Add(instance);
+        await context.SaveChangesAsync();
+
+        Assert.ThrowsAsync<InvalidOperationException>(() =>
+            repository.SetStartModule("user-sub", instance.ModuleInstanceId));
+        Assert.That(await context.UserStartModules.AnyAsync(), Is.False);
     }
 
     [Test]
@@ -294,6 +312,119 @@ public class ModuleRepositoryTests
         manifest.Icon = "pi pi-chart-line";
         await repository.UpdateExtensionModule(registered.ModuleId, manifest, "https://extensions.local/manifest.json");
         Assert.That((await context.Modules.SingleAsync()).Icon, Is.EqualTo("pi pi-chart-line"));
+    }
+
+    [Test]
+    public async Task AddModuleInstance_AllowsFolderAtRootAndAnyModuleInsideFolder()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var folder = new ModuleEntity { Name = ModuleConstants.FolderModuleName };
+        var page = new ModuleEntity { Name = "Page" };
+        context.Modules.AddRange(folder, page);
+        await context.SaveChangesAsync();
+
+        await repository.AddModuleInstance(new AddModuleInstanceDto(folder.ModuleId, "Root", null, null, null));
+        var root = await context.ModuleInstances.SingleAsync();
+        await repository.AddModuleInstance(
+            new AddModuleInstanceDto(folder.ModuleId, "Nested", null, root.ModuleInstanceId, null));
+        await repository.AddModuleInstance(
+            new AddModuleInstanceDto(page.ModuleId, "Page", null, root.ModuleInstanceId, null));
+
+        var children = await context.ModuleInstances
+            .Where(x => x.ParentId == root.ModuleInstanceId)
+            .OrderBy(x => x.Order)
+            .Select(x => x.Label)
+            .ToListAsync();
+
+        Assert.That(children, Is.EqualTo(new[] { "Nested", "Page" }));
+    }
+
+    [Test]
+    public async Task AddModuleInstance_ThrowsForNonFolderAtRoot()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var page = new ModuleEntity { Name = "Page" };
+        context.Modules.Add(page);
+        await context.SaveChangesAsync();
+
+        Assert.ThrowsAsync<InvalidOperationException>(() =>
+            repository.AddModuleInstance(new AddModuleInstanceDto(page.ModuleId, "Page", null, null, null)));
+        Assert.That(await context.ModuleInstances.AnyAsync(), Is.False);
+    }
+
+    [Test]
+    public async Task AddModuleInstance_ThrowsForChildOfNonFolder()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var page = new ModuleEntity { Name = "Page" };
+        var parent = new ModuleInstanceEntity { Module = page, Label = "Parent", Settings = string.Empty };
+        context.ModuleInstances.Add(parent);
+        await context.SaveChangesAsync();
+
+        Assert.ThrowsAsync<InvalidOperationException>(() => repository.AddModuleInstance(
+            new AddModuleInstanceDto(page.ModuleId, "Child", null, parent.ModuleInstanceId, null)));
+        Assert.That(await context.ModuleInstances.CountAsync(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task AddModuleInstance_ThrowsForUnknownModuleOrParent()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var folder = new ModuleEntity { Name = ModuleConstants.FolderModuleName };
+        context.Modules.Add(folder);
+        await context.SaveChangesAsync();
+
+        Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            repository.AddModuleInstance(new AddModuleInstanceDto(42, "Unknown", null, null, null)));
+        Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            repository.AddModuleInstance(new AddModuleInstanceDto(folder.ModuleId, "Orphan", null, 42, null)));
+    }
+
+    [Test]
+    public async Task GetAdminMenu_MarksFolderInstances()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var folder = new ModuleEntity { Name = ModuleConstants.FolderModuleName };
+        var page = new ModuleEntity { Name = "Page" };
+        var root = new ModuleInstanceEntity { Module = folder, Label = "Root", Settings = string.Empty };
+        var child = new ModuleInstanceEntity { Module = page, Parent = root, Label = "Child", Settings = null };
+        context.ModuleInstances.AddRange(root, child);
+        await context.SaveChangesAsync();
+
+        var menu = (await repository.GetAdminMenu()).Single();
+        var modules = (await repository.GetModules()).ToList();
+
+        Assert.That(menu.IsFolder, Is.True);
+        Assert.That(menu.Items!.Single().IsFolder, Is.False);
+        Assert.That(modules.Single(x => x.Value == ModuleConstants.FolderModuleName).IsFolder, Is.True);
+        Assert.That(modules.Single(x => x.Value == "Page").IsFolder, Is.False);
+    }
+
+    [Test]
+    public async Task GetModuleInstanceSettings_ReturnsDefaultsForNullSettings()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var folder = new ModuleEntity { Name = ModuleConstants.FolderModuleName };
+        var instance = new ModuleInstanceEntity { Module = folder, Label = "Root", Settings = null };
+        context.ModuleInstances.Add(instance);
+        await context.SaveChangesAsync();
+
+        Assert.That(repository.GetModuleInstanceSettings(instance.ModuleInstanceId), Is.Null);
+        Assert.That(repository.GetModuleInstanceSettings<FolderModuleSettings>(instance.ModuleInstanceId).Html,
+            Is.Empty);
+        Assert.Throws<KeyNotFoundException>(() => repository.GetModuleInstanceSettings(42));
     }
 
     private static OipModuleContext CreateContext()
