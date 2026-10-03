@@ -7,6 +7,7 @@ import {
   AddModuleInstanceDto,
   ApiExceptionResponse,
   ChangeOrderParams,
+  CopyModuleInstanceParams,
   DeleteModuleInstanceParams,
   EditModuleInstanceDto,
   GetModuleInstanceRightsParams,
@@ -106,6 +107,17 @@ export class MenuApi<
       method: "DELETE",
       query: query,
       secure: true,
+      ...params,
+    });
+  copyModuleInstance = (
+    { id, ...query }: CopyModuleInstanceParams,
+    params: RequestParams = {},
+  ) =>
+    this.request<number, ApiExceptionResponse>({
+      path: `/api/menu/copy-module-instance/${id}`,
+      method: "POST",
+      secure: true,
+      format: "json",
       ...params,
     });
   changeOrder = (query: ChangeOrderParams, params: RequestParams = {}) =>

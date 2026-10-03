@@ -15,7 +15,12 @@ import { ContextMenuItemDto } from '../../dtos/context-menu-item.dto';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { MenuApi } from '../../api/menu.api';
-import { ChangeOrderParams, DeleteModuleInstanceParams, ModuleInstanceDto } from '../../api/data-contracts';
+import {
+  ChangeOrderParams,
+  CopyModuleInstanceParams,
+  DeleteModuleInstanceParams,
+  ModuleInstanceDto
+} from '../../api/data-contracts';
 import { SecurityService } from '../../services/security.service';
 import { StartPageService } from '../../services/start-page.service';
 
@@ -23,6 +28,8 @@ interface MenuItemComponentTranslation {
   delete: string;
   edit: string;
   new: string;
+  copy: string;
+  copyItemSuccessMessage: string;
   deleteItemConfirmHeader: string;
   deleteItemConfirmMessage: string;
   deleteItemSuccessMessage: string;
@@ -270,6 +277,13 @@ export class MenuItemComponent implements OnInit, OnDestroy {
         icon: PrimeIcons.FILE_EDIT,
         command: (event) => this.editClick(event)
       },
+      {
+        label: this.localization.copy,
+        icon: PrimeIcons.COPY,
+        command: () => this.copyItem(item),
+        // Only a leaf instance can be copied, folders with children are not supported.
+        visible: !item.items?.length
+      },
       { separator: true },
       {
         label: this.localization.delete,
@@ -335,6 +349,12 @@ export class MenuItemComponent implements OnInit, OnDestroy {
   private async clearStartModule() {
     await this.startPageService.clearStartModule();
     this.msgService.success(this.localization.unsetStartModuleSuccessMessage);
+    await this.menuService.loadMenu();
+  }
+
+  private async copyItem(item: ContextMenuItemDto) {
+    await this.menuDataService.copyModuleInstance({ id: item.moduleInstanceId } as CopyModuleInstanceParams);
+    this.msgService.success(this.localization.copyItemSuccessMessage);
     await this.menuService.loadMenu();
   }
 

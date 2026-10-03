@@ -6,6 +6,8 @@
   "menuItemComponent": {
     "new": "Добавить",
     "edit": "Редактировать",
+    "copy": "Копировать",
+    "copyItemSuccessMessage": "Успешно скопировано",
     "delete": "Удалить",
     "deleteItemConfirmHeader": "Удаление",
     "deleteItemConfirmMessage": "Вы уверены что хотите удалить элемент?",
