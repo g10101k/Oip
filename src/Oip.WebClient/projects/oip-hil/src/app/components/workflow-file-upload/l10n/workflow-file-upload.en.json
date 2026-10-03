@@ -1,0 +1,20 @@
+{
+  "workflow-file-upload": {
+    "title": "File upload",
+    "subtitle": "Upload a file to resume the workflow.",
+    "workflowInstance": "Workflow instance",
+    "createdAt": "Created",
+    "completedAt": "Completed",
+    "allowedExtensions": "Allowed files",
+    "anyFile": "Any file",
+    "maxFileSize": "Maximum size",
+    "choose": "Choose and upload a file",
+    "notFound": "Step not found.",
+    "uploaded": "File uploaded. Workflow status: {{status}}.",
+    "cancelled": "The workflow was closed before the file was uploaded.",
+    "messages": {
+      "loadError": "Failed to load the step",
+      "uploadError": "Failed to upload the file"
+    }
+  }
+}

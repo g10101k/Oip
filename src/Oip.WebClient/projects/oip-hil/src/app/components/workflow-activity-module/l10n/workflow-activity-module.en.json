@@ -1,0 +1,36 @@
+{
+  "workflow-activity-module": {
+    "title": "Workflow tasks",
+    "content": {
+      "refresh": "Refresh",
+      "runDemo": "Run demo workflow",
+      "empty": "No tasks for the period.",
+      "table": {
+        "title": "Task",
+        "description": "Description",
+        "status": "Status",
+        "createdAt": "Created",
+        "completedBy": "Completed by"
+      },
+      "selectHint": "Select a task to complete it here.",
+      "period": "Workflow start period",
+      "status": {
+        "Pending": "Pending",
+        "Completed": "Completed",
+        "Cancelled": "Cancelled",
+        "Running": "Running",
+        "Failed": "Failed"
+      }
+    },
+    "messages": {
+      "loadError": "Failed to load tasks",
+      "demoStarted": "Demo workflow started, task created",
+      "demoError": "Failed to start the demo workflow"
+    },
+    "settings": {
+      "title": "Workflow tasks settings",
+      "dayCount": "Day Count",
+      "save": "Save"
+    }
+  }
+}

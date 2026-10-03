@@ -1,0 +1,72 @@
+{
+  "llm-provider-module": {
+    "title": "LLM-провайдеры",
+    "content": {
+      "refreshTooltip": "Обновить",
+      "add": "Добавить провайдера",
+      "searchPlaceholder": "Поиск провайдеров",
+      "clear": "Сбросить фильтр",
+      "default": "по умолчанию",
+      "enabled": "Включён",
+      "disabled": "Выключен",
+      "noApiKey": "не задан",
+      "empty": "Провайдеры ещё не настроены.",
+      "table": {
+        "name": "Название",
+        "providerType": "Тип",
+        "baseUrl": "Base URL",
+        "model": "Модель",
+        "apiKey": "API-ключ",
+        "status": "Статус",
+        "updatedAt": "Обновлён",
+        "actions": "Действия",
+        "testTooltip": "Проверить подключение",
+        "editTooltip": "Редактировать",
+        "deleteTooltip": "Удалить"
+      }
+    },
+    "dialog": {
+      "createTitle": "Новый LLM-провайдер",
+      "editTitle": "Редактирование LLM-провайдера",
+      "name": "Название",
+      "providerType": "Тип провайдера",
+      "baseUrl": "Base URL API",
+      "model": "Модель по умолчанию",
+      "apiKey": "API-ключ",
+      "apiKeyPlaceholder": "sk-...",
+      "apiKeyKeep": "Оставьте пустым, чтобы сохранить текущий ключ",
+      "isDefault": "Провайдер по умолчанию",
+      "isEnabled": "Включён",
+      "cancel": "Отмена",
+      "save": "Сохранить",
+      "loadModels": "Загрузить модели провайдера",
+      "modelsEmpty": "Нет доступных моделей",
+      "modelsLoaded": "Загружено моделей: {{count}}"
+    },
+    "messages": {
+      "loadError": "Не удалось загрузить провайдеров",
+      "saveError": "Не удалось сохранить провайдера",
+      "deleteError": "Не удалось удалить провайдера",
+      "testError": "Проверка подключения не удалась",
+      "nameRequired": "Укажите название",
+      "apiKeyRequired": "Для нового провайдера нужен API-ключ",
+      "createSuccess": "Провайдер создан",
+      "updateSuccess": "Провайдер обновлён",
+      "deleteSuccess": "Провайдер удалён",
+      "modelNotFound": "Модель «{{model}}» не найдена в списке моделей провайдера.",
+      "modelsEmpty": "Провайдер не вернул ни одной модели",
+      "modelsError": "Не удалось загрузить список моделей"
+    },
+    "confirm": {
+      "header": "Удаление провайдера",
+      "message": "Удалить провайдера «{{name}}»?",
+      "cancel": "Отмена",
+      "delete": "Удалить"
+    },
+    "settings": {
+      "title": "Настройки модуля LLM-провайдеров",
+      "showDisabled": "Показывать выключенных провайдеров",
+      "save": "Сохранить"
+    }
+  }
+}

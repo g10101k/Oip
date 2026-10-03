@@ -1,0 +1,23 @@
+{
+  "workflow-task": {
+    "title": "Задача процесса",
+    "subtitle": "Выполните задачу, чтобы продолжить процесс.",
+    "workflowInstance": "Экземпляр процесса",
+    "createdAt": "Создана",
+    "outcome": "Решение",
+    "result": "Результат",
+    "resultPlaceholder": "Введите результат",
+    "comment": "Комментарий",
+    "commentPlaceholder": "Необязательный комментарий",
+    "complete": "Выполнить",
+    "notFound": "Задача не найдена.",
+    "completed": "Задача выполнена. Статус процесса: {{status}}.",
+    "messages": {
+      "loadError": "Не удалось загрузить задачу",
+      "completeError": "Не удалось выполнить задачу",
+      "outcomeRequired": "Выберите решение"
+    },
+    "completedAt": "Выполнена",
+    "cancelled": "Процесс завершён до выполнения задачи."
+  }
+}

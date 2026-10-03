@@ -58,6 +58,14 @@ The webhook is signed with `X-Keycloak-Signature` using the shared secret config
 If the Keycloak Postgres volume already contains the realm, changing `realm-export.json` will not update it
 automatically. Update the realm attributes/listeners in the Admin UI or recreate the Keycloak database volume.
 
+## Temporal
+
+The `temporal` service runs the Temporal development server (`temporal server start-dev`) with SQLite persisted in the
+`temporal_data` volume.
+
+- gRPC frontend: `localhost:7233` (`temporal:7233` from other containers), namespace `default`
+- Web UI: http://localhost:8233
+
 ## Development Container Startup
 
 Run the commands from the `.oip-devcontainer` directory:

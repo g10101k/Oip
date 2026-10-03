@@ -277,6 +277,18 @@ services:
       retries: 3
     restart: unless-stopped
 
+  temporal:
+    image: temporalio/temporal:latest
+    command: [ "server", "start-dev", "--ip", "0.0.0.0", "--db-filename", "/home/temporal/temporal.db" ]
+    ports:
+      - "7233:7233"  # gRPC frontend
+      - "8233:8233"  # Web UI
+    volumes:
+      - temporal_data:/home/temporal
+    environment:
+      - TZ=Europe/Moscow
+    restart: unless-stopped
+
 volumes:
   postgres-data:
   pgadmin-data:
@@ -284,3 +296,4 @@ volumes:
   clickhouse_data:
   minio_data:
   redis-data:
+  temporal_data:
