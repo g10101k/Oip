@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Oip.Base.Controllers;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Entities;
 
@@ -24,7 +26,8 @@ public static class WebApplicationBuilderExtension
     public static IApplicationBuilder MigrateOipModuleDatabase(this IApplicationBuilder app)
     {
         using var context = app.MigrateDatabaseInternal<OipModuleContext>();
-        AddModulesFromAssemblies(context);
+        using var scope = app.ApplicationServices.CreateScope();
+        AddModulesFromAssemblies(context, scope.ServiceProvider);
         return app;
     }
 
@@ -64,9 +67,12 @@ public static class WebApplicationBuilderExtension
     /// if the module is not already registered.
     /// </summary>
     /// <param name="moduleContext">The database context used to persist module information.</param>
-    private static void AddModulesFromAssemblies(OipModuleContext moduleContext)
+    /// <param name="serviceProvider">The service provider used to create module controllers to read their icons.</param>
+    private static void AddModulesFromAssemblies(OipModuleContext moduleContext, IServiceProvider serviceProvider)
     {
         var result = GetAllLoadedModules();
+        var logger = serviceProvider.GetRequiredService<ILoggerFactory>()
+            .CreateLogger(typeof(WebApplicationBuilderExtension));
 
         foreach (var type in result)
         {
@@ -74,18 +80,49 @@ public static class WebApplicationBuilderExtension
             var attr = type.GetCustomAttribute<RouteAttribute>();
             if (attr == null) continue;
             var link = attr.Template.Replace("api", string.Empty);
+            var iconResolved = TryGetModuleIcon(type, serviceProvider, logger, out var icon);
             var module = moduleContext.Modules.FirstOrDefault(m => m.Name == moduleName);
             if (module is null)
             {
-                moduleContext.Modules.Add(new ModuleEntity { Name = moduleName, RouterLink = link });
+                moduleContext.Modules.Add(new ModuleEntity { Name = moduleName, RouterLink = link, Icon = icon });
             }
             else
             {
                 module.RouterLink = link;
+                if (iconResolved)
+                    module.Icon = icon;
             }
         }
 
         moduleContext.SaveChanges();
+    }
+
+    /// <summary>
+    /// Creates the module controller and reads its <c>Icon</c> property.
+    /// </summary>
+    /// <param name="type">The module controller type.</param>
+    /// <param name="serviceProvider">The service provider used to resolve controller dependencies.</param>
+    /// <param name="logger">The logger used to report controllers that cannot be created.</param>
+    /// <param name="icon">The module icon, or <c>null</c> when the module does not declare one.</param>
+    /// <returns><c>true</c> when the icon was read; <c>false</c> when the controller could not be created.</returns>
+    private static bool TryGetModuleIcon(Type type, IServiceProvider serviceProvider, ILogger logger, out string? icon)
+    {
+        icon = null;
+        if (type.IsAbstract || type.ContainsGenericParameters)
+            return false;
+
+        try
+        {
+            var controller = ActivatorUtilities.CreateInstance(serviceProvider, type);
+            icon = type.GetProperty(nameof(BaseModuleController<object>.Icon))?.GetValue(controller) as string;
+            (controller as IDisposable)?.Dispose();
+            return true;
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning(e, "Could not read the icon of module {ModuleType}", type.FullName);
+            return false;
+        }
     }
 
     /// <summary>

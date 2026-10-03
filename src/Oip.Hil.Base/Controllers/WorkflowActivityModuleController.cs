@@ -21,6 +21,9 @@ namespace Oip.Hil.Base.Controllers;
 public class WorkflowActivityModuleController(UserStepService userStepService, ModuleRepository moduleRepository)
     : BaseModuleController<WorkflowActivityModuleSettings>(moduleRepository)
 {
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-sitemap";
+
     /// <summary>
     /// Returns all steps, pending and completed, of the workflows started in the period, with links to the Angular
     /// pages that render them.

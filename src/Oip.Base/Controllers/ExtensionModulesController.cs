@@ -21,6 +21,7 @@ public class ExtensionModulesController(ModuleRepository moduleRepository, IHttp
     : ControllerBase
 {
     private const string SupportedHostVersion = "1";
+    private const int MaxIconLength = 64;
     private static readonly Regex ElementNameRegex =
         new("^[a-z][a-z0-9]*(-[a-z0-9]+)+$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
@@ -165,6 +166,15 @@ public class ExtensionModulesController(ModuleRepository moduleRepository, IHttp
         RequireValue(manifest.Name, "name");
         RequireValue(manifest.Version, "version");
         RequireValue(manifest.ApiBaseUrl, "apiBaseUrl");
+
+        manifest.Icon = string.IsNullOrWhiteSpace(manifest.Icon) ? null : manifest.Icon.Trim();
+        if (manifest.Icon?.Length > MaxIconLength)
+        {
+            throw new ApiException(
+                "Invalid extension manifest",
+                $"icon must not exceed {MaxIconLength} characters.",
+                StatusCodes.Status400BadRequest);
+        }
 
         var loadType = string.IsNullOrWhiteSpace(manifest.LoadType)
             ? ExtensionModuleManifestDto.CustomElementLoadType

@@ -13,6 +13,9 @@ namespace Oip.Base.Controllers;
 public class IframeModuleController(ModuleRepository moduleRepository)
     : BaseModuleController<IframeModuleSettings>(moduleRepository)
 {
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-globe";
+
     public override List<SecurityResponse> GetModuleRights()
     {
         return

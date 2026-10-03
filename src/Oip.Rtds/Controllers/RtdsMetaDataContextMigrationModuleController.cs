@@ -11,4 +11,8 @@ namespace Oip.Rtds.Controllers;
 [ApiController]
 [Route("api/rtds-meta-data-context-migration-module")]
 public class RtdsMetaDataContextMigrationModuleController(ModuleRepository repository, RtdsMetaContext dbContext)
-    : BaseDbMigrationController<object>(repository, dbContext);
+    : BaseDbMigrationController<object>(repository, dbContext)
+{
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-database";
+}

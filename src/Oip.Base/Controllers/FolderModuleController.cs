@@ -15,6 +15,9 @@ namespace Oip.Base.Controllers;
 public class FolderModuleController(ModuleRepository moduleRepository)
     : BaseModuleController<FolderModuleSettings>(moduleRepository)
 {
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-folder";
+
     /// <summary>
     /// Returns a list of rights (permissions) required to access the folder module.
     /// </summary>

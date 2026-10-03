@@ -322,12 +322,12 @@ public class ModuleRepository(OipModuleContext db)
     /// <summary>
     /// Retrieves a list of all modules as key-value pairs.
     /// </summary>
-    /// <returns>A list of modules with ID and name.</returns>
-    public async Task<IEnumerable<IntKeyValueDto>> GetModules()
+    /// <returns>A list of modules with ID, name and default icon.</returns>
+    public async Task<IEnumerable<ModuleKeyValueDto>> GetModules()
     {
         var query = from module in db.Modules
             orderby module.Name
-            select new IntKeyValueDto(module.ModuleId, module.Name);
+            select new ModuleKeyValueDto(module.ModuleId, module.Name, module.Icon);
         return await query.AsNoTracking().ToListAsync();
     }
 
@@ -381,6 +381,7 @@ public class ModuleRepository(OipModuleContext db)
             Name = manifest.Name,
             Settings = manifest.SettingsSchema?.ToJsonString(),
             RouterLink = $"/extensions/{manifest.Key}",
+            Icon = manifest.Icon,
             Kind = ModuleKind.Extension,
             ManifestUrl = manifestUrl,
             ExtensionKey = manifest.Key,
@@ -425,6 +426,7 @@ public class ModuleRepository(OipModuleContext db)
         module.Name = manifest.Name;
         module.Settings = manifest.SettingsSchema?.ToJsonString();
         module.RouterLink = $"/extensions/{manifest.Key}";
+        module.Icon = manifest.Icon;
         module.ManifestUrl = manifestUrl;
         module.ExtensionKey = manifest.Key;
         module.LoadType = manifest.LoadType;

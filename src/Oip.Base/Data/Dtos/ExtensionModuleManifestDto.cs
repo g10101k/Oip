@@ -68,7 +68,7 @@ public class ExtensionModuleManifestDto
     public string ApiBaseUrl { get; set; } = null!;
 
     /// <summary>
-    /// Optional PrimeIcons icon name.
+    /// Optional PrimeIcons class used as the default icon for new module instances, e.g. <c>pi pi-chart-bar</c>.
     /// </summary>
     public string? Icon { get; set; }
 

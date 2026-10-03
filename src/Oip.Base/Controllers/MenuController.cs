@@ -114,10 +114,10 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
     /// <summary>
     /// Retrieves all available modules in the system.
     /// </summary>
-    /// <returns>A list of <see cref="IntKeyValueDto"/> representing available modules.</returns>
+    /// <returns>A list of <see cref="ModuleKeyValueDto"/> representing available modules.</returns>
     [HttpGet("get-modules")]
     [Authorize(Roles = SecurityConstants.AdminRole)]
-    public async Task<IEnumerable<IntKeyValueDto>> GetModules()
+    public async Task<IEnumerable<ModuleKeyValueDto>> GetModules()
     {
         return await moduleRepository.GetModules();
     }

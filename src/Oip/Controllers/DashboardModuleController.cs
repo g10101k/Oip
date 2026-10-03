@@ -15,6 +15,9 @@ public class DashboardModuleController(ModuleRepository moduleRepository)
     : BaseModuleController<DashboardSettings>(moduleRepository)
 {
     /// <inheritdoc />
+    public override string? Icon => "pi pi-chart-bar";
+
+    /// <inheritdoc />
     public override List<SecurityResponse> GetModuleRights()
     {
         return

@@ -20,6 +20,9 @@ namespace Oip.Hil.Controllers;
 public class LlmProviderModuleController(LlmProviderService providerService, ModuleRepository moduleRepository)
     : BaseModuleController<LlmProviderModuleSettings>(moduleRepository)
 {
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-microchip-ai";
+
     /// <summary>
     /// Returns all configured providers. API keys are returned masked.
     /// </summary>

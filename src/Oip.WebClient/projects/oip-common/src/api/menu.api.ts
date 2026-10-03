@@ -11,8 +11,8 @@ import {
   DeleteModuleInstanceParams,
   EditModuleInstanceDto,
   GetModuleInstanceRightsParams,
-  IntKeyValueDto,
   ModuleInstanceDto,
+  ModuleKeyValueDto,
   SetStartModuleParams,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
@@ -67,7 +67,7 @@ export class MenuApi<
       ...params,
     });
   getModules = (params: RequestParams = {}) =>
-    this.request<IntKeyValueDto[], any>({
+    this.request<ModuleKeyValueDto[], any>({
       path: `/api/menu/get-modules`,
       method: "GET",
       secure: true,

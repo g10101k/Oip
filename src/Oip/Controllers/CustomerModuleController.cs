@@ -25,6 +25,9 @@ public class CustomerModuleController(
     ModuleRepository moduleRepository)
     : BaseModuleController<CustomerModuleSettings>(moduleRepository)
 {
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-id-card";
+
     private const string ViewFinancialsRight = "view-financials";
 
     /// <summary>
