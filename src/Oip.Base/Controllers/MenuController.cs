@@ -172,6 +172,35 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
     }
 
     /// <summary>
+    /// Copies a leaf module instance together with its settings and security rules.
+    /// </summary>
+    /// <param name="id">The identifier of the module instance to copy.</param>
+    /// <returns>The identifier of the created module instance.</returns>
+    [HttpPost("copy-module-instance/{id:int}")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType<int>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CopyModuleInstance(int id)
+    {
+        try
+        {
+            return Ok(await moduleRepository.CopyModuleInstance(id));
+        }
+        catch (KeyNotFoundException e)
+        {
+            return NotFound(new ApiExceptionResponse("Module instance not found", e.Message,
+                StatusCodes.Status404NotFound));
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest(new ApiExceptionResponse("Module instance cannot be copied", e.Message,
+                StatusCodes.Status400BadRequest));
+        }
+    }
+
+    /// <summary>
     /// Swaps the order positions of two modules in the menu structure.
     /// </summary>
     /// <param name="firstModuleId">The identifier of the first module to swap.</param>

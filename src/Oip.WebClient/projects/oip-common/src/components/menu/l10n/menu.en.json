@@ -6,6 +6,8 @@
   "menuItemComponent": {
     "new": "Add",
     "edit": "Edit",
+    "copy": "Copy",
+    "copyItemSuccessMessage": "Copied successfully",
     "delete": "Delete",
     "deleteItemConfirmHeader": "Delete",
     "deleteItemConfirmMessage": "Are you sure you want to delete the item?",

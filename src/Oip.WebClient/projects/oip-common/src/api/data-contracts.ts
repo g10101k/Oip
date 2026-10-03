@@ -188,6 +188,10 @@ export interface DeleteModuleInstanceParams {
   id?: number;
 }
 
+export interface CopyModuleInstanceParams {
+  id: number;
+}
+
 export interface ChangeOrderParams {
   firstModuleId?: number;
   secondModuleId?: number;

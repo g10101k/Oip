@@ -143,6 +143,116 @@ public class ModuleRepositoryTests
         Assert.That(await repository.GetStartModuleInstanceId("second-sub"), Is.EqualTo(instance.ModuleInstanceId));
     }
 
+    [Test]
+    public async Task CopyModuleInstance_CopiesSettingsAndSecuritiesBelowOriginal()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var module = new ModuleEntity { Name = "Dashboard", Settings = string.Empty };
+        var folder = new ModuleInstanceEntity { Module = module, Label = "Folder", Settings = string.Empty };
+        var first = new ModuleInstanceEntity
+        {
+            Module = module,
+            Parent = folder,
+            Label = "First",
+            Icon = "pi pi-chart-bar",
+            Url = "https://example.com",
+            Target = "_blank",
+            Settings = """{"widgets":[1,2,3]}""",
+            Order = 0,
+            Securities =
+            [
+                new ModuleInstanceSecurityEntity { Right = "read", Role = "admin" },
+                new ModuleInstanceSecurityEntity { Right = "edit", Role = "editor" }
+            ]
+        };
+        var second = new ModuleInstanceEntity
+        {
+            Module = module,
+            Parent = folder,
+            Label = "Second",
+            Settings = string.Empty,
+            Order = 1
+        };
+
+        context.ModuleInstances.AddRange(folder, first, second);
+        await context.SaveChangesAsync();
+
+        var copyId = await repository.CopyModuleInstance(first.ModuleInstanceId);
+
+        var copy = await context.ModuleInstances
+            .Include(x => x.Securities)
+            .SingleAsync(x => x.ModuleInstanceId == copyId);
+        var order = await context.ModuleInstances
+            .Where(x => x.ParentId == folder.ModuleInstanceId)
+            .OrderBy(x => x.Order)
+            .Select(x => x.Label)
+            .ToListAsync();
+
+        Assert.That(copyId, Is.Not.EqualTo(first.ModuleInstanceId));
+        Assert.That(copy.ModuleId, Is.EqualTo(first.ModuleId));
+        Assert.That(copy.Label, Is.EqualTo("First (copy)"));
+        Assert.That(copy.Icon, Is.EqualTo(first.Icon));
+        Assert.That(copy.Url, Is.EqualTo(first.Url));
+        Assert.That(copy.Target, Is.EqualTo(first.Target));
+        Assert.That(copy.Settings, Is.EqualTo(first.Settings));
+        Assert.That(copy.Securities.Select(x => (x.Right, x.Role)),
+            Is.EquivalentTo(new[] { ("read", "admin"), ("edit", "editor") }));
+        Assert.That(order, Is.EqualTo(new[] { "First", "First (copy)", "Second" }));
+    }
+
+    [Test]
+    public async Task CopyModuleInstance_DoesNotShareSettingsWithOriginal()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var module = new ModuleEntity { Name = "Dashboard", Settings = string.Empty };
+        var original = new ModuleInstanceEntity { Module = module, Label = "Original", Settings = "{\"a\":1}" };
+
+        context.ModuleInstances.Add(original);
+        await context.SaveChangesAsync();
+
+        var copyId = await repository.CopyModuleInstance(original.ModuleInstanceId);
+        repository.UpdateModuleInstanceSettings(copyId, "{\"a\":2}");
+
+        Assert.That(repository.GetModuleInstanceSettings(original.ModuleInstanceId), Is.EqualTo("{\"a\":1}"));
+        Assert.That(repository.GetModuleInstanceSettings(copyId), Is.EqualTo("{\"a\":2}"));
+    }
+
+    [Test]
+    public async Task CopyModuleInstance_ThrowsForInstanceWithChildren()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var module = new ModuleEntity { Name = "Folder", Settings = string.Empty };
+        var parent = new ModuleInstanceEntity { Module = module, Label = "Parent", Settings = string.Empty };
+        var child = new ModuleInstanceEntity
+        {
+            Module = module,
+            Parent = parent,
+            Label = "Child",
+            Settings = string.Empty
+        };
+
+        context.ModuleInstances.AddRange(parent, child);
+        await context.SaveChangesAsync();
+
+        Assert.ThrowsAsync<InvalidOperationException>(() => repository.CopyModuleInstance(parent.ModuleInstanceId));
+        Assert.That(await context.ModuleInstances.CountAsync(), Is.EqualTo(2));
+    }
+
+    [Test]
+    public void CopyModuleInstance_ThrowsForUnknownModuleInstance()
+    {
+        var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        Assert.ThrowsAsync<KeyNotFoundException>(() => repository.CopyModuleInstance(42));
+    }
+
     private static OipModuleContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<OipModuleContext>()

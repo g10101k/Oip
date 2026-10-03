@@ -554,6 +554,49 @@ public class ModuleRepository(OipModuleContext db)
         await db.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Copies a leaf module instance together with its settings and security rules.
+    /// The copy is placed under the same parent right below the original.
+    /// </summary>
+    /// <param name="id">The ID of the module instance to copy.</param>
+    /// <returns>The ID of the created module instance.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if the module instance does not exist.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if the module instance has child items.</exception>
+    public async Task<int> CopyModuleInstance(int id)
+    {
+        var instance = await db.ModuleInstances
+                           .Include(x => x.Securities)
+                           .FirstOrDefaultAsync(x => x.ModuleInstanceId == id)
+                       ?? throw new KeyNotFoundException($"Module instance with id {id} not found");
+
+        if (await db.ModuleInstances.AnyAsync(x => x.ParentId == id))
+            throw new InvalidOperationException($"Module instance with id {id} has child items and cannot be copied");
+
+        await db.ModuleInstances.Where(m => m.ParentId == instance.ParentId && m.Order > instance.Order)
+            .ForEachAsync(m => m.Order += 1);
+
+        var copy = new ModuleInstanceEntity
+        {
+            ModuleId = instance.ModuleId,
+            Label = $"{instance.Label} (copy)",
+            Icon = instance.Icon,
+            Url = instance.Url,
+            Target = instance.Target,
+            ParentId = instance.ParentId,
+            Order = instance.Order + 1,
+            Settings = instance.Settings,
+            Securities = instance.Securities.Select(x => new ModuleInstanceSecurityEntity
+            {
+                Right = x.Right,
+                Role = x.Role
+            }).ToList()
+        };
+
+        db.ModuleInstances.Add(copy);
+        await db.SaveChangesAsync();
+        return copy.ModuleInstanceId;
+    }
+
     private async Task<HashSet<int>> GetModuleInstanceTreeIds(int rootId)
     {
         var moduleInstances = await db.ModuleInstances
