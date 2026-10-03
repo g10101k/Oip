@@ -27,6 +27,11 @@ public class ModuleEntity
     public string? RouterLink { get; set; }
 
     /// <summary>
+    /// Default icon for new module instances
+    /// </summary>
+    public string? Icon { get; set; }
+
+    /// <summary>
     /// Module delivery kind.
     /// </summary>
     public ModuleKind Kind { get; set; } = ModuleKind.Core;

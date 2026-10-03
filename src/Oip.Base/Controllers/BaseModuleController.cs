@@ -22,6 +22,11 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     : ControllerBase where TSettings : class, new()
 {
     /// <summary>
+    /// Gets the default PrimeIcons class for new instances of the module, e.g. <c>pi pi-chart-bar</c>.
+    /// </summary>
+    public virtual string? Icon => null;
+
+    /// <summary>
     /// Gets the security configuration for the module instance the request targets.
     /// </summary>
     /// <returns>A list of <see cref="SecurityResponse"/> objects representing the security rights and associated roles.</returns>

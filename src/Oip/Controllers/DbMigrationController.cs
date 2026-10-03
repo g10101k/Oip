@@ -11,4 +11,8 @@ namespace Oip.Controllers;
 [ApiController]
 [Route("api/db-migration")]
 public class DbMigrationController(ModuleRepository repository, OipModuleContext dbContext)
-    : BaseDbMigrationController<object>(repository, dbContext);
+    : BaseDbMigrationController<object>(repository, dbContext)
+{
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-database";
+}

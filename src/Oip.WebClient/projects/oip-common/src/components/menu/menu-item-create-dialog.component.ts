@@ -6,7 +6,7 @@ import { SelectModule } from 'primeng/select';
 import { PrimeIcons } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AddModuleInstanceDto, IntKeyValueDto } from '../../api/data-contracts';
+import { AddModuleInstanceDto, ModuleKeyValueDto } from '../../api/data-contracts';
 import { MenuApi } from '../../api/menu.api';
 import { MenuService } from '../../services/app.menu.service';
 import { MsgService } from '../../services/msg.service';
@@ -63,7 +63,8 @@ type PrimeIconOption = {
           scrollHeight="18rem"
           [filter]="true"
           [options]="modules"
-          [(ngModel)]="selectModule" />
+          [(ngModel)]="selectModule"
+          (ngModelChange)="onModuleChange($event)" />
       </div>
       <div class="flex items-center gap-4 mb-4">
         <label class="font-semibold w-1/3" for="oip-menu-item-create-dialog-icon">
@@ -112,12 +113,13 @@ type PrimeIconOption = {
   `
 })
 export class MenuItemCreateDialogComponent implements OnInit {
+  private static readonly defaultIcon = 'pi pi-box';
   protected readonly menuService = inject(MenuService);
   protected readonly menu = inject(MenuApi);
   private readonly msgService = inject(MsgService);
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
-  modules: IntKeyValueDto[] = [];
+  modules: ModuleKeyValueDto[] = [];
   iconOptions: PrimeIconOption[] = Object.values(PrimeIcons)
     .filter((icon): icon is string => typeof icon === 'string')
     .map((icon) => ({
@@ -127,7 +129,7 @@ export class MenuItemCreateDialogComponent implements OnInit {
     .sort((left, right) => left.label.localeCompare(right.label));
   selectModule: any;
   label: string;
-  selectIcon: string = 'pi pi-box';
+  selectIcon: string = MenuItemCreateDialogComponent.defaultIcon;
   saving = false;
 
   get canSave(): boolean {
@@ -136,6 +138,11 @@ export class MenuItemCreateDialogComponent implements OnInit {
 
   async ngOnInit() {
     this.modules = await this.menu.getModules();
+  }
+
+  onModuleChange(moduleId: number) {
+    const module = this.modules.find((item) => item.key === moduleId);
+    this.selectIcon = module?.icon || MenuItemCreateDialogComponent.defaultIcon;
   }
 
   changeVisible() {

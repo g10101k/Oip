@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Data.Contexts;
+using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Entities;
 using Oip.Base.Data.Repositories;
 
@@ -251,6 +252,48 @@ public class ModuleRepositoryTests
         var repository = new ModuleRepository(context);
 
         Assert.ThrowsAsync<KeyNotFoundException>(() => repository.CopyModuleInstance(42));
+    }
+
+    [Test]
+    public async Task GetModules_ReturnsModuleIcon()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        context.Modules.AddRange(
+            new ModuleEntity { Name = "Dashboard", Icon = "pi pi-chart-bar" },
+            new ModuleEntity { Name = "Folder" });
+        await context.SaveChangesAsync();
+
+        var modules = (await repository.GetModules()).ToList();
+
+        Assert.That(modules.Select(x => x.Value), Is.EqualTo(new[] { "Dashboard", "Folder" }));
+        Assert.That(modules[0].Icon, Is.EqualTo("pi pi-chart-bar"));
+        Assert.That(modules[1].Icon, Is.Null);
+    }
+
+    [Test]
+    public async Task ExtensionModule_StoresManifestIcon()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+        var manifest = new ExtensionModuleManifestDto
+        {
+            Key = "reports",
+            Name = "Reports",
+            Version = "1.0.0",
+            ElementName = "oip-reports",
+            ScriptUrl = "https://extensions.local/reports.js",
+            ApiBaseUrl = "https://extensions.local/api",
+            Icon = "pi pi-file"
+        };
+
+        var registered = await repository.RegisterExtensionModule(manifest, "https://extensions.local/manifest.json");
+        Assert.That((await context.Modules.SingleAsync()).Icon, Is.EqualTo("pi pi-file"));
+
+        manifest.Icon = "pi pi-chart-line";
+        await repository.UpdateExtensionModule(registered.ModuleId, manifest, "https://extensions.local/manifest.json");
+        Assert.That((await context.Modules.SingleAsync()).Icon, Is.EqualTo("pi pi-chart-line"));
     }
 
     private static OipModuleContext CreateContext()

@@ -95,11 +95,6 @@ export interface IframeModuleSettings {
   url?: string | null;
 }
 
-export interface IntKeyValueDto {
-  key?: number;
-  value?: string | null;
-}
-
 export interface ModuleDeleteRequest {
   moduleId?: number;
 }
@@ -137,6 +132,12 @@ export interface ModuleInstanceDto {
   order?: number;
   separator?: boolean;
   isStart?: boolean;
+}
+
+export interface ModuleKeyValueDto {
+  key?: number;
+  value?: string | null;
+  icon?: string | null;
 }
 
 export interface ModuleSecurityDto {

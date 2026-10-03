@@ -19,6 +19,9 @@ namespace Oip.Controllers;
 public class WeatherForecastModuleController(ModuleRepository moduleRepository)
     : BaseModuleController<WeatherModuleSettings>(moduleRepository)
 {
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-sun";
+
     private readonly string[] _summaries =
     [
         Resources.WeatherForecastController_Summaries_Freezing,

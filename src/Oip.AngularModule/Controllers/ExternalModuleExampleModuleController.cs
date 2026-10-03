@@ -17,6 +17,9 @@ namespace Oip.AngularModule.Controllers;
 public class ExternalModuleExampleModuleController(ModuleRepository moduleRepository)
     : BaseModuleController<ExternalModuleExampleModuleSettings>(moduleRepository)
 {
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-external-link";
+
     /// <summary>
     /// Retrieves example data from backend.
     /// </summary>

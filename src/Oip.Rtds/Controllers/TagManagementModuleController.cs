@@ -23,6 +23,9 @@ namespace Oip.Rtds.Controllers;
 public class TagManagementModuleController(TagRepository tagRepository, ModuleRepository moduleRepository)
     : BaseModuleController<object>(moduleRepository)
 {
+    /// <inheritdoc />
+    public override string? Icon => "pi pi-tags";
+
     /// <summary>
     /// Adds a new tag.
     /// </summary>
