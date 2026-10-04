@@ -342,7 +342,7 @@ export class ApplicationsComponent implements OnInit {
     this.cancelAllEdits();
 
     try {
-      this.applications = (await this.applicationsApi.getApplicationRegistryItems()).map(
+      this.applications = (await this.applicationsApi.getAllApplicationRegistryItems()).map(
         (application: ApplicationRegistryItemDto) => ({ ...application })
       );
       this.syncVisibleApplications();

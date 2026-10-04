@@ -16,7 +16,7 @@ namespace Oip.Applications.Base.Controllers;
 public class ApplicationsController(IApplicationRegistryService registryService) : ControllerBase
 {
     /// <summary>
-    /// Retrieves registered frontend applications.
+    /// Retrieves enabled registered frontend applications.
     /// </summary>
     [Authorize]
     [HttpGet("get-application-registry-items")]
@@ -26,6 +26,19 @@ public class ApplicationsController(IApplicationRegistryService registryService)
         CancellationToken cancellationToken = default)
     {
         return registryService.GetApplicationRegistryItemsAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Retrieves all registered frontend applications, including disabled ones, for management.
+    /// </summary>
+    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [HttpGet("get-all-application-registry-items")]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType<IReadOnlyList<ApplicationRegistryItemDto>>(StatusCodes.Status200OK)]
+    public Task<IReadOnlyList<ApplicationRegistryItemDto>> GetAllApplicationRegistryItems(
+        CancellationToken cancellationToken = default)
+    {
+        return registryService.GetAllApplicationRegistryItemsAsync(cancellationToken);
     }
 
     /// <summary>

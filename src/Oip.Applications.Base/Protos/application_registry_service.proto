@@ -37,6 +37,7 @@ message RegisterApplicationRequest {
 }
 
 message GetApplicationRegistryItemsRequest {
+  bool include_disabled = 1;
 }
 
 message GetApplicationRegistryItemByCodeRequest {
