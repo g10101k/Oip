@@ -81,4 +81,9 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     /// Disk storage of the files attached to workflow steps.
     /// </summary>
     public WorkflowFileStorageSettings FileStorage { get; set; } = new();
+
+    /// <summary>
+    /// OpenAI-compatible agent gateway.
+    /// </summary>
+    public AgentGatewaySettings AgentGateway { get; set; } = new();
 }

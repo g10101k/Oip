@@ -25,6 +25,11 @@ public class TemporalWorkerService(
 {
     private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(30);
 
+    /// <summary>
+    /// Longest interval between the heartbeats an activity sends to the server.
+    /// </summary>
+    public static readonly TimeSpan MaxHeartbeatThrottleInterval = TimeSpan.FromSeconds(1);
+
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -59,7 +64,14 @@ public class TemporalWorkerService(
 
     private TemporalWorkerOptions CreateWorkerOptions()
     {
-        var options = new TemporalWorkerOptions(settings.TaskQueue) { LoggerFactory = loggerFactory };
+        var options = new TemporalWorkerOptions(settings.TaskQueue)
+        {
+            LoggerFactory = loggerFactory,
+            // An activity learns about its cancellation from the response to a heartbeat. By default heartbeats are
+            // throttled to 80% of the heartbeat timeout, so e.g. an LLM call would go on for tens of seconds after
+            // the user stopped it.
+            MaxHeartbeatThrottleInterval = MaxHeartbeatThrottleInterval
+        };
         foreach (var type in workflowOptions.Workflows)
             options.AddWorkflow(type);
         foreach (var type in workflowOptions.Activities)

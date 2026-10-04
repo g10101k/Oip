@@ -26,3 +26,21 @@ dotnet run --project Oip.Hil.csproj --no-restore -- --GenerateWebClient=true
 ```
 
 The client is generated into `Oip.WebClient/projects/oip-hil/src/api`.
+
+## Agent gateway (OpenAI-compatible API)
+
+`AgentGatewayController` exposes `GET /v1/models` and `POST /v1/chat/completions` for chat UIs such as Open WebUI.
+Each chat message starts an `AgentWorkflow`; with `stream: true` the activity publishes the answer to a Redis stream
+(`AgentGateway:RedisConnectionString`, the auth ticket store Redis by default) and the gateway forwards it as
+server-sent events. Closing the request (the Stop button) cancels the workflow. Models are the enabled LLM providers,
+identified by name. Routes and errors follow the OpenAI API, so the controller is excluded from the web client.
+
+Requests are authenticated with a Keycloak access token of the `oip` realm (`Authorization: Bearer ...`). The
+`open-webui` service of `.oip-devcontainer/dev.yml` is connected to the gateway and forwards the token of the user signed
+in through Keycloak: start the dev container and `Oip.Hitl`, then open http://localhost:3000.
+
+```shell
+curl -N https://localhost:5009/v1/chat/completions -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"<provider name>","stream":true,"messages":[{"role":"user","content":"Hi"}]}'
+```

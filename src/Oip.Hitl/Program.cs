@@ -53,6 +53,11 @@ internal static class Program
             builder.Services.AddScoped<LlmProviderTools>();
             builder.Services.AddScoped<LlmProviderService>();
             builder.Services.AddScoped<LlmActivities>();
+            builder.Services.AddSingleton(settings.AgentGateway);
+            builder.Services.AddSingleton(_ => new AgentEventStream(
+                settings.AgentGateway.RedisConnectionString ??
+                settings.SecurityService.AuthTicketStore.RedisConnectionString,
+                TimeSpan.FromMinutes(settings.AgentGateway.StreamTtlMinutes)));
             builder.Services.AddCors(settings);
             builder.Services.AddDataProtection(settings);
             builder.Services.AddForwardedHeaders(settings);
@@ -64,6 +69,7 @@ internal static class Program
                 .AddController<WorkflowActivityModuleController>()
                 .AddController<LlmProviderModuleController>()
                 .AddController<WorkflowDemoController>()
+                .AddController<AgentGatewayController>()
                 .AddController<WorkflowStepController>();
             // Controllers are registered explicitly, so the controllers of the services hosted in the application
             // have to be registered too; in Remote mode they are served by the services themselves.
@@ -85,6 +91,7 @@ internal static class Program
             builder.Services.AddOipWorkflows(settings.Temporal, settings.FileStorage, workflows => workflows
                 .AddWorkflow<HelloWorldWorkflow>()
                 .AddWorkflow<UserTaskDemoWorkflow>()
+                .AddWorkflow<AgentWorkflow>()
                 .AddActivities<LlmActivities>());
 
             var app = builder.Build();

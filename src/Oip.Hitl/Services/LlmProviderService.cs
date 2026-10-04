@@ -15,6 +15,7 @@ using Oip.Hitl.Data.Contexts;
 using Oip.Hitl.Data.Entities;
 using OpenAI;
 using OpenAI.Chat;
+using AiChatMessage = Microsoft.Extensions.AI.ChatMessage;
 
 namespace Oip.Hitl.Services;
 
@@ -185,8 +186,7 @@ public class LlmProviderService(
         {
             response = await agent.RunAsync(request.Prompt, options: options, cancellationToken: cancellationToken);
         }
-        catch (ClientResultException e) when (e.Status is not (0 or StatusCodes.Status408RequestTimeout
-                                                  or StatusCodes.Status429TooManyRequests) && e.Status < 500)
+        catch (ClientResultException e) when (IsRejected(e))
         {
             throw new LlmProviderException(e.Message, false);
         }
@@ -206,6 +206,71 @@ public class LlmProviderService(
             response.Usage?.InputTokenCount,
             response.Usage?.OutputTokenCount,
             stopwatch.ElapsedMilliseconds);
+    }
+
+    /// <summary>
+    /// Streams the answer of the provider to the chat without offering tools to the model; <paramref name="onDelta"/>
+    /// is called with each text delta of the answer.
+    /// </summary>
+    /// <exception cref="ApiException">The provider is not found, disabled or not configured.</exception>
+    /// <exception cref="LlmProviderException">The provider rejected the request.</exception>
+    public async Task<AgentTurnResult> StreamChatAsync(AgentTurnRequest request, Func<string, Task> onDelta,
+        CancellationToken cancellationToken)
+    {
+        if (request.Messages.Count == 0)
+            throw new ApiException("Validation error", "Messages are required", StatusCodes.Status400BadRequest);
+
+        var provider = await FindChatProviderAsync(request.ProviderId, cancellationToken);
+        var settings = ValidateSettings(request.Settings);
+        var chatClient = CreateChatClient(provider, provider.Model).AsIChatClient();
+        var options = new ChatOptions
+        {
+            RawRepresentationFactory = settings.Count == 0 ? null : _ => CreateCompletionOptions(settings)
+        };
+
+        var content = new StringBuilder();
+        string? finishReason = null;
+        UsageDetails? usage = null;
+        try
+        {
+            await foreach (var update in chatClient.GetStreamingResponseAsync(
+                               request.Messages.Select(ToChatMessage), options, cancellationToken))
+            {
+                finishReason = update.FinishReason?.Value ?? finishReason;
+                usage = update.Contents.OfType<UsageContent>().LastOrDefault()?.Details ?? usage;
+                var text = update.Text;
+                if (string.IsNullOrEmpty(text)) continue;
+
+                content.Append(text);
+                await onDelta(text);
+            }
+        }
+        catch (ClientResultException e) when (IsRejected(e))
+        {
+            throw new LlmProviderException(e.Message, false);
+        }
+
+        return new AgentTurnResult(content.ToString(), provider.Name, provider.Model, usage?.InputTokenCount,
+            usage?.OutputTokenCount, finishReason);
+    }
+
+    /// <summary>
+    /// Whether the provider rejected the request, so repeating it fails again; timeouts, rate limits and server
+    /// errors are not rejections.
+    /// </summary>
+    private static bool IsRejected(ClientResultException e) =>
+        e.Status is not (0 or StatusCodes.Status408RequestTimeout or StatusCodes.Status429TooManyRequests) &&
+        e.Status < 500;
+
+    private static AiChatMessage ToChatMessage(AgentMessage message)
+    {
+        var role = message.Role switch
+        {
+            "system" => ChatRole.System,
+            "assistant" => ChatRole.Assistant,
+            _ => ChatRole.User
+        };
+        return new AiChatMessage(role, message.Content);
     }
 
     private static IReadOnlyDictionary<string, JsonElement> ValidateSettings(

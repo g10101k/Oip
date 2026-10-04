@@ -50,6 +50,43 @@ public record LlmResponse(
     IReadOnlyList<WorkflowAttachment>? Attachments = null);
 
 /// <summary>
+/// Message of a chat with an agent.
+/// </summary>
+/// <param name="Role">Author of the message: <c>system</c>, <c>user</c> or <c>assistant</c>.</param>
+/// <param name="Content">Text of the message.</param>
+public record AgentMessage(string Role, string Content);
+
+/// <summary>
+/// Turn of an agent: the chat is sent to the model and its answer is streamed.
+/// </summary>
+/// <param name="ProviderId">Provider to use.</param>
+/// <param name="Messages">Chat history; the model answers the last message.</param>
+/// <param name="Settings">Request parameters sent to the chat completions API as is, e.g. <c>temperature</c>.</param>
+/// <param name="StreamKey">Key of the <see cref="AgentEventStream"/> the text deltas of the answer are published to; <c>null</c> to not stream.</param>
+public record AgentTurnRequest(
+    int ProviderId,
+    IReadOnlyList<AgentMessage> Messages,
+    IReadOnlyDictionary<string, JsonElement>? Settings = null,
+    string? StreamKey = null);
+
+/// <summary>
+/// Answer of the model in an agent turn.
+/// </summary>
+/// <param name="Content">Text of the answer.</param>
+/// <param name="Provider">Name of the provider that answered.</param>
+/// <param name="Model">Model that answered.</param>
+/// <param name="PromptTokens">Tokens in the request, when reported by the provider.</param>
+/// <param name="CompletionTokens">Tokens in the answer, when reported by the provider.</param>
+/// <param name="FinishReason">Why the model stopped, e.g. <c>stop</c> or <c>length</c>, when reported by the provider.</param>
+public record AgentTurnResult(
+    string Content,
+    string Provider,
+    string Model,
+    long? PromptTokens,
+    long? CompletionTokens,
+    string? FinishReason);
+
+/// <summary>
 /// Failed call to an LLM provider.
 /// </summary>
 /// <param name="message">Error message.</param>
