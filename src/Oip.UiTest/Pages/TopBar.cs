@@ -12,12 +12,14 @@ internal class TopBar(IWebDriver driver) : BasePage(driver)
     private static readonly By AvatarImage = By.CssSelector("#oip-app-topbar-user-avatar img");
     private static readonly By DarkThemeRoot = By.CssSelector("html.app-dark");
 
+    private readonly Toasts _toasts = new(driver);
+
     /// <summary>
     /// Clicks the logout button and confirms the sign-out.
     /// </summary>
     public void Logout()
     {
-        Wait.UntilFindElement(LogoutButton).Click();
+        Click(LogoutButton);
 
         // Clicking the logout button opens a confirmation dialog;
         // the actual sign-out only happens after confirming.
@@ -42,7 +44,7 @@ internal class TopBar(IWebDriver driver) : BasePage(driver)
     public void ToggleTheme()
     {
         var wasDark = IsDarkTheme;
-        Wait.UntilClick(ThemeButton);
+        Click(ThemeButton);
         Wait.Until(_ => IsDarkTheme != wasDark);
     }
 
@@ -54,7 +56,7 @@ internal class TopBar(IWebDriver driver) : BasePage(driver)
     /// <summary>
     /// Clicks the profile button with the user avatar.
     /// </summary>
-    public void OpenProfile() => Wait.UntilClick(ProfileButton);
+    public void OpenProfile() => Click(ProfileButton);
 
     /// <summary>
     /// Text of the avatar: the user initials while there is no photo.
@@ -67,7 +69,7 @@ internal class TopBar(IWebDriver driver) : BasePage(driver)
     /// <param name="tabId">Id of the tab.</param>
     public void OpenModuleTab(string tabId)
     {
-        Wait.UntilClick(ModuleTab(tabId));
+        Click(ModuleTab(tabId));
         Wait.Until(d => d.FindElement(ModuleTab(tabId)).GetAttribute("aria-selected") == "true");
     }
 
@@ -83,6 +85,17 @@ internal class TopBar(IWebDriver driver) : BasePage(driver)
     /// </summary>
     /// <param name="tabId">Id of the tab.</param>
     public void WaitForModuleTab(string tabId) => Wait.UntilFindElement(ModuleTab(tabId));
+
+    /// <summary>
+    /// Clicks a top bar button. Toasts cover the right part of the top bar, so they are closed first;
+    /// a toast that shows up right before the click is closed on the next attempt.
+    /// </summary>
+    /// <param name="button">The button locator.</param>
+    private void Click(By button) => Wait.Until(d =>
+    {
+        _toasts.CloseAll();
+        d.FindElement(button).Click();
+    });
 
     // PrimeNG p-tab replaces the id from the template (oip-app-topbar-tab-...) with a generated
     // "pn_id_N_tab_<value>", so only the suffix built from the tab value is stable.

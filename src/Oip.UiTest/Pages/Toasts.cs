@@ -8,6 +8,7 @@ internal class Toasts(IWebDriver driver) : BasePage(driver)
 {
     private const string SeenAttribute = "data-uitest-seen";
 
+    private static readonly By Message = By.CssSelector(".p-toast-message");
     private static readonly By NewSuccess = By.CssSelector($".p-toast-message-success:not([{SeenAttribute}])");
     private static readonly By NewError = By.CssSelector($".p-toast-message-error:not([{SeenAttribute}])");
     private static readonly By Summary = By.CssSelector(".p-toast-summary");
@@ -50,6 +51,26 @@ internal class Toasts(IWebDriver driver) : BasePage(driver)
         MarkShown();
         action();
         return Wait.UntilFindElement(NewError).FindElement(Detail).Text.Trim();
+    }
+
+    /// <summary>
+    /// Closes every toast on screen and waits until they are gone. Toasts show up in the top right corner over
+    /// the top bar, and PrimeNG stops their timer while the mouse is over them, so a toast that appeared under
+    /// the cursor after the previous click stays there and takes the clicks meant for the top bar buttons.
+    /// </summary>
+    public void CloseAll()
+    {
+        if (!ExistsNow(Message))
+            return;
+
+        // The close buttons are clicked from script: a toast stacked over another one would intercept a real click.
+        // They are clicked again on every check, as a new toast may show up while the old ones are leaving.
+        Wait.Until(_ =>
+        {
+            ((IJavaScriptExecutor)Driver).ExecuteScript(
+                "document.querySelectorAll('.p-toast-close-button').forEach(button => button.click());");
+            return !ExistsNow(Message);
+        });
     }
 
     private void MarkShown() =>

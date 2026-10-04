@@ -30,14 +30,15 @@ public class UserProfileController(
     };
 
     /// <summary>
-    /// Gets current user photo.
+    /// Gets current user photo. A user without a photo is a regular state, so it is answered with
+    /// 204 No Content rather than 404, which browsers report as an error in the console.
     /// </summary>
-    /// <returns>User photo image or not found response.</returns>
+    /// <returns>User photo image or no content response.</returns>
     [Authorize, HttpGet("get-user-photo")]
     [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK,
         "image/jpeg", "image/png", "image/gif", "image/webp")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserPhoto(CancellationToken cancellationToken)
     {
@@ -48,8 +49,9 @@ public class UserProfileController(
                 StatusCodes.Status401Unauthorized));
         }
 
+        // The signed-in user may not be stored yet on the first sign-in; such a user has no photo either.
         var user = await userRepository.GetBySubjectAsync(subject, cancellationToken);
-        return await GetUserPhotoResultAsync(user, cancellationToken);
+        return user == null ? NoContent() : await GetUserPhotoResultAsync(user, cancellationToken);
     }
 
     /// <summary>
@@ -57,16 +59,23 @@ public class UserProfileController(
     /// </summary>
     /// <param name="userId">User identifier.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>User photo image or not found response.</returns>
+    /// <returns>User photo image, no content response if the user has no photo, or not found response if there is no such user.</returns>
     [Authorize, HttpGet("get-user-photo-by-id/{userId:int}")]
     [ProducesResponseType<FileStreamResult>(StatusCodes.Status200OK,
         "image/jpeg", "image/png", "image/gif", "image/webp")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserPhotoById(int userId, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetByIdAsync(userId, cancellationToken);
+        if (user == null)
+        {
+            return NotFound(new ApiExceptionResponse("User not found", "User was not found.",
+                StatusCodes.Status404NotFound));
+        }
+
         return await GetUserPhotoResultAsync(user, cancellationToken);
     }
 
@@ -193,26 +202,19 @@ public class UserProfileController(
     }
 
     private async Task<IActionResult> GetUserPhotoResultAsync(
-        Data.Entities.UserEntity? user,
+        Data.Entities.UserEntity user,
         CancellationToken cancellationToken)
     {
-        if (user == null)
+        if (string.IsNullOrWhiteSpace(user.PhotoObjectName))
         {
-            return NotFound(new ApiExceptionResponse("Photo not found", "User photo was not found.",
-                StatusCodes.Status404NotFound));
+            return NoContent();
         }
 
-        if (!string.IsNullOrWhiteSpace(user.PhotoObjectName))
-        {
-            var content = await userPhotoStorage.OpenReadAsync(
-                user.PhotoObjectName,
-                user.PhotoContentType ?? "image/jpeg",
-                cancellationToken);
-            return File(content.Content, content.ContentType);
-        }
-
-        return NotFound(new ApiExceptionResponse("Photo not found", "User photo was not found.",
-            StatusCodes.Status404NotFound));
+        var content = await userPhotoStorage.OpenReadAsync(
+            user.PhotoObjectName,
+            user.PhotoContentType ?? "image/jpeg",
+            cancellationToken);
+        return File(content.Content, content.ContentType);
     }
 }
 
