@@ -87,12 +87,20 @@ export class UserService {
 
     this.userProfileApi.getUserPhoto().then(
       (data) => {
-        this.createImageFromBlob(data as Blob);
+        // 204 No Content comes back as an empty blob: the user hasn't uploaded a photo yet,
+        // so the avatar falls back to initials.
+        const photo = data as Blob;
+        if (!photo?.size) {
+          this.photo = null;
+          this.photoLoaded = false;
+          return;
+        }
+
+        this.createImageFromBlob(photo);
         this.photoLoaded = true;
       },
       (error) => {
-        // A 404 just means the user hasn't uploaded a photo yet (e.g. on first login) —
-        // that's an expected state, not a failure, so fall back to initials silently.
+        // Older backends answer 404 when there is no photo — that's an expected state, not a failure.
         if ((error as { status?: number })?.status !== 404) {
           this.msgService.errorFromException(error, this.translateService.instant('userService.failedToLoadPhoto'));
         }
