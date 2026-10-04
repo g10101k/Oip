@@ -61,11 +61,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Discussions.Base", "Oip
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExternalModuleExamples", "ExternalModuleExamples", "{155F490C-E5EF-45AA-A7A9-0200113FF595}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hil", "Hil", "{39C52A38-B318-4064-9F85-5A2C623AB73B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hitl", "Hitl", "{39C52A38-B318-4064-9F85-5A2C623AB73B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Hil", "Oip.Hil\Oip.Hil.csproj", "{F4AEFFBF-B8E8-4D0D-AD99-A5BEBD93183B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Hitl", "Oip.Hitl\Oip.Hitl.csproj", "{F4AEFFBF-B8E8-4D0D-AD99-A5BEBD93183B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Hil.Base", "Oip.Hil.Base\Oip.Hil.Base.csproj", "{A0DACF6C-6CB1-4950-8A35-7EC1478312D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Hitl.Base", "Oip.Hitl.Base\Oip.Hitl.Base.csproj", "{A0DACF6C-6CB1-4950-8A35-7EC1478312D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
