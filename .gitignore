@@ -5,3 +5,4 @@
 /.vs
 /.oip-devcontainer/https
 .DS_Store
+/.claude/launch.json
