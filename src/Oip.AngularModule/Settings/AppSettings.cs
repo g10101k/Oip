@@ -1,4 +1,5 @@
 using Oip.Base.Settings;
+using Oip.Discussions.Base.Settings;
 using Oip.Settings;
 using Oip.Users.Base.Settings;
 
@@ -60,4 +61,9 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     /// User photo storage
     /// </summary>
     public UserPhotoStorageSettings UserPhotoStorage { get; set; } = new();
+
+    /// <summary>
+    /// Discussion attachment storage settings.
+    /// </summary>
+    public DiscussionAttachmentStorageSettings DiscussionAttachmentStorage { get; set; } = new();
 }

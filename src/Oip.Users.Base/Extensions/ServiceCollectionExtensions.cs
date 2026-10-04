@@ -60,8 +60,6 @@ public static class ServiceCollectionExtensions
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        
-        services.AddUsersNotificationPublisherCore();
 
         return services;
     }
@@ -78,6 +76,7 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<KeycloakSyncService>();
         services.AddLocalUserCacheRepository();
         services.AddStartupTask<KeycloakSyncStartupTask>();
+        services.AddUsersNotificationPublisherCore();
         return services;
     }
 
