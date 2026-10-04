@@ -75,10 +75,10 @@ import ru from './l10n/user-notifications.ru.json';
       } @else {
         <div class="flex flex-col gap-3 max-h-[26rem] overflow-y-auto pr-1">
           @for (notification of notifications; track notification.notificationUserId) {
-            <div class="border border-surface-200 dark:border-surface-700 rounded-md p-3">
+            <div class="border border-surface-200 dark:border-surface-700 rounded-md p-3" qa-id="oip-user-notifications-item">
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
-                  <div class="font-medium leading-snug break-words">
+                  <div class="font-medium leading-snug break-words" qa-id="oip-user-notifications-subject">
                     {{ notification.subject }}
                   </div>
                   <div class="text-xs text-surface-500 mt-1">
@@ -100,6 +100,7 @@ import ru from './l10n/user-notifications.ru.json';
               <div class="flex justify-end mt-3">
                 <p-button
                   icon="pi pi-check"
+                  qa-id="oip-user-notifications-mark-as-read"
                   size="small"
                   [label]="'userNotifications.markAsRead' | translate"
                   [loading]="readingNotificationId === notification.notificationUserId"
@@ -111,6 +112,7 @@ import ru from './l10n/user-notifications.ru.json';
 
         <p-paginator
           class="mt-3"
+          qa-id="oip-user-notifications-paginator"
           [first]="skip"
           [rows]="take"
           [rowsPerPageOptions]="[5, 10, 20]"
