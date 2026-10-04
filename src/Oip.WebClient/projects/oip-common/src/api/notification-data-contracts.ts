@@ -13,6 +13,11 @@ export interface ApiExceptionResponse {
   stackTrace?: string | null;
 }
 
+export interface CreateTestNotificationRequest {
+  subject?: string | null;
+  message?: string | null;
+}
+
 export interface UserNotificationCountResponse {
   count?: number;
 }

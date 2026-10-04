@@ -1,4 +1,5 @@
 using OpenQA.Selenium.Interactions;
+using Oip.UiTest.Pages;
 
 namespace Oip.UiTest;
 
@@ -7,10 +8,11 @@ namespace Oip.UiTest;
 /// </summary>
 internal class BaseTest
 {
-    /// <summary>
-    /// The base URL for the application under test.
-    /// </summary>
-    protected const string BaseUrl = "https://localhost:50002";
+    private static readonly By LayoutSidebar = By.ClassName("layout-sidebar");
+
+    private KeycloakLoginPage? _loginPage;
+    private TopBar? _topBar;
+    private SideMenu? _menu;
 
     /// <summary>
     /// The WebDriver instance used for browser automation. Shared across all tests, see <see cref="TestSetup"/>.
@@ -28,68 +30,24 @@ internal class BaseTest
     protected Actions Actions => TestSetup.GlobalActions!;
 
     /// <summary>
-    /// Represents the By locator for the sign-in button on the unauthorized page.
+    /// The Keycloak sign-in form.
     /// </summary>
-    protected By OipSignInButton => By.Id("oip-unauthorized-error-sign-in-button");
+    protected KeycloakLoginPage LoginPage => _loginPage ??= new KeycloakLoginPage(Driver);
 
     /// <summary>
-    /// The Keycloak username field locator.
+    /// The application top bar.
     /// </summary>
-    protected By KeycloakUsername => By.Id("username");
+    protected TopBar TopBar => _topBar ??= new TopBar(Driver);
 
     /// <summary>
-    /// The Keycloak password field locator.
+    /// The sidebar menu.
     /// </summary>
-    protected By KeycloakPassword => By.Id("password");
+    protected SideMenu Menu => _menu ??= new SideMenu(Driver);
 
     /// <summary>
-    /// The Keycloak login button element.
+    /// The browser console of the shared session.
     /// </summary>
-    protected By KeycloakLoginButton => By.Id("kc-login");
-
-    /// <summary>
-    /// The locator for the Keycloak login error alert (custom "oip" theme no longer renders
-    /// the stock "input-error-username" element, only this alert banner).
-    /// </summary>
-    protected By KeycloakErrorUserName => By.CssSelector(".oip-alert.oip-alert-error");
-
-    /// <summary>
-    /// The locator for the input field used when creating a new menu item.
-    /// </summary>
-    protected By OipMenuCreateItemLabel => By.Id("oip-menu-item-create-label");
-
-    /// <summary>
-    /// The By locator for the "Save" button in the create item menu.
-    /// </summary>
-    protected By OipMenuItemCreateSaveButton => By.Id("oip-menu-item-create-save");
-
-    /// <summary>
-    /// The container element for the OIP menu.
-    /// </summary>
-    protected By OipMenuContainer => By.ClassName("layout-sidebar");
-
-    /// <summary>
-    /// The module selector for creating a new menu item.
-    /// </summary>
-    protected By OipMenuItemCreateModule => By.Id("oip-menu-item-create-module");
-
-    protected string RootFolderName => "#RootFolder";
-
-    protected By OipMenuItemCreateLabel => By.Id("oip-menu-item-create-label");
-
-    protected By OipAppTopBarLogoutButton => By.Id("oip-app-topbar-logout-button");
-
-    /// <summary>
-    /// The accept/confirm button of any PrimeNG ConfirmDialog (e.g. the logout confirmation
-    /// opened by <see cref="OipAppTopBarLogoutButton"/>, or the delete confirmation in the menu).
-    /// </summary>
-    protected By ConfirmDialogAcceptButton => By.CssSelector(".p-confirmdialog-accept-button");
-
-    /// <summary>
-    /// The application wrapper while it is blocked by BlockLoaderComponent: a full screen overlay is up
-    /// and the wrapper is marked <c>inert</c>, so clicks and context menus never reach the menu below it.
-    /// </summary>
-    protected By BlockedLayoutWrapper => By.CssSelector(".layout-wrapper[inert]");
+    protected BrowserConsole Console => new(Driver);
 
     /// <summary>
     /// The default timeout in seconds for WebDriverWait operations.
@@ -97,9 +55,30 @@ internal class BaseTest
     internal const int StandardTimeOutInSeconds = 15;
 
     /// <summary>
-    /// How long the blocker must stay away before the application counts as interactive.
+    /// Signs out of the shared browser session and signs back in as the given user.
+    /// The session is shared by the whole assembly, so a test that switches to <see cref="TestSetup.User"/>
+    /// must switch back to <see cref="TestSetup.Admin"/> when it is done.
     /// </summary>
-    private const int InteractiveSettleMilliseconds = 500;
+    /// <param name="user">The user to sign in with.</param>
+    protected void SignInAs(TestUser user)
+    {
+        // Start from the application root: a test that failed halfway may have left the browser anywhere,
+        // and logging out of a page the next user cannot open would return them to it after signing in.
+        Menu.Navigate("/");
+        Wait.Until(_ => LoginPage.IsFormShown() || Menu.ExistsNow(LayoutSidebar), 1, 30);
+
+        if (!LoginPage.IsFormShown())
+        {
+            if (TestSetup.CurrentUser == user)
+                return;
+
+            TopBar.Logout();
+            LoginPage.WaitForForm();
+        }
+
+        LoginPage.SignIn(user);
+        Menu.WaitForAppInteractive();
+    }
 
     /// <summary>
     /// Cross platform Ctrl+A
@@ -125,61 +104,6 @@ internal class BaseTest
     {
         return checkboxElement.FindElement(By.ClassName("p-checkbox")).GetAttribute("class")
             ?.Contains("p-checkbox-checked") == true;
-    }
-
-    /// <summary>
-    /// Navigates to the specified module instance and waits until the application accepts input again.
-    /// </summary>
-    /// <param name="moduleName">The name of the module to navigate to.</param>
-    internal void GoToModuleInstance(string moduleName)
-    {
-        GoToModuleInstance(By.XPath($"//span[text()='{moduleName}']"));
-    }
-
-    /// <summary>
-    /// Navigates to the module instance found by the given locator and waits until the application
-    /// accepts input again.
-    /// </summary>
-    /// <param name="itemLocator">The locator of the menu item to open.</param>
-    internal void GoToModuleInstance(By itemLocator)
-    {
-        var scrollContainer = Wait.Until(d => d.FindElement(By.ClassName("layout-sidebar")));
-        scrollContainer.FindElement(itemLocator).Click();
-        WaitForAppInteractive();
-    }
-
-    /// <summary>
-    /// Waits until BlockLoaderComponent has released the application.
-    /// The blocker outlives the router navigation - it also covers module rights, settings and
-    /// extension loading registered in ModuleLoadingService - and it appears 150 ms after the
-    /// transition starts, so a single check right after a click can pass before it even shows up.
-    /// </summary>
-    internal void WaitForAppInteractive()
-    {
-        Wait.Until(_ =>
-        {
-            for (var elapsed = 0; elapsed < InteractiveSettleMilliseconds; elapsed += 100)
-            {
-                if (ExistsNow(BlockedLayoutWrapper))
-                    return false;
-                Thread.Sleep(100);
-            }
-
-            return true;
-        });
-    }
-
-    /// <summary>
-    /// Checks if an element exists on the page.
-    /// </summary>
-    /// <param name="locator">The locator used to find the element.</param>
-    /// <returns>True if the element exists, otherwise false.</returns>
-    internal bool ExistsNow(By locator)
-    {
-        Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMicroseconds(1);
-        var exists = Driver.FindElements(locator).Count != 0;
-        Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(StandardTimeOutInSeconds);
-        return exists;
     }
 
     /// <summary>

@@ -94,6 +94,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
             <textarea
               class="min-h-28 w-full"
               pTextarea
+              qa-id="oip-discussion-new-comment"
               rows="5"
               [autoResize]="true"
               [placeholder]="'discussionComponent.writeCommentPlaceholder' | translate"
@@ -117,6 +118,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
               <div class="flex flex-col gap-3">
                 @for (candidate of mentionSuggestions; track candidate.userId) {
                   <button
+                    qa-id="oip-discussion-mention-suggestion"
                     class="flex w-full items-center justify-between gap-4 rounded-xl border border-transparent px-3 py-3 text-left transition hover:border-primary-200 hover:bg-primary-50 dark:hover:border-primary-800 dark:hover:bg-primary-950/30"
                     type="button"
                     (click)="insertMention(candidate)">
@@ -135,7 +137,8 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
             <div class="flex flex-col gap-3">
               @for (file of pendingFiles; track file.name + file.size) {
                 <div
-                  class="flex flex-col gap-3 rounded-2xl border border-surface-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-surface-700">
+                  class="flex flex-col gap-3 rounded-2xl border border-surface-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-surface-700"
+                  qa-id="oip-discussion-pending-file">
                   <div class="inline-flex items-center gap-2">
                     <i class="pi pi-file"></i>
                     <span class="break-all">{{ file.name }}</span>
@@ -168,10 +171,11 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                 severity="secondary"
                 [label]="'discussionComponent.attachFiles' | translate"
                 [text]="true" />
-              <input multiple type="file" (change)="onFilesSelected($event)" />
+              <input multiple qa-id="oip-discussion-attach-input" type="file" (change)="onFilesSelected($event)" />
             </label>
             <p-button
               icon="pi pi-send"
+              qa-id="oip-discussion-send"
               [disabled]="submitting || !newComment.trim()"
               [label]="'discussionComponent.send' | translate"
               [loading]="submitting"
@@ -195,7 +199,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
       } @else {
         <div class="flex flex-col gap-4">
           @for (comment of comments; track comment.commentId) {
-            <p-card class="block">
+            <p-card class="block" qa-id="oip-discussion-comment">
               <ng-template pTemplate="content">
                 <div class="grid gap-4 md:grid-cols-[3.2rem_minmax(0,1fr)]">
                   <div>
@@ -216,6 +220,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                           @if (comment.isEdited) {
                             <p-tag
                               icon="pi pi-pencil"
+                              qa-id="oip-discussion-comment-edited"
                               severity="warn"
                               [value]="'discussionComponent.edited' | translate" />
                           }
@@ -223,6 +228,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                         @if (comment.canEdit) {
                           <p-button
                             icon="pi pi-pencil"
+                            qa-id="oip-discussion-comment-edit"
                             severity="secondary"
                             [rounded]="true"
                             [text]="true"
@@ -231,6 +237,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                         @if (comment.historyCount > 0) {
                           <p-button
                             icon="pi pi-history"
+                            qa-id="oip-discussion-comment-history"
                             severity="secondary"
                             [rounded]="true"
                             [text]="true"
@@ -239,6 +246,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                         @if (comment.canDelete) {
                           <p-button
                             icon="pi pi-trash"
+                            qa-id="oip-discussion-comment-delete"
                             severity="danger"
                             [rounded]="true"
                             [text]="true"
@@ -251,6 +259,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                         <textarea
                           class="min-h-24 w-full"
                           pTextarea
+                          qa-id="oip-discussion-edit-content"
                           rows="4"
                           [autoResize]="true"
                           [placeholder]="'discussionComponent.editCommentPlaceholder' | translate"
@@ -269,6 +278,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
 
                           <p-button
                             icon="pi pi-check"
+                            qa-id="oip-discussion-edit-save"
                             [disabled]="!editContent.trim()"
                             [label]="'discussionComponent.save' | translate"
                             (onClick)="saveEdit(comment)" />
@@ -281,17 +291,23 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                         </div>
                       </div>
                     } @else {
-                      <div class="markdown-preview" [innerHTML]="renderMarkdown(comment.content)"></div>
+                      <div
+                        class="markdown-preview"
+                        qa-id="oip-discussion-comment-content"
+                        [innerHTML]="renderMarkdown(comment.content)"></div>
                     }
 
                     @if (comment.attachments.length > 0) {
                       <div class="flex flex-col gap-3">
                         <div class="flex flex-col gap-3">
                           @for (attachment of comment.attachments; track attachment.attachmentId) {
-                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                            <div
+                              class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end"
+                              qa-id="oip-discussion-attachment">
                               <div class="inline-flex items-center gap-2">
                                 <i class="pi pi-file"></i>
                                 <button
+                                  qa-id="oip-discussion-attachment-name"
                                   class="break-all bg-transparent p-0 text-left font-semibold text-primary-600 transition hover:text-primary-500"
                                   type="button"
                                   (click)="downloadAttachment(attachment)">
@@ -303,6 +319,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                               @if (comment.canEdit) {
                                 <p-button
                                   icon="pi pi-times"
+                                  qa-id="oip-discussion-attachment-delete"
                                   severity="danger"
                                   [rounded]="true"
                                   [text]="true"
@@ -317,6 +334,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                     <div class="flex flex-wrap items-center gap-2">
                       @for (reaction of getReactions(comment); track reaction.emojiCode) {
                         <p-button
+                          qa-id="oip-discussion-reaction"
                           severity="secondary"
                           [label]="reaction.emojiCode + ' ' + reaction.count"
                           [outlined]="false"
@@ -326,6 +344,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                       @if (!hasUserReaction(comment)) {
                         <p-button
                           icon="pi pi-face-smile"
+                          qa-id="oip-discussion-add-reaction"
                           severity="secondary"
                           [rounded]="true"
                           [text]="true"
@@ -335,6 +354,7 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                             @for (emoji of emojiPalette; track emoji) {
                               <button
                                 class="emoji-option"
+                                qa-id="oip-discussion-emoji"
                                 type="button"
                                 (click)="reactWithEmoji(comment, emoji, reactionPopover)">
                                 {{ emoji }}
@@ -365,7 +385,9 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                               item of historyByComment[comment.commentId]?.items ?? [];
                               track item.commentEditHistoryId
                             ) {
-                              <div class="rounded-2xl border border-surface-200 px-4 py-4 dark:border-surface-700">
+                              <div
+                                class="rounded-2xl border border-surface-200 px-4 py-4 dark:border-surface-700"
+                                qa-id="oip-discussion-history-item">
                                 <div class="mb-3 inline-flex items-center gap-2 text-sm font-semibold">
                                   <i class="pi pi-clock"></i>
                                   <span>{{ item.editedByDisplayName }} · {{ item.editedAt | date: 'short' }}</span>
@@ -375,12 +397,14 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
                                     <p-tag severity="secondary" [value]="'discussionComponent.before' | translate" />
                                     <div
                                       class="history-markdown rounded-2xl bg-surface-50 px-4 py-3 leading-7 dark:bg-surface-900/40"
+                                      qa-id="oip-discussion-history-old"
                                       [innerHTML]="renderMarkdown(item.oldContent)"></div>
                                   </div>
                                   <div class="flex flex-col gap-2">
                                     <p-tag severity="success" [value]="'discussionComponent.after' | translate" />
                                     <div
                                       class="history-markdown rounded-2xl bg-surface-50 px-4 py-3 leading-7 dark:bg-surface-900/40"
+                                      qa-id="oip-discussion-history-new"
                                       [innerHTML]="renderMarkdown(item.newContent)"></div>
                                   </div>
                                 </div>

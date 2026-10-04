@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Connections;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Remote;
+using Oip.UiTest.Pages;
 
 namespace Oip.UiTest;
 
@@ -12,16 +13,6 @@ namespace Oip.UiTest;
 [SetUpFixture]
 public class TestSetup
 {
-    #region Selectors
-
-    private static readonly By OipSignInButton = By.Id("oip-unauthorized-error-sign-in-button");
-    private static readonly By KeycloakUsername = By.Id("username");
-    private static readonly By KeycloakPassword = By.Id("password");
-    private static readonly By KeycloakLoginButton = By.Id("kc-login");
-    private static readonly By LayoutSidebar = By.ClassName("layout-sidebar");
-
-    #endregion
-
     #region Static fields
 
     private static IWebDriver? _driver;
@@ -46,14 +37,14 @@ public class TestSetup
     public static string? RemoteDriverUrl { get; set; }
 
     /// <summary>
-    /// Username used to sign in.
+    /// Administrator the tests sign in with by default.
     /// </summary>
-    public static string Username { get; set; } = null!;
+    public static TestUser Admin { get; set; } = null!;
 
     /// <summary>
-    /// Password used to sign in.
+    /// Regular user without the admin role, used to check what non-administrators can access.
     /// </summary>
-    public static string Password { get; set; } = null!;
+    public static TestUser User { get; set; } = null!;
 
     #endregion Test settings
 
@@ -74,17 +65,46 @@ public class TestSetup
     /// </summary>
     public static Waiter GlobalWait { get; private set; } = null!;
 
+    /// <summary>
+    /// The user the shared browser session is currently signed in as, or null while signed out.
+    /// </summary>
+    public static TestUser? CurrentUser { get; set; }
+
     #endregion
+
+    /// <summary>
+    /// Host name the backend uses to reach servers started by the tests, see <see cref="ManifestServer"/>.
+    /// </summary>
+    public static string TestHost { get; set; } = null!;
+
+    private static string _windowsPosition = null!;
 
     private static void StartBrowser()
     {
-        var windowsPosition = TestContext.Parameters["WindowsPosition"] ?? "1920,0";
+        _windowsPosition = TestContext.Parameters["WindowsPosition"] ?? "1920,0";
+        TestHost = TestContext.Parameters["TestHost"] ?? "localhost";
         BaseUrl = TestContext.Parameters["BaseUrl"] ?? "https://localhost:50002";
         BaseDirectory = TestContext.Parameters["BaseDirectory"] ?? AppDomain.CurrentDomain.BaseDirectory;
         RemoteDriverUrl = TestContext.Parameters["RemoteDriverUrl"];
-        Username = TestContext.Parameters["Username"] ?? "admin";
-        Password = TestContext.Parameters["Password"] ?? "P@ssw0rd";
+        Admin = new TestUser(
+            TestContext.Parameters["Username"] ?? "admin",
+            TestContext.Parameters["Password"] ?? "P@ssw0rd");
+        User = new TestUser(
+            TestContext.Parameters["UserUsername"] ?? "user",
+            TestContext.Parameters["UserPassword"] ?? "P@ssw0rd");
 
+        _driver = CreateDriver();
+        GlobalActions = new Actions(_driver);
+        GlobalWait = new Waiter(_driver);
+    }
+
+    /// <summary>
+    /// Starts a browser with the settings of the test run. Besides the shared session, tests use it for
+    /// a second browser, e.g. to have a session of another user.
+    /// </summary>
+    /// <param name="userAgent">User agent to send instead of the default one, to tell the browser apart.</param>
+    public static IWebDriver CreateDriver(string? userAgent = null)
+    {
         var options = new ChromeOptions { AcceptInsecureCertificates = true };
         options.AddArguments(new List<string>
         {
@@ -94,32 +114,32 @@ public class TestSetup
             "--disable-infobars",
             "--disable-extensions",
             "--disable-dev-shm-usage",
-            $"--window-position={windowsPosition}",
+            $"--window-position={_windowsPosition}",
             "--window-size=1920,1080"
         });
+        if (userAgent is not null)
+            options.AddArgument($"--user-agent={userAgent}");
+        // Smoke tests read the browser console to catch errors that do not break the page visibly.
+        options.SetLoggingPreference(LogType.Browser, LogLevel.All);
 
         // If a Selenium Grid address is provided, use it (e.g. when running in Docker),
         // otherwise start a local ChromeDriver as before.
-        _driver = string.IsNullOrWhiteSpace(RemoteDriverUrl)
+        IWebDriver driver = string.IsNullOrWhiteSpace(RemoteDriverUrl)
             ? new ChromeDriver(options)
             : new RemoteWebDriver(new Uri(RemoteDriverUrl), options);
 
-        _driver.Manage().Window.Maximize();
-        _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(BaseTest.StandardTimeOutInSeconds);
-        _driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(BaseTest.StandardTimeOutInSeconds);
-        _driver.Manage().Timeouts().AsynchronousJavaScript = TimeSpan.FromSeconds(BaseTest.StandardTimeOutInSeconds);
-        GlobalActions = new Actions(_driver);
-        GlobalWait = new Waiter(_driver);
+        driver.Manage().Window.Maximize();
+        driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(BaseTest.StandardTimeOutInSeconds);
+        driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(BaseTest.StandardTimeOutInSeconds);
+        driver.Manage().Timeouts().AsynchronousJavaScript = TimeSpan.FromSeconds(BaseTest.StandardTimeOutInSeconds);
+        return driver;
     }
 
     private static void Login()
     {
-        _driver?.Navigate().GoToUrl($"{BaseUrl}/unauthorized");
-        GlobalWait.UntilClick(OipSignInButton, 1, 60);
-        GlobalWait.UntilInput(KeycloakUsername, Username);
-        GlobalWait.UntilInput(KeycloakPassword, Password);
-        GlobalWait.UntilClick(KeycloakLoginButton);
-        GlobalWait.UntilFindElement(LayoutSidebar);
+        new KeycloakLoginPage(GlobalDriver)
+            .OpenFromUnauthorizedPage(BaseUrl)
+            .SignIn(Admin);
     }
 
     /// <summary>

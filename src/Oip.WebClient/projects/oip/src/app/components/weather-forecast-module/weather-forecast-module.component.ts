@@ -138,6 +138,7 @@ interface WeatherModuleLocalSettings {
             <div class="flex justify-end">
               <p-button
                 icon="pi pi-save"
+                id="weather-forecast-module-settings-save-button"
                 [label]="'weather-forecast-module.settings.save' | translate"
                 (onClick)="saveSettings(settings)"></p-button>
             </div>

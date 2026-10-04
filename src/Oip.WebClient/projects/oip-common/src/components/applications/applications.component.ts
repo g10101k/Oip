@@ -342,7 +342,7 @@ export class ApplicationsComponent implements OnInit {
     this.cancelAllEdits();
 
     try {
-      this.applications = (await this.applicationsApi.getApplicationRegistryItems()).map(
+      this.applications = (await this.applicationsApi.getAllApplicationRegistryItems()).map(
         (application: ApplicationRegistryItemDto) => ({ ...application })
       );
       this.syncVisibleApplications();
@@ -409,7 +409,7 @@ export class ApplicationsComponent implements OnInit {
     }
 
     const request = this.normalizeEditModel(editModel);
-    if (!request.code || !request.displayName || !request.baseUrl) {
+    if (!request.code || !request.displayName || !request.baseUrl || !request.internalBaseUrl) {
       this.msgService.error(this.t('applications.messages.requiredFields'));
       return;
     }

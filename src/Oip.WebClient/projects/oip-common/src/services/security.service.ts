@@ -156,7 +156,11 @@ export class BffSecurityService implements OnDestroy, SecurityService {
     const normalizedReturnUrl = this.normalizeReturnUrl(returnUrl);
     this.replaceWithUnauthorizedUrl(normalizedReturnUrl);
 
-    const form = this.createPostForm(this.buildUrl('api/security/create-auth-session'));
+    // The return url travels with the request: when a guard rejects the initial navigation, the router
+    // resets the address after this call, so the page address sent as Referer no longer carries it.
+    const form = this.createPostForm(
+      this.buildUrl(`api/security/create-auth-session?returnUrl=${encodeURIComponent(normalizedReturnUrl)}`)
+    );
     document.body.appendChild(form);
     form.submit();
   }

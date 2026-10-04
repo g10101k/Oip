@@ -23,14 +23,14 @@ import ru from './l10n/security.ru.json';
           <div class="font-semibold text-xl">
             {{ 'securityComponent.security' | translate }}
           </div>
-          @for (item of securityData; track item.name) {
+          @for (item of securityData; track item.code) {
             <div class="flex flex-col gap-2">
-              <label htmlFor="oip-security-multiselect-{{ item.name }}">
+              <label htmlFor="oip-security-multiselect-{{ item.code }}">
                 {{ item.name }}
                 <span class="pi pi-question-circle" pTooltip="{{ item.description }}" tooltipPosition="right"></span>
               </label>
               <p-multiSelect
-                id="oip-security-multiselect-{{ item.name }}"
+                id="oip-security-multiselect-{{ item.code }}"
                 placeholder="{{ 'securityComponent.selectRoles' | translate }}"
                 [maxSelectedLabels]="10"
                 [options]="roles"

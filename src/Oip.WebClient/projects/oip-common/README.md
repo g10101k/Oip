@@ -109,7 +109,6 @@ provideOipRoutes({
 | -------------- | ------------------------------ | -------------------------------------------------- |
 | `access`       | `access`                       | Redirect target of both guards, keep it registered |
 | `error`        | `error`                        |                                                    |
-| `profile`      | `profile`                      |                                                    |
 | `config`       | `config`                       |                                                    |
 | `applications` | `applications`                 | Administrators only                                |
 | `modules`      | `modules`                      | Administrators only                                |

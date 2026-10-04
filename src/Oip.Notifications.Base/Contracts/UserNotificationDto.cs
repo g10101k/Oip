@@ -29,3 +29,10 @@ public record UserNotificationListResponse(
 /// Response with current user notification count.
 /// </summary>
 public record UserNotificationCountResponse(int Count);
+
+/// <summary>
+/// Request to send a test notification to the current user.
+/// </summary>
+/// <param name="Subject">Notification subject.</param>
+/// <param name="Message">Notification text.</param>
+public record CreateTestNotificationRequest(string Subject, string Message);

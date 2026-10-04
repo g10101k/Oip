@@ -24,6 +24,14 @@ export class ApplicationsApi<
       format: "json",
       ...params,
     });
+  getAllApplicationRegistryItems = (params: RequestParams = {}) =>
+    this.request<ApplicationRegistryItemDto[], ApiExceptionResponse>({
+      path: `/api/applications/get-all-application-registry-items`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
   getApplicationRegistryItemByCode = (
     { code, ...query }: GetApplicationRegistryItemByCodeParams,
     params: RequestParams = {},

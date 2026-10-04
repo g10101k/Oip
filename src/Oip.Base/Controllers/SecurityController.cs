@@ -11,6 +11,7 @@ using Oip.Base.Exceptions;
 using Oip.Base.Extensions;
 using Oip.Base.Security.DefaultSecrets;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Oip.Base.Services;
 
 namespace Oip.Base.Controllers;
@@ -25,7 +26,8 @@ public class SecurityController(
     KeycloakService keycloakService,
     IAntiforgery antiforgery,
     DefaultSecretsValidator defaultSecretsValidator,
-    IHostEnvironment environment) : ControllerBase
+    IHostEnvironment environment,
+    ILogger<SecurityController> logger) : ControllerBase
 {
     [HttpGet("get-current-auth-session")]
     [AllowAnonymous]
@@ -51,32 +53,52 @@ public class SecurityController(
         };
     }
 
+    /// <summary>
+    /// Starts the Keycloak sign-in and returns the browser to the requested page of the application afterwards.
+    /// </summary>
+    /// <param name="returnUrl">
+    /// Local path to open after signing in. Passed explicitly because the page address the browser sends as
+    /// Referer may already be reset by the client router when the form is submitted; the Referer query is
+    /// only a fallback.
+    /// </param>
     [HttpPost("create-auth-session")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
-    public IActionResult CreateAuthSession()
+    public IActionResult CreateAuthSession([FromQuery] string? returnUrl = null)
     {
-        var redirectUri = GetAuthRedirectUri(Request.Headers.Referer.FirstOrDefault());
+        var referer = Request.Headers.Referer.FirstOrDefault();
+        var redirectUri = GetAuthRedirectUri(referer, returnUrl);
         if (string.IsNullOrWhiteSpace(redirectUri))
             redirectUri = "/";
+
+        logger.LogInformation(
+            "Creating auth session. ReturnUrl: {ReturnUrl}; Referer: {Referer}; RedirectUri: {RedirectUri}",
+            returnUrl, referer, redirectUri);
 
         return Challenge(new AuthenticationProperties { RedirectUri = redirectUri },
             OipModuleApplication.OpenIdConnectAuthenticationScheme);
     }
 
-    private static string? GetAuthRedirectUri(string? referer)
+    /// <summary>
+    /// Builds the address to return to after signing in: the local return path on the origin of the page that
+    /// started the sign-in, which differs from the backend origin when the client is served separately.
+    /// </summary>
+    private static string? GetAuthRedirectUri(string? referer, string? returnUrl)
     {
         if (string.IsNullOrWhiteSpace(referer))
-            return null;
+            return IsLocalReturnUrl(returnUrl) ? returnUrl : null;
 
         if (!Uri.TryCreate(referer, UriKind.Absolute, out var refererUri))
             return referer;
 
-        var query = QueryHelpers.ParseQuery(refererUri.Query);
-        var returnUrl = query.TryGetValue("returnUrl", out var values)
-            ? values.FirstOrDefault()
-            : null;
+        if (!IsLocalReturnUrl(returnUrl))
+        {
+            var query = QueryHelpers.ParseQuery(refererUri.Query);
+            returnUrl = query.TryGetValue("returnUrl", out var values)
+                ? values.FirstOrDefault()
+                : null;
+        }
 
         if (!IsLocalReturnUrl(returnUrl))
             return referer;

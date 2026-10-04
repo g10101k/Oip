@@ -104,7 +104,6 @@ export {
   provideOipRoutes,
   oipAccessRoute,
   oipErrorRoute,
-  oipProfileRoute,
   oipConfigRoute,
   oipApplicationsRoute,
   oipModulesRoute,

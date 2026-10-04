@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Oip.Base.Data.Constants;
 using Oip.Base.Exceptions;
 using Oip.Base.Services;
+using Oip.Notifications.Base.Channels;
 using Oip.Notifications.Base.Contracts;
 using Oip.Notifications.Base.Data.Contexts;
+using Oip.Notifications.Base.Data.Entities;
+using Oip.Notifications.Base.Services;
 
 namespace Oip.Notifications.Base.Controllers;
 
@@ -20,8 +24,15 @@ namespace Oip.Notifications.Base.Controllers;
 public class NotificationController(
     NotificationsDbContext context,
     IUserService userDirectory,
-    ClaimService currentClaimService) : ControllerBase
+    ClaimService currentClaimService,
+    ChannelService channelService,
+    IUserCacheRepository userCache) : ControllerBase
 {
+    /// <summary>
+    /// Notification type of the notifications sent by <see cref="CreateTestNotificationAsync"/>.
+    /// </summary>
+    public const string TestNotificationType = "Oip.Notifications.Base.TestNotification";
+
     /// <summary>
     /// Gets notifications for the current user.
     /// </summary>
@@ -169,6 +180,72 @@ public class NotificationController(
         }
 
         return Ok(notification);
+    }
+
+    /// <summary>
+    /// Sends a test notification to the current user through the portal channel, so that an administrator can
+    /// check the delivery without setting up a notification template.
+    /// </summary>
+    /// <param name="request">Subject and text of the notification.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The notification as the current user receives it.</returns>
+    [HttpPost("create-test-notification")]
+    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [ProducesResponseType<UserNotificationDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<UserNotificationDto>> CreateTestNotificationAsync(
+        [FromBody] CreateTestNotificationRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.Subject) || string.IsNullOrWhiteSpace(request.Message))
+            throw new ApiException("Invalid notification request", "Subject and message are required.",
+                StatusCodes.Status400BadRequest);
+
+        var userId = await GetCurrentUserIdAsync(cancellationToken);
+
+        var portalChannelCode = typeof(PortalChannel).FullName!;
+        var channel = await context.NotificationChannels
+                          .FirstOrDefaultAsync(x => x.Code == portalChannelCode, cancellationToken)
+                      ?? throw new ApiException("Notification channel not found",
+                          "The portal notification channel is not registered.", StatusCodes.Status404NotFound);
+
+        var notificationType = await context.NotificationTypes
+                                   .FirstOrDefaultAsync(x => x.Name == TestNotificationType, cancellationToken)
+                               ?? context.NotificationTypes.Add(new NotificationTypeEntity
+                               {
+                                   Name = TestNotificationType,
+                                   Description = "Test notifications sent by administrators to themselves.",
+                                   Scope = typeof(NotificationController).Assembly.GetName().Name!
+                               }).Entity;
+
+        var sentAt = DateTimeOffset.UtcNow;
+        var notificationUser = new NotificationUserEntity
+        {
+            UserId = userId,
+            Subject = request.Subject.Trim(),
+            Message = request.Message.Trim(),
+            Importance = ImportanceLevel.Low,
+            NotificationChannelId = channel.NotificationChannelId,
+            SentAt = sentAt
+        };
+        context.Notifications.Add(new NotificationEntity
+        {
+            NotificationType = notificationType,
+            CreatedAt = sentAt,
+            NotificationUsers = [notificationUser]
+        });
+        await context.SaveChangesAsync(cancellationToken);
+
+        // The notification is stored either way; the live delivery reaches the open portal pages of the user.
+        if (userCache.Users.TryGetValue(userId, out var user))
+            channelService.Notify(portalChannelCode, user, notificationUser.Subject, notificationUser.Message,
+                notificationUser.Importance);
+
+        return await GetNotificationByIdAsync(notificationUser.NotificationUserId, cancellationToken);
     }
 
     private async Task<int> GetCurrentUserIdAsync(CancellationToken cancellationToken)

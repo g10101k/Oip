@@ -30,6 +30,15 @@ public class GrpcApplicationRegistryServiceClientAdapter(
         return response.Applications.Select(x => x.ToDto()).ToList();
     }
 
+    public async Task<IReadOnlyList<ApplicationRegistryItemDto>> GetAllApplicationRegistryItemsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var response = await client.GetApplicationRegistryItemsAsync(
+            new GetApplicationRegistryItemsRequest { IncludeDisabled = true },
+            cancellationToken: cancellationToken);
+        return response.Applications.Select(x => x.ToDto()).ToList();
+    }
+
     public async Task<ApplicationRegistryItemDto> GetApplicationRegistryItemByCodeAsync(
         string code,
         CancellationToken cancellationToken = default)

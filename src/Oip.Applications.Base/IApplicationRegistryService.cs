@@ -15,9 +15,15 @@ public interface IApplicationRegistryService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves registered applications.
+    /// Retrieves enabled registered applications.
     /// </summary>
     Task<IReadOnlyList<ApplicationRegistryItemDto>> GetApplicationRegistryItemsAsync(
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves all registered applications, including disabled ones.
+    /// </summary>
+    Task<IReadOnlyList<ApplicationRegistryItemDto>> GetAllApplicationRegistryItemsAsync(
         CancellationToken cancellationToken = default);
 
     /// <summary>

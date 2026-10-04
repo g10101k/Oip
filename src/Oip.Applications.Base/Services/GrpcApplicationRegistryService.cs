@@ -24,7 +24,9 @@ public class GrpcApplicationRegistryService(IApplicationRegistryService registry
         GetApplicationRegistryItemsRequest request,
         ServerCallContext context)
     {
-        var applications = await registryService.GetApplicationRegistryItemsAsync(context.CancellationToken);
+        var applications = request.IncludeDisabled
+            ? await registryService.GetAllApplicationRegistryItemsAsync(context.CancellationToken)
+            : await registryService.GetApplicationRegistryItemsAsync(context.CancellationToken);
         var response = new ApplicationRegistryItemsResponse();
         response.Applications.AddRange(applications.Select(x => x.ToGrpc()));
         return response;

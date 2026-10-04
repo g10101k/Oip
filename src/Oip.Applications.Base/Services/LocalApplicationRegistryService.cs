@@ -34,16 +34,16 @@ public class LocalApplicationRegistryService(
         return MapToDto(entity);
     }
 
-    public async Task<IReadOnlyList<ApplicationRegistryItemDto>> GetApplicationRegistryItemsAsync(
+    public Task<IReadOnlyList<ApplicationRegistryItemDto>> GetApplicationRegistryItemsAsync(
         CancellationToken cancellationToken = default)
     {
-        var applications = await repository.GetAllAsync(cancellationToken);
-        return applications
-            .Where(x => x.Enabled)
-            .OrderBy(x => x.Order)
-            .ThenBy(x => x.DisplayName)
-            .Select(MapToDto)
-            .ToList();
+        return QueryApplicationRegistryItemsAsync(includeDisabled: false, cancellationToken);
+    }
+
+    public Task<IReadOnlyList<ApplicationRegistryItemDto>> GetAllApplicationRegistryItemsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return QueryApplicationRegistryItemsAsync(includeDisabled: true, cancellationToken);
     }
 
     public async Task<ApplicationRegistryItemDto> GetApplicationRegistryItemByCodeAsync(
@@ -101,6 +101,19 @@ public class LocalApplicationRegistryService(
             throw NotFound(code);
 
         await repository.DeleteByCodeAsync(code, cancellationToken);
+    }
+
+    private async Task<IReadOnlyList<ApplicationRegistryItemDto>> QueryApplicationRegistryItemsAsync(
+        bool includeDisabled,
+        CancellationToken cancellationToken)
+    {
+        var applications = await repository.GetAllAsync(cancellationToken);
+        return applications
+            .Where(x => includeDisabled || x.Enabled)
+            .OrderBy(x => x.Order)
+            .ThenBy(x => x.DisplayName)
+            .Select(MapToDto)
+            .ToList();
     }
 
     private ApplicationRegistryItemDto MapToDto(ApplicationRegistryItemEntity entity)
