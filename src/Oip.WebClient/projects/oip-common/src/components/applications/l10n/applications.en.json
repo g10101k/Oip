@@ -35,7 +35,7 @@
       "delete": "Delete"
     },
     "messages": {
-      "requiredFields": "Fill code, name and Base URL",
+      "requiredFields": "Fill code, name, Base URL and Internal Base URL",
       "createSuccess": "Application created",
       "updateSuccess": "Application updated",
       "deleteSuccess": "Application deleted"

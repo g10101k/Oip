@@ -409,7 +409,7 @@ export class ApplicationsComponent implements OnInit {
     }
 
     const request = this.normalizeEditModel(editModel);
-    if (!request.code || !request.displayName || !request.baseUrl) {
+    if (!request.code || !request.displayName || !request.baseUrl || !request.internalBaseUrl) {
       this.msgService.error(this.t('applications.messages.requiredFields'));
       return;
     }
