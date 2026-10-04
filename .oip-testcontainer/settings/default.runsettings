@@ -7,5 +7,8 @@
         <Parameter name="RemoteDriverUrl" value="http://localhost:4444/wd/hub" />
         <Parameter name="Username" value="admin" />
         <Parameter name="Password" value="P@ssw0rd" />
+        <Parameter name="UserUsername" value="user" />
+        <Parameter name="UserPassword" value="P@ssw0rd" />
+        <Parameter name="TestHost" value="host.docker.internal" />
     </TestRunParameters>
 </RunSettings>
