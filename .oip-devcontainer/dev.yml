@@ -185,6 +185,10 @@ services:
       KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/data/cert/oip.pem
       KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/data/cert/oip.key
       KC_TRUSTSTORE_PATHS: /opt/keycloak/data/cert/oip-dev-ca.crt
+      # Browser URLs and the token issuer always use localhost, while the token, userinfo and JWKS endpoints use the
+      # host of the request, so containers (e.g. open-webui) can reach them at keycloak:8443.
+      KC_HOSTNAME: https://localhost:8443
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
       KC_SPI_THEME_CACHE_THEMES: false
       KC_SPI_THEME_CACHE_TEMPLATES: false
     ports:
@@ -289,6 +293,46 @@ services:
       - TZ=Europe/Moscow
     restart: unless-stopped
 
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.11.1
+    # Trusts the development CA, so Keycloak and the agent gateway are reached over verified HTTPS.
+    entrypoint: [ "bash", "-c", "cp /https/oip-dev-ca.crt /usr/local/share/ca-certificates/ && update-ca-certificates && exec bash start.sh" ]
+    ports:
+      - "3000:8080"
+    volumes:
+      - open_webui_data:/app/backend/data
+      - ./https/oip-dev-ca.crt:/https/oip-dev-ca.crt:ro
+    environment:
+      TZ: Europe/Moscow
+      WEBUI_URL: http://localhost:3000
+      WEBUI_SECRET_KEY: ${OPEN_WEBUI_SECRET_KEY:-change-me-open-webui-secret}
+      # The configuration below is authoritative; changes made in the admin panel are lost on restart.
+      ENABLE_PERSISTENT_CONFIG: "false"
+      ENABLE_OLLAMA_API: "false"
+      # Agent gateway of Oip.Hitl running on the host; the token of the signed-in user is forwarded to it.
+      OPENAI_API_BASE_URLS: https://host.docker.internal:5009/v1
+      OPENAI_API_KEYS: ""
+      OPENAI_API_CONFIGS: '{"0": {"enable": true, "auth_type": "system_oauth"}}'
+      ENABLE_OAUTH_SIGNUP: "true"
+      OAUTH_MERGE_ACCOUNTS_BY_EMAIL: "true"
+      # The first user to sign in becomes the admin; the next ones can chat right away instead of waiting for approval.
+      DEFAULT_USER_ROLE: user
+      OAUTH_PROVIDER_NAME: Keycloak
+      OPENID_PROVIDER_URL: https://keycloak:8443/realms/oip/.well-known/openid-configuration
+      OPENID_REDIRECT_URI: http://localhost:3000/oauth/oidc/callback
+      OAUTH_CLIENT_ID: open-webui
+      OAUTH_CLIENT_SECRET: ${OPEN_WEBUI_CLIENT_SECRET:-change-me-open-webui}
+      OAUTH_SCOPES: openid email profile
+      SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt
+      REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
+      AIOHTTP_CLIENT_SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres-data:
   pgadmin-data:
@@ -297,3 +341,4 @@ volumes:
   minio_data:
   redis-data:
   temporal_data:
+  open_webui_data:

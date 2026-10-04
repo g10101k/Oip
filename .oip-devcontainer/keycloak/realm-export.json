@@ -991,6 +991,52 @@
       }
     },
     {
+      "id": "741e6c97-46a3-46b1-87e4-4e1cfd83933a",
+      "clientId": "open-webui",
+      "name": "Open WebUI",
+      "description": "Chat UI of the agent gateway (Oip.Hitl), see .oip-devcontainer/README.md",
+      "rootUrl": "http://localhost:3000",
+      "baseUrl": "http://localhost:3000",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "change-me-open-webui",
+      "redirectUris": [
+        "http://localhost:3000/oauth/oidc/callback"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:3000/*",
+        "use.refresh.tokens": "true"
+      },
+      "fullScopeAllowed": true,
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "organization",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
       "id": "d7bc5a93-2221-4a94-aa14-a8e479ea2b2b",
       "clientId": "oip-client",
       "name": "oip-client",

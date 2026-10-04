@@ -66,6 +66,29 @@ The `temporal` service runs the Temporal development server (`temporal server st
 - gRPC frontend: `localhost:7233` (`temporal:7233` from other containers), namespace `default`
 - Web UI: http://localhost:8233
 
+## Open WebUI
+
+The `open-webui` service is the chat UI of the agent gateway of `Oip.Hitl`: http://localhost:3000.
+
+- Sign-in goes through Keycloak (client `open-webui` of the `oip` realm); the first user to sign in becomes the Open WebUI
+  admin.
+- The OpenAI connection points to `Oip.Hitl` running on the host (`https://host.docker.internal:5009/v1`) and forwards
+  the access token of the signed-in user (auth type `system_oauth`), so start `Oip.Hitl` to chat.
+- The configuration lives in `dev.yml` (`ENABLE_PERSISTENT_CONFIG=false`): changes made in the admin panel are lost on
+  restart.
+
+Keycloak runs with `KC_HOSTNAME=https://localhost:8443` and `KC_HOSTNAME_BACKCHANNEL_DYNAMIC=true`: the issuer and the
+browser URLs are always `localhost`, while containers reach the token, userinfo and JWKS endpoints at `keycloak:8443`.
+
+The `open-webui` client is created only with a new Keycloak database. For an existing one, create it from
+`realm-export.json`:
+
+````shell
+python3 -c "import json;c=[c for c in json.load(open('keycloak/realm-export.json'))['clients'] if c['clientId']=='open-webui'][0];c.pop('id');print(json.dumps(c))" > /tmp/open-webui-client.json
+docker cp /tmp/open-webui-client.json oip-devcontainer-keycloak-1:/tmp/open-webui-client.json
+docker exec oip-devcontainer-keycloak-1 bash -c '/opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user "$KC_BOOTSTRAP_ADMIN_USERNAME" --password "$KC_BOOTSTRAP_ADMIN_PASSWORD" && /opt/keycloak/bin/kcadm.sh create clients -r oip -f /tmp/open-webui-client.json'
+````
+
 ## Development Container Startup
 
 Run the commands from the `.oip-devcontainer` directory:
