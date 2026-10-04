@@ -1,188 +1,75 @@
-using Oip.UiTest.Extensions;
+using Oip.UiTest.Pages;
 
 namespace Oip.UiTest;
 
 [Order(2)]
 internal class MenuTests : BaseTest
 {
-    private readonly By _rootFolderLocator = By.XPath("//div[contains(text(),'#RootFolder')]");
-    private readonly By _contextMenuSub = By.TagName("p-contextmenu-sub");
-    private readonly By _layoutSidebar = By.ClassName("layout-sidebar");
+    private const string RootFolderName = "#RootFolder";
+    private const string DashboardLabel = "#DashboardModule";
+    private const string WeatherLabel = "#WeatherForecastModule";
+    private const string WeatherForDeleteLabel = "#WeatherForecastModuleForDelete";
+    private const string EditLabel = "#ModuleForEdit";
+    private const string EditedLabel = "#ModuleEdited";
+    private const string CopyLabel = "#ModuleForCopy";
 
-    private readonly By _menuItem = By.CssSelector(".layout-menu li");
-
-    // The <p-dialog> custom element is always present in the DOM (even closed), so it can't be used
-    // to detect open/closed state; the actual dialog panel is only rendered as this div while open.
-    private readonly By _createDialog = By.CssSelector("div.p-dialog");
-
-    // The context menu item labels are translated ("New"/"Add"/"Delete" etc. depending on locale),
-    // so we target them by their icons instead of their text to stay locale-independent.
-    private readonly By _contextMenuNewItem = By.CssSelector(".p-contextmenu-item-icon.pi-plus");
-    private readonly By _contextMenuDeleteItem = By.CssSelector(".p-contextmenu-item-icon.pi-trash");
-    private readonly By _contextMenuMoveUpItem = By.CssSelector(".p-contextmenu-item-icon.pi-angle-up");
-    private readonly By _contextMenuMoveDownItem = By.CssSelector(".p-contextmenu-item-icon.pi-angle-down");
+    private const string DashboardModule = "DashboardModule";
+    private const string WeatherForecastModule = SideMenu.WeatherForecastModule;
 
     /// <summary>
-    /// Waits until the menu has finished its (async) initial load, so a subsequent existence
-    /// check for a menu item reflects the real state instead of racing the load.
-    /// On an empty database the menu has no items and the app redirects to the "no-modules" page,
-    /// which also means the load has finished.
+    /// Icon WeatherForecastModuleController declares for its module; a new instance takes it by default.
     /// </summary>
-    private void WaitForMenuLoaded() =>
-        Wait.Until(d => d.FindElements(_menuItem).Count > 0 || d.Url.Contains("/no-modules"));
+    private const string WeatherForecastModuleIcon = "pi-sun";
+
+    private readonly By _rootFolder = SideMenu.Folder(RootFolderName);
 
     /// <summary>
-    /// Clicks an item of the currently open context menu, addressing it by its icon.
-    /// PrimeNG rebuilds the shared context menu every time its model is replaced, so looking up the
-    /// menu and its item in two separate steps races with that rebuild and goes stale; locate and
-    /// click in one retried step instead.
+    /// Locates a module instance by its label inside the folder these tests own, so a leftover
+    /// instance with the same label elsewhere in the menu does not make the create tests skip their work.
     /// </summary>
-    private void ClickContextMenuItem(By itemIconLocator) =>
-        Wait.Until(d => d.FindElement(_contextMenuSub).FindElement(itemIconLocator).Click());
+    private static By InRootFolder(string menuLabel) => SideMenu.ItemInFolder(RootFolderName, menuLabel);
 
     /// <summary>
-    /// Locates a module instance by its label inside the folder these tests own.
-    /// A plain "//span[text()=...]" matches the whole sidebar, so a leftover instance with the same
-    /// label anywhere else in the menu makes the create tests skip their work and leaves the later
-    /// tests operating on items that are not siblings.
+    /// Creates a module instance in the root folder unless the folder already holds one with that label.
     /// </summary>
-    private By InRootFolder(string menuLabel) =>
-        By.XPath($"//li[div[contains(text(),'{RootFolderName}')]]//span[text()='{menuLabel}']");
+    private void EnsureInRootFolder(string menuLabel, string moduleName)
+    {
+        if (Menu.Contains(InRootFolder(menuLabel))) return;
+
+        Menu.CreateModuleInstance(_rootFolder, menuLabel, moduleName);
+        Menu.Open(InRootFolder(menuLabel));
+    }
 
     [Test, Order(1)]
     public void CreateRootFolder()
     {
-        var layoutSidebar = Wait.Until(d => d.FindElement(_layoutSidebar));
-        WaitForMenuLoaded();
-        if (layoutSidebar.ExistsNow(_rootFolderLocator)) return;
+        if (Menu.Contains(_rootFolder)) return;
 
-        Actions.ContextClick(layoutSidebar).Perform();
-        ClickContextMenuItem(_contextMenuNewItem);
-        var createLabel = Wait.Until(d => d.FindElement(OipMenuCreateItemLabel));
-        createLabel.SendKeys(RootFolderName);
-        Driver.FindElement(OipMenuItemCreateModule).Click();
-
-        var dialog = Wait.Until(d => d.FindElement(_createDialog));
-        var objectMappingItem = Wait.Until(d => dialog.FindElement(By.XPath("//span[text()='FolderModule']")));
-        Driver.ScrollToElement(objectMappingItem).Click();
-
-        Driver.FindElement(OipMenuItemCreateSaveButton).Click();
-        Wait.Until(d => d.FindElement(_rootFolderLocator));
+        Menu.CreateRootFolder(RootFolderName);
     }
 
     [Test, Order(2)]
-    public void CreateDashboard()
-    {
-        const string menuLabel = "#DashboardModule";
-
-        var layoutSidebar = Wait.Until(d => d.FindElement(_layoutSidebar));
-        WaitForMenuLoaded();
-        if (layoutSidebar.ExistsNow(InRootFolder(menuLabel))) return;
-
-        var rootFolderItem = Wait.Until(d => d.FindElement(_rootFolderLocator));
-
-        Actions.ContextClick(rootFolderItem).Perform();
-        ClickContextMenuItem(_contextMenuNewItem);
-
-        var dialog = Wait.Until(d => d.FindElement(_createDialog));
-        var label = Driver.FindElement(OipMenuItemCreateLabel);
-        label.Clear();
-        label.SendKeys(menuLabel);
-
-        var selectModule = Driver.FindElement(OipMenuItemCreateModule);
-        selectModule.Click();
-
-        var objectMappingItem = Wait.Until(d => dialog.FindElement(By.XPath("//span[text()='DashboardModule']")));
-        Driver.ScrollToElement(objectMappingItem).Click();
-
-        Driver.FindElement(OipMenuItemCreateSaveButton).Click();
-        Wait.UntilDisappear(_createDialog);
-
-        GoToModuleInstance(InRootFolder(menuLabel));
-    }
+    public void CreateDashboard() => EnsureInRootFolder(DashboardLabel, DashboardModule);
 
     [Test, Order(3)]
-    public void CreateWeatherModule()
-    {
-        const string menuLabel = "#WeatherForecastModule";
-        var layoutSidebar = Wait.Until(d => d.FindElement(_layoutSidebar));
-        WaitForMenuLoaded();
-        if (layoutSidebar.ExistsNow(InRootFolder(menuLabel))) return;
-        var folderItem = Wait.Until(d => d.FindElement(_rootFolderLocator));
-        Actions.ContextClick(folderItem).Perform();
-
-        ClickContextMenuItem(_contextMenuNewItem);
-
-        var dialog = Wait.Until(d => d.FindElement(_createDialog));
-        var label = Driver.FindElement(OipMenuItemCreateLabel);
-        label.Clear();
-        label.SendKeys(menuLabel);
-
-        Driver.FindElement(OipMenuItemCreateModule).Click();
-
-        var weatherModuleItem =
-            Wait.Until(d => dialog.FindElement(By.XPath("//span[text()='WeatherForecastModule']")));
-        Driver.ScrollToElement(weatherModuleItem).Click();
-
-        Driver.FindElement(OipMenuItemCreateSaveButton).Click();
-        Wait.UntilDisappear(_createDialog);
-        GoToModuleInstance(InRootFolder(menuLabel));
-    }
+    public void CreateWeatherModule() => EnsureInRootFolder(WeatherLabel, WeatherForecastModule);
 
     [Test, Order(3)]
     public void CreateAndDeleteWeatherModule()
     {
-        const string menuLabel = "#WeatherForecastModuleForDelete";
-        var layoutSidebar = Wait.Until(d => d.FindElement(_layoutSidebar));
-        WaitForMenuLoaded();
-        if (!layoutSidebar.ExistsNow(InRootFolder(menuLabel)))
-        {
-            var folderItem = Wait.Until(d => d.FindElement(_rootFolderLocator));
-            Actions.ContextClick(folderItem).Perform();
+        EnsureInRootFolder(WeatherForDeleteLabel, WeatherForecastModule);
 
-            ClickContextMenuItem(_contextMenuNewItem);
-
-            var dialog = Wait.Until(d => d.FindElement(_createDialog));
-            var label = Driver.FindElement(OipMenuItemCreateLabel);
-            label.Clear();
-            label.SendKeys(menuLabel);
-
-            Driver.FindElement(OipMenuItemCreateModule).Click();
-
-            var weatherModuleItem =
-                Wait.Until(d => dialog.FindElement(By.XPath("//span[text()='WeatherForecastModule']")));
-            Driver.ScrollToElement(weatherModuleItem).Click();
-
-            Driver.FindElement(OipMenuItemCreateSaveButton).Click();
-            Wait.UntilDisappear(_createDialog);
-            GoToModuleInstance(InRootFolder(menuLabel));
-        }
-
-        layoutSidebar = Wait.Until(d => d.FindElement(_layoutSidebar));
-        WaitForMenuLoaded();
-        var moduleInstanceForDelete = layoutSidebar.FindElement(InRootFolder(menuLabel));
-        Actions.ContextClick(moduleInstanceForDelete).Perform();
-
-        ClickContextMenuItem(_contextMenuDeleteItem);
-
-        // The delete confirmation is a PrimeNG ConfirmDialog (<div class="p-confirmdialog p-dialog">),
-        // not the <p-dialog> tag used by the create dialog above, so it needs its own locator.
-        var deleteDialog = Wait.Until(d => d.FindElement(By.CssSelector(".p-confirmdialog")));
-        deleteDialog.FindElement(ConfirmDialogAcceptButton).Click();
-
-        Wait.UntilDisappear(InRootFolder(menuLabel));
+        Menu.WaitLoaded();
+        Menu.Delete(InRootFolder(WeatherForDeleteLabel));
     }
 
     [Test, Order(4)]
     public void ChangeMenuItemPosition()
     {
-        const string firstMenuLabel = "#DashboardModule";
-        const string secondMenuLabel = "#WeatherForecastModule";
-        var firstItemLocator = InRootFolder(firstMenuLabel);
-        var secondItemLocator = InRootFolder(secondMenuLabel);
+        var firstItemLocator = InRootFolder(DashboardLabel);
+        var secondItemLocator = InRootFolder(WeatherLabel);
 
-        Wait.Until(d => d.FindElement(_layoutSidebar));
-        WaitForMenuLoaded();
+        Menu.WaitLoaded();
         Wait.Until(d => d.FindElement(firstItemLocator));
         Wait.Until(d => d.FindElement(secondItemLocator));
 
@@ -194,36 +81,67 @@ internal class MenuTests : BaseTest
         var bottomLocator = ReferenceEquals(topLocator, firstItemLocator) ? secondItemLocator : firstItemLocator;
 
         // Move the top item down via the context menu and verify it now renders below the other item.
-        MoveMenuItem(topLocator, _contextMenuMoveDownItem);
+        Menu.MoveDown(topLocator);
         Wait.Until(d => d.FindElement(topLocator).Location.Y > d.FindElement(bottomLocator).Location.Y);
 
         // Move it back up, restoring the original order for subsequent test runs.
-        MoveMenuItem(topLocator, _contextMenuMoveUpItem);
+        Menu.MoveUp(topLocator);
         Wait.Until(d => d.FindElement(topLocator).Location.Y < d.FindElement(bottomLocator).Location.Y);
     }
 
-    private void MoveMenuItem(By itemLocator, By moveDirectionIconLocator)
+    [Test, Order(5)]
+    public void CreatedModuleGetsModuleIcon()
     {
-        var item = Wait.Until(d => d.FindElement(itemLocator));
-        Actions.ContextClick(item).Perform();
-        ClickContextMenuItem(moveDirectionIconLocator);
+        EnsureInRootFolder(WeatherLabel, WeatherForecastModule);
+
+        Assert.That(IconClasses(InRootFolder(WeatherLabel)), Has.Member(WeatherForecastModuleIcon));
     }
 
     [Test, Order(5)]
+    public void EditMenuItem()
+    {
+        // A previous run that failed after saving leaves the edited item behind.
+        if (Menu.Contains(InRootFolder(EditedLabel)))
+            Menu.Delete(InRootFolder(EditedLabel));
+        EnsureInRootFolder(EditLabel, WeatherForecastModule);
+
+        Menu.Edit(InRootFolder(EditLabel))
+            .SetLabel(EditedLabel)
+            .SelectIcon("heart")
+            .Save();
+
+        Wait.UntilDisappear(InRootFolder(EditLabel));
+        Assert.That(IconClasses(InRootFolder(EditedLabel)), Has.Member("pi-heart"));
+    }
+
+    [Test, Order(5)]
+    public void CopyMenuItem()
+    {
+        var copyLabel = $"{CopyLabel} (copy)";
+        if (Menu.Contains(InRootFolder(copyLabel)))
+            Menu.Delete(InRootFolder(copyLabel));
+        EnsureInRootFolder(CopyLabel, WeatherForecastModule);
+
+        Menu.Copy(InRootFolder(CopyLabel));
+
+        Wait.UntilFindElement(InRootFolder(copyLabel));
+        Assert.Multiple(() =>
+        {
+            Assert.That(Menu.IsAbove(InRootFolder(CopyLabel), InRootFolder(copyLabel)), Is.True,
+                "The copy is expected below the original");
+            Assert.That(Menu.GetPath(InRootFolder(copyLabel)), Is.Not.EqualTo(Menu.GetPath(InRootFolder(CopyLabel))),
+                "The copy is expected to be a separate module instance");
+            Assert.That(Menu.GetIcon(InRootFolder(copyLabel)), Is.EqualTo(Menu.GetIcon(InRootFolder(CopyLabel))));
+        });
+    }
+
+    private string[] IconClasses(By item) => Menu.GetIcon(item).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+    [Test, Order(6)]
     public void DeleteRootFolder()
     {
-        var layoutSidebar = Wait.Until(d => d.FindElement(_layoutSidebar));
-        WaitForMenuLoaded();
-        if (!layoutSidebar.ExistsNow(_rootFolderLocator)) return;
+        if (!Menu.Contains(_rootFolder)) return;
 
-        var rootFolderItem = Wait.Until(d => d.FindElement(_rootFolderLocator));
-        Actions.ContextClick(rootFolderItem).Perform();
-
-        ClickContextMenuItem(_contextMenuDeleteItem);
-
-        var deleteDialog = Wait.Until(d => d.FindElement(By.CssSelector(".p-confirmdialog")));
-        deleteDialog.FindElement(ConfirmDialogAcceptButton).Click();
-
-        Wait.UntilDisappear(_rootFolderLocator);
+        Menu.Delete(_rootFolder);
     }
 }

@@ -24,4 +24,8 @@
         <Using Include="NUnit.Framework"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="TestData\**" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
 </Project>
