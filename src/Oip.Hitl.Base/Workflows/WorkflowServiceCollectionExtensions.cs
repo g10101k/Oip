@@ -64,6 +64,20 @@ public static class WorkflowServiceCollectionExtensions
     public static IServiceCollection AddOipWorkflows(this IServiceCollection services, TemporalSettings settings,
         WorkflowFileStorageSettings fileStorageSettings, Action<OipWorkflowOptions> configure)
     {
+        services.AddOipTemporalWorker(settings, configure);
+        services.AddSingleton(fileStorageSettings);
+        services.AddSingleton<WorkflowFileStorage>();
+        services.AddScoped<UserStepService>();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers the Temporal client and the worker for the configured workflows and activities, e.g. for a worker
+    /// that hosts only activities.
+    /// </summary>
+    public static IServiceCollection AddOipTemporalWorker(this IServiceCollection services, TemporalSettings settings,
+        Action<OipWorkflowOptions> configure)
+    {
         var options = new OipWorkflowOptions();
         configure(options);
 
@@ -77,9 +91,6 @@ public static class WorkflowServiceCollectionExtensions
             return TemporalClient.CreateLazy(connectOptions);
         });
         services.AddHostedService<TemporalWorkerService>();
-        services.AddSingleton(fileStorageSettings);
-        services.AddSingleton<WorkflowFileStorage>();
-        services.AddScoped<UserStepService>();
         return services;
     }
 

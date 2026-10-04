@@ -1,6 +1,8 @@
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Exceptions;
+using Oip.Hitl.Base.Agents;
 using Oip.Hitl.Controllers.Api;
 using Oip.Hitl.Data.Contexts;
 using Oip.Hitl.Data.Entities;
@@ -109,11 +111,76 @@ public partial class AgentService(LlmContext context, AgentToolCatalog toolCatal
     }
 
     /// <summary>
-    /// Returns the tools of the tool catalog.
+    /// Returns the tools of the tool catalog: the tools of Oip.Hitl and the ones registered by skill workers.
     /// </summary>
-    public List<AgentToolDto> GetTools() => toolCatalog.Tools
-        .Select(x => new AgentToolDto(x.Name, x.Description, x.ParametersSchema.GetRawText(), x.RequiresApproval))
-        .ToList();
+    public async Task<List<AgentToolDto>> GetToolsAsync(CancellationToken cancellationToken)
+    {
+        var registered = await context.RegisteredTools.AsNoTracking().ToListAsync(cancellationToken);
+        return toolCatalog.Tools.Concat(registered.Select(ToDefinition))
+            .OrderBy(x => x.Name, StringComparer.Ordinal)
+            .Select(x => new AgentToolDto(x.Name, x.Description, x.ParametersSchema.GetRawText(), x.RequiresApproval,
+                x.TaskQueue))
+            .ToList();
+    }
+
+    /// <summary>
+    /// Replaces the tools registered by the skill worker of the task queue.
+    /// </summary>
+    /// <exception cref="ApiException">A tool is invalid or its name is taken by another tool.</exception>
+    public async Task RegisterToolsAsync(string taskQueue, IReadOnlyList<AgentToolDefinition> tools,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(taskQueue))
+            throw Invalid("Task queue is required");
+        foreach (var tool in tools)
+        {
+            if (!ToolNamePattern().IsMatch(tool.Name))
+                throw Invalid($"Tool name '{tool.Name}' must consist of 1-64 letters, digits, dashes and underscores");
+            if (tool.ParametersSchema.ValueKind != JsonValueKind.Object)
+                throw Invalid($"Parameters schema of tool {tool.Name} must be a JSON object");
+            if (string.IsNullOrWhiteSpace(tool.ActivityName) || tool.TimeoutSeconds <= 0 || tool.MaxAttempts <= 0)
+                throw Invalid($"Tool {tool.Name} must have an activity name, a timeout and attempts");
+            if (toolCatalog.Find(tool.Name) is not null)
+                throw Invalid($"Tool name '{tool.Name}' is taken by a tool of Oip.Hitl");
+        }
+
+        if (tools.GroupBy(x => x.Name).FirstOrDefault(x => x.Count() > 1) is { } duplicate)
+            throw Invalid($"Tool '{duplicate.Key}' is registered more than once");
+        var names = tools.Select(x => x.Name).ToList();
+        var taken = await context.RegisteredTools
+            .Where(x => names.Contains(x.Name) && x.TaskQueue != taskQueue)
+            .Select(x => $"{x.Name} ({x.TaskQueue})")
+            .ToListAsync(cancellationToken);
+        if (taken.Count > 0)
+            throw Invalid($"Tool names are taken by other task queues: {string.Join(", ", taken)}");
+
+        var existing = await context.RegisteredTools.Where(x => x.TaskQueue == taskQueue)
+            .ToDictionaryAsync(x => x.Name, cancellationToken);
+        context.RegisteredTools.RemoveRange(existing.Values.Where(x => !names.Contains(x.Name)));
+        var now = DateTime.UtcNow;
+        foreach (var tool in tools)
+        {
+            if (!existing.TryGetValue(tool.Name, out var entity))
+            {
+                entity = new RegisteredToolEntity { Name = tool.Name };
+                context.RegisteredTools.Add(entity);
+            }
+
+            entity.Description = tool.Description;
+            entity.ParametersSchema = tool.ParametersSchema.GetRawText();
+            entity.ActivityName = tool.ActivityName;
+            entity.HasArguments = tool.HasArguments;
+            entity.TaskQueue = taskQueue;
+            entity.TimeoutSeconds = tool.TimeoutSeconds;
+            entity.MaxAttempts = tool.MaxAttempts;
+            entity.RequiresApproval = tool.RequiresApproval;
+            entity.RegisteredAt = now;
+        }
+
+        await context.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("Tools of task queue {TaskQueue} registered: {Tools}", taskQueue,
+            string.Join(", ", names));
+    }
 
     /// <summary>
     /// Returns the enabled agents ordered by name.
@@ -158,16 +225,44 @@ public partial class AgentService(LlmContext context, AgentToolCatalog toolCatal
                     ?? throw new ApiException("Not found", $"Skill '{request.Code}' is not available to the agent",
                         StatusCodes.Status404NotFound);
 
+        var names = skill.Tools.Select(x => x.ToolName).Order(StringComparer.Ordinal).ToList();
+        var found = await FindToolsAsync(names, cancellationToken);
         var tools = new List<AgentToolDefinition>();
-        foreach (var name in skill.Tools.Select(x => x.ToolName).Order())
+        foreach (var name in names)
         {
-            if (toolCatalog.Find(name) is { } tool)
+            if (found.TryGetValue(name, out var tool))
                 tools.Add(tool);
             else
                 logger.LogWarning("Tool {Tool} of skill {Skill} is not in the tool catalog", name, skill.Code);
         }
 
         return new LoadedSkill(skill.Code, skill.Instructions, tools);
+    }
+
+    /// <summary>
+    /// Returns the tools of the tool catalog with the names, by name.
+    /// </summary>
+    private async Task<Dictionary<string, AgentToolDefinition>> FindToolsAsync(IReadOnlyCollection<string> names,
+        CancellationToken cancellationToken)
+    {
+        var tools = names.Select(toolCatalog.Find).OfType<AgentToolDefinition>()
+            .ToDictionary(x => x.Name, StringComparer.Ordinal);
+        var remote = names.Where(x => !tools.ContainsKey(x)).ToList();
+        if (remote.Count == 0) return tools;
+
+        var registered = await context.RegisteredTools.AsNoTracking()
+            .Where(x => remote.Contains(x.Name))
+            .ToListAsync(cancellationToken);
+        foreach (var tool in registered)
+            tools[tool.Name] = ToDefinition(tool);
+        return tools;
+    }
+
+    private static AgentToolDefinition ToDefinition(RegisteredToolEntity tool)
+    {
+        using var schema = JsonDocument.Parse(tool.ParametersSchema);
+        return new AgentToolDefinition(tool.Name, tool.Description, schema.RootElement.Clone(), tool.ActivityName,
+            tool.HasArguments, tool.TaskQueue, tool.TimeoutSeconds, tool.MaxAttempts, tool.RequiresApproval);
     }
 
     private async Task ValidateAsync(SaveAgentRequest request, int? id, CancellationToken cancellationToken)
@@ -197,7 +292,9 @@ public partial class AgentService(LlmContext context, AgentToolCatalog toolCatal
         if (await context.Skills.AnyAsync(x => x.Code == request.Code.Trim() && x.SkillId != id, cancellationToken))
             throw Invalid($"Skill with code '{request.Code.Trim()}' already exists");
 
-        var unknown = (request.Tools ?? []).Where(x => toolCatalog.Find(x) is null).ToList();
+        var requested = request.Tools?.Distinct().ToList() ?? [];
+        var found = await FindToolsAsync(requested, cancellationToken);
+        var unknown = requested.Where(x => !found.ContainsKey(x)).ToList();
         if (unknown.Count > 0)
             throw Invalid($"Tools not found in the tool catalog: {string.Join(", ", unknown)}");
     }
@@ -258,4 +355,8 @@ public partial class AgentService(LlmContext context, AgentToolCatalog toolCatal
 
     [GeneratedRegex("^[a-z0-9][a-z0-9._-]*$")]
     private static partial Regex CodePattern();
+
+    // Names of functions in the chat completions API.
+    [GeneratedRegex("^[a-zA-Z0-9_-]{1,64}$")]
+    private static partial Regex ToolNamePattern();
 }

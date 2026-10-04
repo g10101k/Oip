@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,7 @@ public class AgentGatewayController(
     TemporalSettings temporalSettings,
     AgentGatewaySettings gatewaySettings,
     AgentEventStream eventStream,
+    AgentUserTokenStore tokenStore,
     UserStepService userStepService,
     ClaimService claimService,
     ILogger<AgentGatewayController> logger) : ControllerBase
@@ -42,7 +44,6 @@ public class AgentGatewayController(
     private const string AssistantRole = "assistant";
     private const string RetrySeparator = "\n\n---\n\n";
     private const string TurnSeparator = "\n\n";
-    private const string RunIdPrefix = "agent-";
     private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(50);
 
     /// <summary>
@@ -70,16 +71,20 @@ public class AgentGatewayController(
         var settings = OpenAiChatConverter.ToSettings(request.Parameters);
         var agent = await FindAgentAsync(request.Model, cancellationToken);
 
-        var runId = $"{RunIdPrefix}{Guid.NewGuid():N}";
+        var runId = $"{AgentWorkflow.RunIdPrefix}{Guid.NewGuid():N}";
         var streamKey = request.Stream ? AgentEventStream.GetKey(runId) : null;
         var userName = claimService.GetUserLogin();
         var input = new AgentWorkflowInput(agent, messages, settings, streamKey, userName,
             TimeSpan.FromMinutes(gatewaySettings.UserStepTimeoutMinutes));
+        var runTimeout = TimeSpan.FromMinutes(gatewaySettings.RunTimeoutMinutes);
+        // Kept apart from the workflow, so the token is not in its history; the tools get it by the run id.
+        var hasUserToken = await GetAccessTokenAsync() is { } accessToken &&
+                           await tokenStore.StoreAsync(runId, accessToken, runTimeout, cancellationToken);
         var handle = await client.CallAsync(() => client.StartWorkflowAsync(
             (AgentWorkflow workflow) => workflow.RunAsync(input),
             new WorkflowOptions(runId, temporalSettings.TaskQueue)
             {
-                ExecutionTimeout = TimeSpan.FromMinutes(gatewaySettings.RunTimeoutMinutes),
+                ExecutionTimeout = runTimeout,
                 Memo = userName is null ? null : new Dictionary<string, object> { [AgentWorkflow.UserMemo] = userName },
                 Rpc = new RpcOptions { CancellationToken = cancellationToken }
             }));
@@ -114,6 +119,11 @@ public class AgentGatewayController(
             await CancelAsync(handle);
             throw;
         }
+        finally
+        {
+            // The run is over or cancelled, so its tools need the token no more.
+            if (hasUserToken) await DeleteUserTokenAsync(runId);
+        }
     }
 
     /// <summary>
@@ -125,7 +135,7 @@ public class AgentGatewayController(
         [FromBody] CompleteAgentStepRequest request, CancellationToken cancellationToken)
     {
         var userName = claimService.GetUserLogin();
-        if (!runId.StartsWith(RunIdPrefix, StringComparison.Ordinal) ||
+        if (!runId.StartsWith(AgentWorkflow.RunIdPrefix, StringComparison.Ordinal) ||
             await GetRunUserAsync(runId, cancellationToken) is not { } owner ||
             !string.Equals(owner, userName, StringComparison.OrdinalIgnoreCase))
             throw new ApiException("Not found", "Step not found or already completed", StatusCodes.Status404NotFound);
@@ -329,6 +339,30 @@ public class AgentGatewayController(
                outcomes.ValueKind == JsonValueKind.Array
             ? outcomes.EnumerateArray().Select(x => x.GetString()).OfType<string>().ToList()
             : [];
+    }
+
+    /// <summary>
+    /// Access token of the user: from the bearer header, or from the session of a cookie-authenticated request.
+    /// </summary>
+    private async Task<string?> GetAccessTokenAsync()
+    {
+        var header = Request.Headers.Authorization.ToString();
+        if (header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            return header["Bearer ".Length..].Trim();
+        return await HttpContext.GetTokenAsync("access_token");
+    }
+
+    private async Task DeleteUserTokenAsync(string runId)
+    {
+        try
+        {
+            await tokenStore.DeleteAsync(runId);
+        }
+        catch (Exception e)
+        {
+            // It expires with the run anyway.
+            logger.LogWarning(e, "Failed to delete the user token of agent run {RunId}", runId);
+        }
     }
 
     private async Task CancelAsync(WorkflowHandle handle)

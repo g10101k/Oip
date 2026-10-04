@@ -1,0 +1,86 @@
+{
+  "agent-module": {
+    "title": "Агенты",
+    "tabs": {
+      "agents": "Агенты",
+      "skills": "Скилы",
+      "tools": "Инструменты"
+    },
+    "content": {
+      "refreshTooltip": "Обновить",
+      "addAgent": "Добавить агента",
+      "addSkill": "Добавить скил",
+      "searchPlaceholder": "Поиск",
+      "clear": "Сбросить фильтр",
+      "enabled": "Включён",
+      "disabled": "Выключен",
+      "status": "Статус",
+      "updatedAt": "Изменён",
+      "actions": "Действия",
+      "editTooltip": "Редактировать",
+      "deleteTooltip": "Удалить"
+    },
+    "agents": {
+      "code": "Id модели",
+      "name": "Название",
+      "description": "Описание",
+      "systemPrompt": "Системный промпт",
+      "provider": "LLM-провайдер",
+      "defaultProvider": "Провайдер по умолчанию",
+      "skills": "Скилы",
+      "empty": "Агенты ещё не настроены."
+    },
+    "skills": {
+      "code": "Имя",
+      "description": "Когда использовать",
+      "instructions": "Инструкции",
+      "tools": "Инструменты",
+      "empty": "Скилы ещё не настроены."
+    },
+    "tools": {
+      "name": "Имя",
+      "description": "Описание",
+      "taskQueue": "Очередь задач",
+      "requiresApproval": "Подтверждение",
+      "approval": "требуется",
+      "empty": "Инструменты не зарегистрированы."
+    },
+    "agentDialog": {
+      "createTitle": "Новый агент",
+      "editTitle": "Редактирование агента",
+      "codePlaceholder": "например, oip-assistant"
+    },
+    "skillDialog": {
+      "createTitle": "Новый скил",
+      "editTitle": "Редактирование скила",
+      "codePlaceholder": "например, report-builder",
+      "descriptionPlaceholder": "Всегда видно модели: когда нужен скил",
+      "instructionsPlaceholder": "Отдаётся модели при загрузке скила: как выполнить задачу"
+    },
+    "dialog": {
+      "cancel": "Отмена",
+      "save": "Сохранить"
+    },
+    "messages": {
+      "loadError": "Не удалось загрузить агентов",
+      "saveError": "Не удалось сохранить",
+      "deleteError": "Не удалось удалить",
+      "agentRequired": "Id модели и название обязательны",
+      "skillRequired": "Имя, описание и инструкции обязательны",
+      "createSuccess": "Создано",
+      "updateSuccess": "Сохранено",
+      "deleteSuccess": "Удалено"
+    },
+    "confirm": {
+      "header": "Удаление",
+      "message": "Удалить «{{name}}»?",
+      "cancel": "Отмена",
+      "delete": "Удалить"
+    },
+    "settings": {
+      "title": "Настройки агентов",
+      "showDisabled": "Показывать выключенных агентов и скилы",
+      "save": "Сохранить"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-namespace Oip.Hitl.AiFunctions;
+namespace Oip.Hitl.Base.Agents;
 
 /// <summary>
 /// Marks a Temporal activity as a tool skills can give agents. The method takes no parameters or one class of the

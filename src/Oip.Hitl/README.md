@@ -81,3 +81,29 @@ list and are completed on the `workflow-task` page like other steps, or in the c
   started the run completes its steps there.
 - Other OpenAI clients get the step as a quote in the answer with the link to its `workflow-task` page; the stream
   goes on once the step is completed there.
+
+### User rights and skill workers
+
+Tools call services with the rights of the user who chats, not with a service account:
+
+1. When a run starts, the gateway exchanges the access token of the user (Keycloak standard token exchange) for a
+   refresh token of `oip-backend` in the same Keycloak session. It is kept in Redis, protected with Data Protection,
+   until the run ends; it is never in the workflow input or history.
+2. A tool gets an access token with `IAgentUserTokenProvider.GetAccessTokenAsync(audience?)`: Oip.Hitl refreshes it
+   from the refresh token and, with an audience, narrows it to that client. The OIP API checks the rights of the user
+   as for the browser; when the user signs out of Keycloak, the tools get no token any more.
+
+Keycloak setup: the `open-webui` client puts `oip-backend` into the audience of its tokens, and `oip-backend` allows
+the standard token exchange with refresh tokens in the same session (see `.oip-devcontainer/README.md`). When the
+exchange fails, e.g. for a token of another client, the chat works, and tools that need the user token fail with an
+error the model reports.
+
+`OipDataToolActivities` are demo tools of this kind: `get_my_notifications` and `search_users` (administrators only)
+call the users and notifications API with the token of the user — Oip.Hitl itself in the Local mode
+(`Application:InternalBaseUrl`), otherwise `Services:UsersService` and `Services:NotificationsService`.
+
+Tools may also be hosted by a separate **skill worker** on its own task queue: it registers with
+`AddAgentSkillWorker` (`Oip.Hitl.Base.Agents`), which on start sends its `[AgentTool]` activities to Oip.Hitl (gRPC
+`GrpcAgentService.RegisterTools`, table `llm.RegisteredTool`), and its tools get the user token through
+`GrpcAgentService.GetUserToken`. The gRPC service is called with the service account token (`ServiceAccountPolicy`) and
+gives the token only for a running agent run.

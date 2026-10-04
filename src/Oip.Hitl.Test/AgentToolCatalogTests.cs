@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging.Abstractions;
+using Oip.Hitl.Base.Agents;
 using Oip.Hitl.Base.Workflows;
 using Oip.Hitl.Services;
 using Oip.Hitl.Workflows.Activities;
@@ -26,6 +27,16 @@ public class AgentToolCatalogTests
         Assert.That(tool.Description, Does.Contain("current date"));
         var property = tool.ParametersSchema.GetProperty("properties").GetProperty("time_zone");
         Assert.That(property.GetProperty("description").GetString(), Does.Contain("IANA"));
+    }
+
+    [Test]
+    public void Describer_SetsTaskQueueOfSkillWorker()
+    {
+        var tools = AgentToolDescriber.Describe([typeof(DemoToolActivities)], "skills");
+
+        Assert.That(tools.Select(x => x.TaskQueue).Distinct(), Is.EqualTo(new[] { "skills" }));
+        Assert.Throws<InvalidOperationException>(() =>
+            AgentToolDescriber.Describe([typeof(DemoToolActivities), typeof(DemoToolActivities)], null));
     }
 
     [Test]

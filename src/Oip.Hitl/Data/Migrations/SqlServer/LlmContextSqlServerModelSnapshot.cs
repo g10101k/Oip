@@ -169,6 +169,66 @@ namespace Oip.Hil.Data.Migrations.SqlServer
                         });
                 });
 
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.RegisteredToolEntity", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("Name of the tool, the primary key.");
+
+                    b.Property<string>("ActivityName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasComment("Temporal name of the activity.");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasComment("What the tool does.");
+
+                    b.Property<bool>("HasArguments")
+                        .HasColumnType("bit")
+                        .HasComment("Whether the activity takes the arguments object as its parameter.");
+
+                    b.Property<int>("MaxAttempts")
+                        .HasColumnType("int")
+                        .HasComment("Attempts before the failure is returned to the model.");
+
+                    b.Property<string>("ParametersSchema")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("JSON schema of the arguments object.");
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("datetime2")
+                        .HasComment("When the worker registered the tool (UTC).");
+
+                    b.Property<bool>("RequiresApproval")
+                        .HasColumnType("bit")
+                        .HasComment("Whether the user allows each call before it is made.");
+
+                    b.Property<string>("TaskQueue")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasComment("Task queue the worker of the tool polls.");
+
+                    b.Property<int>("TimeoutSeconds")
+                        .HasColumnType("int")
+                        .HasComment("Timeout of an attempt in seconds.");
+
+                    b.HasKey("Name");
+
+                    b.HasIndex("TaskQueue");
+
+                    b.ToTable("RegisteredTool", "llm", t =>
+                        {
+                            t.HasComment("Tool registered by a skill worker: an activity of the worker the model may call, on the task queue of the worker.\n            The worker replaces its tools when it starts.");
+                        });
+                });
+
             modelBuilder.Entity("Oip.Hitl.Data.Entities.SkillEntity", b =>
                 {
                     b.Property<int>("SkillId")

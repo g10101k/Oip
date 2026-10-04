@@ -1,0 +1,86 @@
+{
+  "agent-module": {
+    "title": "Agents",
+    "tabs": {
+      "agents": "Agents",
+      "skills": "Skills",
+      "tools": "Tools"
+    },
+    "content": {
+      "refreshTooltip": "Refresh",
+      "addAgent": "Add agent",
+      "addSkill": "Add skill",
+      "searchPlaceholder": "Search",
+      "clear": "Clear filter",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "status": "Status",
+      "updatedAt": "Updated",
+      "actions": "Actions",
+      "editTooltip": "Edit",
+      "deleteTooltip": "Delete"
+    },
+    "agents": {
+      "code": "Model id",
+      "name": "Name",
+      "description": "Description",
+      "systemPrompt": "System prompt",
+      "provider": "LLM provider",
+      "defaultProvider": "Default provider",
+      "skills": "Skills",
+      "empty": "No agents configured yet."
+    },
+    "skills": {
+      "code": "Name",
+      "description": "When to use",
+      "instructions": "Instructions",
+      "tools": "Tools",
+      "empty": "No skills configured yet."
+    },
+    "tools": {
+      "name": "Name",
+      "description": "Description",
+      "taskQueue": "Task queue",
+      "requiresApproval": "Approval",
+      "approval": "required",
+      "empty": "No tools registered."
+    },
+    "agentDialog": {
+      "createTitle": "New agent",
+      "editTitle": "Edit agent",
+      "codePlaceholder": "e.g. oip-assistant"
+    },
+    "skillDialog": {
+      "createTitle": "New skill",
+      "editTitle": "Edit skill",
+      "codePlaceholder": "e.g. report-builder",
+      "descriptionPlaceholder": "Always shown to the model: when the skill is needed",
+      "instructionsPlaceholder": "Given to the model when it loads the skill: how to do the task"
+    },
+    "dialog": {
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "messages": {
+      "loadError": "Failed to load agents",
+      "saveError": "Failed to save",
+      "deleteError": "Failed to delete",
+      "agentRequired": "Model id and name are required",
+      "skillRequired": "Name, description and instructions are required",
+      "createSuccess": "Created",
+      "updateSuccess": "Saved",
+      "deleteSuccess": "Deleted"
+    },
+    "confirm": {
+      "header": "Delete",
+      "message": "Delete \"{{name}}\"?",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "settings": {
+      "title": "Agents settings",
+      "showDisabled": "Show disabled agents and skills",
+      "save": "Save"
+    }
+  }
+}

@@ -11,6 +11,7 @@ import {
   ApiExceptionResponse,
   DeleteAgentParams,
   DeleteSkillParams,
+  LlmProviderDto,
   SaveAgentRequest,
   SaveSkillRequest,
   SkillDto,
@@ -109,6 +110,14 @@ export class AgentModuleApi<
   getTools = (params: RequestParams = {}) =>
     this.request<AgentToolDto[], ApiExceptionResponse>({
       path: `/api/agent-module/get-tools`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  getLlmProviders = (params: RequestParams = {}) =>
+    this.request<LlmProviderDto[], ApiExceptionResponse>({
+      path: `/api/agent-module/get-llm-providers`,
       method: "GET",
       secure: true,
       format: "json",

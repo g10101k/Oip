@@ -66,9 +66,9 @@ public static class AgentStepKind
 /// answer, to the gateway request waiting for the run. A stream is read from its beginning, so unlike pub/sub no
 /// events are lost when the reader starts after the activity.
 /// </summary>
-/// <param name="connectionString">Redis connection string; the stream fails on the first use when it is empty.</param>
+/// <param name="redis">Redis connection.</param>
 /// <param name="ttl">How long the events of a run are kept.</param>
-public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : IAsyncDisposable
+public sealed class AgentEventStream(AgentRedisConnection redis, TimeSpan ttl)
 {
     /// <summary>
     /// Stream position before the first event.
@@ -84,8 +84,6 @@ public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : I
     private const string DeltaType = "delta";
     private const string StatusType = "status";
     private const string UserStepType = "user_step";
-
-    private readonly Lazy<Task<ConnectionMultiplexer>> _connection = new(() => ConnectAsync(connectionString));
 
     /// <summary>
     /// Key of the stream of an agent run.
@@ -145,13 +143,6 @@ public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : I
         return entries.Select(ToEvent).ToList();
     }
 
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-    {
-        if (_connection.IsValueCreated && _connection.Value.IsCompletedSuccessfully)
-            await _connection.Value.Result.DisposeAsync();
-    }
-
     private static AgentEvent ToEvent(StreamEntry entry)
     {
         var type = (string?)entry[TypeField] switch
@@ -166,17 +157,5 @@ public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : I
             entry[StepField], entry[KindField]);
     }
 
-    private async Task<IDatabase> GetDatabaseAsync() => (await _connection.Value).GetDatabase();
-
-    private static async Task<ConnectionMultiplexer> ConnectAsync(string? connectionString)
-    {
-        if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException(
-                "Redis is not configured for the agent gateway: set AgentGateway:RedisConnectionString");
-
-        var options = ConfigurationOptions.Parse(connectionString);
-        // Reconnects in the background instead of failing when Redis is not up yet.
-        options.AbortOnConnectFail = false;
-        return await ConnectionMultiplexer.ConnectAsync(options);
-    }
+    private Task<IDatabase> GetDatabaseAsync() => redis.GetDatabaseAsync();
 }

@@ -32,6 +32,7 @@ export interface AgentToolDto {
   description?: string | null;
   parametersSchema?: string | null;
   requiresApproval?: boolean;
+  taskQueue?: string | null;
 }
 
 export interface ApiExceptionResponse {

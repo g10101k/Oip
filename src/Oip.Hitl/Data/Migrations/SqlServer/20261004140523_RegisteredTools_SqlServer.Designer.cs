@@ -2,70 +2,73 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Hitl.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Hil.Data.Migrations.Postgres
+namespace Oip.Hitl.Data.Migrations.SqlServer
 {
-    [DbContext(typeof(LlmContextPostgres))]
-    partial class LlmContextPostgresModelSnapshot : ModelSnapshot
+    [DbContext(typeof(LlmContextSqlServer))]
+    [Migration("20261004140523_RegisteredTools_SqlServer")]
+    partial class RegisteredTools_SqlServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.12")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Oip.Hitl.Data.Entities.AgentEntity", b =>
                 {
                     b.Property<int>("AgentId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Primary key.");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AgentId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AgentId"));
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("nvarchar(100)")
                         .HasComment("Model id of the agent in the OpenAI-compatible API, e.g. support-agent.");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime2")
                         .HasComment("Creation timestamp (UTC).");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
+                        .HasColumnType("nvarchar(1000)")
                         .HasComment("Description for administrators.");
 
                     b.Property<bool>("IsEnabled")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Whether the agent is offered to chat UIs.");
 
                     b.Property<int?>("LlmProviderId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Provider that answers; null for the default provider.");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .HasColumnType("nvarchar(200)")
                         .HasComment("Human-readable name shown in the UI.");
 
                     b.Property<string>("SystemPrompt")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("System prompt of the agent; the list of its skills is added to it.");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime2")
                         .HasComment("Last update timestamp (UTC).");
 
                     b.HasKey("AgentId");
@@ -84,11 +87,11 @@ namespace Oip.Hil.Data.Migrations.Postgres
             modelBuilder.Entity("Oip.Hitl.Data.Entities.AgentSkillEntity", b =>
                 {
                     b.Property<int>("AgentId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Agent.");
 
                     b.Property<int>("SkillId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Skill.");
 
                     b.HasKey("AgentId", "SkillId");
@@ -105,60 +108,60 @@ namespace Oip.Hil.Data.Migrations.Postgres
                 {
                     b.Property<int>("LlmProviderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Primary key.");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LlmProviderId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LlmProviderId"));
 
                     b.Property<string>("ApiKeyProtected")
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("API key protected with ASP.NET Core Data Protection. Null when no key is configured.");
 
                     b.Property<string>("BaseUrl")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("nvarchar(500)")
                         .HasComment("API base URL, e.g. https://api.openai.com/v1.");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime2")
                         .HasComment("Creation timestamp (UTC).");
 
                     b.Property<bool>("IsDefault")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Whether this provider is used when no provider is specified explicitly. At most one provider is default.");
 
                     b.Property<bool>("IsEnabled")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Whether the provider can be used.");
 
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .HasColumnType("nvarchar(200)")
                         .HasComment("Default model identifier, e.g. gpt-4o-mini.");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .HasColumnType("nvarchar(200)")
                         .HasComment("Human-readable name shown in the UI.");
 
                     b.Property<string>("ProviderType")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("nvarchar(50)")
                         .HasComment("Provider API kind.");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime2")
                         .HasComment("Last update timestamp (UTC).");
 
                     b.HasKey("LlmProviderId");
 
                     b.HasIndex("IsDefault")
                         .IsUnique()
-                        .HasFilter("\"IsDefault\" = true");
+                        .HasFilter("[IsDefault] = 1");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -173,50 +176,50 @@ namespace Oip.Hil.Data.Migrations.Postgres
                 {
                     b.Property<string>("Name")
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("nvarchar(100)")
                         .HasComment("Name of the tool, the primary key.");
 
                     b.Property<string>("ActivityName")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .HasColumnType("nvarchar(200)")
                         .HasComment("Temporal name of the activity.");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
+                        .HasColumnType("nvarchar(2000)")
                         .HasComment("What the tool does.");
 
                     b.Property<bool>("HasArguments")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Whether the activity takes the arguments object as its parameter.");
 
                     b.Property<int>("MaxAttempts")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Attempts before the failure is returned to the model.");
 
                     b.Property<string>("ParametersSchema")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("JSON schema of the arguments object.");
 
                     b.Property<DateTime>("RegisteredAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime2")
                         .HasComment("When the worker registered the tool (UTC).");
 
                     b.Property<bool>("RequiresApproval")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Whether the user allows each call before it is made.");
 
                     b.Property<string>("TaskQueue")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .HasColumnType("nvarchar(200)")
                         .HasComment("Task queue the worker of the tool polls.");
 
                     b.Property<int>("TimeoutSeconds")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Timeout of an attempt in seconds.");
 
                     b.HasKey("Name");
@@ -233,38 +236,38 @@ namespace Oip.Hil.Data.Migrations.Postgres
                 {
                     b.Property<int>("SkillId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Primary key.");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SkillId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SkillId"));
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("nvarchar(100)")
                         .HasComment("Name the model loads the skill by, e.g. datetime.");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime2")
                         .HasComment("Creation timestamp (UTC).");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
+                        .HasColumnType("nvarchar(1000)")
                         .HasComment("When to use the skill; always shown to the model.");
 
                     b.Property<string>("Instructions")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("nvarchar(max)")
                         .HasComment("How to do the task; given to the model when it loads the skill.");
 
                     b.Property<bool>("IsEnabled")
-                        .HasColumnType("boolean")
+                        .HasColumnType("bit")
                         .HasComment("Whether agents may load the skill.");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime2")
                         .HasComment("Last update timestamp (UTC).");
 
                     b.HasKey("SkillId");
@@ -281,12 +284,12 @@ namespace Oip.Hil.Data.Migrations.Postgres
             modelBuilder.Entity("Oip.Hitl.Data.Entities.SkillToolEntity", b =>
                 {
                     b.Property<int>("SkillId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasComment("Skill.");
 
                     b.Property<string>("ToolName")
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasColumnType("nvarchar(100)")
                         .HasComment("Name of the tool, e.g. get_current_time.");
 
                     b.HasKey("SkillId", "ToolName");

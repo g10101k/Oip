@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Oip.Hitl.Base.Agents;
 using Oip.Hitl.Base.Workflows;
 using Oip.Hitl.Base.Workflows.Steps;
 using Oip.Hitl.Services;
@@ -43,6 +44,11 @@ public record AgentWorkflowInput(
 [Workflow]
 public class AgentWorkflow : UserWorkflowBase
 {
+    /// <summary>
+    /// Prefix of the workflow ids of the agent runs.
+    /// </summary>
+    public const string RunIdPrefix = "agent-";
+
     /// <summary>
     /// Name of the tool the model loads skills with.
     /// </summary>

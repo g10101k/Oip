@@ -79,6 +79,7 @@
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0"/>
         <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.0.0"/>
         <PackageVersion Include="Microsoft.Agents.AI.OpenAI" Version="1.22.0"/>
+        <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.10.0"/>
         <PackageVersion Include="Microsoft.SemanticKernel" Version="1.72.0"/>
         <PackageVersion Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.72.0"/>
         <PackageVersion Include="ModelContextProtocol" Version="1.0.0"/>

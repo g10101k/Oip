@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option csharp_namespace = "Oip.Hitl.Base.Agents";
+
+package hitl;
+
+// Agent runtime of Oip.Hitl for skill workers: the workers register their tools and get the token of the user of an
+// agent run. Called with the service account token.
+service GrpcAgentService {
+  // Replaces the tools of the task queue with the given ones.
+  rpc RegisterTools(RegisterToolsRequest) returns (RegisterToolsResponse);
+
+  // Returns an access token of the user who started the running agent run.
+  rpc GetUserToken(GetUserTokenRequest) returns (GetUserTokenResponse);
+}
+
+// Tool of a skill worker: a Temporal activity the model may call.
+message AgentTool {
+  // Name of the tool, e.g. get_my_notifications.
+  string name = 1;
+  // What the tool does.
+  string description = 2;
+  // JSON schema of the arguments object.
+  string parameters_schema = 3;
+  // Temporal name of the activity.
+  string activity_name = 4;
+  // Whether the activity takes the arguments object as its parameter.
+  bool has_arguments = 5;
+  // Timeout of an attempt in seconds.
+  int32 timeout_seconds = 6;
+  // Attempts before the failure is returned to the model.
+  int32 max_attempts = 7;
+  // Whether the user allows each call before it is made.
+  bool requires_approval = 8;
+}
+
+message RegisterToolsRequest {
+  // Task queue the worker of the tools polls.
+  string task_queue = 1;
+  repeated AgentTool tools = 2;
+}
+
+message RegisterToolsResponse {
+}
+
+message GetUserTokenRequest {
+  // Id of the agent run: the workflow id of the tool activity.
+  string run_id = 1;
+  // Client the token is narrowed to; the token of the gateway client when empty.
+  optional string audience = 2;
+}
+
+message GetUserTokenResponse {
+  string access_token = 1;
+  // Lifetime of the token in seconds.
+  int32 expires_in = 2;
+}

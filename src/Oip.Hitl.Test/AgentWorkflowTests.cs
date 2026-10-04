@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Threading.Channels;
+using Oip.Hitl.Base.Agents;
 using Oip.Hitl.Base.Workflows;
 using Oip.Hitl.Services;
 using Oip.Hitl.Workflows;
@@ -174,6 +175,26 @@ public class AgentWorkflowTests
         Assert.That(steps.Single().CompletedAt, Is.Not.Null);
     }
 
+    [Test]
+    public async Task RunAsync_CallsToolOnTaskQueueOfItsWorker()
+    {
+        const string skillQueue = "agent-skill-worker-test";
+        var skill = new LoadedSkill("time", "Call get_time for the time.",
+            [new AgentToolDefinition("get_time", "Returns the time.", ZoneSchema, "RemoteTool", true, skillQueue, 10, 1)]);
+        var activities = new FakeActivities(
+            Turn(ToolCall("1", AgentWorkflow.LoadSkillToolName, """{"name":"time"}""")),
+            Turn(ToolCall("2", "get_time", """{"zone":"UTC"}""")),
+            Turn(content: "Done.")) { Skill = skill };
+        var remote = new RemoteActivities();
+        using var skillWorker = new TemporalWorker(_environment.Client,
+            new TemporalWorkerOptions(skillQueue).AddAllActivities(remote));
+
+        await skillWorker.ExecuteAsync(() => RunAsync(activities, Input()));
+
+        Assert.That(remote.Calls, Is.EqualTo(1));
+        Assert.That(activities.TurnRequests[2].Messages[^1].Content, Is.EqualTo("13:00 from the skill worker"));
+    }
+
     private static AgentWorkflowInput Input() =>
         new(Agent, [new AgentMessage("user", "What time is it?")], null, "stream", "alice");
 
@@ -232,6 +253,8 @@ public class AgentWorkflowTests
 
         public AgentTurnResult? Fallback { get; init; }
 
+        public LoadedSkill Skill { get; init; } = TimeSkill;
+
         public string? TurnError { get; init; }
 
         public string? ToolError { get; init; }
@@ -254,9 +277,9 @@ public class AgentWorkflowTests
         [Activity("LoadSkill")]
         public LoadedSkill LoadSkill(LoadSkillRequest request)
         {
-            if (request.AgentId != Agent.AgentId || request.Code != TimeSkill.Code)
+            if (request.AgentId != Agent.AgentId || request.Code != Skill.Code)
                 throw new ApplicationFailureException($"Skill '{request.Code}' is not available", nonRetryable: true);
-            return TimeSkill;
+            return Skill;
         }
 
         [Activity("PublishUserStep")]
@@ -269,6 +292,21 @@ public class AgentWorkflowTests
             if (ToolError is not null)
                 throw new ApplicationFailureException(ToolError, nonRetryable: true);
             return "12:00";
+        }
+    }
+
+    /// <summary>
+    /// Tool hosted by a skill worker on its own task queue.
+    /// </summary>
+    private sealed class RemoteActivities
+    {
+        public int Calls { get; private set; }
+
+        [Activity("RemoteTool")]
+        public string RemoteTool(JsonElement arguments)
+        {
+            Calls++;
+            return "13:00 from the skill worker";
         }
     }
 }

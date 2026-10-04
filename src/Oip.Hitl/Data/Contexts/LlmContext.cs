@@ -39,6 +39,11 @@ public class LlmContext(DbContextOptions<LlmContext> options, bool designTime = 
     /// </summary>
     public DbSet<SkillEntity> Skills => Set<SkillEntity>();
 
+    /// <summary>
+    /// Tools registered by skill workers.
+    /// </summary>
+    public DbSet<RegisteredToolEntity> RegisteredTools => Set<RegisteredToolEntity>();
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,6 +53,7 @@ public class LlmContext(DbContextOptions<LlmContext> options, bool designTime = 
         modelBuilder.ApplyConfiguration(new SkillEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new AgentSkillEntityConfiguration(Database));
         modelBuilder.ApplyConfiguration(new SkillToolEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new RegisteredToolEntityConfiguration(Database));
 
         modelBuilder.ApplyXmlDocumentation(designTime);
     }

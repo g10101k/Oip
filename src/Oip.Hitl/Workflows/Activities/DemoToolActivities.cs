@@ -3,7 +3,7 @@ using System.Data;
 using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Oip.Hitl.AiFunctions;
+using Oip.Hitl.Base.Agents;
 using Temporalio.Activities;
 using Temporalio.Exceptions;
 

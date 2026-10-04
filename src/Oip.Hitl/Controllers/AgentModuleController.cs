@@ -17,7 +17,10 @@ namespace Oip.Hitl.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/agent-module")]
-public class AgentModuleController(AgentService agentService, ModuleRepository moduleRepository)
+public class AgentModuleController(
+    AgentService agentService,
+    LlmProviderService llmProviderService,
+    ModuleRepository moduleRepository)
     : BaseModuleController<AgentModuleSettings>(moduleRepository)
 {
     /// <inheritdoc />
@@ -134,15 +137,27 @@ public class AgentModuleController(AgentService agentService, ModuleRepository m
     }
 
     /// <summary>
-    /// Returns the tools of the tool catalog that skills can give agents.
+    /// Returns the tools of the tool catalog that skills can give agents: the tools of Oip.Hitl and of skill workers.
     /// </summary>
     [Right(SecurityConstants.Read), HttpGet("get-tools")]
     [ProducesResponseType<List<AgentToolDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
-    public ActionResult<List<AgentToolDto>> GetTools()
+    public async Task<ActionResult<List<AgentToolDto>>> GetTools(CancellationToken cancellationToken)
     {
-        return Ok(agentService.GetTools());
+        return Ok(await agentService.GetToolsAsync(cancellationToken));
+    }
+
+    /// <summary>
+    /// Returns the LLM providers an agent can answer with.
+    /// </summary>
+    [Right(SecurityConstants.Read), HttpGet("get-llm-providers")]
+    [ProducesResponseType<List<LlmProviderDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<List<LlmProviderDto>>> GetLlmProviders(CancellationToken cancellationToken)
+    {
+        return Ok(await llmProviderService.GetAllAsync(cancellationToken));
     }
 
     /// <inheritdoc />

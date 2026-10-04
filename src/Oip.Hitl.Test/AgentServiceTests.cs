@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Oip.Base.Exceptions;
+using Oip.Hitl.Base.Agents;
 using Oip.Hitl.Base.Workflows;
 using Oip.Hitl.Controllers.Api;
 using Oip.Hitl.Data.Contexts;
@@ -99,6 +101,49 @@ public class AgentServiceTests
         Assert.That(updated.SkillIds, Is.EquivalentTo(new[] { time.Id, math.Id }));
         Assert.That(reduced.SkillIds, Is.EqualTo(new[] { math.Id }));
     }
+
+    [Test]
+    public async Task RegisterTools_ReplacesToolsOfTaskQueueAndGivesThemToSkills()
+    {
+        await _service.RegisterToolsAsync("skills", [RemoteTool("get_report"), RemoteTool("old_tool")],
+            CancellationToken.None);
+        await _service.RegisterToolsAsync("skills", [RemoteTool("get_report"), RemoteTool("get_chart")],
+            CancellationToken.None);
+        var skill = await CreateSkillAsync("reports", "get_report");
+        var agent = await _service.CreateAgentAsync(new SaveAgentRequest("assistant", "Assistant",
+            SkillIds: [skill.Id]), CancellationToken.None);
+
+        var tools = await _service.GetToolsAsync(CancellationToken.None);
+        var loaded = await _service.LoadSkillAsync(new LoadSkillRequest(agent.Id, "reports"), CancellationToken.None);
+
+        Assert.That(tools.Where(x => x.TaskQueue == "skills").Select(x => x.Name),
+            Is.EqualTo(new[] { "get_chart", "get_report" }));
+        Assert.That(tools.Single(x => x.Name == "get_current_time").TaskQueue, Is.Null);
+        var tool = loaded.Tools.Single();
+        Assert.That(tool.TaskQueue, Is.EqualTo("skills"));
+        Assert.That(tool.ParametersSchema.GetProperty("type").GetString(), Is.EqualTo("object"));
+        AssertBadRequest(() => CreateSkillAsync("old", "old_tool"));
+    }
+
+    [Test]
+    public async Task RegisterTools_RejectsNamesTakenByOtherTools()
+    {
+        await _service.RegisterToolsAsync("skills", [RemoteTool("get_report")], CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            AssertBadRequest(() => _service.RegisterToolsAsync("other", [RemoteTool("get_report")],
+                CancellationToken.None));
+            AssertBadRequest(() => _service.RegisterToolsAsync("other", [RemoteTool("get_current_time")],
+                CancellationToken.None));
+            AssertBadRequest(() => _service.RegisterToolsAsync("other", [RemoteTool("bad name")],
+                CancellationToken.None));
+        });
+    }
+
+    private static AgentToolDefinition RemoteTool(string name) =>
+        new(name, $"{name} tool", JsonDocument.Parse("""{"type":"object","properties":{}}""").RootElement.Clone(),
+            name, false, "ignored", 30, 2);
 
     private Task<SkillDto> CreateSkillAsync(string code, string tool) =>
         _service.CreateSkillAsync(Skill(code, tool), CancellationToken.None);

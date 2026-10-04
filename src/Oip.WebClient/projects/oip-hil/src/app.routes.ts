@@ -45,6 +45,12 @@ export const appRoutes = provideOipRoutes({
       canActivate: [oipAuthGuard]
     },
     {
+      path: 'agent-module/:id',
+      loadComponent: () =>
+        import('./app/components/agent-module/agent-module.component').then((m) => m.AgentModuleComponent),
+      canActivate: [oipAuthGuard]
+    },
+    {
       path: 'workflow-activity-module/:id',
       loadComponent: () =>
         import('./app/components/workflow-activity-module/workflow-activity-module.component').then(

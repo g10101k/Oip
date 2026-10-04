@@ -97,6 +97,14 @@ If the client was created before its service account was enabled (needed by the 
 docker exec oip-devcontainer-keycloak-1 bash -c 'K=/opt/keycloak/bin/kcadm.sh; $K config credentials --server http://localhost:8080 --realm master --user "$KC_BOOTSTRAP_ADMIN_USERNAME" --password "$KC_BOOTSTRAP_ADMIN_PASSWORD" && $K update clients/$($K get clients -r oip -q clientId=open-webui --fields id --format csv --noquotes) -r oip -s serviceAccountsEnabled=true'
 ````
 
+Tools of agents call services with the rights of the user (see `src/Oip.Hitl/README.md`): the gateway exchanges the
+token of the user for a token of `oip-backend`. This needs the `oip-backend audience` mapper of `open-webui` and the
+standard token exchange of `oip-backend` with refresh tokens in the same session. For an existing Keycloak database:
+
+````shell
+docker exec oip-devcontainer-keycloak-1 bash -c 'K=/opt/keycloak/bin/kcadm.sh; $K config credentials --server http://localhost:8080 --realm master --user "$KC_BOOTSTRAP_ADMIN_USERNAME" --password "$KC_BOOTSTRAP_ADMIN_PASSWORD" && $K create clients/$($K get clients -r oip -q clientId=open-webui --fields id --format csv --noquotes)/protocol-mappers/models -r oip -b "{\"name\":\"oip-backend audience\",\"protocol\":\"openid-connect\",\"protocolMapper\":\"oidc-audience-mapper\",\"config\":{\"included.client.audience\":\"oip-backend\",\"id.token.claim\":\"false\",\"access.token.claim\":\"true\",\"introspection.token.claim\":\"true\"}}" && $K update clients/$($K get clients -r oip -q clientId=oip-backend --fields id --format csv --noquotes) -r oip -b "{\"attributes\":{\"standard.token.exchange.enabled\":\"true\",\"standard.token.exchange.enableRefreshRequestedTokenType\":\"SAME_SESSION\"}}"'
+````
+
 ### OIP pipe
 
 The pipe `src/Oip.Hitl/OpenWebUi/oip_agents_pipe.py` adds the agents as models named `OIP: <agent>`. Unlike a plain

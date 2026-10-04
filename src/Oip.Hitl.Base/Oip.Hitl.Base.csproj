@@ -13,6 +13,14 @@
         <PackageReference Include="NLog"/>
         <PackageReference Include="NLog.Web.AspNetCore"/>
         <PackageReference Include="Temporalio"/>
+        <PackageReference Include="Microsoft.Extensions.AI.Abstractions"/>
+        <PackageReference Include="Google.Protobuf"/>
+        <PackageReference Include="Grpc.Net.ClientFactory"/>
+        <PackageReference Include="Grpc.Tools" PrivateAssets="All"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="Protos\agent_service.proto" GrpcServices="Both"/>
     </ItemGroup>
 
     <ItemGroup>

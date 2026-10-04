@@ -98,4 +98,10 @@ public record SaveSkillRequest(
 /// <param name="Description">What the tool does.</param>
 /// <param name="ParametersSchema">JSON schema of the arguments.</param>
 /// <param name="RequiresApproval">Whether the user allows each call before it is made.</param>
-public record AgentToolDto(string Name, string Description, string ParametersSchema, bool RequiresApproval);
+/// <param name="TaskQueue">Task queue of the skill worker of the tool; <c>null</c> for a tool of Oip.Hitl.</param>
+public record AgentToolDto(
+    string Name,
+    string Description,
+    string ParametersSchema,
+    bool RequiresApproval,
+    string? TaskQueue);

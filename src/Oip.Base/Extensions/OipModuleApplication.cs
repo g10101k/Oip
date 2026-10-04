@@ -733,7 +733,10 @@ public static class OipModuleApplication
         return JsonWebKeySet.Create(jwksJson).GetSigningKeys();
     }
 
-    internal static HttpClientHandler CreateDevelopmentHttpClientHandler()
+    /// <summary>
+    /// Creates an HTTP handler that accepts any server certificate. Intended for development only.
+    /// </summary>
+    public static HttpClientHandler CreateDevelopmentHttpClientHandler()
     {
         return new HttpClientHandler
         {
