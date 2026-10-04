@@ -55,7 +55,12 @@ public class AppSettings : BaseAppSettings<AppSettings>, ISettings
     /// Represents synchronization options for the application.
     /// </summary>
     public KeycloakSyncSettings KeycloakSync { get; set; } = new();
-    
+
+    /// <summary>
+    /// User photo storage
+    /// </summary>
+    public UserPhotoStorageSettings UserPhotoStorage { get; set; } = new();
+
     public CorsSettings Cors { get; set; } = new();
 }
 

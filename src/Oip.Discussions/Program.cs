@@ -41,7 +41,7 @@ internal static class Program
             builder.Services.AddStartupRunner()
                 .AddCors(settings)
                 .AddApplicationsService(settings)
-                .AddUserService(settings)
+                .AddUserService(settings, AddingMode.Remote)
                 .AddDiscussionsService(settings)
                 .AddForwardedHeaders(settings)
                 .AddControllersAndView();

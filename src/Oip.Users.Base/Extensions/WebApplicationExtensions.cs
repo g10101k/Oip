@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Oip.Base.Data.Extensions;
+using Oip.Base.Extensions;
 using Oip.Base.Settings;
 using Oip.Users.Base.Contexts;
 using Oip.Users.Base.Services;
@@ -25,7 +26,8 @@ public static class WebApplicationExtensions
                 break;
             case AddingMode.Service:
                 app.MigrateUserDatabase();
-                app.MapGrpcService<UserService>();
+                app.MapGrpcService<UserService>()
+                    .RequireAuthorization(OipModuleApplication.ServiceAccountPolicy);
                 break;
             case AddingMode.Remote:
                 break;

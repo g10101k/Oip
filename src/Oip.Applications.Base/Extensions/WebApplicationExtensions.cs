@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Oip.Applications.Base.Data.Contexts;
 using Oip.Applications.Base.Services;
+using Oip.Base.Extensions;
 using Oip.Base.Settings;
 
 namespace Oip.Applications.Base.Extensions;
@@ -27,7 +28,8 @@ public static class WebApplicationExtensions
             case AddingMode.Local:
                 break;
             case AddingMode.Service:
-                app.MapGrpcService<GrpcApplicationRegistryService>();
+                app.MapGrpcService<GrpcApplicationRegistryService>()
+                    .RequireAuthorization(OipModuleApplication.ServiceAccountPolicy);
                 break;
             case AddingMode.Remote:
                 break;

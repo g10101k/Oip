@@ -29,7 +29,7 @@ internal static class Program
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);
             builder.Services.AddApplicationsService(settings);
-            builder.Services.AddUserService(settings);
+            builder.Services.AddUserService(settings, AddingMode.Remote);
 
             builder.Services.AddDefaultSecretsValidation();
             builder.Services.AddStartupRunner();

@@ -55,7 +55,16 @@ public static class OipModuleApplication
     public const string OpenIdConnectAuthenticationScheme = "OipOpenIdConnect";
     public const string DefaultAuthenticationScheme = "OipDefault";
     public const string CsrfHeaderName = "X-CSRF-TOKEN";
+
+    /// <summary>
+    /// Authorization policy that admits only bearer tokens of the service account configured in
+    /// <see cref="SecurityServiceSettings.ClientId" />. Used to protect calls between services, e.g. gRPC.
+    /// </summary>
+    public const string ServiceAccountPolicy = "OipServiceAccount";
+
     private const string Bearer = "Bearer";
+    private const string AuthorizedPartyClaim = "azp";
+    private const string ClientIdClaim = "client_id";
 
     /// <summary>
     /// Initializes a new instance of the WebApplicationBuilder class with preconfigured defaults
@@ -607,6 +616,7 @@ public static class OipModuleApplication
             options.DefaultPolicy = new AuthorizationPolicyBuilder(DefaultAuthenticationScheme)
                 .RequireAuthenticatedUser()
                 .Build();
+            options.AddPolicy(ServiceAccountPolicy, CreateServiceAccountPolicy(settings.SecurityService.ClientId));
         });
         services.AddHttpClient<KeycloakClient>(x =>
                 x.BaseAddress = new Uri(settings.SecurityService.DockerUrl ?? settings.SecurityService.BaseUrl))
@@ -630,6 +640,22 @@ public static class OipModuleApplication
     {
         builder.Services.AddDefaultAuthentication(settings);
         return builder;
+    }
+
+    /// <summary>
+    /// Creates the <see cref="ServiceAccountPolicy" /> policy. Keycloak issues the <c>client_id</c> claim only for
+    /// the Client Credentials grant, so a user token obtained through the same client is rejected.
+    /// </summary>
+    /// <param name="clientId">Keycloak client whose service account is allowed. When it is not configured, every
+    /// request is rejected.</param>
+    internal static AuthorizationPolicy CreateServiceAccountPolicy(string? clientId)
+    {
+        clientId ??= string.Empty;
+        return new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthenticatedUser()
+            .RequireClaim(AuthorizedPartyClaim, clientId)
+            .RequireClaim(ClientIdClaim, clientId)
+            .Build();
     }
 
     private static string SelectDefaultAuthenticationScheme(HttpContext context)
@@ -707,7 +733,7 @@ public static class OipModuleApplication
         return JsonWebKeySet.Create(jwksJson).GetSigningKeys();
     }
 
-    private static HttpClientHandler CreateDevelopmentHttpClientHandler()
+    internal static HttpClientHandler CreateDevelopmentHttpClientHandler()
     {
         return new HttpClientHandler
         {
