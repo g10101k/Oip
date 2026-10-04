@@ -7,6 +7,7 @@ import {
   ApiExceptionResponse,
   AuthCsrfTokenResponse,
   AuthSessionResponse,
+  CreateAuthSessionParams,
   DefaultSecretsReportResponse,
 } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
@@ -23,10 +24,14 @@ export class SecurityApi<
       format: "json",
       ...params,
     });
-  createAuthSession = (params: RequestParams = {}) =>
+  createAuthSession = (
+    query: CreateAuthSessionParams,
+    params: RequestParams = {},
+  ) =>
     this.request<any, void | ApiExceptionResponse>({
       path: `/api/security/create-auth-session`,
       method: "POST",
+      query: query,
       secure: true,
       ...params,
     });

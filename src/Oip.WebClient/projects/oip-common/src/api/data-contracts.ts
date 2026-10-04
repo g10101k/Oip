@@ -199,3 +199,7 @@ export interface ChangeOrderParams {
   firstModuleId?: number;
   secondModuleId?: number;
 }
+
+export interface CreateAuthSessionParams {
+  returnUrl?: string;
+}
