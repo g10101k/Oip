@@ -8,7 +8,7 @@ using Oip.Hitl.Data.EntityConfigurations;
 namespace Oip.Hitl.Data.Contexts;
 
 /// <summary>
-/// EF Core context for LLM provider configuration. Lives in the <c>llm</c> schema of the application database.
+/// EF Core context for LLM providers, agents and their skills. Lives in the <c>llm</c> schema of the application database.
 /// </summary>
 /// <param name="options">The options for this context</param>
 /// <param name="designTime">Whether this context is being used at design time</param>
@@ -29,11 +29,25 @@ public class LlmContext(DbContextOptions<LlmContext> options, bool designTime = 
     /// </summary>
     public DbSet<LlmProviderEntity> Providers => Set<LlmProviderEntity>();
 
+    /// <summary>
+    /// Agents exposed to chat UIs.
+    /// </summary>
+    public DbSet<AgentEntity> Agents => Set<AgentEntity>();
+
+    /// <summary>
+    /// Skills of agents.
+    /// </summary>
+    public DbSet<SkillEntity> Skills => Set<SkillEntity>();
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new LlmProviderEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new AgentEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new SkillEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new AgentSkillEntityConfiguration(Database));
+        modelBuilder.ApplyConfiguration(new SkillToolEntityConfiguration(Database));
 
         modelBuilder.ApplyXmlDocumentation(designTime);
     }

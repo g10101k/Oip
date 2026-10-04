@@ -70,7 +70,8 @@ public class ChatCompletionMessage
 /// <param name="Id">Model id sent in <see cref="ChatCompletionRequest.Model"/>.</param>
 /// <param name="Created">Creation time, Unix seconds.</param>
 /// <param name="OwnedBy">Owner of the model.</param>
-public record OpenAiModel(string Id, long Created, string OwnedBy)
+/// <param name="Name">Display name; not in the OpenAI API, but shown by chat UIs such as Open WebUI.</param>
+public record OpenAiModel(string Id, long Created, string OwnedBy, string? Name = null)
 {
     /// <summary>
     /// Object type.
@@ -160,7 +161,8 @@ public record ChatCompletionChunkChoice(int Index, ChatCompletionDelta Delta, st
 /// </summary>
 /// <param name="Role">Author of the message, in the first chunk.</param>
 /// <param name="Content">Text delta.</param>
-public record ChatCompletionDelta(string? Role = null, string? Content = null);
+/// <param name="ReasoningContent">Reasoning delta, shown by chat UIs apart from the answer.</param>
+public record ChatCompletionDelta(string? Role = null, string? Content = null, string? ReasoningContent = null);
 
 /// <summary>
 /// Token usage of a completion.

@@ -53,6 +53,10 @@ internal static class Program
             builder.Services.AddScoped<LlmProviderTools>();
             builder.Services.AddScoped<LlmProviderService>();
             builder.Services.AddScoped<LlmActivities>();
+            builder.Services.AddScoped<AgentService>();
+            builder.Services.AddScoped<AgentActivities>();
+            builder.Services.AddScoped<DemoToolActivities>();
+            builder.Services.AddSingleton<AgentToolCatalog>();
             builder.Services.AddSingleton(settings.AgentGateway);
             builder.Services.AddSingleton(_ => new AgentEventStream(
                 settings.AgentGateway.RedisConnectionString ??
@@ -70,6 +74,7 @@ internal static class Program
                 .AddController<LlmProviderModuleController>()
                 .AddController<WorkflowDemoController>()
                 .AddController<AgentGatewayController>()
+                .AddController<AgentModuleController>()
                 .AddController<WorkflowStepController>();
             // Controllers are registered explicitly, so the controllers of the services hosted in the application
             // have to be registered too; in Remote mode they are served by the services themselves.
@@ -92,7 +97,9 @@ internal static class Program
                 .AddWorkflow<HelloWorldWorkflow>()
                 .AddWorkflow<UserTaskDemoWorkflow>()
                 .AddWorkflow<AgentWorkflow>()
-                .AddActivities<LlmActivities>());
+                .AddActivities<LlmActivities>()
+                .AddActivities<AgentActivities>()
+                .AddActivities<DemoToolActivities>());
 
             var app = builder.Build();
             app.UseOipSpa(settings);

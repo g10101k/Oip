@@ -30,10 +30,10 @@ public class LlmActivities(LlmProviderService providerService, AgentEventStream 
 
     /// <summary>
     /// Runs a turn of an agent and publishes the text deltas of the answer to
-    /// <see cref="AgentTurnRequest.StreamKey"/>. The start of each attempt is published too, so the reader can tell
-    /// the deltas of a retried attempt apart. Heartbeats are sent while the model answers, so a cancelled workflow
-    /// stops the generation and a lost worker is noticed before the activity times out. Failures are handled as in
-    /// <see cref="RequestAsync"/>.
+    /// <see cref="AgentTurnRequest.StreamKey"/>, followed by a status for each tool the model called. The start of
+    /// each attempt is published too, so the reader can tell the deltas of a retried attempt apart. Heartbeats are
+    /// sent while the model answers, so a cancelled workflow stops the generation and a lost worker is noticed before
+    /// the activity times out. Failures are handled as in <see cref="RequestAsync"/>.
     /// </summary>
     [Activity]
     public async Task<AgentTurnResult> ChatTurnAsync(AgentTurnRequest request)
@@ -47,9 +47,13 @@ public class LlmActivities(LlmProviderService providerService, AgentEventStream 
         var heartbeat = HeartbeatAsync(context, heartbeatStop.Token);
         try
         {
-            return await CallProviderAsync(() => providerService.StreamChatAsync(request,
+            var result = await CallProviderAsync(() => providerService.StreamChatAsync(request,
                 delta => key is null ? Task.CompletedTask : eventStream.PublishDeltaAsync(key, delta),
                 context.CancellationToken));
+            if (key is not null)
+                foreach (var call in result.ToolCalls ?? [])
+                    await eventStream.PublishStatusAsync(key, $"🔧 {call.Name} {call.Arguments}");
+            return result;
         }
         finally
         {

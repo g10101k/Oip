@@ -26,7 +26,7 @@ namespace Oip.Hitl.Controllers;
 [ApiExplorerSettings(IgnoreApi = true)]
 [Route("v1")]
 public class AgentGatewayController(
-    LlmProviderService providerService,
+    AgentService agentService,
     ITemporalClient client,
     TemporalSettings temporalSettings,
     AgentGatewaySettings gatewaySettings,
@@ -37,18 +37,18 @@ public class AgentGatewayController(
     private const string OwnedBy = "oip";
     private const string AssistantRole = "assistant";
     private const string RetrySeparator = "\n\n---\n\n";
+    private const string TurnSeparator = "\n\n";
     private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(50);
 
     /// <summary>
-    /// Returns the models the chat can use: the enabled LLM providers.
+    /// Returns the models the chat can use: the enabled agents.
     /// </summary>
     [HttpGet("models")]
     public async Task<IActionResult> GetModels(CancellationToken cancellationToken)
     {
-        var providers = await providerService.GetAllAsync(cancellationToken);
-        var models = providers
-            .Where(x => x.IsEnabled)
-            .Select(x => new OpenAiModel(x.Name, ToUnixSeconds(x.CreatedAt), OwnedBy))
+        var agents = await agentService.GetEnabledAgentsAsync(cancellationToken);
+        var models = agents
+            .Select(x => new OpenAiModel(x.Code, ToUnixSeconds(x.CreatedAt), OwnedBy, x.Name))
             .ToList();
         return new JsonResult(new OpenAiModelList(models), OpenAiJson.Options);
     }
@@ -63,11 +63,11 @@ public class AgentGatewayController(
     {
         var messages = OpenAiChatConverter.ToAgentMessages(request.Messages);
         var settings = OpenAiChatConverter.ToSettings(request.Parameters);
-        var provider = await FindProviderAsync(request.Model, cancellationToken);
+        var agent = await FindAgentAsync(request.Model, cancellationToken);
 
         var runId = $"agent-{Guid.NewGuid():N}";
         var streamKey = request.Stream ? AgentEventStream.GetKey(runId) : null;
-        var input = new AgentWorkflowInput(provider.Id, messages, settings, streamKey, claimService.GetUserLogin());
+        var input = new AgentWorkflowInput(agent, messages, settings, streamKey, claimService.GetUserLogin());
         var handle = await client.CallAsync(() => client.StartWorkflowAsync(
             (AgentWorkflow workflow) => workflow.RunAsync(input),
             new WorkflowOptions(runId, temporalSettings.TaskQueue)
@@ -82,12 +82,12 @@ public class AgentGatewayController(
         {
             if (streamKey is not null)
             {
-                await StreamAsync(handle, streamKey, completionId, created, provider.Name, cancellationToken);
+                await StreamAsync(handle, streamKey, completionId, created, agent.Code, cancellationToken);
                 return new EmptyResult();
             }
 
             var result = await GetResultAsync(handle, cancellationToken);
-            return new JsonResult(new ChatCompletion(completionId, created, provider.Name,
+            return new JsonResult(new ChatCompletion(completionId, created, agent.Code,
                 [new ChatCompletionChoice(0, new ChatCompletionResponseMessage(AssistantRole, result.Content),
                     result.FinishReason ?? "stop")],
                 ToUsage(result)), OpenAiJson.Options);
@@ -109,7 +109,9 @@ public class AgentGatewayController(
 
     /// <summary>
     /// Writes the events of the run as chunks until the workflow is closed. The workflow closes after its activities
-    /// published all their events, so the stream is read once more after that and then ends.
+    /// published all their events, so the stream is read once more after that and then ends. Statuses, e.g. tool
+    /// calls, are sent as reasoning, which chat UIs show apart from the answer; the texts of the turns are separated
+    /// like in the answer of the workflow.
     /// </summary>
     private async Task StreamAsync(WorkflowHandle<AgentWorkflow, AgentTurnResult> handle, string streamKey,
         string completionId, long created, string model, CancellationToken cancellationToken)
@@ -131,6 +133,7 @@ public class AgentGatewayController(
         _ = resultTask.ContinueWith(task => task.Exception, TaskContinuationOptions.OnlyOnFaulted);
         var position = AgentEventStream.Beginning;
         var hasText = false;
+        var turnStarted = false;
         while (true)
         {
             var closed = resultTask.IsCompleted;
@@ -138,13 +141,28 @@ public class AgentGatewayController(
             foreach (var agentEvent in events)
             {
                 position = agentEvent.Id;
-                var text = agentEvent.Type == AgentEventType.Start
-                    ? agentEvent.Attempt > 1 && hasText ? RetrySeparator : null
-                    : agentEvent.Text;
-                if (string.IsNullOrEmpty(text)) continue;
+                ChatCompletionDelta? delta = null;
+                switch (agentEvent.Type)
+                {
+                    case AgentEventType.Start:
+                        // A retried attempt repeats the text of its turn after a separator.
+                        if (agentEvent.Attempt > 1 && turnStarted)
+                            delta = new ChatCompletionDelta(Content: RetrySeparator);
+                        else
+                            turnStarted = false;
+                        break;
+                    case AgentEventType.Status:
+                        delta = new ChatCompletionDelta(ReasoningContent: agentEvent.Text + "\n");
+                        break;
+                    case AgentEventType.Delta when !string.IsNullOrEmpty(agentEvent.Text):
+                        var text = !turnStarted && hasText ? TurnSeparator + agentEvent.Text : agentEvent.Text;
+                        hasText = turnStarted = true;
+                        delta = new ChatCompletionDelta(Content: text);
+                        break;
+                }
 
-                hasText = true;
-                await WriteEventAsync(Chunk(new ChatCompletionDelta(Content: text)), cancellationToken);
+                if (delta is not null)
+                    await WriteEventAsync(Chunk(delta), cancellationToken);
             }
 
             if (events.Count > 0) continue;
@@ -200,14 +218,12 @@ public class AgentGatewayController(
         }
     }
 
-    private async Task<LlmProviderDto> FindProviderAsync(string? model, CancellationToken cancellationToken)
+    private async Task<AgentSnapshot> FindAgentAsync(string? model, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(model))
             throw new ApiException("Invalid request", "model is required", StatusCodes.Status400BadRequest);
 
-        var providers = await providerService.GetAllAsync(cancellationToken);
-        return providers.FirstOrDefault(x => x.IsEnabled && string.Equals(x.Name, model.Trim(),
-                   StringComparison.OrdinalIgnoreCase))
+        return await agentService.GetSnapshotAsync(model.Trim(), cancellationToken)
                ?? throw new ApiException("Not found", $"The model '{model}' does not exist",
                    StatusCodes.Status404NotFound);
     }

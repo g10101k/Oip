@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oip.Hitl.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Hil.Data.Migrations.Postgres
+namespace Oip.Hitl.Data.Migrations.Postgres
 {
     [DbContext(typeof(LlmContextPostgres))]
-    partial class LlmContextPostgresModelSnapshot : ModelSnapshot
+    [Migration("20261004114423_AgentsAndSkills_Postgres")]
+    partial class AgentsAndSkills_Postgres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

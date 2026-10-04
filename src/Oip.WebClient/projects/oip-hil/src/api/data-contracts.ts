@@ -10,6 +10,29 @@ export enum LlmProviderType {
   OpenAi = "OpenAi",
 }
 
+export interface AgentDto {
+  id?: number;
+  code?: string | null;
+  name?: string | null;
+  description?: string | null;
+  systemPrompt?: string | null;
+  llmProviderId?: number | null;
+  isEnabled?: boolean;
+  skillIds?: number[] | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface AgentModuleSettings {
+  showDisabled?: boolean;
+}
+
+export interface AgentToolDto {
+  name?: string | null;
+  description?: string | null;
+  parametersSchema?: string | null;
+}
+
 export interface ApiExceptionResponse {
   title?: string | null;
   message?: string | null;
@@ -68,6 +91,16 @@ export interface RunWorkflowResponse {
   result?: string | null;
 }
 
+export interface SaveAgentRequest {
+  code?: string | null;
+  name?: string | null;
+  description?: string | null;
+  systemPrompt?: string | null;
+  llmProviderId?: number | null;
+  isEnabled?: boolean;
+  skillIds?: number[] | null;
+}
+
 export interface SaveLlmProviderRequest {
   name?: string | null;
   baseUrl?: string | null;
@@ -76,6 +109,25 @@ export interface SaveLlmProviderRequest {
   providerType?: LlmProviderType;
   isDefault?: boolean;
   isEnabled?: boolean;
+}
+
+export interface SaveSkillRequest {
+  code?: string | null;
+  description?: string | null;
+  instructions?: string | null;
+  isEnabled?: boolean;
+  tools?: string[] | null;
+}
+
+export interface SkillDto {
+  id?: number;
+  code?: string | null;
+  description?: string | null;
+  instructions?: string | null;
+  isEnabled?: boolean;
+  tools?: string[] | null;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface TestLlmProviderResponse {
@@ -114,6 +166,22 @@ export interface WorkflowAttachment {
   fileName?: string | null;
   contentType?: string | null;
   size?: number;
+}
+
+export interface UpdateAgentParams {
+  id: number;
+}
+
+export interface DeleteAgentParams {
+  id: number;
+}
+
+export interface UpdateSkillParams {
+  id: number;
+}
+
+export interface DeleteSkillParams {
+  id: number;
 }
 
 export interface UpdateProviderParams {

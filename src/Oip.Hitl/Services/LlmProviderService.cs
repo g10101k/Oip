@@ -209,8 +209,9 @@ public class LlmProviderService(
     }
 
     /// <summary>
-    /// Streams the answer of the provider to the chat without offering tools to the model; <paramref name="onDelta"/>
-    /// is called with each text delta of the answer.
+    /// Streams the answer of the provider to the chat; <paramref name="onDelta"/> is called with each text delta of
+    /// the answer. The model may call the <see cref="AgentTurnRequest.Tools"/>: the calls are returned in
+    /// <see cref="AgentTurnResult.ToolCalls"/>, not made.
     /// </summary>
     /// <exception cref="ApiException">The provider is not found, disabled or not configured.</exception>
     /// <exception cref="LlmProviderException">The provider rejected the request.</exception>
@@ -223,12 +224,18 @@ public class LlmProviderService(
         var provider = await FindChatProviderAsync(request.ProviderId, cancellationToken);
         var settings = ValidateSettings(request.Settings);
         var chatClient = CreateChatClient(provider, provider.Model).AsIChatClient();
+        var tools = request.Tools ?? [];
         var options = new ChatOptions
         {
+            Tools = tools.Count == 0
+                ? null
+                : tools.Select(AITool (x) => AIFunctionFactory.CreateDeclaration(x.Name, x.Description,
+                    x.ParametersSchema)).ToList(),
             RawRepresentationFactory = settings.Count == 0 ? null : _ => CreateCompletionOptions(settings)
         };
 
         var content = new StringBuilder();
+        var toolCalls = new List<AgentToolCall>();
         string? finishReason = null;
         UsageDetails? usage = null;
         try
@@ -238,6 +245,8 @@ public class LlmProviderService(
             {
                 finishReason = update.FinishReason?.Value ?? finishReason;
                 usage = update.Contents.OfType<UsageContent>().LastOrDefault()?.Details ?? usage;
+                toolCalls.AddRange(update.Contents.OfType<FunctionCallContent>().Select(x => new AgentToolCall(
+                    x.CallId, x.Name, JsonSerializer.Serialize(x.Arguments ?? new Dictionary<string, object?>()))));
                 var text = update.Text;
                 if (string.IsNullOrEmpty(text)) continue;
 
@@ -251,7 +260,7 @@ public class LlmProviderService(
         }
 
         return new AgentTurnResult(content.ToString(), provider.Name, provider.Model, usage?.InputTokenCount,
-            usage?.OutputTokenCount, finishReason);
+            usage?.OutputTokenCount, finishReason, toolCalls.Count == 0 ? null : toolCalls);
     }
 
     /// <summary>
@@ -264,13 +273,23 @@ public class LlmProviderService(
 
     private static AiChatMessage ToChatMessage(AgentMessage message)
     {
-        var role = message.Role switch
+        switch (message.Role)
         {
-            "system" => ChatRole.System,
-            "assistant" => ChatRole.Assistant,
-            _ => ChatRole.User
-        };
-        return new AiChatMessage(role, message.Content);
+            case "system":
+                return new AiChatMessage(ChatRole.System, message.Content);
+            case "assistant":
+                List<AIContent> contents = [];
+                if (!string.IsNullOrEmpty(message.Content))
+                    contents.Add(new TextContent(message.Content));
+                contents.AddRange((message.ToolCalls ?? []).Select(x => new FunctionCallContent(x.Id, x.Name,
+                    JsonSerializer.Deserialize<Dictionary<string, object?>>(x.Arguments))));
+                return new AiChatMessage(ChatRole.Assistant, contents);
+            case "tool":
+                return new AiChatMessage(ChatRole.Tool,
+                    [new FunctionResultContent(message.ToolCallId ?? string.Empty, message.Content)]);
+            default:
+                return new AiChatMessage(ChatRole.User, message.Content);
+        }
     }
 
     private static IReadOnlyDictionary<string, JsonElement> ValidateSettings(

@@ -15,7 +15,12 @@ public enum AgentEventType
     /// <summary>
     /// Text delta of the answer.
     /// </summary>
-    Delta
+    Delta,
+
+    /// <summary>
+    /// Progress of the run shown apart from the answer, e.g. a tool call.
+    /// </summary>
+    Status
 }
 
 /// <summary>
@@ -23,7 +28,7 @@ public enum AgentEventType
 /// </summary>
 /// <param name="Id">Id of the stream entry; reading continues after it.</param>
 /// <param name="Type">Kind of the event.</param>
-/// <param name="Text">Text of a <see cref="AgentEventType.Delta"/>.</param>
+/// <param name="Text">Text of a <see cref="AgentEventType.Delta"/> or a <see cref="AgentEventType.Status"/>.</param>
 /// <param name="Attempt">Attempt of the activity of a <see cref="AgentEventType.Start"/>.</param>
 public record AgentEvent(string Id, AgentEventType Type, string? Text, int Attempt);
 
@@ -46,6 +51,7 @@ public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : I
     private const string AttemptField = "attempt";
     private const string StartType = "start";
     private const string DeltaType = "delta";
+    private const string StatusType = "status";
 
     private readonly Lazy<Task<ConnectionMultiplexer>> _connection = new(() => ConnectAsync(connectionString));
 
@@ -74,6 +80,15 @@ public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : I
     }
 
     /// <summary>
+    /// Publishes a status of the run.
+    /// </summary>
+    public async Task PublishStatusAsync(string key, string text)
+    {
+        var database = await GetDatabaseAsync();
+        await database.StreamAddAsync(key, [new(TypeField, StatusType), new(TextField, text)]);
+    }
+
+    /// <summary>
     /// Reads the events published after <paramref name="afterId"/>, oldest first; empty when there are none yet.
     /// </summary>
     /// <param name="key">Key of the stream.</param>
@@ -94,7 +109,12 @@ public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : I
 
     private static AgentEvent ToEvent(StreamEntry entry)
     {
-        var type = entry[TypeField] == StartType ? AgentEventType.Start : AgentEventType.Delta;
+        var type = (string?)entry[TypeField] switch
+        {
+            StartType => AgentEventType.Start,
+            StatusType => AgentEventType.Status,
+            _ => AgentEventType.Delta
+        };
         var attempt = entry[AttemptField];
         return new AgentEvent(entry.Id.ToString(), type, entry[TextField], attempt.IsNull ? 0 : (int)attempt);
     }

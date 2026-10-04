@@ -22,6 +22,85 @@ namespace Oip.Hil.Data.Migrations.SqlServer
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.AgentEntity", b =>
+                {
+                    b.Property<int>("AgentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasComment("Primary key.");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AgentId"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("Model id of the agent in the OpenAI-compatible API, e.g. support-agent.");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasComment("Creation timestamp (UTC).");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasComment("Description for administrators.");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit")
+                        .HasComment("Whether the agent is offered to chat UIs.");
+
+                    b.Property<int?>("LlmProviderId")
+                        .HasColumnType("int")
+                        .HasComment("Provider that answers; null for the default provider.");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasComment("Human-readable name shown in the UI.");
+
+                    b.Property<string>("SystemPrompt")
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("System prompt of the agent; the list of its skills is added to it.");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasComment("Last update timestamp (UTC).");
+
+                    b.HasKey("AgentId");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("LlmProviderId");
+
+                    b.ToTable("Agent", "llm", t =>
+                        {
+                            t.HasComment("Agent exposed to chat UIs as a model: a system prompt, the LLM provider that answers and the skills it may load.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.AgentSkillEntity", b =>
+                {
+                    b.Property<int>("AgentId")
+                        .HasColumnType("int")
+                        .HasComment("Agent.");
+
+                    b.Property<int>("SkillId")
+                        .HasColumnType("int")
+                        .HasComment("Skill.");
+
+                    b.HasKey("AgentId", "SkillId");
+
+                    b.HasIndex("SkillId");
+
+                    b.ToTable("AgentSkill", "llm", t =>
+                        {
+                            t.HasComment("Skill an agent may load.");
+                        });
+                });
+
             modelBuilder.Entity("Oip.Hitl.Data.Entities.LlmProviderEntity", b =>
                 {
                     b.Property<int>("LlmProviderId")
@@ -88,6 +167,126 @@ namespace Oip.Hil.Data.Migrations.SqlServer
                         {
                             t.HasComment("Stored LLM provider configuration.");
                         });
+                });
+
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.SkillEntity", b =>
+                {
+                    b.Property<int>("SkillId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasComment("Primary key.");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SkillId"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("Name the model loads the skill by, e.g. datetime.");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasComment("Creation timestamp (UTC).");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasComment("When to use the skill; always shown to the model.");
+
+                    b.Property<string>("Instructions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("How to do the task; given to the model when it loads the skill.");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit")
+                        .HasComment("Whether agents may load the skill.");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasComment("Last update timestamp (UTC).");
+
+                    b.HasKey("SkillId");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Skill", "llm", t =>
+                        {
+                            t.HasComment("Skill of agents: instructions and tools for a kind of task. The model sees only  until\n            it loads the skill; then it gets  and the tools.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.SkillToolEntity", b =>
+                {
+                    b.Property<int>("SkillId")
+                        .HasColumnType("int")
+                        .HasComment("Skill.");
+
+                    b.Property<string>("ToolName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("Name of the tool, e.g. get_current_time.");
+
+                    b.HasKey("SkillId", "ToolName");
+
+                    b.ToTable("SkillTool", "llm", t =>
+                        {
+                            t.HasComment("Tool a skill gives the model, by its name in the tool catalog.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.AgentEntity", b =>
+                {
+                    b.HasOne("Oip.Hitl.Data.Entities.LlmProviderEntity", "LlmProvider")
+                        .WithMany()
+                        .HasForeignKey("LlmProviderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("LlmProvider");
+                });
+
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.AgentSkillEntity", b =>
+                {
+                    b.HasOne("Oip.Hitl.Data.Entities.AgentEntity", "Agent")
+                        .WithMany("Skills")
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Oip.Hitl.Data.Entities.SkillEntity", "Skill")
+                        .WithMany("Agents")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agent");
+
+                    b.Navigation("Skill");
+                });
+
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.SkillToolEntity", b =>
+                {
+                    b.HasOne("Oip.Hitl.Data.Entities.SkillEntity", "Skill")
+                        .WithMany("Tools")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Skill");
+                });
+
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.AgentEntity", b =>
+                {
+                    b.Navigation("Skills");
+                });
+
+            modelBuilder.Entity("Oip.Hitl.Data.Entities.SkillEntity", b =>
+                {
+                    b.Navigation("Agents");
+
+                    b.Navigation("Tools");
                 });
 #pragma warning restore 612, 618
         }

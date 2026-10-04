@@ -52,22 +52,46 @@ public record LlmResponse(
 /// <summary>
 /// Message of a chat with an agent.
 /// </summary>
-/// <param name="Role">Author of the message: <c>system</c>, <c>user</c> or <c>assistant</c>.</param>
-/// <param name="Content">Text of the message.</param>
-public record AgentMessage(string Role, string Content);
+/// <param name="Role">Author of the message: <c>system</c>, <c>user</c>, <c>assistant</c> or <c>tool</c>.</param>
+/// <param name="Content">Text of the message; the result of the call for a <c>tool</c> message.</param>
+/// <param name="ToolCalls">Tools the model called in an <c>assistant</c> message.</param>
+/// <param name="ToolCallId">Call a <c>tool</c> message is the result of.</param>
+public record AgentMessage(
+    string Role,
+    string Content,
+    IReadOnlyList<AgentToolCall>? ToolCalls = null,
+    string? ToolCallId = null);
+
+/// <summary>
+/// Tool call of the model.
+/// </summary>
+/// <param name="Id">Id of the call the result refers to.</param>
+/// <param name="Name">Name of the tool.</param>
+/// <param name="Arguments">Arguments as a JSON object.</param>
+public record AgentToolCall(string Id, string Name, string Arguments);
+
+/// <summary>
+/// Tool offered to the model; the model only requests calls, they are made by the caller.
+/// </summary>
+/// <param name="Name">Name of the tool.</param>
+/// <param name="Description">What the tool does.</param>
+/// <param name="ParametersSchema">JSON schema of the arguments object.</param>
+public record AgentToolDeclaration(string Name, string Description, JsonElement ParametersSchema);
 
 /// <summary>
 /// Turn of an agent: the chat is sent to the model and its answer is streamed.
 /// </summary>
-/// <param name="ProviderId">Provider to use.</param>
+/// <param name="ProviderId">Provider to use; <c>null</c> for the default provider.</param>
 /// <param name="Messages">Chat history; the model answers the last message.</param>
 /// <param name="Settings">Request parameters sent to the chat completions API as is, e.g. <c>temperature</c>.</param>
 /// <param name="StreamKey">Key of the <see cref="AgentEventStream"/> the text deltas of the answer are published to; <c>null</c> to not stream.</param>
+/// <param name="Tools">Tools the model may call.</param>
 public record AgentTurnRequest(
-    int ProviderId,
+    int? ProviderId,
     IReadOnlyList<AgentMessage> Messages,
     IReadOnlyDictionary<string, JsonElement>? Settings = null,
-    string? StreamKey = null);
+    string? StreamKey = null,
+    IReadOnlyList<AgentToolDeclaration>? Tools = null);
 
 /// <summary>
 /// Answer of the model in an agent turn.
@@ -78,13 +102,15 @@ public record AgentTurnRequest(
 /// <param name="PromptTokens">Tokens in the request, when reported by the provider.</param>
 /// <param name="CompletionTokens">Tokens in the answer, when reported by the provider.</param>
 /// <param name="FinishReason">Why the model stopped, e.g. <c>stop</c> or <c>length</c>, when reported by the provider.</param>
+/// <param name="ToolCalls">Tools the model called; the turn is not finished until their results are sent.</param>
 public record AgentTurnResult(
     string Content,
     string Provider,
     string Model,
     long? PromptTokens,
     long? CompletionTokens,
-    string? FinishReason);
+    string? FinishReason,
+    IReadOnlyList<AgentToolCall>? ToolCalls = null);
 
 /// <summary>
 /// Failed call to an LLM provider.
