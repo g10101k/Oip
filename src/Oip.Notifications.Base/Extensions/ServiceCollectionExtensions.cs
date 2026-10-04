@@ -46,7 +46,7 @@ public static class ServiceCollectionExtensions
                 services.AddGrpcClient<GrpcNotificationService.GrpcNotificationServiceClient>(options =>
                 {
                     options.Address = new Uri(settings.Services.NotificationsService);
-                });
+                }).AddServiceAccountAuthorization(settings);
 
                 services.TryAddScoped<INotificationServiceClient, GrpcNotificationServiceClientAdapter>();
                 break;

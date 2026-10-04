@@ -44,7 +44,7 @@ public static class ServiceCollectionExtensions
                 services.AddGrpcClient<GrpcApplicationRegistryService.GrpcApplicationRegistryServiceClient>(options =>
                 {
                     options.Address = new Uri(settings.Services.ApplicationsService);
-                });
+                }).AddServiceAccountAuthorization(settings);
                 services.TryAddScoped<IApplicationRegistryService, GrpcApplicationRegistryServiceClientAdapter>();
                 services.AddStartupTask<ApplicationSelfRegistrationStartupTask>();
                 break;

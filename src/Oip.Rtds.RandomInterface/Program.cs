@@ -1,6 +1,8 @@
 using NLog;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using Oip.Base.Extensions;
+using Oip.Base.Security.ServiceAccount;
 using Oip.Rtds.Base;
 using Oip.Rtds.Base.Services;
 using Oip.Rtds.Grpc;
@@ -21,9 +23,11 @@ public class Program
             builder.Logging.ClearProviders();
             builder.Logging.AddNLog();
             builder.Services.AddGrpcClient<RtdsService.RtdsServiceClient>(options =>
-            {
-                options.Address = new Uri(settings.RtdsUrl);
-            });
+                {
+                    options.Address = new Uri(settings.RtdsUrl);
+                })
+                .AddServiceAccountAuthorization(ServiceAccountOptions.FromSecurityService(settings.SecurityService,
+                    builder.Environment.IsDevelopment()));
             builder.Services.AddScoped<UpdateTagInfoService>();
             builder.Services.AddScoped<TagWorkerService>();
             builder.Services.AddSingleton<FormulaManager>();

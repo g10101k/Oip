@@ -62,6 +62,41 @@ Default authentication scheme выбирает способ проверки п�
 Это позволяет оставить прямые сервисные вызовы, Swagger/API сценарии и SignalR-особенности, не возвращая хранение токенов
 в браузерное приложение.
 
+## gRPC между сервисами
+
+gRPC-сервисы (`GrpcApplicationRegistryService`, `UserService`, `NotificationService`, `RtdsService`) слушают тот же
+Kestrel endpoint, что и REST API, поэтому каждый из них закрыт политикой
+`OipModuleApplication.ServiceAccountPolicy`:
+
+```csharp
+app.MapGrpcService<UserService>()
+    .RequireAuthorization(OipModuleApplication.ServiceAccountPolicy);
+```
+
+Политика проверяет только JWT bearer (cookie-сессия не подходит) и пропускает токен, у которого `azp` и `client_id`
+равны `SecurityService:ClientId` (`oip-backend`). Claim `client_id` Keycloak выпускает только для grant Client
+Credentials, поэтому пользовательский токен, полученный через тот же клиент, отклоняется.
+
+| Запрос                                       | Результат                     |
+|----------------------------------------------|-------------------------------|
+| без токена, невалидный или просроченный токен | `StatusCode.Unauthenticated`  |
+| токен пользователя                           | `StatusCode.PermissionDenied` |
+| токен сервисного аккаунта `oip-backend`      | вызов выполняется             |
+
+На стороне клиента gRPC-клиент регистрируется с `AddServiceAccountAuthorization`:
+
+```csharp
+services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(options =>
+{
+    options.Address = new Uri(settings.Services.UsersService);
+}).AddServiceAccountAuthorization(settings);
+```
+
+`ServiceAccountTokenProvider` получает токен через OAuth 2.0 Client Credentials (`SecurityService:ClientId` и
+`SecurityService:ClientSecret`), кеширует его и обновляет за 30 секунд до истечения. Если сервер ответил `401`,
+закешированный токен сбрасывается и следующий вызов запросит новый. Секрет клиента задается через
+`SecurityService__ClientSecret`, см. [DefaultSecrets.md](DefaultSecrets.md).
+
 ## Ошибки
 
 Ошибки аутентификации и авторизации возвращаются в формате `ApiExceptionResponse`:

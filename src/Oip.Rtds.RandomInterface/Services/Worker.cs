@@ -1,12 +1,10 @@
 using System.Text;
 using Grpc.Core;
-using Grpc.Net.Client;
 using Oip.Rtds.Grpc;
-using Oip.Rtds.RandomInterface.Settings;
 
 namespace Oip.Rtds.RandomInterface.Services;
 
-public class Worker(ILogger<Worker> logger) : BackgroundService
+public class Worker(IServiceScopeFactory scopeFactory, ILogger<Worker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -14,8 +12,8 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
         {
             try
             {
-                using var channel = GrpcChannel.ForAddress(AppSettings.Instance.RtdsUrl);
-                var client = new RtdsService.RtdsServiceClient(channel);
+                using var scope = scopeFactory.CreateScope();
+                var client = scope.ServiceProvider.GetRequiredService<RtdsService.RtdsServiceClient>();
                 var clientId = $"client_{Guid.NewGuid().ToString()[..8]}";
                 var eventTypes = new[] { "system.alert", "user.notification" };
 

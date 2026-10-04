@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Oip.Base.Extensions;
 using Oip.Base.Settings;
 using Oip.Notifications.Base.Data.Contexts;
 using Oip.Notifications.Base.Hubs;
@@ -33,7 +34,8 @@ public static class WebApplicationExtensions
                 break;
             case AddingMode.Service:
                 // Register gRPC.
-                app.MapGrpcService<NotificationService>();
+                app.MapGrpcService<NotificationService>()
+                    .RequireAuthorization(OipModuleApplication.ServiceAccountPolicy);
                 break;
             case AddingMode.Remote:
                 // No need to register gRPC because the service runs in a separate application.

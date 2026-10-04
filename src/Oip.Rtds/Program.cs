@@ -73,7 +73,8 @@ internal static class Program
             app.MapControllerRoute(name: "default", pattern: "{controller}/{action=Index}/{id?}");
             app.MapOpenApi(settings);
             app.MapFallbackToFile("index.html");
-            app.MapGrpcService<RtdsService>();
+            app.MapGrpcService<RtdsService>()
+                .RequireAuthorization(OipModuleApplication.ServiceAccountPolicy);
             app.MapOpenTelemetry(settings);
             app.Run();
         }

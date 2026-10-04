@@ -53,7 +53,7 @@ public static class ServiceCollectionExtensions
                 services.AddGrpcClient<GrpcUserService.GrpcUserServiceClient>(options =>
                 {
                     options.Address = new Uri(settings.Services.UsersService);
-                });
+                }).AddServiceAccountAuthorization(settings);
                 services.TryAddScoped<IUserService, RemoteUserService>();
                 services.AddUserCacheRepository();
                 break;
