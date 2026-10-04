@@ -42,6 +42,13 @@ public class ChatCompletionRequest
     public bool Stream { get; set; }
 
     /// <summary>
+    /// Not in the OpenAI API: whether the statuses and the user steps of the run are streamed as
+    /// <see cref="ChatCompletionChunk.Oip"/> events instead of text, for the Open WebUI pipe of OIP.
+    /// </summary>
+    [JsonPropertyName("oip_events")]
+    public bool OipEvents { get; set; }
+
+    /// <summary>
     /// Other parameters of the request, e.g. <c>temperature</c> or <c>max_tokens</c>.
     /// </summary>
     [JsonExtensionData]
@@ -135,12 +142,15 @@ public record ChatCompletionResponseMessage(string Role, string Content);
 /// <param name="Model">Model id of the request.</param>
 /// <param name="Choices">Delta of the answer.</param>
 /// <param name="Usage">Token usage, sent in the last chunk when reported by the provider.</param>
+/// <param name="Oip">Not in the OpenAI API: event of the run, sent with no choices when
+/// <see cref="ChatCompletionRequest.OipEvents"/> is set.</param>
 public record ChatCompletionChunk(
     string Id,
     long Created,
     string Model,
     IReadOnlyList<ChatCompletionChunkChoice> Choices,
-    ChatCompletionUsage? Usage = null)
+    ChatCompletionUsage? Usage = null,
+    AgentRunEvent? Oip = null)
 {
     /// <summary>
     /// Object type.
@@ -163,6 +173,37 @@ public record ChatCompletionChunkChoice(int Index, ChatCompletionDelta Delta, st
 /// <param name="Content">Text delta.</param>
 /// <param name="ReasoningContent">Reasoning delta, shown by chat UIs apart from the answer.</param>
 public record ChatCompletionDelta(string? Role = null, string? Content = null, string? ReasoningContent = null);
+
+/// <summary>
+/// Event of an agent run streamed to the Open WebUI pipe of OIP.
+/// </summary>
+/// <param name="Type"><c>status</c> for progress, e.g. a tool call, or <c>user_step</c> when the run waits for the
+/// user.</param>
+/// <param name="Text">Text of a status.</param>
+/// <param name="RunId">Run of a user step, to complete it with.</param>
+/// <param name="StepId">The user step.</param>
+/// <param name="Kind"><c>question</c> or <c>approval</c> of a tool call.</param>
+/// <param name="Title">Title of the step.</param>
+/// <param name="Description">The question, or the tool call to allow.</param>
+/// <param name="Outcomes">Answers to choose from; empty for a free answer.</param>
+/// <param name="Url">Page of the step in OIP, where it can be completed too.</param>
+public record AgentRunEvent(
+    string Type,
+    string? Text = null,
+    string? RunId = null,
+    string? StepId = null,
+    string? Kind = null,
+    string? Title = null,
+    string? Description = null,
+    IReadOnlyList<string>? Outcomes = null,
+    string? Url = null);
+
+/// <summary>
+/// Answer of the user to a step of an agent run.
+/// </summary>
+/// <param name="Result">The answer: one of the outcomes of the step, a free answer, or empty to decline.</param>
+/// <param name="Comment">Optional comment, e.g. why a tool call is denied.</param>
+public record CompleteAgentStepRequest(string? Result, string? Comment = null);
 
 /// <summary>
 /// Token usage of a completion.

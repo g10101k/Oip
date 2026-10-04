@@ -23,4 +23,9 @@ public sealed class AgentToolAttribute(string name) : Attribute
     /// Attempts before the failure is returned to the model.
     /// </summary>
     public int MaxAttempts { get; init; } = 3;
+
+    /// <summary>
+    /// Whether the user allows each call before it is made, e.g. for a tool that changes data.
+    /// </summary>
+    public bool RequiresApproval { get; init; }
 }

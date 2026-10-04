@@ -3,7 +3,7 @@ namespace Oip.Hitl.Base.Workflows;
 /// <summary>
 /// Describes a kind of user step: the Angular page that renders it, the data passed to the page and the check of
 /// the result. Applications define their own steps next to their pages and pass them to
-/// <see cref="UserWorkflowBase.UserStepAsync{TResult}"/>.
+/// <see cref="UserWorkflowBase.UserStepAsync{TResult}(UserStepDefinition{TResult})"/>.
 /// </summary>
 /// <typeparam name="TResult">Type of the result the page sends back.</typeparam>
 public abstract class UserStepDefinition<TResult> : StepDefinition

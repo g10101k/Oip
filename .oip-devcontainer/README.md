@@ -72,8 +72,10 @@ The `open-webui` service is the chat UI of the agent gateway of `Oip.Hitl`: http
 
 - Sign-in goes through Keycloak (client `open-webui` of the `oip` realm); the first user to sign in becomes the Open WebUI
   admin.
-- The OpenAI connection points to `Oip.Hitl` running on the host (`https://host.docker.internal:5009/v1`) and forwards
-  the access token of the signed-in user (auth type `system_oauth`), so start `Oip.Hitl` to chat.
+- The agents are the models of the OIP pipe (see below), which calls `Oip.Hitl` running on the host
+  (`OIP_GATEWAY_URL=https://host.docker.internal:5009/v1`) with the access token of the signed-in user, so start
+  `Oip.Hitl` to chat. There is no OpenAI connection (`ENABLE_OPENAI_API=false`): until the pipe is imported, no models
+  are listed.
 - The configuration lives in `dev.yml` (`ENABLE_PERSISTENT_CONFIG=false`): changes made in the admin panel are lost on
   restart.
 
@@ -88,6 +90,20 @@ python3 -c "import json;c=[c for c in json.load(open('keycloak/realm-export.json
 docker cp /tmp/open-webui-client.json oip-devcontainer-keycloak-1:/tmp/open-webui-client.json
 docker exec oip-devcontainer-keycloak-1 bash -c '/opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user "$KC_BOOTSTRAP_ADMIN_USERNAME" --password "$KC_BOOTSTRAP_ADMIN_PASSWORD" && /opt/keycloak/bin/kcadm.sh create clients -r oip -f /tmp/open-webui-client.json'
 ````
+
+If the client was created before its service account was enabled (needed by the OIP pipe below), enable it:
+
+````shell
+docker exec oip-devcontainer-keycloak-1 bash -c 'K=/opt/keycloak/bin/kcadm.sh; $K config credentials --server http://localhost:8080 --realm master --user "$KC_BOOTSTRAP_ADMIN_USERNAME" --password "$KC_BOOTSTRAP_ADMIN_PASSWORD" && $K update clients/$($K get clients -r oip -q clientId=open-webui --fields id --format csv --noquotes) -r oip -s serviceAccountsEnabled=true'
+````
+
+### OIP pipe
+
+The pipe `src/Oip.Hitl/OpenWebUi/oip_agents_pipe.py` adds the agents as models named `OIP: <agent>`. Unlike a plain
+OpenAI connection, it shows tool calls as statuses, and questions of the agent and approvals of tool calls as dialogs.
+Open WebUI keeps functions in its database, so import the pipe once: Admin Panel → Functions → Import (or `+` and
+paste the file), then enable it. It takes the gateway URL and the Keycloak client from the container environment; the
+valves override them.
 
 ## Development Container Startup
 

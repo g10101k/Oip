@@ -3,6 +3,7 @@ using System.ClientModel.Primitives;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.Agents.AI;
 using Microsoft.AspNetCore.DataProtection;
@@ -32,6 +33,11 @@ public class LlmProviderService(
 {
     private const string ProtectorPurpose = "Oip.LlmProviders.ApiKey";
     private static readonly TimeSpan ChatTimeout = TimeSpan.FromSeconds(120);
+
+    // Tool arguments are shown to the user, e.g. in the approval of a tool call, so non-ASCII text is kept as is.
+    private static readonly JsonSerializerOptions ToolArgumentsJson =
+        new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+
     private readonly IDataProtector _protector = dataProtectionProvider.CreateProtector(ProtectorPurpose);
 
     /// <summary>
@@ -246,7 +252,7 @@ public class LlmProviderService(
                 finishReason = update.FinishReason?.Value ?? finishReason;
                 usage = update.Contents.OfType<UsageContent>().LastOrDefault()?.Details ?? usage;
                 toolCalls.AddRange(update.Contents.OfType<FunctionCallContent>().Select(x => new AgentToolCall(
-                    x.CallId, x.Name, JsonSerializer.Serialize(x.Arguments ?? new Dictionary<string, object?>()))));
+                    x.CallId, x.Name, JsonSerializer.Serialize(x.Arguments ?? new Dictionary<string, object?>(), ToolArgumentsJson))));
                 var text = update.Text;
                 if (string.IsNullOrEmpty(text)) continue;
 

@@ -1,6 +1,9 @@
 using System.Text.Json;
+using System.Threading.Channels;
+using Oip.Hitl.Base.Workflows;
 using Oip.Hitl.Services;
 using Oip.Hitl.Workflows;
+using Oip.Hitl.Workflows.Activities;
 using Temporalio.Activities;
 using Temporalio.Client;
 using Temporalio.Exceptions;
@@ -19,11 +22,14 @@ public class AgentWorkflowTests
     private static readonly AgentSnapshot Agent = new(1, "assistant", 7, "Be brief.",
         [new AgentSkillSummary("time", "Tells the time.")]);
 
+    private static readonly JsonElement ZoneSchema =
+        JsonDocument.Parse("""{"type":"object","properties":{"zone":{"type":"string"}}}""").RootElement.Clone();
+
     private static readonly LoadedSkill TimeSkill = new("time", "Call get_time for the time.",
     [
-        new AgentToolDefinition("get_time", "Returns the time.",
-            JsonDocument.Parse("""{"type":"object","properties":{"zone":{"type":"string"}}}""").RootElement.Clone(),
-            "FakeTool", true, null, 10, 1)
+        new AgentToolDefinition("get_time", "Returns the time.", ZoneSchema, "FakeTool", true, null, 10, 1),
+        new AgentToolDefinition("set_time", "Sets the time.", ZoneSchema, "FakeTool", true, null, 10, 1,
+            RequiresApproval: true)
     ]);
 
     private WorkflowEnvironment _environment = null!;
@@ -53,9 +59,11 @@ public class AgentWorkflowTests
         Assert.That(requests[0].ProviderId, Is.EqualTo(7));
         Assert.That(requests[0].Messages[0].Role, Is.EqualTo("system"));
         Assert.That(requests[0].Messages[0].Content, Does.StartWith("Be brief.").And.Contain("- time: Tells the time."));
-        Assert.That(ToolNames(requests[0]), Is.EqualTo(new[] { AgentWorkflow.LoadSkillToolName }));
+        Assert.That(ToolNames(requests[0]),
+            Is.EqualTo(new[] { AgentWorkflow.LoadSkillToolName, AgentWorkflow.AskUserToolName }));
         // All skills are loaded, so only their tools are offered.
-        Assert.That(ToolNames(requests[1]), Is.EqualTo(new[] { "get_time" }));
+        Assert.That(ToolNames(requests[1]),
+            Is.EqualTo(new[] { AgentWorkflow.AskUserToolName, "get_time", "set_time" }));
         Assert.That(requests[1].Messages[^1].Content, Does.StartWith("Call get_time for the time."));
 
         Assert.That(activities.ToolArguments.Single().GetProperty("zone").GetString(), Is.EqualTo("UTC"));
@@ -101,8 +109,92 @@ public class AgentWorkflowTests
         Assert.That(activities.TurnRequests, Has.Count.EqualTo(1), "a rejected request is not retried");
     }
 
+    [Test]
+    public async Task RunAsync_AsksUserAndReturnsAnswerToModel()
+    {
+        var activities = new FakeActivities(
+            Turn(ToolCall("1", AgentWorkflow.AskUserToolName, """{"question":"Which zone?","options":["UTC","MSK"]}""")),
+            Turn(content: "Done."));
+
+        var result = await RunAsync(activities, Input(), async handle =>
+        {
+            var step = await NextStepAsync(activities);
+            Assert.That(step.Kind, Is.EqualTo(AgentStepKind.Question));
+            Assert.That(step.StreamKey, Is.EqualTo("stream"));
+            Assert.ThrowsAsync<WorkflowUpdateFailedException>(() => CompleteAsync(handle, step, "PST"),
+                "the answer must be one of the options");
+            await CompleteAsync(handle, step, "MSK", "Moscow");
+        });
+
+        Assert.That(result.Content, Is.EqualTo("Done."));
+        Assert.That(activities.TurnRequests[1].Messages[^1].Content, Is.EqualTo("MSK\n\nComment: Moscow"));
+    }
+
+    [Test]
+    public async Task RunAsync_CallsToolOnlyWhenUserAllowsIt()
+    {
+        var activities = new FakeActivities(
+            Turn(ToolCall("1", AgentWorkflow.LoadSkillToolName, """{"name":"time"}""")),
+            Turn(ToolCall("2", "set_time", """{"zone":"UTC"}""")),
+            Turn(ToolCall("3", "set_time", """{"zone":"MSK"}""")),
+            Turn(content: "Done."));
+
+        await RunAsync(activities, Input(), async handle =>
+        {
+            var step = await NextStepAsync(activities);
+            Assert.That(step.Kind, Is.EqualTo(AgentStepKind.Approval));
+            await CompleteAsync(handle, step, AgentWorkflow.DenyOutcome, "Not now");
+            await CompleteAsync(handle, await NextStepAsync(activities), AgentWorkflow.AllowOutcome);
+        });
+
+        Assert.That(activities.TurnRequests[2].Messages[^1].Content,
+            Is.EqualTo("Error: the user denied the call of set_time: Not now"));
+        Assert.That(activities.TurnRequests[3].Messages[^1].Content, Is.EqualTo("12:00"));
+        Assert.That(activities.ToolArguments.Single().GetProperty("zone").GetString(), Is.EqualTo("MSK"));
+    }
+
+    [Test]
+    public async Task RunAsync_TellsModelWhenUserDoesNotAnswerInTime()
+    {
+        var activities = new FakeActivities(
+            Turn(ToolCall("1", AgentWorkflow.AskUserToolName, """{"question":"Which zone?"}""")),
+            Turn(content: "Done."));
+        List<UserStep> steps = [];
+
+        // The test server skips the time while the result is awaited.
+        await RunAsync(activities, Input() with { UserStepTimeout = TimeSpan.FromMinutes(5) }, async handle =>
+        {
+            await handle.GetResultAsync();
+            var memo = (await handle.DescribeAsync()).Memo[UserWorkflowBase.StepsMemo];
+            steps = await memo.ToValueAsync<List<UserStep>>();
+        });
+
+        Assert.That(activities.TurnRequests[1].Messages[^1].Content, Is.EqualTo("The user did not answer in time."));
+        Assert.That(steps.Single().Error, Does.StartWith("Not completed within"));
+        Assert.That(steps.Single().CompletedAt, Is.Not.Null);
+    }
+
     private static AgentWorkflowInput Input() =>
-        new(Agent, [new AgentMessage("user", "What time is it?")], null, null, "alice");
+        new(Agent, [new AgentMessage("user", "What time is it?")], null, "stream", "alice");
+
+    private static async Task<PublishUserStepRequest> NextStepAsync(FakeActivities activities)
+    {
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        return await activities.Steps.Reader.ReadAsync(timeout.Token);
+    }
+
+    private static Task CompleteAsync(WorkflowHandle handle, PublishUserStepRequest step, string result,
+        string? comment = null) =>
+        handle.ExecuteUpdateAsync(UserWorkflowBase.CompleteStepUpdate,
+        [
+            new UserStepCompletion
+            {
+                StepId = step.StepId,
+                Result = JsonSerializer.SerializeToElement(result),
+                Comment = comment,
+                CompletedBy = "alice"
+            }
+        ]);
 
     private static AgentTurnResult Turn(AgentToolCall? call = null, string content = "") =>
         new(content, "Test", "test-model", 3, 1, call is null ? "stop" : "tool_calls", call is null ? null : [call]);
@@ -111,18 +203,28 @@ public class AgentWorkflowTests
 
     private static IEnumerable<string> ToolNames(AgentTurnRequest request) => request.Tools!.Select(x => x.Name);
 
-    private async Task<AgentTurnResult> RunAsync(FakeActivities activities, AgentWorkflowInput input)
+    /// <summary>
+    /// Runs the workflow; <paramref name="interact"/> completes its user steps before the result is awaited, because
+    /// the test server skips the time, and so times the steps out, only then.
+    /// </summary>
+    private async Task<AgentTurnResult> RunAsync(FakeActivities activities, AgentWorkflowInput input,
+        Func<WorkflowHandle<AgentWorkflow, AgentTurnResult>, Task>? interact = null)
     {
         using var worker = new TemporalWorker(_environment.Client, new TemporalWorkerOptions(TaskQueue)
             .AddWorkflow<AgentWorkflow>()
             .AddAllActivities(activities));
-        return await worker.ExecuteAsync(() => _environment.Client.ExecuteWorkflowAsync(
-            (AgentWorkflow workflow) => workflow.RunAsync(input),
-            new WorkflowOptions($"agent-{Guid.NewGuid():N}", TaskQueue)));
+        return await worker.ExecuteAsync(async () =>
+        {
+            var handle = await _environment.Client.StartWorkflowAsync(
+                (AgentWorkflow workflow) => workflow.RunAsync(input),
+                new WorkflowOptions($"agent-{Guid.NewGuid():N}", TaskQueue));
+            if (interact is not null) await interact(handle);
+            return await handle.GetResultAsync();
+        });
     }
 
     /// <summary>
-    /// Replaces the activities of the agent, registered under the same names, and the tool of <see cref="TimeSkill"/>.
+    /// Replaces the activities of the agent, registered under the same names, and the tools of <see cref="TimeSkill"/>.
     /// </summary>
     private sealed class FakeActivities(params AgentTurnResult[] turns)
     {
@@ -137,6 +239,8 @@ public class AgentWorkflowTests
         public List<AgentTurnRequest> TurnRequests { get; } = [];
 
         public List<JsonElement> ToolArguments { get; } = [];
+
+        public Channel<PublishUserStepRequest> Steps { get; } = Channel.CreateUnbounded<PublishUserStepRequest>();
 
         [Activity("ChatTurn")]
         public AgentTurnResult ChatTurn(AgentTurnRequest request)
@@ -154,6 +258,9 @@ public class AgentWorkflowTests
                 throw new ApplicationFailureException($"Skill '{request.Code}' is not available", nonRetryable: true);
             return TimeSkill;
         }
+
+        [Activity("PublishUserStep")]
+        public void PublishUserStep(PublishUserStepRequest request) => Steps.Writer.TryWrite(request);
 
         [Activity("FakeTool")]
         public string FakeTool(JsonElement arguments)

@@ -97,4 +97,5 @@ public record SaveSkillRequest(
 /// <param name="Name">Name of the tool.</param>
 /// <param name="Description">What the tool does.</param>
 /// <param name="ParametersSchema">JSON schema of the arguments.</param>
-public record AgentToolDto(string Name, string Description, string ParametersSchema);
+/// <param name="RequiresApproval">Whether the user allows each call before it is made.</param>
+public record AgentToolDto(string Name, string Description, string ParametersSchema, bool RequiresApproval);

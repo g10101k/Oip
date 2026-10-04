@@ -12,7 +12,7 @@ namespace Oip.Hitl.Workflows.Activities;
 /// <summary>
 /// Demo agent tools to try skills with.
 /// </summary>
-public partial class DemoToolActivities
+public partial class DemoToolActivities(ILogger<DemoToolActivities> logger)
 {
     /// <summary>
     /// Arguments of <see cref="GetCurrentTime"/>.
@@ -38,6 +38,26 @@ public partial class DemoToolActivities
         [JsonPropertyName("expression")]
         [Description("Arithmetic expression with numbers, + - * / % and parentheses, e.g. (2 + 3) * 4.5.")]
         public string Expression { get; init; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Arguments of <see cref="SendNotification"/>.
+    /// </summary>
+    public class SendNotificationArguments
+    {
+        /// <summary>
+        /// Login of the recipient.
+        /// </summary>
+        [JsonPropertyName("recipient")]
+        [Description("Login of the user to notify.")]
+        public string Recipient { get; init; } = string.Empty;
+
+        /// <summary>
+        /// Text of the notification.
+        /// </summary>
+        [JsonPropertyName("text")]
+        [Description("Text of the notification.")]
+        public string Text { get; init; } = string.Empty;
     }
 
     /// <summary>
@@ -78,6 +98,21 @@ public partial class DemoToolActivities
         {
             throw new ApplicationFailureException(e.Message, "InvalidArgument", nonRetryable: true);
         }
+    }
+
+    /// <summary>
+    /// Pretends to send a notification: only logs it. The user allows each call, as for a tool with side effects.
+    /// </summary>
+    [Activity, AgentTool("send_notification", TimeoutSeconds = 10, RequiresApproval = true)]
+    [Description("Sends a notification to a user.")]
+    public string SendNotification(SendNotificationArguments arguments)
+    {
+        if (string.IsNullOrWhiteSpace(arguments.Recipient) || string.IsNullOrWhiteSpace(arguments.Text))
+            throw new ApplicationFailureException("The recipient and the text are required", "InvalidArgument",
+                nonRetryable: true);
+
+        logger.LogInformation("Demo notification to {Recipient}: {Text}", arguments.Recipient, arguments.Text);
+        return $"The notification is sent to {arguments.Recipient}.";
     }
 
     [GeneratedRegex(@"^[\d\s.+\-*/%()]+$")]

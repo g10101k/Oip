@@ -31,6 +31,7 @@ export interface AgentToolDto {
   name?: string | null;
   description?: string | null;
   parametersSchema?: string | null;
+  requiresApproval?: boolean;
 }
 
 export interface ApiExceptionResponse {

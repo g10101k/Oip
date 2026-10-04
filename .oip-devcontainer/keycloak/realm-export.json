@@ -558,6 +558,21 @@
   "webAuthnPolicyPasswordlessExtraOrigins": [],
   "users": [
     {
+      "id": "0f4c2a7e-5b8d-4e1a-9c3f-6d2b8a1e7f40",
+      "username": "service-account-open-webui",
+      "emailVerified": false,
+      "enabled": true,
+      "totp": false,
+      "serviceAccountClientId": "open-webui",
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-oip"
+      ],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
       "id": "79c8b814-adab-4a5e-a00f-8b5871b48a18",
       "username": "service-account-oip-backend",
       "emailVerified": false,
@@ -1011,7 +1026,7 @@
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
+      "serviceAccountsEnabled": true,
       "publicClient": false,
       "frontchannelLogout": true,
       "protocol": "openid-connect",

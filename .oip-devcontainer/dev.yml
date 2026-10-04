@@ -309,10 +309,10 @@ services:
       # The configuration below is authoritative; changes made in the admin panel are lost on restart.
       ENABLE_PERSISTENT_CONFIG: "false"
       ENABLE_OLLAMA_API: "false"
-      # Agent gateway of Oip.Hitl running on the host; the token of the signed-in user is forwarded to it.
-      OPENAI_API_BASE_URLS: https://host.docker.internal:5009/v1
-      OPENAI_API_KEYS: ""
-      OPENAI_API_CONFIGS: '{"0": {"enable": true, "auth_type": "system_oauth"}}'
+      # The agents come from the OIP pipe (src/Oip.Hitl/OpenWebUi/oip_agents_pipe.py), not from an OpenAI connection.
+      ENABLE_OPENAI_API: "false"
+      # Agent gateway of Oip.Hitl running on the host, used by the OIP pipe.
+      OIP_GATEWAY_URL: https://host.docker.internal:5009/v1
       ENABLE_OAUTH_SIGNUP: "true"
       OAUTH_MERGE_ACCOUNTS_BY_EMAIL: "true"
       # The first user to sign in becomes the admin; the next ones can chat right away instead of waiting for approval.

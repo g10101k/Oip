@@ -36,8 +36,9 @@ server-sent events. Closing the request (the Stop button) cancels the workflow. 
 identified by their code. Routes and errors follow the OpenAI API, so the controller is excluded from the web client.
 
 Requests are authenticated with a Keycloak access token of the `oip` realm (`Authorization: Bearer ...`). The
-`open-webui` service of `.oip-devcontainer/dev.yml` is connected to the gateway and forwards the token of the user signed
-in through Keycloak: start the dev container and `Oip.Hitl`, then open http://localhost:3000.
+`open-webui` service of `.oip-devcontainer/dev.yml` reaches the gateway through the OIP pipe, which forwards the token of
+the user signed in through Keycloak: start the dev container and `Oip.Hitl`, import the pipe once, then open
+http://localhost:3000.
 
 ## Agents, skills and tools
 
@@ -60,3 +61,23 @@ curl -N https://localhost:5009/v1/chat/completions -H "Authorization: Bearer $TO
   -H "Content-Type: application/json" \
   -d '{"model":"<agent code>","stream":true,"messages":[{"role":"user","content":"Hi"}]}'
 ```
+
+### Human in the loop
+
+`AgentWorkflow` is a user workflow, so the agent waits for the user in user steps:
+
+- the built-in `ask_user` tool asks a question, optionally with answers to choose from;
+- a tool marked with `[AgentTool("name", RequiresApproval = true)]` (e.g. `send_notification`) is called only after
+  the user allows the call; a denied call, with the comment of the user, is returned to the model as an error text.
+
+A step not completed within `AgentGateway:UserStepTimeoutMinutes` (10) is reported to the model as not answered; the
+whole run, waiting included, is limited by `AgentGateway:RunTimeoutMinutes` (30). Steps of agent runs are in the task
+list and are completed on the `workflow-task` page like other steps, or in the chat:
+
+- The Open WebUI pipe `OpenWebUi/oip_agents_pipe.py` (see `.oip-devcontainer/README.md`) sends `"oip_events": true`:
+  statuses and steps come as `oip` events of the stream (`{"type":"user_step","run_id":...,"step_id":...,"kind":
+  "question"|"approval",...}`), which the pipe shows as statuses and dialogs, and the answer is sent to
+  `POST /v1/agent-runs/{runId}/steps/{stepId}/complete` with `{"result":"...","comment":"..."}`. Only the user who
+  started the run completes its steps there.
+- Other OpenAI clients get the step as a quote in the answer with the link to its `workflow-task` page; the stream
+  goes on once the step is completed there.

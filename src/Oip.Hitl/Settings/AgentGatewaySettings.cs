@@ -21,7 +21,13 @@ public class AgentGatewaySettings
     public int StreamTtlMinutes { get; set; } = 60;
 
     /// <summary>
-    /// Maximum duration of an agent run in minutes, after which Temporal times the workflow out.
+    /// Maximum duration of an agent run in minutes, including the time it waits for the user, after which Temporal
+    /// times the workflow out.
     /// </summary>
-    public int RunTimeoutMinutes { get; set; } = 10;
+    public int RunTimeoutMinutes { get; set; } = 30;
+
+    /// <summary>
+    /// Minutes an agent waits for the user to answer a question or allow a tool call.
+    /// </summary>
+    public int UserStepTimeoutMinutes { get; set; } = 10;
 }

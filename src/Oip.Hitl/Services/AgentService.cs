@@ -112,7 +112,7 @@ public partial class AgentService(LlmContext context, AgentToolCatalog toolCatal
     /// Returns the tools of the tool catalog.
     /// </summary>
     public List<AgentToolDto> GetTools() => toolCatalog.Tools
-        .Select(x => new AgentToolDto(x.Name, x.Description, x.ParametersSchema.GetRawText()))
+        .Select(x => new AgentToolDto(x.Name, x.Description, x.ParametersSchema.GetRawText(), x.RequiresApproval))
         .ToList();
 
     /// <summary>

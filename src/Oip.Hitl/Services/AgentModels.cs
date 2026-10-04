@@ -50,6 +50,7 @@ public record LoadedSkill(string Code, string Instructions, IReadOnlyList<AgentT
 /// <param name="TaskQueue">Task queue of the worker of the activity; <c>null</c> for the queue of the workflow.</param>
 /// <param name="TimeoutSeconds">Timeout of an attempt.</param>
 /// <param name="MaxAttempts">Attempts before the failure is returned to the model.</param>
+/// <param name="RequiresApproval">Whether the user allows each call before it is made.</param>
 public record AgentToolDefinition(
     string Name,
     string Description,
@@ -58,4 +59,5 @@ public record AgentToolDefinition(
     bool HasArguments,
     string? TaskQueue,
     int TimeoutSeconds,
-    int MaxAttempts);
+    int MaxAttempts,
+    bool RequiresApproval = false);

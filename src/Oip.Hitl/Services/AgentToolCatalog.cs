@@ -69,6 +69,7 @@ public class AgentToolCatalog
             parameters.Length == 1,
             null,
             tool.TimeoutSeconds,
-            tool.MaxAttempts);
+            tool.MaxAttempts,
+            tool.RequiresApproval);
     }
 }

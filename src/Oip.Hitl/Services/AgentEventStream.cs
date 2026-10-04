@@ -20,7 +20,12 @@ public enum AgentEventType
     /// <summary>
     /// Progress of the run shown apart from the answer, e.g. a tool call.
     /// </summary>
-    Status
+    Status,
+
+    /// <summary>
+    /// The run waits for the user to complete a step, e.g. to answer a question.
+    /// </summary>
+    UserStep
 }
 
 /// <summary>
@@ -30,7 +35,31 @@ public enum AgentEventType
 /// <param name="Type">Kind of the event.</param>
 /// <param name="Text">Text of a <see cref="AgentEventType.Delta"/> or a <see cref="AgentEventType.Status"/>.</param>
 /// <param name="Attempt">Attempt of the activity of a <see cref="AgentEventType.Start"/>.</param>
-public record AgentEvent(string Id, AgentEventType Type, string? Text, int Attempt);
+/// <param name="StepId">Step of a <see cref="AgentEventType.UserStep"/>.</param>
+/// <param name="StepKind">Kind of the step of a <see cref="AgentEventType.UserStep"/>, see <see cref="AgentStepKind"/>.</param>
+public record AgentEvent(
+    string Id,
+    AgentEventType Type,
+    string? Text,
+    int Attempt,
+    string? StepId = null,
+    string? StepKind = null);
+
+/// <summary>
+/// Kinds of the user steps of an agent run.
+/// </summary>
+public static class AgentStepKind
+{
+    /// <summary>
+    /// The agent asks the user a question.
+    /// </summary>
+    public const string Question = "question";
+
+    /// <summary>
+    /// The user allows or denies a tool call.
+    /// </summary>
+    public const string Approval = "approval";
+}
 
 /// <summary>
 /// Redis streams through which the activities of an agent run pass its progress, e.g. the text deltas of the
@@ -49,9 +78,12 @@ public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : I
     private const string TypeField = "type";
     private const string TextField = "text";
     private const string AttemptField = "attempt";
+    private const string StepField = "step";
+    private const string KindField = "kind";
     private const string StartType = "start";
     private const string DeltaType = "delta";
     private const string StatusType = "status";
+    private const string UserStepType = "user_step";
 
     private readonly Lazy<Task<ConnectionMultiplexer>> _connection = new(() => ConnectAsync(connectionString));
 
@@ -89,6 +121,19 @@ public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : I
     }
 
     /// <summary>
+    /// Publishes that the run waits for the user to complete the step.
+    /// </summary>
+    /// <param name="key">Key of the stream.</param>
+    /// <param name="stepId">Step of the workflow.</param>
+    /// <param name="kind">Kind of the step, see <see cref="AgentStepKind"/>.</param>
+    public async Task PublishUserStepAsync(string key, string stepId, string kind)
+    {
+        var database = await GetDatabaseAsync();
+        await database.StreamAddAsync(key, [new(TypeField, UserStepType), new(StepField, stepId), new(KindField, kind)]);
+        await database.KeyExpireAsync(key, ttl);
+    }
+
+    /// <summary>
     /// Reads the events published after <paramref name="afterId"/>, oldest first; empty when there are none yet.
     /// </summary>
     /// <param name="key">Key of the stream.</param>
@@ -113,10 +158,12 @@ public sealed class AgentEventStream(string? connectionString, TimeSpan ttl) : I
         {
             StartType => AgentEventType.Start,
             StatusType => AgentEventType.Status,
+            UserStepType => AgentEventType.UserStep,
             _ => AgentEventType.Delta
         };
         var attempt = entry[AttemptField];
-        return new AgentEvent(entry.Id.ToString(), type, entry[TextField], attempt.IsNull ? 0 : (int)attempt);
+        return new AgentEvent(entry.Id.ToString(), type, entry[TextField], attempt.IsNull ? 0 : (int)attempt,
+            entry[StepField], entry[KindField]);
     }
 
     private async Task<IDatabase> GetDatabaseAsync() => (await _connection.Value).GetDatabase();

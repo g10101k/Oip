@@ -1,9 +1,11 @@
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Oip.Base.Exceptions;
 using Oip.Base.Services;
+using Oip.Hitl.Base.Controllers.Api;
 using Oip.Hitl.Base.Settings;
 using Oip.Hitl.Base.Workflows;
 using Oip.Hitl.Controllers.Api;
@@ -18,7 +20,8 @@ namespace Oip.Hitl.Controllers;
 /// <summary>
 /// OpenAI-compatible API for chat UIs such as Open WebUI: each chat message starts an <see cref="AgentWorkflow"/>
 /// and its answer is returned, or streamed as server-sent events. Routes and errors follow the OpenAI API instead of
-/// the OIP conventions, and the controller is not in the generated web client.
+/// the OIP conventions, and the controller is not in the generated web client. When the run waits for the user, the
+/// step is streamed too and the user completes it with <see cref="CompleteStep"/>, or on the task page of OIP.
 /// </summary>
 [ApiController]
 [Authorize]
@@ -31,6 +34,7 @@ public class AgentGatewayController(
     TemporalSettings temporalSettings,
     AgentGatewaySettings gatewaySettings,
     AgentEventStream eventStream,
+    UserStepService userStepService,
     ClaimService claimService,
     ILogger<AgentGatewayController> logger) : ControllerBase
 {
@@ -38,6 +42,7 @@ public class AgentGatewayController(
     private const string AssistantRole = "assistant";
     private const string RetrySeparator = "\n\n---\n\n";
     private const string TurnSeparator = "\n\n";
+    private const string RunIdPrefix = "agent-";
     private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(50);
 
     /// <summary>
@@ -65,14 +70,17 @@ public class AgentGatewayController(
         var settings = OpenAiChatConverter.ToSettings(request.Parameters);
         var agent = await FindAgentAsync(request.Model, cancellationToken);
 
-        var runId = $"agent-{Guid.NewGuid():N}";
+        var runId = $"{RunIdPrefix}{Guid.NewGuid():N}";
         var streamKey = request.Stream ? AgentEventStream.GetKey(runId) : null;
-        var input = new AgentWorkflowInput(agent, messages, settings, streamKey, claimService.GetUserLogin());
+        var userName = claimService.GetUserLogin();
+        var input = new AgentWorkflowInput(agent, messages, settings, streamKey, userName,
+            TimeSpan.FromMinutes(gatewaySettings.UserStepTimeoutMinutes));
         var handle = await client.CallAsync(() => client.StartWorkflowAsync(
             (AgentWorkflow workflow) => workflow.RunAsync(input),
             new WorkflowOptions(runId, temporalSettings.TaskQueue)
             {
                 ExecutionTimeout = TimeSpan.FromMinutes(gatewaySettings.RunTimeoutMinutes),
+                Memo = userName is null ? null : new Dictionary<string, object> { [AgentWorkflow.UserMemo] = userName },
                 Rpc = new RpcOptions { CancellationToken = cancellationToken }
             }));
 
@@ -82,7 +90,8 @@ public class AgentGatewayController(
         {
             if (streamKey is not null)
             {
-                await StreamAsync(handle, streamKey, completionId, created, agent.Code, cancellationToken);
+                await StreamAsync(handle, streamKey, completionId, created, agent.Code, request.OipEvents,
+                    cancellationToken);
                 return new EmptyResult();
             }
 
@@ -108,13 +117,36 @@ public class AgentGatewayController(
     }
 
     /// <summary>
+    /// Completes a step the agent run waits for, e.g. answers its question. Only the user who started the run
+    /// completes its steps here.
+    /// </summary>
+    [HttpPost("agent-runs/{runId}/steps/{stepId}/complete")]
+    public async Task<IActionResult> CompleteStep(string runId, string stepId,
+        [FromBody] CompleteAgentStepRequest request, CancellationToken cancellationToken)
+    {
+        var userName = claimService.GetUserLogin();
+        if (!runId.StartsWith(RunIdPrefix, StringComparison.Ordinal) ||
+            await GetRunUserAsync(runId, cancellationToken) is not { } owner ||
+            !string.Equals(owner, userName, StringComparison.OrdinalIgnoreCase))
+            throw new ApiException("Not found", "Step not found or already completed", StatusCodes.Status404NotFound);
+
+        await userStepService.CompleteAsync(runId, stepId, new CompleteUserStepRequest
+        {
+            Result = JsonSerializer.Serialize(request.Result?.Trim() ?? string.Empty),
+            Comment = request.Comment
+        }, userName, cancellationToken);
+        return NoContent();
+    }
+
+    /// <summary>
     /// Writes the events of the run as chunks until the workflow is closed. The workflow closes after its activities
-    /// published all their events, so the stream is read once more after that and then ends. Statuses, e.g. tool
-    /// calls, are sent as reasoning, which chat UIs show apart from the answer; the texts of the turns are separated
-    /// like in the answer of the workflow.
+    /// published all their events, so the stream is read once more after that and then ends. The texts of the turns
+    /// are separated like in the answer of the workflow. With <paramref name="oipEvents"/> statuses and user steps
+    /// are sent as <see cref="AgentRunEvent"/>s; otherwise statuses, e.g. tool calls, are sent as reasoning, which
+    /// chat UIs show apart from the answer, and a user step as text with the link to its page.
     /// </summary>
     private async Task StreamAsync(WorkflowHandle<AgentWorkflow, AgentTurnResult> handle, string streamKey,
-        string completionId, long created, string model, CancellationToken cancellationToken)
+        string completionId, long created, string model, bool oipEvents, CancellationToken cancellationToken)
     {
         Response.StatusCode = StatusCodes.Status200OK;
         Response.ContentType = "text/event-stream";
@@ -125,6 +157,8 @@ public class AgentGatewayController(
         ChatCompletionChunk Chunk(ChatCompletionDelta delta, string? finishReason = null,
             ChatCompletionUsage? usage = null) =>
             new(completionId, created, model, [new ChatCompletionChunkChoice(0, delta, finishReason)], usage);
+
+        ChatCompletionChunk EventChunk(AgentRunEvent runEvent) => new(completionId, created, model, [], Oip: runEvent);
 
         await WriteEventAsync(Chunk(new ChatCompletionDelta(AssistantRole, "")), cancellationToken);
 
@@ -151,8 +185,25 @@ public class AgentGatewayController(
                         else
                             turnStarted = false;
                         break;
+                    case AgentEventType.Status when oipEvents:
+                        await WriteEventAsync(EventChunk(new AgentRunEvent("status", agentEvent.Text)),
+                            cancellationToken);
+                        break;
                     case AgentEventType.Status:
                         delta = new ChatCompletionDelta(ReasoningContent: agentEvent.Text + "\n");
+                        break;
+                    case AgentEventType.UserStep when agentEvent.StepId is not null:
+                        var step = await FindStepAsync(handle.Id, agentEvent.StepId, cancellationToken);
+                        if (step is null) break;
+                        if (oipEvents)
+                        {
+                            await WriteEventAsync(EventChunk(ToRunEvent(step, agentEvent.StepKind)), cancellationToken);
+                            break;
+                        }
+
+                        delta = new ChatCompletionDelta(Content: (hasText ? TurnSeparator : "") + FormatStep(step));
+                        hasText = true;
+                        turnStarted = false;
                         break;
                     case AgentEventType.Delta when !string.IsNullOrEmpty(agentEvent.Text):
                         var text = !turnStarted && hasText ? TurnSeparator + agentEvent.Text : agentEvent.Text;
@@ -204,6 +255,80 @@ public class AgentGatewayController(
             logger.LogWarning(e, "Agent run {WorkflowId} failed", handle.Id);
             throw new ApiException("Agent run failed", GetCause(e), StatusCodes.Status502BadGateway);
         }
+    }
+
+    /// <summary>
+    /// Returns the login of the user who started the agent run; <c>null</c> when there is no such run.
+    /// </summary>
+    private Task<string?> GetRunUserAsync(string runId, CancellationToken cancellationToken)
+    {
+        return client.CallAsync(async () =>
+        {
+            try
+            {
+                var execution = await client.GetWorkflowHandle(runId).DescribeAsync(
+                    new WorkflowDescribeOptions { Rpc = new RpcOptions { CancellationToken = cancellationToken } });
+                return execution.Memo.TryGetValue(AgentWorkflow.UserMemo, out var memo)
+                    ? await memo.ToValueAsync<string>()
+                    : null;
+            }
+            catch (RpcException e) when (e.Code is RpcException.StatusCode.NotFound
+                                             or RpcException.StatusCode.InvalidArgument)
+            {
+                return null;
+            }
+        });
+    }
+
+    /// <summary>
+    /// Reads the step the run waits for; <c>null</c> when it cannot be read, so it is answered on its page only.
+    /// </summary>
+    private async Task<UserStepDto?> FindStepAsync(string runId, string stepId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await userStepService.GetByIdAsync(runId, stepId, cancellationToken);
+        }
+        catch (ApiException e)
+        {
+            logger.LogWarning("Step {StepId} of agent run {WorkflowId} is not found: {Error}", stepId, runId,
+                e.Message);
+            return null;
+        }
+    }
+
+    private static AgentRunEvent ToRunEvent(UserStepDto step, string? kind) =>
+        new("user_step", RunId: step.WorkflowInstanceId, StepId: step.Id, Kind: kind ?? AgentStepKind.Question,
+            Title: step.Title, Description: step.Description, Outcomes: GetOutcomes(step), Url: step.Url);
+
+    /// <summary>
+    /// Text of a user step for chat UIs without the pipe: a quote with the link to its page.
+    /// </summary>
+    private static string FormatStep(UserStepDto step)
+    {
+        var text = new StringBuilder($"> ⏸ **{step.Title}**\n>\n");
+        if (!string.IsNullOrWhiteSpace(step.Description))
+        {
+            foreach (var line in step.Description.Split('\n'))
+                text.Append($"> {line.TrimEnd('\r')}\n");
+            text.Append(">\n");
+        }
+
+        if (GetOutcomes(step) is { Count: > 0 } outcomes)
+            text.Append($"> {string.Join(" / ", outcomes)}\n>\n");
+        text.Append($"> [Answer]({step.Url})");
+        return text.ToString();
+    }
+
+    private static List<string> GetOutcomes(UserStepDto step)
+    {
+        if (step.Data is null) return [];
+        using var data = JsonDocument.Parse(step.Data);
+        return data.RootElement.ValueKind == JsonValueKind.Object &&
+               data.RootElement.TryGetProperty("outcomes", out var outcomes) &&
+               outcomes.ValueKind == JsonValueKind.Array
+            ? outcomes.EnumerateArray().Select(x => x.GetString()).OfType<string>().ToList()
+            : [];
     }
 
     private async Task CancelAsync(WorkflowHandle handle)
