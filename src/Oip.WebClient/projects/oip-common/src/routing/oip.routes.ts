@@ -94,16 +94,6 @@ export function oipErrorRoute(path = 'error'): Route {
   };
 }
 
-/** Current user profile. */
-export function oipProfileRoute(path = 'profile'): Route {
-  return {
-    path,
-    loadComponent: () =>
-      import('../components/user-profile/user-profile.component').then((m) => m.UserProfileComponent),
-    canActivate: [oipAuthGuard]
-  };
-}
-
 /** Application configuration. */
 export function oipConfigRoute(path = 'config'): Route {
   return {
@@ -204,8 +194,6 @@ export interface OipRouteFeatures {
   access?: OipRouteToggle;
   /** Authentication error page. Default path: `error`. */
   error?: OipRouteToggle;
-  /** Current user profile. Default path: `profile`. */
-  profile?: OipRouteToggle;
   /** Application configuration. Default path: `config`. */
   config?: OipRouteToggle;
   /** Registered applications, administrators only. Default path: `applications`. */
@@ -290,7 +278,6 @@ export function provideOipRoutes(options: OipRoutesOptions = {}): Routes {
 
   builtInRoute(features.access, oipAccessRoute, children);
   builtInRoute(features.error, oipErrorRoute, children);
-  builtInRoute(features.profile, oipProfileRoute, children);
   builtInRoute(features.config, oipConfigRoute, children);
   builtInRoute(features.applications, oipApplicationsRoute, children);
   builtInRoute(features.modules, oipModulesRoute, children);
