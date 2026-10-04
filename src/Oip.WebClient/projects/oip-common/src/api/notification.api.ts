@@ -3,9 +3,10 @@
 // @ts-nocheck
 
 import { Injectable } from "@angular/core";
-import { HttpClient, RequestParams } from "./http-client";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 import {
   ApiExceptionResponse,
+  CreateTestNotificationRequest,
   GetNotificationByIdParams,
   GetNotificationByUserParams,
   MarkNotificationAsReadParams,
@@ -57,6 +58,19 @@ export class NotificationApi<
       method: "GET",
       query: query,
       secure: true,
+      format: "json",
+      ...params,
+    });
+  createTestNotification = (
+    data: CreateTestNotificationRequest,
+    params: RequestParams = {},
+  ) =>
+    this.request<UserNotificationDto, ApiExceptionResponse>({
+      path: `/api/notification/create-test-notification`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });
