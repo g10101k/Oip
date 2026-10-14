@@ -42,7 +42,7 @@
     </ItemGroup>
 
     <ItemGroup Label="Api and serialization">
-        <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3"/>
+        <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.3.0"/>
         <PackageVersion Include="Google.Api.CommonProtos" Version="2.17.0"/>
         <PackageVersion Include="Google.Protobuf" Version="3.33.2"/>
         <PackageVersion Include="Grpc.AspNetCore" Version="2.76.0"/>
