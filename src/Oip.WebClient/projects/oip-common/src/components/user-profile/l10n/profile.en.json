@@ -8,6 +8,13 @@
     "deletePhotoConfirmRejectButtonPropsLabel": "Cancel",
     "deletePhotoConfirmAcceptButtonPropsLabel": "Delete",
     "photoDeleted": "Photo deleted",
-    "failedToDeletePhoto": "Failed to delete user photo"
+    "failedToDeletePhoto": "Failed to delete user photo",
+    "cropHeader": "Select photo area",
+    "cropHint": "Drag the circle, change its size with the handle, mouse wheel or slider",
+    "cropSize": "Size",
+    "save": "Save",
+    "cancel": "Cancel",
+    "invalidFile": "Choose an image file",
+    "fileTooLarge": "The file is too large, the maximum size is 10 MB"
   }
 }

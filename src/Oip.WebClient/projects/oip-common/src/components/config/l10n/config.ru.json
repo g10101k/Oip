@@ -1,20 +1,17 @@
 {
   "config": {
-    "all": "Все",
-    "applicationManagement": "Управление приложениями",
+    "administration": "Администрирование",
+    "applications": "Приложения",
     "dateFormat": "Формат даты",
-    "dateTimeFormat": "Формат даты и времени:",
     "firstDayOfWeek": "Первый день недели",
-    "goTo": "Перейти",
-    "localization": "Локализация",
-    "menu": "Меню",
-    "moduleManagement": "Управление модулями",
-    "photo": "Фото",
-    "profile": "Профиль",
-    "selectLanguage": "Выберите язык",
-    "sessionManagement": "Управление сессиями",
+    "language": "Язык",
+    "languageAndRegion": "Язык и регион",
+    "modules": "Модули",
+    "now": "Сейчас",
+    "sessions": "Сессии",
+    "showAllMenuItems": "Показывать все пункты меню",
+    "showAllMenuItemsHint": "Включая пункты, к которым у ваших ролей нет доступа",
     "timeFormat": "Формат времени",
-    "timeZone": "Часовой пояс",
-    "usePhoto256x256Pixel": "Используйте фото 256x256 пикселей"
+    "timeZone": "Часовой пояс"
   }
 }
