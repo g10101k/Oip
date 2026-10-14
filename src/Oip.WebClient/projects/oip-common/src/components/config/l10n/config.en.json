@@ -1,20 +1,17 @@
 {
   "config": {
-    "all": "All",
-    "applicationManagement": "Application management",
+    "administration": "Administration",
+    "applications": "Applications",
     "dateFormat": "Date format",
-    "dateTimeFormat": "Date and time format:",
     "firstDayOfWeek": "First day of the week",
-    "goTo": "Go to",
-    "localization": "Localization",
-    "menu": "Menu",
-    "moduleManagement": "Module management",
-    "photo": "Photo",
-    "profile": "Profile",
-    "selectLanguage": "Select language",
-    "sessionManagement": "Session management",
+    "language": "Language",
+    "languageAndRegion": "Language and region",
+    "modules": "Modules",
+    "now": "Now",
+    "sessions": "Sessions",
+    "showAllMenuItems": "Show all menu items",
+    "showAllMenuItemsHint": "Including the items your roles have no access to",
     "timeFormat": "Time format",
-    "timeZone": "Time zone",
-    "usePhoto256x256Pixel": "Use photo 256x256 pixel"
+    "timeZone": "Time zone"
   }
 }

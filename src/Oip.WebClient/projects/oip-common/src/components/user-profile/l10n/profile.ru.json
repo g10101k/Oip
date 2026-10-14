@@ -8,6 +8,13 @@
     "deletePhotoConfirmRejectButtonPropsLabel": "Отмена",
     "deletePhotoConfirmAcceptButtonPropsLabel": "Удалить",
     "photoDeleted": "Фото удалено",
-    "failedToDeletePhoto": "Не удалось удалить фото пользователя"
+    "failedToDeletePhoto": "Не удалось удалить фото пользователя",
+    "cropHeader": "Выбор области фото",
+    "cropHint": "Перетащите круг, размер меняется ручкой, колесом мыши или ползунком",
+    "cropSize": "Размер",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "invalidFile": "Выберите файл изображения",
+    "fileTooLarge": "Файл слишком большой, максимальный размер — 10 МБ"
   }
 }

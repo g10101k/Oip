@@ -1,16 +1,16 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, DestroyRef, inject, LOCALE_ID, signal } from '@angular/core';
+import { formatDate } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { UserProfileComponent } from '../user-profile/user-profile.component';
-import { Tooltip } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
-import { TableModule } from 'primeng/table';
+import { Tag } from 'primeng/tag';
 import { LayoutService } from '../../services/app.layout.service';
 import { UserService } from '../../services/user.service';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { RouterLink } from '@angular/router';
 import { SecurityService } from '../../services/security.service';
 import { MenuService } from '../../services/app.menu.service';
-import { Button } from 'primeng/button';
 import { L10nService } from '../../services/l10n.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { provideTranslations } from '../../helpers/l10n.helper';
@@ -18,161 +18,201 @@ import { provideTranslations } from '../../helpers/l10n.helper';
 import en from './l10n/config.en.json';
 import ru from './l10n/config.ru.json';
 
+/** Keycloak roles every user has; they say nothing about the user, so the profile doesn't show them. */
+const HIDDEN_ROLES = ['offline_access', 'uma_authorization'];
+const HIDDEN_ROLE_PREFIX = 'default-roles-';
+
+/** How often the date and time preview is refreshed. */
+const PREVIEW_REFRESH_MS = 30_000;
+
 @Component({
   selector: 'app-config',
   template: `
-    <div class="flex flex-col md:flex-row gap-4">
-      <div class="md:w-1/2">
-        <div class="card flex flex-col gap-4">
-          <div class="font-semibold text-xl">{{ 'config.profile' | translate }}</div>
-          <div class="flex justify-content-end flex-wrap">
+    <div class="flex flex-col gap-4">
+      <div class="card !mb-0 flex flex-col sm:flex-row items-center gap-6">
+        <user-profile />
+        <div class="flex flex-col items-center sm:items-start gap-2 min-w-0 text-center sm:text-left">
+          <div class="text-2xl font-semibold break-words" id="oip-app-config-user-name">
             {{ userService.userName }}
           </div>
-          <label>
-            {{ 'config.photo' | translate }}
-            <span
-              class="pi pi-question-circle"
-              pTooltip="{{ 'config.usePhoto256x256Pixel' | translate }}"
-              tooltipPosition="right"></span>
-          </label>
-          <div class="flex justify-content-end flex-wrap">
-            <user-profile></user-profile>
-          </div>
+          @if (email()) {
+            <div class="text-muted-color break-all">{{ email() }}</div>
+          }
+          @if (roles().length) {
+            <div class="flex flex-wrap justify-center sm:justify-start gap-2">
+              @for (role of roles(); track role) {
+                <p-tag [severity]="role === 'admin' ? 'info' : 'secondary'" [value]="role" />
+              }
+            </div>
+          }
         </div>
       </div>
-      <div class="md:w-1/2">
-        <div class="card flex flex-col gap-4">
-          <div class="font-semibold text-xl">{{ 'config.localization' | translate }}</div>
-          <label> {{ 'config.selectLanguage' | translate }} </label>
-          <div class="flex justify-content-end flex-wrap">
-            <p-select
-              class="w-full md:w-56"
-              optionLabel="name"
-              optionValue="code"
-              qa-id="oip-app-config-language-select"
-              [options]="l10nService.availableLanguages"
-              [(ngModel)]="selectedLanguage"
-              (onChange)="changeLanguage()">
-              <ng-template #selectedItem let-selectedOption>
-                <div class="flex items-center gap-2">
-                  <span [class]="selectedOption.icon"></span>
-                  <div>{{ selectedOption.name }}</div>
-                </div>
-              </ng-template>
-              <ng-template #item let-languages>
-                <div class="flex items-center gap-2">
-                  <span [class]="languages.icon"></span>
-                  <div>{{ languages.name }}</div>
-                </div>
-              </ng-template>
-            </p-select>
-          </div>
-          <div class="flex flex-col gap-5">
-            <div class="mt-5">{{ 'config.dateTimeFormat' | translate }}</div>
-            <p-select
-              class="w-full md:w-56"
-              qa-id="oip-app-config-date-format-select"
-              [options]="dateFormats"
-              [placeholder]="'config.dateFormat' | translate"
-              [(ngModel)]="selectedDateFormat"
-              (onChange)="changeDateFormat()" />
-            <p-select
-              class="w-full md:w-56"
-              qa-id="oip-app-config-time-format-select"
-              [options]="timeFormats"
-              [placeholder]="'config.timeFormat' | translate"
-              [(ngModel)]="selectedTimeFormat"
-              (onChange)="changeTimeFormat()" />
-            <div class="mt-5">{{ 'config.firstDayOfWeek' | translate }}</div>
-            <p-select
-              class="w-full md:w-56"
-              optionLabel="label"
-              optionValue="value"
-              qa-id="oip-app-config-first-day-of-week-select"
-              [options]="weekDays()"
-              [placeholder]="'config.firstDayOfWeek' | translate"
-              [(ngModel)]="selectedFirstDayOfWeek"
-              (onChange)="changeFirstDayOfWeek()" />
-            <div class="mt-5">{{ 'config.timeZone' | translate }}</div>
-            <p-select
-              class="w-full md:w-56"
-              qa-id="oip-app-config-timezone-select"
-              [filter]="true"
-              [options]="allTimeZones"
-              [placeholder]="'config.timeZone' | translate"
-              [virtualScroll]="true"
-              [virtualScrollItemSize]="34"
-              [(ngModel)]="selectedTimeZone"
-              (onChange)="changeTimeZone()" />
+
+      <div class="flex flex-col lg:flex-row gap-4">
+        <div class="card !mb-0 lg:flex-[3] flex flex-col gap-4 min-w-0">
+          <div class="font-semibold text-xl">{{ 'config.languageAndRegion' | translate }}</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+              <label for="oip-app-config-language">{{ 'config.language' | translate }}</label>
+              <p-select
+                class="w-full"
+                inputId="oip-app-config-language"
+                optionLabel="name"
+                optionValue="code"
+                qa-id="oip-app-config-language-select"
+                [options]="l10nService.availableLanguages"
+                [(ngModel)]="selectedLanguage"
+                (onChange)="changeLanguage()">
+                <ng-template #selectedItem let-selectedOption>
+                  <div class="flex items-center gap-2">
+                    <span [class]="selectedOption.icon"></span>
+                    <div>{{ selectedOption.name }}</div>
+                  </div>
+                </ng-template>
+                <ng-template #item let-languages>
+                  <div class="flex items-center gap-2">
+                    <span [class]="languages.icon"></span>
+                    <div>{{ languages.name }}</div>
+                  </div>
+                </ng-template>
+              </p-select>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="oip-app-config-timezone">{{ 'config.timeZone' | translate }}</label>
+              <p-select
+                class="w-full"
+                inputId="oip-app-config-timezone"
+                qa-id="oip-app-config-timezone-select"
+                [filter]="true"
+                [options]="allTimeZones"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="34"
+                [(ngModel)]="selectedTimeZone"
+                (onChange)="changeTimeZone()" />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="oip-app-config-date-format">{{ 'config.dateFormat' | translate }}</label>
+              <p-select
+                class="w-full"
+                inputId="oip-app-config-date-format"
+                qa-id="oip-app-config-date-format-select"
+                [options]="dateFormats"
+                [(ngModel)]="selectedDateFormat"
+                (onChange)="changeDateFormat()" />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="oip-app-config-time-format">{{ 'config.timeFormat' | translate }}</label>
+              <p-select
+                class="w-full"
+                inputId="oip-app-config-time-format"
+                qa-id="oip-app-config-time-format-select"
+                [options]="timeFormats"
+                [(ngModel)]="selectedTimeFormat"
+                (onChange)="changeTimeFormat()" />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="oip-app-config-first-day-of-week">{{ 'config.firstDayOfWeek' | translate }}</label>
+              <p-select
+                class="w-full"
+                inputId="oip-app-config-first-day-of-week"
+                optionLabel="label"
+                optionValue="value"
+                qa-id="oip-app-config-first-day-of-week-select"
+                [options]="weekDays()"
+                [(ngModel)]="selectedFirstDayOfWeek"
+                (onChange)="changeFirstDayOfWeek()" />
+            </div>
+            <div class="flex items-end gap-2 text-muted-color pb-2">
+              <i class="pi pi-clock"></i>
+              <span id="oip-app-config-now">{{ 'config.now' | translate }}: {{ nowPreview() }}</span>
+            </div>
           </div>
         </div>
-      </div>
-      @if (securityService.isAdmin()) {
-        <div class="md:w-1/2">
-          <div class="card flex flex-col gap-4">
-            <div class="font-semibold text-xl">{{ 'config.menu' | translate }}</div>
-            <div class="flex items-center gap-2">
-              <label for="oip-app-config-admin-mode">{{ 'config.all' | translate }}</label>
+
+        @if (securityService.isAdmin()) {
+          <div class="card !mb-0 lg:flex-[2] flex flex-col gap-4 min-w-0">
+            <div class="font-semibold text-xl">{{ 'config.administration' | translate }}</div>
+            <div class="flex items-center justify-between gap-4">
+              <label class="flex flex-col gap-1" for="oip-app-config-admin-mode">
+                <span>{{ 'config.showAllMenuItems' | translate }}</span>
+                <span class="text-sm text-muted-color">{{ 'config.showAllMenuItemsHint' | translate }}</span>
+              </label>
               <p-toggle-switch
-                id="oip-app-config-admin-mode"
+                inputId="oip-app-config-admin-mode"
                 [(ngModel)]="menuService.adminMode"
-                (onChange)="onSwitchChange()"></p-toggle-switch>
+                (onChange)="onSwitchChange()" />
             </div>
-            <div class="flex items-center gap-2">
-              <label for="oip-app-config-admin-mode">{{ 'config.moduleManagement' | translate }}</label>
-              <p-button icon="pi pi-cog" label="{{ 'config.goTo' | translate }}" routerLink="/modules" />
-            </div>
-            <div class="flex items-center gap-2">
-              <label for="oip-app-config-applications-link">{{ 'config.applicationManagement' | translate }}</label>
-              <p-button
-                icon="pi pi-th-large"
-                id="oip-app-config-applications-link"
-                label="{{ 'config.goTo' | translate }}"
-                routerLink="/applications" />
-            </div>
-            <div class="flex items-center gap-2">
-              <label for="oip-app-config-sessions-link">{{ 'config.sessionManagement' | translate }}</label>
-              <p-button
-                icon="pi pi-users"
-                id="oip-app-config-sessions-link"
-                label="{{ 'config.goTo' | translate }}"
-                routerLink="/sessions" />
+            <div class="grid grid-cols-3 gap-2">
+              @for (link of adminLinks; track link.path) {
+                <a
+                  class="flex flex-col items-center justify-center gap-2 p-3 rounded-border border border-surface text-center text-color no-underline transition-colors hover:bg-emphasis"
+                  [id]="link.id"
+                  [routerLink]="link.path">
+                  <i [class]="link.icon + ' !text-xl'"></i>
+                  <span class="text-sm">{{ link.label | translate }}</span>
+                </a>
+              }
             </div>
           </div>
-        </div>
-      }
+        }
+      </div>
     </div>
   `,
-  imports: [
-    UserProfileComponent,
-    Tooltip,
-    FormsModule,
-    Select,
-    TableModule,
-    TranslatePipe,
-    ToggleSwitchModule,
-    Button,
-    RouterLink
-  ]
+  imports: [UserProfileComponent, FormsModule, Select, Tag, TranslatePipe, ToggleSwitchModule, RouterLink]
 })
 export class ConfigComponent {
   private readonly translations = provideTranslations({ en, ru });
 
   private readonly layoutService = inject(LayoutService);
+  private readonly locale = inject(LOCALE_ID);
   protected readonly l10nService = inject(L10nService);
   protected readonly userService = inject(UserService);
   protected readonly securityService = inject(SecurityService);
   protected readonly menuService = inject(MenuService);
   protected readonly dateFormats: string[] = ['dd.MM.yyyy', 'dd.MM.yy', 'yyyy-MM-dd', 'dd.MMM.yyyy'];
   protected readonly timeFormats: string[] = ['HH:mm:ss', 'HH:mm'];
-  // @ts-ignore
-  protected readonly allTimeZones: any[] = Intl.supportedValuesOf('timeZone');
+  // The workspace compiles against lib es2018, where Intl.supportedValuesOf isn't declared yet.
+  protected readonly allTimeZones: string[] = (
+    Intl as unknown as { supportedValuesOf(key: 'timeZone'): string[] }
+  ).supportedValuesOf('timeZone');
 
-  protected selectedLanguage: any;
+  protected readonly adminLinks = [
+    { id: 'oip-app-config-modules-link', path: '/modules', icon: 'pi pi-cog', label: 'config.modules' },
+    {
+      id: 'oip-app-config-applications-link',
+      path: '/applications',
+      icon: 'pi pi-th-large',
+      label: 'config.applications'
+    },
+    { id: 'oip-app-config-sessions-link', path: '/sessions', icon: 'pi pi-users', label: 'config.sessions' }
+  ];
+
+  protected selectedLanguage: string;
   protected selectedDateFormat: string;
   protected selectedTimeFormat: string;
   protected selectedTimeZone: string;
   protected selectedFirstDayOfWeek: number;
+
+  private readonly currentUser = toSignal(this.securityService.getCurrentUser$());
+  protected readonly email = computed(() => this.currentUser()?.email as string | undefined);
+  protected readonly roles = computed(() =>
+    ((this.currentUser()?.roles as string[] | undefined) ?? []).filter(
+      (role) => !HIDDEN_ROLES.includes(role) && !role.startsWith(HIDDEN_ROLE_PREFIX)
+    )
+  );
+
+  private readonly now = signal(new Date());
+
+  /** Current date and time in the chosen formats and time zone. */
+  protected readonly nowPreview = computed(() => {
+    const config = this.layoutService.layoutConfig();
+    return formatDate(
+      this.now(),
+      `${config.dateFormat} ${config.timeFormat}`,
+      this.locale,
+      this.getTimeZoneOffset(config.timeZone)
+    );
+  });
 
   /** Days of the week starting from Monday, named in the current language. */
   protected readonly weekDays = computed(() => {
@@ -190,6 +230,9 @@ export class ConfigComponent {
     this.selectedTimeFormat = this.layoutService.timeFormat();
     this.selectedTimeZone = this.layoutService.timeZone();
     this.selectedFirstDayOfWeek = this.layoutService.firstDayOfWeek();
+
+    const timer = setInterval(() => this.now.set(new Date()), PREVIEW_REFRESH_MS);
+    inject(DestroyRef).onDestroy(() => clearInterval(timer));
   }
 
   changeLanguage() {
@@ -218,5 +261,24 @@ export class ConfigComponent {
 
   async onSwitchChange(): Promise<void> {
     await this.menuService.loadMenu();
+  }
+
+  /**
+   * Offset of the time zone in the form the date pipe takes ("+0300"), or undefined for the browser time zone.
+   */
+  private getTimeZoneOffset(timeZone: string | undefined): string | undefined {
+    if (!timeZone) {
+      return undefined;
+    }
+
+    try {
+      const name = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'longOffset' })
+        .formatToParts(this.now())
+        .find((part) => part.type === 'timeZoneName')?.value;
+      // "GMT+03:00" for most zones, plain "GMT" for UTC itself.
+      return name === 'GMT' ? '+0000' : name?.replace('GMT', '').replace(':', '');
+    } catch {
+      return undefined;
+    }
   }
 }
