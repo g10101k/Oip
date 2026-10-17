@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oip.Base.Controllers;
+using Oip.Base.Controllers.Api;
+using Oip.Base.Data.Constants;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Entities;
 
@@ -67,7 +69,7 @@ public static class WebApplicationBuilderExtension
     /// if the module is not already registered.
     /// </summary>
     /// <param name="moduleContext">The database context used to persist module information.</param>
-    /// <param name="serviceProvider">The service provider used to create module controllers to read their icons.</param>
+    /// <param name="serviceProvider">The service provider used to create module controllers to read their icons and rights.</param>
     private static void AddModulesFromAssemblies(OipModuleContext moduleContext, IServiceProvider serviceProvider)
     {
         var result = GetAllLoadedModules();
@@ -80,34 +82,64 @@ public static class WebApplicationBuilderExtension
             var attr = type.GetCustomAttribute<RouteAttribute>();
             if (attr == null) continue;
             var link = attr.Template.Replace("api", string.Empty);
-            var iconResolved = TryGetModuleIcon(type, serviceProvider, logger, out var icon);
-            var module = moduleContext.Modules.FirstOrDefault(m => m.Name == moduleName);
+            var metadataResolved = TryGetModuleMetadata(type, serviceProvider, logger, out var icon, out var rights);
+            var module = moduleContext.Modules
+                .Include(m => m.ModuleSecurities)
+                .FirstOrDefault(m => m.Name == moduleName);
             if (module is null)
             {
-                moduleContext.Modules.Add(new ModuleEntity { Name = moduleName, RouterLink = link, Icon = icon });
+                module = new ModuleEntity { Name = moduleName, RouterLink = link, Icon = icon };
+                moduleContext.Modules.Add(module);
             }
             else
             {
                 module.RouterLink = link;
-                if (iconResolved)
+                if (metadataResolved)
                     module.Icon = icon;
             }
+
+            if (metadataResolved)
+                SyncModuleSecurities(module, rights);
         }
 
         moduleContext.SaveChanges();
     }
 
     /// <summary>
-    /// Creates the module controller and reads its <c>Icon</c> property.
+    /// Replaces the default security rules of a module with the rights its controller declares.
+    /// Every declared right is also granted to the <see cref="SecurityConstants.AdminRole"/> role.
+    /// </summary>
+    /// <param name="module">The module whose <see cref="ModuleEntity.ModuleSecurities"/> are updated.</param>
+    /// <param name="rights">The rights declared by the module controller.</param>
+    internal static void SyncModuleSecurities(ModuleEntity module, IEnumerable<SecurityResponse> rights)
+    {
+        var declared = rights
+            .SelectMany(right => (right.Roles ?? []).Append(SecurityConstants.AdminRole)
+                .Select(role => (Right: right.Code, Role: role)))
+            .ToHashSet();
+
+        foreach (var security in module.ModuleSecurities.Where(x => !declared.Contains((x.Right, x.Role))).ToList())
+            module.ModuleSecurities.Remove(security);
+
+        var existing = module.ModuleSecurities.Select(x => (x.Right, x.Role)).ToHashSet();
+        foreach (var (right, role) in declared.Where(x => !existing.Contains(x)))
+            module.ModuleSecurities.Add(new ModuleSecurityEntity { Right = right, Role = role });
+    }
+
+    /// <summary>
+    /// Creates the module controller and reads its <c>Icon</c> property and declared rights.
     /// </summary>
     /// <param name="type">The module controller type.</param>
     /// <param name="serviceProvider">The service provider used to resolve controller dependencies.</param>
     /// <param name="logger">The logger used to report controllers that cannot be created.</param>
     /// <param name="icon">The module icon, or <c>null</c> when the module does not declare one.</param>
-    /// <returns><c>true</c> when the icon was read; <c>false</c> when the controller could not be created.</returns>
-    private static bool TryGetModuleIcon(Type type, IServiceProvider serviceProvider, ILogger logger, out string? icon)
+    /// <param name="rights">The rights returned by <c>GetModuleRights</c>, or an empty list when none are declared.</param>
+    /// <returns><c>true</c> when the metadata was read; <c>false</c> when the controller could not be created.</returns>
+    private static bool TryGetModuleMetadata(Type type, IServiceProvider serviceProvider, ILogger logger,
+        out string? icon, out List<SecurityResponse> rights)
     {
         icon = null;
+        rights = [];
         if (type.IsAbstract || type.ContainsGenericParameters)
             return false;
 
@@ -115,12 +147,14 @@ public static class WebApplicationBuilderExtension
         {
             var controller = ActivatorUtilities.CreateInstance(serviceProvider, type);
             icon = type.GetProperty(nameof(BaseModuleController<object>.Icon))?.GetValue(controller) as string;
+            rights = type.GetMethod(nameof(BaseModuleController<object>.GetModuleRights), Type.EmptyTypes)
+                ?.Invoke(controller, null) as List<SecurityResponse> ?? [];
             (controller as IDisposable)?.Dispose();
             return true;
         }
         catch (Exception e)
         {
-            logger.LogWarning(e, "Could not read the icon of module {ModuleType}", type.FullName);
+            logger.LogWarning(e, "Could not read the icon and rights of module {ModuleType}", type.FullName);
             return false;
         }
     }
