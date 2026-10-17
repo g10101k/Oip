@@ -1,7 +1,10 @@
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Oip.UiTest;
 
@@ -12,8 +15,7 @@ namespace Oip.UiTest;
 /// </summary>
 internal sealed class ManifestServer : IDisposable
 {
-    private readonly HttpListener _listener = new();
-    private readonly string _manifest;
+    private readonly WebApplication _app;
 
     /// <summary>
     /// Starts the server for an extension module with the given key and name.
@@ -26,7 +28,7 @@ internal sealed class ManifestServer : IDisposable
         var origin = $"http://{TestSetup.TestHost}:{port}";
         ManifestUrl = $"{origin}/manifest.json";
         // The script and the API must share the origin of the manifest; the element name needs a dash.
-        _manifest = JsonSerializer.Serialize(new
+        var manifest = JsonSerializer.Serialize(new
         {
             key,
             name,
@@ -37,10 +39,14 @@ internal sealed class ManifestServer : IDisposable
             apiBaseUrl = $"{origin}/api"
         });
 
-        // "+" listens on every interface: in the test container the backend comes from the docker network.
-        _listener.Prefixes.Add($"http://+:{port}/");
-        _listener.Start();
-        _ = ServeAsync();
+        var builder = WebApplication.CreateSlimBuilder();
+        builder.Logging.ClearProviders();
+        // Every interface: in the test container the backend comes from the docker network. Unlike HttpListener
+        // with a "+" prefix, Kestrel needs no URL reservation, so the tests also run without admin rights on Windows.
+        builder.WebHost.ConfigureKestrel(options => options.ListenAnyIP(port));
+        _app = builder.Build();
+        _app.MapGet("/manifest.json", () => Results.Text(manifest, "application/json"));
+        _app.StartAsync().GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -51,30 +57,7 @@ internal sealed class ManifestServer : IDisposable
     /// <summary>
     /// Stops the server.
     /// </summary>
-    public void Dispose() => _listener.Close();
-
-    private async Task ServeAsync()
-    {
-        while (_listener.IsListening)
-        {
-            HttpListenerContext context;
-            try
-            {
-                context = await _listener.GetContextAsync();
-            }
-            catch (Exception e) when (e is HttpListenerException or ObjectDisposedException)
-            {
-                return;
-            }
-
-            var found = context.Request.Url?.AbsolutePath == "/manifest.json";
-            var body = Encoding.UTF8.GetBytes(found ? _manifest : string.Empty);
-            context.Response.StatusCode = found ? 200 : 404;
-            context.Response.ContentType = "application/json";
-            await context.Response.OutputStream.WriteAsync(body);
-            context.Response.Close();
-        }
-    }
+    public void Dispose() => _app.DisposeAsync().AsTask().GetAwaiter().GetResult();
 
     private static int GetFreePort()
     {

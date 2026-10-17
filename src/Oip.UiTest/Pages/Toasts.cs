@@ -40,7 +40,7 @@ internal class Toasts(IWebDriver driver) : BasePage(driver)
     /// Waits for an error message that was not on screen before the last <see cref="ExpectSuccess"/> call
     /// or page load and returns its summary.
     /// </summary>
-    public string WaitForErrorSummary() => Wait.UntilFindElement(NewError).FindElement(Summary).Text.Trim();
+    public string WaitForErrorSummary() => WaitForNewErrorText(Summary);
 
     /// <summary>
     /// Runs the action and returns the detail of the error message it reports.
@@ -50,8 +50,19 @@ internal class Toasts(IWebDriver driver) : BasePage(driver)
     {
         MarkShown();
         action();
-        return Wait.UntilFindElement(NewError).FindElement(Detail).Text.Trim();
+        return WaitForNewErrorText(Detail);
     }
+
+    /// <summary>
+    /// Waits for a new error message and returns the text of its part. The text is read from the DOM: while the
+    /// toast is fading in, WebDriver does not consider it displayed and reports its text as empty.
+    /// </summary>
+    /// <param name="part">The part of the message, <see cref="Summary"/> or <see cref="Detail"/>.</param>
+    private string WaitForNewErrorText(By part) => Wait.Until(d =>
+    {
+        var text = d.FindElement(NewError).FindElement(part).GetDomProperty("textContent")?.Trim();
+        return string.IsNullOrEmpty(text) ? null : text;
+    });
 
     /// <summary>
     /// Closes every toast on screen and waits until they are gone. Toasts show up in the top right corner over
