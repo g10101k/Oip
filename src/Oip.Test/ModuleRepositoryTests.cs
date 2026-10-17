@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Controllers;
+using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Entities;
+using Oip.Base.Data.Extensions;
 using Oip.Base.Data.Repositories;
 
 namespace Oip.Test;
@@ -339,6 +341,78 @@ public class ModuleRepositoryTests
             .ToListAsync();
 
         Assert.That(children, Is.EqualTo(new[] { "Nested", "Page" }));
+    }
+
+    [Test]
+    public async Task AddModuleInstance_GrantsAdminEveryModuleRight()
+    {
+        await using var context = CreateContext();
+        var repository = new ModuleRepository(context);
+
+        var folder = new ModuleEntity { Name = ModuleConstants.FolderModuleName };
+        var page = new ModuleEntity
+        {
+            Name = "Page",
+            ModuleSecurities =
+            [
+                new ModuleSecurityEntity { Right = SecurityConstants.Edit, Role = SecurityConstants.AdminRole },
+                new ModuleSecurityEntity { Right = SecurityConstants.Edit, Role = "operator" },
+                new ModuleSecurityEntity { Right = SecurityConstants.Delete, Role = "operator" }
+            ]
+        };
+        context.Modules.AddRange(folder, page);
+        await context.SaveChangesAsync();
+
+        await repository.AddModuleInstance(new AddModuleInstanceDto(folder.ModuleId, "Root", null, null, null));
+        var root = await context.ModuleInstances.SingleAsync();
+        await repository.AddModuleInstance(
+            new AddModuleInstanceDto(page.ModuleId, "Page", null, root.ModuleInstanceId, null));
+        var instance = await context.ModuleInstances.SingleAsync(x => x.Label == "Page");
+
+        var rights = await repository.GetUserRightsByInstanceId(instance.ModuleInstanceId,
+            [SecurityConstants.AdminRole]);
+        var rootSecurity = await repository.GetSecurityByInstanceId(root.ModuleInstanceId);
+
+        Assert.That(rights, Is.EquivalentTo(new[]
+        {
+            SecurityConstants.Read, SecurityConstants.Edit, SecurityConstants.Delete
+        }));
+        Assert.That(await context.ModuleInstanceSecurities
+            .Where(x => x.ModuleInstanceId == instance.ModuleInstanceId)
+            .Select(x => x.Role)
+            .Distinct()
+            .ToListAsync(), Is.EqualTo(new[] { SecurityConstants.AdminRole }));
+        Assert.That(rootSecurity.Select(x => (x.Right, x.Role)),
+            Is.EqualTo(new[] { (SecurityConstants.Read, SecurityConstants.AdminRole) }));
+    }
+
+    [Test]
+    public void SyncModuleSecurities_StoresDeclaredRightsWithAdmin()
+    {
+        var module = new ModuleEntity
+        {
+            Name = "Page",
+            ModuleSecurities =
+            [
+                new ModuleSecurityEntity { Right = SecurityConstants.Read, Role = SecurityConstants.AdminRole },
+                new ModuleSecurityEntity { Right = "obsolete", Role = SecurityConstants.AdminRole }
+            ]
+        };
+
+        WebApplicationBuilderExtension.SyncModuleSecurities(module,
+        [
+            new SecurityResponse { Code = SecurityConstants.Read, Roles = [SecurityConstants.AdminRole] },
+            new SecurityResponse { Code = SecurityConstants.Edit, Roles = ["operator"] },
+            new SecurityResponse { Code = SecurityConstants.Delete, Roles = null }
+        ]);
+
+        Assert.That(module.ModuleSecurities.Select(x => (x.Right, x.Role)), Is.EquivalentTo(new[]
+        {
+            (SecurityConstants.Read, SecurityConstants.AdminRole),
+            (SecurityConstants.Edit, "operator"),
+            (SecurityConstants.Edit, SecurityConstants.AdminRole),
+            (SecurityConstants.Delete, SecurityConstants.AdminRole)
+        }));
     }
 
     [Test]

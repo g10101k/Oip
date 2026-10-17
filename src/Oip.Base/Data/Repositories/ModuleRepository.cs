@@ -443,7 +443,8 @@ public class ModuleRepository(OipModuleContext db)
     }
 
     /// <summary>
-    /// Adds a new module instance to the system with default security settings.
+    /// Adds a new module instance to the system and grants the <see cref="SecurityConstants.AdminRole"/> role
+    /// every right declared by the module, plus <see cref="SecurityConstants.Read"/>.
     /// </summary>
     /// <param name="addModuleInstanceDto">The data transfer object containing module instance details.</param>
     /// <exception cref="KeyNotFoundException">Thrown if the module or the parent module instance does not exist.</exception>
@@ -491,6 +492,14 @@ public class ModuleRepository(OipModuleContext db)
             }
         }
 
+        var adminRights = await db.ModuleSecurities
+            .Where(x => x.ModuleId == addModuleInstanceDto.ModuleId)
+            .Select(x => x.Right)
+            .Distinct()
+            .ToListAsync();
+        if (!adminRights.Contains(SecurityConstants.Read))
+            adminRights.Add(SecurityConstants.Read);
+
         db.ModuleInstances.Add(new ModuleInstanceEntity
         {
             ModuleId = addModuleInstanceDto.ModuleId,
@@ -499,7 +508,9 @@ public class ModuleRepository(OipModuleContext db)
             Icon = addModuleInstanceDto.Icon,
             Settings = string.Empty,
             ParentId = addModuleInstanceDto.ParentId,
-            Securities = [new ModuleInstanceSecurityEntity { Right = "read", Role = "admin" }]
+            Securities = adminRights
+                .Select(right => new ModuleInstanceSecurityEntity { Right = right, Role = SecurityConstants.AdminRole })
+                .ToList()
         });
         await db.SaveChangesAsync();
     }
