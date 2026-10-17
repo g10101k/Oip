@@ -149,7 +149,7 @@ internal class SwaggerGenerateWebClientStartupTask(
 
     private string GetTempSwaggerFilePath(OpenApiItem config)
     {
-        return Path.Combine(environment.ContentRootPath, "obj/SwaggerFiles",
+        return Path.Combine(environment.ContentRootPath, "obj", "SwaggerFiles",
             $"swagger-{config.Name.ToLower()}.json");
     }
 
