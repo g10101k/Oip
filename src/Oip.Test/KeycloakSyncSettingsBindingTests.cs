@@ -15,6 +15,7 @@ public class KeycloakSyncSettingsBindingTests
         var settings = Bind<Oip.Users.Base.Settings.AppSettings>("Oip.Users");
 
         Assert.That(settings.KeycloakSync.BatchSize, Is.EqualTo(100));
+        Assert.That(settings.KeycloakSync.SyncOnStartup, Is.True);
     }
 
     [Test]

@@ -122,6 +122,22 @@ docker compose -f .oip-devcontainer/dev.yml exec keycloak /opt/keycloak/bin/kcad
 
 `SharedSecret` должен совпадать со значением `sharedSecret` в `_providerConfig.ext-event-http.0`.
 
+При старте в режимах Local и Service приложение синхронизирует всех пользователей из Keycloak. Если это не нужно
+(например, в тестовом окружении или когда пользователи уже приходят через события Keycloak), стартовую синхронизацию
+можно отключить:
+
+````json
+{
+  "KeycloakSync": {
+    "SyncOnStartup": false
+  }
+}
+````
+
+По умолчанию `SyncOnStartup` равен `true`. При отключённой синхронизации в логе появляется запись
+`Keycloak user synchronization startup task skipped`. Ручная синхронизация и синхронизация по событиям Keycloak
+работают как обычно.
+
 ## Диагностика
 
 Если webhook не вызывается:
