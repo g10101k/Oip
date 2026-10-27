@@ -66,6 +66,53 @@ public class UserRepository(UserContext context) : BaseRepository<UserEntity, in
     }
 
     /// <summary>
+    /// Gets a page of users whose e-mail, first name or last name contains the search text, ignoring case.
+    /// </summary>
+    /// <param name="search">Text to search for; all users are returned when it is empty.</param>
+    /// <param name="isActive">Activity of the users to return; users of both kinds are returned when it is <c>null</c>.</param>
+    /// <param name="skip">Number of users to skip.</param>
+    /// <param name="take">Number of users to return.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The users of the page ordered by e-mail and the total number of users matching the filter.</returns>
+    public async Task<(List<UserEntity> Users, int TotalCount)> GetByFilterAsync(string? search, bool? isActive,
+        int skip, int take, CancellationToken cancellationToken = default)
+    {
+        var query = context.Users.AsNoTracking();
+        if (isActive is not null)
+            query = query.Where(u => u.IsActive == isActive);
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim().ToLower();
+            query = query.Where(u => u.Email.ToLower().Contains(term) ||
+                                     u.FirstName.ToLower().Contains(term) ||
+                                     u.LastName.ToLower().Contains(term));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var users = await query
+            .OrderBy(u => u.Email)
+            .ThenBy(u => u.UserId)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+
+        return (users, totalCount);
+    }
+
+    /// <summary>
+    /// Counts all users and the active ones.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The number of all users and the number of active users.</returns>
+    public async Task<(int TotalCount, int ActiveCount)> GetActivityCountsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var totalCount = await context.Users.CountAsync(cancellationToken);
+        var activeCount = await context.Users.CountAsync(u => u.IsActive, cancellationToken);
+        return (totalCount, activeCount);
+    }
+
+    /// <summary>
     /// Gets active user entities that are linked to Keycloak.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token.</param>

@@ -74,6 +74,7 @@ public static class ServiceCollectionExtensions
         services.TryAddScoped<UserService>();
         services.AddUserPhotoStorage();
         services.TryAddScoped<KeycloakSyncService>();
+        services.TryAddSingleton<UsersSyncCoordinator>();
         services.AddLocalUserCacheRepository();
         services.AddStartupTask<KeycloakSyncStartupTask>();
         services.AddUsersNotificationPublisherCore();

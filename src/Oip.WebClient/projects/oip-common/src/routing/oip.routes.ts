@@ -164,6 +164,16 @@ export function oipIframeModuleRoute(path = 'iframe-module/:id'): Route {
   };
 }
 
+/** Users module listing the users synchronized from Keycloak. The path must keep an `:id` segment. */
+export function oipUsersModuleRoute(path = 'users-module/:id'): Route {
+  return {
+    path,
+    loadComponent: () =>
+      import('../components/users-module/users-module.component').then((m) => m.UsersModuleComponent),
+    canActivate: [oipAuthGuard]
+  };
+}
+
 /** Extension module host. The path must keep the `:extensionKey` and `:id` segments. */
 export function oipExtensionsRoute(path = 'extensions/:extensionKey/:id'): Route {
   return {
@@ -208,6 +218,8 @@ export interface OipRouteFeatures {
   dbMigration?: OipRouteToggle;
   /** Iframe module host. Default path: `iframe-module/:id`. */
   iframeModule?: OipRouteToggle;
+  /** Users module listing the users synchronized from Keycloak. Default path: `users-module/:id`. */
+  usersModule?: OipRouteToggle;
   /** Extension module host. Default path: `extensions/:extensionKey/:id`. */
   extensions?: OipRouteToggle;
   /** Page shown when no module is available. Default path: `no-modules`. */
@@ -285,6 +297,7 @@ export function provideOipRoutes(options: OipRoutesOptions = {}): Routes {
   builtInRoute(features.discussion, oipDiscussionRoute, children);
   builtInRoute(features.dbMigration, oipDbMigrationRoute, children);
   builtInRoute(features.iframeModule, oipIframeModuleRoute, children);
+  builtInRoute(features.usersModule, oipUsersModuleRoute, children);
   builtInRoute(features.extensions, oipExtensionsRoute, children);
   builtInRoute(features.noModules, oipNoModulesRoute, children);
 
