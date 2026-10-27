@@ -1,0 +1,9 @@
+# LF everywhere: in the repository and in the working tree on every OS, whatever core.autocrlf says.
+* text=auto eol=lf
+
+# Shell scripts run in Linux containers and break with CRLF.
+*.sh text eol=lf
+
+# Windows batch files need CRLF.
+*.cmd text eol=crlf
+*.bat text eol=crlf
