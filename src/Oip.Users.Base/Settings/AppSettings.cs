@@ -78,7 +78,12 @@ public class KeycloakSyncSettings
     /// Gets or sets the batch size for synchronization operations.
     /// </summary>
     public int BatchSize { get; set; } = 100;
-    
+
+    /// <summary>
+    /// Gets or sets whether all users are synchronized from Keycloak when the application starts.
+    /// </summary>
+    public bool SyncOnStartup { get; set; } = true;
+
     /// <summary>
     /// The shared secret used to validate the X-Keycloak-Signature HMAC header.
     /// </summary>

@@ -1,13 +1,17 @@
 using Microsoft.Extensions.Logging;
 using Oip.Base.Runtime;
 using Oip.Users.Base.Services;
+using Oip.Users.Base.Settings;
 
 namespace Oip.Users.Base.StartupTasks;
 
 /// <summary>
 /// Startup task for synchronizing users from Keycloak once when the application starts.
 /// </summary>
-public class KeycloakSyncStartupTask(KeycloakSyncService keycloakSyncService, ILogger<KeycloakSyncStartupTask> logger)
+public class KeycloakSyncStartupTask(
+    KeycloakSyncService keycloakSyncService,
+    KeycloakSyncSettings keycloakSyncSettings,
+    ILogger<KeycloakSyncStartupTask> logger)
     : IStartupTask
 {
     /// <inheritdoc />
@@ -16,6 +20,13 @@ public class KeycloakSyncStartupTask(KeycloakSyncService keycloakSyncService, IL
     /// <inheritdoc />
     public async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
+        if (!keycloakSyncSettings.SyncOnStartup)
+        {
+            logger.LogInformation(
+                "Keycloak user synchronization startup task skipped: KeycloakSync:SyncOnStartup is disabled.");
+            return;
+        }
+
         try
         {
             logger.LogInformation("Starting Keycloak user synchronization startup task.");
