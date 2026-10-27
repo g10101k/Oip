@@ -1,0 +1,44 @@
+{
+  "users-module": {
+    "subtitle": "Accounts synchronized from Keycloak",
+    "searchPlaceholder": "Search by e-mail or name",
+    "refresh": "Refresh",
+    "sync": "Sync with Keycloak",
+    "syncRunning": "Synchronization with Keycloak is running",
+    "syncRunningSince": "Started at {{date}}",
+    "syncCompleted": "Synchronization with Keycloak is complete. Users synchronized: {{count}}",
+    "syncFinished": "Synchronization is complete",
+    "syncFinishedDetails": "{{date}} · users processed: {{count}} · took {{duration}} s",
+    "syncFailed": "Synchronization with Keycloak failed. See the service logs for details.",
+    "syncFailedTitle": "Synchronization failed",
+    "syncFailedDetails": "{{date}} · see the service logs for details",
+    "summary": {
+      "total": "Total",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "filter": {
+      "label": "Filter by status",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "pageReport": "Showing {first}–{last} of {totalRecords}",
+    "ago": {
+      "now": "just now",
+      "minutes": "{{count}} min ago",
+      "hours": "{{count}} h ago",
+      "days": "{{count}} d ago",
+      "months": "{{count}} mo ago",
+      "years": "{{count}} y ago"
+    },
+    "empty": "No users found",
+    "active": "Active",
+    "inactive": "Inactive",
+    "columns": {
+      "user": "User",
+      "status": "Status",
+      "lastSyncedAt": "Last sync"
+    }
+  }
+}

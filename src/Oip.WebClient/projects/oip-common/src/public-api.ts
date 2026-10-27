@@ -21,6 +21,7 @@ export { AppConfiguratorComponent } from './components/app-configurator/app-conf
 export { AppFloatingConfiguratorComponent } from './components/app-floating-configurator/app-floating-configurator.component';
 export { DiscussionComponent } from './components/discussion/discussion.component';
 export { IframeModuleComponent } from './components/iframe-module/iframe-module.component';
+export { UsersModuleComponent } from './components/users-module/users-module.component';
 export { ExtensionModuleHostComponent } from './components/extension-module-host/extension-module-host.component';
 export { UserNotificationsComponent } from './components/user-notifications/user-notifications.component';
 export { AppTopbarApplicationSwitcherComponent } from './components/top-bar-application-switcher/top-bar-application-switcher.component';
@@ -89,6 +90,7 @@ export {
 } from './extension-host/extension-host.events';
 export { FolderModuleApi } from './api/folder-module.api';
 export { IframeModuleApi } from './api/iframe-module.api';
+export { UsersModuleApi } from './api/users-module.api';
 export { SecurityApi } from './api/security.api';
 export { AuthSessionsApi } from './api/auth-sessions.api';
 export { ApplicationsApi } from './api/applications.api';
@@ -111,6 +113,7 @@ export {
   oipDiscussionRoute,
   oipDbMigrationRoute,
   oipIframeModuleRoute,
+  oipUsersModuleRoute,
   oipExtensionsRoute,
   oipNoModulesRoute,
   oipStartRoute,

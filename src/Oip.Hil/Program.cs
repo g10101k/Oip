@@ -72,6 +72,7 @@ internal static class Program
                 builder.Services
                     .AddController<ApplicationsController>()
                     .AddController<UsersController>()
+                    .AddController<UsersModuleController>()
                     .AddController<UserProfileController>()
                     .AddController<KeycloakEventsController>()
                     .AddController<DiscussionController>()

@@ -176,8 +176,8 @@ public class KeycloakSyncService(
     /// <summary>
     /// Synchronizes all users from Keycloak to the local database.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task SyncAllUsersAsync(CancellationToken cancellationToken = default)
+    /// <returns>The summary of the completed synchronization, also published as a notification.</returns>
+    public async Task<SyncUsersCompleteNotify> SyncAllUsersAsync(CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Starting full user synchronization");
         var startTime = DateTimeOffset.UtcNow;
@@ -205,7 +205,9 @@ public class KeycloakSyncService(
         logger.LogInformation(
             "Full user synchronization completed. Deactivated {DeactivatedCount} users missing from Keycloak",
             deactivatedCount);
-        await notificationPublisher.Notify(new SyncUsersCompleteNotify(totalUsers, startTime, endTime));
+        var result = new SyncUsersCompleteNotify(totalUsers, startTime, endTime);
+        await notificationPublisher.Notify(result);
+        return result;
     }
 
     /// <summary>
