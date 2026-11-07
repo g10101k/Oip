@@ -8,7 +8,7 @@ import type { PaletteDesignToken, Preset } from '@primeuix/themes/types';
  * built on a dynamic import, which keeps it out of the initial bundle:
  *
  * ```ts
- * { id: 'Lara', preset: () => import('@primeng/themes/lara').then((m) => m.default as Preset) }
+ * { id: 'Lara', preset: () => import('@primeuix/themes/lara').then((m) => m.default as Preset) }
  * ```
  */
 export type AppThemePresetLoader = () => Promise<Preset>;
