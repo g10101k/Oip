@@ -130,6 +130,9 @@ export class LayoutService {
 
       if (!this.initialized || !config) {
         this.initialized = true;
+        if (config) {
+          this.toggleDarkMode(config);
+        }
         return;
       }
 
@@ -145,6 +148,7 @@ export class LayoutService {
     const appConfigUiString = localStorage.getItem('layoutConfig');
     if (appConfigUiString != null) {
       const config = JSON.parse(appConfigUiString) as AppConfig;
+      config.darkTheme ??= window.matchMedia('(prefers-color-scheme: dark)').matches;
       config.timeZone ??= Intl.DateTimeFormat().resolvedOptions().timeZone;
       config.firstDayOfWeek ??= 1;
       return config;
@@ -153,7 +157,7 @@ export class LayoutService {
       preset: 'Aura',
       primary: 'emerald',
       surface: null,
-      darkTheme: false,
+      darkTheme: window.matchMedia('(prefers-color-scheme: dark)').matches,
       menuMode: 'static',
       language: 'ru',
       dateFormat: 'yyyy-MM-dd',
