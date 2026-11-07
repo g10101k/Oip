@@ -259,22 +259,23 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
 
-  minio:
-    image: minio/minio:latest
-    command: server --console-address ":9001" /data
+  rustfs:
+    image: rustfs/rustfs:1.0.4
     ports:
       - "9010:9000"  # API port
       - "9011:9001"  # Console port
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=P@ssw0rd
+      - RUSTFS_ACCESS_KEY=admin
+      - RUSTFS_SECRET_KEY=P@ssw0rd
+      - RUSTFS_CONSOLE_ENABLE=true
     volumes:
-      - minio_data:/data
+      - rustfs_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/health && curl -fsS http://localhost:9001/rustfs/console/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 40s
     restart: unless-stopped
 
   temporal:
@@ -294,6 +295,6 @@ volumes:
   pgadmin-data:
   pgadminhome-data:
   clickhouse_data:
-  minio_data:
+  rustfs_data:
   redis-data:
   temporal_data:
