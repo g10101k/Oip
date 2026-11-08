@@ -1,0 +1,15 @@
+{
+  "customization": {
+    "title": "Customization",
+    "description": "These assets apply to the entire OIP site. Saved changes take effect after a page reload.",
+    "scriptDescription": "This JavaScript runs in the browser for everyone who opens the site.",
+    "faviconSize": "The favicon must be at most 256 KiB.",
+    "resetFavicon": "Use the default favicon",
+    "save": "Save",
+    "saved": "Customization saved. Reload the page to see the changes.",
+    "loadError": "Could not load customization.",
+    "faviconError": "Could not read the favicon file.",
+    "saveError": "Could not save customization.",
+    "loading": "Loading customization…"
+  }
+}

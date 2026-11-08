@@ -151,6 +151,12 @@ export interface RegisterExtensionModuleRequest {
   manifestUrl?: string | null;
 }
 
+export interface SiteCustomization {
+  css: string;
+  javaScript: string;
+  faviconBase64?: string | null;
+}
+
 export interface UpdateExtensionModuleRequest {
   manifestUrl?: string | null;
 }

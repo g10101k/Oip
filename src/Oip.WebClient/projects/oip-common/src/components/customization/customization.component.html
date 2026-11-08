@@ -1,0 +1,71 @@
+<section class="card flex flex-col gap-4">
+  <div>
+    <h1 class="text-xl font-semibold">{{ 'customization.title' | translate }}</h1>
+    <p>{{ 'customization.description' | translate }}</p>
+  </div>
+
+  @if (customization(); as assets) {
+    <form class="flex flex-col gap-4" (ngSubmit)="save(assets)">
+      <label class="flex flex-col gap-2" for="customer-css">
+        <span class="font-medium">customer.css</span>
+        <textarea
+          id="customer-css"
+          name="css"
+          pTextarea
+          class="w-full font-mono"
+          rows="12"
+          [maxlength]="maxTextLength"
+          [(ngModel)]="assets.css"
+          [disabled]="busy()"
+          spellcheck="false"
+        ></textarea>
+      </label>
+
+      <label class="flex flex-col gap-2" for="customer-script">
+        <span class="font-medium">JavaScript</span>
+        <span>{{ 'customization.scriptDescription' | translate }}</span>
+        <textarea
+          id="customer-script"
+          name="javaScript"
+          pTextarea
+          class="w-full font-mono"
+          rows="8"
+          [maxlength]="maxTextLength"
+          [(ngModel)]="assets.javaScript"
+          [disabled]="busy()"
+          spellcheck="false"
+        ></textarea>
+      </label>
+
+      <div class="flex flex-col items-start gap-2">
+        <label class="font-medium" for="customer-favicon">Favicon (PNG, ICO)</label>
+        <input
+          #faviconInput
+          id="customer-favicon"
+          type="file"
+          accept=".png,.ico"
+          [disabled]="busy()"
+          (change)="selectFavicon(faviconInput)"
+        />
+        @if (assets.faviconBase64) {
+          <p-button
+            type="button"
+            severity="secondary"
+            [label]="'customization.resetFavicon' | translate"
+            [disabled]="busy()"
+            (onClick)="assets.faviconBase64 = null"
+          />
+        }
+      </div>
+
+      <p-button
+        type="submit"
+        [label]="'customization.save' | translate"
+        [disabled]="busy()"
+        class="self-start"
+      />
+    </form>
+  } @else if (busy()) {
+    <p>{{ 'customization.loading' | translate }}</p>
+  }
+</section>

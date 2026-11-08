@@ -48,7 +48,11 @@ public class OipModuleContext : DbContext
     /// </summary>
     public DbSet<UserStartModuleEntity> UserStartModules => Set<UserStartModuleEntity>();
 
-
+    /// <summary>
+    /// Site-wide shell customization.
+    /// </summary>
+    public DbSet<CustomizationEntity> Customizations => Set<CustomizationEntity>();
+    
     /// <summary>
     /// .ctor
     /// </summary>
@@ -78,6 +82,7 @@ public class OipModuleContext : DbContext
         modelBuilder.ApplyConfiguration(new ModuleInstanceSecurityEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new ModuleSecurityEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new UserStartModuleEntityConfiguration(Database, _designTime));
+        modelBuilder.ApplyConfiguration(new CustomizationEntityConfiguration(Database));
 
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }

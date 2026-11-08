@@ -184,7 +184,13 @@ export class ConfigComponent {
       icon: 'pi pi-th-large',
       label: 'config.applications'
     },
-    { id: 'oip-app-config-sessions-link', path: '/sessions', icon: 'pi pi-users', label: 'config.sessions' }
+    { id: 'oip-app-config-sessions-link', path: '/sessions', icon: 'pi pi-users', label: 'config.sessions' },
+    {
+      id: 'oip-app-config-customization-link',
+      path: '/customization',
+      icon: 'pi pi-palette',
+      label: 'config.customization'
+    }
   ];
 
   protected selectedLanguage: string;
