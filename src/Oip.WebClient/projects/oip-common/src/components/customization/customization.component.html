@@ -1,71 +1,151 @@
-<section class="card flex flex-col gap-4">
-  <div>
-    <h1 class="text-xl font-semibold">{{ 'customization.title' | translate }}</h1>
-    <p>{{ 'customization.description' | translate }}</p>
-  </div>
+<section class="card flex flex-1 flex-col gap-4">
+  <header class="flex flex-col gap-1">
+    <h1 class="!mb-0 text-2xl font-semibold">{{ "customization.title" | translate }}</h1>
+    <p class="text-muted-color">{{ "customization.description" | translate }}</p>
+  </header>
 
   @if (customization(); as assets) {
-    <form class="flex flex-col gap-4" (ngSubmit)="save(assets)">
-      <label class="flex flex-col gap-2" for="customer-css">
-        <span class="font-medium">customer.css</span>
-        <textarea
-          id="customer-css"
-          name="css"
-          pTextarea
-          class="w-full font-mono"
-          rows="12"
-          [maxlength]="maxTextLength"
-          [(ngModel)]="assets.css"
-          [disabled]="busy()"
-          spellcheck="false"
-        ></textarea>
-      </label>
+    <form class="flex min-w-0 flex-1 flex-col gap-4" (ngSubmit)="save()">
+      <p-tabs value="css" class="flex-1">
+        <p-tablist>
+          <p-tab value="css" class="!px-2 sm:!px-4">
+            <i class="pi pi-palette" aria-hidden="true"></i>
+            CSS
+          </p-tab>
+          <p-tab value="javascript" class="!px-2 sm:!px-4">
+            <i class="pi pi-code" aria-hidden="true"></i>
+            JavaScript
+          </p-tab>
+          <p-tab value="favicon" class="!px-2 sm:!px-4">
+            <i class="pi pi-image" aria-hidden="true"></i>
+            Favicon
+          </p-tab>
+        </p-tablist>
 
-      <label class="flex flex-col gap-2" for="customer-script">
-        <span class="font-medium">JavaScript</span>
-        <span>{{ 'customization.scriptDescription' | translate }}</span>
-        <textarea
-          id="customer-script"
-          name="javaScript"
-          pTextarea
-          class="w-full font-mono"
-          rows="8"
-          [maxlength]="maxTextLength"
-          [(ngModel)]="assets.javaScript"
-          [disabled]="busy()"
-          spellcheck="false"
-        ></textarea>
-      </label>
+        <p-tabpanels class="mt-4 grid min-h-72 flex-1 rounded-border border border-surface !p-3 sm:!p-4">
+          <p-tabpanel value="css">
+            <div class="flex h-full flex-col gap-3">
+              <div class="flex flex-col gap-1">
+                <label class="font-semibold" for="customer-css">
+                  {{ "customization.cssTitle" | translate }}
+                  <code class="ml-1 text-xs font-normal text-muted-color">customer.css</code>
+                </label>
+                <p id="customer-css-description" class="text-sm text-muted-color">
+                  {{ "customization.cssDescription" | translate }}
+                </p>
+              </div>
+              <textarea
+                id="customer-css"
+                name="css"
+                pTextarea
+                class="w-full flex-auto !font-mono"
+                rows="8"
+                wrap="off"
+                aria-describedby="customer-css-description"
+                [maxlength]="maxTextLength"
+                [ngModel]="assets.css"
+                (ngModelChange)="updateAssets({ css: $event })"
+                [disabled]="busy()"
+                spellcheck="false"></textarea>
+            </div>
+          </p-tabpanel>
 
-      <div class="flex flex-col items-start gap-2">
-        <label class="font-medium" for="customer-favicon">Favicon (PNG, ICO)</label>
-        <input
-          #faviconInput
-          id="customer-favicon"
-          type="file"
-          accept=".png,.ico"
-          [disabled]="busy()"
-          (change)="selectFavicon(faviconInput)"
-        />
-        @if (assets.faviconBase64) {
-          <p-button
-            type="button"
-            severity="secondary"
-            [label]="'customization.resetFavicon' | translate"
-            [disabled]="busy()"
-            (onClick)="assets.faviconBase64 = null"
-          />
-        }
-      </div>
+          <p-tabpanel value="javascript">
+            <div class="flex h-full flex-col gap-3">
+              <div class="flex flex-col gap-1">
+                <label class="font-semibold" for="customer-script">JavaScript</label>
+                <p id="customer-script-description" class="flex items-start gap-2 text-sm text-muted-color">
+                  <i class="pi pi-exclamation-triangle mt-0.5 text-primary" aria-hidden="true"></i>
+                  {{ "customization.scriptDescription" | translate }}
+                </p>
+              </div>
+              <textarea
+                id="customer-script"
+                name="javaScript"
+                pTextarea
+                class="w-full flex-auto !font-mono"
+                rows="8"
+                wrap="off"
+                aria-describedby="customer-script-description"
+                [maxlength]="maxTextLength"
+                [ngModel]="assets.javaScript"
+                (ngModelChange)="updateAssets({ javaScript: $event })"
+                [disabled]="busy()"
+                spellcheck="false"></textarea>
+            </div>
+          </p-tabpanel>
 
-      <p-button
-        type="submit"
-        [label]="'customization.save' | translate"
-        [disabled]="busy()"
-        class="self-start"
-      />
+          <p-tabpanel value="favicon">
+            <div class="flex flex-col items-start gap-3">
+              <div class="flex flex-col gap-1">
+                <h2 class="!mb-0 text-base font-semibold">{{ "customization.faviconTitle" | translate }}</h2>
+                <p class="text-sm text-muted-color">{{ "customization.faviconDescription" | translate }}</p>
+              </div>
+
+              <div
+                class="w-full max-w-72 rounded-border border border-surface bg-emphasis px-2 pt-2"
+                role="img"
+                [attr.aria-label]="'customization.faviconPreview' | translate">
+                <div class="mb-2 flex gap-1" aria-hidden="true">
+                  <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                  <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                  <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                </div>
+                <div
+                  class="flex w-36 max-w-full items-center gap-2 rounded-t-md bg-surface-0 px-2 py-1 dark:bg-surface-900">
+                  <img
+                    class="h-4 w-4 object-contain"
+                    [class]="assets.faviconBase64 ? '' : 'dark:invert'"
+                    [src]="faviconPreview()"
+                    alt="" />
+                  <span>OIP</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <input
+                  #faviconInput
+                  type="file"
+                  accept=".png,.ico"
+                  hidden
+                  [disabled]="busy()"
+                  (change)="selectFavicon(faviconInput)" />
+                <p-button
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="
+                    (assets.faviconBase64 ? 'customization.replaceFavicon' : 'customization.chooseFavicon') | translate
+                  "
+                  [disabled]="busy()"
+                  (onClick)="faviconInput.click()" />
+                @if (assets.faviconBase64) {
+                  <p-button
+                    type="button"
+                    severity="secondary"
+                    [text]="true"
+                    [label]="'customization.resetFavicon' | translate"
+                    [disabled]="busy()"
+                    (onClick)="updateAssets({ faviconBase64: null })" />
+                }
+              </div>
+              <p class="text-sm text-muted-color">{{ "customization.faviconFormats" | translate }}</p>
+            </div>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+
+      <footer class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-col gap-1">
+          <span role="status" class="text-sm font-medium" [class.text-primary]="hasChanges()">
+            {{ (hasChanges() ? "customization.unsaved" : "customization.upToDate") | translate }}
+          </span>
+          <span class="text-sm text-muted-color">{{ "customization.reloadHint" | translate }}</span>
+        </div>
+        <p-button type="submit" [label]="'customization.save' | translate" [disabled]="busy() || !hasChanges()" />
+      </footer>
     </form>
   } @else if (busy()) {
-    <p>{{ 'customization.loading' | translate }}</p>
+    <p>{{ "customization.loading" | translate }}</p>
   }
 </section>

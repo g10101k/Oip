@@ -1,0 +1,8 @@
+.layout-main:has(> app-customization) {
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-main:has(> app-customization) + app-footer {
+  margin-block-start: 1rem;
+}
