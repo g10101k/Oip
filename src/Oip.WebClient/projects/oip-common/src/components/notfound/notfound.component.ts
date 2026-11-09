@@ -20,7 +20,7 @@ import ru from './l10n/notfound.ru.json';
             class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20 flex flex-col items-center"
             style="border-radius: 53px">
             <div class="flex flex-col items-center justify-center">
-              <logo [height]="96" [width]="96"></logo>
+              <logo class="logo-error-page" />
             </div>
             <span class="text-primary font-bold text-3xl">{{ 'notfound.errorCode' | translate }}</span>
             <h1 class="text-surface-900 dark:text-surface-0 font-bold text-3xl lg:text-5xl mb-2">

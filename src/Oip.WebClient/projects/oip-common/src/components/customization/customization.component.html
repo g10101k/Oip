@@ -1,0 +1,214 @@
+<section class="card flex flex-1 flex-col gap-4">
+  <header class="flex flex-col gap-1">
+    <h1 class="!mb-0 text-2xl font-semibold">{{ "customization.title" | translate }}</h1>
+    <p class="text-muted-color">{{ "customization.description" | translate }}</p>
+  </header>
+
+  @if (customization(); as assets) {
+    <form class="flex min-w-0 flex-1 flex-col gap-4" (ngSubmit)="save()">
+      <p-tabs value="css" class="flex-1">
+        <p-tablist>
+          <p-tab value="css" class="!px-2 sm:!px-4">
+            <i class="pi pi-palette" aria-hidden="true"></i>
+            CSS
+          </p-tab>
+          <p-tab value="javascript" class="!px-2 sm:!px-4">
+            <i class="pi pi-code" aria-hidden="true"></i>
+            JavaScript
+          </p-tab>
+          <p-tab value="logo" class="!px-2 sm:!px-4">
+            <i class="pi pi-image" aria-hidden="true"></i>
+            {{ "customization.logoTab" | translate }}
+          </p-tab>
+        </p-tablist>
+
+        <p-tabpanels class="mt-4 grid min-h-72 flex-1 rounded-border border border-surface !p-3 sm:!p-4">
+          <p-tabpanel value="css">
+            <div class="flex h-full flex-col gap-3">
+              <div class="flex flex-col gap-1">
+                <label class="font-semibold" for="customer-css">
+                  {{ "customization.cssTitle" | translate }}
+                  <code class="ml-1 text-xs font-normal text-muted-color">customer.css</code>
+                </label>
+                <p id="customer-css-description" class="text-sm text-muted-color">
+                  {{ "customization.cssDescription" | translate }}
+                </p>
+              </div>
+              <textarea
+                id="customer-css"
+                name="css"
+                pTextarea
+                class="w-full flex-auto !font-mono"
+                rows="8"
+                wrap="off"
+                aria-describedby="customer-css-description"
+                [maxlength]="maxTextLength"
+                [ngModel]="assets.css"
+                (ngModelChange)="updateAssets({ css: $event })"
+                [disabled]="busy()"
+                spellcheck="false"></textarea>
+            </div>
+          </p-tabpanel>
+
+          <p-tabpanel value="javascript">
+            <div class="flex h-full flex-col gap-3">
+              <div class="flex flex-col gap-1">
+                <label class="font-semibold" for="customer-script">JavaScript</label>
+                <p id="customer-script-description" class="flex items-start gap-2 text-sm text-muted-color">
+                  <i class="pi pi-exclamation-triangle mt-0.5 text-primary" aria-hidden="true"></i>
+                  {{ "customization.scriptDescription" | translate }}
+                </p>
+              </div>
+              <textarea
+                id="customer-script"
+                name="javaScript"
+                pTextarea
+                class="w-full flex-auto !font-mono"
+                rows="8"
+                wrap="off"
+                aria-describedby="customer-script-description"
+                [maxlength]="maxTextLength"
+                [ngModel]="assets.javaScript"
+                (ngModelChange)="updateAssets({ javaScript: $event })"
+                [disabled]="busy()"
+                spellcheck="false"></textarea>
+            </div>
+          </p-tabpanel>
+
+          <p-tabpanel value="logo">
+            <div class="grid min-w-0 gap-6 md:grid-cols-2">
+              <section class="flex min-w-0 flex-col items-start gap-3">
+                <div class="flex flex-col gap-1">
+                  <h2 class="!mb-0 text-base font-semibold">{{ "customization.logoTitle" | translate }}</h2>
+                  <p class="text-sm text-muted-color">{{ "customization.logoDescription" | translate }}</p>
+                </div>
+
+                <div class="grid w-full min-w-0 gap-3">
+                  <figure class="grid min-w-0 gap-1">
+                    <figcaption class="text-sm text-muted-color">
+                      {{ "customization.logoHeader" | translate }}
+                    </figcaption>
+                    <div class="flex min-w-0 items-center gap-2 rounded-border border border-surface p-2">
+                      <logo class="logo-header" [src]="logoPreview()" />
+                      <span class="min-w-0 truncate">{{ appInfo.getTitle() ?? ("app-info.title" | translate) }}</span>
+                    </div>
+                  </figure>
+                  <figure class="grid min-w-0 gap-1">
+                    <figcaption class="text-sm text-muted-color">
+                      {{ "customization.logoFooter" | translate }}
+                    </figcaption>
+                    <div
+                      class="flex min-w-0 items-center justify-center gap-2 rounded-border border border-surface p-2">
+                      <logo class="logo-footer" [src]="logoPreview()" />
+                      <span class="min-w-0 break-words">{{
+                          appInfo.getFooter() ?? ("app-info.footer" | translate)
+                        }}</span>
+                    </div>
+                  </figure>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                  <input
+                    #logoInput
+                    type="file"
+                    accept=".png,.svg,image/png,image/svg+xml"
+                    hidden
+                    [disabled]="busy()"
+                    (change)="selectLogo(logoInput)"/>
+                  <p-button
+                    type="button"
+                    severity="secondary"
+                    [outlined]="true"
+                    [label]="
+                      (assets.logoBase64 ? 'customization.replaceLogo' : 'customization.chooseLogo') | translate
+                    "
+                    [disabled]="busy()"
+                    (onClick)="logoInput.click()"/>
+                  @if (assets.logoBase64) {
+                    <p-button
+                      type="button"
+                      severity="secondary"
+                      [text]="true"
+                      [label]="'customization.resetLogo' | translate"
+                      [disabled]="busy()"
+                      (onClick)="updateAssets({ logoBase64: null  })"/>
+                  }
+                </div>
+                <p class="text-sm text-muted-color">{{ "customization.logoFormats" | translate }}</p>
+              </section>
+
+              <section class="flex min-w-0 flex-col items-start gap-3">
+                <div class="flex flex-col gap-1">
+                  <h2 class="!mb-0 text-base font-semibold">{{ "customization.faviconTitle" | translate }}</h2>
+                  <p class="text-sm text-muted-color">{{ "customization.faviconDescription" | translate }}</p>
+                </div>
+
+                <div
+                  class="w-full max-w-72 rounded-border border border-surface bg-emphasis px-2 pt-2"
+                  role="img"
+                  [attr.aria-label]="'customization.faviconPreview' | translate">
+                  <div class="mb-2 flex gap-1" aria-hidden="true">
+                    <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                  </div>
+                  <div
+                    class="flex w-36 max-w-full items-center gap-2 rounded-t-md bg-surface-0 px-2 py-1 dark:bg-surface-900">
+                    <img
+                      class="h-4 w-4 object-contain"
+                      [class]="assets.faviconBase64 ? '' : 'dark:invert'"
+                      [src]="faviconPreview()"
+                      alt=""/>
+                    <span>OIP</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                  <input
+                    #faviconInput
+                    type="file"
+                    accept=".png,.ico,.svg"
+                    hidden
+                    [disabled]="busy()"
+                    (change)="selectFavicon(faviconInput)"/>
+                  <p-button
+                    type="button"
+                    severity="secondary"
+                    [outlined]="true"
+                    [label]="
+                      (assets.faviconBase64 ? 'customization.replaceFavicon' : 'customization.chooseFavicon')
+                        | translate
+                    "
+                    [disabled]="busy()"
+                    (onClick)="faviconInput.click()"/>
+                  @if (assets.faviconBase64) {
+                    <p-button
+                      type="button"
+                      severity="secondary"
+                      [text]="true"
+                      [label]="'customization.resetFavicon' | translate"
+                      [disabled]="busy()"
+                      (onClick)="updateAssets({ faviconBase64: null })"/>
+                  }
+                </div>
+                <p class="text-sm text-muted-color">{{ "customization.faviconFormats" | translate }}</p>
+              </section>
+            </div>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+
+      <footer class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-col gap-1">
+          <span role="status" class="text-sm font-medium" [class.text-primary]="hasChanges()">
+            {{ (hasChanges() ? "customization.unsaved" : "customization.upToDate") | translate }}
+          </span>
+          <span class="text-sm text-muted-color">{{ "customization.reloadHint" | translate }}</span>
+        </div>
+        <p-button type="submit" [label]="'customization.save' | translate" [disabled]="busy() || !hasChanges()"/>
+      </footer>
+    </form>
+  } @else if (busy()) {
+    <p>{{ "customization.loading" | translate }}</p>
+  }
+</section>

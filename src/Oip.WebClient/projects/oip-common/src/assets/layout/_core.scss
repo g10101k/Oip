@@ -28,3 +28,18 @@ a {
     color: color-mix(in srgb, var(--primary-color), transparent 20%);
   }
 }
+
+:where(logo.logo-header) {
+  --logo-max-width: 144px;
+  --logo-max-height: 36px;
+}
+
+:where(logo.logo-footer) {
+  --logo-max-width: 72px;
+  --logo-max-height: 18px;
+}
+
+:where(logo.logo-error-page) {
+  --logo-max-width: 96px;
+  --logo-max-height: 96px;
+}

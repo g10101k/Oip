@@ -4,6 +4,9 @@ import { Provider } from '@angular/core';
 
 export const LOGO_COMPONENT_TOKEN = new InjectionToken<Type<any>>('LOGO_COMPONENT_TOKEN');
 
+/**
+ * @deprecated This method will be removed in version 0.17.0. Use the built-in Customization page. Open the Logo tab to change the site logo.
+ */
 export function provideLogoComponent(component: Type<any>): Provider {
   return {
     provide: LOGO_COMPONENT_TOKEN,

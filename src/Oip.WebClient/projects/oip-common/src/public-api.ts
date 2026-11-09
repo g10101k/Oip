@@ -110,6 +110,7 @@ export {
   oipApplicationsRoute,
   oipModulesRoute,
   oipSessionsRoute,
+  oipCustomizationRoute,
   oipDiscussionRoute,
   oipDbMigrationRoute,
   oipIframeModuleRoute,

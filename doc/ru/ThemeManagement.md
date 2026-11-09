@@ -75,9 +75,9 @@ src/Oip.WebClient/projects/oip/src/app.theme.ts
 Пример текущей структуры:
 
 ```ts
-import { definePreset } from '@primeng/themes';
-import Aura from '@primeng/themes/aura';
-import { primitive } from '@primeng/themes/aura/base';
+import { definePreset } from '@primeuix/themes';
+import Aura from '@primeuix/themes/aura';
+import { primitive } from '@primeuix/themes/aura/base';
 import { AppThemePreset } from 'oip-common';
 
 export const appTheme: AppThemePreset[] = [

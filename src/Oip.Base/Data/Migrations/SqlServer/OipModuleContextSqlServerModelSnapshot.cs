@@ -21,6 +21,38 @@ namespace Oip.Base.Data.SqlServer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Oip.Base.Data.Entities.CustomizationEntity", b =>
+                {
+                    b.Property<int>("CustomizationId")
+                        .HasColumnType("int")
+                        .HasComment("Primary key of the customization record.");
+
+                    b.Property<string>("Css")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Contents of the custom stylesheet loaded by the OIP shell.");
+
+                    b.Property<byte[]>("Favicon")
+                        .HasColumnType("varbinary(max)")
+                        .HasComment("Custom favicon bytes. A null value selects the default favicon.");
+
+                    b.Property<string>("JavaScript")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Contents of the custom JavaScript file loaded by the OIP shell.");
+
+                    b.Property<byte[]>("Logo")
+                        .HasColumnType("varbinary(max)")
+                        .HasComment("Custom logo bytes. A null value selects the original logo.");
+
+                    b.HasKey("CustomizationId");
+
+                    b.ToTable("Customization", "oip", t =>
+                        {
+                            t.HasComment("Stores the site-wide assets loaded by the OIP shell.");
+                        });
+                });
+
             modelBuilder.Entity("Oip.Base.Data.Entities.ModuleEntity", b =>
                 {
                     b.Property<string>("ApiBaseUrl")
