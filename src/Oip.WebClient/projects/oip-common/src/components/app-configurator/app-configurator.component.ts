@@ -2,9 +2,9 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, computed, inject, PLATFORM_ID, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { $t, updatePreset, updateSurfacePalette } from '@primeng/themes';
+import { $t, updatePreset, updateSurfacePalette } from '@primeuix/themes';
 import type { PaletteDesignToken, Preset } from '@primeuix/themes/types';
-import Aura from '@primeng/themes/aura';
+import Aura from '@primeuix/themes/aura';
 import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '../../services/app.layout.service';
@@ -27,8 +27,8 @@ import ru from './l10n/app-configurator.ru.json';
  */
 const DEFAULT_THEME_PRESETS: ReadonlyArray<AppThemePreset> = [
   { id: 'Aura', label: 'Aura', preset: Aura as Preset },
-  { id: 'Lara', label: 'Lara', preset: () => import('@primeng/themes/lara').then((m) => m.default as Preset) },
-  { id: 'Nora', label: 'Nora', preset: () => import('@primeng/themes/nora').then((m) => m.default as Preset) }
+  { id: 'Lara', label: 'Lara', preset: () => import('@primeuix/themes/lara').then((m) => m.default as Preset) },
+  { id: 'Nora', label: 'Nora', preset: () => import('@primeuix/themes/nora').then((m) => m.default as Preset) }
 ];
 
 function isPresetLoader(preset: AppThemePreset['preset']): preset is AppThemePresetLoader {

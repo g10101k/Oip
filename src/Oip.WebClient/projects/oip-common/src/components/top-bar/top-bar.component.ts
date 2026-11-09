@@ -12,7 +12,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { UserService } from '../../services/user.service';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { LogoService } from '../../services/logo.service';
+import { LogoComponent } from '../logo/logo.component';
 import { AppInfoService } from '../../services/app-info.service';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { UserNotificationsComponent } from '../user-notifications/user-notifications.component';
@@ -38,19 +38,19 @@ import ru from './l10n/topbar.ru.json';
     ConfirmDialog,
     UserNotificationsComponent,
     TranslatePipe,
-    AppTopbarApplicationSwitcherComponent
+    AppTopbarApplicationSwitcherComponent,
+    LogoComponent
   ],
   template: `
     <div class="layout-topbar">
       <p-confirmDialog appendTo="body"/>
-      <div class="layout-topbar-logo-container">
-        <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
+      <div class="layout-topbar-logo-container min-w-0">
+        <button class="layout-menu-button layout-topbar-action shrink-0" (click)="layoutService.onMenuToggle()">
           <i class="pi pi-bars"></i>
         </button>
-        <a class="layout-topbar-logo" id="oip-app-topbar-logo-link" routerLink="">
-          <ng-container
-            *ngComponentOutlet="logoService.getLogoComponent(); inputs: { width: 36, height: 36 }"></ng-container>
-          <span>{{ appInfoService.getTitle() ?? ('app-info.title' | translate) }}</span>
+        <a class="layout-topbar-logo min-w-0" id="oip-app-topbar-logo-link" routerLink="">
+          <logo class="logo-header" />
+          <span class="min-w-0 truncate">{{ appInfoService.getTitle() ?? ('app-info.title' | translate) }}</span>
         </a>
       </div>
 
@@ -152,7 +152,6 @@ export class AppTopbar {
   topBarService = inject(TopBarService);
   userService = inject(UserService);
   layoutService = inject(LayoutService);
-  logoService = inject(LogoService);
   appInfoService = inject(AppInfoService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translateService = inject(TranslateService);

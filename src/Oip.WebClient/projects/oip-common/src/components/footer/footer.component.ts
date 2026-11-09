@@ -1,27 +1,22 @@
 import { Component, inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { NgComponentOutlet } from '@angular/common';
-import { LogoService } from '../../services/logo.service';
+import { LogoComponent } from '../logo/logo.component';
 import { AppInfoService } from '../../services/app-info.service';
 
 @Component({
   selector: 'app-footer',
   template: `
-    <div class="layout-footer">
-      <div class="flex justify-center flex-1">
-        <div class="mr-2 -my-0.5">
-          <ng-container
-            *ngComponentOutlet="logoService.getLogoComponent(); inputs: { width: 18, height: 18 }"></ng-container>
-        </div>
-        <span class="font-medium">{{ appInfoService.getFooter() ?? ('app-info.footer' | translate) }}</span>
+    <div class="layout-footer flex-wrap">
+      <div class="flex min-w-0 flex-1 items-center justify-center gap-2">
+        <logo class="logo-footer" />
+        <span class="min-w-0 break-words font-medium">{{ appInfoService.getFooter() ?? ('app-info.footer' | translate) }}</span>
       </div>
       <p class="mr-auto">{{ appInfoService.getVersion() ?? ('app-info.version' | translate) }}</p>
     </div>
   `,
   standalone: true,
-  imports: [TranslatePipe, NgComponentOutlet]
+  imports: [TranslatePipe, LogoComponent]
 })
 export class FooterComponent {
-  protected logoService = inject(LogoService);
   protected appInfoService = inject(AppInfoService);
 }

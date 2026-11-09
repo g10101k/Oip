@@ -8,6 +8,7 @@
     "template"
   ],
   "peerDependencies": {
+    "@primeuix/themes": "^1.2.5",
     "@angular-architects/module-federation": "^20.0.0"
   },
   "author": "Igor Tyulyakov aka g101k",
