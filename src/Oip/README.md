@@ -6,7 +6,7 @@
 ## Generate web api
 
 ```shell
-dotnet run ./Oip.csproj --no-restore -- --GenerateWebClient=true
+dotnet run --project ./Oip/Oip.csproj --no-restore -- --GenerateWebClient=true
 ```
 
 ## DbMigration
