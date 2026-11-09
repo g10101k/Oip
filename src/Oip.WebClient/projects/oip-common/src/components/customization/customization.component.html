@@ -16,9 +16,9 @@
             <i class="pi pi-code" aria-hidden="true"></i>
             JavaScript
           </p-tab>
-          <p-tab value="favicon" class="!px-2 sm:!px-4">
+          <p-tab value="logo" class="!px-2 sm:!px-4">
             <i class="pi pi-image" aria-hidden="true"></i>
-            Favicon
+            {{ "customization.logoTab" | translate }}
           </p-tab>
         </p-tablist>
 
@@ -75,61 +75,124 @@
             </div>
           </p-tabpanel>
 
-          <p-tabpanel value="favicon">
-            <div class="flex flex-col items-start gap-3">
-              <div class="flex flex-col gap-1">
-                <h2 class="!mb-0 text-base font-semibold">{{ "customization.faviconTitle" | translate }}</h2>
-                <p class="text-sm text-muted-color">{{ "customization.faviconDescription" | translate }}</p>
-              </div>
-
-              <div
-                class="w-full max-w-72 rounded-border border border-surface bg-emphasis px-2 pt-2"
-                role="img"
-                [attr.aria-label]="'customization.faviconPreview' | translate">
-                <div class="mb-2 flex gap-1" aria-hidden="true">
-                  <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
-                  <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
-                  <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+          <p-tabpanel value="logo">
+            <div class="grid min-w-0 gap-6 md:grid-cols-2">
+              <section class="flex min-w-0 flex-col items-start gap-3">
+                <div class="flex flex-col gap-1">
+                  <h2 class="!mb-0 text-base font-semibold">{{ "customization.logoTitle" | translate }}</h2>
+                  <p class="text-sm text-muted-color">{{ "customization.logoDescription" | translate }}</p>
                 </div>
-                <div
-                  class="flex w-36 max-w-full items-center gap-2 rounded-t-md bg-surface-0 px-2 py-1 dark:bg-surface-900">
-                  <img
-                    class="h-4 w-4 object-contain"
-                    [class]="assets.faviconBase64 ? '' : 'dark:invert'"
-                    [src]="faviconPreview()"
-                    alt="" />
-                  <span>OIP</span>
-                </div>
-              </div>
 
-              <div class="flex flex-wrap items-center gap-2">
-                <input
-                  #faviconInput
-                  type="file"
-                  accept=".png,.ico"
-                  hidden
-                  [disabled]="busy()"
-                  (change)="selectFavicon(faviconInput)" />
-                <p-button
-                  type="button"
-                  severity="secondary"
-                  [outlined]="true"
-                  [label]="
-                    (assets.faviconBase64 ? 'customization.replaceFavicon' : 'customization.chooseFavicon') | translate
-                  "
-                  [disabled]="busy()"
-                  (onClick)="faviconInput.click()" />
-                @if (assets.faviconBase64) {
+                <div class="grid w-full min-w-0 gap-3">
+                  <figure class="grid min-w-0 gap-1">
+                    <figcaption class="text-sm text-muted-color">
+                      {{ "customization.logoHeader" | translate }}
+                    </figcaption>
+                    <div class="flex min-w-0 items-center gap-2 rounded-border border border-surface p-2">
+                      <logo class="logo-header" [src]="logoPreview()" />
+                      <span class="min-w-0 truncate">{{ appInfo.getTitle() ?? ("app-info.title" | translate) }}</span>
+                    </div>
+                  </figure>
+                  <figure class="grid min-w-0 gap-1">
+                    <figcaption class="text-sm text-muted-color">
+                      {{ "customization.logoFooter" | translate }}
+                    </figcaption>
+                    <div
+                      class="flex min-w-0 items-center justify-center gap-2 rounded-border border border-surface p-2">
+                      <logo class="logo-footer" [src]="logoPreview()" />
+                      <span class="min-w-0 break-words">{{
+                          appInfo.getFooter() ?? ("app-info.footer" | translate)
+                        }}</span>
+                    </div>
+                  </figure>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                  <input
+                    #logoInput
+                    type="file"
+                    accept=".png,.svg,image/png,image/svg+xml"
+                    hidden
+                    [disabled]="busy()"
+                    (change)="selectLogo(logoInput)"/>
                   <p-button
                     type="button"
                     severity="secondary"
-                    [text]="true"
-                    [label]="'customization.resetFavicon' | translate"
+                    [outlined]="true"
+                    [label]="
+                      (assets.logoBase64 ? 'customization.replaceLogo' : 'customization.chooseLogo') | translate
+                    "
                     [disabled]="busy()"
-                    (onClick)="updateAssets({ faviconBase64: null })" />
-                }
-              </div>
-              <p class="text-sm text-muted-color">{{ "customization.faviconFormats" | translate }}</p>
+                    (onClick)="logoInput.click()"/>
+                  @if (assets.logoBase64) {
+                    <p-button
+                      type="button"
+                      severity="secondary"
+                      [text]="true"
+                      [label]="'customization.resetLogo' | translate"
+                      [disabled]="busy()"
+                      (onClick)="updateAssets({ logoBase64: null  })"/>
+                  }
+                </div>
+                <p class="text-sm text-muted-color">{{ "customization.logoFormats" | translate }}</p>
+              </section>
+
+              <section class="flex min-w-0 flex-col items-start gap-3">
+                <div class="flex flex-col gap-1">
+                  <h2 class="!mb-0 text-base font-semibold">{{ "customization.faviconTitle" | translate }}</h2>
+                  <p class="text-sm text-muted-color">{{ "customization.faviconDescription" | translate }}</p>
+                </div>
+
+                <div
+                  class="w-full max-w-72 rounded-border border border-surface bg-emphasis px-2 pt-2"
+                  role="img"
+                  [attr.aria-label]="'customization.faviconPreview' | translate">
+                  <div class="mb-2 flex gap-1" aria-hidden="true">
+                    <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                  </div>
+                  <div
+                    class="flex w-36 max-w-full items-center gap-2 rounded-t-md bg-surface-0 px-2 py-1 dark:bg-surface-900">
+                    <img
+                      class="h-4 w-4 object-contain"
+                      [class]="assets.faviconBase64 ? '' : 'dark:invert'"
+                      [src]="faviconPreview()"
+                      alt=""/>
+                    <span>OIP</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                  <input
+                    #faviconInput
+                    type="file"
+                    accept=".png,.ico,.svg"
+                    hidden
+                    [disabled]="busy()"
+                    (change)="selectFavicon(faviconInput)"/>
+                  <p-button
+                    type="button"
+                    severity="secondary"
+                    [outlined]="true"
+                    [label]="
+                      (assets.faviconBase64 ? 'customization.replaceFavicon' : 'customization.chooseFavicon')
+                        | translate
+                    "
+                    [disabled]="busy()"
+                    (onClick)="faviconInput.click()"/>
+                  @if (assets.faviconBase64) {
+                    <p-button
+                      type="button"
+                      severity="secondary"
+                      [text]="true"
+                      [label]="'customization.resetFavicon' | translate"
+                      [disabled]="busy()"
+                      (onClick)="updateAssets({ faviconBase64: null })"/>
+                  }
+                </div>
+                <p class="text-sm text-muted-color">{{ "customization.faviconFormats" | translate }}</p>
+              </section>
             </div>
           </p-tabpanel>
         </p-tabpanels>
@@ -142,7 +205,7 @@
           </span>
           <span class="text-sm text-muted-color">{{ "customization.reloadHint" | translate }}</span>
         </div>
-        <p-button type="submit" [label]="'customization.save' | translate" [disabled]="busy() || !hasChanges()" />
+        <p-button type="submit" [label]="'customization.save' | translate" [disabled]="busy() || !hasChanges()"/>
       </footer>
     </form>
   } @else if (busy()) {

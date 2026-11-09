@@ -50,6 +50,7 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddBaseServiceControllers()
+            .AddController<CustomizationController>()
             .AddController<FolderModuleController>()
             .AddController<IframeModuleController>()
             .AddController<MenuController>()

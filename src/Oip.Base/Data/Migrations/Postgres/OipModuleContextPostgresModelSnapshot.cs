@@ -41,6 +41,10 @@ namespace Oip.Base.Data.Postgres.Migrations
                         .HasColumnType("text")
                         .HasComment("Contents of the custom JavaScript file loaded by the OIP shell.");
 
+                    b.Property<byte[]>("Logo")
+                        .HasColumnType("bytea")
+                        .HasComment("Custom logo bytes. A null value selects the original logo.");
+
                     b.HasKey("CustomizationId");
 
                     b.ToTable("Customization", "oip", t =>

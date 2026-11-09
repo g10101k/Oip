@@ -7,21 +7,23 @@ using Oip.Base.Data.Constants;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Entities;
 using Oip.Base.Exceptions;
+using Oip.Base.Helpers;
 
 namespace Oip.Base.Controllers;
 
 /// <summary>
 /// Manages the assets loaded by the OIP shell.
 /// </summary>
-[Authorize]
 [Route("api/customization")]
+[Authorize(Roles = SecurityConstants.AdminRole)]
 [ApiExplorerSettings(GroupName = "base")]
-[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
 [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
 [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
 public class CustomizationController(OipModuleContext context) : ControllerBase
 {
+    private const string SvgContentType = "image/svg+xml";
+
     /// <summary>
     /// Returns the current site customization for an administrator.
     /// </summary>
@@ -29,18 +31,18 @@ public class CustomizationController(OipModuleContext context) : ControllerBase
     [ProducesResponseType<SiteCustomization>(StatusCodes.Status200OK)]
     public async Task<SiteCustomization> GetCustomization(CancellationToken cancellationToken)
     {
-        RequireAdministrator();
         var customization = await SiteCustomizationQuery().SingleAsync(cancellationToken);
         return new SiteCustomization
         {
             Css = customization.Css,
             JavaScript = customization.JavaScript,
-            FaviconBase64 = customization.Favicon is null ? null : Convert.ToBase64String(customization.Favicon)
+            FaviconBase64 = customization.Favicon is null ? null : Convert.ToBase64String(customization.Favicon),
+            LogoBase64 = customization.Logo is null ? null : Convert.ToBase64String(customization.Logo)
         };
     }
 
     /// <summary>
-    /// Replaces the site-wide CSS, JavaScript, and optional favicon.
+    /// Updates the site-wide CSS, JavaScript, favicon, and logo.
     /// </summary>
     [HttpPut("update-customization")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -48,17 +50,20 @@ public class CustomizationController(OipModuleContext context) : ControllerBase
     public async Task<IActionResult> UpdateCustomization([FromBody] SiteCustomization? request,
         CancellationToken cancellationToken)
     {
-        RequireAdministrator();
         if (request is null || !ModelState.IsValid)
             throw new ApiException("Invalid customization",
-                "Provide CSS and JavaScript up to 512 Ki characters each and a favicon up to 256 KiB.",
+                "Provide CSS and JavaScript up to 512 Ki characters each and images up to 256 KiB each.",
                 StatusCodes.Status400BadRequest);
 
         var favicon = DecodeFavicon(request.FaviconBase64);
-        await SiteCustomizationQuery().ExecuteUpdateAsync(updates => updates
-            .SetProperty(x => x.Css, request.Css)
-            .SetProperty(x => x.JavaScript, request.JavaScript)
-            .SetProperty(x => x.Favicon, favicon), cancellationToken);
+        var logo = request.LogoBase64 is null ? null : CustomizationLogoImage.Decode(request.LogoBase64);
+        await SiteCustomizationQuery().ExecuteUpdateAsync(updates =>
+        {
+            updates.SetProperty(x => x.Css, request.Css)
+                .SetProperty(x => x.JavaScript, request.JavaScript)
+                .SetProperty(x => x.Favicon, favicon)
+                .SetProperty(x => x.Logo, logo);
+        }, cancellationToken);
 
         return NoContent();
     }
@@ -101,15 +106,31 @@ public class CustomizationController(OipModuleContext context) : ControllerBase
         if (favicon is null)
             return LocalRedirect("~/assets/favicon.svg");
 
-        Response.Headers.XContentTypeOptions = "nosniff";
-        return File(favicon, GetFaviconContentType(favicon) ?? "application/octet-stream");
+        return CustomizationImageFile(favicon, GetFaviconContentType(favicon) ?? "application/octet-stream");
     }
 
-    private void RequireAdministrator()
+    /// <summary>
+    /// Serves the custom logo used by the shell.
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("get-logo")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> GetLogo(CancellationToken cancellationToken)
     {
-        if (!User.IsInRole(SecurityConstants.AdminRole))
-            throw new ApiException("Forbidden", "An administrator role is required to manage customization.",
-                StatusCodes.Status403Forbidden);
+        var logo = await SiteCustomizationQuery().Select(x => x.Logo).SingleAsync(cancellationToken);
+        if (logo is null)
+            return NoContent();
+
+        return CustomizationImageFile(logo,
+            CustomizationLogoImage.HasPngSignature(logo) ? "image/png" : SvgContentType);
+    }
+
+    private FileContentResult CustomizationImageFile(byte[] bytes, string contentType)
+    {
+        Response.Headers.XContentTypeOptions = "nosniff";
+        if (contentType == SvgContentType)
+            Response.Headers.ContentSecurityPolicy = CustomizationLogoImage.SvgContentSecurityPolicy;
+        return File(bytes, contentType);
     }
 
     private IQueryable<CustomizationEntity> SiteCustomizationQuery() =>
@@ -132,18 +153,18 @@ public class CustomizationController(OipModuleContext context) : ControllerBase
         }
 
         if (data.Length > SiteCustomization.MaxFaviconBytes || GetFaviconContentType(data) is null)
-            throw new ApiException("Invalid favicon", "Upload a PNG or ICO image up to 256 KiB.",
+            throw new ApiException("Invalid favicon", "Upload a PNG, ICO, or static SVG image up to 256 KiB.",
                 StatusCodes.Status400BadRequest);
 
         return data;
     }
 
-    private static string? GetFaviconContentType(ReadOnlySpan<byte> data)
+    private static string? GetFaviconContentType(byte[] data)
     {
-        if (data.Length >= 33 && data.StartsWith(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }))
+        if (data.Length >= 33 && CustomizationLogoImage.HasPngSignature(data))
             return "image/png";
-        if (data.Length >= 22 && data.StartsWith(new byte[] { 0, 0, 1, 0 }))
+        if (data.Length >= 22 && data.AsSpan().StartsWith(new byte[] { 0, 0, 1, 0 }))
             return "image/x-icon";
-        return null;
+        return CustomizationLogoImage.IsStaticSvg(data) ? SvgContentType : null;
     }
 }

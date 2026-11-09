@@ -29,4 +29,9 @@ public class CustomizationEntity
     /// Custom favicon bytes. A null value selects the default favicon.
     /// </summary>
     public byte[]? Favicon { get; set; }
+
+    /// <summary>
+    /// Custom logo bytes. A null value selects the original logo.
+    /// </summary>
+    public byte[]? Logo { get; set; }
 }

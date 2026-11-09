@@ -3,11 +3,12 @@ using System.ComponentModel.DataAnnotations;
 namespace Oip.Base.Controllers.Api;
 
 /// <summary>
-/// Site-wide CSS, JavaScript, and an optional favicon.
+/// Site-wide CSS, JavaScript, favicon, and logo.
 /// </summary>
 public class SiteCustomization
 {
     internal const int MaxFaviconBytes = 256 * 1024;
+    internal const int MaxLogoBytes = 256 * 1024;
 
     /// <summary>
     /// Contents of the custom stylesheet. An empty string clears the stylesheet.
@@ -22,8 +23,14 @@ public class SiteCustomization
     public required string JavaScript { get; init; }
 
     /// <summary>
-    /// Base64-encoded PNG or ICO image. A null value selects the default favicon.
+    /// Base64-encoded PNG, ICO, or static SVG image. A null value selects the default favicon.
     /// </summary>
     [MaxLength((MaxFaviconBytes + 2) / 3 * 4)]
     public string? FaviconBase64 { get; init; }
+
+    /// <summary>
+    /// Base64-encoded PNG or SVG. A null value restores the original logo.
+    /// </summary>
+    [MaxLength((MaxLogoBytes + 2) / 3 * 4)]
+    public required string? LogoBase64 { get; init; }
 }

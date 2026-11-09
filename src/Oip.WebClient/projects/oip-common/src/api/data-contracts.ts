@@ -155,6 +155,7 @@ export interface SiteCustomization {
   css: string;
   javaScript: string;
   faviconBase64?: string | null;
+  logoBase64: string | null;
 }
 
 export interface UpdateExtensionModuleRequest {
