@@ -6,8 +6,24 @@
     <base href="/" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <link href="/assets/favicon.svg" rel="icon" type="image/svg+xml" />
+    <link href="assets/startup.css" rel="stylesheet" />
   </head>
   <body>
-    <app-root></app-root>
+    <app-root>
+      <!-- Angular replaces this initial screen when it mounts the application. -->
+      <div class="oip-startup" role="status" aria-live="polite" lang="ru">
+        <div class="oip-startup__content">
+          <div class="oip-startup__emblem" aria-hidden="true">
+            <div class="oip-startup__halo"></div>
+            <div class="oip-startup__orbit"></div>
+            <div class="oip-startup__logo"></div>
+          </div>
+          <p class="oip-startup__brand">OIP HIL</p>
+          <p class="oip-startup__label">Загружаем рабочее пространство</p>
+          <div class="oip-startup__progress" aria-hidden="true"></div>
+          <noscript class="oip-startup__noscript">Для работы сайта включите JavaScript в браузере.</noscript>
+        </div>
+      </div>
+    </app-root>
   </body>
 </html>
