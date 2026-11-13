@@ -102,7 +102,6 @@ public class SmtpChannel : INotificationChannel
     /// <summary>A channel that sends notifications via SMTP email using configured mail settings and encryption services</summary>
     public SmtpChannel(ILogger<SmtpChannel> logger, CryptService cryptService, IConfiguration configuration)
     {
-        ServicePointManager.SecurityProtocol |= (SecurityProtocolType)0xC00;
         _logger = logger;
         _cryptService = cryptService;
         _settings = configuration.GetSection("SmtpSettings").Get<SmtpSettings>() ?? new SmtpSettings();
