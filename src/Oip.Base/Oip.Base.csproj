@@ -7,7 +7,9 @@
     <PropertyGroup>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>Base library for OIP template</Title>
-
+        <!-- The Prometheus ASP.NET Core exporter is only available as a prerelease package.
+             Keep this packaging exception local until the exporter has a stable release. -->
+        <NoWarn>$(NoWarn);NU5104</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,6 +22,7 @@
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
         <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer"/>
         <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens"/>
         <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect"/>
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
@@ -34,6 +37,7 @@
         <PackageReference Include="Swashbuckle.AspNetCore"/>
 
         <PackageReference Include="System.IdentityModel.Tokens.Jwt"/>
+        <PackageReference Include="System.Security.Cryptography.Pkcs"/>
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore"/>

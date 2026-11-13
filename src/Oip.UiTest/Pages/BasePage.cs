@@ -97,8 +97,8 @@ internal abstract class BasePage
     /// </summary>
     /// <param name="urlPart">Part of the request address.</param>
     public void WaitForResponse(string urlPart) =>
-        Wait.Until(d => (bool)((IJavaScriptExecutor)d).ExecuteScript(
-            "return performance.getEntriesByType('resource').some(e => e.name.includes(arguments[0]));", urlPart));
+        Wait.Until(d => ((IJavaScriptExecutor)d).ExecuteScript(
+            "return performance.getEntriesByType('resource').some(e => e.name.includes(arguments[0]));", urlPart) is true);
 
     /// <summary>
     /// Checks whether an element exists on the page right now, without waiting for it.

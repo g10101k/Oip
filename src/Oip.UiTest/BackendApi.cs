@@ -66,7 +66,10 @@ internal class BackendApi(IWebDriver driver)
     private (bool Ok, string Text) Execute(string method, string path, object? body)
     {
         var json = body is null ? null : JsonSerializer.Serialize(body, JsonSerializerOptions.Web);
-        var result = (Dictionary<string, object>)((IJavaScriptExecutor)driver).ExecuteAsyncScript(Script, method, path, json);
+        if (((IJavaScriptExecutor)driver).ExecuteAsyncScript(Script, method, path, json)
+            is not Dictionary<string, object> result)
+            throw new InvalidOperationException($"{method} {path} returned an unexpected browser response.");
+
         return ((bool)result["ok"], (string)result["text"]);
     }
 
