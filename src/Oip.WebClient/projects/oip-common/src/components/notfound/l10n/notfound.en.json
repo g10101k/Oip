@@ -1,8 +1,9 @@
 {
   "notfound": {
-    "title": "Not Found",
-    "errorCode": "404",
-    "description": "Requested resource is not available.",
+    "title": "Page not found",
+    "errorCode": "Error 404",
+    "description": "The page may have been moved or deleted, or there is a typo in the address.",
+    "back": "Go back",
     "button": "Go to home"
   }
 }
