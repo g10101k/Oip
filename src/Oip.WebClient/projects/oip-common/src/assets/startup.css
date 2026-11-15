@@ -1,4 +1,4 @@
-/* Use the OIP preset's Rose and Zinc colors before Angular loads the theme. */
+/* Use the OIP preset's Rose and Zinc colors before Angular loads the theme; the logo keeps its own colors. */
 .oip-startup {
   --oip-startup-bg: #09090b;
   --oip-startup-fg: #fafafa;
@@ -6,9 +6,8 @@
   --oip-startup-glow: #7f1d1d40;
   --oip-startup-glow-low: #991b1b26;
   --oip-startup-dots: #fecaca1a;
-  --oip-startup-logo-start: #fef2f2;
-  --oip-startup-logo-middle: #fca5a5;
-  --oip-startup-logo-end: #ef4444;
+  --oip-startup-logo-primary: #ef4444;
+  --oip-startup-logo-secondary: #dc2626;
 
   position: fixed;
   inset: 0;
@@ -28,6 +27,20 @@
     sans-serif;
   text-align: center;
   isolation: isolate;
+  transition:
+    opacity 500ms ease,
+    visibility 0s linear 500ms;
+}
+
+/* Set by main.ts once the application has rendered under the startup screen. */
+.oip-startup--leaving {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.oip-startup--leaving .oip-startup__content {
+  transform: translateY(-12px) scale(0.96);
 }
 
 /* The saved application theme wins over the system one; see startup.js. */
@@ -38,9 +51,6 @@
   --oip-startup-glow: #fecaca65;
   --oip-startup-glow-low: #fecaca36;
   --oip-startup-dots: #b91c1c20;
-  --oip-startup-logo-start: #ef4444;
-  --oip-startup-logo-middle: #dc2626;
-  --oip-startup-logo-end: #991b1b;
 }
 
 @media (prefers-color-scheme: light) {
@@ -51,9 +61,6 @@
     --oip-startup-glow: #fecaca65;
     --oip-startup-glow-low: #fecaca36;
     --oip-startup-dots: #b91c1c20;
-    --oip-startup-logo-start: #ef4444;
-    --oip-startup-logo-middle: #dc2626;
-    --oip-startup-logo-end: #991b1b;
   }
 }
 
@@ -82,6 +89,7 @@
   width: 100%;
   max-width: 440px;
   transform: translateY(-12px);
+  transition: transform 500ms ease;
 }
 
 .oip-startup__logo {
@@ -92,16 +100,12 @@
   overflow: visible;
 }
 
-.oip-startup__stop-start {
-  stop-color: var(--oip-startup-logo-start);
+.oip-startup__piece--primary {
+  fill: var(--oip-startup-logo-primary);
 }
 
-.oip-startup__stop-middle {
-  stop-color: var(--oip-startup-logo-middle);
-}
-
-.oip-startup__stop-end {
-  stop-color: var(--oip-startup-logo-end);
+.oip-startup__piece--secondary {
+  fill: var(--oip-startup-logo-secondary);
 }
 
 /* Each piece flies in from its own side, then the assembled logo pulses piece by piece while loading. */
@@ -135,6 +139,19 @@
   color: var(--oip-startup-muted);
   font-size: 13px;
   letter-spacing: 0.02em;
+}
+
+/* Both translations are in index.html; startup.js sets the saved language, Russian is the default. */
+.oip-startup__text:not(:lang(ru)) {
+  display: none;
+}
+
+:root[data-startup-lang]:not([data-startup-lang="ru"]) .oip-startup__text:lang(ru) {
+  display: none;
+}
+
+:root[data-startup-lang="en"] .oip-startup__text:lang(en) {
+  display: inline;
 }
 
 .oip-startup__noscript {
@@ -185,5 +202,9 @@
   .oip-startup *::before,
   .oip-startup *::after {
     animation: none;
+  }
+  .oip-startup,
+  .oip-startup__content {
+    transition: none;
   }
 }
