@@ -7,7 +7,7 @@ namespace Oip.Discussions.Base.Data.Repositories;
 /// Repository for managing CommentEntity entities
 /// </summary>
 /// <param name="context">The database context</param>
-public sealed class CommentRepository(DiscussionsDbContext context) : BaseRepository<CommentEntity, long>(context)
+public class CommentRepository(DiscussionsDbContext context) : BaseRepository<CommentEntity, long>(context)
 {
     /// <summary>
     /// Gets comments by object type and object ID with related data
@@ -16,7 +16,7 @@ public sealed class CommentRepository(DiscussionsDbContext context) : BaseReposi
     /// <param name="objectId">Object identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of comments with related data</returns>
-    public async Task<List<CommentEntity>> GetByObjectAsync(long objectTypeId, long objectId,
+    public virtual async Task<List<CommentEntity>> GetByObjectAsync(long objectTypeId, long objectId,
         CancellationToken cancellationToken = default)
     {
         return await DbSet
@@ -37,7 +37,7 @@ public sealed class CommentRepository(DiscussionsDbContext context) : BaseReposi
     /// <param name="id">Comment identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Comment with related data if found; otherwise, null</returns>
-    public async Task<CommentEntity?> GetByIdWithDetailsAsync(long id,
+    public virtual async Task<CommentEntity?> GetByIdWithDetailsAsync(long id,
         CancellationToken cancellationToken = default)
     {
         return await DbSet
@@ -54,7 +54,7 @@ public sealed class CommentRepository(DiscussionsDbContext context) : BaseReposi
     /// </summary>
     /// <param name="id">Comment identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    public async Task SoftDeleteAsync(long id, CancellationToken cancellationToken = default)
+    public virtual async Task SoftDeleteAsync(long id, CancellationToken cancellationToken = default)
     {
         var comment = await GetByIdAsync(id, cancellationToken);
         if (comment != null)
@@ -71,7 +71,7 @@ public sealed class CommentRepository(DiscussionsDbContext context) : BaseReposi
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of user's active comments</returns>
-    public async Task<List<CommentEntity>> GetByUserAsync(long userId,
+    public virtual async Task<List<CommentEntity>> GetByUserAsync(long userId,
         CancellationToken cancellationToken = default)
     {
         return await DbSet
