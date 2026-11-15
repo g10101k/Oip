@@ -21,9 +21,12 @@
         "saveTooltip": "Save",
         "cancelTooltip": "Cancel",
         "editTooltip": "Edit",
-        "deleteTooltip": "Delete"
+        "deleteTooltip": "Delete",
+        "rightsTooltip": "Access rights"
       },
-      "refreshTooltip": "Refresh"
+      "refreshTooltip": "Refresh",
+      "categoryRights": "Category access rights",
+      "rightsTitle": "Access rights"
     },
     "messages": {
       "requiredFields": "Fill in name, email, category and country.",

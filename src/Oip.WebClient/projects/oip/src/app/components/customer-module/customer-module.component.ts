@@ -10,10 +10,18 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { BaseModuleComponent, ContentType, provideTranslations, SecurityComponent } from 'oip-common';
+import { Dialog } from 'primeng/dialog';
+import {
+  BaseModuleComponent,
+  ContentType,
+  ObjectAclEditorComponent,
+  provideTranslations,
+  SecurityComponent
+} from 'oip-common';
 import { CustomerModuleApi } from '../../../api/customer-module.api';
 import {
   CustomerModuleSettings,
+  DemoCustomerCategoryDto,
   DemoCustomerStatus,
   DemoCustomerTableRowDto,
   TableQueryRequest
@@ -46,6 +54,12 @@ interface CustomerTableItem extends DemoCustomerTableRowDto {
   _isEditing?: boolean;
   _isNew?: boolean;
   _editModel?: CustomerEditModel;
+}
+
+interface AclTarget {
+  objectType: string;
+  objectId: number;
+  title: string;
 }
 
 interface SelectOption<TValue = string> {
@@ -87,6 +101,17 @@ interface SelectOption<TValue = string> {
                     [disabled]="loading || !canEdit"
                     [pTooltip]="'customer-module.content.add' | translate"
                     (onClick)="beginCreateCustomer()"></p-button>
+                  @if (manageableCategories.length > 0) {
+                    <p-button
+                      icon="pi pi-sitemap"
+                      id="oip-customer-category-rights"
+                      rounded="true"
+                      severity="secondary"
+                      text="true"
+                      tooltipPosition="bottom"
+                      [pTooltip]="'customer-module.content.categoryRights' | translate"
+                      (onClick)="openCategoryRights()"></p-button>
+                  }
                   <input
                     class="w-full md:w-96"
                     pInputText
@@ -303,7 +328,7 @@ interface SelectOption<TValue = string> {
                       rounded="true"
                       tooltipPosition="bottom"
                       [pTooltip]="'customer-module.content.table.editTooltip' | translate"
-                      [disabled]="activeRowAction || !canEdit"
+                      [disabled]="activeRowAction || !canEditRow(customer)"
                       [text]="true"
                       (onClick)="editCustomer(customer)" />
                     <p-button
@@ -312,9 +337,20 @@ interface SelectOption<TValue = string> {
                       tooltipPosition="bottom"
                       [pTooltip]="'customer-module.content.table.deleteTooltip' | translate"
                       severity="danger"
-                      [disabled]="activeRowAction || !canDelete"
+                      [disabled]="activeRowAction || !canDeleteRow(customer)"
                       [text]="true"
                       (onClick)="deleteCustomer(customer)" />
+                    @if (customer.rights?.includes('manage-acl')) {
+                      <p-button
+                        icon="pi pi-lock"
+                        rounded="true"
+                        severity="secondary"
+                        tooltipPosition="bottom"
+                        [attr.data-customer-id]="customer.id"
+                        [pTooltip]="'customer-module.content.table.rightsTooltip' | translate"
+                        [text]="true"
+                        (onClick)="openCustomerRights(customer)" />
+                    }
                   }
                 </div>
               </td>
@@ -331,6 +367,35 @@ interface SelectOption<TValue = string> {
         </p-table>
         </div>
       </div>
+
+      <p-dialog
+        appendTo="body"
+        styleClass="w-full max-w-4xl"
+        [header]="aclTarget?.title ?? ''"
+        [modal]="true"
+        [visible]="aclDialogVisible"
+        (visibleChange)="aclDialogVisible = $event">
+        @if (aclSelectingCategory) {
+          <div class="mb-4">
+            <p-select
+              appendTo="body"
+              class="w-full md:w-80"
+              optionLabel="name"
+              optionValue="id"
+              [options]="manageableCategories"
+              [placeholder]="'customer-module.content.table.category' | translate"
+              [ngModel]="aclTarget?.objectId"
+              (ngModelChange)="selectCategoryRights($event)" />
+          </div>
+        }
+        @if (aclTarget; as target) {
+          <oip-object-acl-editor
+            apiBase="customer-access-control"
+            [objectId]="target.objectId"
+            [objectType]="target.objectType"
+            (saved)="onRightsSaved()" />
+        }
+      </p-dialog>
     } @else if (isSettings) {
       <div class="card">
         <div class="font-semibold text-xl">{{ 'customer-module.settings.title' | translate }}</div>
@@ -346,6 +411,8 @@ interface SelectOption<TValue = string> {
     SharedModule,
     TagModule,
     SecurityComponent,
+    ObjectAclEditorComponent,
+    Dialog,
     ButtonModule,
     ToolbarModule,
     Tooltip,
@@ -378,6 +445,10 @@ export class CustomerModuleComponent
   );
 
   protected categoryOptions: SelectOption[] = [];
+  protected manageableCategories: DemoCustomerCategoryDto[] = [];
+  protected aclDialogVisible = false;
+  protected aclSelectingCategory = false;
+  protected aclTarget: AclTarget | null = null;
   protected countryOptions: SelectOption[] = [];
   protected customers: CustomerTableItem[] = [];
   protected visibleCustomers: CustomerTableItem[] = [];
@@ -523,7 +594,7 @@ export class CustomerModuleComponent
   }
 
   protected editCustomer(customer: CustomerTableItem): void {
-    if (!this.canEdit) {
+    if (!this.canEditRow(customer)) {
       return;
     }
 
@@ -599,7 +670,7 @@ export class CustomerModuleComponent
   }
 
   protected async deleteCustomer(customer: CustomerTableItem): Promise<void> {
-    if (!this.canDelete) {
+    if (!this.canDeleteRow(customer)) {
       return;
     }
 
@@ -630,6 +701,53 @@ export class CustomerModuleComponent
     }
   }
 
+  protected canEditRow(customer: CustomerTableItem): boolean {
+    return this.canEdit && (!!customer._isNew || !!customer.rights?.includes('edit'));
+  }
+
+  protected canDeleteRow(customer: CustomerTableItem): boolean {
+    return this.canDelete && (!!customer._isNew || !!customer.rights?.includes('delete'));
+  }
+
+  protected openCustomerRights(customer: CustomerTableItem): void {
+    if (!customer.id) {
+      return;
+    }
+    this.aclSelectingCategory = false;
+    this.aclTarget = {
+      objectType: 'demo.customer',
+      objectId: customer.id,
+      title: `${this.l10nService.instant('customer-module.content.rightsTitle')}: ${customer.fullName}`
+    };
+    this.aclDialogVisible = true;
+  }
+
+  protected openCategoryRights(): void {
+    this.aclSelectingCategory = true;
+    this.aclTarget = null;
+    const first = this.manageableCategories[0];
+    if (first) {
+      this.selectCategoryRights(first.id);
+    }
+    this.aclDialogVisible = true;
+  }
+
+  protected selectCategoryRights(categoryId: number | undefined): void {
+    const category = this.manageableCategories.find((c) => c.id === categoryId);
+    if (!category?.id) {
+      return;
+    }
+    this.aclTarget = {
+      objectType: 'demo.customer-category',
+      objectId: category.id,
+      title: this.l10nService.instant('customer-module.content.categoryRights')
+    };
+  }
+
+  protected async onRightsSaved(): Promise<void> {
+    await Promise.all([this.loadLookupOptions(), this.loadCustomers(this.createLazyEventFromState())]);
+  }
+
   private createLazyEventFromState(): TableLazyLoadEvent {
     return {
       first: this.localSettings().first ?? 0,
@@ -643,8 +761,8 @@ export class CustomerModuleComponent
   private async loadLookupOptions(): Promise<void> {
     try {
       const [categories, countries] = await Promise.all([
-        this.dataService.request<string[]>({
-          path: '/api/customer-module/get-categories',
+        this.dataService.request<DemoCustomerCategoryDto[]>({
+          path: '/api/customer-module/get-customer-categories',
           method: 'GET',
           secure: true,
           format: 'json'
@@ -657,10 +775,14 @@ export class CustomerModuleComponent
         })
       ]);
 
-      this.categoryOptions = this.toSelectOptions(categories);
+      this.categoryOptions = this.toSelectOptions(
+        categories.filter((c) => c.rights?.includes('edit')).map((c) => c.name ?? '')
+      );
+      this.manageableCategories = categories.filter((c) => c.rights?.includes('manage-acl'));
       this.countryOptions = this.toSelectOptions(countries);
     } catch (error) {
       this.categoryOptions = [];
+      this.manageableCategories = [];
       this.countryOptions = [];
       this.msgService.errorFromException(error, 'Load customer lookups error');
     }

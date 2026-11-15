@@ -11,4 +11,10 @@ public record DemoCustomerTableRowDto(
     int CreditScore,
     decimal LifetimeValue,
     DateTime CreatedAt,
-    int OrdersCount);
+    int OrdersCount)
+{
+    /// <summary>
+    /// Rights of the current user on the customer besides read: edit, delete, manage-acl.
+    /// </summary>
+    public List<string> Rights { get; init; } = [];
+}

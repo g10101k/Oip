@@ -30,8 +30,11 @@ internal static class Program
             builder.Services.AddSingleton<ISettings>(settings);
             builder.Services.AddSettingsToDependencyInjection(settings);
             builder.Services.AddOipModuleContext(settings.ConnectionString);
-            builder.Services.AddDbContext<DemoCustomerTableContext>(options =>
-                options.UseInMemoryDatabase("CustomerTableDemo"));
+            builder.Services.AddDbContext<DemoCustomerTableContext>((serviceProvider, options) =>
+                options.UseInMemoryDatabase("CustomerTableDemo")
+                    .UseOipAccessControl<DemoCustomerTableContext>(serviceProvider));
+            builder.Services.AddOipAccessControl<DemoCustomerTableContext>(
+                DemoCustomerTableContext.ConfigureAccessControl);
             builder.Services.AddDefaultHealthChecks();
             builder.Services.AddDefaultAuthentication(settings);
             builder.Services.AddOpenApi(settings);

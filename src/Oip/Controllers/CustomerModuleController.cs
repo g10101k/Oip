@@ -9,6 +9,7 @@ using Oip.Base.Data.Repositories;
 using Oip.Base.Data.Services;
 using Oip.Base.Exceptions;
 using Oip.Base.Security;
+using Oip.Base.Security.Objects;
 using Oip.Demo.TableQueryDemo;
 using Oip.Properties;
 
@@ -22,6 +23,7 @@ namespace Oip.Controllers;
 [Route("api/customer-module")]
 public class CustomerModuleController(
     DemoCustomerTableContext context,
+    ObjectAccessService<DemoCustomerTableContext> access,
     ModuleRepository moduleRepository)
     : BaseModuleController<CustomerModuleSettings>(moduleRepository)
 {
@@ -29,6 +31,9 @@ public class CustomerModuleController(
     public override string? Icon => "pi pi-id-card";
 
     private const string ViewFinancialsRight = "view-financials";
+
+    private static readonly string[] RowRights =
+        [SecurityConstants.Edit, SecurityConstants.Delete, SecurityConstants.ManageAcl];
 
     /// <summary>
     /// Retrieves a filtered page of customers for the customer module table.
@@ -69,6 +74,7 @@ public class CustomerModuleController(
 
             var query = context.Customers
                 .AsNoTracking()
+                .WhereAccessible(access, SecurityConstants.Read)
                 .Include(x => x.Category)
                 .Include(x => x.Country)
                 .Include(x => x.Orders);
@@ -94,6 +100,13 @@ public class CustomerModuleController(
             if (!await HasInstanceRight(ViewFinancialsRight))
                 result = result with { Data = result.Data.Select(MaskFinancials).ToList() };
 
+            var rights = await access.GetRightsByIdsAsync<DemoCustomer>(
+                result.Data.Select(x => (long)x.Id).ToList(), RowRights, cancellationToken);
+            result = result with
+            {
+                Data = result.Data.Select(x => x with { Rights = rights.GetValueOrDefault(x.Id, []) }).ToList()
+            };
+
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -115,11 +128,38 @@ public class CustomerModuleController(
     {
         var categories = await context.Categories
             .AsNoTracking()
+            .WhereAccessible(access, SecurityConstants.Read)
             .OrderBy(x => x.Name)
             .Select(x => x.Name)
             .ToArrayAsync(cancellationToken);
 
         return Ok(categories);
+    }
+
+    /// <summary>
+    /// Retrieves the customer categories the user can read, with the rights of the user on each of them.
+    /// </summary>
+    [HttpGet("get-customer-categories")]
+    [Right(SecurityConstants.Read)]
+    [ProducesResponseType(typeof(List<DemoCustomerCategoryDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<List<DemoCustomerCategoryDto>>> GetCustomerCategories(
+        CancellationToken cancellationToken = default)
+    {
+        var categories = await context.Categories
+            .AsNoTracking()
+            .WhereAccessible(access, SecurityConstants.Read)
+            .OrderBy(x => x.Name)
+            .Select(x => new { x.Id, x.Name })
+            .ToListAsync(cancellationToken);
+
+        var rights = await access.GetRightsByIdsAsync<DemoCustomerCategory>(
+            categories.Select(x => (long)x.Id).ToList(), RowRights, cancellationToken);
+        return Ok(categories
+            .Select(x => new DemoCustomerCategoryDto(x.Id, x.Name, rights.GetValueOrDefault(x.Id, [])))
+            .ToList());
     }
 
     /// <summary>
@@ -161,6 +201,7 @@ public class CustomerModuleController(
             CreatedAt = DateTime.UtcNow,
             IsActive = request.Status == DemoCustomerStatus.Active
         }, request, cancellationToken);
+        await DemandCategoryEditAsync(customer.Category, cancellationToken);
 
         context.Customers.Add(customer);
         await context.SaveChangesAsync(cancellationToken);
@@ -174,6 +215,7 @@ public class CustomerModuleController(
     /// </summary>
     [HttpPut("update/{id}")]
     [Right(SecurityConstants.Edit)]
+    [ObjectRight(DemoCustomerTableContext.CustomerObjectType, SecurityConstants.Edit)]
     [ProducesResponseType(typeof(DemoCustomerTableRowDto), StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
@@ -195,7 +237,10 @@ public class CustomerModuleController(
             throw new ApiException("Customer not found", $"Customer with id {id} was not found.",
                 StatusCodes.Status404NotFound);
 
+        var previousCategoryId = customer.CategoryId;
         await BuildCustomerAsync(customer, request, cancellationToken);
+        if (customer.Category.Id != previousCategoryId)
+            await DemandCategoryEditAsync(customer.Category, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
         await LoadRelationsAsync(customer, cancellationToken);
 
@@ -207,6 +252,7 @@ public class CustomerModuleController(
     /// </summary>
     [HttpDelete("delete/{id}")]
     [Right(SecurityConstants.Delete)]
+    [ObjectRight(DemoCustomerTableContext.CustomerObjectType, SecurityConstants.Delete)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
@@ -288,8 +334,29 @@ public class CustomerModuleController(
 
     private async Task<DemoCustomerTableRowDto> MapCustomerWithRights(DemoCustomer customer)
     {
-        var dto = MapCustomer(customer);
+        var dto = MapCustomer(customer) with
+        {
+            Rights = (await access.GetEffectiveRightsAsync(
+                    new ObjectRef(DemoCustomerTableContext.CustomerObjectType, customer.Id)))
+                .Where(RowRights.Contains)
+                .ToList()
+        };
         return await HasInstanceRight(ViewFinancialsRight) ? dto : MaskFinancials(dto);
+    }
+
+    /// <summary>
+    /// A customer can be placed into an existing category only with the edit right on it. A new category gets the
+    /// default rights of the type, so it needs no check.
+    /// </summary>
+    private async Task DemandCategoryEditAsync(DemoCustomerCategory category, CancellationToken cancellationToken)
+    {
+        if (category.Id == 0)
+            return;
+
+        var categoryRef = new ObjectRef(DemoCustomerTableContext.CategoryObjectType, category.Id);
+        if (!await access.HasRightAsync(categoryRef, SecurityConstants.Edit, cancellationToken))
+            throw new ApiException("Forbidden", $"The '{SecurityConstants.Edit}' right on category '{category.Name}' is required.",
+                StatusCodes.Status403Forbidden);
     }
 
     private static DemoCustomerTableRowDto MaskFinancials(DemoCustomerTableRowDto row)

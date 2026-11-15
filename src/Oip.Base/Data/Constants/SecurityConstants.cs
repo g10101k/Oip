@@ -22,6 +22,11 @@ public static class SecurityConstants
     public const string Delete = "delete";
 
     /// <summary>
+    /// Permission to view and change the access control list of an object.
+    /// </summary>
+    public const string ManageAcl = "manage-acl";
+
+    /// <summary>
     /// Role that grants full administrative access, including user and settings management.
     /// </summary>
     public const string AdminRole = "admin";

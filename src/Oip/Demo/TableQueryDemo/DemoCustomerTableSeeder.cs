@@ -2,11 +2,11 @@ namespace Oip.Demo.TableQueryDemo;
 
 public static class DemoCustomerTableSeeder
 {
-    public static void Seed(DemoCustomerTableContext context)
+    public static bool Seed(DemoCustomerTableContext context)
     {
         if (context.Customers.Any())
         {
-            return;
+            return false;
         }
 
         var categories = new List<DemoCustomerCategory>
@@ -80,5 +80,6 @@ public static class DemoCustomerTableSeeder
         context.Customers.AddRange(customers);
         context.Orders.AddRange(orders);
         context.SaveChanges();
+        return true;
     }
 }

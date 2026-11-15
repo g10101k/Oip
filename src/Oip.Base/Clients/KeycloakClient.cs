@@ -272,15 +272,19 @@ public sealed class KeycloakClient : HttpClient
     /// <param name="first">First result</param>
     /// <param name="max">Maximum results</param>
     /// <param name="cancellationToken">Cancellation token</param>
+    /// <param name="search">Text matched against the username, names and email, or null for every user</param>
     /// <returns>List of users</returns>
     public async Task<List<UserRepresentation>> GetUsersAsync(string realm, int first = 0, int max = 100,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, string? search = null)
     {
         EnsureAuthenticatedAsync(cancellationToken);
 
         using var request = new HttpRequestMessage();
         request.Method = HttpMethod.Get;
-        request.RequestUri = CreateRequestUri($"admin/realms/{realm}/users", $"first={first}&max={max}");
+        request.RequestUri = CreateRequestUri($"admin/realms/{realm}/users",
+            string.IsNullOrWhiteSpace(search)
+                ? $"first={first}&max={max}"
+                : $"first={first}&max={max}&search={Uri.EscapeDataString(search)}");
 
         using var response =
             await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);

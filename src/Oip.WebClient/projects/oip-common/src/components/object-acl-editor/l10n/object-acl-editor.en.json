@@ -1,0 +1,29 @@
+{
+  "objectAclEditor": {
+    "inherit": "Inherit rights from the parent object",
+    "subject": "Subject",
+    "unknown": "Unknown",
+    "remove": "Remove",
+    "noEntries": "No explicit rights",
+    "addSubject": "Add a role, user or everyone",
+    "save": "Save",
+    "saved": "Access rights saved",
+    "inherited": "Inherited rights",
+    "loading": "Loading access rights…",
+    "state": {
+      "none": "Not set: click to allow",
+      "allow": "Allowed: click to deny",
+      "deny": "Denied: click to clear"
+    },
+    "rights": {
+      "read": "Read",
+      "edit": "Edit",
+      "delete": "Delete",
+      "manage-acl": "Manage rights"
+    },
+    "subjects": {
+      "everyone": "Everyone",
+      "owner": "Owner"
+    }
+  }
+}

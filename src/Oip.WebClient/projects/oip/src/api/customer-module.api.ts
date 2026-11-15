@@ -8,6 +8,7 @@ import {
   ApiExceptionResponse,
   CustomerModuleSettings,
   DeleteParams,
+  DemoCustomerCategoryDto,
   DemoCustomerTableRowDto,
   DemoCustomerTableRowDtoTablePageResult,
   SaveDemoCustomerRequest,
@@ -32,6 +33,14 @@ export class CustomerModuleApi<
   getCategories = (params: RequestParams = {}) =>
     this.request<string[], ApiExceptionResponse>({
       path: `/api/customer-module/get-categories`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  getCustomerCategories = (params: RequestParams = {}) =>
+    this.request<DemoCustomerCategoryDto[], ApiExceptionResponse>({
+      path: `/api/customer-module/get-customer-categories`,
       method: "GET",
       secure: true,
       format: "json",
