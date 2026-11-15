@@ -84,5 +84,9 @@ internal static class Program
         {
             logger.Error(e, "Unhandled exception");
         }
+        finally
+        {
+            LogManager.Shutdown();
+        }
     }
 }
