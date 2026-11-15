@@ -1,14 +1,14 @@
 {
   "discussionComponent": {
-    "writeCommentPlaceholder": "Write a comment. Use @email or @first.last for mentions.",
-    "mentionSuggestions": "Mention suggestions",
+    "writeCommentPlaceholder": "Write a comment… Markdown is supported",
+    "mentionSuggestions": "Mention",
     "edit": "Edit",
     "preview": "Preview",
     "attachFiles": "Attach files",
     "send": "Send",
     "loadingComments": "Loading comments...",
     "noCommentsYet": "No comments yet.",
-    "edited": "Edited",
+    "edited": "edited",
     "editCommentPlaceholder": "Edit comment",
     "addAttachment": "Add attachment",
     "save": "Save",
@@ -37,6 +37,22 @@
       "downloadAttachment": "Failed to download attachment.",
       "updateReaction": "Failed to update reaction.",
       "addReaction": "Failed to add reaction."
+    },
+    "title": "Discussion",
+    "newComment": "New comment",
+    "write": "Write",
+    "nothingToPreview": "Nothing to preview",
+    "sendHint": "Ctrl + Enter to send",
+    "removeFile": "Remove file",
+    "addReaction": "Add reaction",
+    "newestFirst": "Newest first",
+    "oldestFirst": "Oldest first",
+    "close": "Close",
+    "ago": {
+      "now": "just now",
+      "minutes": "{{count}} min ago",
+      "hours": "{{count}} h ago",
+      "days": "{{count}} d ago"
     }
   }
 }

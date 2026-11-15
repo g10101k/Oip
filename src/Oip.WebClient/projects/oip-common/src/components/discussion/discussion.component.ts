@@ -1,9 +1,10 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe, formatDate } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   Input,
+  LOCALE_ID,
   OnChanges,
   OnDestroy,
   SecurityContext,
@@ -17,14 +18,12 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ConfirmationService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { ConfirmDialog } from 'primeng/confirmdialog';
-import { DividerModule } from 'primeng/divider';
-import { PanelModule } from 'primeng/panel';
 import { PopoverModule } from 'primeng/popover';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TagModule } from 'primeng/tag';
+import { SelectButton } from 'primeng/selectbutton';
 import { Textarea } from 'primeng/textarea';
+import { TooltipModule } from 'primeng/tooltip';
 import {
   AttachmentDto,
   CommentDto,
@@ -46,6 +45,8 @@ type HistoryState = {
   opened: boolean;
   items: DiscussionHistoryItem[];
 };
+
+type SortOrder = 'newest' | 'oldest';
 
 type DiscussionAttachment = Required<AttachmentDto>;
 type DiscussionReaction = Required<CommentReactionDto>;
@@ -73,410 +74,17 @@ type DiscussionHistoryItem = Required<CommentHistoryDto>;
     FormsModule,
     AvatarModule,
     ButtonModule,
-    CardModule,
     ConfirmDialog,
-    DividerModule,
-    PanelModule,
     PopoverModule,
     ProgressSpinnerModule,
-    TagModule,
+    SelectButton,
     Textarea,
+    TooltipModule,
     DatePipe,
     TranslatePipe
   ],
-  template: `
-    <p-confirmDialog />
-
-    <section class="flex flex-col gap-4">
-      <p-card class="block">
-        <div class="flex flex-col gap-4">
-          @if (!previewMode) {
-            <textarea
-              class="min-h-28 w-full"
-              pTextarea
-              qa-id="oip-discussion-new-comment"
-              rows="5"
-              [autoResize]="true"
-              [placeholder]="'discussionComponent.writeCommentPlaceholder' | translate"
-              [(ngModel)]="newComment"
-              (ngModelChange)="onComposerInput()"></textarea>
-          } @else {
-            <div
-              class="markdown-preview min-h-28 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 leading-7 dark:border-surface-700 dark:bg-surface-900/40"
-              [innerHTML]="renderMarkdown(newComment)"></div>
-          }
-
-          @if (mentionSuggestions.length > 0) {
-            <p-panel class="block">
-              <ng-template pTemplate="header">
-                <div class="inline-flex items-center gap-2 text-sm font-medium">
-                  <i class="pi pi-at"></i>
-                  <span>{{ 'discussionComponent.mentionSuggestions' | translate }}</span>
-                </div>
-              </ng-template>
-
-              <div class="flex flex-col gap-3">
-                @for (candidate of mentionSuggestions; track candidate.userId) {
-                  <button
-                    qa-id="oip-discussion-mention-suggestion"
-                    class="flex w-full items-center justify-between gap-4 rounded-xl border border-transparent px-3 py-3 text-left transition hover:border-primary-200 hover:bg-primary-50 dark:hover:border-primary-800 dark:hover:bg-primary-950/30"
-                    type="button"
-                    (click)="insertMention(candidate)">
-                    <div class="min-w-0">
-                      <strong>{{ candidate.displayName }}</strong>
-                      <small class="mt-1 block text-surface-500">{{ candidate.email }}</small>
-                    </div>
-                    <i class="pi pi-arrow-up-left shrink-0 text-surface-400"></i>
-                  </button>
-                }
-              </div>
-            </p-panel>
-          }
-
-          @if (pendingFiles.length > 0) {
-            <div class="flex flex-col gap-3">
-              @for (file of pendingFiles; track file.name + file.size) {
-                <div
-                  class="flex flex-col gap-3 rounded-2xl border border-surface-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-surface-700"
-                  qa-id="oip-discussion-pending-file">
-                  <div class="inline-flex items-center gap-2">
-                    <i class="pi pi-file"></i>
-                    <span class="break-all">{{ file.name }}</span>
-                    <p-tag severity="contrast" [value]="formatBytes(file.size)" />
-                  </div>
-                  <p-button
-                    icon="pi pi-times"
-                    severity="danger"
-                    [rounded]="true"
-                    [text]="true"
-                    (onClick)="removePendingFile(file)" />
-                </div>
-              }
-            </div>
-          }
-
-          <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
-            <p-button
-              severity="secondary"
-              [icon]="previewMode ? 'pi pi-pencil' : 'pi pi-eye'"
-              [label]="
-                previewMode ? ('discussionComponent.edit' | translate) : ('discussionComponent.preview' | translate)
-              "
-              [text]="true"
-              (onClick)="previewMode = !previewMode" />
-
-            <label class="file-trigger">
-              <p-button
-                icon="pi pi-paperclip"
-                severity="secondary"
-                [label]="'discussionComponent.attachFiles' | translate"
-                [text]="true" />
-              <input multiple qa-id="oip-discussion-attach-input" type="file" (change)="onFilesSelected($event)" />
-            </label>
-            <p-button
-              icon="pi pi-send"
-              qa-id="oip-discussion-send"
-              [disabled]="submitting || !newComment.trim()"
-              [label]="'discussionComponent.send' | translate"
-              [loading]="submitting"
-              (onClick)="createComment()" />
-          </div>
-        </div>
-      </p-card>
-
-      @if (loading) {
-        <div
-          class="flex min-h-20 flex-col items-center justify-center gap-3 rounded-2xl border border-surface-200 px-4 py-5 text-surface-500 dark:border-surface-700">
-          <p-progressSpinner strokeWidth="4" />
-          <span>{{ 'discussionComponent.loadingComments' | translate }}</span>
-        </div>
-      } @else if (comments.length === 0) {
-        <div
-          class="flex min-h-20 items-center justify-center gap-3 rounded-2xl border border-surface-200 px-4 py-5 text-surface-500 dark:border-surface-700">
-          <i class="pi pi-inbox"></i>
-          <span>{{ 'discussionComponent.noCommentsYet' | translate }}</span>
-        </div>
-      } @else {
-        <div class="flex flex-col gap-4">
-          @for (comment of comments; track comment.commentId) {
-            <p-card class="block" qa-id="oip-discussion-comment">
-              <ng-template pTemplate="content">
-                <div class="grid gap-4 md:grid-cols-[3.2rem_minmax(0,1fr)]">
-                  <div>
-                    <p-avatar shape="circle" [label]="getInitialsFromString(comment.authorDisplayName)" />
-                  </div>
-
-                  <div class="flex flex-col gap-2">
-                    <div class="flex flex-row gap-3 justify-between">
-                      <div class="flex flex-wrap items-center gap-2">
-                        <strong>{{ comment.authorDisplayName }}</strong>
-                        <span class="text-sm text-surface-500">{{
-                          comment.createdAt | date: layoutService.dateTimeFormat()
-                        }}</span>
-                      </div>
-
-                      <div class="flex flex-wrap items-center justify-end gap-2">
-                        <div class="flex flex-wrap items-center">
-                          @if (comment.isEdited) {
-                            <p-tag
-                              icon="pi pi-pencil"
-                              qa-id="oip-discussion-comment-edited"
-                              severity="warn"
-                              [value]="'discussionComponent.edited' | translate" />
-                          }
-                        </div>
-                        @if (comment.canEdit) {
-                          <p-button
-                            icon="pi pi-pencil"
-                            qa-id="oip-discussion-comment-edit"
-                            severity="secondary"
-                            [rounded]="true"
-                            [text]="true"
-                            (onClick)="startEdit(comment)" />
-                        }
-                        @if (comment.historyCount > 0) {
-                          <p-button
-                            icon="pi pi-history"
-                            qa-id="oip-discussion-comment-history"
-                            severity="secondary"
-                            [rounded]="true"
-                            [text]="true"
-                            (onClick)="toggleHistory(comment)" />
-                        }
-                        @if (comment.canDelete) {
-                          <p-button
-                            icon="pi pi-trash"
-                            qa-id="oip-discussion-comment-delete"
-                            severity="danger"
-                            [rounded]="true"
-                            [text]="true"
-                            (onClick)="deleteComment(comment)" />
-                        }
-                      </div>
-                    </div>
-                    @if (editingCommentId === comment.commentId) {
-                      <div class="flex flex-col gap-4">
-                        <textarea
-                          class="min-h-24 w-full"
-                          pTextarea
-                          qa-id="oip-discussion-edit-content"
-                          rows="4"
-                          [autoResize]="true"
-                          [placeholder]="'discussionComponent.editCommentPlaceholder' | translate"
-                          [(ngModel)]="editContent"></textarea>
-                        <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
-                          <div>
-                            <label class="file-trigger">
-                              <p-button
-                                icon="pi pi-paperclip"
-                                severity="secondary"
-                                [label]="'discussionComponent.addAttachment' | translate"
-                                [text]="true" />
-                              <input multiple type="file" (change)="onInlineFilesSelected(comment, $event)" />
-                            </label>
-                          </div>
-
-                          <p-button
-                            icon="pi pi-check"
-                            qa-id="oip-discussion-edit-save"
-                            [disabled]="!editContent.trim()"
-                            [label]="'discussionComponent.save' | translate"
-                            (onClick)="saveEdit(comment)" />
-                          <p-button
-                            icon="pi pi-times"
-                            severity="secondary"
-                            [label]="'discussionComponent.cancel' | translate"
-                            [text]="true"
-                            (onClick)="cancelEdit()" />
-                        </div>
-                      </div>
-                    } @else {
-                      <div
-                        class="markdown-preview"
-                        qa-id="oip-discussion-comment-content"
-                        [innerHTML]="renderMarkdown(comment.content)"></div>
-                    }
-
-                    @if (comment.attachments.length > 0) {
-                      <div class="flex flex-col gap-3">
-                        <div class="flex flex-col gap-3">
-                          @for (attachment of comment.attachments; track attachment.attachmentId) {
-                            <div
-                              class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end"
-                              qa-id="oip-discussion-attachment">
-                              <div class="inline-flex items-center gap-2">
-                                <i class="pi pi-file"></i>
-                                <button
-                                  qa-id="oip-discussion-attachment-name"
-                                  class="break-all bg-transparent p-0 text-left font-semibold text-primary-600 transition hover:text-primary-500"
-                                  type="button"
-                                  (click)="downloadAttachment(attachment)">
-                                  {{ attachment.fileName }}
-                                </button>
-                                <p-tag severity="contrast" [value]="formatBytes(attachment.fileSize)" />
-                              </div>
-
-                              @if (comment.canEdit) {
-                                <p-button
-                                  icon="pi pi-times"
-                                  qa-id="oip-discussion-attachment-delete"
-                                  severity="danger"
-                                  [rounded]="true"
-                                  [text]="true"
-                                  (onClick)="deleteAttachment(comment, attachment)" />
-                              }
-                            </div>
-                          }
-                        </div>
-                      </div>
-                    }
-
-                    <div class="flex flex-wrap items-center gap-2">
-                      @for (reaction of getReactions(comment); track reaction.emojiCode) {
-                        <p-button
-                          qa-id="oip-discussion-reaction"
-                          severity="secondary"
-                          [label]="reaction.emojiCode + ' ' + reaction.count"
-                          [outlined]="false"
-                          (onClick)="toggleReaction(comment, reaction)" />
-                      }
-
-                      @if (!hasUserReaction(comment)) {
-                        <p-button
-                          icon="pi pi-face-smile"
-                          qa-id="oip-discussion-add-reaction"
-                          severity="secondary"
-                          [rounded]="true"
-                          [text]="true"
-                          (onClick)="reactionPopover.toggle($event)" />
-                        <p-popover #reactionPopover>
-                          <div class="emoji-popover">
-                            @for (emoji of emojiPalette; track emoji) {
-                              <button
-                                class="emoji-option"
-                                qa-id="oip-discussion-emoji"
-                                type="button"
-                                (click)="reactWithEmoji(comment, emoji, reactionPopover)">
-                                {{ emoji }}
-                              </button>
-                            }
-                          </div>
-                        </p-popover>
-                      }
-                    </div>
-
-                    @if (historyByComment[comment.commentId]?.opened) {
-                      <p-panel class="block" [collapsed]="false" [toggleable]="true">
-                        <ng-template pTemplate="header">
-                          <div class="inline-flex items-center gap-2 text-sm font-medium">
-                            <i class="pi pi-history"></i>
-                            <span>{{ 'discussionComponent.editHistory' | translate }}</span>
-                          </div>
-                        </ng-template>
-
-                        @if (historyByComment[comment.commentId]?.loading) {
-                          <div class="flex items-center gap-3 text-surface-500">
-                            <p-progressSpinner strokeWidth="4" />
-                            <span>{{ 'discussionComponent.loadingHistory' | translate }}</span>
-                          </div>
-                        } @else {
-                          <div class="flex flex-col gap-4">
-                            @for (
-                              item of historyByComment[comment.commentId]?.items ?? [];
-                              track item.commentEditHistoryId
-                            ) {
-                              <div
-                                class="rounded-2xl border border-surface-200 px-4 py-4 dark:border-surface-700"
-                                qa-id="oip-discussion-history-item">
-                                <div class="mb-3 inline-flex items-center gap-2 text-sm font-semibold">
-                                  <i class="pi pi-clock"></i>
-                                  <span>{{ item.editedByDisplayName }} · {{ item.editedAt | date: 'short' }}</span>
-                                </div>
-                                <div class="grid gap-4 lg:grid-cols-2">
-                                  <div class="flex flex-col gap-2">
-                                    <p-tag severity="secondary" [value]="'discussionComponent.before' | translate" />
-                                    <div
-                                      class="history-markdown rounded-2xl bg-surface-50 px-4 py-3 leading-7 dark:bg-surface-900/40"
-                                      qa-id="oip-discussion-history-old"
-                                      [innerHTML]="renderMarkdown(item.oldContent)"></div>
-                                  </div>
-                                  <div class="flex flex-col gap-2">
-                                    <p-tag severity="success" [value]="'discussionComponent.after' | translate" />
-                                    <div
-                                      class="history-markdown rounded-2xl bg-surface-50 px-4 py-3 leading-7 dark:bg-surface-900/40"
-                                      qa-id="oip-discussion-history-new"
-                                      [innerHTML]="renderMarkdown(item.newContent)"></div>
-                                  </div>
-                                </div>
-                              </div>
-                            }
-                          </div>
-                        }
-                      </p-panel>
-                    }
-                  </div>
-                </div>
-              </ng-template>
-            </p-card>
-          }
-        </div>
-      }
-    </section>
-  `,
-  styles: [
-    `
-      :host {
-        display: block;
-      }
-
-      .file-trigger {
-        position: relative;
-        display: inline-flex;
-      }
-
-      .file-trigger input {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        cursor: pointer;
-      }
-
-      .markdown-preview,
-      .history-markdown {
-        word-break: break-word;
-      }
-
-      .markdown-preview :is(h1, h2, h3),
-      .history-markdown :is(h1, h2, h3) {
-        margin: 0 0 0.75rem;
-        font-weight: 600;
-      }
-
-      .markdown-preview a,
-      .history-markdown a {
-        color: #2563eb;
-        text-decoration: underline;
-        text-underline-offset: 0.18em;
-      }
-
-      .emoji-popover {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        max-width: 16rem;
-      }
-
-      .emoji-option {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.5rem;
-        height: 2.5rem;
-        font-size: 1.25rem;
-        cursor: pointer;
-      }
-    `
-  ],
+  templateUrl: './discussion.component.html',
+  styleUrl: './discussion.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
@@ -489,6 +97,7 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly confirmationService = inject(ConfirmationService);
   protected readonly layoutService = inject(LayoutService);
+  private readonly locale = inject(LOCALE_ID);
 
   @Input({ required: true }) objectTypeId = 1;
   @Input({ required: true }) objectId = 1;
@@ -503,7 +112,20 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
   pendingFiles: File[] = [];
   mentionSuggestions: DiscussionMentionUser[] = [];
   historyByComment: Record<number, HistoryState> = {};
-  emojiPalette = ['👍', '👎', '🐳', '🍆', '🍑'];
+  emojiPalette = ['👍', '👎', '🐳'];
+  sortOrder: SortOrder = 'newest';
+  readonly sortOptions = [
+    { label: this.translateService.instant('discussionComponent.newestFirst'), value: 'newest' },
+    { label: this.translateService.instant('discussionComponent.oldestFirst'), value: 'oldest' }
+  ];
+
+  /** Comments in the order the user picked. */
+  get orderedComments(): DiscussionComment[] {
+    const direction = this.sortOrder === 'newest' ? -1 : 1;
+    return [...this.comments].sort(
+      (a, b) => direction * (new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime())
+    );
+  }
   private mentionSearchTimer: ReturnType<typeof setTimeout> | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -878,12 +500,50 @@ export class DiscussionComponent implements OnChanges, OnDestroy, OnInit {
     return `${(value / (1024 * 1024)).toFixed(1)} ${this.translateService.instant('discussionComponent.units.megabytes')}`;
   }
 
-  hasUserReaction(comment: DiscussionComment): boolean {
-    return comment.reactions.some((reaction) => reaction.reactedByCurrentUser);
+  /** Describes how long ago the date was, e.g. "2 hours ago"; dates older than a week are shown in full. */
+  relativeTime(value: Date | string | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+    const seconds = Math.round((date.getTime() - Date.now()) / 1000);
+    if (seconds < -7 * 86400) {
+      return formatDate(date, this.layoutService.dateTimeFormat(), this.locale);
+    }
+
+    const units: [string, number][] = [
+      ['days', 86400],
+      ['hours', 3600],
+      ['minutes', 60]
+    ];
+    for (const [unit, size] of units) {
+      if (-seconds >= size) {
+        return this.translateService.instant(`discussionComponent.ago.${unit}`, {
+          count: Math.floor(-seconds / size)
+        });
+      }
+    }
+
+    return this.translateService.instant('discussionComponent.ago.now');
   }
 
-  getReactions(comment: DiscussionComment): DiscussionReaction[] {
-    return comment.reactions;
+  /** PrimeIcons class for a file of the given MIME type. */
+  fileIcon(mimeType: string | null | undefined): string {
+    const type = mimeType ?? '';
+    if (type.startsWith('image/')) {
+      return 'pi pi-image';
+    }
+    if (type === 'application/pdf') {
+      return 'pi pi-file-pdf';
+    }
+    if (type.includes('sheet') || type.includes('excel') || type === 'text/csv') {
+      return 'pi pi-file-excel';
+    }
+    if (type.includes('word')) {
+      return 'pi pi-file-word';
+    }
+    return 'pi pi-file';
   }
 
   private applyReactions(commentId: number, reactions: DiscussionReaction[]): void {

@@ -1,0 +1,404 @@
+<p-confirmDialog />
+
+<section class="flex flex-col gap-5">
+  <header class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2">
+      <h2 class="!m-0 text-xl font-semibold">{{ "discussionComponent.title" | translate }}</h2>
+      @if (!loading) {
+        <span
+          class="rounded-full bg-emphasis px-2 py-0.5 text-xs font-semibold text-muted-color"
+          qa-id="oip-discussion-count">
+          {{ comments.length }}
+        </span>
+      }
+    </div>
+    <p-selectButton
+      optionLabel="label"
+      optionValue="value"
+      size="small"
+      [allowEmpty]="false"
+      [options]="sortOptions"
+      [(ngModel)]="sortOrder" />
+  </header>
+
+  <div
+    class="composer rounded-xl border border-surface bg-surface-0 transition-shadow dark:bg-surface-900"
+    qa-id="oip-discussion-composer">
+    <div class="flex gap-1 px-2 pt-2" role="tablist">
+      <button
+        role="tab"
+        type="button"
+        class="composer-tab"
+        [attr.aria-selected]="!previewMode"
+        [class.composer-tab-active]="!previewMode"
+        (click)="previewMode = false">
+        {{ "discussionComponent.write" | translate }}
+      </button>
+      <button
+        role="tab"
+        type="button"
+        class="composer-tab"
+        [attr.aria-selected]="previewMode"
+        [class.composer-tab-active]="previewMode"
+        (click)="previewMode = true">
+        {{ "discussionComponent.preview" | translate }}
+      </button>
+    </div>
+
+    @if (!previewMode) {
+      <textarea
+        class="composer-input"
+        pTextarea
+        qa-id="oip-discussion-new-comment"
+        rows="3"
+        [attr.aria-label]="'discussionComponent.newComment' | translate"
+        [placeholder]="'discussionComponent.writeCommentPlaceholder' | translate"
+        [(ngModel)]="newComment"
+        (keydown.control.enter)="createComment()"
+        (keydown.meta.enter)="createComment()"
+        (ngModelChange)="onComposerInput()"></textarea>
+    } @else {
+      <div class="markdown-preview min-h-24 px-4 py-3 leading-7">
+        @if (newComment.trim()) {
+          <div [innerHTML]="renderMarkdown(newComment)"></div>
+        } @else {
+          <span class="text-muted-color">{{ "discussionComponent.nothingToPreview" | translate }}</span>
+        }
+      </div>
+    }
+
+    @if (!previewMode && mentionSuggestions.length > 0) {
+      <div
+        class="mx-3 mb-3 w-full max-w-sm overflow-hidden rounded-lg border border-surface bg-surface-0 shadow-md dark:bg-surface-950">
+        <div class="border-b border-surface px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-color">
+          {{ "discussionComponent.mentionSuggestions" | translate }}
+        </div>
+        @for (candidate of mentionSuggestions; track candidate.userId) {
+          <button
+            class="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-emphasis"
+            qa-id="oip-discussion-mention-suggestion"
+            type="button"
+            (click)="insertMention(candidate)">
+            <p-avatar shape="circle" size="normal" [label]="getInitialsFromString(candidate.displayName)" />
+            <span class="flex min-w-0 flex-col">
+              <strong class="truncate">{{ candidate.displayName }}</strong>
+              <small class="truncate text-muted-color">{{ candidate.email }}</small>
+            </span>
+          </button>
+        }
+      </div>
+    }
+
+    @if (pendingFiles.length > 0) {
+      <div class="flex flex-wrap gap-2 px-3 pb-3">
+        @for (file of pendingFiles; track file.name + file.size) {
+          <div
+            class="inline-flex items-center gap-2 rounded-lg bg-emphasis py-1 pl-3 pr-1 text-sm"
+            qa-id="oip-discussion-pending-file">
+            <i class="text-muted-color" [class]="fileIcon(file.type)"></i>
+            <span class="max-w-60 truncate">{{ file.name }}</span>
+            <span class="text-muted-color">{{ formatBytes(file.size) }}</span>
+            <p-button
+              icon="pi pi-times"
+              severity="secondary"
+              size="small"
+              [ariaLabel]="'discussionComponent.removeFile' | translate"
+              [rounded]="true"
+              [text]="true"
+              (onClick)="removePendingFile(file)" />
+          </div>
+        }
+      </div>
+    }
+
+    <div class="flex flex-wrap items-center justify-between gap-2 border-t border-surface px-2 py-2">
+      <div class="flex items-center gap-1">
+        <label class="file-trigger" [pTooltip]="'discussionComponent.attachFiles' | translate" tooltipPosition="top">
+          <p-button
+            icon="pi pi-paperclip"
+            severity="secondary"
+            [ariaLabel]="'discussionComponent.attachFiles' | translate"
+            [rounded]="true"
+            [text]="true" />
+          <input multiple qa-id="oip-discussion-attach-input" type="file" (change)="onFilesSelected($event)" />
+        </label>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="hidden text-xs text-muted-color sm:inline">{{ "discussionComponent.sendHint" | translate }}</span>
+        <p-button
+          icon="pi pi-send"
+          qa-id="oip-discussion-send"
+          [disabled]="submitting || !newComment.trim()"
+          [label]="'discussionComponent.send' | translate"
+          [loading]="submitting"
+          (onClick)="createComment()" />
+      </div>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-surface bg-surface-0 dark:bg-surface-900">
+    @if (loading) {
+      <div class="flex min-h-24 items-center justify-center gap-3 px-4 py-6 text-muted-color">
+        <p-progressSpinner strokeWidth="4" styleClass="!h-8 !w-8" />
+        <span>{{ "discussionComponent.loadingComments" | translate }}</span>
+      </div>
+    } @else if (comments.length === 0) {
+      <div class="flex min-h-24 flex-col items-center justify-center gap-2 px-4 py-8 text-muted-color">
+        <i class="pi pi-comments text-2xl"></i>
+        <span>{{ "discussionComponent.noCommentsYet" | translate }}</span>
+      </div>
+    } @else {
+      @for (comment of orderedComments; track comment.commentId) {
+        <article
+          class="comment group relative flex gap-3 border-t border-surface px-4 py-4 transition-colors first:border-t-0 hover:bg-surface-50 sm:px-5 dark:hover:bg-surface-800/40"
+          qa-id="oip-discussion-comment">
+          <p-avatar class="shrink-0" shape="circle" [label]="getInitialsFromString(comment.authorDisplayName)" />
+
+          <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+            <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 pr-28">
+              <strong>{{ comment.authorDisplayName }}</strong>
+              <time
+                class="text-xs text-muted-color"
+                tooltipPosition="top"
+                [attr.datetime]="comment.createdAt"
+                [pTooltip]="(comment.createdAt | date: layoutService.dateTimeFormat()) ?? ''">
+                {{ relativeTime(comment.createdAt) }}
+              </time>
+              @if (comment.isEdited) {
+                @if (comment.historyCount > 0) {
+                  <button
+                    class="edited-link text-xs text-muted-color"
+                    qa-id="oip-discussion-comment-edited"
+                    type="button"
+                    (click)="toggleHistory(comment)">
+                    {{ "discussionComponent.edited" | translate }}
+                  </button>
+                } @else {
+                  <span class="text-xs text-muted-color" qa-id="oip-discussion-comment-edited">
+                    {{ "discussionComponent.edited" | translate }}
+                  </span>
+                }
+              }
+            </div>
+
+            @if (
+              editingCommentId !== comment.commentId &&
+              (comment.canEdit || comment.canDelete || comment.historyCount > 0)
+            ) {
+              <div
+                class="comment-actions absolute right-3 top-2.5 flex items-center gap-0.5 rounded-lg border border-surface bg-surface-0 p-0.5 shadow-sm dark:bg-surface-900">
+                @if (comment.canEdit) {
+                  <p-button
+                    icon="pi pi-pencil"
+                    qa-id="oip-discussion-comment-edit"
+                    severity="secondary"
+                    size="small"
+                    tooltipPosition="top"
+                    [ariaLabel]="'discussionComponent.edit' | translate"
+                    [pTooltip]="'discussionComponent.edit' | translate"
+                    [text]="true"
+                    (onClick)="startEdit(comment)" />
+                }
+                @if (comment.historyCount > 0) {
+                  <p-button
+                    icon="pi pi-history"
+                    qa-id="oip-discussion-comment-history"
+                    severity="secondary"
+                    size="small"
+                    tooltipPosition="top"
+                    [ariaLabel]="'discussionComponent.editHistory' | translate"
+                    [pTooltip]="'discussionComponent.editHistory' | translate"
+                    [text]="true"
+                    (onClick)="toggleHistory(comment)" />
+                }
+                @if (comment.canDelete) {
+                  <p-button
+                    icon="pi pi-trash"
+                    qa-id="oip-discussion-comment-delete"
+                    severity="danger"
+                    size="small"
+                    tooltipPosition="top"
+                    [ariaLabel]="'discussionComponent.delete' | translate"
+                    [pTooltip]="'discussionComponent.delete' | translate"
+                    [text]="true"
+                    (onClick)="deleteComment(comment)" />
+                }
+              </div>
+            }
+
+            @if (editingCommentId === comment.commentId) {
+              <div class="composer mt-1 rounded-xl border border-surface bg-surface-0 dark:bg-surface-950">
+                <textarea
+                  class="composer-input"
+                  pTextarea
+                  qa-id="oip-discussion-edit-content"
+                  rows="3"
+                  [attr.aria-label]="'discussionComponent.editCommentPlaceholder' | translate"
+                  [placeholder]="'discussionComponent.editCommentPlaceholder' | translate"
+                  [(ngModel)]="editContent"
+                  (keydown.control.enter)="saveEdit(comment)"
+                  (keydown.escape)="cancelEdit()"
+                  (keydown.meta.enter)="saveEdit(comment)"></textarea>
+                <div class="flex flex-wrap items-center justify-between gap-2 border-t border-surface px-2 py-2">
+                  <label class="file-trigger">
+                    <p-button
+                      icon="pi pi-paperclip"
+                      severity="secondary"
+                      size="small"
+                      [label]="'discussionComponent.addAttachment' | translate"
+                      [text]="true" />
+                    <input multiple type="file" (change)="onInlineFilesSelected(comment, $event)" />
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <p-button
+                      severity="secondary"
+                      size="small"
+                      [label]="'discussionComponent.cancel' | translate"
+                      [text]="true"
+                      (onClick)="cancelEdit()" />
+                    <p-button
+                      icon="pi pi-check"
+                      qa-id="oip-discussion-edit-save"
+                      size="small"
+                      [disabled]="!editContent.trim()"
+                      [label]="'discussionComponent.save' | translate"
+                      (onClick)="saveEdit(comment)" />
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div
+                class="markdown-preview leading-6"
+                qa-id="oip-discussion-comment-content"
+                [innerHTML]="renderMarkdown(comment.content)"></div>
+            }
+
+            @if (comment.attachments.length > 0) {
+              <div class="mt-1 flex flex-wrap gap-2">
+                @for (attachment of comment.attachments; track attachment.attachmentId) {
+                  <div
+                    class="inline-flex max-w-full items-center gap-2 rounded-lg border border-surface py-1 pl-3 pr-1 text-sm"
+                    qa-id="oip-discussion-attachment">
+                    <i class="text-muted-color" [class]="fileIcon(attachment.fileType)"></i>
+                    <button
+                      class="truncate bg-transparent p-0 text-left font-semibold text-color transition-colors hover:text-primary"
+                      qa-id="oip-discussion-attachment-name"
+                      type="button"
+                      (click)="downloadAttachment(attachment)">
+                      {{ attachment.fileName }}
+                    </button>
+                    <span class="shrink-0 text-muted-color">{{ formatBytes(attachment.fileSize) }}</span>
+                    @if (comment.canEdit) {
+                      <p-button
+                        icon="pi pi-times"
+                        qa-id="oip-discussion-attachment-delete"
+                        severity="secondary"
+                        size="small"
+                        [ariaLabel]="'discussionComponent.delete' | translate"
+                        [rounded]="true"
+                        [text]="true"
+                        (onClick)="deleteAttachment(comment, attachment)" />
+                    } @else {
+                      <span class="w-1"></span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="mt-1 flex flex-wrap items-center gap-1.5">
+              @for (reaction of comment.reactions; track reaction.emojiCode) {
+                <button
+                  class="reaction"
+                  qa-id="oip-discussion-reaction"
+                  type="button"
+                  [attr.aria-pressed]="reaction.reactedByCurrentUser"
+                  [class.reaction-mine]="reaction.reactedByCurrentUser"
+                  (click)="toggleReaction(comment, reaction)">
+                  {{ reaction.emojiCode }} <span class="font-semibold">{{ reaction.count }}</span>
+                </button>
+              }
+
+              <button
+                class="reaction-add"
+                qa-id="oip-discussion-add-reaction"
+                type="button"
+                [attr.aria-label]="'discussionComponent.addReaction' | translate"
+                (click)="reactionPopover.toggle($event)">
+                <i class="pi pi-face-smile text-sm"></i>
+              </button>
+              <p-popover #reactionPopover>
+                <div class="flex flex-wrap gap-1">
+                  @for (emoji of emojiPalette; track emoji) {
+                    <button
+                      class="emoji-option"
+                      qa-id="oip-discussion-emoji"
+                      type="button"
+                      (click)="reactWithEmoji(comment, emoji, reactionPopover)">
+                      {{ emoji }}
+                    </button>
+                  }
+                </div>
+              </p-popover>
+            </div>
+
+            @if (historyByComment[comment.commentId]?.opened) {
+              <div class="mt-2 rounded-xl border border-surface">
+                <div class="flex items-center justify-between gap-2 border-b border-surface py-1 pl-3 pr-1">
+                  <span class="inline-flex items-center gap-2 text-sm font-semibold">
+                    <i class="pi pi-history text-muted-color"></i>
+                    {{ "discussionComponent.editHistory" | translate }}
+                  </span>
+                  <p-button
+                    icon="pi pi-times"
+                    severity="secondary"
+                    size="small"
+                    [ariaLabel]="'discussionComponent.close' | translate"
+                    [rounded]="true"
+                    [text]="true"
+                    (onClick)="toggleHistory(comment)" />
+                </div>
+
+                @if (historyByComment[comment.commentId]?.loading) {
+                  <div class="flex items-center gap-3 px-3 py-3 text-muted-color">
+                    <p-progressSpinner strokeWidth="4" styleClass="!h-6 !w-6" />
+                    <span>{{ "discussionComponent.loadingHistory" | translate }}</span>
+                  </div>
+                } @else {
+                  @for (item of historyByComment[comment.commentId]?.items ?? []; track item.commentEditHistoryId) {
+                    <div
+                      class="flex flex-col gap-2 border-t border-surface px-3 py-3 first:border-t-0"
+                      qa-id="oip-discussion-history-item">
+                      <div class="text-xs text-muted-color">
+                        <strong class="text-color">{{ item.editedByDisplayName }}</strong>
+                        · {{ item.editedAt | date: layoutService.dateTimeFormat() }}
+                      </div>
+                      <div class="overflow-hidden rounded-lg border border-surface text-sm">
+                        <div class="history-row history-old">
+                          <span class="history-sign" aria-hidden="true">−</span>
+                          <div
+                            class="history-markdown min-w-0 flex-1"
+                            qa-id="oip-discussion-history-old"
+                            [attr.aria-label]="'discussionComponent.before' | translate"
+                            [innerHTML]="renderMarkdown(item.oldContent)"></div>
+                        </div>
+                        <div class="history-row history-new">
+                          <span class="history-sign" aria-hidden="true">+</span>
+                          <div
+                            class="history-markdown min-w-0 flex-1"
+                            qa-id="oip-discussion-history-new"
+                            [attr.aria-label]="'discussionComponent.after' | translate"
+                            [innerHTML]="renderMarkdown(item.newContent)"></div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </article>
+      }
+    }
+  </div>
+</section>
