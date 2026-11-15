@@ -154,11 +154,6 @@
   display: inline;
 }
 
-/* Without JavaScript the language is unknown, so the message is shown in every language. */
-.oip-startup__noscript span {
-  display: block;
-}
-
 .oip-startup__noscript {
   display: block;
   margin-top: 24px;
