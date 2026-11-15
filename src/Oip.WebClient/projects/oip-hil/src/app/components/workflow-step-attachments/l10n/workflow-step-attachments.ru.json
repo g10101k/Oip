@@ -1,9 +1,0 @@
-{
-  "workflow-step-attachments": {
-    "title": "Вложения",
-    "download": "Скачать",
-    "messages": {
-      "downloadError": "Не удалось скачать файл"
-    }
-  }
-}

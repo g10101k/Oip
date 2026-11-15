@@ -1,14 +1,14 @@
 {
   "discussionComponent": {
-    "writeCommentPlaceholder": "Напишите комментарий. Используйте @email или @first.last для упоминаний.",
-    "mentionSuggestions": "Варианты упоминаний",
+    "writeCommentPlaceholder": "Напишите комментарий… Поддерживается Markdown",
+    "mentionSuggestions": "Упомянуть",
     "edit": "Редактировать",
     "preview": "Предпросмотр",
     "attachFiles": "Прикрепить файлы",
     "send": "Отправить",
     "loadingComments": "Загрузка комментариев...",
     "noCommentsYet": "Комментариев пока нет.",
-    "edited": "Изменено",
+    "edited": "изменено",
     "editCommentPlaceholder": "Изменить комментарий",
     "addAttachment": "Добавить вложение",
     "save": "Сохранить",
@@ -37,6 +37,22 @@
       "downloadAttachment": "Не удалось скачать вложение.",
       "updateReaction": "Не удалось обновить реакцию.",
       "addReaction": "Не удалось добавить реакцию."
+    },
+    "title": "Обсуждение",
+    "newComment": "Новый комментарий",
+    "write": "Написать",
+    "nothingToPreview": "Нечего показать",
+    "sendHint": "Ctrl + Enter — отправить",
+    "removeFile": "Убрать файл",
+    "addReaction": "Добавить реакцию",
+    "newestFirst": "Сначала новые",
+    "oldestFirst": "Сначала старые",
+    "close": "Закрыть",
+    "ago": {
+      "now": "только что",
+      "minutes": "{{count}} мин назад",
+      "hours": "{{count}} ч назад",
+      "days": "{{count}} дн. назад"
     }
   }
 }

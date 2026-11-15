@@ -38,5 +38,7 @@ public class CommentEditHistoryEntityConfiguration(DatabaseFacade database, bool
             .WithMany()
             .HasForeignKey(e => e.CommentId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasQueryFilter(e => !e.Comment.IsDeleted);
     }
 }

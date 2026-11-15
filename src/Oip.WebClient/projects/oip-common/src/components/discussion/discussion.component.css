@@ -1,0 +1,186 @@
+:host {
+  display: block;
+}
+
+.composer:focus-within {
+  border-color: var(--p-primary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-primary-color) 18%, transparent);
+}
+
+.composer-tab {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--p-text-muted-color);
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.composer-tab:hover {
+  color: var(--p-text-color);
+}
+
+.composer-tab-active {
+  background: var(--p-content-hover-background);
+  color: var(--p-text-color);
+  font-weight: 600;
+}
+
+.composer-input {
+  display: block;
+  width: 100%;
+  min-height: 5.5rem;
+  max-height: 20rem;
+  field-sizing: content;
+  resize: none;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.75rem 1rem;
+  line-height: 1.5rem;
+}
+
+.file-trigger {
+  position: relative;
+  display: inline-flex;
+}
+
+.file-trigger input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.comment-actions {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.comment:hover .comment-actions,
+.comment:focus-within .comment-actions {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .comment-actions {
+    opacity: 1;
+  }
+}
+
+.edited-link {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+.edited-link:hover {
+  color: var(--p-text-color);
+}
+
+.reaction,
+.reaction-add {
+  height: 1.75rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+
+.reaction {
+  padding: 0 0.625rem;
+  border: 1px solid var(--p-content-border-color);
+}
+
+.reaction:hover {
+  background: var(--p-content-hover-background);
+}
+
+.reaction-mine {
+  border-color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color) 14%, transparent);
+}
+
+.reaction-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  border: 1px dashed var(--p-content-border-color);
+  color: var(--p-text-muted-color);
+}
+
+.reaction-add:hover {
+  color: var(--p-text-color);
+  border-style: solid;
+}
+
+.emoji-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.emoji-option:hover {
+  background: var(--p-content-hover-background);
+}
+
+.history-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+}
+
+.history-old {
+  background: color-mix(in srgb, var(--p-red-500) 12%, transparent);
+}
+
+.history-new {
+  background: color-mix(in srgb, var(--p-green-500) 12%, transparent);
+}
+
+.history-sign {
+  flex: none;
+  width: 0.75rem;
+  font-family: ui-monospace, monospace;
+  color: var(--p-text-muted-color);
+}
+
+.markdown-preview,
+.history-markdown {
+  word-break: break-word;
+}
+
+:host ::ng-deep :is(.markdown-preview, .history-markdown) :is(h1, h2, h3) {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+:host ::ng-deep :is(.markdown-preview, .history-markdown) a {
+  color: var(--p-primary-color);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+:host ::ng-deep :is(.markdown-preview, .history-markdown) code {
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+  background: var(--p-content-hover-background);
+  font-size: 0.875em;
+}
+
+:host ::ng-deep .mention-token {
+  padding: 0 0.2em;
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, var(--p-primary-color) 14%, transparent);
+  color: var(--p-primary-color);
+  font-weight: 600;
+}

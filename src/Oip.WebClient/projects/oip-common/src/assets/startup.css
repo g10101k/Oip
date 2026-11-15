@@ -1,5 +1,15 @@
 /* Use the OIP preset's Rose and Zinc colors before Angular loads the theme. */
 .oip-startup {
+  --oip-startup-bg: #09090b;
+  --oip-startup-fg: #fafafa;
+  --oip-startup-muted: #a1a1aa;
+  --oip-startup-glow: #7f1d1d40;
+  --oip-startup-glow-low: #991b1b26;
+  --oip-startup-dots: #fecaca1a;
+  --oip-startup-logo-start: #fef2f2;
+  --oip-startup-logo-middle: #fca5a5;
+  --oip-startup-logo-end: #ef4444;
+
   position: fixed;
   inset: 0;
   z-index: 10000;
@@ -8,8 +18,8 @@
   overflow: hidden;
   box-sizing: border-box;
   padding: 24px;
-  background: #09090b;
-  color: #fafafa;
+  background: var(--oip-startup-bg);
+  color: var(--oip-startup-fg);
   font:
     400 14px/1.5 system-ui,
     -apple-system,
@@ -18,6 +28,33 @@
     sans-serif;
   text-align: center;
   isolation: isolate;
+}
+
+/* The saved application theme wins over the system one; see startup.js. */
+:root[data-startup-theme="light"] .oip-startup {
+  --oip-startup-bg: #fafafa;
+  --oip-startup-fg: #18181b;
+  --oip-startup-muted: #52525b;
+  --oip-startup-glow: #fecaca65;
+  --oip-startup-glow-low: #fecaca36;
+  --oip-startup-dots: #b91c1c20;
+  --oip-startup-logo-start: #ef4444;
+  --oip-startup-logo-middle: #dc2626;
+  --oip-startup-logo-end: #991b1b;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-startup-theme]) .oip-startup {
+    --oip-startup-bg: #fafafa;
+    --oip-startup-fg: #18181b;
+    --oip-startup-muted: #52525b;
+    --oip-startup-glow: #fecaca65;
+    --oip-startup-glow-low: #fecaca36;
+    --oip-startup-dots: #b91c1c20;
+    --oip-startup-logo-start: #ef4444;
+    --oip-startup-logo-middle: #dc2626;
+    --oip-startup-logo-end: #991b1b;
+  }
 }
 
 .oip-startup::before,
@@ -31,12 +68,12 @@
 
 .oip-startup::before {
   background:
-    radial-gradient(ellipse at 50% 42%, #7f1d1d40, transparent 55%),
-    radial-gradient(ellipse at 50% 105%, #991b1b26, transparent 50%);
+    radial-gradient(ellipse at 50% 42%, var(--oip-startup-glow), transparent 55%),
+    radial-gradient(ellipse at 50% 105%, var(--oip-startup-glow-low), transparent 50%);
 }
 
 .oip-startup::after {
-  background-image: radial-gradient(#fecaca1a 0.7px, transparent 0.7px);
+  background-image: radial-gradient(var(--oip-startup-dots) 0.7px, transparent 0.7px);
   background-size: 28px 28px;
   mask-image: radial-gradient(ellipse at center, #000, transparent 70%);
 }
@@ -47,58 +84,45 @@
   transform: translateY(-12px);
 }
 
-.oip-startup__emblem {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: min(320px, 72vw, 48vh);
-  aspect-ratio: 1;
-  margin: 0 auto 30px;
-}
-
-.oip-startup__halo {
-  position: absolute;
-  inset: -20%;
-  border-radius: 50%;
-  background: radial-gradient(circle, #f871712e, #ef44440a 42%, transparent 65%);
-  animation: oip-startup-breathe 5s ease-in-out infinite;
-}
-
-.oip-startup__orbit {
-  position: absolute;
-  inset: 10%;
-  border: 1px solid #fecaca1a;
-  border-radius: 50%;
-}
-
-.oip-startup__orbit::before {
-  position: absolute;
-  inset: -1px;
-  border: 1px solid transparent;
-  border-top-color: #fca5a580;
-  border-radius: inherit;
-  content: "";
-  animation: oip-startup-orbit 14s linear infinite;
-}
-
-.oip-startup__orbit::after {
-  position: absolute;
-  inset: -14%;
-  border: 1px solid #fecaca0d;
-  border-radius: inherit;
-  content: "";
-}
-
 .oip-startup__logo {
-  position: relative;
-  width: 36%;
-  aspect-ratio: 60 / 65;
-  background: linear-gradient(145deg, #fef2f2 5%, #fca5a5 45%, #ef4444);
-  mask: url("/assets/favicon.svg") center / contain no-repeat;
+  display: block;
+  width: min(136px, 36vw, 26vh);
+  height: auto;
+  margin: 0 auto 36px;
+  overflow: visible;
+}
+
+.oip-startup__stop-start {
+  stop-color: var(--oip-startup-logo-start);
+}
+
+.oip-startup__stop-middle {
+  stop-color: var(--oip-startup-logo-middle);
+}
+
+.oip-startup__stop-end {
+  stop-color: var(--oip-startup-logo-end);
+}
+
+/* Each piece flies in from its own side, then the assembled logo pulses piece by piece while loading. */
+.oip-startup__piece {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    oip-startup-assemble 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    oip-startup-wave 2.4s ease-in-out infinite;
+  animation-delay:
+    calc(var(--oip-piece-index) * 120ms),
+    calc(1100ms + var(--oip-piece-index) * 150ms);
+}
+
+.oip-startup__brand,
+.oip-startup__label {
+  animation: oip-startup-fade 600ms ease-out 450ms both;
 }
 
 .oip-startup__brand {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   padding-left: 0.38em;
   font-size: 25px;
   font-weight: 500;
@@ -108,123 +132,51 @@
 
 .oip-startup__label {
   margin: 0;
-  color: #a1a1aa;
+  color: var(--oip-startup-muted);
   font-size: 13px;
   letter-spacing: 0.02em;
-}
-
-.oip-startup__progress {
-  position: relative;
-  width: 112px;
-  height: 2px;
-  margin: 26px auto 0;
-  overflow: hidden;
-  border-radius: 2px;
-  background: #fecaca1a;
-}
-
-.oip-startup__progress::after {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(90deg, transparent, #fca5a5, transparent);
-  content: "";
-  animation: oip-startup-progress 2.4s ease-in-out infinite;
 }
 
 .oip-startup__noscript {
   display: block;
   margin-top: 24px;
-  color: #d4d4d8;
+  color: var(--oip-startup-muted);
 }
 
-@media (prefers-color-scheme: light) {
-  .oip-startup {
-    background: #fafafa;
-    color: #18181b;
-  }
-
-  .oip-startup::before {
-    background:
-      radial-gradient(ellipse at 50% 42%, #fecaca65, transparent 55%),
-      radial-gradient(ellipse at 50% 105%, #fecaca36, transparent 50%);
-  }
-
-  .oip-startup::after {
-    background-image: radial-gradient(#b91c1c20 0.7px, transparent 0.7px);
-  }
-
-  .oip-startup__halo {
-    background: radial-gradient(circle, #f8717130, #fca5a514 42%, transparent 65%);
-  }
-
-  .oip-startup__orbit,
-  .oip-startup__orbit::after {
-    border-color: #b91c1c20;
-  }
-
-  .oip-startup__orbit::before {
-    border-top-color: #dc262680;
-  }
-
-  .oip-startup__logo {
-    background: linear-gradient(145deg, #ef4444 5%, #dc2626 45%, #991b1b);
-  }
-
-  .oip-startup__label,
-  .oip-startup__noscript {
-    color: #52525b;
-  }
-
-  .oip-startup__progress {
-    background: #b91c1c20;
-  }
-
-  .oip-startup__progress::after {
-    background: linear-gradient(90deg, transparent, #dc2626, transparent);
+@keyframes oip-startup-assemble {
+  from {
+    opacity: 0;
+    transform: translate(var(--oip-piece-x, 0), var(--oip-piece-y, 0)) scale(var(--oip-piece-scale, 0.9));
   }
 }
 
-@keyframes oip-startup-orbit {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes oip-startup-breathe {
+@keyframes oip-startup-wave {
   0%,
   100% {
-    opacity: 0.55;
-    transform: scale(0.94);
+    opacity: 1;
   }
   50% {
-    opacity: 1;
-    transform: scale(1.06);
+    opacity: 0.45;
   }
 }
 
-@keyframes oip-startup-progress {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
+@keyframes oip-startup-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
 }
 
 @media (max-height: 480px) {
-  .oip-startup__emblem {
-    width: min(160px, 34vh);
-    margin-bottom: 12px;
+  .oip-startup__logo {
+    width: min(80px, 22vh);
+    margin-bottom: 16px;
   }
   .oip-startup__content {
     transform: none;
   }
   .oip-startup__brand {
-    margin-bottom: 12px;
-  }
-  .oip-startup__progress {
-    margin-top: 18px;
+    margin-bottom: 8px;
   }
 }
 

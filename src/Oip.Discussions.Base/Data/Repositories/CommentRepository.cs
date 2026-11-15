@@ -24,8 +24,10 @@ public class CommentRepository(DiscussionsDbContext context) : BaseRepository<Co
             .Include(c => c.Reactions)
             .Include(c => c.Mentions)
             .Include(c => c.EditHistory)
+            .AsSplitQuery()
             .Where(c => c.ObjectTypeId == objectTypeId && c.ObjectId == objectId && !c.IsDeleted)
             .OrderByDescending(c => c.CreatedAt)
+            .ThenByDescending(c => c.CommentId)
             .ToListAsync(cancellationToken);
     }
 
@@ -43,6 +45,7 @@ public class CommentRepository(DiscussionsDbContext context) : BaseRepository<Co
             .Include(c => c.Reactions)
             .Include(c => c.Mentions)
             .Include(c => c.EditHistory)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.CommentId == id && !c.IsDeleted, cancellationToken);
     }
 

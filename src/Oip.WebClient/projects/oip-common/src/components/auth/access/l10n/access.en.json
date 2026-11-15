@@ -1,7 +1,9 @@
 {
   "access": {
-    "title": "Access Denied",
-    "message": "You do not have the necessary permissions. Please contact admins.",
-    "button": "Go to Dashboard"
+    "title": "Access denied",
+    "errorCode": "Error 403",
+    "message": "You don't have permission to view this page. Contact your administrator if you need access.",
+    "back": "Go back",
+    "button": "Go to home"
   }
 }
