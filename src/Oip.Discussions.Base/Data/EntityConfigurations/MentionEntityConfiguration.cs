@@ -33,5 +33,7 @@ public class MentionEntityConfiguration(DatabaseFacade database, bool designTime
             .WithMany()
             .HasForeignKey(e => e.CommentId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasQueryFilter(e => !e.Comment.IsDeleted);
     }
 }

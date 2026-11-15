@@ -37,5 +37,7 @@ public class ReactionEntityConfiguration(DatabaseFacade database, bool designTim
             .WithMany(c => c.Reactions)
             .HasForeignKey(e => e.CommentId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasQueryFilter(e => !e.Comment.IsDeleted);
     }
 }

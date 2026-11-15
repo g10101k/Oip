@@ -38,5 +38,7 @@ public class AttachmentEntityConfiguration(DatabaseFacade database, bool designT
             .WithMany(c => c.Attachments)
             .HasForeignKey(e => e.CommentId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasQueryFilter(e => !e.Comment.IsDeleted);
     }
 }
