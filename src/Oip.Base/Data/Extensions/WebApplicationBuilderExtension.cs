@@ -10,6 +10,7 @@ using Oip.Base.Controllers.Api;
 using Oip.Base.Data.Constants;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Entities;
+using Oip.Base.Security.Objects;
 
 namespace Oip.Base.Data.Extensions;
 
@@ -29,8 +30,29 @@ public static class WebApplicationBuilderExtension
     {
         using var context = app.MigrateDatabaseInternal<OipModuleContext>();
         using var scope = app.ApplicationServices.CreateScope();
-        AddModulesFromAssemblies(context, scope.ServiceProvider);
+        var declaredRights = AddModulesFromAssemblies(context, scope.ServiceProvider);
+        MigrateModuleSecurity(scope.ServiceProvider, declaredRights);
         return app;
+    }
+
+    /// <summary>
+    /// Moves the rights of the module instances to the object access control and registers the declared rights.
+    /// </summary>
+    private static void MigrateModuleSecurity(IServiceProvider serviceProvider, IEnumerable<string> declaredRights)
+    {
+        var logger = serviceProvider.GetRequiredService<ILoggerFactory>()
+            .CreateLogger(typeof(ModuleSecurityMigration));
+        try
+        {
+            ModuleSecurityMigration.MigrateAsync(serviceProvider.GetRequiredService<OipModuleContext>(),
+                    serviceProvider.GetRequiredService<ObjectAccessService<OipModuleContext>>(), declaredRights, logger)
+                .GetAwaiter().GetResult();
+        }
+        catch (DbUpdateException e)
+        {
+            // Another service moved the same instances at the same moment; the rest is moved on the next start.
+            logger.LogWarning(e, "Moving the module instance rights to the object access control was interrupted.");
+        }
     }
 
     /// <summary>
@@ -70,8 +92,11 @@ public static class WebApplicationBuilderExtension
     /// </summary>
     /// <param name="moduleContext">The database context used to persist module information.</param>
     /// <param name="serviceProvider">The service provider used to create module controllers to read their icons and rights.</param>
-    private static void AddModulesFromAssemblies(OipModuleContext moduleContext, IServiceProvider serviceProvider)
+    /// <returns>Codes of the rights the modules declare.</returns>
+    private static HashSet<string> AddModulesFromAssemblies(OipModuleContext moduleContext,
+        IServiceProvider serviceProvider)
     {
+        var declaredRights = new HashSet<string>();
         var result = GetAllLoadedModules();
         var logger = serviceProvider.GetRequiredService<ILoggerFactory>()
             .CreateLogger(typeof(WebApplicationBuilderExtension));
@@ -99,10 +124,14 @@ public static class WebApplicationBuilderExtension
             }
 
             if (metadataResolved)
+            {
                 SyncModuleSecurities(module, rights);
+                declaredRights.UnionWith(rights.Select(r => r.Code).Where(code => !string.IsNullOrWhiteSpace(code)));
+            }
         }
 
         moduleContext.SaveChanges();
+        return declaredRights;
     }
 
     /// <summary>

@@ -42,6 +42,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   private static readonly readRight = 'read';
   private static readonly editRight = 'edit';
   private static readonly deleteRight = 'delete';
+  private static readonly manageAclRight = 'manage-acl';
 
   protected isInitialized = false;
 
@@ -55,6 +56,8 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
   protected rightsSubscription?: Subscription;
   protected securityRoles: string[] = [];
   protected securitySettings: SecurityDto[] = [];
+  /** Rights of the current user on the module instance, inherited ones included, as computed by the server. */
+  protected effectiveRights: string[] = [];
   protected readonly destroyRef = inject(DestroyRef);
   protected readonly securityService = inject(SecurityService);
   protected readonly moduleLoadingService = inject(ModuleLoadingService);
@@ -223,7 +226,7 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
    * Checks whether the current user has the specified security right.
    */
   public hasRight(code: string): boolean {
-    return this.hasSecurityRight(this.securityRoles, this.securitySettings, code);
+    return this.effectiveRights.includes(code);
   }
 
   /**
@@ -378,14 +381,14 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
       this.rightsSubscription = this.securityService.payload
         .pipe(
           switchMap((payload) =>
-            from(this.getSecurity(controller, id)).pipe(map((securitySettings) => ({payload, securitySettings})))
+            from(this.getEffectiveRights(id)).pipe(map((rights) => ({payload, rights})))
           ),
           takeUntilDestroyed(this.destroyRef)
         )
         .subscribe({
-          next: ({payload, securitySettings}) => {
+          next: ({payload, rights}) => {
             const roles = payload?.realm_access?.roles ?? [];
-            this.updateRightsState(roles, securitySettings);
+            this.updateRightsState(roles, rights);
             settle();
           },
           error: (error) => {
@@ -405,22 +408,47 @@ export abstract class BaseModuleComponent<TBackendStoreSettings, TLocalStoreSett
     this.securityRightsLoaded = false;
     this.securityRoles = [];
     this.securitySettings = [];
+    this.effectiveRights = [];
+    this.topBarService.nonAdminTabIds = null;
   }
 
-  private updateRightsState(roles: string[], securitySettings: SecurityDto[]): void {
+  private updateRightsState(roles: string[], rights: string[]): void {
     this.securityRoles = roles;
-    this.securitySettings = securitySettings;
-    this.canRead = this.hasSecurityRight(roles, securitySettings, BaseModuleComponent.readRight);
-    this.canEdit = this.hasSecurityRight(roles, securitySettings, BaseModuleComponent.editRight);
-    this.canDelete = this.hasSecurityRight(roles, securitySettings, BaseModuleComponent.deleteRight);
+    this.effectiveRights = rights;
+    this.canRead = rights.includes(BaseModuleComponent.readRight);
+    this.canEdit = rights.includes(BaseModuleComponent.editRight);
+    this.canDelete = rights.includes(BaseModuleComponent.deleteRight);
+    // A user who may manage the rights of the instance sees its security tab even without the admin role.
+    this.topBarService.nonAdminTabIds = rights.includes(BaseModuleComponent.manageAclRight)
+      ? ['content', 'security']
+      : null;
     this.securityRightsLoaded = true;
     this.onSecurityRightsChange();
   }
 
-  protected hasSecurityRight(roles: string[], securitySettings: SecurityDto[], code: string): boolean {
-    return (
-      securitySettings.find((security) => security.code === code)?.roles?.some((role) => roles.includes(role)) ?? false
-    );
+  /** Rights of the current user on the module instance, inherited ones included. */
+  protected getEffectiveRights(id: number | undefined = this.id): Promise<string[]> {
+    if (id == null) {
+      return Promise.resolve([]);
+    }
+
+    return this.httpClient.request<string[], ApiExceptionResponse>({
+      path: `/api/menu/get-module-instance-rights`,
+      method: 'GET',
+      query: { id },
+      secure: true,
+      format: 'json'
+    });
+  }
+
+  /**
+   * Checks a right of the current user on the module instance. Kept for modules written before the object access
+   * control: the roles and role-right pairs are ignored, the answer comes from the rights computed by the server,
+   * inherited ones and the admin role included.
+   * @deprecated Use {@link hasRight}.
+   */
+  protected hasSecurityRight(_roles: string[], _securitySettings: SecurityDto[], code: string): boolean {
+    return this.hasRight(code);
   }
 
   protected getSecurity(controller: string = this.controller, id: number | undefined = this.id): Promise<SecurityDto[]> {

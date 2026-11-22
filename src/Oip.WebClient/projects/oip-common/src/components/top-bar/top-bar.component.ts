@@ -54,13 +54,13 @@ import ru from './l10n/topbar.ru.json';
         </a>
       </div>
 
-      @if (securityService.isAdmin() && topBarService.topBarItems.length > 0) {
+      @if (topBarService.visibleTopBarItems(securityService.isAdmin()).length > 0) {
         <p-tabs
           class="layout-topbar-tabs ml-2"
           [value]="topBarService.activeId"
           (valueChange)="onActiveTabChange($event)">
           <p-tablist>
-            @for (tab of topBarService.availableTopBarItems; track tab.id) {
+            @for (tab of topBarService.visibleTopBarItems(securityService.isAdmin()); track tab.id) {
               <p-tab id="oip-app-topbar-tab-{{ tab.id }}" [value]="tab.id">
                 <i class="pi {{ tab.icon }}"></i>
                 <span class="ml-2">{{ tab.caption }}</span>

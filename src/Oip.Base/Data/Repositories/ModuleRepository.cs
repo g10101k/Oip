@@ -5,6 +5,9 @@ using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Entities;
 using Oip.Base.Data.Extensions;
+using Oip.Base.Exceptions;
+using Oip.Base.Security.Objects;
+using Oip.Base.Security.Objects.Dtos;
 
 namespace Oip.Base.Data.Repositories;
 
@@ -14,8 +17,11 @@ namespace Oip.Base.Data.Repositories;
 /// <remarks>
 /// This repository encapsulates access to module data, such as module definitions, settings, instances, and associated security rules.
 /// </remarks>
-public class ModuleRepository(OipModuleContext db)
+public class ModuleRepository(OipModuleContext db, ObjectAccessService<OipModuleContext>? access = null)
 {
+    private ObjectAccessService<OipModuleContext> Access => access ?? throw new InvalidOperationException(
+        "Access control of the module instances is not registered. Register the context with AddOipModuleContext.");
+
     /// <summary>
     /// Options used to read module instance settings. Property names are matched case-insensitively so that
     /// settings persisted before the switch to <see cref="JsonSerializer"/> keep deserializing.
@@ -104,37 +110,41 @@ public class ModuleRepository(OipModuleContext db)
     {
         var loadedModules = await WebApplicationBuilderExtension.GetAllLoadedModulesAsync();
         var modulesLoadedNames = loadedModules.Select(x => x.Name.Replace("Controller", string.Empty)).ToList();
-        var query = await db.ModuleInstances
+        var subjects = ModuleAccessControl.SubjectsOf(roles, userSubject);
+        var query = await Access.WhereAccessible(db.ModuleInstances, SecurityConstants.Read, subjects)
             .Include(x => x.Module)
             .Where(x => x.Module.Kind == ModuleKind.Extension ||
-                        modulesLoadedNames.Contains(x.Module.Name)) // Load the related Module.
-            .Include(x => x.Securities) // Load Securities if needed.
-            .Where(m => m.Securities.Any(s => s.Right == SecurityConstants.Read && roles.Contains(s.Role)))
+                        modulesLoadedNames.Contains(x.Module.Name))
             .OrderBy(m => m.Order)
             .ToListAsync();
 
         var startModuleInstanceId = await GetStartModuleInstanceId(userSubject);
-        var result = query.Where(x => x.Parent == null).Select(x => ToDto(x, startModuleInstanceId));
+        var viewRoles = await GetViewRolesAsync(query.Select(x => (long)x.ModuleInstanceId).ToList());
+        // The tree is built from the filtered list, not from the Items navigation, which may also hold children
+        // the context tracks for another reason.
+        var children = query.ToLookup(x => x.ParentId);
+        var result = query.Where(x => x.ParentId == null)
+            .Select(x => ToDto(x, startModuleInstanceId, viewRoles, children));
 
         return result.ToList();
     }
 
     /// <summary>
-    /// Retrieves the list of security settings associated with a specific module instance.
+    /// Retrieves the roles and the rights they are granted explicitly on a module instance.
     /// </summary>
     /// <param name="id">The ID of the module instance.</param>
-    /// <returns>A list of security roles and rights for the given module instance.</returns>
+    /// <returns>A role and right pair for every right granted to a role.</returns>
     public async Task<List<ModuleSecurityDto>> GetSecurityByInstanceId(int id)
     {
-        var query = from security in db.ModuleInstanceSecurities
-            where security.ModuleInstanceId == id
-            select new ModuleSecurityDto
+        var acl = await FindAclAsync(id);
+        return acl?.Entries
+            .Where(e => e.SubjectType == SubjectKeys.RoleType)
+            .SelectMany(e => e.Allow.Select(right => new ModuleSecurityDto
             {
-                Right = security.Right,
-                Role = security.Role
-            };
-
-        return await query.AsNoTracking().ToListAsync();
+                Right = right,
+                Role = SubjectKeys.GetValue(e.SubjectKey)
+            }))
+            .ToList() ?? [];
     }
 
     /// <summary>
@@ -144,74 +154,107 @@ public class ModuleRepository(OipModuleContext db)
     /// <param name="roles">The roles of the current user.</param>
     /// <param name="right">The right to check, see <see cref="SecurityConstants"/>.</param>
     /// <returns><c>true</c> when the right is granted; otherwise <c>false</c>.</returns>
-    public async Task<bool> HasInstanceRight(int moduleInstanceId, List<string> roles, string right)
-    {
-        if (roles.Contains(SecurityConstants.AdminRole))
-            return true;
-
-        if (roles.Count == 0)
-            return false;
-
-        return await db.ModuleInstanceSecurities
-            .AnyAsync(x => x.ModuleInstanceId == moduleInstanceId
-                           && x.Right == right
-                           && roles.Contains(x.Role));
-    }
+    public Task<bool> HasInstanceRight(int moduleInstanceId, List<string> roles, string right) =>
+        Access.HasRightAsync(ModuleAccessControl.Instance(moduleInstanceId), right,
+            ModuleAccessControl.SubjectsOf(roles));
 
     /// <summary>
-    /// Retrieves the rights the specified roles grant on a module instance.
+    /// Retrieves the rights the specified roles hold on a module instance, inherited ones included.
     /// </summary>
     /// <param name="moduleInstanceId">The ID of the module instance.</param>
     /// <param name="roles">The roles of the current user.</param>
-    /// <returns>A distinct list of rights. Administrators get every right configured on the instance plus <see cref="SecurityConstants.Read"/>.</returns>
-    public async Task<List<string>> GetUserRightsByInstanceId(int moduleInstanceId, List<string> roles)
+    /// <returns>A distinct list of rights. Administrators get every right of the module instances.</returns>
+    public async Task<List<string>> GetUserRightsByInstanceId(int moduleInstanceId, List<string> roles) =>
+        (await Access.GetEffectiveRightsAsync(ModuleAccessControl.Instance(moduleInstanceId),
+            ModuleAccessControl.SubjectsOf(roles))).ToList();
+
+    /// <summary>
+    /// Replaces the rights granted to roles on a module instance. Entries of other subjects, the denied rights of
+    /// the roles and the inheritance setting are kept.
+    /// </summary>
+    /// <param name="id">The ID of the module instance.</param>
+    /// <param name="security">The rights granted to each role.</param>
+    public async Task UpdateInstanceSecurity(int id, IEnumerable<ModuleSecurityDto> security)
     {
-        var isAdmin = roles.Contains(SecurityConstants.AdminRole);
+        var pairs = security.ToList();
+        Access.Registry.EnsureRights(ModuleAccessControl.ModuleInstanceType, pairs.Select(x => x.Right));
 
-        var query = db.ModuleInstanceSecurities.Where(x => x.ModuleInstanceId == moduleInstanceId);
-        if (!isAdmin)
-            query = query.Where(x => roles.Contains(x.Role));
+        var obj = ModuleAccessControl.Instance(id);
+        var acl = await Access.GetAclUncheckedAsync(obj);
+        var denied = acl.Entries.Where(e => e.SubjectType == SubjectKeys.RoleType)
+            .ToDictionary(e => e.SubjectKey, e => e.Deny);
 
-        var rights = await query.Select(x => x.Right).Distinct().ToListAsync();
+        var entries = acl.Entries.Where(e => e.SubjectType != SubjectKeys.RoleType).Select(ToAclEntry).ToList();
+        var granted = pairs.GroupBy(x => SubjectKeys.Role(x.Role))
+            .ToDictionary(g => g.Key, g => g.Select(x => x.Right).Distinct().ToList());
+        entries.AddRange(granted.Keys.Union(denied.Keys).Select(key => new AclEntry(key,
+            granted.GetValueOrDefault(key) ?? [], denied.GetValueOrDefault(key) ?? [])));
 
-        if (isAdmin && !rights.Contains(SecurityConstants.Read))
-            rights.Add(SecurityConstants.Read);
-
-        return rights;
+        await Access.SetAclUncheckedAsync(obj, acl.InheritanceBroken, entries);
     }
 
     /// <summary>
-    /// Updates the security rules for a given module instance.
+    /// Grants the read right to exactly the given roles on a module instance, keeping every other entry.
     /// </summary>
-    /// <param name="id">The ID of the module instance.</param>
-    /// <param name="security">The updated list of security roles and rights.</param>
-    public async Task UpdateInstanceSecurity(int id, IEnumerable<ModuleSecurityDto> security)
+    private async Task SetViewRolesAsync(int id, IReadOnlyCollection<string> viewRoles)
     {
-        var query =
-            from sec in db.ModuleInstanceSecurities
-            where sec.ModuleInstanceId == id
-            select sec;
-        var list = await query.ToListAsync();
-        SyncRule(id, security, list);
+        var obj = ModuleAccessControl.Instance(id);
+        var acl = await Access.GetAclUncheckedAsync(obj);
+        var keys = viewRoles.Select(SubjectKeys.Role).ToHashSet();
 
-        await db.SaveChangesAsync();
+        var entries = acl.Entries.Select(e =>
+        {
+            if (e.SubjectType != SubjectKeys.RoleType)
+                return ToAclEntry(e);
+            var allow = e.Allow.Where(r => r != SecurityConstants.Read || keys.Contains(e.SubjectKey)).ToList();
+            if (keys.Contains(e.SubjectKey) && !allow.Contains(SecurityConstants.Read))
+                allow.Add(SecurityConstants.Read);
+            return new AclEntry(e.SubjectKey, allow, e.Deny);
+        }).ToList();
+        entries.AddRange(keys.Where(key => acl.Entries.All(e => e.SubjectKey != key))
+            .Select(key => new AclEntry(key, [SecurityConstants.Read])));
+
+        await Access.SetAclUncheckedAsync(obj, acl.InheritanceBroken, entries);
     }
 
-    private void SyncRule(int id, IEnumerable<ModuleSecurityDto> security, List<ModuleInstanceSecurityEntity> list)
+    /// <summary>
+    /// Roles granted the read right explicitly, by module instance.
+    /// </summary>
+    private async Task<Dictionary<long, List<string>>> GetViewRolesAsync(List<long>? ids = null)
     {
-        // delete
-        var listToDelete = list.Where(x => !security.Any(s => s.Right == x.Right && s.Role == x.Role)).ToList();
-        db.ModuleInstanceSecurities.RemoveRange(listToDelete);
-        // add
-        var listToAdd = security.Where(x => !list.Exists(s => s.Right == x.Right && s.Role == x.Role))
-            .Select(x => new ModuleInstanceSecurityEntity()
-            {
-                ModuleInstanceId = id,
-                Right = x.Right,
-                Role = x.Role
-            }).ToList();
-        db.ModuleInstanceSecurities.AddRange(listToAdd);
+        var type = Access.Registry.Get(ModuleAccessControl.ModuleInstanceType);
+        var readMask = StandardRights.MaskOf(SecurityConstants.Read);
+        const string rolePrefix = SubjectKeys.RoleType + ":";
+
+        var objects = db.AccessObjects.Where(o => o.ObjectTypeId == type.ObjectTypeId && o.OwnAclSetId != null);
+        if (ids is not null)
+            objects = objects.Where(o => ids.Contains(o.ObjectId));
+
+        var rows = await (from o in objects
+                join e in db.AclSetEntries on o.OwnAclSetId equals e.AclSetId
+                where e.SubjectKey.StartsWith(rolePrefix) && (e.AllowMask & readMask) != 0 &&
+                      (e.DenyMask & readMask) == 0
+                select new { o.ObjectId, e.SubjectKey })
+            .AsNoTracking()
+            .ToListAsync();
+
+        return rows.GroupBy(x => x.ObjectId)
+            .ToDictionary(g => g.Key, g => g.Select(x => SubjectKeys.GetValue(x.SubjectKey)).OrderBy(x => x).ToList());
     }
+
+    private async Task<ObjectAclDto?> FindAclAsync(int id)
+    {
+        try
+        {
+            return await Access.GetAclUncheckedAsync(ModuleAccessControl.Instance(id));
+        }
+        catch (ApiException e) when (e.StatusCode == 404)
+        {
+            return null;
+        }
+    }
+
+    private static AclEntry ToAclEntry(AclEntryDto entry) => new(entry.SubjectKey, entry.Allow, entry.Deny);
 
     /// <summary>
     /// Converts a <see cref="ModuleInstanceEntity"/> to a <see cref="ModuleInstanceDto"/>.
@@ -219,8 +262,10 @@ public class ModuleRepository(OipModuleContext db)
     /// <param name="module">The <see cref="ModuleInstanceEntity"/> to convert.</param>
     /// <param name="startModuleInstanceId">Module instance marked as the start page of the current user.</param>
     /// <return>The converted <see cref="ModuleInstanceDto"/>.</return>
-    private static ModuleInstanceDto ToDto(ModuleInstanceEntity module, int? startModuleInstanceId = null)
+    private static ModuleInstanceDto ToDto(ModuleInstanceEntity module, int? startModuleInstanceId = null,
+        IReadOnlyDictionary<long, List<string>>? viewRoles = null, ILookup<int?, ModuleInstanceEntity>? children = null)
     {
+        var items = children is null ? module.Items : children[module.ModuleInstanceId].ToList();
         return new ModuleInstanceDto
         {
             IsStart = startModuleInstanceId == module.ModuleInstanceId,
@@ -237,11 +282,10 @@ public class ModuleRepository(OipModuleContext db)
             Target = module.Target,
             Settings = module.Settings,
             IsFolder = module.Module.Name == ModuleConstants.FolderModuleName,
-            Items = module.Items.Count == 0
+            Items = items.Count == 0
                 ? null
-                : module.Items.Select(x => ToDto(x, startModuleInstanceId)).ToList(),
-            Securities = module.Securities.Where(s => s.Right == SecurityConstants.Read).Select(s => s.Role)
-                .ToList()
+                : items.Select(x => ToDto(x, startModuleInstanceId, viewRoles, children)).ToList(),
+            Securities = viewRoles?.GetValueOrDefault(module.ModuleInstanceId) ?? []
         };
     }
 
@@ -311,9 +355,9 @@ public class ModuleRepository(OipModuleContext db)
     {
         var query = from module in db.ModuleInstances
                 .Include(x => x.Module)
-                .Include(x => x.Securities)
             select module;
-        var result = (await query.ToListAsync()).Where(x => x.Parent == null).Select(x => ToDto(x));
+        var viewRoles = await GetViewRolesAsync();
+        var result = (await query.ToListAsync()).Where(x => x.Parent == null).Select(x => ToDto(x, null, viewRoles));
 
         return result.ToList();
     }
@@ -492,14 +536,6 @@ public class ModuleRepository(OipModuleContext db)
             }
         }
 
-        var adminRights = await db.ModuleSecurities
-            .Where(x => x.ModuleId == addModuleInstanceDto.ModuleId)
-            .Select(x => x.Right)
-            .Distinct()
-            .ToListAsync();
-        if (!adminRights.Contains(SecurityConstants.Read))
-            adminRights.Add(SecurityConstants.Read);
-
         db.ModuleInstances.Add(new ModuleInstanceEntity
         {
             ModuleId = addModuleInstanceDto.ModuleId,
@@ -507,10 +543,7 @@ public class ModuleRepository(OipModuleContext db)
             Order = position,
             Icon = addModuleInstanceDto.Icon,
             Settings = string.Empty,
-            ParentId = addModuleInstanceDto.ParentId,
-            Securities = adminRights
-                .Select(right => new ModuleInstanceSecurityEntity { Right = right, Role = SecurityConstants.AdminRole })
-                .ToList()
+            ParentId = addModuleInstanceDto.ParentId
         });
         await db.SaveChangesAsync();
     }
@@ -522,7 +555,6 @@ public class ModuleRepository(OipModuleContext db)
     public async Task EditModuleInstance(EditModuleInstanceDto editModel)
     {
         var instance = await db.ModuleInstances
-                           .Include(x => x.Securities)
                            .FirstOrDefaultAsync(x => x.ModuleInstanceId == editModel.ModuleInstanceId)
                        ?? throw new KeyNotFoundException(
                            $"Module instance with id {editModel.ModuleInstanceId} not found");
@@ -530,36 +562,10 @@ public class ModuleRepository(OipModuleContext db)
         instance.Label = editModel.Label;
         instance.Icon = editModel.Icon;
 
-        if (editModel.ViewRoles != null)
-        {
-            var rolesToRemove = instance.Securities
-                .Where(s => s.Right == SecurityConstants.Read && !editModel.ViewRoles.Contains(s.Role))
-                .ToList();
-
-            foreach (var roleEntity in rolesToRemove)
-            {
-                db.ModuleInstanceSecurities.Remove(roleEntity);
-            }
-
-            var existingRoles = instance.Securities.Where(s => s.Right == SecurityConstants.Read)
-                .Select(s => s.Role).ToHashSet();
-            var newRoles = editModel.ViewRoles
-                .Where(role => !existingRoles.Contains(role))
-                .Select(role => new ModuleInstanceSecurityEntity
-                {
-                    ModuleInstance = instance,
-                    ModuleInstanceId = instance.ModuleInstanceId,
-                    Role = role,
-                    Right = SecurityConstants.Read
-                });
-
-            foreach (var newRole in newRoles)
-            {
-                db.ModuleInstanceSecurities.Add(newRole);
-            }
-        }
-
         await db.SaveChangesAsync();
+
+        if (editModel.ViewRoles != null)
+            await SetViewRolesAsync(instance.ModuleInstanceId, editModel.ViewRoles);
     }
 
     /// <summary>
@@ -606,7 +612,6 @@ public class ModuleRepository(OipModuleContext db)
     public async Task<int> CopyModuleInstance(int id)
     {
         var instance = await db.ModuleInstances
-                           .Include(x => x.Securities)
                            .FirstOrDefaultAsync(x => x.ModuleInstanceId == id)
                        ?? throw new KeyNotFoundException($"Module instance with id {id} not found");
 
@@ -625,16 +630,17 @@ public class ModuleRepository(OipModuleContext db)
             Target = instance.Target,
             ParentId = instance.ParentId,
             Order = instance.Order + 1,
-            Settings = instance.Settings,
-            Securities = instance.Securities.Select(x => new ModuleInstanceSecurityEntity
-            {
-                Right = x.Right,
-                Role = x.Role
-            }).ToList()
+            Settings = instance.Settings
         };
 
         db.ModuleInstances.Add(copy);
         await db.SaveChangesAsync();
+
+        var acl = await FindAclAsync(id);
+        if (acl is not null)
+            await Access.SetAclUncheckedAsync(ModuleAccessControl.Instance(copy.ModuleInstanceId), acl.InheritanceBroken,
+                acl.Entries.Select(ToAclEntry).ToList());
+
         return copy.ModuleInstanceId;
     }
 

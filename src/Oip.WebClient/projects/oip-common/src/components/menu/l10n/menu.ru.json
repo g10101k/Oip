@@ -30,7 +30,7 @@
     "icon": "Иконка",
     "cancel": "Отмена",
     "save": "Сохранить",
-    "security": "Доступ на чтение"
+    "security": "Доступ"
   },
   "menuItemCreateDialogComponent": {
     "header": "Новый элемент меню",

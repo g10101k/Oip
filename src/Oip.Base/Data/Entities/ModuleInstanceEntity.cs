@@ -1,9 +1,11 @@
+using Oip.Base.Security.Objects;
+
 namespace Oip.Base.Data.Entities;
 
 /// <summary>
 /// Module instance
 /// </summary>
-public class ModuleInstanceEntity
+public class ModuleInstanceEntity : ISecurableEntity
 {
     /// <summary>
     /// Id
@@ -70,4 +72,9 @@ public class ModuleInstanceEntity
     /// Module
     /// </summary>
     public ModuleEntity Module { get; set; } = null!;
+
+    /// <summary>
+    /// Identifier of the effective access control set of the instance.
+    /// </summary>
+    public long AclSetId { get; set; }
 }

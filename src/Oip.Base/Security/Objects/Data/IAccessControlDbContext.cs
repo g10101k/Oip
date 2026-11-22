@@ -19,6 +19,11 @@ public interface IAccessControlDbContext
     DbSet<AclSetEntryEntity> AclSetEntries { get; }
 
     /// <summary>
+    /// Custom rights of the entries of the access control sets.
+    /// </summary>
+    DbSet<AclSetEntryRightEntity> AclSetEntryRights { get; }
+
+    /// <summary>
     /// Securable objects.
     /// </summary>
     DbSet<AccessObjectEntity> AccessObjects { get; }
@@ -29,7 +34,12 @@ public interface IAccessControlDbContext
     DbSet<AccessObjectTypeEntity> AccessObjectTypes { get; }
 
     /// <summary>
-    /// Bits assigned to the rights of the object types.
+    /// Custom rights of the context.
     /// </summary>
     DbSet<AccessRightEntity> AccessRights { get; }
+
+    /// <summary>
+    /// Custom rights available for each object type.
+    /// </summary>
+    DbSet<AccessObjectTypeRightEntity> AccessObjectTypeRights { get; }
 }

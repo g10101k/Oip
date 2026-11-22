@@ -38,6 +38,9 @@ public class DemoCustomerTableContext(DbContextOptions<DemoCustomerTableContext>
     public DbSet<AclSetEntryEntity> AclSetEntries => Set<AclSetEntryEntity>();
 
     /// <inheritdoc />
+    public DbSet<AclSetEntryRightEntity> AclSetEntryRights => Set<AclSetEntryRightEntity>();
+
+    /// <inheritdoc />
     public DbSet<AccessObjectEntity> AccessObjects => Set<AccessObjectEntity>();
 
     /// <inheritdoc />
@@ -45,6 +48,9 @@ public class DemoCustomerTableContext(DbContextOptions<DemoCustomerTableContext>
 
     /// <inheritdoc />
     public DbSet<AccessRightEntity> AccessRights => Set<AccessRightEntity>();
+
+    /// <inheritdoc />
+    public DbSet<AccessObjectTypeRightEntity> AccessObjectTypeRights => Set<AccessObjectTypeRightEntity>();
 
     /// <summary>
     /// Registers the securable object types of the demo.

@@ -57,7 +57,7 @@ public sealed class ObjectAccessService<TContext>(
     ISubjectResolver subjectResolver) : IObjectAccessService
     where TContext : DbContext, IAccessControlDbContext
 {
-    private readonly Dictionary<long, Dictionary<string, Masks>> _setCache = [];
+    private readonly Dictionary<long, Dictionary<string, Grants>> _setCache = [];
 
     /// <summary>
     /// Registry of the context.
@@ -65,48 +65,75 @@ public sealed class ObjectAccessService<TContext>(
     public AccessControlRegistry<TContext> Registry => registry;
 
     /// <inheritdoc />
-    public IReadOnlyList<AccessObjectTypeDto> GetObjectTypes() => registry.Definitions.Select(ToDto).ToList();
+    public IReadOnlyList<AccessObjectTypeDto> GetObjectTypes() =>
+        registry.Definitions.Select(d => ToDto(registry.Get(d.Type))).ToList();
 
     /// <inheritdoc />
     public bool IsRegistered(string objectType) => registry.Find(objectType) is not null;
 
     /// <inheritdoc />
-    public async Task<bool> HasRightAsync(ObjectRef obj, string right, CancellationToken cancellationToken = default)
+    public Task<bool> HasRightAsync(ObjectRef obj, string right, CancellationToken cancellationToken = default) =>
+        HasRightAsync(obj, right, subjectResolver.Resolve(), cancellationToken);
+
+    /// <summary>
+    /// Whether the given subjects hold the right on the object, for a check on behalf of someone else than the caller.
+    /// </summary>
+    public async Task<bool> HasRightAsync(ObjectRef obj, string right, SubjectSet subjects,
+        CancellationToken cancellationToken = default)
     {
-        var type = registry.Get(obj.Type);
-        var mask = type.MaskOf(right);
-        return (await GetEffectiveMaskAsync(type, obj.Id, subjectResolver.Resolve(), cancellationToken) & mask) != 0;
+        if (subjects.IsAdmin)
+            return true;
+        var (type, resolved) = ResolveRight(obj.Type, right);
+        if (resolved.IsNone)
+            return false;
+        var (mask, customIds) = await GetEffectiveAsync(type, obj.Id, subjects, cancellationToken);
+        return resolved.Mask != 0 ? (mask & resolved.Mask) != 0 : customIds.Contains(resolved.CustomId);
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<string>> GetEffectiveRightsAsync(ObjectRef obj,
+    public Task<IReadOnlyList<string>> GetEffectiveRightsAsync(ObjectRef obj,
+        CancellationToken cancellationToken = default) =>
+        GetEffectiveRightsAsync(obj, subjectResolver.Resolve(), cancellationToken);
+
+    /// <summary>
+    /// Rights of the given subjects on the object.
+    /// </summary>
+    public async Task<IReadOnlyList<string>> GetEffectiveRightsAsync(ObjectRef obj, SubjectSet subjects,
         CancellationToken cancellationToken = default)
     {
         var type = registry.Get(obj.Type);
-        return type.RightsOf(await GetEffectiveMaskAsync(type, obj.Id, subjectResolver.Resolve(), cancellationToken));
+        var (mask, customIds) = await GetEffectiveAsync(type, obj.Id, subjects, cancellationToken);
+        return type.RightsOf(mask, customIds);
     }
 
     /// <summary>
     /// Keeps only the entities the caller holds the right on.
     /// </summary>
-    public IQueryable<T> WhereAccessible<T>(IQueryable<T> query, string right) where T : class, ISecurableEntity
+    public IQueryable<T> WhereAccessible<T>(IQueryable<T> query, string right) where T : class, ISecurableEntity =>
+        WhereAccessible(query, right, subjectResolver.Resolve());
+
+    /// <summary>
+    /// Keeps only the entities the given subjects hold the right on.
+    /// </summary>
+    public IQueryable<T> WhereAccessible<T>(IQueryable<T> query, string right, SubjectSet subjects)
+        where T : class, ISecurableEntity
     {
         var definition = registry.FindByEntity(typeof(T))
                          ?? throw new ArgumentException(
                              $"{typeof(T).Name} is not registered as a securable object in {typeof(TContext).Name}.");
-        var mask = registry.Get(definition.Type).MaskOf(right);
-        var subjects = subjectResolver.Resolve();
 
         if (subjects.IsAdmin)
             return query;
-        if (!subjects.IsAuthenticated)
+
+        var (_, resolved) = ResolveRight(definition.Type, right);
+        if (!subjects.IsAuthenticated || resolved.IsNone)
             return query.Where(_ => false);
 
         if (definition is SecurableObjectDefinition<T> { OwnerExpression: { } ownerOf } &&
             subjects.UserSubject is not null)
-            return FilterOwned(query, mask, subjects, ownerOf);
+            return FilterOwned(query, resolved, subjects, ownerOf);
 
-        return Filter(query, mask, subjects);
+        return Filter(query, resolved, subjects);
     }
 
     /// <summary>
@@ -131,7 +158,7 @@ public sealed class ObjectAccessService<TContext>(
 
         foreach (var right in rights)
         {
-            var granted = await WhereAccessible(context.Set<T>().AsNoTracking(), right)
+            var granted = await WhereAccessible(context.Set<T>().AsNoTracking(), right, subjectResolver.Resolve())
                 .Where(definition.IdIn(result.Keys))
                 .Select(definition.IdExpression)
                 .ToListAsync(cancellationToken);
@@ -142,33 +169,60 @@ public sealed class ObjectAccessService<TContext>(
         return result;
     }
 
-    private IQueryable<T> Filter<T>(IQueryable<T> query, long mask, SubjectSet subjects)
+    private IQueryable<T> Filter<T>(IQueryable<T> query, RightRef right, SubjectSet subjects)
         where T : class, ISecurableEntity
     {
         var keys = subjects.Keys.ToList();
-        var entries = context.AclSetEntries;
+        if (right.Mask != 0)
+        {
+            var mask = right.Mask;
+            var entries = context.AclSetEntries;
+            return query.Where(e =>
+                entries.Any(a => a.AclSetId == e.AclSetId && keys.Contains(a.SubjectKey) && (a.AllowMask & mask) != 0) &&
+                !entries.Any(a => a.AclSetId == e.AclSetId && keys.Contains(a.SubjectKey) && (a.DenyMask & mask) != 0));
+        }
+
+        var rightId = right.CustomId;
+        var rows = context.AclSetEntryRights;
         return query.Where(e =>
-            entries.Any(a => a.AclSetId == e.AclSetId && keys.Contains(a.SubjectKey) && (a.AllowMask & mask) != 0) &&
-            !entries.Any(a => a.AclSetId == e.AclSetId && keys.Contains(a.SubjectKey) && (a.DenyMask & mask) != 0));
+            rows.Any(r => r.AclSetId == e.AclSetId && keys.Contains(r.SubjectKey) && r.RightId == rightId && !r.IsDeny) &&
+            !rows.Any(r => r.AclSetId == e.AclSetId && keys.Contains(r.SubjectKey) && r.RightId == rightId && r.IsDeny));
     }
 
-    private IQueryable<T> FilterOwned<T>(IQueryable<T> query, long mask, SubjectSet subjects,
+    private IQueryable<T> FilterOwned<T>(IQueryable<T> query, RightRef right, SubjectSet subjects,
         Expression<Func<T, string?>> ownerOf)
         where T : class, ISecurableEntity
     {
         var keys = subjects.Keys.ToList();
         var subject = subjects.UserSubject;
         const string owner = SubjectKeys.Owner;
-        var entries = context.AclSetEntries;
 
         // The owner value is a placeholder that is replaced with the owner expression of the type below.
-        Expression<Func<T, string?, bool>> template = (e, ownerValue) =>
-            entries.Any(a => a.AclSetId == e.AclSetId &&
-                             (keys.Contains(a.SubjectKey) || (a.SubjectKey == owner && ownerValue == subject)) &&
-                             (a.AllowMask & mask) != 0) &&
-            !entries.Any(a => a.AclSetId == e.AclSetId &&
-                              (keys.Contains(a.SubjectKey) || (a.SubjectKey == owner && ownerValue == subject)) &&
-                              (a.DenyMask & mask) != 0);
+        Expression<Func<T, string?, bool>> template;
+        if (right.Mask != 0)
+        {
+            var mask = right.Mask;
+            var entries = context.AclSetEntries;
+            template = (e, ownerValue) =>
+                entries.Any(a => a.AclSetId == e.AclSetId &&
+                                 (keys.Contains(a.SubjectKey) || (a.SubjectKey == owner && ownerValue == subject)) &&
+                                 (a.AllowMask & mask) != 0) &&
+                !entries.Any(a => a.AclSetId == e.AclSetId &&
+                                  (keys.Contains(a.SubjectKey) || (a.SubjectKey == owner && ownerValue == subject)) &&
+                                  (a.DenyMask & mask) != 0);
+        }
+        else
+        {
+            var rightId = right.CustomId;
+            var rows = context.AclSetEntryRights;
+            template = (e, ownerValue) =>
+                rows.Any(r => r.AclSetId == e.AclSetId &&
+                              (keys.Contains(r.SubjectKey) || (r.SubjectKey == owner && ownerValue == subject)) &&
+                              r.RightId == rightId && !r.IsDeny) &&
+                !rows.Any(r => r.AclSetId == e.AclSetId &&
+                               (keys.Contains(r.SubjectKey) || (r.SubjectKey == owner && ownerValue == subject)) &&
+                               r.RightId == rightId && r.IsDeny);
+        }
 
         var entity = template.Parameters[0];
         var ownerBody = new ParameterReplacer(ownerOf.Parameters[0], entity).Visit(ownerOf.Body);
@@ -183,18 +237,30 @@ public sealed class ObjectAccessService<TContext>(
     }
 
     /// <inheritdoc />
-    public async Task<ObjectAclDto> GetAclAsync(ObjectRef obj, CancellationToken cancellationToken = default)
+    public Task<ObjectAclDto> GetAclAsync(ObjectRef obj, CancellationToken cancellationToken = default) =>
+        GetAclCoreAsync(obj, true, cancellationToken);
+
+    /// <summary>
+    /// Explicit and inherited rights of the object without checking the rights of the caller. For seeding,
+    /// migrations and background jobs only.
+    /// </summary>
+    public Task<ObjectAclDto> GetAclUncheckedAsync(ObjectRef obj, CancellationToken cancellationToken = default) =>
+        GetAclCoreAsync(obj, false, cancellationToken);
+
+    private async Task<ObjectAclDto> GetAclCoreAsync(ObjectRef obj, bool demandManageAcl,
+        CancellationToken cancellationToken)
     {
         var type = registry.Get(obj.Type);
         var accessObject = await FindAsync(type, obj.Id, cancellationToken) ?? throw NotRegistered(obj);
-        await DemandManageAclAsync(type, accessObject, cancellationToken);
+        if (demandManageAcl)
+            await DemandManageAclAsync(type, accessObject, cancellationToken);
 
         var result = new ObjectAclDto
         {
             ObjectType = obj.Type,
             ObjectId = obj.Id,
             InheritanceBroken = accessObject.InheritanceBroken,
-            Rights = ToDto(type.Definition).Rights,
+            Rights = ToDto(type).Rights,
             Entries = accessObject.OwnAclSetId is { } ownId
                 ? ToEntries(type, await LoadSetAsync(ownId, cancellationToken))
                 : []
@@ -234,11 +300,14 @@ public sealed class ObjectAccessService<TContext>(
         var accessObject = await FindAsync(type, obj.Id, cancellationToken) ?? throw NotRegistered(obj);
         if (demandManageAcl)
             await DemandManageAclAsync(type, accessObject, cancellationToken);
-        var masks = ToMasks(type, entries);
+        var unknown = entries.SelectMany(e => e.Allow.Concat(e.Deny ?? [])).FirstOrDefault(r => !type.Knows(r));
+        if (unknown is not null)
+            type = registry.Get(obj.Type, unknown);
+        var grants = ToGrants(type, entries);
 
         await InTransactionAsync(async () =>
         {
-            accessObject.OwnAclSetId = masks.Count == 0 ? null : await GetOrCreateSetAsync(masks, cancellationToken);
+            accessObject.OwnAclSetId = grants.Count == 0 ? null : await GetOrCreateSetAsync(grants, cancellationToken);
             accessObject.InheritanceBroken = inheritanceBroken;
             await RecomputeAsync(accessObject, cancellationToken);
         }, cancellationToken);
@@ -282,7 +351,7 @@ public sealed class ObjectAccessService<TContext>(
         }
         else if (type.Definition.DefaultAcl.Count > 0)
         {
-            accessObject.OwnAclSetId = await GetOrCreateSetAsync(ToMasks(type, type.Definition.DefaultAcl),
+            accessObject.OwnAclSetId = await GetOrCreateSetAsync(ToGrants(type, type.Definition.DefaultAcl),
                 cancellationToken);
         }
 
@@ -355,6 +424,23 @@ public sealed class ObjectAccessService<TContext>(
         await RecomputeAsync(accessObject, cancellationToken);
     }
 
+    /// <summary>
+    /// Resolves a right. A right that a type with stored rights does not know yet is granted to nobody but the admin,
+    /// so a module may check a right before anyone assigned it.
+    /// </summary>
+    private (ResolvedObjectType Type, RightRef Right) ResolveRight(string objectType, string right)
+    {
+        var type = registry.Get(objectType, right);
+        var mask = StandardRights.MaskOf(right);
+        if (mask != 0)
+            return (type, new RightRef(mask, 0));
+        if (type.CustomRightIds.TryGetValue(right, out var id))
+            return (type, new RightRef(0, id));
+        if (type.Definition.AcceptsStoredRights)
+            return (type, default);
+        throw new ArgumentException($"Right '{right}' is not defined for '{objectType}'.", nameof(right));
+    }
+
     private ResolvedObjectType ValidateParent(ResolvedObjectType type, ObjectRef parent)
     {
         if (type.Definition.ParentType != parent.Type)
@@ -411,46 +497,51 @@ public sealed class ObjectAccessService<TContext>(
         if (merged is not null && merged.TryGetValue(key, out var known))
             return known;
 
-        var masks = new Dictionary<string, Masks>(StringComparer.Ordinal);
+        var grants = new Dictionary<string, Grants>(StringComparer.Ordinal);
         foreach (var setId in new[] { inherited, node.OwnAclSetId }.OfType<long>())
         foreach (var (subject, entry) in await LoadSetAsync(setId, cancellationToken))
-            masks[subject] = masks.TryGetValue(subject, out var current) ? current | entry : entry;
+            grants[subject] = grants.TryGetValue(subject, out var current) ? current.Union(entry) : entry;
 
-        var result = await GetOrCreateSetAsync(masks, cancellationToken);
+        var result = await GetOrCreateSetAsync(grants, cancellationToken);
         if (merged is not null)
             merged[key] = result;
         return result;
     }
 
-    private async Task<long> GetEffectiveMaskAsync(ResolvedObjectType type, long objectId, SubjectSet subjects,
-        CancellationToken cancellationToken)
+    /// <summary>
+    /// Effective standard mask and custom right identifiers of the subjects on the object.
+    /// </summary>
+    private async Task<(int Mask, IReadOnlySet<int> CustomIds)> GetEffectiveAsync(ResolvedObjectType type,
+        long objectId, SubjectSet subjects, CancellationToken cancellationToken)
     {
         if (subjects.IsAdmin)
-            return type.AllRightsMask;
+            return (StandardRights.All, type.CustomRightIds.Values.ToHashSet());
         if (!subjects.IsAuthenticated)
-            return 0;
+            return (0, EmptyIds);
 
         var accessObject = await FindAsync(type, objectId, cancellationToken);
         if (accessObject is null)
-            return 0;
+            return (0, EmptyIds);
 
         var isOwner = subjects.UserSubject is not null && accessObject.OwnerSubject == subjects.UserSubject;
-        var keys = subjects.Keys.ToList();
-        var entries = await context.AclSetEntries.AsNoTracking()
-            .Where(a => a.AclSetId == accessObject.AclSetId &&
-                        (keys.Contains(a.SubjectKey) || (isOwner && a.SubjectKey == SubjectKeys.Owner)))
-            .ToListAsync(cancellationToken);
+        var keys = subjects.Keys.ToHashSet(StringComparer.Ordinal);
+        var granted = Grants.Empty;
+        foreach (var (subject, entry) in await LoadSetAsync(accessObject.AclSetId, cancellationToken))
+            if (keys.Contains(subject) || (isOwner && subject == SubjectKeys.Owner))
+                granted = granted.Union(entry);
 
-        var allow = entries.Aggregate(0L, (mask, e) => mask | e.AllowMask);
-        var deny = entries.Aggregate(0L, (mask, e) => mask | e.DenyMask);
-        return allow & ~deny & type.AllRightsMask;
+        var customIds = granted.CustomAllow.Except(granted.CustomDeny)
+            .Where(id => type.CustomRightIds.Values.Contains(id))
+            .ToHashSet();
+        return (granted.Allow & ~granted.Deny & StandardRights.All, customIds);
     }
 
     private async Task DemandManageAclAsync(ResolvedObjectType type, AccessObjectEntity accessObject,
         CancellationToken cancellationToken)
     {
-        var mask = await GetEffectiveMaskAsync(type, accessObject.ObjectId, subjectResolver.Resolve(), cancellationToken);
-        if ((mask & type.MaskOf(SecurityConstants.ManageAcl)) == 0)
+        var (mask, _) = await GetEffectiveAsync(type, accessObject.ObjectId, subjectResolver.Resolve(),
+            cancellationToken);
+        if ((mask & StandardRights.MaskOf(SecurityConstants.ManageAcl)) == 0)
             throw new ApiException("Forbidden",
                 $"The '{SecurityConstants.ManageAcl}' right on {type.Definition.Type}:{accessObject.ObjectId} is required.",
                 StatusCodes.Status403Forbidden);
@@ -467,7 +558,7 @@ public sealed class ObjectAccessService<TContext>(
                 a => a.ObjectTypeId == type.ObjectTypeId && a.ObjectId == objectId, cancellationToken);
     }
 
-    private async Task<Dictionary<string, Masks>> LoadSetAsync(long aclSetId, CancellationToken cancellationToken)
+    private async Task<Dictionary<string, Grants>> LoadSetAsync(long aclSetId, CancellationToken cancellationToken)
     {
         if (_setCache.TryGetValue(aclSetId, out var cached))
             return cached;
@@ -475,19 +566,28 @@ public sealed class ObjectAccessService<TContext>(
         var entries = await context.AclSetEntries.AsNoTracking()
             .Where(a => a.AclSetId == aclSetId)
             .ToListAsync(cancellationToken);
-        var result = entries.ToDictionary(e => e.SubjectKey, e => new Masks(e.AllowMask, e.DenyMask),
+        var rows = (await context.AclSetEntryRights.AsNoTracking()
+                .Where(r => r.AclSetId == aclSetId)
+                .ToListAsync(cancellationToken))
+            .ToLookup(r => r.SubjectKey, StringComparer.Ordinal);
+
+        var result = entries.ToDictionary(e => e.SubjectKey, e => new Grants(e.AllowMask, e.DenyMask,
+                new SortedSet<int>(rows[e.SubjectKey].Where(r => !r.IsDeny).Select(r => r.RightId)),
+                new SortedSet<int>(rows[e.SubjectKey].Where(r => r.IsDeny).Select(r => r.RightId))),
             StringComparer.Ordinal);
         _setCache[aclSetId] = result;
         return result;
     }
 
-    private async Task<long> GetOrCreateSetAsync(IReadOnlyDictionary<string, Masks> masks,
+    private async Task<long> GetOrCreateSetAsync(IReadOnlyDictionary<string, Grants> grants,
         CancellationToken cancellationToken)
     {
-        var normalized = masks.Where(m => m.Value.Allow != 0 || m.Value.Deny != 0)
-            .OrderBy(m => m.Key, StringComparer.Ordinal)
+        var normalized = grants.Where(g => !g.Value.IsEmpty)
+            .OrderBy(g => g.Key, StringComparer.Ordinal)
             .ToList();
-        var canonical = string.Join('\n', normalized.Select(m => $"{m.Key}\u001f{m.Value.Allow}\u001f{m.Value.Deny}"));
+        var canonical = string.Join('\n', normalized.Select(g =>
+            $"{g.Key}\u001f{g.Value.Allow}\u001f{g.Value.Deny}\u001f{string.Join(',', g.Value.CustomAllow)}" +
+            $"\u001f{string.Join(',', g.Value.CustomDeny)}"));
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(canonical)));
 
         var existing = await context.AclSets.AsNoTracking()
@@ -500,63 +600,77 @@ public sealed class ObjectAccessService<TContext>(
         var set = new AclSetEntity
         {
             Hash = hash,
-            Entries = normalized.Select(m => new AclSetEntryEntity
+            Entries = normalized.Select(g => new AclSetEntryEntity
             {
-                SubjectKey = m.Key,
-                AllowMask = m.Value.Allow,
-                DenyMask = m.Value.Deny
+                SubjectKey = g.Key,
+                AllowMask = g.Value.Allow,
+                DenyMask = g.Value.Deny,
+                Rights = g.Value.CustomAllow.Select(id => new AclSetEntryRightEntity
+                        { SubjectKey = g.Key, RightId = id, IsDeny = false })
+                    .Concat(g.Value.CustomDeny.Select(id => new AclSetEntryRightEntity
+                        { SubjectKey = g.Key, RightId = id, IsDeny = true }))
+                    .ToList()
             }).ToList()
         };
         context.AclSets.Add(set);
         await context.SaveChangesAsync(cancellationToken);
-        _setCache[set.AclSetId] = normalized.ToDictionary(m => m.Key, m => m.Value, StringComparer.Ordinal);
+        _setCache[set.AclSetId] = normalized.ToDictionary(g => g.Key, g => g.Value, StringComparer.Ordinal);
         return set.AclSetId;
     }
 
-    private static Dictionary<string, Masks> ToMasks(ResolvedObjectType type, IEnumerable<AclEntry> entries)
+    private static Dictionary<string, Grants> ToGrants(ResolvedObjectType type, IEnumerable<AclEntry> entries)
     {
-        var result = new Dictionary<string, Masks>(StringComparer.Ordinal);
+        var result = new Dictionary<string, Grants>(StringComparer.Ordinal);
         foreach (var entry in entries)
         {
             if (!SubjectKeys.IsValid(entry.SubjectKey))
                 throw new ApiException("Invalid subject", $"Subject key '{entry.SubjectKey}' is not valid.",
                     StatusCodes.Status400BadRequest);
 
-            Masks masks;
+            Grants grants;
             try
             {
-                masks = new Masks(type.MaskOf(entry.Allow), type.MaskOf(entry.Deny ?? []));
+                var allow = type.Encode(entry.Allow);
+                var deny = type.Encode(entry.Deny ?? []);
+                grants = new Grants(allow.Mask, deny.Mask, new SortedSet<int>(allow.CustomIds),
+                    new SortedSet<int>(deny.CustomIds));
             }
             catch (ArgumentException ex)
             {
                 throw new ApiException("Invalid right", ex.Message, StatusCodes.Status400BadRequest);
             }
 
-            if (masks.Allow == 0 && masks.Deny == 0)
+            if (grants.IsEmpty)
                 continue;
-            result[entry.SubjectKey] = result.TryGetValue(entry.SubjectKey, out var current) ? current | masks : masks;
+            result[entry.SubjectKey] = result.TryGetValue(entry.SubjectKey, out var current)
+                ? current.Union(grants)
+                : grants;
         }
 
         return result;
     }
 
-    private static List<AclEntryDto> ToEntries(ResolvedObjectType type, Dictionary<string, Masks> set) =>
+    private static List<AclEntryDto> ToEntries(ResolvedObjectType type, Dictionary<string, Grants> set) =>
         set.OrderBy(e => e.Key, StringComparer.Ordinal)
             .Select(e => new AclEntryDto
             {
                 SubjectKey = e.Key,
                 SubjectType = SubjectKeys.GetType(e.Key),
                 DisplayName = SubjectKeys.GetValue(e.Key),
-                Allow = type.RightsOf(e.Value.Allow),
-                Deny = type.RightsOf(e.Value.Deny)
+                Allow = type.RightsOf(e.Value.Allow, e.Value.CustomAllow),
+                Deny = type.RightsOf(e.Value.Deny, e.Value.CustomDeny)
             })
             .Where(e => e.Allow.Count > 0 || e.Deny.Count > 0)
             .ToList();
 
-    private static AccessObjectTypeDto ToDto(SecurableObjectDefinition definition) => new()
+    private static AccessObjectTypeDto ToDto(ResolvedObjectType type) => new()
     {
-        Code = definition.Type,
-        Rights = definition.Rights.Select(r => new AccessRightDto { Code = r.Code, Name = r.Name }).ToList()
+        Code = type.Definition.Type,
+        Rights = type.RightCodes.Select(code => new AccessRightDto
+        {
+            Code = code,
+            Name = type.Definition.Rights.FirstOrDefault(r => r.Code == code)?.Name
+        }).ToList()
     };
 
     private async Task InTransactionAsync(Func<Task> action, CancellationToken cancellationToken)
@@ -576,9 +690,27 @@ public sealed class ObjectAccessService<TContext>(
     private static ApiException NotRegistered(ObjectRef obj) =>
         new("Object not found", $"Object {obj} is not known to the access control.", StatusCodes.Status404NotFound);
 
-    private readonly record struct Masks(long Allow, long Deny)
+    private static readonly IReadOnlySet<int> EmptyIds = new HashSet<int>();
+
+    /// <summary>
+    /// Right of a check: a standard right mask, or a custom right identifier. Neither for a stored right not
+    /// assigned yet.
+    /// </summary>
+    private readonly record struct RightRef(int Mask, int CustomId)
     {
-        public static Masks operator |(Masks left, Masks right) =>
-            new(left.Allow | right.Allow, left.Deny | right.Deny);
+        public bool IsNone => Mask == 0 && CustomId == 0;
+    }
+
+    /// <summary>
+    /// Rights of one subject in a set: masks of the standard rights and identifiers of the custom rights.
+    /// </summary>
+    private sealed record Grants(int Allow, int Deny, SortedSet<int> CustomAllow, SortedSet<int> CustomDeny)
+    {
+        public static readonly Grants Empty = new(0, 0, [], []);
+
+        public bool IsEmpty => Allow == 0 && Deny == 0 && CustomAllow.Count == 0 && CustomDeny.Count == 0;
+
+        public Grants Union(Grants other) => new(Allow | other.Allow, Deny | other.Deny,
+            [..CustomAllow, ..other.CustomAllow], [..CustomDeny, ..other.CustomDeny]);
     }
 }

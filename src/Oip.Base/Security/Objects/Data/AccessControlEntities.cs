@@ -37,14 +37,46 @@ public class AclSetEntryEntity
     public string SubjectKey { get; set; } = null!;
 
     /// <summary>
-    /// Bit mask of granted rights.
+    /// Bit mask of the granted standard rights: read, edit, delete and manage-acl.
     /// </summary>
-    public long AllowMask { get; set; }
+    public int AllowMask { get; set; }
 
     /// <summary>
-    /// Bit mask of denied rights. A denied right wins over a granted one.
+    /// Bit mask of the denied standard rights. A denied right wins over a granted one.
     /// </summary>
-    public long DenyMask { get; set; }
+    public int DenyMask { get; set; }
+
+    /// <summary>
+    /// Custom rights granted or denied to the subject.
+    /// </summary>
+    public List<AclSetEntryRightEntity> Rights { get; set; } = [];
+}
+
+/// <summary>
+/// Custom right granted or denied to one subject within an access control set. The standard rights are kept in the
+/// masks of <see cref="AclSetEntryEntity" />, any other right is kept as a row, so a context has no limit of rights.
+/// </summary>
+public class AclSetEntryRightEntity
+{
+    /// <summary>
+    /// Identifier of the set the entry belongs to.
+    /// </summary>
+    public long AclSetId { get; set; }
+
+    /// <summary>
+    /// Subject key of the entry.
+    /// </summary>
+    public string SubjectKey { get; set; } = null!;
+
+    /// <summary>
+    /// Identifier of the custom right.
+    /// </summary>
+    public int RightId { get; set; }
+
+    /// <summary>
+    /// When true the right is denied, otherwise granted. A denied right wins over a granted one.
+    /// </summary>
+    public bool IsDeny { get; set; }
 }
 
 /// <summary>
@@ -109,11 +141,27 @@ public class AccessObjectTypeEntity
     public string Code { get; set; } = null!;
 }
 
-
 /// <summary>
-/// Bit assigned to a right of an object type. A bit, once assigned, is never reused for another right.
+/// Custom right of a service context. A code has one identifier in the whole context, so an inherited set means the
+/// same right in a parent and in a child of another type.
 /// </summary>
 public class AccessRightEntity
+{
+    /// <summary>
+    /// Identifier of the right.
+    /// </summary>
+    public int RightId { get; set; }
+
+    /// <summary>
+    /// Unique code of the right, for example approve.
+    /// </summary>
+    public string Code { get; set; } = null!;
+}
+
+/// <summary>
+/// Custom right available for an object type.
+/// </summary>
+public class AccessObjectTypeRightEntity
 {
     /// <summary>
     /// Identifier of the object type.
@@ -121,12 +169,7 @@ public class AccessRightEntity
     public int ObjectTypeId { get; set; }
 
     /// <summary>
-    /// Code of the right, for example read or approve.
+    /// Identifier of the right.
     /// </summary>
-    public string Code { get; set; } = null!;
-
-    /// <summary>
-    /// Bit number of the right in the masks, from 0 to 62.
-    /// </summary>
-    public byte Bit { get; set; }
+    public int RightId { get; set; }
 }

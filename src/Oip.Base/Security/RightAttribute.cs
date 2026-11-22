@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Oip.Base.Data.Constants;
-using Oip.Base.Data.Repositories;
+using Oip.Base.Data.Contexts;
+using Oip.Base.Security.Objects;
 using Oip.Base.Exceptions;
-using Oip.Base.Services;
 
 namespace Oip.Base.Security;
 
@@ -33,8 +33,7 @@ public class RightAttribute : TypeFilterAttribute
 /// </summary>
 public class ModuleInstanceRightFilter(
     string right,
-    ModuleRepository moduleRepository,
-    ClaimService claimService)
+    ObjectAccessService<OipModuleContext> access)
     : IAsyncAuthorizationFilter
 {
     /// <inheritdoc />
@@ -53,8 +52,8 @@ public class ModuleInstanceRightFilter(
             return;
         }
 
-        var hasRight = await moduleRepository.HasInstanceRight(moduleInstanceId.Value, claimService.GetUserRoles(),
-            right);
+        var hasRight = await access.HasRightAsync(ModuleAccessControl.Instance(moduleInstanceId.Value), right,
+            ModuleAccessControl.SubjectsOf(context.HttpContext.User), context.HttpContext.RequestAborted);
         if (!hasRight)
         {
             context.Result =

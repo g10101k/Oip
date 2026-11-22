@@ -7,6 +7,8 @@ import { TopBarDto } from '../dtos/top-bar.dto';
 })
 export class TopBarService {
   topBarItems: TopBarDto[] = [];
+  /** Tabs a user without the admin role sees, null when such a user sees no tabs. */
+  nonAdminTabIds: string[] | null = null;
   private readonly activeIdSubject = new Subject<string | undefined>();
 
   readonly activeId$ = this.activeIdSubject.asObservable();
@@ -15,6 +17,13 @@ export class TopBarService {
 
   get availableTopBarItems(): TopBarDto[] {
     return this.topBarItems;
+  }
+
+  /** Tabs to show to a user with or without the admin role. */
+  visibleTopBarItems(isAdmin: boolean): TopBarDto[] {
+    if (isAdmin) return this.topBarItems;
+    const ids = this.nonAdminTabIds;
+    return ids ? this.topBarItems.filter((item) => ids.includes(item.id)) : [];
   }
 
   get activeTopBarItem(): TopBarDto | undefined {
@@ -40,6 +49,7 @@ export class TopBarService {
   // Set tob bar items
   setTopBarItems(items: TopBarDto[]) {
     this.topBarItems = items;
+    this.nonAdminTabIds = null;
   }
 
   checkId(id: string): boolean {

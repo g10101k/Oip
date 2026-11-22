@@ -10,6 +10,9 @@ using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
 using Oip.Base.Properties;
 using Oip.Base.Security;
+using Oip.Base.Security.Objects;
+using Oip.Base.Data.Contexts;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Oip.Base.Controllers;
 
@@ -115,7 +118,7 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
     /// </summary>
     /// <returns>A list of <see cref="SecurityResponse"/> representing available rights.</returns>
     [HttpGet("get-module-rights")]
-    [Authorize(Roles = SecurityConstants.AdminRole)]
+    [Authorize]
     [ProducesResponseType<List<SecurityResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status403Forbidden)]
@@ -149,8 +152,9 @@ public abstract class BaseModuleController<TSettings>(ModuleRepository moduleRep
         if (moduleInstanceId is null)
             return false;
 
-        var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
-        return await moduleRepository.HasInstanceRight(moduleInstanceId.Value, roles, right);
+        var access = HttpContext.RequestServices.GetRequiredService<ObjectAccessService<OipModuleContext>>();
+        return await access.HasRightAsync(ModuleAccessControl.Instance(moduleInstanceId.Value), right,
+            ModuleAccessControl.SubjectsOf(User));
     }
 
     /// <summary>

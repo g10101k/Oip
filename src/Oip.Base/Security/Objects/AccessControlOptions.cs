@@ -74,6 +74,7 @@ public sealed class SecurableObjectBuilder<TEntity> where TEntity : class
     private Expression<Func<TEntity, long?>>? _parentId;
     private Expression<Func<TEntity, string?>>? _owner;
     private bool _fillOwnerOnInsert;
+    private bool _storedRights;
 
     internal SecurableObjectBuilder(string type)
     {
@@ -122,6 +123,16 @@ public sealed class SecurableObjectBuilder<TEntity> where TEntity : class
     }
 
     /// <summary>
+    /// Accepts rights added at run time with <see cref="AccessControlRegistry{TContext}.EnsureRights" /> and every
+    /// right stored for the type, also by other services. Used when the rights come from plugged-in modules.
+    /// </summary>
+    public SecurableObjectBuilder<TEntity> StoredRights()
+    {
+        _storedRights = true;
+        return this;
+    }
+
+    /// <summary>
     /// Adds rights besides read, edit, delete and manage-acl.
     /// </summary>
     public SecurableObjectBuilder<TEntity> Rights(params string[] codes)
@@ -158,7 +169,7 @@ public sealed class SecurableObjectBuilder<TEntity> where TEntity : class
         if (_id is null)
             throw new InvalidOperationException($"Identifier of the object type '{_type}' is not configured.");
         return new SecurableObjectDefinition<TEntity>(_type, _id, _parentType, _parentId, _owner, _fillOwnerOnInsert,
-            _rights, _defaultAcl);
+            _rights, _defaultAcl) { AcceptsStoredRights = _storedRights };
     }
 }
 
@@ -198,6 +209,11 @@ public abstract class SecurableObjectDefinition
     /// Explicit rights given to a new root object.
     /// </summary>
     public IReadOnlyList<AclEntry> DefaultAcl { get; }
+
+    /// <summary>
+    /// Whether the type accepts rights added at run time, see <see cref="SecurableObjectBuilder{TEntity}.StoredRights" />.
+    /// </summary>
+    public bool AcceptsStoredRights { get; internal init; }
 
     /// <summary>
     /// Whether the type has an owner, see <see cref="SecurableObjectBuilder{TEntity}.Owner" />.
@@ -330,6 +346,4 @@ internal static class AccessControlRegistryConstants
 {
     public static readonly IReadOnlyList<string> ReservedRights =
         [SecurityConstants.Read, SecurityConstants.Edit, SecurityConstants.Delete, SecurityConstants.ManageAcl];
-
-    public const int MaxBit = 62;
 }

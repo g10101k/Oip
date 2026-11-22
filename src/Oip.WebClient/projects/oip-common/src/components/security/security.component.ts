@@ -1,157 +1,76 @@
-import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { TooltipModule } from 'primeng/tooltip';
-import { ButtonModule } from 'primeng/button';
-import { FormsModule } from '@angular/forms';
-import { MsgService } from '../../services/msg.service';
-import { PutSecurityDto } from '../../dtos/put-security.dto';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { ContentType, HttpClient } from '../../api/http-client';
+import { Component, effect, inject, input } from '@angular/core';
+import { HttpClient } from '../../api/http-client';
+import { AccessRightDto } from '../../dtos/object-acl.dto';
 import { SecurityDto } from '../../dtos/security.dto';
-import { SecurityApi } from '../../api/security.api';
-import { provideTranslations } from '../../helpers/l10n.helper';
+import { MsgService } from '../../services/msg.service';
+import { ObjectAclEditorComponent } from '../object-acl-editor/object-acl-editor.component';
 
-import en from './l10n/security.en.json';
-import ru from './l10n/security.ru.json';
+/** Object type of a module instance, see ModuleAccessControl on the server. */
+export const MODULE_INSTANCE_OBJECT_TYPE = 'oip.module-instance';
 
+/** Route of the access control controller of the module instances. */
+export const MODULE_ACCESS_CONTROL_API = 'module-access-control';
+
+/**
+ * Security tab of a module instance: the access control list of the instance, with the rights the module declares.
+ * Folder rights are inherited unless the inheritance is switched off.
+ */
 @Component({
   selector: 'security',
+  standalone: true,
+  imports: [ObjectAclEditorComponent],
   template: `
-    <div class="flex flex-col md:flex-row gap-8">
-      <div class="md:w-1/2">
-        <div class="card flex flex-col gap-4">
-          <div class="font-semibold text-xl">
-            {{ 'securityComponent.security' | translate }}
-          </div>
-          @for (item of securityData; track item.code) {
-            <div class="flex flex-col gap-2">
-              <label htmlFor="oip-security-multiselect-{{ item.code }}">
-                {{ item.name }}
-                <span class="pi pi-question-circle" pTooltip="{{ item.description }}" tooltipPosition="right"></span>
-              </label>
-              <p-multiSelect
-                id="oip-security-multiselect-{{ item.code }}"
-                placeholder="{{ 'securityComponent.selectRoles' | translate }}"
-                [maxSelectedLabels]="10"
-                [options]="roles"
-                [(ngModel)]="item.roles" />
-            </div>
-          }
-          <div class="flex justify-content-end flex-wrap">
-            <p-button
-              icon="pi pi-save"
-              id="oip-security-save-button"
-              label="{{ 'securityComponent.save' | translate }}"
-              (click)="saveClick()"
-              (keydown)="saveKeyDown($event)" />
-          </div>
-        </div>
+    @if (id() != null) {
+      <div class="card">
+        <oip-object-acl-editor
+          [apiBase]="apiBase"
+          [objectId]="id()!"
+          [objectType]="objectType"
+          [rights]="rights" />
       </div>
-    </div>
-  `,
-  imports: [MultiSelectModule, TooltipModule, FormsModule, ButtonModule, TranslatePipe],
-  standalone: true
+    }
+  `
 })
-export class SecurityComponent implements OnChanges, OnInit, OnDestroy {
-  private readonly translations = provideTranslations({ en, ru });
-
-  private readonly msgService = inject(MsgService);
-  private readonly translateService = inject(TranslateService);
+export class SecurityComponent {
   private readonly httpClient = inject(HttpClient);
-  private readonly securityApi = inject(SecurityApi);
-  private securityLoadToken = 0;
+  private readonly msgService = inject(MsgService);
+  private loadToken = 0;
 
-  securityData: SecurityDto[] = [];
-  @Input() id?: number;
-  @Input() controller?: string;
-  roles: string[] = [];
+  protected readonly apiBase = MODULE_ACCESS_CONTROL_API;
+  protected readonly objectType = MODULE_INSTANCE_OBJECT_TYPE;
+  protected rights: AccessRightDto[] | null = null;
 
-  ngOnDestroy(): void {
-    // on destroy
+  /** Module instance. */
+  readonly id = input<number | undefined>(undefined);
+  /** Route of the module controller, used to read the rights the module declares. */
+  readonly controller = input<string | undefined>(undefined);
+
+  constructor() {
+    effect(() => {
+      void this.loadRights(this.controller());
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['id'] || changes['controller']) {
-      void this.loadSecurity();
-    }
-  }
-
-  ngOnInit(): void {
-    this.securityApi.getRealmRoles().then(
-      (result) => {
-        this.roles = result;
-      },
-      (error) => this.msgService.error(error)
-    );
-  }
-
-  saveClick() {
-    if (this.id == null) {
-      this.msgService.error('Module id not passed!');
-      return;
-    }
-    if (!this.controller) {
-      this.msgService.error('Controller not passed!');
-      return;
-    }
-
-    const request: PutSecurityDto = {
-      id: this.id,
-      securities: this.securityData
-    };
-    this.saveSecurity(this.controller, request).then(
-      (result) => {
-        this.msgService.success(this.translateService.instant('securityComponent.savedSecurity'));
-      },
-      (error) => this.msgService.error(error)
-    );
-  }
-
-  saveKeyDown($event: KeyboardEvent) {
-    if ($event.key === 'Enter' || $event.key === 'Space') {
-      this.saveClick();
-    }
-  }
-
-  private async loadSecurity(): Promise<void> {
-    const loadToken = ++this.securityLoadToken;
-    const controller = this.controller;
-    const id = this.id;
-
-    this.securityData = [];
-
-    if (!controller || id == null) {
-      return;
-    }
+  private async loadRights(controller: string | undefined): Promise<void> {
+    const token = ++this.loadToken;
+    this.rights = null;
+    if (!controller) return;
 
     try {
-      const result = await this.getSecurity(controller);
-      if (loadToken === this.securityLoadToken) {
-        this.securityData = result;
-      }
+      const declared = await this.httpClient.request<SecurityDto[]>({
+        path: `/api/${controller}/get-module-rights`,
+        method: 'GET',
+        secure: true,
+        format: 'json'
+      });
+      if (token !== this.loadToken) return;
+      this.rights = declared.map((right) => ({
+        code: right.code,
+        name: right.name,
+        description: right.description
+      }));
     } catch (error) {
-      if (loadToken === this.securityLoadToken) {
-        this.msgService.error(error);
-      }
+      if (token === this.loadToken) this.msgService.errorFromException(error, 'Load module rights error');
     }
-  }
-
-  private getSecurity(controller: string) {
-    return this.httpClient.request<SecurityDto[]>({
-      path: `/api/${controller}/get-security`,
-      method: 'GET',
-      secure: true,
-      format: 'json'
-    });
-  }
-
-  private saveSecurity(controller: string, request: PutSecurityDto) {
-    return this.httpClient.request<unknown>({
-      path: `/api/${controller}/put-security`,
-      method: 'PUT',
-      body: request,
-      secure: true,
-      type: ContentType.Json
-    });
   }
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Base.Data.Contexts;
 using Oip.Base.Data.Repositories;
+using Oip.Base.Security.Objects;
 using Oip.Settings.Enums;
 using Oip.Settings.Models;
 
@@ -21,7 +22,9 @@ public static class ServiceCollectionExtension
     {
         return services
             .AddOipBasedContext<OipModuleContext>(connectionString, migrationHistoryTableName,
-                migrationHistorySchemaName)
+                migrationHistorySchemaName,
+                (serviceProvider, options) => options.UseOipAccessControl<OipModuleContext>(serviceProvider))
+            .AddOipAccessControl<OipModuleContext>(ModuleAccessControl.Configure)
             .AddScoped<ModuleRepository>();
     }
 
@@ -32,14 +35,16 @@ public static class ServiceCollectionExtension
     /// <param name="connectionModel">The connection string for the database.</param>
     /// <param name="migrationHistoryTableName">The name of the migration history table (default: "__OipModuleMigrationHistory").</param>
     /// <param name="migrationHistorySchemaName">The schema name for the migration history table (default: "oip").</param>
+    /// <param name="configure">Additional configuration of the context, for example its interceptors.</param>
     /// <returns>The configured service collection.</returns>
     public static IServiceCollection AddOipBasedContext<T>(this IServiceCollection services, ConnectionModel connectionModel,
         string migrationHistoryTableName = OipModuleContext.MigrationHistoryTableName,
-        string migrationHistorySchemaName = OipModuleContext.SchemaName)
+        string migrationHistorySchemaName = OipModuleContext.SchemaName,
+        Action<IServiceProvider, DbContextOptionsBuilder>? configure = null)
         where T : DbContext
     {
         // Register DbContext with a configuration lambda.
-        return services.AddDbContext<T>(options =>
+        return services.AddDbContext<T>((serviceProvider, options) =>
         {
             switch (connectionModel.Provider)
             {
@@ -61,6 +66,7 @@ public static class ServiceCollectionExtension
                         $"Invalid provider `{Enum.GetName(connectionModel.Provider)}` in connection string");
             }
             options.EnableSensitiveDataLogging(connectionModel.SensitiveDataLogging);
+            configure?.Invoke(serviceProvider, options);
         });
     }
 }

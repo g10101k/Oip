@@ -66,23 +66,82 @@ public class ObjectAccessControlTests
     }
 
     [Test]
-    public async Task Bits_StayFixed_AndAreSharedAcrossTypes()
+    public void RightIds_StayFixed_AndAreSharedAcrossTypes()
     {
         using var env = new TestEnvironment();
         var folderType = env.Registry.Get(FolderType);
         var documentType = env.Registry.Get(DocumentType);
 
-        Assert.That(folderType.Bits[SecurityConstants.Read], Is.EqualTo(0));
-        Assert.That(folderType.Bits[SecurityConstants.ManageAcl], Is.EqualTo(3));
-        Assert.That(documentType.Bits[Approve], Is.EqualTo(folderType.Bits[Approve]));
-        Assert.That(documentType.Bits[Export], Is.Not.EqualTo(folderType.Bits[Approve]));
+        Assert.That(StandardRights.MaskOf(SecurityConstants.Read), Is.EqualTo(1));
+        Assert.That(StandardRights.MaskOf(SecurityConstants.ManageAcl), Is.EqualTo(8));
+        Assert.That(folderType.CustomRightIds.ContainsKey(SecurityConstants.Read), Is.False);
+        Assert.That(documentType.CustomRightIds[Approve], Is.EqualTo(folderType.CustomRightIds[Approve]));
+        Assert.That(documentType.CustomRightIds[Export], Is.Not.EqualTo(folderType.CustomRightIds[Approve]));
 
-        // A later release adds a right in front of the others: the stored bits do not move.
+        // A later release adds a right in front of the others: the stored identifiers do not move.
         var registry = new AccessControlRegistry<AclTestContext>(TestEnvironment.CreateOptions("archive"),
             env.Provider.GetRequiredService<IServiceScopeFactory>());
         var reloaded = registry.Get(FolderType);
-        Assert.That(reloaded.Bits[Approve], Is.EqualTo(folderType.Bits[Approve]));
-        Assert.That(reloaded.Bits["archive"], Is.GreaterThan(documentType.Bits[Export]));
+        Assert.That(reloaded.CustomRightIds[Approve], Is.EqualTo(folderType.CustomRightIds[Approve]));
+        Assert.That(reloaded.CustomRightIds["archive"], Is.GreaterThan(documentType.CustomRightIds[Export]));
+    }
+
+    [Test]
+    public async Task CustomRights_HaveNoLimit()
+    {
+        var extra = Enumerable.Range(1, 150).Select(i => $"right-{i}").ToArray();
+        using var env = new TestEnvironment(extra);
+        env.Context.Folders.AddRange(new Folder { Id = 1, Name = "a" }, new Folder { Id = 2, Name = "b" });
+        await env.Context.SaveChangesAsync();
+
+        Assert.That(env.Registry.Get(FolderType).CustomRightIds, Has.Count.EqualTo(151));
+        await env.Access.SetAclUncheckedAsync(new ObjectRef(FolderType, 1), false,
+        [
+            new AclEntry(SubjectKeys.Everyone, ["right-1", "right-150"]),
+            new AclEntry(SubjectKeys.Role("engineers"), [SecurityConstants.Read], ["right-150"])
+        ]);
+
+        env.Subjects = Guest;
+        Assert.That(await env.Access.GetEffectiveRightsAsync(new ObjectRef(FolderType, 1)),
+            Is.EquivalentTo(new[] { "right-1", "right-150" }));
+        Assert.That(await env.Access.WhereAccessible(env.Context.Folders, "right-150").Select(f => f.Id).ToListAsync(),
+            Is.EqualTo(new[] { 1 }));
+
+        env.Subjects = Engineer;
+        Assert.That(await env.Access.GetEffectiveRightsAsync(new ObjectRef(FolderType, 1)),
+            Is.EquivalentTo(new[] { SecurityConstants.Read, "right-1" }));
+        Assert.That(await env.Access.HasRightAsync(new ObjectRef(FolderType, 1), "right-150"), Is.False);
+        Assert.That(await env.Access.WhereAccessible(env.Context.Folders, "right-150").CountAsync(), Is.Zero);
+
+        var acl = await env.Access.GetAclUncheckedAsync(new ObjectRef(FolderType, 1));
+        Assert.That(acl.Entries.Single(e => e.SubjectKey == SubjectKeys.Role("engineers")).Deny,
+            Is.EqualTo(new[] { "right-150" }));
+    }
+
+    [Test]
+    public async Task CustomRight_IsInheritedByAChildOfAnotherType()
+    {
+        using var env = new TestEnvironment("archive");
+        env.Context.Folders.Add(new Folder { Id = 1, Name = "projects" });
+        env.Context.Documents.AddRange(
+            new Document { Id = 10, FolderId = 1, Title = "plan" },
+            new Document { Id = 11, FolderId = 1, Title = "budget" });
+        await env.Context.SaveChangesAsync();
+        await env.Access.SetAclUncheckedAsync(new ObjectRef(FolderType, 1), false,
+            [new AclEntry(SubjectKeys.Everyone, [SecurityConstants.Read, Approve, "archive"])]);
+        await env.Access.SetAclUncheckedAsync(new ObjectRef(DocumentType, 11), false,
+            [new AclEntry(SubjectKeys.Role("engineers"), [], [Approve])]);
+
+        env.Subjects = Engineer;
+        // The folder only right does not exist for a document, so it is not reported there.
+        Assert.That(await env.Access.GetEffectiveRightsAsync(new ObjectRef(DocumentType, 10)),
+            Is.EquivalentTo(new[] { SecurityConstants.Read, Approve }));
+        Assert.That(await env.Access.HasRightAsync(new ObjectRef(DocumentType, 11), Approve), Is.False);
+        Assert.That(await env.Access.WhereAccessible(env.Context.Documents, Approve).Select(d => d.Id).ToListAsync(),
+            Is.EqualTo(new[] { 10 }));
+
+        env.Subjects = Guest;
+        Assert.That(await env.Access.WhereAccessible(env.Context.Documents, Approve).CountAsync(), Is.EqualTo(2));
     }
 
     [Test]
@@ -179,12 +238,15 @@ public class ObjectAccessControlTests
             new Document { Id = 12, FolderId = 2, Title = "bob", Author = "bob" });
         await env.Context.SaveChangesAsync();
         await env.Access.SetAclUncheckedAsync(new ObjectRef(FolderType, 2), false,
-            [new AclEntry(SubjectKeys.Owner, [SecurityConstants.Read])]);
+            [new AclEntry(SubjectKeys.Owner, [SecurityConstants.Read, Approve])]);
 
         env.Subjects = Engineer;
         var visible = await env.Access.WhereAccessible(env.Context.Documents, SecurityConstants.Read)
             .OrderBy(d => d.Id).Select(d => d.Title).ToListAsync();
         Assert.That(visible, Is.EqualTo(new[] { "public", "alice" }));
+        var approvable = await env.Access.WhereAccessible(env.Context.Documents, Approve)
+            .Select(d => d.Title).ToListAsync();
+        Assert.That(approvable, Is.EqualTo(new[] { "alice" }));
 
         env.Subjects = SubjectSet.Anonymous;
         Assert.That(await env.Access.WhereAccessible(env.Context.Documents, SecurityConstants.Read).CountAsync(),
@@ -339,7 +401,7 @@ public class ObjectAccessControlTests
 
     [TestCase("Npgsql")]
     [TestCase("SqlServer")]
-    public void WhereAccessible_TranslatesToABitwiseSubquery(string provider)
+    public void WhereAccessible_TranslatesToASubquery(string provider)
     {
         var options = new DbContextOptionsBuilder<AclTestContext>();
         if (provider == "Npgsql")
@@ -352,14 +414,25 @@ public class ObjectAccessControlTests
         var access = new ObjectAccessService<AclTestContext>(context, registry.Registry, new FixedSubjectResolver(() => Engineer));
 
         var sql = access.WhereAccessible(context.Documents, SecurityConstants.Edit).ToQueryString();
+        var customSql = access.WhereAccessible(context.Documents, Approve).ToQueryString();
         var script = context.Database.GenerateCreateScript();
         TestContext.Out.WriteLine(sql);
+        TestContext.Out.WriteLine(customSql);
 
+        // A standard right is a bit of the entry masks.
         Assert.That(sql, Does.Contain("AclSetEntry"));
+        Assert.That(sql, Does.Not.Contain("AclSetEntryRight"));
         Assert.That(sql, Does.Contain("&"));
         Assert.That(sql, Does.Not.Contain("JOIN"));
+
+        // A custom right is a row of AclSetEntryRight.
+        Assert.That(customSql, Does.Contain("AclSetEntryRight"));
+        Assert.That(customSql, Does.Not.Contain("&"));
+        Assert.That(customSql, Does.Not.Contain("JOIN"));
+
         Assert.That(script, Does.Contain("AccessObject"));
-        Assert.That(script, Does.Contain("AclSetEntry"));
+        Assert.That(script, Does.Contain("AclSetEntryRight"));
+        Assert.That(script, Does.Contain("AccessObjectTypeRight"));
     }
 
     /// <summary>
@@ -386,7 +459,7 @@ public class ObjectAccessControlTests
         private readonly IServiceScope _scope;
         private readonly Microsoft.AspNetCore.Http.HttpContextAccessor _httpContextAccessor = new();
 
-        public TestEnvironment()
+        public TestEnvironment(params string[] extraFolderRights)
         {
             var services = new ServiceCollection();
             var dbName = Guid.NewGuid().ToString();
@@ -395,7 +468,7 @@ public class ObjectAccessControlTests
             services.AddSingleton<Microsoft.AspNetCore.Http.IHttpContextAccessor>(_httpContextAccessor);
             services.AddDbContext<AclTestContext>((sp, o) =>
                 o.UseInMemoryDatabase(dbName).UseOipAccessControl<AclTestContext>(sp));
-            services.AddOipAccessControl<AclTestContext>(o => Configure(o));
+            services.AddOipAccessControl<AclTestContext>(o => Configure(o, extraFolderRights));
             Provider = services.BuildServiceProvider();
             _scope = Provider.CreateScope();
             _httpContextAccessor.HttpContext =
@@ -479,9 +552,11 @@ public class ObjectAccessControlTests
         public DbSet<Document> Documents => Set<Document>();
         public DbSet<AclSetEntity> AclSets => Set<AclSetEntity>();
         public DbSet<AclSetEntryEntity> AclSetEntries => Set<AclSetEntryEntity>();
+        public DbSet<AclSetEntryRightEntity> AclSetEntryRights => Set<AclSetEntryRightEntity>();
         public DbSet<AccessObjectEntity> AccessObjects => Set<AccessObjectEntity>();
         public DbSet<AccessObjectTypeEntity> AccessObjectTypes => Set<AccessObjectTypeEntity>();
         public DbSet<AccessRightEntity> AccessRights => Set<AccessRightEntity>();
+        public DbSet<AccessObjectTypeRightEntity> AccessObjectTypeRights => Set<AccessObjectTypeRightEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

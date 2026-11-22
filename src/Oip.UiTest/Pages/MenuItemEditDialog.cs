@@ -10,7 +10,6 @@ internal class MenuItemEditDialog(IWebDriver driver) : BasePage(driver)
     private static readonly By Dialog = By.CssSelector("div.p-dialog");
     private static readonly By Label = By.Id("oip-menu-item-edit-dialog-menu-input");
     private static readonly By Icon = By.Id("oip-menu-item-edit-dialog-icon");
-    private static readonly By ViewRoles = By.Id("oip-menu-item-edit-dialog-roles-multi-select");
     private static readonly By SaveButton = By.Id("oip-menu-item-edit-dialog-save-edit-button");
     private static readonly By SelectFilter = By.CssSelector("input.p-select-filter");
 
@@ -52,11 +51,19 @@ internal class MenuItemEditDialog(IWebDriver driver) : BasePage(driver)
     /// Grants the read right to the realm role, keeping the roles already selected.
     /// </summary>
     /// <param name="role">Realm role name.</param>
+    /// <summary>
+    /// Allows the role to see the menu item, in the access section of the dialog.
+    /// </summary>
     public MenuItemEditDialog AddViewRole(string role)
     {
-        new PrimeMultiSelect(Driver, ViewRoles).Select(role);
+        Access.WaitLoaded().Grant(ModuleSecurityTab.ReadRight, role);
         return this;
     }
+
+    /// <summary>
+    /// Access control list editor of the menu item.
+    /// </summary>
+    public ObjectAclEditor Access => new(Driver, "#oip-menu-item-edit-dialog-access");
 
     /// <summary>
     /// Saves the changes and waits until the dialog closes.

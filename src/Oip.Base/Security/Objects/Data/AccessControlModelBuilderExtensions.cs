@@ -45,6 +45,18 @@ public static class AccessControlModelBuilderExtensions
             entity.HasKey(e => new { e.AclSetId, e.SubjectKey });
             entity.Property(e => e.SubjectKey).HasMaxLength(SubjectKeyMaxLength).IsRequired();
             entity.HasIndex(e => new { e.SubjectKey, e.AclSetId });
+            entity.HasMany(e => e.Rights).WithOne().HasForeignKey(e => new { e.AclSetId, e.SubjectKey })
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AclSetEntryRightEntity>(entity =>
+        {
+            entity.SetTableWithSchema(database, schemaName);
+            entity.HasKey(e => new { e.AclSetId, e.SubjectKey, e.RightId, e.IsDeny });
+            entity.Property(e => e.SubjectKey).HasMaxLength(SubjectKeyMaxLength).IsRequired();
+            entity.HasIndex(e => new { e.RightId, e.SubjectKey, e.AclSetId });
+            entity.HasOne<AccessRightEntity>().WithMany().HasForeignKey(e => e.RightId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<AccessObjectEntity>(entity =>
@@ -69,9 +81,20 @@ public static class AccessControlModelBuilderExtensions
         modelBuilder.Entity<AccessRightEntity>(entity =>
         {
             entity.SetTableWithSchema(database, schemaName);
-            entity.HasKey(e => new { e.ObjectTypeId, e.Code });
+            entity.HasKey(e => e.RightId);
+            entity.Property(e => e.RightId).ValueGeneratedOnAdd();
             entity.Property(e => e.Code).HasMaxLength(CodeMaxLength).IsRequired();
-            entity.HasIndex(e => new { e.ObjectTypeId, e.Bit }).IsUnique();
+            entity.HasIndex(e => e.Code).IsUnique();
+        });
+
+        modelBuilder.Entity<AccessObjectTypeRightEntity>(entity =>
+        {
+            entity.SetTableWithSchema(database, schemaName);
+            entity.HasKey(e => new { e.ObjectTypeId, e.RightId });
+            entity.HasOne<AccessObjectTypeEntity>().WithMany().HasForeignKey(e => e.ObjectTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<AccessRightEntity>().WithMany().HasForeignKey(e => e.RightId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         return modelBuilder;

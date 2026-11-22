@@ -512,6 +512,14 @@ export class CustomerModuleComponent
       [field: string]: FilterMetadata | FilterMetadata[];
     };
 
+    // The table restores its global filter from the saved filters before the module restores the search text,
+    // so the search box follows the filter that is actually applied.
+    const globalMeta = filters['global'];
+    const globalValue = (Array.isArray(globalMeta) ? globalMeta[0] : globalMeta)?.value;
+    if (typeof globalValue === 'string') {
+      this.globalFilter = globalValue;
+    }
+
     const request: TableQueryRequest = {
       first: event.first ?? this.localSettings().first ?? 0,
       rows: event.rows ?? this.localSettings().rows ?? 10,

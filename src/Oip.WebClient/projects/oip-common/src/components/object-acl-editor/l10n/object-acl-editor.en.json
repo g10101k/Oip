@@ -8,7 +8,6 @@
     "addSubject": "Add a role, user or everyone",
     "save": "Save",
     "saved": "Access rights saved",
-    "inherited": "Inherited rights",
     "loading": "Loading access rights…",
     "state": {
       "none": "Not set: click to allow",
@@ -24,6 +23,19 @@
     "subjects": {
       "everyone": "Everyone",
       "owner": "Owner"
+    },
+    "inheritedTag": "Inherited",
+    "makeExplicit": "Make explicit: copy to this object",
+    "inheritedState": {
+      "none": "Not set in the parent",
+      "allow": "Allowed by the parent",
+      "deny": "Denied by the parent"
+    },
+    "legend": {
+      "allow": "Allowed",
+      "deny": "Denied",
+      "none": "Not set",
+      "hint": "Click a cell to switch the state"
     }
   }
 }

@@ -3,6 +3,8 @@ export interface AccessRightDto {
   code: string;
   /** Display name, null for the standard rights translated by the client. */
   name?: string | null;
+  /** Hint shown next to the name. */
+  description?: string | null;
 }
 
 /** Subject that rights are given to: role, user, client, group, everyone or owner. */
