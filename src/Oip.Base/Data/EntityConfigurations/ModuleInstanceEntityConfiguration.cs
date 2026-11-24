@@ -39,6 +39,7 @@ public class ModuleInstanceEntityConfiguration : IEntityTypeConfiguration<Module
         entity.Property(e => e.Label).HasMaxLength(128);
         entity.Property(e => e.Url).HasMaxLength(1024);
         entity.Property(e => e.Target).HasMaxLength(64);
+        entity.HasIndex(e => e.AclSetId);
 
         if (_designTime)
         {

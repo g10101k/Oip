@@ -21,9 +21,12 @@
         "saveTooltip": "Сохранить",
         "cancelTooltip": "Отмена",
         "editTooltip": "Редактировать",
-        "deleteTooltip": "Удалить"
+        "deleteTooltip": "Удалить",
+        "rightsTooltip": "Права доступа"
       },
-      "refreshTooltip": "Обновить"
+      "refreshTooltip": "Обновить",
+      "categoryRights": "Права на категории",
+      "rightsTitle": "Права доступа"
     },
     "messages": {
       "requiredFields": "Заполните имя, email, категорию и страну.",

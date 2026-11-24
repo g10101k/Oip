@@ -1,60 +1,46 @@
 namespace Oip.UiTest.Pages;
 
 /// <summary>
-/// The security tab of a module instance: the realm roles granted each right of the module.
+/// Security tab of a module instance: the access control list editor of the instance.
 /// </summary>
 internal class ModuleSecurityTab(IWebDriver driver) : BasePage(driver)
 {
-    /// <summary>
-    /// The right to see the module instance in the menu and to open it.
-    /// </summary>
     public const string ReadRight = "read";
 
-    private static readonly By SaveButton = By.Id("oip-security-save-button");
+    private static readonly By SaveButton = By.Id("oip-acl-save-button");
 
-    /// <summary>
-    /// Opens the security tab of the module instance shown in the browser.
-    /// </summary>
+    private ObjectAclEditor Editor => new(Driver, "security");
+
     public ModuleSecurityTab Open()
     {
         new TopBar(Driver).OpenModuleTab("security");
-        Wait.UntilFindElement(Roles(ReadRight));
+        Wait.UntilFindElement(SaveButton);
         return this;
     }
 
-    /// <summary>
-    /// Grants the right to the role, keeping the roles already granted.
-    /// </summary>
-    /// <param name="right">Right code, e.g. <see cref="ReadRight"/>.</param>
-    /// <param name="role">Realm role name.</param>
+    /// <inheritdoc cref="ObjectAclEditor.Grant" />
     public ModuleSecurityTab Grant(string right, string role)
     {
-        new PrimeMultiSelect(Driver, Roles(right)).Select(role);
+        Editor.Grant(right, role);
         return this;
     }
 
-    /// <summary>
-    /// Takes the right away from the role, keeping the other roles.
-    /// </summary>
-    /// <param name="right">Right code, e.g. <see cref="ReadRight"/>.</param>
-    /// <param name="role">Realm role name.</param>
+    /// <inheritdoc cref="ObjectAclEditor.Revoke" />
     public ModuleSecurityTab Revoke(string right, string role)
     {
-        new PrimeMultiSelect(Driver, Roles(right)).Deselect(role);
+        Editor.Revoke(right, role);
         return this;
     }
 
-    /// <summary>
-    /// Checks whether the right is granted to the role in the form.
-    /// </summary>
-    /// <param name="right">Right code, e.g. <see cref="ReadRight"/>.</param>
-    /// <param name="role">Realm role name.</param>
-    public bool IsGranted(string right, string role) => new PrimeMultiSelect(Driver, Roles(right)).IsSelected(role);
+    /// <inheritdoc cref="ObjectAclEditor.IsGranted" />
+    public bool IsGranted(string right, string role) => Editor.IsGranted(right, role);
 
-    /// <summary>
-    /// Saves the rights and waits until the backend confirms it.
-    /// </summary>
+    /// <inheritdoc cref="ObjectAclEditor.SetInheritance" />
+    public ModuleSecurityTab SetInheritance(bool inherit)
+    {
+        Editor.SetInheritance(inherit);
+        return this;
+    }
+
     public void Save() => new Toasts(Driver).ExpectSuccess(() => Wait.UntilClick(SaveButton));
-
-    private static By Roles(string right) => By.Id($"oip-security-multiselect-{right}");
 }

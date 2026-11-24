@@ -1,6 +1,16 @@
 // Components
 export { BaseModuleComponent } from './components/base-module/base-module.component';
 export { SecurityComponent } from './components/security/security.component';
+export { ObjectAclEditorComponent } from './components/object-acl-editor/object-acl-editor.component';
+export { HasRightDirective } from './directives/has-right.directive';
+export { ObjectRightsService } from './services/object-rights.service';
+export {
+  AccessRightDto,
+  AclEntryDto,
+  ObjectAclDto,
+  SubjectDto,
+  UpdateObjectAclRequest
+} from './dtos/object-acl.dto';
 export { AppTopbar } from './components/top-bar/top-bar.component';
 export { FooterComponent } from './components/footer/footer.component';
 export { MenuComponent } from './components/menu/menu.component';

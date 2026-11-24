@@ -26,7 +26,7 @@ internal class ModuleSecurityTests : BaseTest
         Menu.CreateRootFolder(FolderLabel);
         Menu.Edit(_folder).AddViewRole(UserRole).Save();
 
-        // A new module instance is readable by administrators only.
+        // A new module instance inherits the rights of its folder, so the user role can read it.
         Menu.CreateModuleInstance(_folder, ModuleLabel, SideMenu.WeatherForecastModule);
         _modulePath = Menu.GetPath(_module);
     }
@@ -40,10 +40,34 @@ internal class ModuleSecurityTests : BaseTest
     }
 
     [Test, Order(1)]
+    public void UserSeesModuleThroughTheRightsOfTheFolder()
+    {
+        SignInAs(TestSetup.Admin);
+        OpenSecurityTab().SetInheritance(true).Save();
+
+        SignInAs(TestSetup.User);
+        Assert.That(Menu.Contains(_module), Is.True, "The module does not inherit the read right of its folder");
+    }
+
+    [Test, Order(2)]
+    public void UserLosesModuleWhenInheritanceIsTurnedOff()
+    {
+        SignInAs(TestSetup.Admin);
+        var security = OpenSecurityTab().SetInheritance(false);
+        security.Revoke(ModuleSecurityTab.ReadRight, UserRole);
+        security.Save();
+
+        SignInAs(TestSetup.User);
+        Assert.That(Menu.Contains(_module), Is.False, "The module is still listed in the menu of a regular user");
+        Menu.Navigate(_modulePath);
+        Menu.WaitForPath("/access");
+    }
+
+    [Test, Order(3)]
     public void UserSeesModuleAfterReadRightIsGranted()
     {
         SignInAs(TestSetup.Admin);
-        OpenSecurityTab().Grant(ModuleSecurityTab.ReadRight, UserRole).Save();
+        OpenSecurityTab().SetInheritance(false).Grant(ModuleSecurityTab.ReadRight, UserRole).Save();
 
         Menu.Reload();
         Assert.That(Security.Open().IsGranted(ModuleSecurityTab.ReadRight, UserRole), Is.True,
@@ -55,11 +79,11 @@ internal class ModuleSecurityTests : BaseTest
         Assert.That(Menu.CurrentPath, Is.EqualTo(_modulePath));
     }
 
-    [Test, Order(2)]
+    [Test, Order(4)]
     public void UserLosesModuleAfterReadRightIsRevoked()
     {
         SignInAs(TestSetup.Admin);
-        var security = OpenSecurityTab();
+        var security = OpenSecurityTab().SetInheritance(false);
         // Independent of the previous test: grant the right first if it is not granted yet.
         if (!security.IsGranted(ModuleSecurityTab.ReadRight, UserRole))
             security.Grant(ModuleSecurityTab.ReadRight, UserRole).Save();

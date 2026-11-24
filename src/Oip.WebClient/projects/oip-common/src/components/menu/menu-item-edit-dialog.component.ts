@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -8,9 +8,10 @@ import { FormsModule } from '@angular/forms';
 import { MenuService } from '../../services/app.menu.service';
 import { MsgService } from '../../services/msg.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { EditModuleInstanceDto } from '../../api/data-contracts';
-import { SecurityApi } from '../../api/security.api';
+import { AccessRightDto } from '../../dtos/object-acl.dto';
+import { ObjectAclEditorComponent } from '../object-acl-editor/object-acl-editor.component';
+import { MODULE_ACCESS_CONTROL_API, MODULE_INSTANCE_OBJECT_TYPE } from '../security/security.component';
 
 type PrimeIconOption = {
   label: string;
@@ -18,16 +19,25 @@ type PrimeIconOption = {
 };
 
 @Component({
-  imports: [ButtonModule, DialogModule, InputTextModule, SelectModule, FormsModule, TranslatePipe, MultiSelectModule],
+  imports: [
+    ButtonModule,
+    DialogModule,
+    InputTextModule,
+    SelectModule,
+    FormsModule,
+    TranslatePipe,
+    ObjectAclEditorComponent
+  ],
   selector: 'menu-item-edit-dialog',
   standalone: true,
   template: `
     <p-dialog
       header="{{ 'menuItemEditDialogComponent.header' | translate }}"
       [modal]="true"
-      [style]="{ width: '40rem' }"
+      [breakpoints]="{ '960px': '95vw' }"
+      [style]="{ width: '56rem' }"
       [(visible)]="visible"
-      (keydown.enter)="save()">
+      (keydown.enter)="onEnter($event)">
       <div class="flex items-center gap-4 mb-4 mt-1">
         <label class="font-semibold w-1/3" for="oip-menu-item-edit-dialog-menu-input">
           {{ 'menuItemEditDialogComponent.label' | translate }}
@@ -83,19 +93,18 @@ type PrimeIconOption = {
         </p-select>
       </div>
 
-      <div class="flex items-center gap-4 mb-4">
-        <label class="font-semibold w-1/3" for="security">
-          {{ 'menuItemEditDialogComponent.security' | translate }}
-        </label>
-        <p-multiSelect
-          appendTo="body"
-          class="flex-auto"
-          id="oip-menu-item-edit-dialog-roles-multi-select"
-          placeholder="Select roles"
-          [maxSelectedLabels]="10"
-          [options]="roles"
-          [(ngModel)]="item.viewRoles" />
-      </div>
+      @if (visible && item.moduleInstanceId) {
+        <div class="flex flex-col gap-2 mb-4" id="oip-menu-item-edit-dialog-access">
+          <div class="font-semibold">{{ 'menuItemEditDialogComponent.security' | translate }}</div>
+          <oip-object-acl-editor
+            #aclEditor
+            [apiBase]="accessControlApi"
+            [objectId]="item.moduleInstanceId"
+            [objectType]="moduleInstanceType"
+            [rights]="menuRights"
+            [showSaveButton]="false" />
+        </div>
+      }
 
       <div class="flex justify-end gap-2">
         <p-button
@@ -116,13 +125,18 @@ type PrimeIconOption = {
 })
 export class MenuItemEditDialogComponent {
   private readonly menuService = inject(MenuService);
-  private readonly securityApi = inject(SecurityApi);
   private readonly msgService = inject(MsgService);
+
+  @ViewChild('aclEditor') aclEditor?: ObjectAclEditorComponent;
+
+  protected readonly accessControlApi = MODULE_ACCESS_CONTROL_API;
+  protected readonly moduleInstanceType = MODULE_INSTANCE_OBJECT_TYPE;
+  /** The menu item controls who sees the item; the other rights are set on the security tab of the module. */
+  protected readonly menuRights: AccessRightDto[] = [{ code: 'read' }];
 
   @Input() visible!: boolean;
   @Output() visibleChange = new EventEmitter<boolean>();
 
-  roles: string[] = [];
   moduleName = '';
   iconOptions: PrimeIconOption[] = Object.values(PrimeIcons)
     .filter((icon): icon is string => typeof icon === 'string')
@@ -134,7 +148,6 @@ export class MenuItemEditDialogComponent {
   item: EditModuleInstanceDto = {
     icon: '',
     label: '',
-    viewRoles: [''],
     moduleId: 0,
     moduleInstanceId: 0,
     parentId: 0
@@ -153,7 +166,11 @@ export class MenuItemEditDialogComponent {
 
     this.saving = true;
     try {
-      await this.menuService.editModuleInstance(this.item);
+      // The rights are saved first: when they are rejected the dialog stays open with the user's changes.
+      if (this.aclEditor && !(await this.aclEditor.save())) {
+        return;
+      }
+      await this.menuService.editModuleInstance({ ...this.item, viewRoles: null });
       await this.menuService.loadMenu();
       this.hide();
     } catch (error) {
@@ -161,6 +178,14 @@ export class MenuItemEditDialogComponent {
     } finally {
       this.saving = false;
     }
+  }
+
+  /** Enter saves the dialog, except while choosing a subject in the rights editor. */
+  onEnter(event: Event) {
+    if ((event.target as HTMLElement | null)?.closest('oip-object-acl-editor')) {
+      return;
+    }
+    void this.save();
   }
 
   hide() {
@@ -174,12 +199,10 @@ export class MenuItemEditDialogComponent {
       moduleId: this.menuService.contextMenuItem?.moduleId,
       parentId: this.menuService.contextMenuItem?.parentId,
       label: this.menuService.contextMenuItem?.label,
-      icon: this.menuService.contextMenuItem?.icon,
-      viewRoles: this.menuService.contextMenuItem?.securities
+      icon: this.menuService.contextMenuItem?.icon
     };
 
-    const [roles, modules] = await Promise.all([this.securityApi.getRealmRoles(), this.menuService.getModules()]);
-    this.roles = roles;
+    const modules = await this.menuService.getModules();
     this.moduleName = modules.find((module) => module.key === this.item.moduleId)?.value ?? '';
 
     this.visible = true;

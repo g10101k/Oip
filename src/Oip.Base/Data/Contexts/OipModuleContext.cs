@@ -3,13 +3,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Oip.Base.Data.Entities;
 using Oip.Base.Data.EntityConfigurations;
 using Oip.Base.Data.Extensions;
+using Oip.Base.Security.Objects.Data;
 
 namespace Oip.Base.Data.Contexts;
 
 /// <summary>
 /// OIP module context
 /// </summary>
-public class OipModuleContext : DbContext
+public class OipModuleContext : DbContext, IAccessControlDbContext
 {
     private readonly bool _designTime;
 
@@ -53,6 +54,27 @@ public class OipModuleContext : DbContext
     /// </summary>
     public DbSet<CustomizationEntity> Customizations => Set<CustomizationEntity>();
     
+    /// <inheritdoc />
+    public DbSet<AclSetEntity> AclSets => Set<AclSetEntity>();
+
+    /// <inheritdoc />
+    public DbSet<AclSetEntryEntity> AclSetEntries => Set<AclSetEntryEntity>();
+
+    /// <inheritdoc />
+    public DbSet<AclSetEntryRightEntity> AclSetEntryRights => Set<AclSetEntryRightEntity>();
+
+    /// <inheritdoc />
+    public DbSet<AccessObjectEntity> AccessObjects => Set<AccessObjectEntity>();
+
+    /// <inheritdoc />
+    public DbSet<AccessObjectTypeEntity> AccessObjectTypes => Set<AccessObjectTypeEntity>();
+
+    /// <inheritdoc />
+    public DbSet<AccessRightEntity> AccessRights => Set<AccessRightEntity>();
+
+    /// <inheritdoc />
+    public DbSet<AccessObjectTypeRightEntity> AccessObjectTypeRights => Set<AccessObjectTypeRightEntity>();
+
     /// <summary>
     /// .ctor
     /// </summary>
@@ -83,6 +105,7 @@ public class OipModuleContext : DbContext
         modelBuilder.ApplyConfiguration(new ModuleSecurityEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new UserStartModuleEntityConfiguration(Database, _designTime));
         modelBuilder.ApplyConfiguration(new CustomizationEntityConfiguration(Database));
+        modelBuilder.ApplyOipAccessControl(Database, SchemaName);
 
         modelBuilder.ApplyXmlDocumentation(_designTime);
     }

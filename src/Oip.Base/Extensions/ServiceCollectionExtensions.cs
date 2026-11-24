@@ -54,6 +54,7 @@ public static class ServiceCollectionExtensions
             .AddController<FolderModuleController>()
             .AddController<IframeModuleController>()
             .AddController<MenuController>()
+            .AddController<ModuleAccessControlController>()
             .AddController<ModuleController>()
             .AddController<ExtensionsController>()
             .AddController<ExtensionModulesController>();

@@ -30,7 +30,7 @@
     "icon": "Icon",
     "cancel": "Cancel",
     "save": "Save",
-    "security": "Read access"
+    "security": "Access"
   },
   "menuItemCreateDialogComponent": {
     "header": "New menu item",

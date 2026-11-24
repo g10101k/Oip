@@ -27,11 +27,13 @@ public class KeycloakService(KeycloakClient client, ILogger<KeycloakService> log
     /// </summary>
     /// <param name="offset">The offset for pagination (default is 0).</param>
     /// <param name="limit">The maximum number of users to retrieve (default is 100).</param>
+    /// <param name="search">Text matched against the username, names and email, or null for every user.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the collection of users.</returns>
-    public async Task<IEnumerable<UserRepresentation>> GetUsersAsync(int offset = 0, int limit = 100)
+    public async Task<IEnumerable<UserRepresentation>> GetUsersAsync(int offset = 0, int limit = 100,
+        string? search = null)
     {
         await EnsureAuthenticatedAsync();
-        var users = await client.GetUsersAsync(options.Realm, first: offset, max: limit);
+        var users = await client.GetUsersAsync(options.Realm, first: offset, max: limit, search: search);
         return users ?? [];
     }
 

@@ -34,11 +34,16 @@ internal class RoleAccessTests : BaseTest
         Menu.CreateModuleInstance(_folder, UserModuleLabel, SideMenu.WeatherForecastModule);
         Menu.Edit(InFolder(UserModuleLabel)).AddViewRole(UserRole).Save();
 
-        // A new module instance is readable by administrators only.
+        // A new module instance inherits the rights of its folder; without the inheritance and without own rights it
+        // is readable by administrators only.
         Menu.CreateModuleInstance(_folder, AdminModuleLabel, SideMenu.WeatherForecastModule);
 
         _userModulePath = Menu.GetPath(InFolder(UserModuleLabel));
         _adminModulePath = Menu.GetPath(InFolder(AdminModuleLabel));
+
+        Menu.Navigate(_adminModulePath);
+        Menu.WaitForAppInteractive();
+        new ModuleSecurityTab(Driver).Open().SetInheritance(false).Save();
     }
 
     [OneTimeTearDown]

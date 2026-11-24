@@ -5,6 +5,8 @@ using Oip.Base.Data.Constants;
 using Oip.Base.Data.Dtos;
 using Oip.Base.Data.Repositories;
 using Oip.Base.Exceptions;
+using Oip.Base.Data.Contexts;
+using Oip.Base.Security.Objects;
 using Oip.Base.Services;
 
 namespace Oip.Base.Controllers;
@@ -15,7 +17,10 @@ namespace Oip.Base.Controllers;
 [ApiController]
 [Route("api/menu")]
 [ApiExplorerSettings(GroupName = "base")]
-public class MenuController(ModuleRepository moduleRepository, ClaimService claimService) : ControllerBase
+public class MenuController(
+    ModuleRepository moduleRepository,
+    ClaimService claimService,
+    ObjectAccessService<OipModuleContext> access) : ControllerBase
 {
     /// <summary>
     /// Retrieves the menu available to the current authenticated user.
@@ -49,7 +54,8 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
         }
 
         // A module instance the user cannot read must never become their landing page.
-        if (!await moduleRepository.HasInstanceRight(id, claimService.GetUserRoles(), SecurityConstants.Read))
+        if (!await access.HasRightAsync(ModuleAccessControl.Instance(id), SecurityConstants.Read,
+                ModuleAccessControl.SubjectsOf(User)))
         {
             return StatusCode(StatusCodes.Status403Forbidden,
                 new ApiExceptionResponse("Forbidden", "Read right on the module instance is required.",
@@ -103,7 +109,8 @@ public class MenuController(ModuleRepository moduleRepository, ClaimService clai
     [ProducesResponseType<ApiExceptionResponse>(StatusCodes.Status401Unauthorized)]
     public async Task<List<string>> GetModuleInstanceRights(int id)
     {
-        return await moduleRepository.GetUserRightsByInstanceId(id, claimService.GetUserRoles());
+        return (await access.GetEffectiveRightsAsync(ModuleAccessControl.Instance(id),
+            ModuleAccessControl.SubjectsOf(User))).ToList();
     }
 
     /// <summary>

@@ -1,8 +1,14 @@
+using Oip.Base.Security.Objects;
+
 namespace Oip.Demo.TableQueryDemo;
 
-public class DemoCustomer
+public class DemoCustomer : ISecurableEntity
 {
     public int Id { get; set; }
+
+    public long AclSetId { get; set; }
+
+    public string? OwnerSubject { get; set; }
 
     public string FirstName { get; set; } = string.Empty;
 

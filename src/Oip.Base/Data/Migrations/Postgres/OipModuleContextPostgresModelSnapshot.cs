@@ -7,7 +7,7 @@ using Oip.Base.Data.Contexts;
 
 #nullable disable
 
-namespace Oip.Base.Data.Postgres.Migrations
+namespace Oip.Base.Data.Migrations.Postgres
 {
     [DbContext(typeof(OipModuleContextPostgres))]
     partial class OipModuleContextPostgresModelSnapshot : ModelSnapshot
@@ -16,7 +16,7 @@ namespace Oip.Base.Data.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -144,6 +144,10 @@ namespace Oip.Base.Data.Postgres.Migrations
 
             modelBuilder.Entity("Oip.Base.Data.Entities.ModuleInstanceEntity", b =>
                 {
+                    b.Property<long>("AclSetId")
+                        .HasColumnType("bigint")
+                        .HasComment("Identifier of the effective access control set of the instance.");
+
                     b.Property<string>("Icon")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)")
@@ -187,6 +191,8 @@ namespace Oip.Base.Data.Postgres.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("character varying(1024)")
                         .HasComment("Url");
+
+                    b.HasIndex("AclSetId");
 
                     b.ToTable("ModuleInstance", "oip", t =>
                         {
@@ -279,6 +285,258 @@ namespace Oip.Base.Data.Postgres.Migrations
                         {
                             t.HasComment("Module instance a user opens by default");
                         });
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AccessObjectEntity", b =>
+                {
+                    b.Property<int>("ObjectTypeId")
+                        .HasColumnType("integer")
+                        .HasComment("Identifier of the object type.");
+
+                    b.Property<long>("ObjectId")
+                        .HasColumnType("bigint")
+                        .HasComment("Identifier of the object within its type.");
+
+                    b.Property<long>("AclSetId")
+                        .HasColumnType("bigint")
+                        .HasComment("Set with the effective rights: the inherited rights merged with the explicit ones.");
+
+                    b.Property<bool>("InheritanceBroken")
+                        .HasColumnType("boolean")
+                        .HasComment("When true the object does not inherit the rights of its parent.");
+
+                    b.Property<long?>("OwnAclSetId")
+                        .HasColumnType("bigint")
+                        .HasComment("Set with the rights assigned to the object explicitly.");
+
+                    b.Property<string>("OwnerSubject")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasComment("Subject of the user that owns the object.");
+
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint")
+                        .HasComment("Identifier of the parent object the rights are inherited from.");
+
+                    b.Property<int?>("ParentTypeId")
+                        .HasColumnType("integer")
+                        .HasComment("Type of the parent object the rights are inherited from.");
+
+                    b.HasKey("ObjectTypeId", "ObjectId");
+
+                    b.HasIndex("AclSetId");
+
+                    b.HasIndex("ParentTypeId", "ParentId");
+
+                    b.ToTable("AccessObject", "oip", t =>
+                        {
+                            t.HasComment("Securable object known to the access control: its place in the hierarchy and its access control sets.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AccessObjectTypeEntity", b =>
+                {
+                    b.Property<int>("ObjectTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasComment("Identifier of the type.");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ObjectTypeId"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("Unique code of the type, for example acme.factory.");
+
+                    b.HasKey("ObjectTypeId");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("AccessObjectType", "oip", t =>
+                        {
+                            t.HasComment("Registered type of securable objects.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AccessObjectTypeRightEntity", b =>
+                {
+                    b.Property<int>("ObjectTypeId")
+                        .HasColumnType("integer")
+                        .HasComment("Identifier of the object type.");
+
+                    b.Property<int>("RightId")
+                        .HasColumnType("integer")
+                        .HasComment("Identifier of the right.");
+
+                    b.HasKey("ObjectTypeId", "RightId");
+
+                    b.HasIndex("RightId");
+
+                    b.ToTable("AccessObjectTypeRight", "oip", t =>
+                        {
+                            t.HasComment("Custom right available for an object type.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AccessRightEntity", b =>
+                {
+                    b.Property<int>("RightId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasComment("Identifier of the right.");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RightId"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasComment("Unique code of the right, for example approve.");
+
+                    b.HasKey("RightId");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("AccessRight", "oip", t =>
+                        {
+                            t.HasComment("Custom right of a service context. A code has one identifier in the whole context, so an inherited set means the\n            same right in a parent and in a child of another type.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AclSetEntity", b =>
+                {
+                    b.Property<long>("AclSetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasComment("Identifier of the set.");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("AclSetId"));
+
+                    b.Property<string>("Hash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasComment("SHA-256 of the normalized entries, used to reuse an existing set instead of creating a duplicate.");
+
+                    b.HasKey("AclSetId");
+
+                    b.HasIndex("Hash")
+                        .IsUnique();
+
+                    b.ToTable("AclSet", "oip", t =>
+                        {
+                            t.HasComment("Immutable set of access control entries shared by every object with the same effective or explicit rights.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AclSetEntryEntity", b =>
+                {
+                    b.Property<long>("AclSetId")
+                        .HasColumnType("bigint")
+                        .HasComment("Identifier of the set the entry belongs to.");
+
+                    b.Property<string>("SubjectKey")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasComment("Subject key, for example role:engineers, user:{sub}, client:{client_id}, everyone or owner.");
+
+                    b.Property<int>("AllowMask")
+                        .HasColumnType("integer")
+                        .HasComment("Bit mask of the granted standard rights: read, edit, delete and manage-acl.");
+
+                    b.Property<int>("DenyMask")
+                        .HasColumnType("integer")
+                        .HasComment("Bit mask of the denied standard rights. A denied right wins over a granted one.");
+
+                    b.HasKey("AclSetId", "SubjectKey");
+
+                    b.HasIndex("SubjectKey", "AclSetId");
+
+                    b.ToTable("AclSetEntry", "oip", t =>
+                        {
+                            t.HasComment("Rights granted or denied to one subject within an access control set.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AclSetEntryRightEntity", b =>
+                {
+                    b.Property<long>("AclSetId")
+                        .HasColumnType("bigint")
+                        .HasComment("Identifier of the set the entry belongs to.");
+
+                    b.Property<string>("SubjectKey")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasComment("Subject key of the entry.");
+
+                    b.Property<int>("RightId")
+                        .HasColumnType("integer")
+                        .HasComment("Identifier of the custom right.");
+
+                    b.Property<bool>("IsDeny")
+                        .HasColumnType("boolean")
+                        .HasComment("When true the right is denied, otherwise granted. A denied right wins over a granted one.");
+
+                    b.HasKey("AclSetId", "SubjectKey", "RightId", "IsDeny");
+
+                    b.HasIndex("RightId", "SubjectKey", "AclSetId");
+
+                    b.ToTable("AclSetEntryRight", "oip", t =>
+                        {
+                            t.HasComment("Custom right granted or denied to one subject within an access control set. The standard rights are kept in the\n            masks of , any other right is kept as a row, so a context has no limit of rights.");
+                        });
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AccessObjectTypeRightEntity", b =>
+                {
+                    b.HasOne("Oip.Base.Security.Objects.Data.AccessObjectTypeEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ObjectTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Oip.Base.Security.Objects.Data.AccessRightEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RightId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AclSetEntryEntity", b =>
+                {
+                    b.HasOne("Oip.Base.Security.Objects.Data.AclSetEntity", null)
+                        .WithMany("Entries")
+                        .HasForeignKey("AclSetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AclSetEntryRightEntity", b =>
+                {
+                    b.HasOne("Oip.Base.Security.Objects.Data.AccessRightEntity", null)
+                        .WithMany()
+                        .HasForeignKey("RightId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Oip.Base.Security.Objects.Data.AclSetEntryEntity", null)
+                        .WithMany("Rights")
+                        .HasForeignKey("AclSetId", "SubjectKey")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AclSetEntity", b =>
+                {
+                    b.Navigation("Entries");
+                });
+
+            modelBuilder.Entity("Oip.Base.Security.Objects.Data.AclSetEntryEntity", b =>
+                {
+                    b.Navigation("Rights");
                 });
 #pragma warning restore 612, 618
         }

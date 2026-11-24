@@ -21,6 +21,12 @@ export interface DashboardSettings {
   nothing?: string | null;
 }
 
+export interface DemoCustomerCategoryDto {
+  id?: number;
+  name?: string | null;
+  rights?: string[] | null;
+}
+
 export interface DemoCustomerTableRowDto {
   id?: number;
   fullName?: string | null;
@@ -33,6 +39,7 @@ export interface DemoCustomerTableRowDto {
   lifetimeValue?: number;
   createdAt?: Date;
   ordersCount?: number;
+  rights?: string[] | null;
 }
 
 export interface DemoCustomerTableRowDtoTablePageResult {
